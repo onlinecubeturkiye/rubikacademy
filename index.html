@@ -1276,15 +1276,37 @@ body.dark-mode .contact-box {
 }
     
 </style>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+<!-- ... (Diğer kodlar) ... -->
 
-  gtag('config', 'G-F7KXWC8B5N');
-</script>
+    <!-- Schema Kodu -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Rubik Academy",
+      "url": "https://rubikacademy.fun",
+      "logo": "https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png",
+      "sameAs": [
+        "https://www.instagram.com/erenrubiks",
+        "https://www.youtube.com/@rubikacademyy"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "muhammederenyalcin@gmail.com",
+        "contactType": "customer service"
+      }
+    }
+    </script>
+
+    <!-- Google Analytics Kodu -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-F7KXWC8B5N');
+    </script>
+</head>
 </head>
 
 
