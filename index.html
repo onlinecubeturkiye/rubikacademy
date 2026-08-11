@@ -27,11 +27,6 @@
 <meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
 <meta name="twitter:card" content="summary_large_image">
 
-<meta
-name="description"
-content="Rubik Academy - Rubik küp öğren, algoritmaları keşfet ve hızını geliştir."
->
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -43,7 +38,7 @@ rel="stylesheet"
 <style>
 
 /* =========================================
-   RENKLER
+   RENKLER VE ARKA PLAN EFEKTİ
 ========================================= */
 
 :root {
@@ -68,6 +63,36 @@ rel="stylesheet"
 
     --shadow:
         0 15px 40px rgba(15, 23, 42, 0.07);
+}
+
+.bg-glow {
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+    opacity: 0.15;
+    pointer-events: none;
+    animation: floatGlow 15s infinite alternate ease-in-out;
+}
+
+.glow-1 {
+    background: #2563eb;
+    top: -50px;
+    left: -50px;
+}
+
+.glow-2 {
+    background: #6366f1;
+    bottom: -50px;
+    right: -50px;
+    animation-delay: -7s;
+}
+
+@keyframes floatGlow {
+    0% { transform: translate(0px, 0px) scale(1); }
+    100% { transform: translate(100px, 150px) scale(1.2); }
 }
 
 
@@ -305,21 +330,7 @@ a {
 
     padding: 90px 7%;
 
-    background:
-
-        radial-gradient(
-            circle at 10% 20%,
-            rgba(59,130,246,.10),
-            transparent 28%
-        ),
-
-        radial-gradient(
-            circle at 90% 30%,
-            rgba(99,102,241,.08),
-            transparent 30%
-        ),
-
-        var(--background);
+    background: transparent;
     
     transition: background-color 0.3s;
 }
@@ -1241,7 +1252,7 @@ body.dark-mode .navbar {
 
 html.dark-mode .hero,
 body.dark-mode .hero {
-    background: #0f172a;
+    background: transparent;
 }
 
 html.dark-mode .learning-section,
@@ -1274,9 +1285,12 @@ html.dark-mode .contact-box,
 body.dark-mode .contact-box {
     border-color: var(--border);
 }
+
+html.dark-mode .bg-glow {
+    opacity: 0.25;
+}
     
 </style>
-<!-- ... (Diğer kodlar) ... -->
 
     <!-- Schema Kodu -->
     <script type="application/ld+json">
@@ -1307,10 +1321,13 @@ body.dark-mode .contact-box {
       gtag('config', 'G-F7KXWC8B5N');
     </script>
 </head>
-</head>
 
 
 <body>
+
+    <!-- Arka Plan Işık Efektleri -->
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
 
 
 <!-- =========================================
