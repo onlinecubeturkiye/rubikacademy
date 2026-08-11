@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rubik Academy | 5×5 Eğitimleri</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================
+   RENKLER VE DEĞİŞKENLER
+========================================= */
+:root {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-soft: #f1f5f9;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+}
+
+/* =========================================
+   GENEL SIFIRLAMA
+========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    background: #f8fbff;
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* =========================================
+   ÜST BAR (NAVBAR)
+========================================= */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 7%;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo-mark {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    padding: 4px;
+    border-radius: 10px;
+    background: #1e293b;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+}
+
+.nav-logo-mark div {
+    border-radius: 2px;
+    background: #f8fafc;
+}
+
+.nav-logo-mark div:nth-child(2),
+.nav-logo-mark div:nth-child(8) {
+    background: #ef4444;
+}
+
+.nav-logo-mark div:nth-child(4),
+.nav-logo-mark div:nth-child(6) {
+    background: #22c55e;
+}
+
+.nav-logo-mark div:nth-child(5) {
+    background: #3b82f6;
+}
+
+.nav-logo-mark div:nth-child(1),
+.nav-logo-mark div:nth-child(9) {
+    background: #facc15;
+}
+
+.nav-logo-text {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links a {
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    transition: .25s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+@media(max-width: 500px) {
+    .navbar {
+        padding: 14px 5%;
+    }
+    .nav-logo-text {
+        font-size: 15px;
+    }
+    .nav-links a {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+/* =========================================
+   SAYFA İÇERİK DÜZENİ
+========================================= */
+.page {
+    min-height: calc(100vh - 71px);
+    padding: 45px 5% 80px;
+    background:
+        radial-gradient(circle at 5% 0%, #dff3ff 0, transparent 28%),
+        radial-gradient(circle at 100% 20%, #edf6ff 0, transparent 30%),
+        #f8fbff;
+}
+
+/* NAV / GERİ DÖN */
+.nav-bar {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #dceafd;
+    color: #1684d1;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(22, 132, 209, 0.06);
+    transition: all .25s ease;
+}
+
+.back-btn:hover {
+    transform: translateX(-4px);
+    border-color: #c0e0fc;
+    background: #f4f9ff;
+}
+
+/* HERO */
+.hero {
+    max-width: 1250px;
+    min-height: 390px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 55px 65px;
+    background: linear-gradient(120deg, #e8f7ff, #c8eaff);
+    border: 1px solid #cce8fa;
+    box-shadow: 0 18px 50px rgba(38, 104, 150, .10);
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .35);
+    left: -180px;
+    top: -180px;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 3;
+    max-width: 590px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 15px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, .75);
+    border: 1px solid rgba(255, 255, 255, .9);
+    color: #1684d1;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    margin-bottom: 18px;
+}
+
+.badge i {
+    width: 7px;
+    height: 7px;
+    background: #168ee0;
+    border-radius: 50%;
+}
+
+.hero h1 {
+    font-size: clamp(42px, 5vw, 68px);
+    line-height: .98;
+    letter-spacing: -3px;
+    font-weight: 950;
+    margin-bottom: 18px;
+}
+
+.hero h1 span { color: #1684d1; }
+
+.hero p {
+    color: #64778d;
+    font-size: 15px;
+    line-height: 1.75;
+    max-width: 560px;
+}
+
+.hero-cube {
+    width: 300px;
+    height: 300px;
+    position: relative;
+    z-index: 3;
+    flex-shrink: 0;
+    filter: drop-shadow(0 25px 22px rgba(30, 67, 95, .23));
+    animation: floating 5s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+.section-title {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.section-title small {
+    display: block;
+    color: #1684d1;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.7px;
+    margin-bottom: 8px;
+}
+
+.section-title h2 {
+    font-size: 30px;
+    letter-spacing: -1px;
+    font-weight: 900;
+}
+
+.section-title p {
+    color: #718196;
+    font-size: 13px;
+    margin-top: 7px;
+}
+
+.methods {
+    max-width: 1250px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.card {
+    background: white;
+    border: 1px solid #dfebf5;
+    border-radius: 27px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(42, 82, 115, .07);
+    transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+    display: block;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    border-color: #c7e5fa;
+    box-shadow: 0 25px 50px rgba(35, 108, 162, .14);
+}
+
+.card-visual {
+    height: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.card-visual::before {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    border: 40px solid rgba(255, 255, 255, .25);
+    top: -140px;
+    right: -90px;
+}
+
+.beginner { background: linear-gradient(135deg, #e2f5ff, #91d8ff); }
+.middle { background: linear-gradient(135deg, #e9e4ff, #b7a5ff); }
+.advanced { background: linear-gradient(135deg, #dffaf1, #73d8c3); }
+
+.level {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    padding: 8px 11px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .78);
+    backdrop-filter: blur(10px);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #26374b;
+}
+
+.cube {
+    width: 225px;
+    height: 225px;
+    transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+    filter: drop-shadow(0 20px 18px rgba(16, 35, 53, .22));
+}
+
+.card:hover .cube {
+    transform: scale(1.08) translateY(-7px) rotate(-2deg);
+}
+
+.card-info { padding: 25px 25px 27px; }
+
+.card-info h3 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -.5px;
+    margin-bottom: 9px;
+}
+
+.card-info p {
+    color: #718196;
+    font-size: 13px;
+    line-height: 1.65;
+    min-height: 64px;
+    margin-bottom: 20px;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 13px 15px;
+    border-radius: 13px;
+    background: #eef8ff;
+    color: #1684d1;
+    font-size: 12px;
+    font-weight: 900;
+    transition: background .25s ease, padding .25s ease;
+}
+
+.card:hover .button {
+    background: #dff2ff;
+    padding-left: 19px;
+}
+
+.arrow { font-size: 18px; }
+
+.bottom {
+    max-width: 1250px;
+    margin: 38px auto 0;
+    padding: 32px;
+    text-align: center;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #edf8ff, #e6f4ff);
+    border: 1px solid #d5eafa;
+}
+
+.bottom h3 { color: #18578c; font-size: 21px; margin-bottom: 7px; }
+.bottom p { color: #718196; font-size: 13px; }
+
+@media(max-width: 1000px) {
+    .hero { padding: 45px; }
+    .hero-cube { width: 250px; height: 250px; }
+    .methods { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media(max-width: 700px) {
+    .page { padding: 25px 4% 55px; }
+    .hero { min-height: auto; padding: 38px 25px 25px; flex-direction: column; text-align: center; border-radius: 27px; }
+    .hero-text { max-width: 100%; }
+    .hero h1 { font-size: 43px; }
+    .hero p { font-size: 14px; }
+    .hero-cube { width: 235px; height: 235px; margin-top: 15px; }
+    .methods { grid-template-columns: 1fr; gap: 20px; }
+    .card-visual { height: 320px; }
+    .section-title h2 { font-size: 27px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================
+     ÜST BAR (NAVBAR)
+========================================= -->
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <div class="nav-logo-mark">
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <span class="nav-logo-text">
+            Rubik Academy
+        </span>
+    </a>
+
+    <nav class="nav-links">
+        <a href="http://rubikacademy.fun">
+            Ana Sayfa
+        </a>
+        <a href="http://rubikacademy.fun/icerikler" class="active">
+            İçerikler
+        </a>
+    </nav>
+</header>
+
+<div class="page">
+
+<!-- NAVIGATION -->
+<nav class="nav-bar">
+    <a href="http://rubikacademy.fun/icerikler" class="back-btn">← Geri Dön</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+5×5 RUBİK KÜP
+</div>
+<h1>5×5 <span>Eğitimleri</span></h1>
+<p>
+5×5 Rubik Küp'ü (Professor's Cube) çözmeyi sıfırdan öğren; merkez ve kenar eşleştirme tekniklerinden ileri seviye parity çözümlerine kadar kendini geliştir.
+</p>
+</div>
+
+<!-- HERO KÜP (2D) -->
+<svg class="hero-cube" viewBox="0 0 300 300">
+<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<rect x="59.10" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#ffffff" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#ffffff" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+</svg>
+</section>
+
+<!-- BAŞLIK -->
+<section class="section-title">
+<small>ÖĞRENME YOLCULUĞU</small>
+<h2>5×5 Methodları</h2>
+<p>Seviyeni seç ve küp çözme yolculuğuna başla.</p>
+</section>
+
+<!-- KARTLAR -->
+<section class="methods">
+
+<!-- BAŞLANGIÇ -->
+<a href="http://rubikacademy.fun/yakında.html" class="card">
+<div class="card-visual beginner">
+<div class="level">BAŞLANGIÇ SEVİYESİ</div>
+<svg class="cube" viewBox="0 0 300 300">
+<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<rect x="59.10" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+</svg>
+</div>
+<div class="card-info">
+<h3>Başlangıç Methodu</h3>
+<p>5×5 Rubik Küp'ü ilk kez çözecekler için hazırlanmış, merkezleri ve kenarları adım adım tamamlayan başlangıç eğitimi.</p>
+<div class="button">
+<span>Eğitime Başla</span>
+<span class="arrow">→</span>
+</div>
+</div>
+</a>
+
+<!-- ORTA -->
+<a href="http://rubikacademy.fun/yakında.html" class="card">
+<div class="card-visual middle">
+<div class="level">ORTA SEVİYESİ</div>
+<svg class="cube" viewBox="0 0 300 300">
+<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<rect x="59.10" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+</svg>
+</div>
+<div class="card-info">
+<h3>Orta Seviye Methodu</h3>
+<p>Temel yöntemi bilenler için kenar eşleştirme, hızlı merkez çözümü ve gelişmiş algoritmalar üzerine hazırlanan eğitim.</p>
+<div class="button">
+<span>Eğitime Başla</span>
+<span class="arrow">→</span>
+</div>
+</div>
+</a>
+
+<!-- İLERİ -->
+<a href="http://rubikacademy.fun/yakında.html" class="card">
+<div class="card-visual advanced">
+<div class="level">İLERİ SEVİYE</div>
+<svg class="cube" viewBox="0 0 300 300">
+<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<rect x="59.10" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#ffffff" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#ffffff" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="59.10" width="33.6" height="33.6" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="96.15" width="33.6" height="33.6" rx="7.4" fill="#ffffff" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#ffffff" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="133.20" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#ffffff" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#ffffff" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="170.25" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+
+<rect x="59.10" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.0"/>
+<rect x="96.15" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#ffffff" stroke="#111827" stroke-width="2.0"/>
+<rect x="133.20" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="170.25" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="2.0"/>
+<rect x="207.30" y="207.30" width="33.6" height="33.6" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="2.0"/>
+</svg>
+</div>
+<div class="card-info">
+<h3>İleri Seviye Methodu</h3>
+<p>Daha hızlı süreler hedefleyenler için parity çözümleri, gelişmiş algoritmalar ve speedcubing teknikleri.</p>
+<div class="button">
+<span>Eğitime Başla</span>
+<span class="arrow">→</span>
+</div>
+</div>
+</a>
+
+</section>
+
+<!-- ALT -->
+<section class="bottom">
+<h3>🧩 Seviyeni seç, küpünü hızlandır!</h3>
+<p>Rubik Academy ile 5×5 çözüm becerilerini adım adım geliştir.</p>
+</section>
+
+</div>
+
+</body>
+</html>
