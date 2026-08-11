@@ -34,12 +34,14 @@
     --background: #f8fafc; --surface: #ffffff; --surface-soft: #f1f5f9;
     --primary: #2563eb; --primary-dark: #1d4ed8; --primary-light: #eff6ff;
     --text: #172033; --text-soft: #64748b; --border: #e2e8f0;
+    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
 }
 
 html.dark-mode, body.dark-mode {
     --background: #0f172a; --surface: #1e293b; --surface-soft: #334155;
     --text: #f8fafc; --text-soft: #cbd5e1; --border: #334155;
     --primary-light: #1e3a8a; --primary: #3b82f6;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -49,67 +51,78 @@ body {
     color: var(--text);
     min-height: 100vh;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    transition: background-color 0.3s, color 0.3s;
+    padding: 24px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.error-container {
-    text-align: center;
-    max-width: 500px;
+.error-card {
+    width: 100%;
+    max-width: 480px;
     background: var(--surface);
-    padding: 50px 30px;
-    border-radius: 24px;
     border: 1px solid var(--border);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    border-radius: 24px;
+    padding: 48px 36px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.error-code {
-    font-size: 96px;
-    font-weight: 900;
+.error-badge {
+    display: inline-block;
+    background: var(--primary-light);
     color: var(--primary);
-    line-height: 1;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 20px;
     margin-bottom: 20px;
-    letter-spacing: -2px;
+    letter-spacing: 0.5px;
 }
 
 .error-title {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
     margin-bottom: 12px;
+    color: var(--text);
 }
 
 .error-desc {
     font-size: 15px;
     color: var(--text-soft);
     line-height: 1.6;
-    margin-bottom: 30px;
+    margin-bottom: 32px;
 }
 
 .home-btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: var(--primary);
-    color: white;
+    color: #ffffff;
+    font-size: 15px;
     font-weight: 600;
-    padding: 12px 28px;
-    border-radius: 12px;
-    transition: 0.25s ease;
+    padding: 14px 28px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+    transition: all 0.25s ease;
 }
 
 .home-btn:hover {
     background: var(--primary-dark);
     transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
 }
 </style>
 </head>
 <body>
 
-<div class="error-container">
-    <div class="error-code">404</div>
+<div class="error-card">
+    <div class="error-badge">HATA 404</div>
     <h1 class="error-title">Sayfa Bulunamadı</h1>
-    <p class="error-desc">Aradığınız sayfa kaldırılmış, adı değiştirilmiş veya hiç var olmamış olabilir. Yanlış bir bağlantıya tıklamış olabilirsiniz.</p>
+    <p class="error-desc">Aradığınız sayfa taşınmış, silinmiş veya hiç var olmamış olabilir. Ana sayfaya dönerek küp çözmeye devam edebilirsiniz.</p>
     <a href="/" class="home-btn">Ana Sayfaya Dön</a>
 </div>
 
