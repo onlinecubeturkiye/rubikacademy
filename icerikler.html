@@ -17,8 +17,45 @@ rel="stylesheet"
 <style>
 
 /* =========================================================
-   GENEL
+   GENEL & RENK DEĞİŞKENLERİ
 ========================================================= */
+
+:root {
+    --background: #f8fbff;
+    --surface: #ffffff;
+    --surface-soft: #f1f5f9;
+    --text: #172033;
+    --text-soft: #728197;
+    --border: #e2e8f0;
+    --card-border: #e0eaf4;
+    --shadow: 0 10px 30px rgba(39,84,125,.07);
+    --bottom-bg: linear-gradient(135deg, #edf8ff, #e8f4ff);
+    --bottom-border: #d4eaff;
+    --bottom-text: #18558a;
+    --badge-bg: #edf7ff;
+    --badge-border: #cfe8ff;
+    --primary-light: #eff6ff;
+    --primary: #2563eb;
+}
+
+/* Karanlık mod değişkenleri */
+.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --card-border: #334155;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+    --bottom-bg: #1e293b;
+    --bottom-border: #334155;
+    --bottom-text: #60a5fa;
+    --badge-bg: #1e3a8a;
+    --badge-border: #1d4ed8;
+    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+}
 
 *{
     box-sizing:border-box;
@@ -37,8 +74,9 @@ body{
         Helvetica,
         sans-serif;
 
-    background:#f8fbff;
-    color:#172033;
+    background: var(--background);
+    color: var(--text);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 a{
@@ -47,177 +85,134 @@ a{
 }
 
 /* =========================================================
-   ÜST BAR (NAVBAR) - Ana sayfadan alındı
+   ÜST BAR (NAVBAR)
 ========================================================= */
 
 .navbar {
-
     position: sticky;
-
     top: 0;
-
     z-index: 1000;
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     padding: 16px 7%;
-
     background: rgba(248, 250, 252, 0.85);
-
     backdrop-filter: blur(12px);
-
     -webkit-backdrop-filter: blur(12px);
-
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
+.dark-mode .navbar {
+    background: rgba(15, 23, 42, 0.90);
+}
 
 .nav-logo {
-
     display: flex;
-
     align-items: center;
-
     gap: 12px;
 }
 
-
 .nav-logo-mark {
-
     width: 38px;
-
     height: 38px;
-
     display: grid;
-
     grid-template-columns: repeat(3,1fr);
-
     grid-template-rows: repeat(3,1fr);
-
     gap: 2px;
-
     padding: 4px;
-
     border-radius: 10px;
-
     background: #1e293b;
-
-    box-shadow:
-        0 8px 18px rgba(15,23,42,.18);
+    box-shadow: 0 8px 18px rgba(15,23,42,.18);
 }
 
-
 .nav-logo-mark div {
-
     border-radius: 2px;
-
     background: #f8fafc;
 }
 
-
 .nav-logo-mark div:nth-child(2),
 .nav-logo-mark div:nth-child(8) {
-
     background: #ef4444;
 }
 
-
 .nav-logo-mark div:nth-child(4),
 .nav-logo-mark div:nth-child(6) {
-
     background: #22c55e;
 }
 
-
 .nav-logo-mark div:nth-child(5) {
-
     background: #3b82f6;
 }
 
-
 .nav-logo-mark div:nth-child(1),
 .nav-logo-mark div:nth-child(9) {
-
     background: #facc15;
 }
 
-
 .nav-logo-text {
-
     font-size: 17px;
-
     font-weight: 800;
-
     letter-spacing: -0.5px;
-
-    color: #172033;
+    color: var(--text);
 }
 
-
 .nav-links {
-
     display: flex;
-
     align-items: center;
-
     gap: 8px;
 }
 
-
 .nav-links a {
-
     padding: 9px 16px;
-
     border-radius: 10px;
-
     font-size: 14px;
-
     font-weight: 600;
-
-    color: #64748b;
-
+    color: var(--text-soft);
     transition: .25s;
 }
 
-
 .nav-links a:hover {
-
-    background: #eff6ff;
-
-    color: #2563eb;
+    background: var(--primary-light);
+    color: var(--primary);
 }
-
 
 .nav-links a.active {
-
-    background: #eff6ff;
-
-    color: #2563eb;
+    background: var(--primary-light);
+    color: var(--primary);
 }
 
+/* KARANLIK MOD BUTONU */
+.dark-mode-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+}
+
+.dark-mode-btn:hover {
+    transform: scale(1.08);
+}
 
 @media(max-width:500px) {
-
     .navbar {
-
         padding: 14px 5%;
     }
 
-
     .nav-logo-text {
-
         font-size: 15px;
     }
 
-
     .nav-links a {
-
         padding: 8px 12px;
-
         font-size: 13px;
     }
 }
@@ -225,26 +220,9 @@ a{
 .page{
     width:100%;
     min-height:100vh;
-
-    padding:
-        55px
-        5%
-        90px;
-
-    background:
-        radial-gradient(
-            circle at 0% 0%,
-            #dff2ff 0,
-            transparent 28%
-        ),
-        radial-gradient(
-            circle at 100% 10%,
-            #eef6ff 0,
-            transparent 30%
-        ),
-        #f8fbff;
+    padding: 55px 5% 90px;
+    background: var(--background);
 }
-
 
 /* =========================================================
    BAŞLIK
@@ -260,551 +238,238 @@ a{
     display:inline-flex;
     align-items:center;
     gap:9px;
-
     padding:9px 17px;
-
     border-radius:50px;
-
-    background:#edf7ff;
-    border:1px solid #cfe8ff;
-
-    color:#1682d4;
-
+    background: var(--badge-bg);
+    border:1px solid var(--badge-border);
+    color: var(--primary);
     font-size:11px;
     font-weight:800;
-
     letter-spacing:1.7px;
-
     margin-bottom:18px;
 }
 
 .intro-badge i{
     width:7px;
     height:7px;
-
     display:block;
-
     border-radius:50%;
-
     background:#20a4f3;
-
-    box-shadow:
-        0 0 0 5px rgba(32,164,243,.12);
+    box-shadow: 0 0 0 5px rgba(32,164,243,.12);
 }
 
 .intro h1{
-    font-size:
-        clamp(40px,5vw,65px);
-
+    font-size: clamp(40px,5vw,65px);
     line-height:1;
-
     letter-spacing:-3px;
-
     font-weight:900;
-
-    color:#152238;
-
+    color: var(--text);
     margin-bottom:18px;
 }
 
 .intro h1 span{
-    color:#1682d4;
+    color: var(--primary);
 }
 
 .intro p{
     max-width:700px;
-
     margin:auto;
-
-    color:#708198;
-
+    color: var(--text-soft);
     line-height:1.8;
-
     font-size:15px;
 }
 
-
 /* =========================================================
-   GRID
+   GRID & KARTLAR
 ========================================================= */
 
 .cards{
     width:100%;
     max-width:1350px;
-
     margin:auto;
-
     display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
+    grid-template-columns: repeat(3,1fr);
     gap:28px;
 }
 
-
-/* =========================================================
-   KART
-========================================================= */
-
 .card{
     position:relative;
-
     overflow:hidden;
-
     border-radius:28px;
-
-    background:#fff;
-
-    border:1px solid #e0eaf4;
-
-    box-shadow:
-        0 10px 30px
-        rgba(39,84,125,.07);
-
-    transition:
-        transform .35s ease,
-        box-shadow .35s ease,
-        border-color .35s ease;
+    background: var(--surface);
+    border:1px solid var(--card-border);
+    box-shadow: var(--shadow);
+    transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease, background-color 0.3s;
 }
 
 .card:hover{
     transform:translateY(-8px);
-
-    border-color:#c8e5fb;
-
-    box-shadow:
-        0 24px 55px
-        rgba(34,111,168,.14);
+    border-color: #bfdbfe;
+    box-shadow: 0 24px 55px rgba(34,111,168,.14);
 }
-
-
-/* =========================================================
-   GÖRSEL ALANI
-========================================================= */
 
 .visual{
     height:355px;
-
     position:relative;
-
     overflow:hidden;
-
     display:flex;
-
     align-items:center;
     justify-content:center;
-
     isolation:isolate;
 }
 
-
-/* dekoratif çizgiler */
-
 .visual::before{
     content:"";
-
     position:absolute;
-
     width:390px;
     height:390px;
-
     border-radius:50%;
-
-    border:
-        55px solid
-        rgba(255,255,255,.25);
-
+    border: 55px solid rgba(255,255,255,.25);
     top:-190px;
     left:-130px;
-
     z-index:-3;
 }
 
 .visual::after{
     content:"";
-
     position:absolute;
-
     width:190px;
     height:190px;
-
     border-radius:45px;
-
-    background:
-        rgba(255,255,255,.19);
-
+    background: rgba(255,255,255,.19);
     right:-75px;
     bottom:-80px;
-
     transform:rotate(32deg);
-
     z-index:-3;
 }
 
+/* ARKA PLAN RENKLERİ */
+.blue{ background: linear-gradient(135deg, #e1f3ff, #8bd4ff); }
+.purple{ background: linear-gradient(135deg, #eee8ff, #b39cff); }
+.cyan{ background: linear-gradient(135deg, #d8fbff, #5cdae5); }
+.green{ background: linear-gradient(135deg, #e5f9e8, #79df87); }
+.red{ background: linear-gradient(135deg, #ffe8e9, #ff7f89); }
+.pink{ background: linear-gradient(135deg, #ffe7f2, #f783b5); }
+.orange{ background: linear-gradient(135deg, #fff0df, #ffac5b); }
+.yellow{ background: linear-gradient(135deg, #fffbd9, #f7dc50); }
+.navy{ background: linear-gradient(135deg, #e3efff, #72a9ee); }
+.teal{ background: linear-gradient(135deg, #ddfaf5, #63d5c3); }
 
-/* =========================================================
-   ARKA PLAN RENKLERİ
-========================================================= */
-
-.blue{
-    background:
-        linear-gradient(
-            135deg,
-            #e1f3ff,
-            #8bd4ff
-        );
-}
-
-.purple{
-    background:
-        linear-gradient(
-            135deg,
-            #eee8ff,
-            #b39cff
-        );
-}
-
-.cyan{
-    background:
-        linear-gradient(
-            135deg,
-            #d8fbff,
-            #5cdae5
-        );
-}
-
-.green{
-    background:
-        linear-gradient(
-            135deg,
-            #e5f9e8,
-            #79df87
-        );
-}
-
-.red{
-    background:
-        linear-gradient(
-            135deg,
-            #ffe8e9,
-            #ff7f89
-        );
-}
-
-.pink{
-    background:
-        linear-gradient(
-            135deg,
-            #ffe7f2,
-            #f783b5
-        );
-}
-
-.orange{
-    background:
-        linear-gradient(
-            135deg,
-            #fff0df,
-            #ffac5b
-        );
-}
-
-.yellow{
-    background:
-        linear-gradient(
-            135deg,
-            #fffbd9,
-            #f7dc50
-        );
-}
-
-.navy{
-    background:
-        linear-gradient(
-            135deg,
-            #e3efff,
-            #72a9ee
-        );
-}
-
-.teal{
-    background:
-        linear-gradient(
-            135deg,
-            #ddfaf5,
-            #63d5c3
-        );
-}
-
-
-/* =========================================================
-   NUMARA
-========================================================= */
-
+/* NUMARA VE ETİKETLER */
 .number{
     position:absolute;
-
     top:20px;
     left:20px;
-
     z-index:30;
-
-    padding:
-        8px
-        12px;
-
+    padding: 8px 12px;
     border-radius:11px;
-
-    background:
-        rgba(255,255,255,.72);
-
-    border:
-        1px solid
-        rgba(255,255,255,.8);
-
-    backdrop-filter:
-        blur(10px);
-
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.8);
+    backdrop-filter: blur(10px);
     font-size:11px;
-
     font-weight:900;
-
     color:#26364d;
-
-    box-shadow:
-        0 7px 18px
-        rgba(20,45,70,.08);
+    box-shadow: 0 7px 18px rgba(20,45,70,.08);
 }
 
-
-/* =========================================================
-   SVG KÜP
-========================================================= */
+.visual-label{
+    position:absolute;
+    bottom:18px;
+    left:20px;
+    z-index:30;
+    padding: 9px 13px;
+    border-radius:10px;
+    background: rgba(255,255,255,.76);
+    backdrop-filter: blur(10px);
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.3px;
+    color:#25344a;
+}
 
 .cube-wrap{
     width:260px;
     height:260px;
-
     position:relative;
-
     display:flex;
-
     align-items:center;
     justify-content:center;
-
-    transition:
-        transform .5s cubic-bezier(.2,.8,.2,1);
+    transition: transform .5s cubic-bezier(.2,.8,.2,1);
 }
 
 .card:hover .cube-wrap{
-    transform:
-        translateY(-8px)
-        scale(1.06)
-        rotate(-1deg);
+    transform: translateY(-8px) scale(1.06) rotate(-1deg);
 }
 
 .cube-svg{
     width:100%;
     height:100%;
-
     overflow:visible;
-
-    filter:
-        drop-shadow(
-            0 25px 18px
-            rgba(16,36,58,.24)
-        );
+    filter: drop-shadow(0 25px 18px rgba(16,36,58,.24));
 }
-
-
-/* =========================================================
-   GÖRSEL ETİKETİ
-========================================================= */
-
-.visual-label{
-    position:absolute;
-
-    bottom:18px;
-    left:20px;
-
-    z-index:30;
-
-    padding:
-        9px
-        13px;
-
-    border-radius:10px;
-
-    background:
-        rgba(255,255,255,.76);
-
-    backdrop-filter:
-        blur(10px);
-
-    font-size:10px;
-
-    font-weight:900;
-
-    letter-spacing:1.3px;
-
-    color:#25344a;
-}
-
-
-/* =========================================================
-   KART BİLGİ
-========================================================= */
 
 .info{
-    padding:
-        24px
-        26px
-        27px;
+    padding: 24px 26px 27px;
 }
 
 .tag{
     display:inline-block;
-
-    padding:
-        6px
-        10px;
-
+    padding: 6px 10px;
     border-radius:7px;
-
-    background:#edf7ff;
-
-    color:#1682d4;
-
+    background: var(--badge-bg);
+    color: var(--primary);
     font-size:9px;
-
     font-weight:900;
-
     letter-spacing:1px;
-
     margin-bottom:11px;
 }
 
 .info h2{
     font-size:22px;
-
     font-weight:850;
-
     letter-spacing:-.5px;
-
-    color:#172033;
-
+    color: var(--text);
     margin-bottom:8px;
 }
 
 .info p{
     font-size:13px;
-
     line-height:1.65;
-
-    color:#728197;
-
+    color: var(--text-soft);
     min-height:43px;
-
     margin-bottom:17px;
 }
 
 .start{
     display:inline-flex;
-
     align-items:center;
-
     gap:7px;
-
-    color:#1682d4;
-
+    color: var(--primary);
     font-size:13px;
-
     font-weight:800;
-
-    transition:
-        gap .25s ease;
+    transition: gap .25s ease;
 }
 
 .card:hover .start{
     gap:12px;
 }
 
-
-/* =========================================================
-   ÖZEL PUZZLE
-========================================================= */
-
 .special{
     width:250px;
     height:250px;
-
-    transition:
-        transform .5s ease;
-
-    filter:
-        drop-shadow(
-            0 25px 18px
-            rgba(15,30,50,.20)
-        );
+    transition: transform .5s ease;
+    filter: drop-shadow(0 25px 18px rgba(15,30,50,.20));
 }
 
 .card:hover .special{
-    transform:
-        translateY(-9px)
-        scale(1.06);
+    transform: translateY(-9px) scale(1.06);
 }
 
-
-/* =========================================================
-   PYRAMINX
-========================================================= */
-
-.pyraminx-svg{
-    width:230px;
-    height:230px;
-}
-
-
-/* =========================================================
-   SKEWB
-========================================================= */
-
-.skewb-svg{
-    width:240px;
-    height:240px;
-}
-
-
-/* =========================================================
-   SQUARE 1
-========================================================= */
-
-.square-svg{
-    width:240px;
-    height:240px;
-}
-
-
-/* =========================================================
-   MEGAMINX
-========================================================= */
-
-.megaminx-svg{
-    width:250px;
-    height:250px;
-}
-
-
-/* =========================================================
-   CLOCK
-========================================================= */
-
-.clock-svg{
-    width:245px;
-    height:245px;
-}
-
+.pyraminx-svg{ width:230px; height:230px; }
+.skewb-svg{ width:240px; height:240px; }
+.square-svg{ width:240px; height:240px; }
+.megaminx-svg{ width:250px; height:250px; }
+.clock-svg{ width:245px; height:245px; }
 
 /* =========================================================
    ALT BANNER
@@ -813,121 +478,47 @@ a{
 .bottom{
     width:100%;
     max-width:1350px;
-
-    margin:
-        45px auto 0;
-
-    padding:
-        35px 25px;
-
+    margin: 45px auto 0;
+    padding: 35px 25px;
     border-radius:25px;
-
     text-align:center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #edf8ff,
-            #e8f4ff
-        );
-
-    border:
-        1px solid #d4eaff;
+    background: var(--bottom-bg);
+    border: 1px solid var(--bottom-border);
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .bottom h3{
     font-size:24px;
-
     font-weight:850;
-
-    color:#18558a;
-
+    color: var(--bottom-text);
     margin-bottom:8px;
 }
 
 .bottom p{
     font-size:13px;
-
     line-height:1.7;
-
-    color:#718198;
+    color: var(--text-soft);
 }
 
-
-/* =========================================================
-   TABLET
-========================================================= */
-
+/* RESPONSIVE */
 @media(max-width:1050px){
-
-    .cards{
-        grid-template-columns:
-            repeat(2,1fr);
-    }
-
+    .cards{ grid-template-columns: repeat(2,1fr); }
 }
-
-
-/* =========================================================
-   MOBİL
-========================================================= */
 
 @media(max-width:680px){
-
-    .page{
-        padding:
-            35px 4% 60px;
-    }
-
-    .intro{
-        margin-bottom:35px;
-    }
-
-    .intro h1{
-        font-size:40px;
-    }
-
-    .intro p{
-        font-size:14px;
-    }
-
-    .cards{
-        grid-template-columns:1fr;
-
-        gap:22px;
-    }
-
-    .visual{
-        height:330px;
-    }
-
-    .card{
-        border-radius:23px;
-    }
-
+    .page{ padding: 35px 4% 60px; }
+    .intro{ margin-bottom:35px; }
+    .intro h1{ font-size:40px; }
+    .intro p{ font-size:14px; }
+    .cards{ grid-template-columns:1fr; gap:22px; }
+    .visual{ height:330px; }
+    .card{ border-radius:23px; }
 }
 
-
-/* =========================================================
-   KÜÇÜK TELEFON
-========================================================= */
-
 @media(max-width:390px){
-
-    .visual{
-        height:310px;
-    }
-
-    .cube-wrap{
-        width:230px;
-        height:230px;
-    }
-
-    .special{
-        width:220px;
-        height:220px;
-    }
-
+    .visual{ height:310px; }
+    .cube-wrap{ width:230px; height:230px; }
+    .special{ width:220px; height:220px; }
 }
 
 </style>
@@ -960,13 +551,11 @@ a{
 
         </div>
 
-
         <span class="nav-logo-text">
             Rubik Academy
         </span>
 
     </a>
-
 
     <nav class="nav-links">
 
@@ -980,11 +569,14 @@ a{
 
     </nav>
 
+    <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+        🌙
+    </button>
+
 </header>
 
 
 <div class="page">
-
 
 <!-- ======================================================
      BAŞLIK
@@ -1016,68 +608,34 @@ a{
 
 <section class="cards">
 
-
-<!-- ======================================================
-     2X2
-====================================================== -->
-
+<!-- 2X2 -->
 <a href="http://rubikacademy.fun/2x2" class="card">
-
 <div class="visual blue">
-
 <div class="number">01</div>
-
 <div class="cube-wrap">
-
 <svg class="cube-svg" viewBox="0 0 300 300">
 <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
 <rect x="60.7" y="60.7" width="84.6" height="84.6" rx="18.6" fill="#1e6fe6" stroke="#111827" stroke-width="3.8"/>
 <rect x="154.7" y="60.7" width="84.6" height="84.6" rx="18.6" fill="#12a04a" stroke="#111827" stroke-width="3.8"/>
 <rect x="60.7" y="154.7" width="84.6" height="84.6" rx="18.6" fill="#12a04a" stroke="#111827" stroke-width="3.8"/>
 <rect x="154.7" y="154.7" width="84.6" height="84.6" rx="18.6" fill="#ffd21f" stroke="#111827" stroke-width="3.8"/>
-
 </svg>
-
 </div>
-
-<div class="visual-label">
-    2×2 RUBİK KÜP
+<div class="visual-label">2×2 RUBİK KÜP</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">BAŞLANGIÇ</span>
-
 <h2>2×2 Rubik Küp</h2>
-
-<p>
-2×2 küpün temel çözümünü
-adım adım öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>2×2 küpün temel çözümünü adım adım öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     3X3
-====================================================== -->
-
+<!-- 3X3 -->
 <a href="http://rubikacademy.fun/3x3" class="card">
-
 <div class="visual purple">
-
 <div class="number">02</div>
-
 <div class="cube-wrap">
-
 <svg class="cube-svg" viewBox="0 0 300 300">
 <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
 <rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
@@ -1089,49 +647,23 @@ Eğitime Başla →
 <rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
 <rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
 <rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-
 </svg>
-
 </div>
-
-<div class="visual-label">
-    3×3 RUBİK KÜP
+<div class="visual-label">3×3 RUBİK KÜP</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">EN POPÜLER</span>
-
 <h2>3×3 Rubik Küp</h2>
-
-<p>
-Klasik Rubik küpünü başlangıçtan
-ileri seviyeye kadar öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>Klasik Rubik küpünü başlangıçtan ileri seviyeye kadar öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     4X4
-====================================================== -->
-
+<!-- 4X4 -->
 <a href="http://rubikacademy.fun/4x4" class="card">
-
 <div class="visual cyan">
-
 <div class="number">03</div>
-
 <div class="cube-wrap">
-
 <svg class="cube-svg" viewBox="0 0 300 300">
 <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
 <rect x="58.4" y="58.4" width="42.3" height="42.3" rx="9.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.9"/>
@@ -1150,49 +682,23 @@ Eğitime Başla →
 <rect x="105.3" y="199.3" width="42.3" height="42.3" rx="9.3" fill="#e6252f" stroke="#111827" stroke-width="1.9"/>
 <rect x="152.3" y="199.3" width="42.3" height="42.3" rx="9.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.9"/>
 <rect x="199.3" y="199.3" width="42.3" height="42.3" rx="9.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.9"/>
-
 </svg>
-
 </div>
-
-<div class="visual-label">
-    4×4 RUBİK KÜP
+<div class="visual-label">4×4 RUBİK KÜP</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">ORTA SEVİYE</span>
-
 <h2>4×4 Rubik Küp</h2>
-
-<p>
-Merkezleri ve kenarları çözerek
-4×4 çözümünü öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>Merkezleri ve kenarları çözerek 4×4 çözümünü öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     5X5
-====================================================== -->
-
+<!-- 5X5 -->
 <a href="http://rubikacademy.fun/5x5" class="card">
-
 <div class="visual green">
-
 <div class="number">04</div>
-
 <div class="cube-wrap">
-
 <svg class="cube-svg" viewBox="0 0 300 300">
 <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
 <rect x="57.9" y="57.9" width="33.8" height="33.8" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
@@ -1220,49 +726,23 @@ Eğitime Başla →
 <rect x="133.1" y="208.3" width="33.8" height="33.8" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
 <rect x="170.7" y="208.3" width="33.8" height="33.8" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
 <rect x="208.3" y="208.3" width="33.8" height="33.8" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
-
 </svg>
-
 </div>
-
-<div class="visual-label">
-    5×5 RUBİK KÜP
+<div class="visual-label">5×5 RUBİK KÜP</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">İLERİ</span>
-
 <h2>5×5 Rubik Küp</h2>
-
-<p>
-Büyük küplerin merkez ve kenar
-çözüm tekniklerini öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>Büyük küplerin merkez ve kenar çözüm tekniklerini öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     6X6
-====================================================== -->
-
+<!-- 6X6 -->
 <a href="http://rubikacademy.fun/yakında" class="card">
-
 <div class="visual red">
-
 <div class="number">05</div>
-
 <div class="cube-wrap">
-
 <svg class="cube-svg" viewBox="0 0 300 300">
 <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
 <rect x="57.6" y="57.6" width="28.2" height="28.2" rx="6.2" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
@@ -1301,49 +781,23 @@ Eğitime Başla →
 <rect x="151.6" y="214.2" width="28.2" height="28.2" rx="6.2" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
 <rect x="182.9" y="214.2" width="28.2" height="28.2" rx="6.2" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
 <rect x="214.2" y="214.2" width="28.2" height="28.2" rx="6.2" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
-
 </svg>
-
 </div>
-
-<div class="visual-label">
-    6×6 RUBİK KÜP
+<div class="visual-label">6×6 RUBİK KÜP</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">UZMAN</span>
-
 <h2>6×6 Rubik Küp</h2>
-
-<p>
-6×6 merkezlerini ve kenarlarını
-çözmeyi öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>6×6 merkezlerini ve kenarlarını çözmeyi öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     7X7
-====================================================== -->
-
+<!-- 7X7 -->
 <a href="http://rubikacademy.fun/yakında" class="card">
-
 <div class="visual pink">
-
 <div class="number">06</div>
-
 <div class="cube-wrap">
-
 <svg class="cube-svg" viewBox="0 0 300 300">
 <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
 <rect x="57.3" y="57.3" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
@@ -1395,49 +849,23 @@ Eğitime Başla →
 <rect x="164.8" y="218.5" width="24.2" height="24.2" rx="5.3" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
 <rect x="191.6" y="218.5" width="24.2" height="24.2" rx="5.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
 <rect x="218.5" y="218.5" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
-
 </svg>
-
 </div>
-
-<div class="visual-label">
-    7×7 RUBİK KÜP
+<div class="visual-label">7×7 RUBİK KÜP</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">UZMAN</span>
-
 <h2>7×7 Rubik Küp</h2>
-
-<p>
-En büyük küplerden biri olan
-7×7'nin çözümünü öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>En büyük küplerden biri olan 7×7'nin çözümünü öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     3X3 ONE HAND
-====================================================== -->
-
+<!-- 3X3 ONE HAND -->
 <a href="http://rubikacademy.fun/yakında" class="card">
-
 <div class="visual orange">
-
 <div class="number">07</div>
-
 <div class="cube-wrap">
-
 <svg class="cube-svg" viewBox="0 0 300 300">
 <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
 <rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
@@ -1449,46 +877,22 @@ Eğitime Başla →
 <rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f3f5fa" stroke="#111827" stroke-width="2.5"/>
 <rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
 <rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-
 </svg>
-
 </div>
-
-<div class="visual-label">
-    3×3 ONE HANDED
+<div class="visual-label">3×3 ONE HANDED</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">SPEEDCUBING</span>
-
 <h2>3×3 One Handed</h2>
-
-<p>
-Tek elle küp çözme ve hız geliştirme
-tekniklerini öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>Tek elle küp çözme ve hız geliştirme tekniklerini öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     PYRAMINX
-====================================================== -->
-
+<!-- PYRAMINX -->
 <a href="http://rubikacademy.fun/yakında" class="card">
 <div class="visual yellow">
-
 <div class="number">08</div>
-
 <svg class="special pyraminx-svg" viewBox="0 0 250 250">
 <polygon points="125.0,8.0 238.0,222.0 12.0,222.0" fill="#111827" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
 <polygon points="125.0,26.3 94.7,83.9 155.3,83.9" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
@@ -1500,45 +904,21 @@ Eğitime Başla →
 <polygon points="61.0,152.1 91.3,209.7 121.6,152.1" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
 <polygon points="125.0,154.3 94.7,211.9 155.3,211.9" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
 <polygon points="57.7,154.3 27.4,211.9 88.0,211.9" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
-
 </svg>
-
-<div class="visual-label">
-    PYRAMINX
+<div class="visual-label">PYRAMINX</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">PUZZLE</span>
-
 <h2>Pyraminx</h2>
-
-<p>
-Üçgen yapılı Pyraminx'i kolay
-yöntemlerle çözmeyi öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>Üçgen yapılı Pyraminx'i kolay yöntemlerle çözmeyi öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     SKEWB
-====================================================== -->
-
+<!-- SKEWB -->
 <a href="http://rubikacademy.fun/yakında" class="card">
-
 <div class="visual navy">
-
 <div class="number">09</div>
-
 <svg class="special skewb-svg" viewBox="0 0 250 250">
 <rect x="13.0" y="13.0" width="224.0" height="224.0" rx="28.0" fill="#111827" stroke="#111827" stroke-width="3"/>
 <polygon points="36.4,36.4 123.7,36.4 123.7,123.7 36.4,123.7" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
@@ -1546,125 +926,55 @@ Eğitime Başla →
 <polygon points="213.7,213.7 126.3,213.7 126.3,126.3 213.7,126.3" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
 <polygon points="36.4,213.7 36.4,126.3 123.7,126.3 123.7,213.7" fill="#1e6fe6" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
 <polygon points="125.0,37.7 212.3,125.0 125.0,212.3 37.7,125.0" fill="#f3f5fa" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
-
 </svg>
-
-<div class="visual-label">
-    SKEWB
+<div class="visual-label">SKEWB</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">PUZZLE</span>
-
 <h2>Skewb</h2>
-
-<p>
-Skewb mekanizmasını ve temel
-çözüm algoritmalarını öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>Skewb mekanizmasını ve temel çözüm algoritmalarını öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     SQUARE 1 (GÖRSEL RENK PALETİNE UYARLANDI)
-====================================================== -->
-
+<!-- SQUARE 1 -->
 <a href="http://rubikacademy.fun/yakında" class="card">
-
 <div class="visual orange">
-
 <div class="number">10</div>
-
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" class="special square-svg">
   <defs>
-    <!-- Gölge Efekti -->
     <filter id="sq1-real-shadow" x="-10%" y="-10%" width="120%" height="120%">
       <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
     </filter>
   </defs>
-
   <g filter="url(#sq1-real-shadow)">
-    <!-- Dış Siyah Plastik Gövde -->
     <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
-
-    <!-- 8 ADET SARI PARÇA (Dış Köşeleri Yuvarlatılmış Yapı) -->
     <g fill="#ffe600" stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-      
-      <!-- 1. ÜST KENAR (YUKARI BAKAN KAMA) -->
       <path d="M 150 148 L 133 41 L 167 41 Z"/>
-
-      <!-- 2. SAĞ-ÜST KÖŞE (BÜYÜK BLOK - Dış Köşesi Kavisli) -->
       <path d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
-
-      <!-- 3. SAĞ KENAR (SAĞA BAKAN KAMA) -->
       <path d="M 152 150 L 259 133 L 259 167 Z"/>
-
-      <!-- 4. SAĞ-ALT KÖŞE (BÜYÜK BLOK - Dış Köşesi Kavisli) -->
       <path d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
-
-      <!-- 5. ALT KENAR (AŞAĞI BAKAN KAMA) -->
       <path d="M 150 152 L 167 259 L 133 259 Z"/>
-
-      <!-- 6. SOL-ALT KÖŞE (BÜYÜK BLOK - Dış Köşesi Kavisli) -->
       <path d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
-
-      <!-- 7. SOL KENAR (SOLA BAKAN KAMA) -->
       <path d="M 148 150 L 41 167 L 41 133 Z"/>
-
-      <!-- 8. SOL-ÜST KÖŞE (BÜYÜK BLOK - Dış Köşesi Kavisli) -->
       <path d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
-
     </g>
   </g>
 </svg>
-
-
-<div class="visual-label">
-    SQUARE-1
+<div class="visual-label">SQUARE-1</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">İLERİ</span>
-
 <h2>Square-1</h2>
-
-<p>
-Şekil değiştiren küpler dünyasına
-Square-1 ile giriş yap.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>Şekil değiştiren küpler dünyasına Square-1 ile giriş yap.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     MEGAMINX
-====================================================== -->
-
+<!-- MEGAMINX -->
 <a href="http://rubikacademy.fun/yakında" class="card">
-
 <div class="visual teal">
-
 <div class="number">11</div>
-
 <svg class="special megaminx-svg" viewBox="0 0 250 250">
 <polygon points="125.0,20.6 230.9,97.6 190.5,222.1 59.5,222.1 19.1,97.6" fill="#111827" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
 <polygon points="125.0,91.7 163.3,119.5 148.7,164.6 101.3,164.6 86.7,119.5" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
@@ -1673,229 +983,136 @@ Eğitime Başla →
 <polygon points="148.7,164.6 181.4,209.7 101.3,164.6" fill="#f97316" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
 <polygon points="101.3,164.6 68.6,209.7 86.7,119.5" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
 <polygon points="86.7,119.5 33.7,102.3 125.0,91.7" fill="#f3f5fa" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
-
 </svg>
-
-<div class="visual-label">
-    MEGAMINX
+<div class="visual-label">MEGAMINX</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">İLERİ</span>
-
 <h2>Megaminx</h2>
-
-<p>
-Çok yüzlü yapıyı ve Megaminx
-çözüm mantığını öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>Çok yüzlü yapıyı ve Megaminx çözüm mantığını öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
-<!-- ======================================================
-     CLOCK
-====================================================== -->
-
+<!-- CLOCK -->
 <a href="http://rubikacademy.fun/yakında" class="card">
-
 <div class="visual blue">
-
 <div class="number">12</div>
-
 <svg class="special clock-svg" viewBox="0 0 250 250">
-
-<rect
-x="22"
-y="22"
-width="206"
-height="206"
-rx="26"
-fill="#101827"/>
-
-<g
-fill="#f8fafc"
-stroke="#0f172a"
-stroke-width="5">
-
+<rect x="22" y="22" width="206" height="206" rx="26" fill="#101827"/>
+<g fill="#f8fafc" stroke="#0f172a" stroke-width="5">
 <circle cx="63" cy="63" r="31"/>
 <circle cx="125" cy="63" r="31"/>
 <circle cx="187" cy="63" r="31"/>
-
 <circle cx="63" cy="125" r="31"/>
 <circle cx="125" cy="125" r="31"/>
 <circle cx="187" cy="125" r="31"/>
-
 <circle cx="63" cy="187" r="31"/>
 <circle cx="125" cy="187" r="31"/>
 <circle cx="187" cy="187" r="31"/>
-
 </g>
-
-<g
-stroke="#101827"
-stroke-width="5"
-stroke-linecap="round">
-
+<g stroke="#101827" stroke-width="5" stroke-linecap="round">
 <path d="M63 63 L63 43"/>
 <path d="M125 63 L139 48"/>
 <path d="M187 63 L174 73"/>
-
 <path d="M63 125 L81 125"/>
 <path d="M125 125 L125 103"/>
 <path d="M187 125 L169 137"/>
-
 <path d="M63 187 L76 173"/>
 <path d="M125 187 L125 205"/>
 <path d="M187 187 L204 187"/>
-
 </g>
-
 </svg>
-
-<div class="visual-label">
-    RUBIK'S CLOCK
+<div class="visual-label">RUBIK'S CLOCK</div>
 </div>
-
-</div>
-
 <div class="info">
-
 <span class="tag">PUZZLE</span>
-
 <h2>Rubik's Clock</h2>
-
-<p>
-Clock mekanizmasını ve çözüm
-adımlarını öğren.
-</p>
-
-<span class="start">
-Eğitime Başla →
-</span>
-
+<p>Clock mekanizmasını ve çözüm adımlarını öğren.</p>
+<span class="start">Eğitime Başla →</span>
 </div>
-
 </a>
 
-
 </section>
-
 
 <!-- ======================================================
      ALT ALAN
 ====================================================== -->
 
 <section class="bottom">
-
-<h3>
-🧩 Küpünü seç ve öğrenmeye başla!
-</h3>
-
-<p>
-Başlangıç seviyesinden speedcubing seviyesine
-kadar Rubik Academy ile kendini geliştir.
-</p>
-
+    <h3>🧩 Küpünü seç ve öğrenmeye başla!</h3>
+    <p>Başlangıç seviyesinden speedcubing seviyesine kadar Rubik Academy ile kendini geliştir.</p>
 </section>
-
 
 </div>
 
-
 <script>
-
 /* =========================================================
-   KART HAREKETİ
+   KARANLIK MOD MANTIĞI & LOCALSTORAGE (Hafızada Tutma)
 ========================================================= */
 
-document
-.querySelectorAll(".card")
-.forEach(card => {
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    const btn = document.getElementById("darkModeBtn");
 
-    card.addEventListener(
-        "mousemove",
-        e => {
+    if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("theme", "dark");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        localStorage.setItem("theme", "light");
+        if(btn) btn.innerHTML = "🌙";
+    }
+}
 
-            if(
-                window.innerWidth < 800
-            ) return;
+// Sayfa yüklendiğinde hafızadaki modu uygula
+(function checkTheme() {
+    const savedTheme = localStorage.getItem("theme");
+    const btn = document.getElementById("darkModeBtn");
 
-            const rect =
-                card.getBoundingClientRect();
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        document.body.classList.remove("dark-mode");
+        if(btn) btn.innerHTML = "🌙";
+    }
+})();
 
-            const x =
-                e.clientX -
-                rect.left;
+/* =========================================================
+   KART HAREKETİ (3D Efekt)
+========================================================= */
 
-            const y =
-                e.clientY -
-                rect.top;
+document.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("mousemove", e => {
+        if(window.innerWidth < 800) return;
 
-            const rotateY =
-                ((x / rect.width) - .5)
-                * 2.2;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-            const rotateX =
-                ((y / rect.height) - .5)
-                * -2.2;
+        const rotateY = ((x / rect.width) - .5) * 2.2;
+        const rotateX = ((y / rect.height) - .5) * -2.2;
 
-            card.style.transform =
-                `
-                translateY(-8px)
-                perspective(1200px)
-                rotateX(${rotateX}deg)
-                rotateY(${rotateY}deg)
-                `;
-        }
-    );
+        card.style.transform = `
+            translateY(-8px)
+            perspective(1200px)
+            rotateX(${rotateX}deg)
+            rotateY(${rotateY}deg)
+        `;
+    });
 
-    card.addEventListener(
-        "mouseleave",
-        () => {
-
-            card.style.transform = "";
-
-        }
-    );
-
+    card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
+    });
 });
 
-
-/* =========================================================
-   MOBİLDE HAREKETİ KAPAT
-========================================================= */
-
-window.addEventListener(
-    "resize",
-    () => {
-
-        if(
-            window.innerWidth < 800
-        ){
-
-            document
-            .querySelectorAll(".card")
-            .forEach(card => {
-
-                card.style.transform = "";
-
-            });
-
-        }
-
+window.addEventListener("resize", () => {
+    if(window.innerWidth < 800){
+        document.querySelectorAll(".card").forEach(card => {
+            card.style.transform = "";
+        });
     }
-);
-
+});
 </script>
 
 </body>
