@@ -3,6 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- =========================================================
+   SAYFA YÜKLENMEDEN ÖNCE TEMA KONTROLÜ (Çakmayı ve mod kaybını önler)
+========================================================= -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark-mode");
+    }
+  })();
+</script>
+
 <title>Rubik Academy | 4×4 Eğitimleri</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +36,37 @@
     --text: #172033;
     --text-soft: #64748b;
     --border: #e2e8f0;
+    --card-border: #dfebf5;
     --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+    --hero-bg: linear-gradient(120deg, #e8f7ff, #c8eaff);
+    --hero-border: #cce8fa;
+    --btn-bg: #eef8ff;
+    --btn-hover-bg: #dff2ff;
+    --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
+    --bottom-border: #d5eafa;
+    --bottom-text: #18578c;
+}
+
+/* Karanlık Mod Değişkenleri */
+html.dark-mode,
+body.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --card-border: #334155;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+    --hero-bg: linear-gradient(120deg, #1e293b, #0f172a);
+    --hero-border: #334155;
+    --btn-bg: #334155;
+    --btn-hover-bg: #1e3a8a;
+    --bottom-bg: #1e293b;
+    --bottom-border: #334155;
+    --bottom-text: #60a5fa;
 }
 
 /* =========================================
@@ -37,9 +80,10 @@
 
 body {
     font-family: "Inter", sans-serif;
-    background: #f8fbff;
+    background: var(--background);
     color: var(--text);
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 a {
@@ -62,6 +106,12 @@ a {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .navbar,
+body.dark-mode .navbar {
+    background: rgba(15, 23, 42, 0.90);
 }
 
 .nav-logo {
@@ -135,6 +185,26 @@ a {
     color: var(--primary);
 }
 
+/* KARANLIK MOD BUTONU */
+.dark-mode-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+}
+
+.dark-mode-btn:hover {
+    transform: scale(1.08);
+}
+
 @media(max-width: 500px) {
     .navbar {
         padding: 14px 5%;
@@ -154,10 +224,8 @@ a {
 .page {
     min-height: calc(100vh - 71px);
     padding: 45px 5% 80px;
-    background:
-        radial-gradient(circle at 5% 0%, #dff3ff 0, transparent 28%),
-        radial-gradient(circle at 100% 20%, #edf6ff 0, transparent 30%),
-        #f8fbff;
+    background: var(--background);
+    transition: background-color 0.3s;
 }
 
 /* NAV / GERİ DÖN */
@@ -172,19 +240,19 @@ a {
     gap: 8px;
     padding: 10px 18px;
     border-radius: 12px;
-    background: #ffffff;
-    border: 1px solid #dceafd;
-    color: #1684d1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
     font-size: 13px;
     font-weight: 800;
-    box-shadow: 0 4px 15px rgba(22, 132, 209, 0.06);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
     transition: all .25s ease;
 }
 
 .back-btn:hover {
     transform: translateX(-4px);
     border-color: #c0e0fc;
-    background: #f4f9ff;
+    background: var(--primary-light);
 }
 
 /* HERO */
@@ -199,9 +267,10 @@ a {
     align-items: center;
     justify-content: space-between;
     padding: 55px 65px;
-    background: linear-gradient(120deg, #e8f7ff, #c8eaff);
-    border: 1px solid #cce8fa;
-    box-shadow: 0 18px 50px rgba(38, 104, 150, .10);
+    background: var(--hero-bg);
+    border: 1px solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
 }
 
 .hero::before {
@@ -210,7 +279,7 @@ a {
     width: 430px;
     height: 430px;
     border-radius: 50%;
-    border: 70px solid rgba(255, 255, 255, .35);
+    border: 70px solid rgba(255, 255, 255, .15);
     left: -180px;
     top: -180px;
 }
@@ -227,9 +296,9 @@ a {
     gap: 9px;
     padding: 9px 15px;
     border-radius: 50px;
-    background: rgba(255, 255, 255, .75);
-    border: 1px solid rgba(255, 255, 255, .9);
-    color: #1684d1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
     font-size: 10px;
     font-weight: 900;
     letter-spacing: 1.5px;
@@ -249,12 +318,13 @@ a {
     letter-spacing: -3px;
     font-weight: 950;
     margin-bottom: 18px;
+    color: var(--text);
 }
 
-.hero h1 span { color: #1684d1; }
+.hero h1 span { color: var(--primary); }
 
 .hero p {
-    color: #64778d;
+    color: var(--text-soft);
     font-size: 15px;
     line-height: 1.75;
     max-width: 560px;
@@ -266,7 +336,7 @@ a {
     position: relative;
     z-index: 3;
     flex-shrink: 0;
-    filter: drop-shadow(0 25px 22px rgba(30, 67, 95, .23));
+    filter: drop-shadow(0 25px 22px rgba(0, 0, 0, .23));
     animation: floating 5s ease-in-out infinite;
 }
 
@@ -282,7 +352,7 @@ a {
 
 .section-title small {
     display: block;
-    color: #1684d1;
+    color: var(--primary);
     font-size: 10px;
     font-weight: 900;
     letter-spacing: 1.7px;
@@ -293,10 +363,11 @@ a {
     font-size: 30px;
     letter-spacing: -1px;
     font-weight: 900;
+    color: var(--text);
 }
 
 .section-title p {
-    color: #718196;
+    color: var(--text-soft);
     font-size: 13px;
     margin-top: 7px;
 }
@@ -310,12 +381,12 @@ a {
 }
 
 .card {
-    background: white;
-    border: 1px solid #dfebf5;
+    background: var(--surface);
+    border: 1px solid var(--card-border);
     border-radius: 27px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(42, 82, 115, .07);
-    transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+    box-shadow: var(--shadow);
+    transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease, background-color 0.3s;
     display: block;
 }
 
@@ -356,7 +427,7 @@ a {
     z-index: 5;
     padding: 8px 11px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, .78);
+    background: rgba(255, 255, 255, .85);
     backdrop-filter: blur(10px);
     font-size: 9px;
     font-weight: 900;
@@ -382,10 +453,11 @@ a {
     font-weight: 900;
     letter-spacing: -.5px;
     margin-bottom: 9px;
+    color: var(--text);
 }
 
 .card-info p {
-    color: #718196;
+    color: var(--text-soft);
     font-size: 13px;
     line-height: 1.65;
     min-height: 64px;
@@ -399,15 +471,15 @@ a {
     width: 100%;
     padding: 13px 15px;
     border-radius: 13px;
-    background: #eef8ff;
-    color: #1684d1;
+    background: var(--btn-bg);
+    color: var(--primary);
     font-size: 12px;
     font-weight: 900;
-    transition: background .25s ease, padding .25s ease;
+    transition: background .25s ease, padding .25s ease, color .25s ease;
 }
 
 .card:hover .button {
-    background: #dff2ff;
+    background: var(--btn-hover-bg);
     padding-left: 19px;
 }
 
@@ -419,12 +491,13 @@ a {
     padding: 32px;
     text-align: center;
     border-radius: 25px;
-    background: linear-gradient(135deg, #edf8ff, #e6f4ff);
-    border: 1px solid #d5eafa;
+    background: var(--bottom-bg);
+    border: 1px solid var(--bottom-border);
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-.bottom h3 { color: #18578c; font-size: 21px; margin-bottom: 7px; }
-.bottom p { color: #718196; font-size: 13px; }
+.bottom h3 { color: var(--bottom-text); font-size: 21px; margin-bottom: 7px; }
+.bottom p { color: var(--text-soft); font-size: 13px; }
 
 @media(max-width: 1000px) {
     .hero { padding: 45px; }
@@ -480,6 +553,10 @@ a {
             İçerikler
         </a>
     </nav>
+
+    <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+        🌙
+    </button>
 </header>
 
 <div class="page">
@@ -645,6 +722,41 @@ a {
 </section>
 
 </div>
+
+<script>
+/* =========================================================
+   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
+========================================================= */
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+    
+    var btn = document.getElementById("darkModeBtn");
+
+    if (isDark) {
+        localStorage.setItem("theme", "dark");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        localStorage.setItem("theme", "light");
+        if(btn) btn.innerHTML = "🌙";
+    }
+}
+
+// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+    
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        if(btn) btn.innerHTML = "🌙";
+    }
+});
+</script>
 
 </body>
 </html>
