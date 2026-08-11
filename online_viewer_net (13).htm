@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Rubik Academy</title>
+
+<meta
+name="description"
+content="Rubik Academy - Rubik küp öğren, algoritmaları keşfet ve hızını geliştir."
+>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link
+href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+rel="stylesheet"
+>
+
+<style>
+
+/* =========================================
+   RENKLER
+========================================= */
+
+:root {
+
+    --background: #f8fafc;
+
+    --surface: #ffffff;
+
+    --surface-soft: #f1f5f9;
+
+    --primary: #2563eb;
+
+    --primary-dark: #1d4ed8;
+
+    --primary-light: #eff6ff;
+
+    --text: #172033;
+
+    --text-soft: #64748b;
+
+    --border: #e2e8f0;
+
+    --shadow:
+        0 15px 40px rgba(15, 23, 42, 0.07);
+}
+
+
+/* =========================================
+   GENEL
+========================================= */
+
+* {
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+
+html {
+
+    scroll-behavior: smooth;
+}
+
+
+body {
+
+    font-family: "Inter", sans-serif;
+
+    background: var(--background);
+
+    color: var(--text);
+
+    overflow-x: hidden;
+}
+
+
+a {
+
+    text-decoration: none;
+
+    color: inherit;
+}
+
+
+/* =========================================
+   ANA GİRİŞ
+========================================= */
+
+.hero {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 90px 7%;
+
+    background:
+
+        radial-gradient(
+            circle at 10% 20%,
+            rgba(59,130,246,.10),
+            transparent 28%
+        ),
+
+        radial-gradient(
+            circle at 90% 30%,
+            rgba(99,102,241,.08),
+            transparent 30%
+        ),
+
+        #f8fafc;
+}
+
+
+.hero-container {
+
+    width: 100%;
+
+    max-width: 1200px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        1.1fr
+        .9fr;
+
+    gap: 70px;
+
+    align-items: center;
+}
+
+
+/* =========================================
+   ETİKET
+========================================= */
+
+.badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 9px 16px;
+
+    border-radius: 50px;
+
+    background:
+        var(--primary-light);
+
+    border:
+        1px solid #dbeafe;
+
+    color:
+        var(--primary);
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    margin-bottom: 25px;
+}
+
+
+.badge::before {
+
+    content: "";
+
+    width: 7px;
+
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+}
+
+
+/* =========================================
+   BAŞLIK
+========================================= */
+
+.hero h1 {
+
+    font-size:
+        clamp(45px, 6vw, 76px);
+
+    line-height: 1.04;
+
+    letter-spacing: -4px;
+
+    font-weight: 900;
+
+    color: var(--text);
+
+    margin-bottom: 25px;
+}
+
+
+.gradient-text {
+
+    background:
+
+        linear-gradient(
+            90deg,
+            #2563eb,
+            #0891b2,
+            #6366f1
+        );
+
+    -webkit-background-clip: text;
+
+    background-clip: text;
+
+    color: transparent;
+}
+
+
+.hero p {
+
+    max-width: 620px;
+
+    color: var(--text-soft);
+
+    font-size: 18px;
+
+    line-height: 1.75;
+
+    margin-bottom: 35px;
+}
+
+
+/* =========================================
+   BUTON
+========================================= */
+
+.btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 15px 25px;
+
+    border-radius: 12px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    transition: .3s;
+}
+
+
+.btn-primary {
+
+    color: white;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #4f46e5
+        );
+
+    box-shadow:
+
+        0 12px 30px
+        rgba(37,99,235,.22);
+}
+
+
+.btn-primary:hover {
+
+    transform:
+        translateY(-4px);
+
+    box-shadow:
+
+        0 18px 40px
+        rgba(37,99,235,.30);
+}
+
+
+/* =========================================
+   RUBİK KÜP
+========================================= */
+
+.cube-area {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+}
+
+
+.cube {
+
+    width: 280px;
+
+    height: 280px;
+
+    padding: 12px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    grid-template-rows:
+        repeat(3,1fr);
+
+    gap: 7px;
+
+    border-radius: 28px;
+
+    background: #1e293b;
+
+    transform:
+        rotate(-7deg);
+
+    box-shadow:
+
+        0 35px 60px
+        rgba(15,23,42,.20),
+
+        0 0 60px
+        rgba(37,99,235,.10);
+
+    animation:
+
+        cubeFloat
+        5s
+        ease-in-out
+        infinite;
+}
+
+
+.cube div {
+
+    border-radius: 7px;
+
+    background: #f8fafc;
+
+    box-shadow:
+
+        inset
+        0 0 0 2px
+        rgba(0,0,0,.08);
+}
+
+
+.cube div:nth-child(2),
+.cube div:nth-child(8) {
+
+    background: #ef4444;
+}
+
+
+.cube div:nth-child(4),
+.cube div:nth-child(6) {
+
+    background: #22c55e;
+}
+
+
+.cube div:nth-child(5) {
+
+    background: #3b82f6;
+}
+
+
+.cube div:nth-child(1),
+.cube div:nth-child(9) {
+
+    background: #facc15;
+}
+
+
+@keyframes cubeFloat {
+
+    0%,
+    100% {
+
+        transform:
+            rotate(-7deg)
+            translateY(0);
+    }
+
+    50% {
+
+        transform:
+            rotate(-4deg)
+            translateY(-15px);
+    }
+}
+
+
+/* =========================================
+   BÖLÜMLER
+========================================= */
+
+section {
+
+    padding:
+        100px 7%;
+}
+
+
+.section-container {
+
+    max-width: 1200px;
+
+    margin: auto;
+}
+
+
+.section-heading {
+
+    text-align: center;
+
+    max-width: 700px;
+
+    margin:
+        0 auto 55px;
+}
+
+
+.section-heading span {
+
+    color:
+        var(--primary);
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+.section-heading h2 {
+
+    font-size:
+        clamp(32px,4vw,48px);
+
+    line-height: 1.1;
+
+    letter-spacing: -2px;
+
+    color:
+        var(--text);
+
+    margin:
+        12px 0;
+}
+
+
+.section-heading p {
+
+    color:
+        var(--text-soft);
+
+    line-height: 1.7;
+}
+
+
+/* =========================================
+   AKADEMİ KARTLARI
+========================================= */
+
+.cards {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 22px;
+}
+
+
+.card {
+
+    padding: 32px;
+
+    border-radius: 22px;
+
+    background:
+        var(--surface);
+
+    border:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        var(--shadow);
+
+    transition: .3s;
+}
+
+
+.card:hover {
+
+    transform:
+        translateY(-8px);
+
+    border-color:
+        #bfdbfe;
+
+    box-shadow:
+
+        0 20px 45px
+        rgba(37,99,235,.10);
+}
+
+
+.card-icon {
+
+    width: 55px;
+
+    height: 55px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 15px;
+
+    background:
+        var(--primary-light);
+
+    font-size: 25px;
+
+    margin-bottom: 20px;
+}
+
+
+.card h3 {
+
+    font-size: 20px;
+
+    color:
+        var(--text);
+
+    margin-bottom: 10px;
+}
+
+
+.card p {
+
+    color:
+        var(--text-soft);
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================
+   EĞİTİM BÖLÜMÜ
+========================================= */
+
+.learning-section {
+
+    background:
+        #f1f5f9;
+}
+
+
+.learning-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 22px;
+}
+
+
+.learning-card {
+
+    padding: 35px;
+
+    border-radius: 22px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        0 10px 30px
+        rgba(15,23,42,.05);
+
+    transition: .3s;
+}
+
+
+.learning-card:hover {
+
+    transform:
+        translateY(-5px);
+
+    box-shadow:
+        0 18px 40px
+        rgba(15,23,42,.09);
+}
+
+
+.learning-number {
+
+    color:
+        var(--primary);
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 12px;
+}
+
+
+.learning-card h3 {
+
+    font-size: 24px;
+
+    color:
+        var(--text);
+
+    margin-bottom: 12px;
+}
+
+
+.learning-card p {
+
+    color:
+        var(--text-soft);
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================
+   SOSYAL MEDYA
+========================================= */
+
+.social-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 22px;
+}
+
+
+.social-card {
+
+    padding: 30px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    border-radius: 20px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        0 10px 30px
+        rgba(15,23,42,.05);
+
+    transition: .3s;
+}
+
+
+.social-card:hover {
+
+    transform:
+        translateY(-5px);
+
+    box-shadow:
+        0 18px 40px
+        rgba(15,23,42,.09);
+}
+
+
+.social-icon {
+
+    width: 55px;
+
+    height: 55px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 15px;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #6366f1
+        );
+
+    color: white;
+
+    font-size: 23px;
+}
+
+
+.social-card h3 {
+
+    font-size: 17px;
+
+    color:
+        var(--text);
+}
+
+
+.social-card p {
+
+    color:
+        var(--text-soft);
+
+    font-size: 13px;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================
+   İLETİŞİM
+========================================= */
+
+.contact {
+
+    text-align: center;
+
+    background:
+        #f1f5f9;
+}
+
+
+.contact-box {
+
+    max-width: 800px;
+
+    margin: auto;
+
+    padding:
+        55px 30px;
+
+    border-radius: 25px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        var(--shadow);
+}
+
+
+.contact-box h2 {
+
+    font-size: 40px;
+
+    color:
+        var(--text);
+
+    margin-bottom: 15px;
+}
+
+
+.contact-box p {
+
+    color:
+        var(--text-soft);
+
+    margin-bottom: 25px;
+}
+
+
+.email {
+
+    display: inline-block;
+
+    padding:
+        14px 20px;
+
+    border-radius: 12px;
+
+    background:
+        var(--primary-light);
+
+    color:
+        var(--primary);
+
+    font-weight: 700;
+
+    border:
+        1px solid
+        #dbeafe;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+footer {
+
+    padding: 35px;
+
+    text-align: center;
+
+    background:
+        #ffffff;
+
+    border-top:
+        1px solid
+        var(--border);
+
+    color:
+        var(--text-soft);
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   ANİMASYON
+========================================= */
+
+.reveal {
+
+    opacity: 0;
+
+    transform:
+        translateY(30px);
+
+    transition:
+        .7s ease;
+}
+
+
+.reveal.active {
+
+    opacity: 1;
+
+    transform:
+        translateY(0);
+}
+
+
+/* =========================================
+   MOBİL
+========================================= */
+
+@media(max-width:900px) {
+
+    .hero {
+
+        padding:
+            80px 6%;
+    }
+
+
+    .hero-container {
+
+        grid-template-columns:
+            1fr;
+
+        text-align: center;
+    }
+
+
+    .hero p {
+
+        margin-left: auto;
+
+        margin-right: auto;
+    }
+
+
+    .cube {
+
+        width: 230px;
+
+        height: 230px;
+    }
+
+
+    .cards {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .learning-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .social-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+}
+
+
+@media(max-width:500px) {
+
+    .hero h1 {
+
+        font-size: 43px;
+
+        letter-spacing: -2px;
+    }
+
+
+    section {
+
+        padding:
+            75px 5%;
+    }
+
+
+    .contact-box h2 {
+
+        font-size: 32px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================
+     GİRİŞ
+========================================= -->
+
+<section class="hero">
+
+    <div class="hero-container">
+
+
+        <div class="hero-content reveal">
+
+
+            <div class="badge">
+
+                Speedcubing'e Hoş Geldin
+
+            </div>
+
+
+            <h1>
+
+                Rubik Küpü
+
+                <span class="gradient-text">
+                    öğren.
+                </span>
+
+                <br>
+
+                Hızını geliştir.
+
+            </h1>
+
+
+            <p>
+
+                Rubik Academy, Rubik küp çözmeyi öğrenmek
+                ve çözüm sürelerini geliştirmek isteyenler
+                için hazırlanmış modern ve sistemli bir
+                eğitim platformudur.
+
+            </p>
+
+
+            <a
+                href="#academy"
+                class="btn btn-primary"
+            >
+
+                Öğrenmeye Başla →
+
+            </a>
+
+
+        </div>
+
+
+        <!-- KÜP -->
+
+        <div class="cube-area reveal">
+
+            <div class="cube">
+
+                <div></div>
+                <div></div>
+                <div></div>
+
+                <div></div>
+                <div></div>
+                <div></div>
+
+                <div></div>
+                <div></div>
+                <div></div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     AKADEMİ
+========================================= -->
+
+<section id="academy">
+
+    <div class="section-container">
+
+
+        <div class="section-heading reveal">
+
+            <span>
+                Rubik Academy
+            </span>
+
+
+            <h2>
+
+                Küp çözmeyi
+                sistemli şekilde öğren.
+
+            </h2>
+
+
+            <p>
+
+                Temelden başlayıp speedcubing seviyesine
+                kadar ilerleyebileceğin içerikler.
+
+            </p>
+
+        </div>
+
+
+
+        <div class="cards">
+
+
+            <div class="card reveal">
+
+                <div class="card-icon">
+                    🧩
+                </div>
+
+
+                <h3>
+                    3x3 Rubik Küp
+                </h3>
+
+
+                <p>
+
+                    3x3 Rubik küpü adım adım öğren.
+                    Temel hareketlerden ileri seviyeye
+                    kadar kendini geliştir.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="card reveal">
+
+                <div class="card-icon">
+                    ⚡
+                </div>
+
+
+                <h3>
+                    Algoritmalar
+                </h3>
+
+
+                <p>
+
+                    Daha hızlı çözüm yapabilmek için
+                    gerekli algoritmaları öğren ve
+                    pratik yap.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="card reveal">
+
+                <div class="card-icon">
+                    🚀
+                </div>
+
+
+                <h3>
+                    Speedcubing
+                </h3>
+
+
+                <p>
+
+                    Çözüm sürelerini geliştir,
+                    kendi rekorlarını kır ve
+                    speedcubing dünyasında ilerle.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     EĞİTİM
+========================================= -->
+
+<section class="learning-section">
+
+    <div class="section-container">
+
+
+        <div class="section-heading reveal">
+
+            <span>
+                Eğitim
+            </span>
+
+
+            <h2>
+                Adım adım ilerle.
+            </h2>
+
+
+            <p>
+
+                Rubik küp öğrenme sürecini
+                kolay ve anlaşılır hale getir.
+
+            </p>
+
+        </div>
+
+
+
+        <div class="learning-grid">
+
+
+            <div class="learning-card reveal">
+
+                <div class="learning-number">
+                    01 — BAŞLANGIÇ
+                </div>
+
+
+                <h3>
+                    Küpü Tanı
+                </h3>
+
+
+                <p>
+
+                    Rubik küpün yapısını,
+                    yüzlerini, merkez parçalarını,
+                    köşe ve kenar parçalarını öğren.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="learning-card reveal">
+
+                <div class="learning-number">
+                    02 — TEMEL
+                </div>
+
+
+                <h3>
+                    İlk Çözümünü Yap
+                </h3>
+
+
+                <p>
+
+                    Temel hareketleri öğrenerek
+                    Rubik küpünü baştan sona
+                    çözmeyi öğren.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="learning-card reveal">
+
+                <div class="learning-number">
+                    03 — GELİŞİM
+                </div>
+
+
+                <h3>
+                    Algoritmaları Öğren
+                </h3>
+
+
+                <p>
+
+                    Çözüm süreni azaltmak için
+                    gerekli algoritmaları
+                    çalışmaya başla.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="learning-card reveal">
+
+                <div class="learning-number">
+                    04 — SPEEDCUBING
+                </div>
+
+
+                <h3>
+                    Hızını Geliştir
+                </h3>
+
+
+                <p>
+
+                    Farklı teknikleri kullan,
+                    pratik yap ve kendi en iyi
+                    dereceni oluşturmaya çalış.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     SOSYAL MEDYA
+========================================= -->
+
+<section>
+
+    <div class="section-container">
+
+
+        <div class="section-heading reveal">
+
+            <span>
+                Sosyal Medya
+            </span>
+
+
+            <h2>
+                Rubik Academy'yi takip et.
+            </h2>
+
+
+            <p>
+
+                Yeni içerikleri ve speedcubing
+                paylaşımlarını kaçırma.
+
+            </p>
+
+        </div>
+
+
+
+        <div class="social-grid">
+
+
+            <a
+                href="https://www.instagram.com/erenrubiks"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-card reveal"
+            >
+
+                <div class="social-icon">
+                    ◎
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Instagram
+                    </h3>
+
+                    <p>
+                        @erenrubiks
+                    </p>
+
+                </div>
+
+            </a>
+
+
+
+            <a
+                href="https://www.youtube.com/@rubikacademyy"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-card reveal"
+            >
+
+                <div class="social-icon">
+                    ▶
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        YouTube
+                    </h3>
+
+                    <p>
+                        @rubikacademyy
+                    </p>
+
+                </div>
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     İLETİŞİM
+========================================= -->
+
+<section class="contact">
+
+    <div class="section-container">
+
+
+        <div class="contact-box reveal">
+
+
+            <h2>
+                Bir sorunuz mu var?
+            </h2>
+
+
+            <p>
+
+                Sorularınız, önerileriniz veya
+                iş birlikleri için bizimle
+                iletişime geçebilirsiniz.
+
+            </p>
+
+
+            <a
+                href="mailto:muhammederenyalcin@gmail.com"
+                class="email"
+            >
+
+                ✉
+                muhammederenyalcin@gmail.com
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     FOOTER
+========================================= -->
+
+<footer>
+
+    © 2026 Rubik Academy.
+    Tüm hakları saklıdır.
+
+</footer>
+
+
+
+<script>
+
+/* =========================================
+   SCROLL ANIMATION
+========================================= */
+
+const observer =
+    new IntersectionObserver(
+
+        (entries) => {
+
+            entries.forEach(
+                (entry) => {
+
+                    if (
+                        entry.isIntersecting
+                    ) {
+
+                        entry.target
+                            .classList
+                            .add("active");
+
+                    }
+
+                }
+            );
+
+        },
+
+        {
+            threshold: 0.15
+        }
+
+    );
+
+
+document
+    .querySelectorAll(".reveal")
+    .forEach(
+        (element) => {
+
+            observer.observe(element);
+
+        }
+    );
+
+</script>
+
+
+</body>
+</html>
