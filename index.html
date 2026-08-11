@@ -1157,6 +1157,73 @@ footer {
 
 }
 
+/* =========================================
+   KARANLIK MOD
+========================================= */
+
+.dark-mode-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+}
+
+.dark-mode-btn:hover {
+    transform: scale(1.08);
+}
+
+/* Karanlık mod renkleri */
+
+.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --primary-light: #1e3a8a;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+}
+
+.dark-mode body {
+    background: var(--background);
+    color: var(--text);
+}
+
+.dark-mode .navbar {
+    background: rgba(15, 23, 42, 0.90);
+}
+
+.dark-mode .hero {
+    background: #0f172a;
+}
+
+.dark-mode .learning-section,
+.dark-mode .contact {
+    background: #111827;
+}
+
+.dark-mode .learning-card,
+.dark-mode .social-card,
+.dark-mode .contact-box,
+.dark-mode footer {
+    background: var(--surface);
+}
+
+.dark-mode .learning-card,
+.dark-mode .social-card,
+.dark-mode .contact-box {
+    border-color: var(--border);
+}
+   
 </style>
    
 <script src="darkmode.js"></script>
