@@ -5,6 +5,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- =========================================================
+   SAYFA YÜKLENMEDEN ÖNCE TEMA KONTROLÜ (Çakmayı ve mod kaybını önler)
+========================================================= -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark-mode");
+    }
+  })();
+</script>
+
 <title>Rubik Academy</title>
 
 <meta
@@ -79,6 +91,8 @@ body {
     color: var(--text);
 
     overflow-x: hidden;
+
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 
@@ -117,6 +131,8 @@ a {
     -webkit-backdrop-filter: blur(12px);
 
     border-bottom: 1px solid var(--border);
+
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 
@@ -295,7 +311,9 @@ a {
             transparent 30%
         ),
 
-        #f8fafc;
+        var(--background);
+    
+    transition: background-color 0.3s;
 }
 
 
@@ -763,6 +781,8 @@ section {
 
     background:
         #f1f5f9;
+
+    transition: background-color 0.3s;
 }
 
 
@@ -955,6 +975,8 @@ section {
 
     background:
         #f1f5f9;
+
+    transition: background-color 0.3s;
 }
 
 
@@ -978,6 +1000,8 @@ section {
 
     box-shadow:
         var(--shadow);
+
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 
@@ -1045,6 +1069,8 @@ footer {
         var(--text-soft);
 
     font-size: 13px;
+
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 
@@ -1182,7 +1208,8 @@ footer {
 
 /* Karanlık mod renkleri */
 
-.dark-mode {
+html.dark-mode,
+body.dark-mode {
     --background: #0f172a;
     --surface: #1e293b;
     --surface-soft: #334155;
@@ -1193,40 +1220,54 @@ footer {
     --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
 }
 
-.dark-mode body {
+html.dark-mode body,
+body.dark-mode {
     background: var(--background);
     color: var(--text);
 }
 
-.dark-mode .navbar {
+html.dark-mode .navbar,
+body.dark-mode .navbar {
     background: rgba(15, 23, 42, 0.90);
 }
 
-.dark-mode .hero {
+html.dark-mode .hero,
+body.dark-mode .hero {
     background: #0f172a;
 }
 
-.dark-mode .learning-section,
-.dark-mode .contact {
+html.dark-mode .learning-section,
+body.dark-mode .learning-section,
+html.dark-mode .contact,
+body.dark-mode .contact {
     background: #111827;
 }
 
-.dark-mode .learning-card,
-.dark-mode .social-card,
-.dark-mode .contact-box,
-.dark-mode footer {
+html.dark-mode .card,
+body.dark-mode .card,
+html.dark-mode .learning-card,
+body.dark-mode .learning-card,
+html.dark-mode .social-card,
+body.dark-mode .social-card,
+html.dark-mode .contact-box,
+body.dark-mode .contact-box,
+html.dark-mode footer,
+body.dark-mode footer {
     background: var(--surface);
 }
 
-.dark-mode .learning-card,
-.dark-mode .social-card,
-.dark-mode .contact-box {
+html.dark-mode .card,
+body.dark-mode .card,
+html.dark-mode .learning-card,
+body.dark-mode .learning-card,
+html.dark-mode .social-card,
+body.dark-mode .social-card,
+html.dark-mode .contact-box,
+body.dark-mode .contact-box {
     border-color: var(--border);
 }
-   
+    
 </style>
-   
-<script src="darkmode.js"></script>
 </head>
 
 
@@ -1271,16 +1312,16 @@ footer {
         Ana Sayfa
     </a>
 
-    <a href="http://rubikacademy.fun/icerikler" class="active">
+    <a href="http://rubikacademy.fun/icerikler">
         İçerikler
     </a>
 
 </nav>
 
-<button class="dark-mode-btn" onclick="toggleDarkMode()">
+<button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
     🌙
 </button>
-   
+    
 </header>
 
 
@@ -1783,6 +1824,39 @@ footer {
 
 
 <script>
+
+/* =========================================
+   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
+========================================= */
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+    
+    var btn = document.getElementById("darkModeBtn");
+
+    if (isDark) {
+        localStorage.setItem("theme", "dark");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        localStorage.setItem("theme", "light");
+        if(btn) btn.innerHTML = "🌙";
+    }
+}
+
+// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+    
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        if(btn) btn.innerHTML = "🌙";
+    }
+});
 
 /* =========================================
    SCROLL ANIMATION
