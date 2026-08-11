@@ -91,6 +91,183 @@ a {
 
 
 /* =========================================
+   ÜST BAR (NAVBAR)
+========================================= */
+
+.navbar {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 1000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 16px 7%;
+
+    background: rgba(248, 250, 252, 0.85);
+
+    backdrop-filter: blur(12px);
+
+    -webkit-backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid var(--border);
+}
+
+
+.nav-logo {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.nav-logo-mark {
+
+    width: 38px;
+
+    height: 38px;
+
+    display: grid;
+
+    grid-template-columns: repeat(3,1fr);
+
+    grid-template-rows: repeat(3,1fr);
+
+    gap: 2px;
+
+    padding: 4px;
+
+    border-radius: 10px;
+
+    background: #1e293b;
+
+    box-shadow:
+        0 8px 18px rgba(15,23,42,.18);
+}
+
+
+.nav-logo-mark div {
+
+    border-radius: 2px;
+
+    background: #f8fafc;
+}
+
+
+.nav-logo-mark div:nth-child(2),
+.nav-logo-mark div:nth-child(8) {
+
+    background: #ef4444;
+}
+
+
+.nav-logo-mark div:nth-child(4),
+.nav-logo-mark div:nth-child(6) {
+
+    background: #22c55e;
+}
+
+
+.nav-logo-mark div:nth-child(5) {
+
+    background: #3b82f6;
+}
+
+
+.nav-logo-mark div:nth-child(1),
+.nav-logo-mark div:nth-child(9) {
+
+    background: #facc15;
+}
+
+
+.nav-logo-text {
+
+    font-size: 17px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.5px;
+
+    color: var(--text);
+}
+
+
+.nav-links {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.nav-links a {
+
+    padding: 9px 16px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: var(--text-soft);
+
+    transition: .25s;
+}
+
+
+.nav-links a:hover {
+
+    background: var(--primary-light);
+
+    color: var(--primary);
+}
+
+
+.nav-links a.active {
+
+    background: var(--primary-light);
+
+    color: var(--primary);
+}
+
+
+@media(max-width:500px) {
+
+    .navbar {
+
+        padding: 14px 5%;
+    }
+
+
+    .nav-logo-text {
+
+        font-size: 15px;
+    }
+
+
+    .nav-links a {
+
+        padding: 8px 12px;
+
+        font-size: 13px;
+    }
+}
+
+
+/* =========================================
    ANA GİRİŞ
 ========================================= */
 
@@ -986,6 +1163,54 @@ footer {
 
 
 <body>
+
+
+<!-- =========================================
+     ÜST BAR
+========================================= -->
+
+<header class="navbar">
+
+    <a href="/" class="nav-logo">
+
+        <div class="nav-logo-mark">
+
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <div></div>
+            <div></div>
+            <div></div>
+
+        </div>
+
+
+        <span class="nav-logo-text">
+            Rubik Academy
+        </span>
+
+    </a>
+
+
+    <nav class="nav-links">
+
+        <a href="/" class="active">
+            Ana Sayfa
+        </a>
+
+        <a href="https://www.rubikacademy.fun/icerikler">
+            İçerikler
+        </a>
+
+    </nav>
+
+</header>
+
 
 
 <!-- =========================================
