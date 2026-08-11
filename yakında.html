@@ -3,6 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- =========================================================
+   SAYFA YÜKLENMEDEN ÖNCE TEMA KONTROLÜ (Çakmayı ve mod kaybını önler)
+========================================================= -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark-mode");
+    }
+  })();
+</script>
+
 <title>Rubik Academy | Çok Yakında!</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +36,31 @@
     --text: #172033;
     --text-soft: #64748b;
     --border: #e2e8f0;
+    --card-border: #e0eaf4;
     --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+    --badge-bg: #edf7ff;
+    --badge-border: #cfe8ff;
+    --badge-text: #1682d4;
+    --h1-color: #152238;
+}
+
+/* Karanlık Mod Değişkenleri */
+html.dark-mode,
+body.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --card-border: #334155;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+    --badge-bg: #1e3a8a;
+    --badge-border: #1d4ed8;
+    --badge-text: #60a5fa;
+    --h1-color: #f8fafc;
 }
 
 /* =========================================
@@ -37,9 +74,10 @@
 
 body {
     font-family: "Inter", sans-serif;
-    background: #f8fbff;
+    background: var(--background);
     color: var(--text);
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 a {
@@ -62,6 +100,12 @@ a {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .navbar,
+body.dark-mode .navbar {
+    background: rgba(15, 23, 42, 0.90);
 }
 
 .nav-logo {
@@ -135,6 +179,26 @@ a {
     color: var(--primary);
 }
 
+/* KARANLIK MOD BUTONU */
+.dark-mode-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+}
+
+.dark-mode-btn:hover {
+    transform: scale(1.08);
+}
+
 @media(max-width: 500px) {
     .navbar {
         padding: 14px 5%;
@@ -157,10 +221,8 @@ a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background:
-        radial-gradient(circle at 50% 0%, #dff3ff 0, transparent 40%),
-        radial-gradient(circle at 100% 100%, #edf6ff 0, transparent 30%),
-        #f8fbff;
+    background: var(--background);
+    transition: background-color 0.3s;
 }
 
 /* NAV / GERİ DÖN */
@@ -176,33 +238,34 @@ a {
     gap: 8px;
     padding: 11px 20px;
     border-radius: 12px;
-    background: #ffffff;
-    border: 1px solid #dceafd;
-    color: #1684d1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
     font-size: 13px;
     font-weight: 800;
-    box-shadow: 0 4px 15px rgba(22, 132, 209, 0.06);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
     transition: all .25s ease;
 }
 
 .back-btn:hover {
     transform: translateX(-4px);
     border-color: #c0e0fc;
-    background: #f4f9ff;
+    background: var(--primary-light);
 }
 
 /* YAKINDA KART KUTUSU */
 .coming-soon-card {
     width: 100%;
     max-width: 850px;
-    background: #ffffff;
+    background: var(--surface);
     border-radius: 32px;
-    border: 1px solid #e0eaf4;
+    border: 1px solid var(--card-border);
     padding: 60px 40px;
     text-align: center;
-    box-shadow: 0 20px 50px rgba(39, 84, 125, 0.08);
+    box-shadow: var(--shadow);
     position: relative;
     overflow: hidden;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .coming-soon-card::before {
@@ -211,7 +274,7 @@ a {
     width: 300px;
     height: 300px;
     border-radius: 50%;
-    border: 45px solid rgba(240, 247, 255, 0.6);
+    border: 45px solid rgba(255, 255, 255, 0.05);
     top: -150px;
     right: -100px;
     z-index: 1;
@@ -229,9 +292,9 @@ a {
     gap: 8px;
     padding: 8px 16px;
     border-radius: 50px;
-    background: #edf7ff;
-    border: 1px solid #cfe8ff;
-    color: #1682d4;
+    background: var(--badge-bg);
+    border: 1px solid var(--badge-border);
+    color: var(--badge-text);
     font-size: 11px;
     font-weight: 900;
     letter-spacing: 1.5px;
@@ -250,7 +313,7 @@ a {
     width: 160px;
     height: 160px;
     margin: 0 auto 30px;
-    filter: drop-shadow(0 15px 20px rgba(22, 132, 209, 0.15));
+    filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.15));
     animation: floating 4s ease-in-out infinite;
 }
 
@@ -263,18 +326,18 @@ a {
     font-size: clamp(32px, 4vw, 48px);
     font-weight: 950;
     letter-spacing: -1.5px;
-    color: #152238;
+    color: var(--h1-color);
     margin-bottom: 15px;
 }
 
 .coming-soon-card h1 span {
-    color: #1682d4;
+    color: var(--primary);
 }
 
 .coming-soon-card p {
     font-size: 15px;
     line-height: 1.7;
-    color: #708198;
+    color: var(--text-soft);
     max-width: 540px;
     margin: 0 auto 35px;
 }
@@ -285,18 +348,18 @@ a {
     gap: 10px;
     padding: 14px 28px;
     border-radius: 14px;
-    background: #1682d4;
+    background: var(--primary);
     color: #ffffff;
     font-size: 13px;
     font-weight: 800;
-    box-shadow: 0 10px 25px rgba(22, 130, 212, 0.3);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
     transition: all .25s ease;
 }
 
 .action-btn:hover {
-    background: #1272bc;
+    background: var(--primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 14px 30px rgba(22, 130, 212, 0.4);
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.4);
 }
 
 @media(max-width: 600px) {
@@ -340,6 +403,10 @@ a {
             İçerikler
         </a>
     </nav>
+
+    <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+        🌙
+    </button>
 </header>
 
 <!-- =========================================
@@ -392,6 +459,41 @@ a {
     </div>
 
 </div>
+
+<script>
+/* =========================================================
+   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
+========================================================= */
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+    
+    var btn = document.getElementById("darkModeBtn");
+
+    if (isDark) {
+        localStorage.setItem("theme", "dark");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        localStorage.setItem("theme", "light");
+        if(btn) btn.innerHTML = "🌙";
+    }
+}
+
+// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+    
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        if(btn) btn.innerHTML = "🌙";
+    }
+});
+</script>
 
 </body>
 </html>
