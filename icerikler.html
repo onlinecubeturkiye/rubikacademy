@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- =========================================================
+   SAYFA YÜKLENMEDEN ÖNÇE TEMA KONTROLÜ (Çakmayı ve mod kaybını önler)
+========================================================= -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark-mode");
+    }
+  })();
+</script>
+
 <title>Rubik Academy - Küp Eğitimleri</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,8 +50,9 @@ rel="stylesheet"
     --primary: #2563eb;
 }
 
-/* Karanlık mod değişkenleri */
-.dark-mode {
+/* Karanlık mod değişkenleri - Hem html hem body seçicilerini kapsar */
+html.dark-mode,
+body.dark-mode {
     --background: #0f172a;
     --surface: #1e293b;
     --surface-soft: #334155;
@@ -103,7 +116,8 @@ a{
     transition: background-color 0.3s, border-color 0.3s;
 }
 
-.dark-mode .navbar {
+html.dark-mode .navbar,
+body.dark-mode .navbar {
     background: rgba(15, 23, 42, 0.90);
 }
 
@@ -1048,14 +1062,16 @@ a{
 
 <script>
 /* =========================================================
-   KARANLIK MOD MANTIĞI & LOCALSTORAGE (Hafızada Tutma)
+   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
 ========================================================= */
 
 function toggleDarkMode() {
-    document.body.classList.toggle("dark-mode");
-    const btn = document.getElementById("darkModeBtn");
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+    
+    var btn = document.getElementById("darkModeBtn");
 
-    if (document.body.classList.contains("dark-mode")) {
+    if (isDark) {
         localStorage.setItem("theme", "dark");
         if(btn) btn.innerHTML = "☀️";
     } else {
@@ -1064,34 +1080,34 @@ function toggleDarkMode() {
     }
 }
 
-// Sayfa yüklendiğinde hafızadaki modu uygula
-(function checkTheme() {
-    const savedTheme = localStorage.getItem("theme");
-    const btn = document.getElementById("darkModeBtn");
-
+// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+    
     if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
         document.body.classList.add("dark-mode");
         if(btn) btn.innerHTML = "☀️";
     } else {
-        document.body.classList.remove("dark-mode");
         if(btn) btn.innerHTML = "🌙";
     }
-})();
+});
 
 /* =========================================================
    KART HAREKETİ (3D Efekt)
 ========================================================= */
 
-document.querySelectorAll(".card").forEach(card => {
-    card.addEventListener("mousemove", e => {
+document.querySelectorAll(".card").forEach(function(card) {
+    card.addEventListener("mousemove", function(e) {
         if(window.innerWidth < 800) return;
 
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        var rect = card.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
 
-        const rotateY = ((x / rect.width) - .5) * 2.2;
-        const rotateX = ((y / rect.height) - .5) * -2.2;
+        var rotateY = ((x / rect.width) - .5) * 2.2;
+        var rotateX = ((y / rect.height) - .5) * -2.2;
 
         card.style.transform = `
             translateY(-8px)
@@ -1101,14 +1117,14 @@ document.querySelectorAll(".card").forEach(card => {
         `;
     });
 
-    card.addEventListener("mouseleave", () => {
+    card.addEventListener("mouseleave", function() {
         card.style.transform = "";
     });
 });
 
-window.addEventListener("resize", () => {
+window.addEventListener("resize", function() {
     if(window.innerWidth < 800){
-        document.querySelectorAll(".card").forEach(card => {
+        document.querySelectorAll(".card").forEach(function(card) {
             card.style.transform = "";
         });
     }
