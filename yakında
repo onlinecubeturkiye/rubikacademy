@@ -5,47 +5,175 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rubik Academy | Çok Yakında!</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+/* =========================================
+   RENKLER VE DEĞİŞKENLER
+========================================= */
+:root {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-soft: #f1f5f9;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
 }
 
-body{
-    font-family: Inter, Arial, Helvetica, sans-serif;
-    background:#f8fbff;
-    color:#162235;
+/* =========================================
+   GENEL SIFIRLAMA
+========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-a{
-    text-decoration:none;
-    color:inherit;
+body {
+    font-family: "Inter", sans-serif;
+    background: #f8fbff;
+    color: var(--text);
+    overflow-x: hidden;
 }
 
-.page{
-    min-height:100vh;
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* =========================================
+   ÜST BAR (NAVBAR)
+========================================= */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 7%;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo-mark {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    padding: 4px;
+    border-radius: 10px;
+    background: #1e293b;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+}
+
+.nav-logo-mark div {
+    border-radius: 2px;
+    background: #f8fafc;
+}
+
+.nav-logo-mark div:nth-child(2),
+.nav-logo-mark div:nth-child(8) {
+    background: #ef4444;
+}
+
+.nav-logo-mark div:nth-child(4),
+.nav-logo-mark div:nth-child(6) {
+    background: #22c55e;
+}
+
+.nav-logo-mark div:nth-child(5) {
+    background: #3b82f6;
+}
+
+.nav-logo-mark div:nth-child(1),
+.nav-logo-mark div:nth-child(9) {
+    background: #facc15;
+}
+
+.nav-logo-text {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links a {
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    transition: .25s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+@media(max-width: 500px) {
+    .navbar {
+        padding: 14px 5%;
+    }
+    .nav-logo-text {
+        font-size: 15px;
+    }
+    .nav-links a {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+/* =========================================
+   SAYFA DÜZENİ & ÇOK YAKINDA KARTI
+========================================= */
+.page {
+    min-height: calc(100vh - 71px);
     padding: 40px 5% 60px;
     display: flex;
     flex-direction: column;
     align-items: center;
     background:
-    radial-gradient(circle at 50% 0%, #dff3ff 0, transparent 40%),
-    radial-gradient(circle at 100% 100%, #edf6ff 0, transparent 30%),
-    #f8fbff;
+        radial-gradient(circle at 50% 0%, #dff3ff 0, transparent 40%),
+        radial-gradient(circle at 100% 100%, #edf6ff 0, transparent 30%),
+        #f8fbff;
 }
 
 /* NAV / GERİ DÖN */
-.nav-bar{
+.nav-bar {
     width: 100%;
     max-width: 850px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
-.back-btn{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 11px 20px;
     border-radius: 12px;
     background: #ffffff;
@@ -57,14 +185,14 @@ a{
     transition: all .25s ease;
 }
 
-.back-btn:hover{
+.back-btn:hover {
     transform: translateX(-4px);
     border-color: #c0e0fc;
     background: #f4f9ff;
 }
 
 /* YAKINDA KART KUTUSU */
-.coming-soon-card{
+.coming-soon-card {
     width: 100%;
     max-width: 850px;
     background: #ffffff;
@@ -77,28 +205,28 @@ a{
     overflow: hidden;
 }
 
-.coming-soon-card::before{
-    content:"";
-    position:absolute;
-    width:300px;
-    height:300px;
-    border-radius:50%;
+.coming-soon-card::before {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
     border: 45px solid rgba(240, 247, 255, 0.6);
-    top:-150px;
-    right:-100px;
+    top: -150px;
+    right: -100px;
     z-index: 1;
 }
 
-.content-wrap{
+.content-wrap {
     position: relative;
     z-index: 2;
 }
 
 /* BADGE */
-.badge{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 8px 16px;
     border-radius: 50px;
     background: #edf7ff;
@@ -110,15 +238,15 @@ a{
     margin-bottom: 25px;
 }
 
-.badge i{
+.badge i {
     width: 7px;
     height: 7px;
     border-radius: 50%;
     background: #20a4f3;
 }
 
-/* YAKINDA ICON (3D Kum Saati/Saat) */
-.icon-wrap{
+/* YAKINDA ICON */
+.icon-wrap {
     width: 160px;
     height: 160px;
     margin: 0 auto 30px;
@@ -126,12 +254,12 @@ a{
     animation: floating 4s ease-in-out infinite;
 }
 
-@keyframes floating{
-    0%,100%{ transform: translateY(0); }
-    50%{ transform: translateY(-10px); }
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
-.coming-soon-card h1{
+.coming-soon-card h1 {
     font-size: clamp(32px, 4vw, 48px);
     font-weight: 950;
     letter-spacing: -1.5px;
@@ -139,11 +267,11 @@ a{
     margin-bottom: 15px;
 }
 
-.coming-soon-card h1 span{
+.coming-soon-card h1 span {
     color: #1682d4;
 }
 
-.coming-soon-card p{
+.coming-soon-card p {
     font-size: 15px;
     line-height: 1.7;
     color: #708198;
@@ -151,7 +279,7 @@ a{
     margin: 0 auto 35px;
 }
 
-.action-btn{
+.action-btn {
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -165,66 +293,103 @@ a{
     transition: all .25s ease;
 }
 
-.action-btn:hover{
+.action-btn:hover {
     background: #1272bc;
     transform: translateY(-2px);
     box-shadow: 0 14px 30px rgba(22, 130, 212, 0.4);
 }
 
-@media(max-width:600px){
-    .coming-soon-card{ padding: 40px 20px; }
-    .icon-wrap{ width: 130px; height: 130px; }
+@media(max-width: 600px) {
+    .coming-soon-card { padding: 40px 20px; }
+    .icon-wrap { width: 130px; height: 130px; }
 }
 </style>
 </head>
 
 <body>
 
+<!-- =========================================
+     ÜST BAR (NAVBAR)
+========================================= -->
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <div class="nav-logo-mark">
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <span class="nav-logo-text">
+            Rubik Academy
+        </span>
+    </a>
+
+    <nav class="nav-links">
+        <a href="http://rubikacademy.fun">
+            Ana Sayfa
+        </a>
+        <a href="http://rubikacademy.fun/icerikler" class="active">
+            İçerikler
+        </a>
+    </nav>
+</header>
+
+<!-- =========================================
+     SAYFA İÇERİĞİ
+========================================= -->
 <div class="page">
 
-<!-- GERİ DÖN NAVİGASYONU -->
-<nav class="nav-bar">
-    <a href="https://sites.google.com/view/rubikacademy/i%C3%A7erikler_1?authuser=0" class="back-btn">← Eğitimlere Geri Dön</a>
-</nav>
+    <!-- GERİ DÖN NAVİGASYONU -->
+    <nav class="nav-bar">
+        <a href="http://rubikacademy.fun/icerikler" class="back-btn">← Eğitimlere Geri Dön</a>
+    </nav>
 
-<!-- İÇERİK KUTUSU -->
-<div class="coming-soon-card">
-    <div class="content-wrap">
-        
-        <div class="badge">
-            <i></i>
-            İÇERİK HAZIRLANIYOR
+    <!-- İÇERİK KUTUSU -->
+    <div class="coming-soon-card">
+        <div class="content-wrap">
+            
+            <div class="badge">
+                <i></i>
+                İÇERİK HAZIRLANIYOR
+            </div>
+
+            <!-- 3D ANİMASYONLU SAAT/SAYFA İKONU -->
+            <div class="icon-wrap">
+                <svg viewBox="0 0 200 200" width="100%" height="100%">
+                    <circle cx="100" cy="100" r="85" fill="#edf7ff" stroke="#cfe8ff" stroke-width="6"/>
+                    <circle cx="100" cy="100" r="65" fill="#ffffff" stroke="#e0eaf4" stroke-width="4"/>
+                    <!-- Akrep / Yelkovan -->
+                    <path d="M100 100 L100 55" stroke="#1682d4" stroke-width="8" stroke-linecap="round"/>
+                    <path d="M100 100 L135 100" stroke="#20a4f3" stroke-width="8" stroke-linecap="round"/>
+                    <circle cx="100" cy="100" r="10" fill="#152238"/>
+                    <!-- Dekoratif Noktalar -->
+                    <circle cx="100" cy="42" r="4" fill="#708198"/>
+                    <circle cx="158" cy="100" r="4" fill="#708198"/>
+                    <circle cx="100" cy="158" r="4" fill="#708198"/>
+                    <circle cx="42" cy="100" r="4" fill="#708198"/>
+                </svg>
+            </div>
+
+            <h1>Bu Eğitim <span>Çok Yakında!</span></h1>
+            
+            <p>
+                Rubik Academy ekibi olarak bu bölümün rehber ve algoritma videolarını titizlikle hazırlıyoruz. Takipte kal, çok yakında yayınlanacak!
+            </p>
+
+            <a href="http://rubikacademy.fun/icerikler" class="action-btn">
+                Diğer Eğitimlere Göz At →
+            </a>
+
         </div>
-
-        <!-- 3D ANİMASYONLU SAAT/SAYFA İKONU -->
-        <div class="icon-wrap">
-            <svg viewBox="0 0 200 200" width="100%" height="100%">
-                <circle cx="100" cy="100" r="85" fill="#edf7ff" stroke="#cfe8ff" stroke-width="6"/>
-                <circle cx="100" cy="100" r="65" fill="#ffffff" stroke="#e0eaf4" stroke-width="4"/>
-                <!-- Akrep / Yelkovan -->
-                <path d="M100 100 L100 55" stroke="#1682d4" stroke-width="8" stroke-linecap="round"/>
-                <path d="M100 100 L135 100" stroke="#20a4f3" stroke-width="8" stroke-linecap="round"/>
-                <circle cx="100" cy="100" r="10" fill="#152238"/>
-                <!-- Dekoratif Noktalar -->
-                <circle cx="100" cy="42" r="4" fill="#708198"/>
-                <circle cx="158" cy="100" r="4" fill="#708198"/>
-                <circle cx="100" cy="158" r="4" fill="#708198"/>
-                <circle cx="42" cy="100" r="4" fill="#708198"/>
-            </svg>
-        </div>
-
-        <h1>Bu Eğitim <span>Çok Yakında!</span></h1>
-        
-        <p>
-            Rubik Academy ekibi olarak bu bölümün rehber ve algoritma videolarını titizlikle hazırlıyoruz. Takipte kal, çok yakında yayınlanacak!
-        </p>
-
-        <a href="https://sites.google.com/view/rubikacademy/i%C3%A7erikler" class="action-btn">
-            Diğer Eğitimlere Göz At →
-        </a>
-
     </div>
-</div>
 
 </div>
 
