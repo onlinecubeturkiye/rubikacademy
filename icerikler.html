@@ -78,6 +78,50 @@ body.dark-mode {
     --primary: #3b82f6;
 }
 
+/* =========================================================
+   ARKA PLAN IŞIK EFEKTİ (AMBIENT GLOW)
+========================================================= */
+.bg-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -999;
+    pointer-events: none;
+}
+
+.bg-glow::before,
+.bg-glow::after {
+    content: "";
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.18;
+    animation: floatGlow 15s infinite alternate ease-in-out;
+}
+
+.bg-glow::before {
+    background: #2563eb;
+    top: -100px;
+    left: -100px;
+}
+
+.bg-glow::after {
+    background: #6366f1;
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -7s;
+}
+
+@keyframes floatGlow {
+    0% { transform: translate(0px, 0px) scale(1); }
+    100% { transform: translate(150px, 200px) scale(1.25); }
+}
+
 *{
     box-sizing:border-box;
     margin:0;
@@ -98,6 +142,7 @@ body{
     background: var(--background);
     color: var(--text);
     transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
 }
 
 a{
@@ -243,7 +288,7 @@ body.dark-mode .navbar {
     width:100%;
     min-height:100vh;
     padding: 55px 5% 90px;
-    background: var(--background);
+    background: transparent;
 }
 
 /* =========================================================
@@ -522,6 +567,11 @@ body.dark-mode .navbar {
     color: var(--text-soft);
 }
 
+html.dark-mode .bg-glow::before,
+html.dark-mode .bg-glow::after {
+    opacity: 0.25;
+}
+
 /* RESPONSIVE */
 @media(max-width:1050px){
     .cards{ grid-template-columns: repeat(2,1fr); }
@@ -558,13 +608,16 @@ body.dark-mode .navbar {
 
 <body>
 
+    <!-- Arka Plan Işık Efektleri -->
+    <div class="bg-glow"></div>
+
 <!-- =========================================
      ÜST BAR
 ========================================= -->
 
 <header class="navbar">
 
-    <a href="/" class="nav-logo">
+    <a href="http://rubikacademy.fun" class="nav-logo">
 
         <div class="nav-logo-mark">
 
