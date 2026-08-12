@@ -19,7 +19,7 @@
 <link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
 
 <link rel="canonical" href="https://rubikacademy.fun/square-1">
-<meta name="description" content="Rubik Academy - Square-1 çözme tekniklerini, özel dilim hareketlerini ve algoritma yapılarını adım adım öğren.">
+<meta name="description" content="Rubik Academy - Square-1 çözme tekniklerini, mekanizmasını ve temel çözüm algoritmalarını adım adım öğren.">
 <meta property="og:title" content="Rubik Academy - Square-1 Eğitimi">
 <meta property="og:description" content="Square-1 bulmacasını adım adım çöz! Başlangıçtan ileri seviyeye küp çözme teknikleri ve ipuçları.">
 <meta property="og:type" content="website">
@@ -444,6 +444,25 @@ body.dark-mode .navbar {
     color: #26374b;
 }
 
+.number {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(10px);
+    font-size: 18px;
+    font-weight: 900;
+    color: #26374b;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, .12);
+}
+
 .cube {
     width: 225px;
     height: 225px;
@@ -593,30 +612,30 @@ SQUARE-1
 </div>
 <h1>Square-1 <span>Eğitimleri</span></h1>
 <p>
-Benzersiz dilim hareketleri ve şekil değiştiren mekanizmasıyla Square-1 çözümünü adım adım öğren; küpün formunu koruma ve çözüm tekniklerinde ustalaş.
+Square-1 mekanizmasını ve temel çözüm algoritmalarını adım adım öğren; başlangıçtan ileri seviyeye küp çözme teknikleriyle kendini geliştir.
 </p>
 </div>
 
-<!-- HERO SVG (Square-1) -->
+<!-- HERO SQUARE-1 (2D) -->
 <svg class="hero-cube" viewBox="0 0 300 300">
-  <defs>
-    <filter id="sq1-real-shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
-    </filter>
-  </defs>
-  <g filter="url(#sq1-real-shadow)">
-    <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
-    <g fill="#ffe600" stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-      <path d="M 150 148 L 133 41 L 167 41 Z"/>
-      <path d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
-      <path d="M 152 150 L 259 133 L 259 167 Z"/>
-      <path d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
-      <path d="M 150 152 L 167 259 L 133 259 Z"/>
-      <path d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
-      <path d="M 148 150 L 41 167 L 41 133 Z"/>
-      <path d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
-    </g>
+<defs>
+  <filter id="sq1-hero-shadow" x="-10%" y="-10%" width="120%" height="120%">
+    <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
+  </filter>
+</defs>
+<g filter="url(#sq1-hero-shadow)">
+  <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
+  <g fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M 150 148 L 133 41 L 167 41 Z"/>
+    <path d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
+    <path d="M 152 150 L 259 133 L 259 167 Z"/>
+    <path d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
+    <path d="M 150 152 L 167 259 L 133 259 Z"/>
+    <path d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
+    <path d="M 148 150 L 41 167 L 41 133 Z"/>
+    <path d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
   </g>
+</g>
 </svg>
 </section>
 
@@ -635,22 +654,29 @@ Benzersiz dilim hareketleri ve şekil değiştiren mekanizmasıyla Square-1 çö
 <div class="card-visual beginner">
 <div class="level">BAŞLANGIÇ SEVİYESİ</div>
 <svg class="cube" viewBox="0 0 300 300">
-    <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
-    <g fill="#ffe600" stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-      <path d="M 150 148 L 133 41 L 167 41 Z"/>
-      <path d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
-      <path d="M 152 150 L 259 133 L 259 167 Z"/>
-      <path d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
-      <path d="M 150 152 L 167 259 L 133 259 Z"/>
-      <path d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
-      <path d="M 148 150 L 41 167 L 41 133 Z"/>
-      <path d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
-    </g>
+<defs>
+  <filter id="sq1-beg-shadow" x="-10%" y="-10%" width="120%" height="120%">
+    <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
+  </filter>
+</defs>
+<g filter="url(#sq1-beg-shadow)">
+  <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
+  <g stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path fill="#ffd21f" d="M 150 148 L 133 41 L 167 41 Z"/>
+    <path fill="#ffffff" d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
+    <path fill="#ffd21f" d="M 152 150 L 259 133 L 259 167 Z"/>
+    <path fill="#ffffff" d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
+    <path fill="#ffd21f" d="M 150 152 L 167 259 L 133 259 Z"/>
+    <path fill="#ffffff" d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
+    <path fill="#ffd21f" d="M 148 150 L 41 167 L 41 133 Z"/>
+    <path fill="#ffffff" d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
+  </g>
+</g>
 </svg>
 </div>
 <div class="card-info">
 <h3>Başlangıç Methodu</h3>
-<p>Square-1'i ilk kez çözecekler için, şekil değişimini anlama ve ilk katmanları tamamlama eğitimi.</p>
+<p>Square-1'i ilk kez çözecekler için hazırlanmış, temel katman şekillendirme ve yüzey tamamlama adımlarını içeren başlangıç eğitimi.</p>
 <div class="button">
 <span>Eğitime Başla</span>
 <span class="arrow">→</span>
@@ -663,22 +689,29 @@ Benzersiz dilim hareketleri ve şekil değiştiren mekanizmasıyla Square-1 çö
 <div class="card-visual middle">
 <div class="level">ORTA SEVİYESİ</div>
 <svg class="cube" viewBox="0 0 300 300">
-    <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
-    <g fill="#ffe600" stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-      <path d="M 150 148 L 133 41 L 167 41 Z"/>
-      <path d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
-      <path d="M 152 150 L 259 133 L 259 167 Z"/>
-      <path d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
-      <path d="M 150 152 L 167 259 L 133 259 Z"/>
-      <path d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
-      <path d="M 148 150 L 41 167 L 41 133 Z"/>
-      <path d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
-    </g>
+<defs>
+  <filter id="sq1-mid-shadow" x="-10%" y="-10%" width="120%" height="120%">
+    <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
+  </filter>
+</defs>
+<g filter="url(#sq1-mid-shadow)">
+  <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
+  <g stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path fill="#ffffff" d="M 150 148 L 133 41 L 167 41 Z"/>
+    <path fill="#ffffff" d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
+    <path fill="#ffd21f" d="M 152 150 L 259 133 L 259 167 Z"/>
+    <path fill="#ffd21f" d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
+    <path fill="#ffffff" d="M 150 152 L 167 259 L 133 259 Z"/>
+    <path fill="#ffffff" d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
+    <path fill="#ffd21f" d="M 148 150 L 41 167 L 41 133 Z"/>
+    <path fill="#ffd21f" d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
+  </g>
+</g>
 </svg>
 </div>
 <div class="card-info">
 <h3>Orta Seviye Methodu</h3>
-<p>Dilim hareketlerini optimize etme, parite durumlarını çözme ve hız kazanma teknikleri.</p>
+<p>Temel yöntemi bilenler için köşe ve kenar parçalarını daha hızlı yerleştirme odaklı orta seviye çözüm algoritmaları.</p>
 <div class="button">
 <span>Eğitime Başla</span>
 <span class="arrow">→</span>
@@ -691,22 +724,29 @@ Benzersiz dilim hareketleri ve şekil değiştiren mekanizmasıyla Square-1 çö
 <div class="card-visual advanced">
 <div class="level">İLERİ SEVİYE</div>
 <svg class="cube" viewBox="0 0 300 300">
-    <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
-    <g fill="#ffe600" stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-      <path d="M 150 148 L 133 41 L 167 41 Z"/>
-      <path d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
-      <path d="M 152 150 L 259 133 L 259 167 Z"/>
-      <path d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
-      <path d="M 150 152 L 167 259 L 133 259 Z"/>
-      <path d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
-      <path d="M 148 150 L 41 167 L 41 133 Z"/>
-      <path d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
-    </g>
+<defs>
+  <filter id="sq1-adv-shadow" x="-10%" y="-10%" width="120%" height="120%">
+    <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
+  </filter>
+</defs>
+<g filter="url(#sq1-adv-shadow)">
+  <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
+  <g stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path fill="#ffd21f" d="M 150 148 L 133 41 L 167 41 Z"/>
+    <path fill="#ffd21f" d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
+    <path fill="#ffffff" d="M 152 150 L 259 133 L 259 167 Z"/>
+    <path fill="#ffffff" d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
+    <path fill="#ffd21f" d="M 150 152 L 167 259 L 133 259 Z"/>
+    <path fill="#ffd21f" d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
+    <path fill="#ffffff" d="M 148 150 L 41 167 L 41 133 Z"/>
+    <path fill="#ffffff" d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
+  </g>
+</g>
 </svg>
 </div>
 <div class="card-info">
 <h3>İleri Seviye Methodu</h3>
-<p>Vandenbergh veya CSP gibi gelişmiş yöntemlerle Square-1'de profesyonel süreler elde et.</p>
+<p>Daha hızlı süreler hedefleyenler için gelişmiş Square-1 algoritmaları ve speedcubing teknikleri.</p>
 <div class="button">
 <span>Eğitime Başla</span>
 <span class="arrow">→</span>
@@ -718,8 +758,8 @@ Benzersiz dilim hareketleri ve şekil değiştiren mekanizmasıyla Square-1 çö
 
 <!-- ALT -->
 <section class="bottom">
-<h3>🧩 Dilimle, çevir ve çöz!</h3>
-<p>Rubik Academy ile Square-1'in karmaşık dünyasını çöz.</p>
+<h3>🧩 Seviyeni seç, küpünü hızlandır!</h3>
+<p>Rubik Academy ile Square-1 çözüm becerilerini adım adım geliştir.</p>
 </section>
 
 </div>
