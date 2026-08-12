@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- TEMA VE SEO AYARLARI -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark-mode");
+    }
+  })();
+</script>
+
+<title>Rubik Academy - Pyraminx Eğitimi</title>
+<!-- TARAYICI SEKMESİ İÇİN LOGO -->
+<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
+
+<link rel="canonical" href="https://rubikacademy.fun/pyraminx">
+<meta name="description" content="Rubik Academy - Pyraminx çözme tekniklerini, kenar eşleştirmeyi ve tepe köşelerini adım adım öğren.">
+<meta property="og:title" content="Rubik Academy - Pyraminx Eğitimi">
+<meta property="og:description" content="Üçgen yapılı Pyraminx bulmacasını adım adım çöz! Başlangıçtan ileri seviyeye küp çözme teknikleri ve ipuçları.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/pyraminx">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================
+   RENKLER VE DEĞİŞKENLER
+========================================= */
+:root {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-soft: #f1f5f9;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #e2e8f0;
+    --card-border: #dfebf5;
+    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+    --hero-bg: linear-gradient(120deg, #e8f7ff, #c8eaff);
+    --hero-border: #cce8fa;
+    --btn-bg: #eef8ff;
+    --btn-hover-bg: #dff2ff;
+    --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
+    --bottom-border: #d5eafa;
+    --bottom-text: #18578c;
+}
+
+/* Karanlık Mod Değişkenleri */
+html.dark-mode,
+body.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --card-border: #334155;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+    --hero-bg: linear-gradient(120deg, #1e293b, #0f172a);
+    --hero-border: #334155;
+    --btn-bg: #334155;
+    --btn-hover-bg: #1e3a8a;
+    --bottom-bg: #1e293b;
+    --bottom-border: #334155;
+    --bottom-text: #60a5fa;
+}
+
+/* =========================================
+   GENEL SIFIRLAMA
+========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    background: var(--background);
+    color: var(--text);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* =========================================
+   ÜST BAR (NAVBAR)
+========================================= */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 7%;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .navbar,
+body.dark-mode .navbar {
+    background: rgba(15, 23, 42, 0.90);
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo-mark {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    padding: 4px;
+    border-radius: 10px;
+    background: #1e293b;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+}
+
+.nav-logo-mark div {
+    border-radius: 2px;
+    background: #f8fafc;
+}
+
+.nav-logo-mark div:nth-child(2),
+.nav-logo-mark div:nth-child(8) {
+    background: #ef4444;
+}
+
+.nav-logo-mark div:nth-child(4),
+.nav-logo-mark div:nth-child(6) {
+    background: #22c55e;
+}
+
+.nav-logo-mark div:nth-child(5) {
+    background: #3b82f6;
+}
+
+.nav-logo-mark div:nth-child(1),
+.nav-logo-mark div:nth-child(9) {
+    background: #facc15;
+}
+
+.nav-logo-text {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links a {
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    transition: .25s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* KARANLIK MOD BUTONU */
+.dark-mode-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+}
+
+.dark-mode-btn:hover {
+    transform: scale(1.08);
+}
+
+@media(max-width: 500px) {
+    .navbar {
+        padding: 14px 5%;
+    }
+    .nav-logo-text {
+        font-size: 15px;
+    }
+    .nav-links a {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+/* =========================================
+   SAYFA İÇERİK DÜZENİ
+========================================= */
+.page {
+    min-height: calc(100vh - 71px);
+    padding: 45px 5% 80px;
+    background: var(--background);
+    transition: background-color 0.3s;
+}
+
+/* NAV / GERİ DÖN */
+.nav-bar {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: all .25s ease;
+}
+
+.back-btn:hover {
+    transform: translateX(-4px);
+    border-color: #c0e0fc;
+    background: var(--primary-light);
+}
+
+/* HERO */
+.hero {
+    max-width: 1250px;
+    min-height: 390px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 55px 65px;
+    background: var(--hero-bg);
+    border: 1px solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    left: -180px;
+    top: -180px;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 3;
+    max-width: 590px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 15px;
+    border-radius: 50px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    margin-bottom: 18px;
+}
+
+.badge i {
+    width: 7px;
+    height: 7px;
+    background: #168ee0;
+    border-radius: 50%;
+}
+
+.hero h1 {
+    font-size: clamp(42px, 5vw, 68px);
+    line-height: .98;
+    letter-spacing: -3px;
+    font-weight: 950;
+    margin-bottom: 18px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 15px;
+    line-height: 1.75;
+    max-width: 560px;
+}
+
+.hero-cube {
+    width: 300px;
+    height: 300px;
+    position: relative;
+    z-index: 3;
+    flex-shrink: 0;
+    filter: drop-shadow(0 25px 22px rgba(0, 0, 0, .23));
+    animation: floating 5s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+.section-title {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.section-title small {
+    display: block;
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.7px;
+    margin-bottom: 8px;
+}
+
+.section-title h2 {
+    font-size: 30px;
+    letter-spacing: -1px;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.section-title p {
+    color: var(--text-soft);
+    font-size: 13px;
+    margin-top: 7px;
+}
+
+.methods {
+    max-width: 1250px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 27px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease, background-color 0.3s;
+    display: block;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    border-color: #c7e5fa;
+    box-shadow: 0 25px 50px rgba(35, 108, 162, .14);
+}
+
+.card-visual {
+    height: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.card-visual::before {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    border: 40px solid rgba(255, 255, 255, .25);
+    top: -140px;
+    right: -90px;
+}
+
+.beginner { background: linear-gradient(135deg, #e2f5ff, #91d8ff); }
+.middle { background: linear-gradient(135deg, #e9e4ff, #b7a5ff); }
+.advanced { background: linear-gradient(135deg, #dffaf1, #73d8c3); }
+
+.level {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    padding: 8px 11px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(10px);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #26374b;
+}
+
+.cube {
+    width: 225px;
+    height: 225px;
+    transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+    filter: drop-shadow(0 20px 18px rgba(16, 35, 53, .22));
+}
+
+.card:hover .cube {
+    transform: scale(1.08) translateY(-7px) rotate(-2deg);
+}
+
+.card-info { padding: 25px 25px 27px; }
+
+.card-info h3 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -.5px;
+    margin-bottom: 9px;
+    color: var(--text);
+}
+
+.card-info p {
+    color: var(--text-soft);
+    font-size: 13px;
+    line-height: 1.65;
+    min-height: 64px;
+    margin-bottom: 20px;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 13px 15px;
+    border-radius: 13px;
+    background: var(--btn-bg);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 900;
+    transition: background .25s ease, padding .25s ease, color .25s ease;
+}
+
+.card:hover .button {
+    background: var(--btn-hover-bg);
+    padding-left: 19px;
+}
+
+.arrow { font-size: 18px; }
+
+.bottom {
+    max-width: 1250px;
+    margin: 38px auto 0;
+    padding: 32px;
+    text-align: center;
+    border-radius: 25px;
+    background: var(--bottom-bg);
+    border: 1px solid var(--bottom-border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.bottom h3 { color: var(--bottom-text); font-size: 21px; margin-bottom: 7px; }
+.bottom p { color: var(--text-soft); font-size: 13px; }
+
+@media(max-width: 1000px) {
+    .hero { padding: 45px; }
+    .hero-cube { width: 250px; height: 250px; }
+    .methods { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media(max-width: 700px) {
+    .page { padding: 25px 4% 55px; }
+    .hero { min-height: auto; padding: 38px 25px 25px; flex-direction: column; text-align: center; border-radius: 27px; }
+    .hero-text { max-width: 100%; }
+    .hero h1 { font-size: 43px; }
+    .hero p { font-size: 14px; }
+    .hero-cube { width: 235px; height: 235px; margin-top: 15px; }
+    .methods { grid-template-columns: 1fr; gap: 20px; }
+    .card-visual { height: 320px; }
+    .section-title h2 { font-size: 27px; }
+}
+</style>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<!-- =========================================
+     ÜST BAR (NAVBAR)
+========================================= -->
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <div class="nav-logo-mark">
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <span class="nav-logo-text">
+            Rubik Academy
+        </span>
+    </a>
+
+    <nav class="nav-links">
+        <a href="http://rubikacademy.fun">
+            Ana Sayfa
+        </a>
+        <a href="http://rubikacademy.fun/icerikler" class="active">
+            İçerikler
+        </a>
+    </nav>
+
+    <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+        🌙
+    </button>
+</header>
+
+<div class="page">
+
+<!-- NAVIGATION -->
+<nav class="nav-bar">
+    <a href="http://rubikacademy.fun/icerikler" class="back-btn">← Geri Dön</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+PYRAMINX
+</div>
+<h1>Pyraminx <span>Eğitimleri</span></h1>
+<p>
+Üçgen yapılı Pyraminx bulmacasını çözmeyi sıfırdan öğren; tepe köşelerini hizalamaktan kenar eşleştirmeye, ileri seviye algoritmalara kadar kendini geliştir.
+</p>
+</div>
+
+<!-- HERO PYRAMINX (2D) -->
+<svg class="hero-cube" viewBox="0 0 250 250">
+<polygon points="125.0,8.0 238.0,222.0 12.0,222.0" fill="#111827" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="125.0,26.3 94.7,83.9 155.3,83.9" fill="#1e6fe6" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="94.7,88.1 125.0,145.7 155.3,88.1" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="158.7,90.3 128.4,147.9 189.0,147.9" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="128.4,152.1 158.7,209.7 189.0,152.1" fill="#f97316" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="192.3,154.3 162.0,211.9 222.6,211.9" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="91.3,90.3 61.0,147.9 121.6,147.9" fill="#1e6fe6" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="61.0,152.1 91.3,209.7 121.6,152.1" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="125.0,154.3 94.7,211.9 155.3,211.9" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="57.7,154.3 27.4,211.9 88.0,211.9" fill="#f97316" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+</svg>
+</section>
+
+<!-- BAŞLIK -->
+<section class="section-title">
+<small>ÖĞRENME YOLCULUĞU</small>
+<h2>Pyraminx Methodları</h2>
+<p>Seviyeni seç ve küp çözme yolculuğuna başla.</p>
+</section>
+
+<!-- KARTLAR -->
+<section class="methods">
+
+<!-- BAŞLANGIÇ -->
+<a href="http://rubikacademy.fun/yakinda.html" class="card">
+<div class="card-visual beginner">
+<div class="level">BAŞLANGIÇ SEVİYESİ</div>
+<svg class="cube" viewBox="0 0 250 250">
+<polygon points="125.0,8.0 238.0,222.0 12.0,222.0" fill="#111827" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="125.0,26.3 94.7,83.9 155.3,83.9" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="94.7,88.1 125.0,145.7 155.3,88.1" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="158.7,90.3 128.4,147.9 189.0,147.9" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="128.4,152.1 158.7,209.7 189.0,152.1" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="192.3,154.3 162.0,211.9 222.6,211.9" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="91.3,90.3 61.0,147.9 121.6,147.9" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="61.0,152.1 91.3,209.7 121.6,152.1" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="125.0,154.3 94.7,211.9 155.3,211.9" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="57.7,154.3 27.4,211.9 88.0,211.9" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+</svg>
+</div>
+<div class="card-info">
+<h3>Başlangıç Methodu</h3>
+<p>Pyraminx'i ilk kez çözecekler için hazırlanmış, tepe köşelerini ve kenarları adım adım tamamlayan başlangıç eğitimi.</p>
+<div class="button">
+<span>Eğitime Başla</span>
+<span class="arrow">→</span>
+</div>
+</div>
+</a>
+
+<!-- ORTA -->
+<a href="http://rubikacademy.fun/yakinda.html" class="card">
+<div class="card-visual middle">
+<div class="level">ORTA SEVİYESİ</div>
+<svg class="cube" viewBox="0 0 250 250">
+<polygon points="125.0,8.0 238.0,222.0 12.0,222.0" fill="#111827" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="125.0,26.3 94.7,83.9 155.3,83.9" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="94.7,88.1 125.0,145.7 155.3,88.1" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="158.7,90.3 128.4,147.9 189.0,147.9" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="128.4,152.1 158.7,209.7 189.0,152.1" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="192.3,154.3 162.0,211.9 222.6,211.9" fill="#f97316" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="91.3,90.3 61.0,147.9 121.6,147.9" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="61.0,152.1 91.3,209.7 121.6,152.1" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="125.0,154.3 94.7,211.9 155.3,211.9" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="57.7,154.3 27.4,211.9 88.0,211.9" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+</svg>
+</div>
+<div class="card-info">
+<h3>Orta Seviye Methodu</h3>
+<p>Temel yöntemi bilenler için kenar eşleştirme, hızlı köşe çözümü ve gelişmiş algoritmalar üzerine hazırlanan eğitim.</p>
+<div class="button">
+<span>Eğitime Başla</span>
+<span class="arrow">→</span>
+</div>
+</div>
+</a>
+
+<!-- İLERİ -->
+<a href="http://rubikacademy.fun/yakinda.html" class="card">
+<div class="card-visual advanced">
+<div class="level">İLERİ SEVİYE</div>
+<svg class="cube" viewBox="0 0 250 250">
+<polygon points="125.0,8.0 238.0,222.0 12.0,222.0" fill="#111827" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="125.0,26.3 94.7,83.9 155.3,83.9" fill="#f97316" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="94.7,88.1 125.0,145.7 155.3,88.1" fill="#1e6fe6" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="158.7,90.3 128.4,147.9 189.0,147.9" fill="#ffffff" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="128.4,152.1 158.7,209.7 189.0,152.1" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="192.3,154.3 162.0,211.9 222.6,211.9" fill="#f97316" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="91.3,90.3 61.0,147.9 121.6,147.9" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="61.0,152.1 91.3,209.7 121.6,152.1" fill="#1e6fe6" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="125.0,154.3 94.7,211.9 155.3,211.9" fill="#ffffff" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="57.7,154.3 27.4,211.9 88.0,211.9" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+</svg>
+</div>
+<div class="card-info">
+<h3>İleri Seviye Methodu</h3>
+<p>Daha hızlı süreler hedefleyenler için gelişmiş algoritmalar ve speedcubing teknikleri.</p>
+<div class="button">
+<span>Eğitime Başla</span>
+<span class="arrow">→</span>
+</div>
+</div>
+</a>
+
+</section>
+
+<!-- ALT -->
+<section class="bottom">
+<h3>🧩 Seviyeni seç, küpünü hızlandır!</h3>
+<p>Rubik Academy ile Pyraminx çözüm becerilerini adım adım geliştir.</p>
+</section>
+
+</div>
+
+<script>
+/* =========================================================
+   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
+========================================================= */
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+    
+    var btn = document.getElementById("darkModeBtn");
+
+    if (isDark) {
+        localStorage.setItem("theme", "dark");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        localStorage.setItem("theme", "light");
+        if(btn) btn.innerHTML = "🌙";
+    }
+}
+
+// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+    
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        if(btn) btn.innerHTML = "🌙";
+    }
+});
+</script>
+
+</body>
+</html>
