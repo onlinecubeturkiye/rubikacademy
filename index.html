@@ -262,6 +262,16 @@ a {
 }
 
 
+.nav-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
 .nav-links {
 
     display: flex;
@@ -323,6 +333,20 @@ a {
         padding: 8px 12px;
 
         font-size: 13px;
+    }
+
+
+    .nav-right {
+
+        gap: 6px;
+    }
+
+
+    .lang-switch-btn {
+
+        padding: 0 10px;
+
+        font-size: 12px;
     }
 }
 
@@ -1237,6 +1261,38 @@ footer {
     transform: scale(1.08);
 }
 
+/* =========================================
+   DİL SEÇİCİ
+========================================= */
+
+.lang-switch-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 21px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: .3s;
+}
+
+.lang-switch-btn:hover {
+    transform: scale(1.06);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-switch-btn .lang-globe {
+    font-size: 15px;
+    line-height: 1;
+}
+
 /* Karanlık mod renkleri */
 
 html.dark-mode,
@@ -1374,21 +1430,29 @@ html.dark-mode .bg-glow::after {
     </a>
 
 
-    <nav class="nav-links">
+    <div class="nav-right">
 
-    <a href="http://rubikacademy.fun" class="active">
-        Ana Sayfa
-    </a>
+        <nav class="nav-links">
 
-    <a href="http://rubikacademy.fun/icerikler">
-        İçerikler
-    </a>
+            <a href="http://rubikacademy.fun" class="active" data-i18n="navHome">
+                Ana Sayfa
+            </a>
 
-</nav>
+            <a href="http://rubikacademy.fun/icerikler" data-i18n="navContent">
+                İçerikler
+            </a>
 
-<button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-    🌙
-</button>
+        </nav>
+
+        <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLanguage()" aria-label="Dili değiştir / Switch language">
+            <span class="lang-globe">🌐</span><span id="langLabel">EN</span>
+        </button>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+            🌙
+        </button>
+
+    </div>
     
 </header>
 
@@ -1406,7 +1470,7 @@ html.dark-mode .bg-glow::after {
         <div class="hero-content reveal">
 
 
-            <div class="badge">
+            <div class="badge" data-i18n="badge">
 
                 Speedcubing'e Hoş Geldin
 
@@ -1415,20 +1479,20 @@ html.dark-mode .bg-glow::after {
 
             <h1>
 
-                Rubik Küpü
+                <span data-i18n="heroTitle1">Rubik Küpü</span>
 
-                <span class="gradient-text">
+                <span class="gradient-text" data-i18n="heroTitleGradient">
                     öğren.
                 </span>
 
                 <br>
 
-                Hızını geliştir.
+                <span data-i18n="heroTitle2">Hızını geliştir.</span>
 
             </h1>
 
 
-            <p>
+            <p data-i18n="heroP">
 
                 Rubik Academy, Rubik küp çözmeyi öğrenmek
                 ve çözüm sürelerini geliştirmek isteyenler
@@ -1441,6 +1505,7 @@ html.dark-mode .bg-glow::after {
             <a
                 href="#academy"
                 class="btn btn-primary"
+                data-i18n="heroBtn"
             >
 
                 Öğrenmeye Başla →
@@ -1491,12 +1556,12 @@ html.dark-mode .bg-glow::after {
 
         <div class="section-heading reveal">
 
-            <span>
+            <span data-i18n="academySpan">
                 Rubik Academy
             </span>
 
 
-            <h2>
+            <h2 data-i18n="academyH2">
 
                 Küp çözmeyi
                 sistemli şekilde öğren.
@@ -1504,7 +1569,7 @@ html.dark-mode .bg-glow::after {
             </h2>
 
 
-            <p>
+            <p data-i18n="academyP">
 
                 Temelden başlayıp speedcubing seviyesine
                 kadar ilerleyebileceğin içerikler.
@@ -1525,12 +1590,12 @@ html.dark-mode .bg-glow::after {
                 </div>
 
 
-                <h3>
+                <h3 data-i18n="card1Title">
                     3x3 Rubik Küp
                 </h3>
 
 
-                <p>
+                <p data-i18n="card1P">
 
                     3x3 Rubik küpü adım adım öğren.
                     Temel hareketlerden ileri seviyeye
@@ -1549,12 +1614,12 @@ html.dark-mode .bg-glow::after {
                 </div>
 
 
-                <h3>
+                <h3 data-i18n="card2Title">
                     Algoritmalar
                 </h3>
 
 
-                <p>
+                <p data-i18n="card2P">
 
                     Daha hızlı çözüm yapabilmek için
                     gerekli algoritmaları öğren ve
@@ -1573,12 +1638,12 @@ html.dark-mode .bg-glow::after {
                 </div>
 
 
-                <h3>
+                <h3 data-i18n="card3Title">
                     Speedcubing
                 </h3>
 
 
-                <p>
+                <p data-i18n="card3P">
 
                     Çözüm sürelerini geliştir,
                     kendi rekorlarını kır ve
@@ -1608,17 +1673,17 @@ html.dark-mode .bg-glow::after {
 
         <div class="section-heading reveal">
 
-            <span>
+            <span data-i18n="learningSpan">
                 Eğitim
             </span>
 
 
-            <h2>
+            <h2 data-i18n="learningH2">
                 Adım adım ilerle.
             </h2>
 
 
-            <p>
+            <p data-i18n="learningP">
 
                 Rubik küp öğrenme sürecini
                 kolay ve anlaşılır hale getir.
@@ -1634,17 +1699,17 @@ html.dark-mode .bg-glow::after {
 
             <div class="learning-card reveal">
 
-                <div class="learning-number">
+                <div class="learning-number" data-i18n="l1num">
                     01 — BAŞLANGIÇ
                 </div>
 
 
-                <h3>
+                <h3 data-i18n="l1title">
                     Küpü Tanı
                 </h3>
 
 
-                <p>
+                <p data-i18n="l1p">
 
                     Rubik küpün yapısını,
                     yüzlerini, merkez parçalarını,
@@ -1658,17 +1723,17 @@ html.dark-mode .bg-glow::after {
 
             <div class="learning-card reveal">
 
-                <div class="learning-number">
+                <div class="learning-number" data-i18n="l2num">
                     02 — TEMEL
                 </div>
 
 
-                <h3>
+                <h3 data-i18n="l2title">
                     İlk Çözümünü Yap
                 </h3>
 
 
-                <p>
+                <p data-i18n="l2p">
 
                     Temel hareketleri öğrenerek
                     Rubik küpünü baştan sona
@@ -1682,17 +1747,17 @@ html.dark-mode .bg-glow::after {
 
             <div class="learning-card reveal">
 
-                <div class="learning-number">
+                <div class="learning-number" data-i18n="l3num">
                     03 — GELİŞİM
                 </div>
 
 
-                <h3>
+                <h3 data-i18n="l3title">
                     Algoritmaları Öğren
                 </h3>
 
 
-                <p>
+                <p data-i18n="l3p">
 
                     Çözüm süreni azaltmak için
                     gerekli algoritmaları
@@ -1706,17 +1771,17 @@ html.dark-mode .bg-glow::after {
 
             <div class="learning-card reveal">
 
-                <div class="learning-number">
+                <div class="learning-number" data-i18n="l4num">
                     04 — SPEEDCUBING
                 </div>
 
 
-                <h3>
+                <h3 data-i18n="l4title">
                     Hızını Geliştir
                 </h3>
 
 
-                <p>
+                <p data-i18n="l4p">
 
                     Farklı teknikleri kullan,
                     pratik yap ve kendi en iyi
@@ -1746,17 +1811,17 @@ html.dark-mode .bg-glow::after {
 
         <div class="section-heading reveal">
 
-            <span>
+            <span data-i18n="socialSpan">
                 Sosyal Medya
             </span>
 
 
-            <h2>
+            <h2 data-i18n="socialH2">
                 Rubik Academy'yi takip et.
             </h2>
 
 
-            <p>
+            <p data-i18n="socialP">
 
                 Yeni içerikleri ve speedcubing
                 paylaşımlarını kaçırma.
@@ -1845,12 +1910,12 @@ html.dark-mode .bg-glow::after {
         <div class="contact-box reveal">
 
 
-            <h2>
+            <h2 data-i18n="contactH2">
                 Bir sorunuz mu var?
             </h2>
 
 
-            <p>
+            <p data-i18n="contactP">
 
                 Sorularınız, önerileriniz veya
                 iş birlikleri için bizimle
@@ -1884,8 +1949,7 @@ html.dark-mode .bg-glow::after {
 
 <footer>
 
-    © 2026 Rubik Academy.
-    Tüm hakları saklıdır.
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
 
 </footer>
 
@@ -1924,6 +1988,128 @@ document.addEventListener("DOMContentLoaded", function() {
     } else {
         if(btn) btn.innerHTML = "🌙";
     }
+});
+
+/* =========================================
+   DİL SEÇİCİ (TR / EN)
+========================================= */
+
+var translations = {
+    tr: {
+        navHome: "Ana Sayfa",
+        navContent: "İçerikler",
+        badge: "Speedcubing'e Hoş Geldin",
+        heroTitle1: "Rubik Küpü",
+        heroTitleGradient: "öğren.",
+        heroTitle2: "Hızını geliştir.",
+        heroP: "Rubik Academy, Rubik küp çözmeyi öğrenmek ve çözüm sürelerini geliştirmek isteyenler için hazırlanmış modern ve sistemli bir eğitim platformudur.",
+        heroBtn: "Öğrenmeye Başla →",
+        academySpan: "Rubik Academy",
+        academyH2: "Küp çözmeyi sistemli şekilde öğren.",
+        academyP: "Temelden başlayıp speedcubing seviyesine kadar ilerleyebileceğin içerikler.",
+        card1Title: "3x3 Rubik Küp",
+        card1P: "3x3 Rubik küpü adım adım öğren. Temel hareketlerden ileri seviyeye kadar kendini geliştir.",
+        card2Title: "Algoritmalar",
+        card2P: "Daha hızlı çözüm yapabilmek için gerekli algoritmaları öğren ve pratik yap.",
+        card3Title: "Speedcubing",
+        card3P: "Çözüm sürelerini geliştir, kendi rekorlarını kır ve speedcubing dünyasında ilerle.",
+        learningSpan: "Eğitim",
+        learningH2: "Adım adım ilerle.",
+        learningP: "Rubik küp öğrenme sürecini kolay ve anlaşılır hale getir.",
+        l1num: "01 — BAŞLANGIÇ",
+        l1title: "Küpü Tanı",
+        l1p: "Rubik küpün yapısını, yüzlerini, merkez parçalarını, köşe ve kenar parçalarını öğren.",
+        l2num: "02 — TEMEL",
+        l2title: "İlk Çözümünü Yap",
+        l2p: "Temel hareketleri öğrenerek Rubik küpünü baştan sona çözmeyi öğren.",
+        l3num: "03 — GELİŞİM",
+        l3title: "Algoritmaları Öğren",
+        l3p: "Çözüm süreni azaltmak için gerekli algoritmaları çalışmaya başla.",
+        l4num: "04 — SPEEDCUBING",
+        l4title: "Hızını Geliştir",
+        l4p: "Farklı teknikleri kullan, pratik yap ve kendi en iyi dereceni oluşturmaya çalış.",
+        socialSpan: "Sosyal Medya",
+        socialH2: "Rubik Academy'yi takip et.",
+        socialP: "Yeni içerikleri ve speedcubing paylaşımlarını kaçırma.",
+        contactH2: "Bir sorunuz mu var?",
+        contactP: "Sorularınız, önerileriniz veya iş birlikleri için bizimle iletişime geçebilirsiniz.",
+        footer: "© 2026 Rubik Academy. Tüm hakları saklıdır."
+    },
+    en: {
+        navHome: "Home",
+        navContent: "Content",
+        badge: "Welcome to Speedcubing",
+        heroTitle1: "Learn the",
+        heroTitleGradient: "Rubik's Cube.",
+        heroTitle2: "Boost your speed.",
+        heroP: "Rubik Academy is a modern, structured learning platform for anyone who wants to learn how to solve the Rubik's Cube and improve their solve times.",
+        heroBtn: "Start Learning →",
+        academySpan: "Rubik Academy",
+        academyH2: "Learn to solve the cube, step by step.",
+        academyP: "Content that takes you from the basics all the way to speedcubing level.",
+        card1Title: "3x3 Rubik's Cube",
+        card1P: "Learn the 3x3 Rubik's Cube step by step. Progress from basic moves to advanced techniques.",
+        card2Title: "Algorithms",
+        card2P: "Learn the algorithms you need for faster solves and put them into practice.",
+        card3Title: "Speedcubing",
+        card3P: "Improve your solve times, beat your own records, and advance in the world of speedcubing.",
+        learningSpan: "Learning Path",
+        learningH2: "Progress step by step.",
+        learningP: "Make the process of learning the Rubik's Cube simple and clear.",
+        l1num: "01 — GETTING STARTED",
+        l1title: "Meet the Cube",
+        l1p: "Learn the structure of the Rubik's Cube: its faces, center pieces, corner pieces, and edge pieces.",
+        l2num: "02 — BASICS",
+        l2title: "Solve It for the First Time",
+        l2p: "Learn the basic moves and solve the Rubik's Cube from start to finish.",
+        l3num: "03 — PROGRESS",
+        l3title: "Learn the Algorithms",
+        l3p: "Start practicing the algorithms you need to bring your solve time down.",
+        l4num: "04 — SPEEDCUBING",
+        l4title: "Boost Your Speed",
+        l4p: "Use different techniques, practice consistently, and work toward your personal best.",
+        socialSpan: "Social Media",
+        socialH2: "Follow Rubik Academy.",
+        socialP: "Don't miss new content and speedcubing updates.",
+        contactH2: "Got a question?",
+        contactP: "Feel free to reach out for questions, suggestions, or collaborations.",
+        footer: "© 2026 Rubik Academy. All rights reserved."
+    }
+};
+
+function applyLanguage(lang) {
+    var dict = translations[lang] || translations.tr;
+
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "tr");
+
+    var label = document.getElementById("langLabel");
+    if (label) {
+        label.textContent = lang === "tr" ? "EN" : "TR";
+    }
+
+    var btn = document.getElementById("langSwitchBtn");
+    if (btn) {
+        btn.setAttribute("aria-label", lang === "tr" ? "Switch to English" : "Türkçeye geç");
+    }
+}
+
+function toggleLanguage() {
+    var current = localStorage.getItem("site-lang") || "tr";
+    var next = current === "tr" ? "en" : "tr";
+    localStorage.setItem("site-lang", next);
+    applyLanguage(next);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
 });
 
 /* =========================================
