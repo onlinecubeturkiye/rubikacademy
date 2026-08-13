@@ -1242,9 +1242,135 @@ html.dark-mode .bg-glow::after {
 
 </div>
 
-<script src="/lang.js"></script>
-
 <script>
+/* =========================================================
+   DİL SEÇİCİ (TR / EN)
+========================================================= */
+
+var translations = {
+    tr: {
+        navHome: "Ana Sayfa",
+        navContent: "İçerikler",
+        ic_title1: "Küp",
+        ic_titleAccent: "Eğitimleri",
+        ic_intro: "Rubik küplerini ve farklı twisty puzzle türlerini adım adım öğren. Başlangıç seviyesinden ileri seviyeye kadar tüm eğitimlere buradan ulaş.",
+        tag_beginner: "BAŞLANGIÇ",
+        c_2x2_title: "2×2 Rubik Küp",
+        c_2x2_p: "2×2 küpün temel çözümünü adım adım öğren.",
+        cta_start: "Eğitime Başla →",
+        tag_popular: "EN POPÜLER",
+        c_3x3_title: "3×3 Rubik Küp",
+        c_3x3_p: "Klasik Rubik küpünü başlangıçtan ileri seviyeye kadar öğren.",
+        tag_intermediate: "ORTA SEVİYE",
+        c_4x4_title: "4×4 Rubik Küp",
+        c_4x4_p: "Merkezleri ve kenarları çözerek 4×4 çözümünü öğren.",
+        tag_advanced: "İLERİ",
+        c_5x5_title: "5×5 Rubik Küp",
+        c_5x5_p: "Büyük küplerin merkez ve kenar çözüm tekniklerini öğren.",
+        tag_expert: "UZMAN",
+        c_6x6_title: "6×6 Rubik Küp",
+        c_6x6_p: "6×6 merkezlerini ve kenarlarını çözmeyi öğren.",
+        c_7x7_title: "7×7 Rubik Küp",
+        c_7x7_p: "En büyük küplerden biri olan 7×7'nin çözümünü öğren.",
+        tag_speedcubing: "SPEEDCUBING",
+        c_oneHand_title: "3×3 One Handed",
+        c_oneHand_p: "Tek elle küp çözme ve hız geliştirme tekniklerini öğren.",
+        tag_puzzle: "PUZZLE",
+        c_pyraminx_title: "Pyraminx",
+        c_pyraminx_p: "Üçgen yapılı Pyraminx'i kolay yöntemlerle çözmeyi öğren.",
+        c_skewb_title: "Skewb",
+        c_skewb_p: "Skewb mekanizmasını ve temel çözüm algoritmalarını öğren.",
+        c_square1_title: "Square-1",
+        c_square1_p: "Şekil değiştiren küpler dünyasına Square-1 ile giriş yap.",
+        c_megaminx_title: "Megaminx",
+        c_megaminx_p: "Çok yüzlü yapıyı ve Megaminx çözüm mantığını öğren.",
+        c_clock_title: "Rubik's Clock",
+        c_clock_p: "Clock mekanizmasını ve çözüm adımlarını öğren.",
+        c_fto_title: "FTO",
+        c_fto_p: "Face Turning Octahedron'un sekiz yüzlü yapısını ve temel çözüm mantığını öğren.",
+        bottom_title: "🧩 Küpünü seç ve öğrenmeye başla!",
+        bottom_p: "Başlangıç seviyesinden speedcubing seviyesine kadar Rubik Academy ile kendini geliştir."
+    },
+    en: {
+        navHome: "Home",
+        navContent: "Content",
+        ic_title1: "Cube",
+        ic_titleAccent: "Tutorials",
+        ic_intro: "Learn Rubik's cubes and different twisty puzzle types step by step. Access all tutorials here, from beginner to advanced level.",
+        tag_beginner: "BEGINNER",
+        c_2x2_title: "2×2 Rubik's Cube",
+        c_2x2_p: "Learn the basic solution of the 2×2 cube step by step.",
+        cta_start: "Start Learning →",
+        tag_popular: "MOST POPULAR",
+        c_3x3_title: "3×3 Rubik's Cube",
+        c_3x3_p: "Learn the classic Rubik's Cube from beginner to advanced level.",
+        tag_intermediate: "INTERMEDIATE",
+        c_4x4_title: "4×4 Rubik's Cube",
+        c_4x4_p: "Learn the 4×4 solution by solving centers and edges.",
+        tag_advanced: "ADVANCED",
+        c_5x5_title: "5×5 Rubik's Cube",
+        c_5x5_p: "Learn center and edge solving techniques for big cubes.",
+        tag_expert: "EXPERT",
+        c_6x6_title: "6×6 Rubik's Cube",
+        c_6x6_p: "Learn to solve the centers and edges of the 6×6.",
+        c_7x7_title: "7×7 Rubik's Cube",
+        c_7x7_p: "Learn to solve the 7×7, one of the largest cubes.",
+        tag_speedcubing: "SPEEDCUBING",
+        c_oneHand_title: "3×3 One Handed",
+        c_oneHand_p: "Learn one-handed solving and speed-building techniques.",
+        tag_puzzle: "PUZZLE",
+        c_pyraminx_title: "Pyraminx",
+        c_pyraminx_p: "Learn to solve the triangular Pyraminx with easy methods.",
+        c_skewb_title: "Skewb",
+        c_skewb_p: "Learn the Skewb mechanism and basic solving algorithms.",
+        c_square1_title: "Square-1",
+        c_square1_p: "Step into the world of shape-shifting cubes with Square-1.",
+        c_megaminx_title: "Megaminx",
+        c_megaminx_p: "Learn the multi-faced structure and Megaminx solving logic.",
+        c_clock_title: "Rubik's Clock",
+        c_clock_p: "Learn the Clock mechanism and solving steps.",
+        c_fto_title: "FTO",
+        c_fto_p: "Learn the eight-faced structure of the Face Turning Octahedron and basic solving logic.",
+        bottom_title: "🧩 Pick your cube and start learning!",
+        bottom_p: "Develop yourself with Rubik Academy, from beginner level to speedcubing level."
+    }
+};
+
+function applyLanguage(lang) {
+    var dict = translations[lang] || translations.tr;
+
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "tr");
+
+    var label = document.getElementById("langLabel");
+    if (label) {
+        label.textContent = lang === "tr" ? "EN" : "TR";
+    }
+
+    var btn = document.getElementById("langSwitchBtn");
+    if (btn) {
+        btn.setAttribute("aria-label", lang === "tr" ? "Switch to English" : "Türkçeye geç");
+    }
+}
+
+function toggleLanguage() {
+    var current = localStorage.getItem("site-lang") || "tr";
+    var next = current === "tr" ? "en" : "tr";
+    localStorage.setItem("site-lang", next);
+    applyLanguage(next);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
+});
+
 /* =========================================================
    KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
 ========================================================= */
