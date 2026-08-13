@@ -173,6 +173,12 @@ body.dark-mode .navbar {
     color: var(--text);
 }
 
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .nav-links {
     display: flex;
     align-items: center;
@@ -214,6 +220,35 @@ body.dark-mode .navbar {
     transform: scale(1.08);
 }
 
+/* DİL SEÇİCİ BUTONU */
+.lang-switch-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 21px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: .3s;
+}
+
+.lang-switch-btn:hover {
+    transform: scale(1.06);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-switch-btn .lang-globe {
+    font-size: 15px;
+    line-height: 1;
+}
+
 @media(max-width: 500px) {
     .navbar {
         padding: 14px 5%;
@@ -224,6 +259,13 @@ body.dark-mode .navbar {
     .nav-links a {
         padding: 8px 12px;
         font-size: 13px;
+    }
+    .nav-right {
+        gap: 6px;
+    }
+    .lang-switch-btn {
+        padding: 0 10px;
+        font-size: 12px;
     }
 }
 
@@ -568,25 +610,33 @@ body.dark-mode .navbar {
         </span>
     </a>
 
-    <nav class="nav-links">
-        <a href="http://rubikacademy.fun">
-            Ana Sayfa
-        </a>
-        <a href="http://rubikacademy.fun/icerikler" class="active">
-            İçerikler
-        </a>
-    </nav>
+    <div class="nav-right">
 
-    <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-        🌙
-    </button>
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">
+                Ana Sayfa
+            </a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">
+                İçerikler
+            </a>
+        </nav>
+
+        <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLanguage()" aria-label="Dili değiştir / Switch language">
+            <span class="lang-globe">🌐</span><span id="langLabel">EN</span>
+        </button>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+            🌙
+        </button>
+
+    </div>
 </header>
 
 <div class="page">
 
 <!-- NAVIGATION -->
 <nav class="nav-bar">
-    <a href="http://rubikacademy.fun/icerikler" class="back-btn">← Geri Dön</a>
+    <a href="http://rubikacademy.fun/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
 </nav>
 
 <!-- HERO -->
@@ -596,8 +646,8 @@ body.dark-mode .navbar {
 <i></i>
 RUBİK'S CLOCK
 </div>
-<h1>Clock <span>Eğitimleri</span></h1>
-<p>
+<h1><span data-i18n="hero_title1">Clock</span> <span data-i18n="hero_titleAccent">Eğitimleri</span></h1>
+<p data-i18n="hero_p">
 Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızlı çözüm tekniklerine kadar kendini geliştir.
 </p>
 </div>
@@ -632,9 +682,9 @@ Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızl
 
 <!-- BAŞLIK -->
 <section class="section-title">
-<small>ÖĞRENME YOLCULUĞU</small>
-<h2>Clock Methodları</h2>
-<p>Seviyeni seç ve Rubik's Clock çözme yolculuğuna başla.</p>
+<small data-i18n="section_small">ÖĞRENME YOLCULUĞU</small>
+<h2 data-i18n="section_h2">Clock Methodları</h2>
+<p data-i18n="section_p">Seviyeni seç ve Rubik's Clock çözme yolculuğuna başla.</p>
 </section>
 
 <!-- KARTLAR -->
@@ -643,7 +693,7 @@ Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızl
 <!-- BAŞLANGIÇ -->
 <a href="http://rubikacademy.fun/yakinda" class="card">
 <div class="card-visual beginner">
-<div class="level">BAŞLANGIÇ SEVİYESİ</div>
+<div class="level" data-i18n="level_beginner">BAŞLANGIÇ SEVİYESİ</div>
 <svg class="clock-svg" viewBox="0 0 250 250">
 <rect x="22" y="22" width="206" height="206" rx="26" fill="#101827"/>
 <g fill="#f8fafc" stroke="#0f172a" stroke-width="5">
@@ -671,10 +721,10 @@ Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızl
 </svg>
 </div>
 <div class="card-info">
-<h3>Başlangıç Methodu</h3>
-<p>Rubik's Clock'u ilk kez çözecekler için hazırlanmış adım adım başlangıç eğitimi.</p>
+<h3 data-i18n="beginner_title">Başlangıç Methodu</h3>
+<p data-i18n="beginner_p">Rubik's Clock'u ilk kez çözecekler için hazırlanmış adım adım başlangıç eğitimi.</p>
 <div class="button">
-<span>Eğitime Başla</span>
+<span data-i18n="cta_start">Eğitime Başla</span>
 <span class="arrow">→</span>
 </div>
 </div>
@@ -683,7 +733,7 @@ Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızl
 <!-- ORTA -->
 <a href="http://rubikacademy.fun/yakinda" class="card">
 <div class="card-visual middle">
-<div class="level">ORTA SEVİYESİ</div>
+<div class="level" data-i18n="level_middle">ORTA SEVİYESİ</div>
 <svg class="clock-svg" viewBox="0 0 250 250">
 <rect x="22" y="22" width="206" height="206" rx="26" fill="#101827"/>
 <g fill="#f8fafc" stroke="#0f172a" stroke-width="5">
@@ -711,10 +761,10 @@ Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızl
 </svg>
 </div>
 <div class="card-info">
-<h3>Orta Seviye Methodu</h3>
-<p>Temel yöntemi bilenler için daha hızlı çözüm ve gelişmiş algoritmalar üzerine hazırlanan eğitim.</p>
+<h3 data-i18n="middle_title">Orta Seviye Methodu</h3>
+<p data-i18n="middle_p">Temel yöntemi bilenler için daha hızlı çözüm ve gelişmiş algoritmalar üzerine hazırlanan eğitim.</p>
 <div class="button">
-<span>Eğitime Başla</span>
+<span data-i18n="cta_start">Eğitime Başla</span>
 <span class="arrow">→</span>
 </div>
 </div>
@@ -723,7 +773,7 @@ Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızl
 <!-- İLERİ -->
 <a href="http://rubikacademy.fun/yakinda" class="card">
 <div class="card-visual advanced">
-<div class="level">İLERİ SEVİYE</div>
+<div class="level" data-i18n="level_advanced">İLERİ SEVİYE</div>
 <svg class="clock-svg" viewBox="0 0 250 250">
 <rect x="22" y="22" width="206" height="206" rx="26" fill="#101827"/>
 <g fill="#f8fafc" stroke="#0f172a" stroke-width="5">
@@ -751,10 +801,10 @@ Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızl
 </svg>
 </div>
 <div class="card-info">
-<h3>İleri Seviye Methodu</h3>
-<p>Daha hızlı süreler hedefleyenler için speedcubing, gelişmiş algoritmalar ve ileri çözüm teknikleri.</p>
+<h3 data-i18n="advanced_title">İleri Seviye Methodu</h3>
+<p data-i18n="advanced_p">Daha hızlı süreler hedefleyenler için speedcubing, gelişmiş algoritmalar ve ileri çözüm teknikleri.</p>
 <div class="button">
-<span>Eğitime Başla</span>
+<span data-i18n="cta_start">Eğitime Başla</span>
 <span class="arrow">→</span>
 </div>
 </div>
@@ -764,13 +814,101 @@ Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızl
 
 <!-- ALT -->
 <section class="bottom">
-<h3>🕐 Seviyeni seç, saatini hızlandır!</h3>
-<p>Rubik Academy ile Clock çözüm becerilerini adım adım geliştir.</p>
+<h3 data-i18n="bottom_title">🕐 Seviyeni seç, saatini hızlandır!</h3>
+<p data-i18n="bottom_p">Rubik Academy ile Clock çözüm becerilerini adım adım geliştir.</p>
 </section>
 
 </div>
 
 <script>
+/* =========================================================
+   DİL SEÇİCİ (TR / EN)
+========================================================= */
+
+var translations = {
+    tr: {
+        navHome: "Ana Sayfa",
+        navContent: "İçerikler",
+        back_btn: "← Geri Dön",
+        hero_title1: "Clock",
+        hero_titleAccent: "Eğitimleri",
+        hero_p: "Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızlı çözüm tekniklerine kadar kendini geliştir.",
+        section_small: "ÖĞRENME YOLCULUĞU",
+        section_h2: "Clock Methodları",
+        section_p: "Seviyeni seç ve Rubik's Clock çözme yolculuğuna başla.",
+        level_beginner: "BAŞLANGIÇ SEVİYESİ",
+        beginner_title: "Başlangıç Methodu",
+        beginner_p: "Rubik's Clock'u ilk kez çözecekler için hazırlanmış adım adım başlangıç eğitimi.",
+        level_middle: "ORTA SEVİYESİ",
+        middle_title: "Orta Seviye Methodu",
+        middle_p: "Temel yöntemi bilenler için daha hızlı çözüm ve gelişmiş algoritmalar üzerine hazırlanan eğitim.",
+        level_advanced: "İLERİ SEVİYE",
+        advanced_title: "İleri Seviye Methodu",
+        advanced_p: "Daha hızlı süreler hedefleyenler için speedcubing, gelişmiş algoritmalar ve ileri çözüm teknikleri.",
+        cta_start: "Eğitime Başla",
+        bottom_title: "🕐 Seviyeni seç, saatini hızlandır!",
+        bottom_p: "Rubik Academy ile Clock çözüm becerilerini adım adım geliştir."
+    },
+    en: {
+        navHome: "Home",
+        navContent: "Content",
+        back_btn: "← Go Back",
+        hero_title1: "Clock",
+        hero_titleAccent: "Tutorials",
+        hero_p: "Learn to solve the Rubik's Clock from scratch; develop yourself from the logic of setting the clocks through to fast solving techniques.",
+        section_small: "LEARNING JOURNEY",
+        section_h2: "Clock Methods",
+        section_p: "Pick your level and start your Rubik's Clock solving journey.",
+        level_beginner: "BEGINNER LEVEL",
+        beginner_title: "Beginner Method",
+        beginner_p: "A step-by-step beginner tutorial for those solving the Rubik's Clock for the first time.",
+        level_middle: "INTERMEDIATE LEVEL",
+        middle_title: "Intermediate Method",
+        middle_p: "A tutorial built on faster solving and advanced algorithms for those who already know the basic method.",
+        level_advanced: "ADVANCED LEVEL",
+        advanced_title: "Advanced Method",
+        advanced_p: "Speedcubing, advanced algorithms, and advanced solving techniques for those aiming for faster solve times.",
+        cta_start: "Start Learning",
+        bottom_title: "🕐 Pick your level, speed up your clock!",
+        bottom_p: "Develop your Clock solving skills step by step with Rubik Academy."
+    }
+};
+
+function applyLanguage(lang) {
+    var dict = translations[lang] || translations.tr;
+
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "tr");
+
+    var label = document.getElementById("langLabel");
+    if (label) {
+        label.textContent = lang === "tr" ? "EN" : "TR";
+    }
+
+    var btn = document.getElementById("langSwitchBtn");
+    if (btn) {
+        btn.setAttribute("aria-label", lang === "tr" ? "Switch to English" : "Türkçeye geç");
+    }
+}
+
+function toggleLanguage() {
+    var current = localStorage.getItem("site-lang") || "tr";
+    var next = current === "tr" ? "en" : "tr";
+    localStorage.setItem("site-lang", next);
+    applyLanguage(next);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
+});
+
 /* =========================================================
    KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
 ========================================================= */
