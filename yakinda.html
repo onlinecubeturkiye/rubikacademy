@@ -167,6 +167,12 @@ body.dark-mode .navbar {
     color: var(--text);
 }
 
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .nav-links {
     display: flex;
     align-items: center;
@@ -208,6 +214,35 @@ body.dark-mode .navbar {
     transform: scale(1.08);
 }
 
+/* DİL SEÇİCİ BUTONU */
+.lang-switch-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 21px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: .3s;
+}
+
+.lang-switch-btn:hover {
+    transform: scale(1.06);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-switch-btn .lang-globe {
+    font-size: 15px;
+    line-height: 1;
+}
+
 @media(max-width: 500px) {
     .navbar {
         padding: 14px 5%;
@@ -218,6 +253,13 @@ body.dark-mode .navbar {
     .nav-links a {
         padding: 8px 12px;
         font-size: 13px;
+    }
+    .nav-right {
+        gap: 6px;
+    }
+    .lang-switch-btn {
+        padding: 0 10px;
+        font-size: 12px;
     }
 }
 
@@ -413,18 +455,26 @@ body.dark-mode .navbar {
         </span>
     </a>
 
-    <nav class="nav-links">
-        <a href="http://rubikacademy.fun">
-            Ana Sayfa
-        </a>
-        <a href="http://rubikacademy.fun/icerikler" class="active">
-            İçerikler
-        </a>
-    </nav>
+    <div class="nav-right">
 
-    <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-        🌙
-    </button>
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">
+                Ana Sayfa
+            </a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">
+                İçerikler
+            </a>
+        </nav>
+
+        <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLanguage()" aria-label="Dili değiştir / Switch language">
+            <span class="lang-globe">🌐</span><span id="langLabel">EN</span>
+        </button>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+            🌙
+        </button>
+
+    </div>
 </header>
 
 <!-- =========================================
@@ -434,14 +484,14 @@ body.dark-mode .navbar {
 
     <!-- GERİ DÖN NAVİGASYONU -->
     <nav class="nav-bar">
-        <a href="http://rubikacademy.fun/icerikler" class="back-btn">← Eğitimlere Geri Dön</a>
+        <a href="http://rubikacademy.fun/icerikler" class="back-btn" data-i18n="back_btn">← Eğitimlere Geri Dön</a>
     </nav>
 
     <!-- İÇERİK KUTUSU -->
     <div class="coming-soon-card">
         <div class="content-wrap">
             
-            <div class="badge">
+            <div class="badge" data-i18n="badge">
                 <i></i>
                 İÇERİK HAZIRLANIYOR
             </div>
@@ -463,13 +513,13 @@ body.dark-mode .navbar {
                 </svg>
             </div>
 
-            <h1>Bu Eğitim <span>Çok Yakında!</span></h1>
+            <h1><span data-i18n="h1_part1">Bu Eğitim</span> <span data-i18n="h1_part2">Çok Yakında!</span></h1>
             
-            <p>
+            <p data-i18n="desc_p">
                 Rubik Academy ekibi olarak bu bölümün rehber ve algoritma videolarını titizlikle hazırlıyoruz. Takipte kal, çok yakında yayınlanacak!
             </p>
 
-            <a href="http://rubikacademy.fun/icerikler" class="action-btn">
+            <a href="http://rubikacademy.fun/icerikler" class="action-btn" data-i18n="action_btn">
                 Diğer Eğitimlere Göz At →
             </a>
 
@@ -479,6 +529,75 @@ body.dark-mode .navbar {
 </div>
 
 <script>
+/* =========================================================
+   DİL SEÇİCİ (TR / EN)
+========================================================= */
+
+var translations = {
+    tr: {
+        navHome: "Ana Sayfa",
+        navContent: "İçerikler",
+        back_btn: "← Eğitimlere Geri Dön",
+        badge: "İÇERİK HAZIRLANIYOR",
+        h1_part1: "Bu Eğitim",
+        h1_part2: "Çok Yakında!",
+        desc_p: "Rubik Academy ekibi olarak bu bölümün rehber ve algoritma videolarını titizlikle hazırlıyoruz. Takipte kal, çok yakında yayınlanacak!",
+        action_btn: "Diğer Eğitimlere Göz At →"
+    },
+    en: {
+        navHome: "Home",
+        navContent: "Content",
+        back_btn: "← Back to Tutorials",
+        badge: "CONTENT IN PROGRESS",
+        h1_part1: "This Tutorial",
+        h1_part2: "Coming Soon!",
+        desc_p: "The Rubik Academy team is carefully preparing the guide and algorithm videos for this section. Stay tuned, it'll be published very soon!",
+        action_btn: "Browse Other Tutorials →"
+    }
+};
+
+function applyLanguage(lang) {
+    var dict = translations[lang] || translations.tr;
+
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+            if (el.classList.contains("badge")) {
+                // Rozet içindeki nokta (i) elementini koruyarak metni güncelle
+                var iEl = el.querySelector("i");
+                el.textContent = dict[key];
+                if (iEl) el.prepend(iEl);
+            } else {
+                el.textContent = dict[key];
+            }
+        }
+    });
+
+    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "tr");
+
+    var label = document.getElementById("langLabel");
+    if (label) {
+        label.textContent = lang === "tr" ? "EN" : "TR";
+    }
+
+    var btn = document.getElementById("langSwitchBtn");
+    if (btn) {
+        btn.setAttribute("aria-label", lang === "tr" ? "Switch to English" : "Türkçeye geç");
+    }
+}
+
+function toggleLanguage() {
+    var current = localStorage.getItem("site-lang") || "tr";
+    var next = current === "tr" ? "en" : "tr";
+    localStorage.setItem("site-lang", next);
+    applyLanguage(next);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
+});
+
 /* =========================================================
    KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
 ========================================================= */
