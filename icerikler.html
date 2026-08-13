@@ -59,8 +59,7 @@ rel="stylesheet"
 }
 
 /* Karanlık mod değişkenleri - Hem html hem body seçicilerini kapsar */
-html.dark-mode,
-body.dark-mode {
+html.dark-mode, body.dark-mode {
     --background: #0f172a;
     --surface: #1e293b;
     --surface-soft: #334155;
@@ -92,8 +91,7 @@ body.dark-mode {
     pointer-events: none;
 }
 
-.bg-glow::before,
-.bg-glow::after {
+.bg-glow::before, .bg-glow::after {
     content: "";
     position: absolute;
     width: 500px;
@@ -224,6 +222,12 @@ body.dark-mode .navbar {
     color: var(--text);
 }
 
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .nav-links {
     display: flex;
     align-items: center;
@@ -269,6 +273,35 @@ body.dark-mode .navbar {
     transform: scale(1.08);
 }
 
+/* DİL SEÇİCİ BUTONU */
+.lang-switch-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 21px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: .3s;
+}
+
+.lang-switch-btn:hover {
+    transform: scale(1.06);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-switch-btn .lang-globe {
+    font-size: 15px;
+    line-height: 1;
+}
+
 @media(max-width:500px) {
     .navbar {
         padding: 14px 5%;
@@ -281,6 +314,15 @@ body.dark-mode .navbar {
     .nav-links a {
         padding: 8px 12px;
         font-size: 13px;
+    }
+
+    .nav-right {
+        gap: 6px;
+    }
+
+    .lang-switch-btn {
+        padding: 0 10px;
+        font-size: 12px;
     }
 }
 
@@ -595,7 +637,8 @@ html.dark-mode .bg-glow::after {
 }
 
 </style>
-  <!-- Google tag (gtag.js) -->
+
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -605,7 +648,6 @@ html.dark-mode .bg-glow::after {
   gtag('config', 'G-F7KXWC8B5N');
 </script>
 </head>
-
 
 <body>
 
@@ -642,24 +684,31 @@ html.dark-mode .bg-glow::after {
 
     </a>
 
-    <nav class="nav-links">
+    <div class="nav-right">
 
-        <a href="http://rubikacademy.fun">
-            Ana Sayfa
-        </a>
+        <nav class="nav-links">
 
-        <a href="http://rubikacademy.fun/icerikler" class="active">
-            İçerikler
-        </a>
+            <a href="http://rubikacademy.fun" data-i18n="navHome">
+                Ana Sayfa
+            </a>
 
-    </nav>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">
+                İçerikler
+            </a>
 
-    <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-        🌙
-    </button>
+        </nav>
+
+        <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLanguage()" aria-label="Dili değiştir / Switch language">
+            <span class="lang-globe">🌐</span><span id="langLabel">EN</span>
+        </button>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+            🌙
+        </button>
+
+    </div>
 
 </header>
-
 
 <div class="page">
 
@@ -675,17 +724,17 @@ html.dark-mode .bg-glow::after {
     </div>
 
     <h1>
-        Küp <span>Eğitimleri</span>
+        <span data-i18n="ic_title1">Küp</span>
+        <span data-i18n="ic_titleAccent">Eğitimleri</span>
     </h1>
 
-    <p>
+    <p data-i18n="ic_intro">
         Rubik küplerini ve farklı twisty puzzle türlerini
         adım adım öğren. Başlangıç seviyesinden ileri
         seviyeye kadar tüm eğitimlere buradan ulaş.
     </p>
 
 </section>
-
 
 <!-- ======================================================
      KARTLAR
@@ -709,10 +758,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">2×2 RUBİK KÜP</div>
 </div>
 <div class="info">
-<span class="tag">BAŞLANGIÇ</span>
-<h2>2×2 Rubik Küp</h2>
-<p>2×2 küpün temel çözümünü adım adım öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_beginner">BAŞLANGIÇ</span>
+<h2 data-i18n="c_2x2_title">2×2 Rubik Küp</h2>
+<p data-i18n="c_2x2_p">2×2 küpün temel çözümünü adım adım öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -737,10 +786,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">3×3 RUBİK KÜP</div>
 </div>
 <div class="info">
-<span class="tag">EN POPÜLER</span>
-<h2>3×3 Rubik Küp</h2>
-<p>Klasik Rubik küpünü başlangıçtan ileri seviyeye kadar öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_popular">EN POPÜLER</span>
+<h2 data-i18n="c_3x3_title">3×3 Rubik Küp</h2>
+<p data-i18n="c_3x3_p">Klasik Rubik küpünü başlangıçtan ileri seviyeye kadar öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -772,10 +821,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">4×4 RUBİK KÜP</div>
 </div>
 <div class="info">
-<span class="tag">ORTA SEVİYE</span>
-<h2>4×4 Rubik Küp</h2>
-<p>Merkezleri ve kenarları çözerek 4×4 çözümünü öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_intermediate">ORTA SEVİYE</span>
+<h2 data-i18n="c_4x4_title">4×4 Rubik Küp</h2>
+<p data-i18n="c_4x4_p">Merkezleri ve kenarları çözerek 4×4 çözümünü öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -816,10 +865,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">5×5 RUBİK KÜP</div>
 </div>
 <div class="info">
-<span class="tag">İLERİ</span>
-<h2>5×5 Rubik Küp</h2>
-<p>Büyük küplerin merkez ve kenar çözüm tekniklerini öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_advanced">İLERİ</span>
+<h2 data-i18n="c_5x5_title">5×5 Rubik Küp</h2>
+<p data-i18n="c_5x5_p">Büyük küplerin merkez ve kenar çözüm tekniklerini öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -871,10 +920,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">6×6 RUBİK KÜP</div>
 </div>
 <div class="info">
-<span class="tag">UZMAN</span>
-<h2>6×6 Rubik Küp</h2>
-<p>6×6 merkezlerini ve kenarlarını çözmeyi öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_expert">UZMAN</span>
+<h2 data-i18n="c_6x6_title">6×6 Rubik Küp</h2>
+<p data-i18n="c_6x6_p">6×6 merkezlerini ve kenarlarını çözmeyi öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -939,10 +988,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">7×7 RUBİK KÜP</div>
 </div>
 <div class="info">
-<span class="tag">UZMAN</span>
-<h2>7×7 Rubik Küp</h2>
-<p>En büyük küplerden biri olan 7×7'nin çözümünü öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_expert">UZMAN</span>
+<h2 data-i18n="c_7x7_title">7×7 Rubik Küp</h2>
+<p data-i18n="c_7x7_p">En büyük küplerden biri olan 7×7'nin çözümünü öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -967,10 +1016,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">3×3 ONE HANDED</div>
 </div>
 <div class="info">
-<span class="tag">SPEEDCUBING</span>
-<h2>3×3 One Handed</h2>
-<p>Tek elle küp çözme ve hız geliştirme tekniklerini öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_speedcubing">SPEEDCUBING</span>
+<h2 data-i18n="c_oneHand_title">3×3 One Handed</h2>
+<p data-i18n="c_oneHand_p">Tek elle küp çözme ve hız geliştirme tekniklerini öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -993,10 +1042,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">PYRAMINX</div>
 </div>
 <div class="info">
-<span class="tag">PUZZLE</span>
-<h2>Pyraminx</h2>
-<p>Üçgen yapılı Pyraminx'i kolay yöntemlerle çözmeyi öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_puzzle">PUZZLE</span>
+<h2 data-i18n="c_pyraminx_title">Pyraminx</h2>
+<p data-i18n="c_pyraminx_p">Üçgen yapılı Pyraminx'i kolay yöntemlerle çözmeyi öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -1015,10 +1064,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">SKEWB</div>
 </div>
 <div class="info">
-<span class="tag">PUZZLE</span>
-<h2>Skewb</h2>
-<p>Skewb mekanizmasını ve temel çözüm algoritmalarını öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_puzzle">PUZZLE</span>
+<h2 data-i18n="c_skewb_title">Skewb</h2>
+<p data-i18n="c_skewb_p">Skewb mekanizmasını ve temel çözüm algoritmalarını öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -1049,10 +1098,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">SQUARE-1</div>
 </div>
 <div class="info">
-<span class="tag">İLERİ</span>
-<h2>Square-1</h2>
-<p>Şekil değiştiren küpler dünyasına Square-1 ile giriş yap.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_advanced">İLERİ</span>
+<h2 data-i18n="c_square1_title">Square-1</h2>
+<p data-i18n="c_square1_p">Şekil değiştiren küpler dünyasına Square-1 ile giriş yap.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -1072,10 +1121,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">MEGAMINX</div>
 </div>
 <div class="info">
-<span class="tag">İLERİ</span>
-<h2>Megaminx</h2>
-<p>Çok yüzlü yapıyı ve Megaminx çözüm mantığını öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_advanced">İLERİ</span>
+<h2 data-i18n="c_megaminx_title">Megaminx</h2>
+<p data-i18n="c_megaminx_p">Çok yüzlü yapıyı ve Megaminx çözüm mantığını öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -1111,10 +1160,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">RUBIK'S CLOCK</div>
 </div>
 <div class="info">
-<span class="tag">PUZZLE</span>
-<h2>Rubik's Clock</h2>
-<p>Clock mekanizmasını ve çözüm adımlarını öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_puzzle">PUZZLE</span>
+<h2 data-i18n="c_clock_title">Rubik's Clock</h2>
+<p data-i18n="c_clock_p">Clock mekanizmasını ve çözüm adımlarını öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -1173,10 +1222,10 @@ html.dark-mode .bg-glow::after {
 <div class="visual-label">FTO</div>
 </div>
 <div class="info">
-<span class="tag">PUZZLE</span>
-<h2>FTO</h2>
-<p>Face Turning Octahedron'un sekiz yüzlü yapısını ve temel çözüm mantığını öğren.</p>
-<span class="start">Eğitime Başla →</span>
+<span class="tag" data-i18n="tag_puzzle">PUZZLE</span>
+<h2 data-i18n="c_fto_title">FTO</h2>
+<p data-i18n="c_fto_p">Face Turning Octahedron'un sekiz yüzlü yapısını ve temel çözüm mantığını öğren.</p>
+<span class="start" data-i18n="cta_start">Eğitime Başla →</span>
 </div>
 </a>
 
@@ -1187,11 +1236,13 @@ html.dark-mode .bg-glow::after {
 ====================================================== -->
 
 <section class="bottom">
-    <h3>🧩 Küpünü seç ve öğrenmeye başla!</h3>
-    <p>Başlangıç seviyesinden speedcubing seviyesine kadar Rubik Academy ile kendini geliştir.</p>
+    <h3 data-i18n="bottom_title">🧩 Küpünü seç ve öğrenmeye başla!</h3>
+    <p data-i18n="bottom_p">Başlangıç seviyesinden speedcubing seviyesine kadar Rubik Academy ile kendini geliştir.</p>
 </section>
 
 </div>
+
+<script src="/lang.js"></script>
 
 <script>
 /* =========================================================
