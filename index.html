@@ -898,6 +898,80 @@ section {
         rgba(37,99,235,.10);
 }
 
+/* YAYINDA OLAN VİDEO - KIRMIZI ÇERÇEVE */
+.featured-card.live-video{
+    border: 3px solid #e6252f;
+    box-shadow: 0 0 0 4px rgba(230,37,47,.14), 0 24px 55px rgba(230,37,47,.18);
+}
+
+.featured-card.live-video:hover{
+    border-color:#e6252f;
+    box-shadow: 0 0 0 5px rgba(230,37,47,.20), 0 26px 60px rgba(230,37,47,.24);
+}
+
+.featured-thumb{
+    position:relative;
+    width:150px;
+    height:110px;
+    flex-shrink:0;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow: 0 12px 25px rgba(15,23,42,.20);
+    background: linear-gradient(135deg, #eee8ff, #b39cff);
+}
+
+.featured-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.featured-thumb .video-play-icon{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background: rgba(230,37,47,.92);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+}
+
+.featured-thumb .video-play-icon::after{
+    content:"";
+    border-style: solid;
+    border-width: 8px 0 8px 14px;
+    border-color: transparent transparent transparent #fff;
+    margin-left:3px;
+}
+
+.live-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 11px;
+    border-radius:8px;
+    background:#e6252f;
+    color:#fff;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.6px;
+    margin-bottom:8px;
+}
+
+@media(max-width:700px){
+    .featured-thumb{
+        width:100%;
+        max-width:280px;
+        height:160px;
+    }
+}
+
 
 .featured-date {
 
@@ -1814,14 +1888,27 @@ html.dark-mode .bg-glow::after {
         <div class="featured-list">
 
 
-            <div class="featured-card reveal">
+            <a
+                href="https://m.youtube.com/watch?v=rBXQqvlVrs0"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="featured-card live-video reveal"
+            >
 
-                <div class="featured-date">
-                    <span class="fd-day">16</span>
-                    <span class="fd-month" data-i18n="featuredMonth">Ağu</span>
+                <div class="featured-thumb">
+                    <img
+                        src="https://i.ytimg.com/vi/rBXQqvlVrs0/hqdefault.jpg"
+                        alt="FTO Nasıl Çözülür? Video Thumbnail"
+                        referrerpolicy="no-referrer"
+                        loading="eager"
+                        onerror="this.onerror=null; var t=['https://i.ytimg.com/vi/rBXQqvlVrs0/mqdefault.jpg','https://i.ytimg.com/vi/rBXQqvlVrs0/0.jpg','https://img.youtube.com/vi/rBXQqvlVrs0/hqdefault.jpg']; var i=parseInt(this.dataset.i||0); if(i<t.length){this.dataset.i=i+1; this.src=t[i];}"
+                    >
+                    <span class="video-play-icon"></span>
                 </div>
 
                 <div class="featured-body">
+
+                    <span class="live-badge">🎥 YAYINDA</span>
 
                     <span class="featured-tag" data-i18n="featuredTag">
                         Yeni Video · Pazar
@@ -1841,7 +1928,7 @@ html.dark-mode .bg-glow::after {
                     15:00
                 </div>
 
-            </div>
+            </a>
 
 
             <div class="featured-card reveal">
