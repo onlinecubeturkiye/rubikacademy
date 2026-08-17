@@ -1576,6 +1576,10 @@ footer {
    DİL SEÇİCİ
 ========================================= */
 
+.lang-switcher {
+    position: relative;
+}
+
 .lang-switch-btn {
     border: none;
     background: var(--surface-soft);
@@ -1602,6 +1606,70 @@ footer {
 .lang-switch-btn .lang-globe {
     font-size: 15px;
     line-height: 1;
+}
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
+}
+
+.lang-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-menu-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.lang-menu-item.active .lang-check {
+    opacity: 1;
 }
 
 /* Karanlık mod renkleri */
@@ -1767,9 +1835,32 @@ html.dark-mode .bg-glow::after {
 
         </nav>
 
-        <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLanguage()" aria-label="Dili değiştir / Switch language">
-            <span class="lang-globe">🌐</span><span id="langLabel">EN</span>
-        </button>
+        <div class="lang-switcher" id="langSwitcher">
+
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
+                <span class="lang-globe">🌐</span><span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+            </div>
+
+        </div>
 
         <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
             🌙
@@ -2421,7 +2512,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 /* =========================================
-   DİL SEÇİCİ (TR / EN)
+   DİL SEÇİCİ (TR / EN / RU)
 ========================================= */
 
 var translations = {
@@ -2528,11 +2619,67 @@ var translations = {
         contactH2: "Got a question?",
         contactP: "Feel free to reach out for questions, suggestions, or collaborations.",
         footer: "© 2026 Rubik Academy. All rights reserved."
+    },
+    ru: {
+        navHome: "Главная",
+        navContent: "Контент",
+        badge: "Добро пожаловать в спидкубинг",
+        heroTitle1: "Изучи",
+        heroTitleGradient: "кубик Рубика.",
+        heroTitle2: "Развивай скорость.",
+        heroP: "Rubik Academy — современная и структурированная образовательная платформа для тех, кто хочет научиться собирать кубик Рубика и улучшить своё время сборки.",
+        heroBtn: "Начать обучение →",
+        featuredSpan: "Рекомендуем",
+        featuredH2: "Не пропусти новое видео.",
+        featuredMonth: "авг",
+        featuredTag: "Новое видео · Воскресенье",
+        featuredTitle: "Как собрать FTO? - Метод Bencisco",
+        featuredDesc: "Научись собирать FTO на продвинутом уровне методом Bencisco.",
+        featuredTime: "15:00",
+        featuredMonth2: "авг",
+        featuredTag2: "Новое видео · Понедельник",
+        featuredTitle2: "Как перемешать FTO?",
+        featuredDesc2: "Научись правильно и равномерно перемешивать кубик FTO.",
+        featuredTime2: "15:00",
+        academySpan: "Rubik Academy",
+        academyH2: "Изучай сборку кубика системно.",
+        academyP: "Контент, который проведёт тебя от основ до уровня спидкубинга.",
+        card1Title: "Кубик Рубика 3x3",
+        card1P: "Изучи кубик 3x3 шаг за шагом. Развивайся от базовых движений до продвинутого уровня.",
+        card2Title: "Алгоритмы",
+        card2P: "Изучи алгоритмы, необходимые для более быстрой сборки, и практикуйся.",
+        card3Title: "Спидкубинг",
+        card3P: "Улучшай время сборки, побеждай свои рекорды и развивайся в мире спидкубинга.",
+        learningSpan: "Обучение",
+        learningH2: "Двигайся шаг за шагом.",
+        learningP: "Сделай процесс изучения кубика Рубика простым и понятным.",
+        l1num: "01 — НАЧАЛО",
+        l1title: "Познакомься с кубиком",
+        l1p: "Изучи структуру кубика Рубика: грани, центральные, угловые и рёберные элементы.",
+        l2num: "02 — ОСНОВЫ",
+        l2title: "Собери его в первый раз",
+        l2p: "Изучи базовые движения и собери кубик Рубика от начала до конца.",
+        l3num: "03 — РАЗВИТИЕ",
+        l3title: "Изучи алгоритмы",
+        l3p: "Начни изучать алгоритмы, необходимые для сокращения времени сборки.",
+        l4num: "04 — СПИДКУБИНГ",
+        l4title: "Развивай скорость",
+        l4p: "Используй разные техники, практикуйся и стремись установить свой личный рекорд.",
+        socialSpan: "Социальные сети",
+        socialH2: "Подпишись на Rubik Academy.",
+        socialP: "Не пропускай новый контент и обновления по спидкубингу.",
+        contactH2: "Есть вопрос?",
+        contactP: "Свяжись с нами по любым вопросам, предложениям или сотрудничеству.",
+        footer: "© 2026 Rubik Academy. Все права защищены."
     }
 };
 
+var langCodes = { tr: "TR", en: "EN", ru: "RU" };
+
 function applyLanguage(lang) {
-    var dict = translations[lang] || translations.tr;
+    if (!translations[lang]) lang = "tr";
+
+    var dict = translations[lang];
 
     document.querySelectorAll("[data-i18n]").forEach(function(el) {
         var key = el.getAttribute("data-i18n");
@@ -2541,25 +2688,52 @@ function applyLanguage(lang) {
         }
     });
 
-    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "tr");
+    document.documentElement.setAttribute("lang", lang);
 
     var label = document.getElementById("langLabel");
     if (label) {
-        label.textContent = lang === "tr" ? "EN" : "TR";
+        label.textContent = langCodes[lang] || "TR";
     }
 
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
     var btn = document.getElementById("langSwitchBtn");
-    if (btn) {
-        btn.setAttribute("aria-label", lang === "tr" ? "Switch to English" : "Türkçeye geç");
-    }
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
 }
 
-function toggleLanguage() {
-    var current = localStorage.getItem("site-lang") || "tr";
-    var next = current === "tr" ? "en" : "tr";
-    localStorage.setItem("site-lang", next);
-    applyLanguage(next);
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
 }
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) {
+        closeLangMenu();
+    }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
 
 document.addEventListener("DOMContentLoaded", function() {
     var savedLang = localStorage.getItem("site-lang") || "tr";
