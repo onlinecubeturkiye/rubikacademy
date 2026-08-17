@@ -220,7 +220,11 @@ body.dark-mode .navbar {
     transform: scale(1.08);
 }
 
-/* DİL SEÇİCİ BUTONU */
+/* DİL SEÇİCİ */
+.lang-switcher {
+    position: relative;
+}
+
 .lang-switch-btn {
     border: none;
     background: var(--surface-soft);
@@ -247,6 +251,70 @@ body.dark-mode .navbar {
 .lang-switch-btn .lang-globe {
     font-size: 15px;
     line-height: 1;
+}
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
+}
+
+.lang-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-menu-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.lang-menu-item.active .lang-check {
+    opacity: 1;
 }
 
 @media(max-width: 500px) {
@@ -616,9 +684,32 @@ body.dark-mode .navbar {
             </a>
         </nav>
 
-        <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLanguage()" aria-label="Dili değiştir / Switch language">
-            <span class="lang-globe">🌐</span><span id="langLabel">EN</span>
-        </button>
+        <div class="lang-switcher" id="langSwitcher">
+
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
+                <span class="lang-globe">🌐</span><span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+            </div>
+
+        </div>
 
         <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
             🌙
@@ -765,7 +856,7 @@ body.dark-mode .navbar {
 
 <script>
 /* =========================================================
-   DİL SEÇİCİ (TR / EN)
+   DİL SEÇİCİ (TR / EN / RU)
 ========================================================= */
 
 var translations = {
@@ -814,11 +905,38 @@ var translations = {
         cta_start: "Start Learning",
         bottom_title: "🧩 Pick your level, speed up your cube!",
         bottom_p: "Develop your 3×3 solving skills step by step with Rubik Academy."
+    },
+    ru: {
+        navHome: "Главная",
+        navContent: "Контент",
+        back_btn: "← Назад",
+        hero_title1: "3×3",
+        hero_titleAccent: "уроки",
+        hero_p: "Изучи сборку кубика Рубика 3×3 с нуля; развивайся от базовых методов до среднего уровня и продвинутых техник спидкубинга.",
+        section_small: "УЧЕБНЫЙ ПУТЬ",
+        section_h2: "Методы 3×3",
+        section_p: "Выбери свой уровень и начни путь сборки кубика.",
+        level_beginner: "НАЧАЛЬНЫЙ УРОВЕНЬ",
+        beginner_title: "Начальный метод",
+        beginner_p: "Пошаговый урок для тех, кто впервые собирает кубик Рубика 3×3.",
+        level_middle: "СРЕДНИЙ УРОВЕНЬ",
+        middle_title: "Метод среднего уровня",
+        middle_p: "Урок с более быстрой сборкой и продвинутыми алгоритмами для тех, кто уже знает базовый метод.",
+        level_advanced: "ПРОДВИНУТЫЙ УРОВЕНЬ",
+        advanced_title: "Продвинутый метод",
+        advanced_p: "Спидкубинг, продвинутые алгоритмы и техники сборки для тех, кто нацелен на более быстрое время.",
+        cta_start: "Начать обучение",
+        bottom_title: "🧩 Выбери уровень, ускори свой кубик!",
+        bottom_p: "Развивай навыки сборки 3×3 шаг за шагом вместе с Rubik Academy."
     }
 };
 
+var langCodes = { tr: "TR", en: "EN", ru: "RU" };
+
 function applyLanguage(lang) {
-    var dict = translations[lang] || translations.tr;
+    if (!translations[lang]) lang = "tr";
+
+    var dict = translations[lang];
 
     document.querySelectorAll("[data-i18n]").forEach(function(el) {
         var key = el.getAttribute("data-i18n");
@@ -827,25 +945,52 @@ function applyLanguage(lang) {
         }
     });
 
-    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "tr");
+    document.documentElement.setAttribute("lang", lang);
 
     var label = document.getElementById("langLabel");
     if (label) {
-        label.textContent = lang === "tr" ? "EN" : "TR";
+        label.textContent = langCodes[lang] || "TR";
     }
 
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
     var btn = document.getElementById("langSwitchBtn");
-    if (btn) {
-        btn.setAttribute("aria-label", lang === "tr" ? "Switch to English" : "Türkçeye geç");
-    }
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
 }
 
-function toggleLanguage() {
-    var current = localStorage.getItem("site-lang") || "tr";
-    var next = current === "tr" ? "en" : "tr";
-    localStorage.setItem("site-lang", next);
-    applyLanguage(next);
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
 }
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) {
+        closeLangMenu();
+    }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
 
 document.addEventListener("DOMContentLoaded", function() {
     var savedLang = localStorage.getItem("site-lang") || "tr";
