@@ -273,7 +273,11 @@ body.dark-mode .navbar {
     transform: scale(1.08);
 }
 
-/* DİL SEÇİCİ BUTONU */
+/* DİL SEÇİCİ */
+.lang-switcher {
+    position: relative;
+}
+
 .lang-switch-btn {
     border: none;
     background: var(--surface-soft);
@@ -300,6 +304,70 @@ body.dark-mode .navbar {
 .lang-switch-btn .lang-globe {
     font-size: 15px;
     line-height: 1;
+}
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
+}
+
+.lang-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-menu-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.lang-menu-item.active .lang-check {
+    opacity: 1;
 }
 
 @media(max-width:500px) {
@@ -698,9 +766,32 @@ html.dark-mode .bg-glow::after {
 
         </nav>
 
-        <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLanguage()" aria-label="Dili değiştir / Switch language">
-            <span class="lang-globe">🌐</span><span id="langLabel">EN</span>
-        </button>
+        <div class="lang-switcher" id="langSwitcher">
+
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
+                <span class="lang-globe">🌐</span><span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+            </div>
+
+        </div>
 
         <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
             🌙
@@ -1244,7 +1335,7 @@ html.dark-mode .bg-glow::after {
 
 <script>
 /* =========================================================
-   DİL SEÇİCİ (TR / EN)
+   DİL SEÇİCİ (TR / EN / RU)
 ========================================================= */
 
 var translations = {
@@ -1333,11 +1424,58 @@ var translations = {
         c_fto_p: "Learn the eight-faced structure of the Face Turning Octahedron and basic solving logic.",
         bottom_title: "🧩 Pick your cube and start learning!",
         bottom_p: "Develop yourself with Rubik Academy, from beginner level to speedcubing level."
+    },
+    ru: {
+        navHome: "Главная",
+        navContent: "Контент",
+        ic_title1: "Обучение",
+        ic_titleAccent: "сборке кубика",
+        ic_intro: "Изучай кубики Рубика и другие виды твисти-пазлов шаг за шагом. Доступ ко всем урокам — от начального до продвинутого уровня.",
+        tag_beginner: "НАЧАЛЬНЫЙ",
+        c_2x2_title: "Кубик Рубика 2×2",
+        c_2x2_p: "Изучи базовую сборку кубика 2×2 шаг за шагом.",
+        cta_start: "Начать обучение →",
+        tag_popular: "САМЫЙ ПОПУЛЯРНЫЙ",
+        c_3x3_title: "Кубик Рубика 3×3",
+        c_3x3_p: "Изучи классический кубик Рубика от начального до продвинутого уровня.",
+        tag_intermediate: "СРЕДНИЙ УРОВЕНЬ",
+        c_4x4_title: "Кубик Рубика 4×4",
+        c_4x4_p: "Изучи сборку 4×4, решая центры и рёбра.",
+        tag_advanced: "ПРОДВИНУТЫЙ",
+        c_5x5_title: "Кубик Рубика 5×5",
+        c_5x5_p: "Изучи техники сборки центров и рёбер больших кубиков.",
+        tag_expert: "ЭКСПЕРТ",
+        c_6x6_title: "Кубик Рубика 6×6",
+        c_6x6_p: "Научись собирать центры и рёбра кубика 6×6.",
+        c_7x7_title: "Кубик Рубика 7×7",
+        c_7x7_p: "Научись собирать 7×7 — один из самых больших кубиков.",
+        tag_speedcubing: "СПИДКУБИНГ",
+        c_oneHand_title: "3×3 одной рукой",
+        c_oneHand_p: "Изучи сборку одной рукой и техники увеличения скорости.",
+        tag_puzzle: "ПАЗЛ",
+        c_pyraminx_title: "Пирамидка",
+        c_pyraminx_p: "Изучи сборку треугольной Пирамидки простыми методами.",
+        c_skewb_title: "Skewb",
+        c_skewb_p: "Изучи механизм Skewb и базовые алгоритмы сборки.",
+        c_square1_title: "Square-1",
+        c_square1_p: "Войди в мир кубиков, меняющих форму, вместе со Square-1.",
+        c_megaminx_title: "Мегаминкс",
+        c_megaminx_p: "Изучи многогранную структуру и логику сборки Мегаминкса.",
+        c_clock_title: "Rubik's Clock",
+        c_clock_p: "Изучи механизм Clock и шаги сборки.",
+        c_fto_title: "FTO",
+        c_fto_p: "Изучи восьмигранную структуру Face Turning Octahedron и базовую логику сборки.",
+        bottom_title: "🧩 Выбери свой кубик и начни обучение!",
+        bottom_p: "Развивайся вместе с Rubik Academy — от начального уровня до спидкубинга."
     }
 };
 
+var langCodes = { tr: "TR", en: "EN", ru: "RU" };
+
 function applyLanguage(lang) {
-    var dict = translations[lang] || translations.tr;
+    if (!translations[lang]) lang = "tr";
+
+    var dict = translations[lang];
 
     document.querySelectorAll("[data-i18n]").forEach(function(el) {
         var key = el.getAttribute("data-i18n");
@@ -1346,25 +1484,52 @@ function applyLanguage(lang) {
         }
     });
 
-    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "tr");
+    document.documentElement.setAttribute("lang", lang);
 
     var label = document.getElementById("langLabel");
     if (label) {
-        label.textContent = lang === "tr" ? "EN" : "TR";
+        label.textContent = langCodes[lang] || "TR";
     }
 
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
     var btn = document.getElementById("langSwitchBtn");
-    if (btn) {
-        btn.setAttribute("aria-label", lang === "tr" ? "Switch to English" : "Türkçeye geç");
-    }
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
 }
 
-function toggleLanguage() {
-    var current = localStorage.getItem("site-lang") || "tr";
-    var next = current === "tr" ? "en" : "tr";
-    localStorage.setItem("site-lang", next);
-    applyLanguage(next);
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
 }
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) {
+        closeLangMenu();
+    }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
 
 document.addEventListener("DOMContentLoaded", function() {
     var savedLang = localStorage.getItem("site-lang") || "tr";
