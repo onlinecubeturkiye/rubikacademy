@@ -1,1067 +1,975 @@
 <!DOCTYPE html>
 <html lang="tr">
-	<head>
-		<meta charset="UTF-8">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-				<!-- TEMA VE SEO AYARLARI -->
-				<script>
-					(function() {
-					var savedTheme = localStorage.getItem("theme");
-					if (savedTheme === "dark") {
-					document.documentElement.classList.add("dark-mode");
-					}
-					})();
-				</script>
-
-				<title>Rubik Academy - One Hand (Tek El) Eğitimi</title>
-				<!-- TARAYICI SEKMESİ İÇİN LOGO -->
-				<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
-
-					<link rel="canonical" href="https://rubikacademy.fun/onehand">
-						<meta name="description" content="Rubik Academy - Tek elle (One Hand) Rubik küp çözme tekniklerini adım adım öğren.">
-							<meta property="og:title" content="Rubik Academy - One Hand Eğitimi">
-								<meta property="og:description" content="Tek elle küp çözmeyi en anlaşılır yöntemler ve teknik rehberiyle öğren!">
-									<meta property="og:type" content="website">
-										<meta property="og:url" content="https://rubikacademy.fun/onehand">
-											<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
-												<meta name="twitter:card" content="summary_large_image">
-
-													<link rel="preconnect" href="https://fonts.googleapis.com">
-														<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-															<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-																<style>
-																	/* =========================================
-																	RENKLER VE DEĞİŞKENLER
-																	========================================= */
-																	:root {
-																	--background: #f8fafc;
-																	--surface: #ffffff;
-																	--surface-soft: #f1f5f9;
-																	--primary: #2563eb;
-																	--primary-dark: #1d4ed8;
-																	--primary-light: #eff6ff;
-																	--text: #172033;
-																	--text-soft: #64748b;
-																	--border: #e2e8f0;
-																	--card-border: #dfebf5;
-																	--shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
-																	--hero-bg: linear-gradient(120deg, #e8f7ff, #c8eaff);
-																	--hero-border: #cce8fa;
-																	--btn-bg: #eef8ff;
-																	--btn-hover-bg: #dff2ff;
-																	--bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
-																	--bottom-border: #d5eafa;
-																	--bottom-text: #18578c;
-																	}
-
-																	/* Karanlık Mod Değişkenleri */
-																	html.dark-mode,
-																	body.dark-mode {
-																	--background: #0f172a;
-																	--surface: #1e293b;
-																	--surface-soft: #334155;
-																	--text: #f8fafc;
-																	--text-soft: #cbd5e1;
-																	--border: #334155;
-																	--card-border: #334155;
-																	--shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
-																	--primary-light: #1e3a8a;
-																	--primary: #3b82f6;
-																	--hero-bg: linear-gradient(120deg, #1e293b, #0f172a);
-																	--hero-border: #334155;
-																	--btn-bg: #334155;
-																	--btn-hover-bg: #1e3a8a;
-																	--bottom-bg: #1e293b;
-																	--bottom-border: #334155;
-																	--bottom-text: #60a5fa;
-																	}
-
-																	/* =========================================
-																	GENEL SIFIRLAMA
-																	========================================= */
-																	* {
-																	box-sizing: border-box;
-																	margin: 0;
-																	padding: 0;
-																	}
-
-																	body {
-																	font-family: "Inter", sans-serif;
-																	background: var(--background);
-																	color: var(--text);
-																	overflow-x: hidden;
-																	transition: background-color 0.3s ease, color 0.3s ease;
-																	}
-
-																	a {
-																	text-decoration: none;
-																	color: inherit;
-																	}
-
-																	/* =========================================
-																	ÜST BAR (NAVBAR)
-																	========================================= */
-																	.navbar {
-																	position: sticky;
-																	top: 0;
-																	z-index: 1000;
-																	display: flex;
-																	align-items: center;
-																	justify-content: space-between;
-																	padding: 16px 7%;
-																	background: rgba(248, 250, 252, 0.85);
-																	backdrop-filter: blur(12px);
-																	-webkit-backdrop-filter: blur(12px);
-																	border-bottom: 1px solid var(--border);
-																	transition: background-color 0.3s, border-color 0.3s;
-																	}
-
-																	html.dark-mode .navbar,
-																	body.dark-mode .navbar {
-																	background: rgba(15, 23, 42, 0.90);
-																	}
-
-																	.nav-logo {
-																	display: flex;
-																	align-items: center;
-																	gap: 12px;
-																	}
-
-																	.nav-logo-mark {
-																	width: 38px;
-																	height: 38px;
-																	display: grid;
-																	grid-template-columns: repeat(3, 1fr);
-																	grid-template-rows: repeat(3, 1fr);
-																	gap: 2px;
-																	padding: 4px;
-																	border-radius: 10px;
-																	background: #1e293b;
-																	box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
-																	}
-
-																	.nav-logo-mark div {
-																	border-radius: 2px;
-																	background: #f8fafc;
-																	}
-
-																	.nav-logo-mark div:nth-child(2),
-																	.nav-logo-mark div:nth-child(8) {
-																	background: #ef4444;
-																	}
-
-																	.nav-logo-mark div:nth-child(4),
-																	.nav-logo-mark div:nth-child(6) {
-																	background: #22c55e;
-																	}
-
-																	.nav-logo-mark div:nth-child(5) {
-																	background: #3b82f6;
-																	}
-
-																	.nav-logo-mark div:nth-child(1),
-																	.nav-logo-mark div:nth-child(9) {
-																	background: #facc15;
-																	}
-
-																	.nav-logo-text {
-																	font-size: 17px;
-																	font-weight: 800;
-																	letter-spacing: -0.5px;
-																	color: var(--text);
-																	}
-
-																	.nav-right {
-																	display: flex;
-																	align-items: center;
-																	gap: 10px;
-																	}
-
-																	.nav-links {
-																	display: flex;
-																	align-items: center;
-																	gap: 8px;
-																	}
-
-																	.nav-links a {
-																	padding: 9px 16px;
-																	border-radius: 10px;
-																	font-size: 14px;
-																	font-weight: 600;
-																	color: var(--text-soft);
-																	transition: .25s;
-																	}
-
-																	.nav-links a:hover,
-																	.nav-links a.active {
-																	background: var(--primary-light);
-																	color: var(--primary);
-																	}
-
-																	/* KARANLIK MOD BUTONU */
-																	.dark-mode-btn {
-																	border: none;
-																	background: var(--surface-soft);
-																	color: var(--text);
-																	width: 42px;
-																	height: 42px;
-																	border-radius: 50%;
-																	font-size: 20px;
-																	cursor: pointer;
-																	display: flex;
-																	align-items: center;
-																	justify-content: center;
-																	transition: .3s;
-																	}
-
-																	.dark-mode-btn:hover {
-																	transform: scale(1.08);
-																	}
-
-																	/* DİL SEÇİCİ */
-																	.lang-switcher {
-																	position: relative;
-																	}
-
-																	.lang-switch-btn {
-																	border: none;
-																	background: var(--surface-soft);
-																	color: var(--text);
-																	height: 42px;
-																	padding: 0 16px;
-																	border-radius: 21px;
-																	font-size: 13px;
-																	font-weight: 700;
-																	letter-spacing: .3px;
-																	cursor: pointer;
-																	display: flex;
-																	align-items: center;
-																	gap: 7px;
-																	transition: .3s;
-																	}
-
-																	.lang-switch-btn:hover {
-																	transform: scale(1.06);
-																	background: var(--primary-light);
-																	color: var(--primary);
-																	}
-
-																	.lang-switch-btn .lang-globe {
-																	font-size: 15px;
-																	line-height: 1;
-																	}
-
-																	.lang-menu {
-																	position: absolute;
-																	top: calc(100% + 10px);
-																	right: 0;
-																	min-width: 168px;
-																	background: var(--surface);
-																	border: 1px solid var(--border);
-																	border-radius: 16px;
-																	box-shadow: var(--shadow);
-																	padding: 7px;
-																	display: flex;
-																	flex-direction: column;
-																	gap: 3px;
-																	opacity: 0;
-																	visibility: hidden;
-																	transform: translateY(-8px);
-																	transition: .2s ease;
-																	z-index: 1100;
-																	}
-
-																	.lang-menu.open {
-																	opacity: 1;
-																	visibility: visible;
-																	transform: translateY(0);
-																	}
-
-																	.lang-menu-item {
-																	display: flex;
-																	align-items: center;
-																	gap: 10px;
-																	border: none;
-																	background: transparent;
-																	color: var(--text);
-																	text-align: left;
-																	padding: 10px 14px;
-																	border-radius: 11px;
-																	font-size: 14px;
-																	font-weight: 600;
-																	cursor: pointer;
-																	transition: .2s;
-																	width: 100%;
-																	}
-
-																	.lang-menu-item:hover {
-																	background: var(--primary-light);
-																	color: var(--primary);
-																	}
-
-																	.lang-menu-item.active {
-																	background: var(--primary-light);
-																	color: var(--primary);
-																	font-weight: 800;
-																	}
-
-																	.lang-menu-item .lang-check {
-																	margin-left: auto;
-																	font-size: 12px;
-																	opacity: 0;
-																	}
-
-																	.lang-menu-item.active .lang-check {
-																	opacity: 1;
-																	}
-
-																	@media(max-width: 500px) {
-																	.navbar {
-																	padding: 14px 5%;
-																	}
-																	.nav-logo-text {
-																	font-size: 15px;
-																	}
-																	.nav-links a {
-																	padding: 8px 12px;
-																	font-size: 13px;
-																	}
-																	.nav-right {
-																	gap: 6px;
-																	}
-																	.lang-switch-btn {
-																	padding: 0 10px;
-																	font-size: 12px;
-																	}
-																	}
-
-																	/* =========================================
-																	SAYFA İÇERİK DÜZENİ
-																	========================================= */
-																	.page {
-																	min-height: calc(100vh - 71px);
-																	padding: 45px 5% 80px;
-																	background: var(--background);
-																	transition: background-color 0.3s;
-																	}
-
-																	/* NAV / GERİ DÖN */
-																	.nav-bar {
-																	max-width: 1250px;
-																	margin: 0 auto 25px;
-																	}
-
-																	.back-btn {
-																	display: inline-flex;
-																	align-items: center;
-																	gap: 8px;
-																	padding: 10px 18px;
-																	border-radius: 12px;
-																	background: var(--surface);
-																	border: 1px solid var(--border);
-																	color: var(--primary);
-																	font-size: 13px;
-																	font-weight: 800;
-																	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-																	transition: all .25s ease;
-																	}
-
-																	.back-btn:hover {
-																	transform: translateX(-4px);
-																	border-color: #c0e0fc;
-																	background: var(--primary-light);
-																	}
-
-																	/* HERO */
-																	.hero {
-																	max-width: 1250px;
-																	min-height: 390px;
-																	margin: 0 auto 45px;
-																	border-radius: 34px;
-																	overflow: hidden;
-																	position: relative;
-																	display: flex;
-																	align-items: center;
-																	justify-content: space-between;
-																	padding: 55px 65px;
-																	background: var(--hero-bg);
-																	border: 1px solid var(--hero-border);
-																	box-shadow: var(--shadow);
-																	transition: background 0.3s, border-color 0.3s;
-																	}
-
-																	.hero::before {
-																	content: "";
-																	position: absolute;
-																	width: 430px;
-																	height: 430px;
-																	border-radius: 50%;
-																	border: 70px solid rgba(255, 255, 255, .15);
-																	left: -180px;
-																	top: -180px;
-																	}
-
-																	.hero-text {
-																	position: relative;
-																	z-index: 3;
-																	max-width: 590px;
-																	}
-
-																	.badge {
-																	display: inline-flex;
-																	align-items: center;
-																	gap: 9px;
-																	padding: 9px 15px;
-																	border-radius: 50px;
-																	background: var(--surface);
-																	border: 1px solid var(--border);
-																	color: var(--primary);
-																	font-size: 10px;
-																	font-weight: 900;
-																	letter-spacing: 1.5px;
-																	margin-bottom: 18px;
-																	}
-
-																	.badge i {
-																	width: 7px;
-																	height: 7px;
-																	background: #168ee0;
-																	border-radius: 50%;
-																	}
-
-																	.hero h1 {
-																	font-size: clamp(42px, 5vw, 68px);
-																	line-height: .98;
-																	letter-spacing: -3px;
-																	font-weight: 950;
-																	margin-bottom: 18px;
-																	color: var(--text);
-																	}
-
-																	.hero h1 span { color: var(--primary); }
-
-																	.hero p {
-																	color: var(--text-soft);
-																	font-size: 15px;
-																	line-height: 1.75;
-																	max-width: 560px;
-																	}
-
-																	.hero-cube {
-																	width: 300px;
-																	height: 300px;
-																	position: relative;
-																	z-index: 3;
-																	flex-shrink: 0;
-																	filter: drop-shadow(0 25px 22px rgba(0, 0, 0, .23));
-																	animation: floating 5s ease-in-out infinite;
-																	}
-
-																	@keyframes floating {
-																	0%, 100% { transform: translateY(0) rotate(-2deg); }
-																	50% { transform: translateY(-12px) rotate(2deg); }
-																	}
-
-																	.section-title {
-																	max-width: 1250px;
-																	margin: 0 auto 25px;
-																	}
-
-																	.section-title small {
-																	display: block;
-																	color: var(--primary);
-																	font-size: 10px;
-																	font-weight: 900;
-																	letter-spacing: 1.7px;
-																	margin-bottom: 8px;
-																	}
-
-																	.section-title h2 {
-																	font-size: 30px;
-																	letter-spacing: -1px;
-																	font-weight: 900;
-																	color: var(--text);
-																	}
-
-																	.section-title p {
-																	color: var(--text-soft);
-																	font-size: 13px;
-																	margin-top: 7px;
-																	}
-
-																	.methods {
-																	max-width: 1250px;
-																	margin: auto;
-																	display: grid;
-																	grid-template-columns: repeat(3, 1fr);
-																	gap: 25px;
-																	}
-
-																	.card {
-																	background: var(--surface);
-																	border: 1px solid var(--card-border);
-																	border-radius: 27px;
-																	overflow: hidden;
-																	box-shadow: var(--shadow);
-																	transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease, background-color 0.3s;
-																	display: block;
-																	}
-
-																	.card:hover {
-																	transform: translateY(-8px);
-																	border-color: #c7e5fa;
-																	box-shadow: 0 25px 50px rgba(35, 108, 162, .14);
-																	}
-
-																	.card-visual {
-																	height: 300px;
-																	position: relative;
-																	display: flex;
-																	align-items: center;
-																	justify-content: center;
-																	overflow: hidden;
-																	}
-
-																	.card-visual::before {
-																	content: "";
-																	position: absolute;
-																	width: 250px;
-																	height: 250px;
-																	border-radius: 50%;
-																	border: 40px solid rgba(255, 255, 255, .25);
-																	top: -140px;
-																	right: -90px;
-																	}
-
-																	.beginner { background: linear-gradient(135deg, #e2f5ff, #91d8ff); }
-																	.middle { background: linear-gradient(135deg, #e9e4ff, #b7a5ff); }
-																	.advanced { background: linear-gradient(135deg, #dffaf1, #73d8c3); }
-
-																	.level {
-																	position: absolute;
-																	left: 18px;
-																	top: 18px;
-																	z-index: 5;
-																	padding: 8px 11px;
-																	border-radius: 10px;
-																	background: rgba(255, 255, 255, .85);
-																	backdrop-filter: blur(10px);
-																	font-size: 9px;
-																	font-weight: 900;
-																	letter-spacing: 1px;
-																	color: #26374b;
-																	}
-
-																	.cube {
-																	width: 225px;
-																	height: 225px;
-																	transition: transform .45s cubic-bezier(.2, .8, .2, 1);
-																	filter: drop-shadow(0 20px 18px rgba(16, 35, 53, .22));
-																	}
-
-																	.card:hover .cube {
-																	transform: scale(1.08) translateY(-7px) rotate(-2deg);
-																	}
-
-																	.card-info { padding: 25px 25px 27px; }
-
-																	.card-info h3 {
-																	font-size: 22px;
-																	font-weight: 900;
-																	letter-spacing: -.5px;
-																	margin-bottom: 9px;
-																	color: var(--text);
-																	}
-
-																	.card-info p {
-																	color: var(--text-soft);
-																	font-size: 13px;
-																	line-height: 1.65;
-																	min-height: 64px;
-																	margin-bottom: 20px;
-																	}
-
-																	.button {
-																	display: flex;
-																	align-items: center;
-																	justify-content: space-between;
-																	width: 100%;
-																	padding: 13px 15px;
-																	border-radius: 13px;
-																	background: var(--btn-bg);
-																	color: var(--primary);
-																	font-size: 12px;
-																	font-weight: 900;
-																	transition: background .25s ease, padding .25s ease, color .25s ease;
-																	}
-
-																	.card:hover .button {
-																	background: var(--btn-hover-bg);
-																	padding-left: 19px;
-																	}
-
-																	.arrow { font-size: 18px; }
-
-																	.bottom {
-																	max-width: 1250px;
-																	margin: 38px auto 0;
-																	padding: 32px;
-																	text-align: center;
-																	border-radius: 25px;
-																	background: var(--bottom-bg);
-																	border: 1px solid var(--bottom-border);
-																	transition: background-color 0.3s, border-color 0.3s;
-																	}
-
-																	.bottom h3 { color: var(--bottom-text); font-size: 21px; margin-bottom: 7px; }
-																	.bottom p { color: var(--text-soft); font-size: 13px; }
-
-																	@media(max-width: 1000px) {
-																	.hero { padding: 45px; }
-																	.hero-cube { width: 250px; height: 250px; }
-																	.methods { grid-template-columns: repeat(2, 1fr); }
-																	}
-
-																	@media(max-width: 700px) {
-																	.page { padding: 25px 4% 55px; }
-																	.hero { min-height: auto; padding: 38px 25px 25px; flex-direction: column; text-align: center; border-radius: 27px; }
-																	.hero-text { max-width: 100%; }
-																	.hero h1 { font-size: 43px; }
-																	.hero p { font-size: 14px; }
-																	.hero-cube { width: 235px; height: 235px; margin-top: 15px; }
-																	.methods { grid-template-columns: 1fr; gap: 20px; }
-																	.visual { height: 320px; }
-																	.section-title h2 { font-size: 27px; }
-																	}
-																</style>
-																<!-- Google tag (gtag.js) -->
-																<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
-																<script>
-																	window.dataLayer = window.dataLayer || [];
-																	function gtag(){dataLayer.push(arguments);}
-																	gtag('js', new Date());
-
-																	gtag('config', 'G-F7KXWC8B5N');
-																</script>
-															</head>
-
-	<body>
-
-		<!-- =========================================
-     ÜST BAR (NAVBAR)
-========================================= -->
-		<header class="navbar">
-			<a href="http://rubikacademy.fun" class="nav-logo">
-				<div class="nav-logo-mark">
-					<div></div>
-					<div></div>
-					<div></div>
-
-					<div></div>
-					<div></div>
-					<div></div>
-
-					<div></div>
-					<div></div>
-					<div></div>
-				</div>
-
-				<span class="nav-logo-text">
-					Rubik Academy
-				</span>
-			</a>
-
-			<div class="nav-right">
-
-				<nav class="nav-links">
-					<a href="http://rubikacademy.fun" data-i18n="navHome">
-						Ana Sayfa
-					</a>
-					<a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">
-						İçerikler
-					</a>
-				</nav>
-
-				<div class="lang-switcher" id="langSwitcher">
-
-					<button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Sprache wechseln / تغيير اللغة">
-						<span class="lang-globe">🌐</span>
-						<span id="langLabel">TR</span>
-					</button>
-
-					<div class="lang-menu" id="langMenu" role="menu">
-
-						<button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
-							<span>Türkçe</span>
-							<span class="lang-check">✓</span>
-						</button>
-
-						<button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
-							<span>English</span>
-							<span class="lang-check">✓</span>
-						</button>
-
-						<button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
-							<span>Deutsch</span>
-							<span class="lang-check">✓</span>
-						</button>
-
-						<button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
-							<span>العربية</span>
-							<span class="lang-check">✓</span>
-						</button>
-
-					</div>
-
-				</div>
-
-				<button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-					🌙
-				</button>
-
-			</div>
-		</header>
-
-		<div class="page">
-
-			<!-- NAVIGATION -->
-			<nav class="nav-bar">
-				<a href="http://rubikacademy.fun/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
-			</nav>
-
-			<!-- HERO -->
-			<section class="hero">
-				<div class="hero-text">
-					<div class="badge">
-						<i></i>
-						3×3 ONE HAND
-					</div>
-					<h1>
-						<span data-i18n="hero_title1">One Hand</span>
-						<span data-i18n="hero_titleAccent">Eğitimleri</span>
-					</h1>
-					<p data-i18n="hero_p">
-						Rubik Küpü tek elle çözmeyi öğren; parmak tekniklerinden algoritma seçimine kadar tek el (OH) becerini adım adım geliştir.
-					</p>
-				</div>
-
-				<!-- HERO KÜP (2D) -->
-				<svg class="hero-cube" viewBox="0 0 300 300">
-					<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
-					<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
-					<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-					<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-					<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-					<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-					<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
-					<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-					<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
-					<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-				</svg>
-			</section>
-
-			<!-- BAŞLIK -->
-			<section class="section-title">
-				<small data-i18n="section_small">ÖĞRENME YOLCULUĞU</small>
-				<h2 data-i18n="section_h2">One Hand Methodları</h2>
-				<p data-i18n="section_p">Seviyeni seç ve tek elle küp çözme yolculuğuna başla.</p>
-			</section>
-
-			<!-- KARTLAR -->
-			<section class="methods">
-
-				<!-- BAŞLANGIÇ -->
-				<a href="http://rubikacademy.fun/yakinda" class="card">
-					<div class="card-visual beginner">
-						<div class="level" data-i18n="level_beginner">BAŞLANGIÇ SEVİYESİ</div>
-						<svg class="cube" viewBox="0 0 300 300">
-							<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
-							<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-						</svg>
-					</div>
-					<div class="card-info">
-						<h3 data-i18n="beginner_title">Başlangıç Methodu</h3>
-						<p data-i18n="beginner_p">Tek elle çözmeye ilk kez başlayacaklar için hazırlanmış adım adım başlangıç eğitimi.</p>
-						<div class="button">
-							<span data-i18n="cta_start">Eğitime Başla</span>
-							<span class="arrow">→</span>
-						</div>
-					</div>
-				</a>
-
-				<!-- ORTA -->
-				<a href="http://rubikacademy.fun/yakinda" class="card">
-					<div class="card-visual middle">
-						<div class="level" data-i18n="level_middle">ORTA SEVİYESİ</div>
-						<svg class="cube" viewBox="0 0 300 300">
-							<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
-							<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-						</svg>
-					</div>
-					<div class="card-info">
-						<h3 data-i18n="middle_title">Orta Seviye Methodu</h3>
-						<p data-i18n="middle_p">Temel tek el tekniğini bilenler için daha akıcı parmak hareketleri ve gelişmiş algoritmalar.</p>
-						<div class="button">
-							<span data-i18n="cta_start">Eğitime Başla</span>
-							<span class="arrow">→</span>
-						</div>
-					</div>
-				</a>
-
-				<!-- İLERİ -->
-				<a href="http://rubikacademy.fun/yakinda" class="card">
-					<div class="card-visual advanced">
-						<div class="level" data-i18n="level_advanced">İLERİ SEVİYE</div>
-						<svg class="cube" viewBox="0 0 300 300">
-							<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
-							<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffffff" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffffff" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
-						</svg>
-					</div>
-					<div class="card-info">
-						<h3 data-i18n="advanced_title">İleri Seviye Methodu</h3>
-						<p data-i18n="advanced_p">Rekabetçi süreler hedefleyenler için ileri düzey tek el (OH) algoritmaları ve teknikleri.</p>
-						<div class="button">
-							<span data-i18n="cta_start">Eğitime Başla</span>
-							<span class="arrow">→</span>
-						</div>
-					</div>
-				</a>
-
-			</section>
-
-			<!-- ALT -->
-			<section class="bottom">
-				<h3 data-i18n="bottom_title">🧩 Seviyeni seç, tek elini hızlandır!</h3>
-				<p data-i18n="bottom_p">Rubik Academy ile One Hand çözüm becerilerini adım adım geliştir.</p>
-			</section>
-
-		</div>
-
-		<script>
-			/* =========================================================
-			DİL SEÇİCİ (TR / EN / DE / AR)
-			========================================================= */
-
-			var translations = {
-			tr: {
-			navHome: "Ana Sayfa",
-			navContent: "İçerikler",
-			back_btn: "← Geri Dön",
-			hero_title1: "One Hand",
-			hero_titleAccent: "Eğitimleri",
-			hero_p: "Rubik Küpü tek elle çözmeyi öğren; parmak tekniklerinden algoritma seçimine kadar tek el (OH) becerini adım adım geliştir.",
-			section_small: "ÖĞRENME YOLCULUĞU",
-			section_h2: "One Hand Methodları",
-			section_p: "Seviyeni seç ve tek elle küp çözme yolculuğuna başla.",
-			level_beginner: "BAŞLANGIÇ SEVİYESİ",
-			beginner_title: "Başlangıç Methodu",
-			beginner_p: "Tek elle çözmeye ilk kez başlayacaklar için hazırlanmış adım adım başlangıç eğitimi.",
-			level_middle: "ORTA SEVİYESİ",
-			middle_title: "Orta Seviye Methodu",
-			middle_p: "Temel tek el tekniğini bilenler için daha akıcı parmak hareketleri ve gelişmiş algoritmalar.",
-			level_advanced: "İLERİ SEVİYE",
-			advanced_title: "İleri Seviye Methodu",
-			advanced_p: "Rekabetçi süreler hedefleyenler için ileri düzey tek el (OH) algoritmaları ve teknikleri.",
-			cta_start: "Eğitime Başla",
-			bottom_title: "🧩 Seviyeni seç, tek elini hızlandır!",
-			bottom_p: "Rubik Academy ile One Hand çözüm becerilerini adım adım geliştir."
-			},
-			en: {
-			navHome: "Home",
-			navContent: "Content",
-			back_btn: "← Go Back",
-			hero_title1: "One Hand",
-			hero_titleAccent: "Tutorials",
-			hero_p: "Learn to solve the Rubik's Cube with one hand; develop your one-handed (OH) skills step by step, from finger tricks to algorithm choice.",
-			section_small: "LEARNING JOURNEY",
-			section_h2: "One Hand Methods",
-			section_p: "Pick your level and start your one-handed solving journey.",
-			level_beginner: "BEGINNER LEVEL",
-			beginner_title: "Beginner Method",
-			beginner_p: "A step-by-step beginner tutorial for those starting to solve one-handed for the first time.",
-			level_middle: "INTERMEDIATE LEVEL",
-			middle_title: "Intermediate Method",
-			middle_p: "Smoother finger tricks and advanced algorithms for those who already know the basic one-handed technique.",
-			level_advanced: "ADVANCED LEVEL",
-			advanced_title: "Advanced Method",
-			advanced_p: "Advanced one-handed (OH) algorithms and techniques for those aiming for competitive times.",
-			cta_start: "Start Learning",
-			bottom_title: "🧩 Pick your level, speed up your one hand!",
-			bottom_p: "Develop your One Hand solving skills step by step with Rubik Academy."
-			},
-			de: {
-			navHome: "Startseite",
-			navContent: "Inhalte",
-			back_btn: "← Zurück",
-			hero_title1: "One Hand",
-			hero_titleAccent: "Anleitungen",
-			hero_p: "Lerne, den Zauberwürfel mit einer Hand zu lösen; entwickle deine einhändigen (OH) Fähigkeiten Schritt für Schritt, von Fingertricks bis zur Algorithmuswahl.",
-			section_small: "LERNREISE",
-			section_h2: "One-Hand-Methoden",
-			section_p: "Wähle dein Niveau und starte deine einhändige Lösungsreise.",
-			level_beginner: "EINSTEIGERSTUFE",
-			beginner_title: "Einsteigermethode",
-			beginner_p: "Eine Schritt-für-Schritt-Anleitung für alle, die zum ersten Mal einhändig lösen.",
-			level_middle: "MITTELSTUFE",
-			middle_title: "Methode für Fortgeschrittene",
-			middle_p: "Flüssigere Fingertricks und fortgeschrittene Algorithmen für alle, die die einhändige Grundtechnik bereits beherrschen.",
-			level_advanced: "FORTGESCHRITTENENSTUFE",
-			advanced_title: "Fortgeschrittene Methode",
-			advanced_p: "Fortgeschrittene einhändige (OH) Algorithmen und Techniken für alle, die wettbewerbsfähige Zeiten anstreben.",
-			cta_start: "Jetzt lernen",
-			bottom_title: "🧩 Wähle dein Niveau, beschleunige deine eine Hand!",
-			bottom_p: "Entwickle deine One-Hand-Lösungsfähigkeiten Schritt für Schritt mit Rubik Academy."
-			},
-			ar: {
-			navHome: "الرئيسية",
-			navContent: "المحتوى",
-			back_btn: "← رجوع",
-			hero_title1: "اليد الواحدة",
-			hero_titleAccent: "دروس",
-			hero_p: "تعلّم حل مكعب روبيك بيد واحدة؛ طوّر مهاراتك في الحل بيد واحدة (OH) خطوة بخطوة، من تقنيات الأصابع إلى اختيار الخوارزميات.",
-			section_small: "رحلة التعلم",
-			section_h2: "طرق الحل بيد واحدة",
-			section_p: "اختر مستواك وابدأ رحلة الحل بيد واحدة.",
-			level_beginner: "مستوى مبتدئ",
-			beginner_title: "طريقة المبتدئين",
-			beginner_p: "درس تدريجي لمن يبدأون الحل بيد واحدة لأول مرة.",
-			level_middle: "مستوى متوسط",
-			middle_title: "طريقة المستوى المتوسط",
-			middle_p: "تقنيات أصابع أكثر سلاسة وخوارزميات متقدمة لمن يعرفون تقنية اليد الواحدة الأساسية بالفعل.",
-			level_advanced: "مستوى متقدم",
-			advanced_title: "الطريقة المتقدمة",
-			advanced_p: "خوارزميات وتقنيات متقدمة للحل بيد واحدة (OH) لمن يسعون لأوقات تنافسية.",
-			cta_start: "ابدأ التعلم",
-			bottom_title: "🧩 اختر مستواك، سرّع يدك الواحدة!",
-			bottom_p: "طوّر مهاراتك في الحل بيد واحدة خطوة بخطوة مع Rubik Academy."
-			}
-			};
-
-			var langCodes = { tr: "TR", en: "EN", de: "DE", ar: "AR" };
-
-			function applyLanguage(lang) {
-			if (!translations[lang]) lang = "tr";
-			var dict = translations[lang];
-
-			document.querySelectorAll("[data-i18n]").forEach(function(el) {
-			var key = el.getAttribute("data-i18n");
-			if (dict[key]) {
-			el.textContent = dict[key];
-			}
-			});
-
-			document.documentElement.setAttribute("lang", lang);
-			document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
-
-			var label = document.getElementById("langLabel");
-			if (label) {
-			label.textContent = langCodes[lang] || "TR";
-			}
-
-			document.querySelectorAll(".lang-menu-item").forEach(function(item) {
-			item.classList.toggle("active", item.getAttribute("data-lang") === lang);
-			});
-
-			localStorage.setItem("site-lang", lang);
-			}
-
-			function toggleLangMenu(e) {
-			if (e) e.stopPropagation();
-			var menu = document.getElementById("langMenu");
-			var btn = document.getElementById("langSwitchBtn");
-			if (!menu) return;
-			var willOpen = !menu.classList.contains("open");
-			menu.classList.toggle("open", willOpen);
-			if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
-			}
-
-			function closeLangMenu() {
-			var menu = document.getElementById("langMenu");
-			var btn = document.getElementById("langSwitchBtn");
-			if (menu) menu.classList.remove("open");
-			if (btn) btn.setAttribute("aria-expanded", "false");
-			}
-
-			function selectLanguage(lang) {
-			applyLanguage(lang);
-			closeLangMenu();
-			}
-
-			document.addEventListener("click", function(e) {
-			var switcher = document.getElementById("langSwitcher");
-			if (switcher && !switcher.contains(e.target)) {
-			closeLangMenu();
-			}
-			});
-
-			document.addEventListener("keydown", function(e) {
-			if (e.key === "Escape") closeLangMenu();
-			});
-
-			document.addEventListener("DOMContentLoaded", function() {
-			var savedLang = localStorage.getItem("site-lang") || "tr";
-			applyLanguage(savedLang);
-			});
-
-			/* =========================================================
-			KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
-			========================================================= */
-
-			function toggleDarkMode() {
-			var isDark = document.documentElement.classList.toggle("dark-mode");
-			document.body.classList.toggle("dark-mode", isDark);
-
-			var btn = document.getElementById("darkModeBtn");
-
-			if (isDark) {
-			localStorage.setItem("theme", "dark");
-			if(btn) btn.innerHTML = "☀️";
-			} else {
-			localStorage.setItem("theme", "light");
-			if(btn) btn.innerHTML = "🌙";
-			}
-			}
-
-			// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
-			document.addEventListener("DOMContentLoaded", function() {
-			var savedTheme = localStorage.getItem("theme");
-			var btn = document.getElementById("darkModeBtn");
-
-			if (savedTheme === "dark") {
-			document.documentElement.classList.add("dark-mode");
-			document.body.classList.add("dark-mode");
-			if(btn) btn.innerHTML = "☀️";
-			} else {
-			if(btn) btn.innerHTML = "🌙";
-			}
-			});
-		</script>
-
-	</body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+  })();
+</script>
+<title>Rubik Academy - One Hand (Tek El) Eğitimi</title>
+<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
+<link rel="canonical" href= + canonical + >
+<meta name="description" content= + description + >
+<meta property="og:title" content= + og_title + >
+<meta property="og:description" content= + og_description + >
+<meta property="og:type" content="website">
+<meta property="og:url" content= + canonical + >
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* =========================================
+   RENKLER VE DEĞİŞKENLER
+========================================= */
+:root {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-soft: #f1f5f9;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #e2e8f0;
+    --card-border: #dfebf5;
+    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+    --hero-bg: linear-gradient(120deg, #e8f7ff, #c8eaff);
+    --hero-border: #cce8fa;
+    --btn-bg: #eef8ff;
+    --btn-hover-bg: #dff2ff;
+    --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
+    --bottom-border: #d5eafa;
+    --bottom-text: #18578c;
+}
+
+html.dark-mode,
+body.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --card-border: #334155;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+    --hero-bg: linear-gradient(120deg, #1e293b, #0f172a);
+    --hero-border: #334155;
+    --btn-bg: #334155;
+    --btn-hover-bg: #1e3a8a;
+    --bottom-bg: #1e293b;
+    --bottom-border: #334155;
+    --bottom-text: #60a5fa;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    background: var(--background);
+    color: var(--text);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 7%;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .navbar,
+body.dark-mode .navbar {
+    background: rgba(15, 23, 42, 0.90);
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo-mark {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    padding: 4px;
+    border-radius: 10px;
+    background: #1e293b;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+}
+
+.nav-logo-mark div {
+    border-radius: 2px;
+    background: #f8fafc;
+}
+
+.nav-logo-mark div:nth-child(2),
+.nav-logo-mark div:nth-child(8) {
+    background: #ef4444;
+}
+
+.nav-logo-mark div:nth-child(4),
+.nav-logo-mark div:nth-child(6) {
+    background: #22c55e;
+}
+
+.nav-logo-mark div:nth-child(5) {
+    background: #3b82f6;
+}
+
+.nav-logo-mark div:nth-child(1),
+.nav-logo-mark div:nth-child(9) {
+    background: #facc15;
+}
+
+.nav-logo-text {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links a {
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    transition: .25s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.dark-mode-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+}
+
+.dark-mode-btn:hover {
+    transform: scale(1.08);
+}
+
+.lang-switcher {
+    position: relative;
+}
+
+.lang-switch-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 21px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: .3s;
+}
+
+.lang-switch-btn:hover {
+    transform: scale(1.06);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-switch-btn .lang-globe {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
+}
+
+.lang-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-menu-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.lang-menu-item.active .lang-check {
+    opacity: 1;
+}
+
+@media(max-width: 500px) {
+    .navbar { padding: 14px 5%; }
+    .nav-logo-text { font-size: 15px; }
+    .nav-links a { padding: 8px 12px; font-size: 13px; }
+    .nav-right { gap: 6px; }
+    .lang-switch-btn { padding: 0 10px; font-size: 12px; }
+}
+
+.page {
+    min-height: calc(100vh - 71px);
+    padding: 45px 5% 80px;
+    background: var(--background);
+    transition: background-color 0.3s;
+}
+
+.nav-bar {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: all .25s ease;
+}
+
+.back-btn:hover {
+    transform: translateX(-4px);
+    border-color: #c0e0fc;
+    background: var(--primary-light);
+}
+
+.hero {
+    max-width: 1250px;
+    min-height: 390px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 55px 65px;
+    background: var(--hero-bg);
+    border: 1px solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    left: -180px;
+    top: -180px;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 3;
+    max-width: 590px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 15px;
+    border-radius: 50px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    margin-bottom: 18px;
+}
+
+.badge i {
+    width: 7px;
+    height: 7px;
+    background: #168ee0;
+    border-radius: 50%;
+}
+
+.hero h1 {
+    font-size: clamp(42px, 5vw, 68px);
+    line-height: .98;
+    letter-spacing: -3px;
+    font-weight: 950;
+    margin-bottom: 18px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 15px;
+    line-height: 1.75;
+    max-width: 560px;
+}
+
+.hero-cube {
+    width: 300px;
+    height: 300px;
+    position: relative;
+    z-index: 3;
+    flex-shrink: 0;
+    filter: drop-shadow(0 25px 22px rgba(0, 0, 0, .23));
+    animation: floating 5s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+.section-title {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.section-title small {
+    display: block;
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.7px;
+    margin-bottom: 8px;
+}
+
+.section-title h2 {
+    font-size: 30px;
+    letter-spacing: -1px;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.section-title p {
+    color: var(--text-soft);
+    font-size: 13px;
+    margin-top: 7px;
+}
+
+.methods {
+    max-width: 1250px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 27px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease, background-color 0.3s;
+    display: block;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    border-color: #c7e5fa;
+    box-shadow: 0 25px 50px rgba(35, 108, 162, .14);
+}
+
+.card-visual {
+    height: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.card-visual::before {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    border: 40px solid rgba(255, 255, 255, .25);
+    top: -140px;
+    right: -90px;
+}
+
+.beginner { background: linear-gradient(135deg, #e2f5ff, #91d8ff); }
+.middle { background: linear-gradient(135deg, #e9e4ff, #b7a5ff); }
+.advanced { background: linear-gradient(135deg, #dffaf1, #73d8c3); }
+
+.level {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    padding: 8px 11px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(10px);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #26374b;
+}
+
+.cube {
+    width: 225px;
+    height: 225px;
+    transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+    filter: drop-shadow(0 20px 18px rgba(16, 35, 53, .22));
+}
+
+.card:hover .cube {
+    transform: scale(1.08) translateY(-7px) rotate(-2deg);
+}
+
+.card-info { padding: 25px 25px 27px; }
+
+.card-info h3 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -.5px;
+    margin-bottom: 9px;
+    color: var(--text);
+}
+
+.card-info p {
+    color: var(--text-soft);
+    font-size: 13px;
+    line-height: 1.65;
+    min-height: 64px;
+    margin-bottom: 20px;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 13px 15px;
+    border-radius: 13px;
+    background: var(--btn-bg);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 900;
+    transition: background .25s ease, padding .25s ease, color .25s ease;
+}
+
+.card:hover .button {
+    background: var(--btn-hover-bg);
+    padding-left: 19px;
+}
+
+.arrow { font-size: 18px; }
+
+.bottom {
+    max-width: 1250px;
+    margin: 38px auto 0;
+    padding: 32px;
+    text-align: center;
+    border-radius: 25px;
+    background: var(--bottom-bg);
+    border: 1px solid var(--bottom-border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.bottom h3 { color: var(--bottom-text); font-size: 21px; margin-bottom: 7px; }
+.bottom p { color: var(--text-soft); font-size: 13px; }
+
+@media(max-width: 1000px) {
+    .hero { padding: 45px; }
+    .hero-cube { width: 250px; height: 250px; }
+    .methods { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media(max-width: 700px) {
+    .page { padding: 25px 4% 55px; }
+    .hero { min-height: auto; padding: 38px 25px 25px; flex-direction: column; text-align: center; border-radius: 27px; }
+    .hero-text { max-width: 100%; }
+    .hero h1 { font-size: 43px; }
+    .hero p { font-size: 14px; }
+    .hero-cube { width: 235px; height: 235px; margin-top: 15px; }
+    .methods { grid-template-columns: 1fr; gap: 20px; }
+    .card-visual { height: 320px; }
+    .section-title h2 { font-size: 27px; }
+}
+</style>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+<body>
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <div class="nav-logo-mark">
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+        </div>
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Sprache wechseln / Сменить язык / تغيير اللغة">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+                    <span>Deutsch</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+                    <span>العربية</span><span class="lang-check">✓</span>
+                </button>
+            </div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="http://rubikacademy.fun/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<section class="hero">
+<div class="hero-text">
+<div class="badge"><i></i>3×3 ONE HAND</div>
+<h1><span data-i18n="hero_title1">One Hand</span> <span data-i18n="hero_titleAccent">Eğitimleri</span></h1>
+<p data-i18n="hero_p">Rubik Küpü tek elle çözmeyi öğren; parmak tekniklerinden algoritma seçimine kadar tek el (OH) becerini adım adım geliştir.</p>
+</div>
+<svg class="hero-cube" viewBox="0 0 300 300">
+<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+</svg>
+</section>
+
+<section class="section-title">
+<small data-i18n="section_small">ÖĞRENME YOLCULUĞU</small>
+<h2 data-i18n="section_h2">One Hand Methodları</h2>
+<p data-i18n="section_p">Seviyeni seç ve tek elle küp çözme yolculuğuna başla.</p>
+</section>
+
+<section class="methods">
+
+<a href="http://rubikacademy.fun/yakinda" class="card">
+<div class="card-visual beginner">
+<div class="level" data-i18n="level_beginner">BAŞLANGIÇ SEVİYESİ</div>
+<svg class="cube" viewBox="0 0 300 300">
+<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+</svg>
+</div>
+<div class="card-info">
+<h3 data-i18n="beginner_title">Başlangıç Methodu</h3>
+<p data-i18n="beginner_p">Tek elle çözmeye ilk kez başlayacaklar için hazırlanmış adım adım başlangıç eğitimi.</p>
+<div class="button"><span data-i18n="cta_start">Eğitime Başla</span><span class="arrow">→</span></div>
+</div>
+</a>
+
+<a href="http://rubikacademy.fun/yakinda" class="card">
+<div class="card-visual middle">
+<div class="level" data-i18n="level_middle">ORTA SEVİYESİ</div>
+<svg class="cube" viewBox="0 0 300 300">
+<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+</svg>
+</div>
+<div class="card-info">
+<h3 data-i18n="middle_title">Orta Seviye Methodu</h3>
+<p data-i18n="middle_p">Temel tek el tekniğini bilenler için daha akıcı parmak hareketleri ve gelişmiş algoritmalar.</p>
+<div class="button"><span data-i18n="cta_start">Eğitime Başla</span><span class="arrow">→</span></div>
+</div>
+</a>
+
+<a href="http://rubikacademy.fun/yakinda" class="card">
+<div class="card-visual advanced">
+<div class="level" data-i18n="level_advanced">İLERİ SEVİYE</div>
+<svg class="cube" viewBox="0 0 300 300">
+<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffffff" stroke="#111827" stroke-width="2.5"/>
+<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
+<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffffff" stroke="#111827" stroke-width="2.5"/>
+<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+</svg>
+</div>
+<div class="card-info">
+<h3 data-i18n="advanced_title">İleri Seviye Methodu</h3>
+<p data-i18n="advanced_p">Rekabetçi süreler hedefleyenler için ileri düzey tek el (OH) algoritmaları ve teknikleri.</p>
+<div class="button"><span data-i18n="cta_start">Eğitime Başla</span><span class="arrow">→</span></div>
+</div>
+</a>
+
+</section>
+
+<section class="bottom">
+<h3 data-i18n="bottom_title">🧩 Seviyeni seç, tek elini hızlandır!</h3>
+<p data-i18n="bottom_p">Rubik Academy ile One Hand çözüm becerilerini adım adım geliştir.</p>
+</section>
+
+</div>
+
+<script>
+var translations = {
+    "tr": {
+        "navHome": "Ana Sayfa",
+        "navContent": "İçerikler",
+        "back_btn": "← Geri Dön",
+        "hero_title1": "One Hand",
+        "hero_titleAccent": "Eğitimleri",
+        "hero_p": "Rubik Küpü tek elle çözmeyi öğren; parmak tekniklerinden algoritma seçimine kadar tek el (OH) becerini adım adım geliştir.",
+        "section_small": "ÖĞRENME YOLCULUĞU",
+        "section_h2": "One Hand Methodları",
+        "section_p": "Seviyeni seç ve tek elle küp çözme yolculuğuna başla.",
+        "level_beginner": "BAŞLANGIÇ SEVİYESİ",
+        "beginner_title": "Başlangıç Methodu",
+        "beginner_p": "Tek elle çözmeye ilk kez başlayacaklar için hazırlanmış adım adım başlangıç eğitimi.",
+        "level_middle": "ORTA SEVİYESİ",
+        "middle_title": "Orta Seviye Methodu",
+        "middle_p": "Temel tek el tekniğini bilenler için daha akıcı parmak hareketleri ve gelişmiş algoritmalar.",
+        "level_advanced": "İLERİ SEVİYE",
+        "advanced_title": "İleri Seviye Methodu",
+        "advanced_p": "Rekabetçi süreler hedefleyenler için ileri düzey tek el (OH) algoritmaları ve teknikleri.",
+        "cta_start": "Eğitime Başla",
+        "bottom_title": "🧩 Seviyeni seç, tek elini hızlandır!",
+        "bottom_p": "Rubik Academy ile One Hand çözüm becerilerini adım adım geliştir."
+    },
+    "en": {
+        "navHome": "Home",
+        "navContent": "Content",
+        "back_btn": "← Go Back",
+        "hero_title1": "One Hand",
+        "hero_titleAccent": "Tutorials",
+        "hero_p": "Learn to solve the Rubik's Cube with one hand; develop your one-handed (OH) skills step by step, from finger tricks to algorithm choice.",
+        "section_small": "LEARNING JOURNEY",
+        "section_h2": "One Hand Methods",
+        "section_p": "Pick your level and start your one-handed solving journey.",
+        "level_beginner": "BEGINNER LEVEL",
+        "beginner_title": "Beginner Method",
+        "beginner_p": "A step-by-step beginner tutorial for those starting to solve one-handed for the first time.",
+        "level_middle": "INTERMEDIATE LEVEL",
+        "middle_title": "Intermediate Method",
+        "middle_p": "Smoother finger tricks and advanced algorithms for those who already know the basic one-handed technique.",
+        "level_advanced": "ADVANCED LEVEL",
+        "advanced_title": "Advanced Method",
+        "advanced_p": "Advanced one-handed (OH) algorithms and techniques for those aiming for competitive times.",
+        "cta_start": "Start Learning",
+        "bottom_title": "🧩 Pick your level, speed up your one hand!",
+        "bottom_p": "Develop your One Hand solving skills step by step with Rubik Academy."
+    },
+    "ru": {
+        "navHome": "Главная",
+        "navContent": "Контент",
+        "back_btn": "← Назад",
+        "hero_title1": "Одной рукой",
+        "hero_titleAccent": "Обучение",
+        "hero_p": "Научись собирать кубик Рубика одной рукой; развивай свои навыки OH шаг за шагом — от техник пальцев до выбора алгоритмов.",
+        "section_small": "ОБУЧАЮЩИЙ ПУТЬ",
+        "section_h2": "Методы One Hand",
+        "section_p": "Выбери свой уровень и начни путь сборки одной рукой.",
+        "level_beginner": "НАЧАЛЬНЫЙ УРОВЕНЬ",
+        "beginner_title": "Метод для начинающих",
+        "beginner_p": "Пошаговое обучение для тех, кто впервые начинает собирать одной рукой.",
+        "level_middle": "СРЕДНИЙ УРОВЕНЬ",
+        "middle_title": "Метод среднего уровня",
+        "middle_p": "Более плавные техники пальцев и продвинутые алгоритмы для тех, кто уже знает базовую технику одной руки.",
+        "level_advanced": "ПРОДВИНУТЫЙ УРОВЕНЬ",
+        "advanced_title": "Продвинутый метод",
+        "advanced_p": "Продвинутые алгоритмы и техники одной руки (OH) для тех, кто стремится к соревновательному времени.",
+        "cta_start": "Начать обучение",
+        "bottom_title": "🧩 Выбери уровень, ускорь свою одну руку!",
+        "bottom_p": "Развивай свои навыки сборки One Hand шаг за шагом с Rubik Academy."
+    },
+    "de": {
+        "navHome": "Startseite",
+        "navContent": "Inhalte",
+        "back_btn": "← Zurück",
+        "hero_title1": "One Hand",
+        "hero_titleAccent": "Anleitungen",
+        "hero_p": "Lerne, den Zauberwürfel mit einer Hand zu lösen; entwickle deine einhändigen (OH) Fähigkeiten Schritt für Schritt, von Fingertricks bis zur Algorithmuswahl.",
+        "section_small": "LERNREISE",
+        "section_h2": "One-Hand-Methoden",
+        "section_p": "Wähle dein Niveau und starte deine einhändige Lösungsreise.",
+        "level_beginner": "EINSTEIGERSTUFE",
+        "beginner_title": "Einsteigermethode",
+        "beginner_p": "Eine Schritt-für-Schritt-Anleitung für alle, die zum ersten Mal einhändig lösen.",
+        "level_middle": "MITTELSTUFE",
+        "middle_title": "Methode für Fortgeschrittene",
+        "middle_p": "Flüssigere Fingertricks und fortgeschrittene Algorithmen für alle, die die einhändige Grundtechnik bereits beherrschen.",
+        "level_advanced": "FORTGESCHRITTENENSTUFE",
+        "advanced_title": "Fortgeschrittene Methode",
+        "advanced_p": "Fortgeschrittene einhändige (OH) Algorithmen und Techniken für alle, die wettbewerbsfähige Zeiten anstreben.",
+        "cta_start": "Jetzt lernen",
+        "bottom_title": "🧩 Wähle dein Niveau, beschleunige deine eine Hand!",
+        "bottom_p": "Entwickle deine One-Hand-Lösungsfähigkeiten Schritt für Schritt mit Rubik Academy."
+    },
+    "ar": {
+        "navHome": "الرئيسية",
+        "navContent": "المحتوى",
+        "back_btn": "← رجوع",
+        "hero_title1": "اليد الواحدة",
+        "hero_titleAccent": "دروس",
+        "hero_p": "تعلّم حل مكعب روبيك بيد واحدة؛ طوّر مهاراتك في الحل بيد واحدة (OH) خطوة بخطوة، من تقنيات الأصابع إلى اختيار الخوارزميات.",
+        "section_small": "رحلة التعلم",
+        "section_h2": "طرق الحل بيد واحدة",
+        "section_p": "اختر مستواك وابدأ رحلة الحل بيد واحدة.",
+        "level_beginner": "مستوى مبتدئ",
+        "beginner_title": "طريقة المبتدئين",
+        "beginner_p": "درس تدريجي لمن يبدأون الحل بيد واحدة لأول مرة.",
+        "level_middle": "مستوى متوسط",
+        "middle_title": "طريقة المستوى المتوسط",
+        "middle_p": "تقنيات أصابع أكثر سلاسة وخوارزميات متقدمة لمن يعرفون تقنية اليد الواحدة الأساسية بالفعل.",
+        "level_advanced": "مستوى متقدم",
+        "advanced_title": "الطريقة المتقدمة",
+        "advanced_p": "خوارزميات وتقنيات متقدمة للحل بيد واحدة (OH) لمن يسعون لأوقات تنافسية.",
+        "cta_start": "ابدأ التعلم",
+        "bottom_title": "🧩 اختر مستواك، سرّع يدك الواحدة!",
+        "bottom_p": "طوّر مهاراتك في الحل بيد واحدة خطوة بخطوة مع Rubik Academy."
+    }
+};
+
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
+function applyLanguage(lang) {
+    if (!translations[lang]) lang = "tr";
+    var dict = translations[lang];
+
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) { el.textContent = dict[key]; }
+    });
+
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+
+    var label = document.getElementById("langLabel");
+    if (label) { label.textContent = langCodes[lang] || "TR"; }
+
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) { closeLangMenu(); }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
+});
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+    var btn = document.getElementById("darkModeBtn");
+    if (isDark) {
+        localStorage.setItem("theme", "dark");
+        if (btn) btn.innerHTML = "☀️";
+    } else {
+        localStorage.setItem("theme", "light");
+        if (btn) btn.innerHTML = "🌙";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
+        if (btn) btn.innerHTML = "☀️";
+    } else {
+        if (btn) btn.innerHTML = "🌙";
+    }
+});
+</script>
+</body>
 </html>
