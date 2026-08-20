@@ -3,34 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- TEMA VE SEO AYARLARI -->
 <script>
   (function() {
     var savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark-mode");
-    }
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
   })();
 </script>
-
 <title>Rubik Academy - 4x4 Eğitimi (Rubik's Revenge)</title>
-<!-- TARAYICI SEKMESİ İÇİN LOGO -->
 <link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
-
-<link rel="canonical" href="https://rubikacademy.fun/4x4">
-<meta name="description" content="Rubik Academy - 4x4 Rubik küp çözme tekniklerini, merkezleri, kenar birleştirmeyi ve parity çözümlerini öğren.">
-<meta property="og:title" content="Rubik Academy - 4x4 Eğitimi">
-<meta property="og:description" content="4x4 Rubik küpü (Rubik's Revenge) reduction metodu ve özel parite algoritmalarıyla adım adım çözmeyi öğren!">
+<link rel="canonical" href= + canonical + >
+<meta name="description" content= + description + >
+<meta property="og:title" content= + og_title + >
+<meta property="og:description" content= + og_description + >
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://rubikacademy.fun/4x4">
+<meta property="og:url" content= + canonical + >
 <meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
 <meta name="twitter:card" content="summary_large_image">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
 <style>
 /* =========================================
    RENKLER VE DEĞİŞKENLER
@@ -56,7 +47,6 @@
     --bottom-text: #18578c;
 }
 
-/* Karanlık Mod Değişkenleri */
 html.dark-mode,
 body.dark-mode {
     --background: #0f172a;
@@ -78,9 +68,6 @@ body.dark-mode {
     --bottom-text: #60a5fa;
 }
 
-/* =========================================
-   GENEL SIFIRLAMA
-========================================= */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -100,9 +87,6 @@ a {
     color: inherit;
 }
 
-/* =========================================
-   ÜST BAR (NAVBAR)
-========================================= */
 .navbar {
     position: sticky;
     top: 0;
@@ -200,7 +184,6 @@ body.dark-mode .navbar {
     color: var(--primary);
 }
 
-/* KARANLIK MOD BUTONU */
 .dark-mode-btn {
     border: none;
     background: var(--surface-soft);
@@ -220,7 +203,10 @@ body.dark-mode .navbar {
     transform: scale(1.08);
 }
 
-/* DİL SEÇİCİ BUTONU */
+.lang-switcher {
+    position: relative;
+}
+
 .lang-switch-btn {
     border: none;
     background: var(--surface-soft);
@@ -249,29 +235,78 @@ body.dark-mode .navbar {
     line-height: 1;
 }
 
-@media(max-width: 500px) {
-    .navbar {
-        padding: 14px 5%;
-    }
-    .nav-logo-text {
-        font-size: 15px;
-    }
-    .nav-links a {
-        padding: 8px 12px;
-        font-size: 13px;
-    }
-    .nav-right {
-        gap: 6px;
-    }
-    .lang-switch-btn {
-        padding: 0 10px;
-        font-size: 12px;
-    }
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
 }
 
-/* =========================================
-   SAYFA İÇERİK DÜZENİ
-========================================= */
+.lang-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-menu-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.lang-menu-item.active .lang-check {
+    opacity: 1;
+}
+
+@media(max-width: 500px) {
+    .navbar { padding: 14px 5%; }
+    .nav-logo-text { font-size: 15px; }
+    .nav-links a { padding: 8px 12px; font-size: 13px; }
+    .nav-right { gap: 6px; }
+    .lang-switch-btn { padding: 0 10px; font-size: 12px; }
+}
+
 .page {
     min-height: calc(100vh - 71px);
     padding: 45px 5% 80px;
@@ -279,7 +314,6 @@ body.dark-mode .navbar {
     transition: background-color 0.3s;
 }
 
-/* NAV / GERİ DÖN */
 .nav-bar {
     max-width: 1250px;
     margin: 0 auto 25px;
@@ -306,7 +340,6 @@ body.dark-mode .navbar {
     background: var(--primary-light);
 }
 
-/* HERO */
 .hero {
     max-width: 1250px;
     min-height: 390px;
@@ -568,86 +601,72 @@ body.dark-mode .navbar {
     .section-title h2 { font-size: 27px; }
 }
 </style>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-F7KXWC8B5N');
 </script>
 </head>
-
 <body>
-
-<!-- =========================================
-     ÜST BAR (NAVBAR)
-========================================= -->
 <header class="navbar">
     <a href="http://rubikacademy.fun" class="nav-logo">
         <div class="nav-logo-mark">
-            <div></div>
-            <div></div>
-            <div></div>
-
-            <div></div>
-            <div></div>
-            <div></div>
-
-            <div></div>
-            <div></div>
-            <div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
         </div>
-
-        <span class="nav-logo-text">
-            Rubik Academy
-        </span>
+        <span class="nav-logo-text">Rubik Academy</span>
     </a>
 
     <div class="nav-right">
-
         <nav class="nav-links">
-            <a href="http://rubikacademy.fun" data-i18n="navHome">
-                Ana Sayfa
-            </a>
-            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">
-                İçerikler
-            </a>
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
         </nav>
 
-        <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLanguage()" aria-label="Dili değiştir / Switch language">
-            <span class="lang-globe">🌐</span><span id="langLabel">EN</span>
-        </button>
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Sprache wechseln / Сменить язык / تغيير اللغة">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
 
-        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-            🌙
-        </button>
+            <div class="lang-menu" id="langMenu" role="menu">
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+                    <span>Deutsch</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+                    <span>العربية</span><span class="lang-check">✓</span>
+                </button>
+            </div>
+        </div>
 
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
     </div>
 </header>
 
 <div class="page">
 
-<!-- NAVIGATION -->
 <nav class="nav-bar">
     <a href="http://rubikacademy.fun/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
 <div class="hero-text">
-<div class="badge">
-<i></i>
-4×4 RUBİK KÜP
-</div>
+<div class="badge"><i></i>4×4 RUBİK KÜP</div>
 <h1><span data-i18n="hero_title1">4×4</span> <span data-i18n="hero_titleAccent">Eğitimleri</span></h1>
-<p data-i18n="hero_p">
-4×4 Rubik Küp'ü (Rubik's Revenge) çözmeyi sıfırdan öğren; kenar eşleştirme (edge pairing) ve orta blok (center) tekniklerinden ileri seviye parity çözümlerine kadar kendini geliştir.
-</p>
+<p data-i18n="hero_p">4×4 Rubik Küp'ü (Rubik's Revenge) çözmeyi sıfırdan öğren; kenar eşleştirme (edge pairing) ve orta blok (center) tekniklerinden ileri seviye parity çözümlerine kadar kendini geliştir.</p>
 </div>
-
-<!-- HERO KÜP (2D) -->
 <svg class="hero-cube" viewBox="0 0 300 300">
 <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
 <rect x="59.1" y="59.1" width="42.3" height="42.3" rx="9.3" fill="#1e6fe6" stroke="#111827" stroke-width="2.2"/>
@@ -669,17 +688,14 @@ body.dark-mode .navbar {
 </svg>
 </section>
 
-<!-- BAŞLIK -->
 <section class="section-title">
 <small data-i18n="section_small">ÖĞRENME YOLCULUĞU</small>
 <h2 data-i18n="section_h2">4×4 Methodları</h2>
 <p data-i18n="section_p">Seviyeni seç ve küp çözme yolculuğuna başla.</p>
 </section>
 
-<!-- KARTLAR -->
 <section class="methods">
 
-<!-- BAŞLANGIÇ -->
 <a href="http://rubikacademy.fun/yakinda.html" class="card">
 <div class="card-visual beginner">
 <div class="level" data-i18n="level_beginner">BAŞLANGIÇ SEVİYESİ</div>
@@ -706,14 +722,10 @@ body.dark-mode .navbar {
 <div class="card-info">
 <h3 data-i18n="beginner_title">Başlangıç Methodu</h3>
 <p data-i18n="beginner_p">4×4 Rubik Küp'ü ilk kez çözecekler için hazırlanmış, merkezleri ve kenarları adım adım tamamlayan başlangıç eğitimi.</p>
-<div class="button">
-<span data-i18n="cta_start">Eğitime Başla</span>
-<span class="arrow">→</span>
-</div>
+<div class="button"><span data-i18n="cta_start">Eğitime Başla</span><span class="arrow">→</span></div>
 </div>
 </a>
 
-<!-- ORTA -->
 <a href="http://rubikacademy.fun/yakinda.html" class="card">
 <div class="card-visual middle">
 <div class="level" data-i18n="level_middle">ORTA SEVİYESİ</div>
@@ -740,14 +752,10 @@ body.dark-mode .navbar {
 <div class="card-info">
 <h3 data-i18n="middle_title">Orta Seviye Methodu</h3>
 <p data-i18n="middle_p">Temel yöntemi bilenler için kenar eşleştirme, hızlı merkez çözümü ve gelişmiş algoritmalar üzerine hazırlanan eğitim.</p>
-<div class="button">
-<span data-i18n="cta_start">Eğitime Başla</span>
-<span class="arrow">→</span>
-</div>
+<div class="button"><span data-i18n="cta_start">Eğitime Başla</span><span class="arrow">→</span></div>
 </div>
 </a>
 
-<!-- İLERİ -->
 <a href="http://rubikacademy.fun/yakinda.html" class="card">
 <div class="card-visual advanced">
 <div class="level" data-i18n="level_advanced">İLERİ SEVİYE</div>
@@ -774,16 +782,12 @@ body.dark-mode .navbar {
 <div class="card-info">
 <h3 data-i18n="advanced_title">İleri Seviye Methodu</h3>
 <p data-i18n="advanced_p">Daha hızlı süreler hedefleyenler için parity çözümleri, gelişmiş algoritmalar ve speedcubing teknikleri.</p>
-<div class="button">
-<span data-i18n="cta_start">Eğitime Başla</span>
-<span class="arrow">→</span>
-</div>
+<div class="button"><span data-i18n="cta_start">Eğitime Başla</span><span class="arrow">→</span></div>
 </div>
 </a>
 
 </section>
 
-<!-- ALT -->
 <section class="bottom">
 <h3 data-i18n="bottom_title">🧩 Seviyeni seç, küpünü hızlandır!</h3>
 <p data-i18n="bottom_p">Rubik Academy ile 4×4 çözüm becerilerini adım adım geliştir.</p>
@@ -792,127 +796,208 @@ body.dark-mode .navbar {
 </div>
 
 <script>
-/* =========================================================
-   DİL SEÇİCİ (TR / EN)
-========================================================= */
-
 var translations = {
-    tr: {
-        navHome: "Ana Sayfa",
-        navContent: "İçerikler",
-        back_btn: "← Geri Dön",
-        hero_title1: "4×4",
-        hero_titleAccent: "Eğitimleri",
-        hero_p: "4×4 Rubik Küp'ü (Rubik's Revenge) çözmeyi sıfırdan öğren; kenar eşleştirme (edge pairing) ve orta blok (center) tekniklerinden ileri seviye parity çözümlerine kadar kendini geliştir.",
-        section_small: "ÖĞRENME YOLCULUĞU",
-        section_h2: "4×4 Methodları",
-        section_p: "Seviyeni seç ve küp çözme yolculuğuna başla.",
-        level_beginner: "BAŞLANGIÇ SEVİYESİ",
-        beginner_title: "Başlangıç Methodu",
-        beginner_p: "4×4 Rubik Küp'ü ilk kez çözecekler için hazırlanmış, merkezleri ve kenarları adım adım tamamlayan başlangıç eğitimi.",
-        level_middle: "ORTA SEVİYESİ",
-        middle_title: "Orta Seviye Methodu",
-        middle_p: "Temel yöntemi bilenler için kenar eşleştirme, hızlı merkez çözümü ve gelişmiş algoritmalar üzerine hazırlanan eğitim.",
-        level_advanced: "İLERİ SEVİYE",
-        advanced_title: "İleri Seviye Methodu",
-        advanced_p: "Daha hızlı süreler hedefleyenler için parity çözümleri, gelişmiş algoritmalar ve speedcubing teknikleri.",
-        cta_start: "Eğitime Başla",
-        bottom_title: "🧩 Seviyeni seç, küpünü hızlandır!",
-        bottom_p: "Rubik Academy ile 4×4 çözüm becerilerini adım adım geliştir."
+    "tr": {
+        "navHome": "Ana Sayfa",
+        "navContent": "İçerikler",
+        "back_btn": "← Geri Dön",
+        "hero_title1": "4×4",
+        "hero_titleAccent": "Eğitimleri",
+        "hero_p": "4×4 Rubik Küp'ü (Rubik's Revenge) çözmeyi sıfırdan öğren; kenar eşleştirme (edge pairing) ve orta blok (center) tekniklerinden ileri seviye parity çözümlerine kadar kendini geliştir.",
+        "section_small": "ÖĞRENME YOLCULUĞU",
+        "section_h2": "4×4 Methodları",
+        "section_p": "Seviyeni seç ve küp çözme yolculuğuna başla.",
+        "level_beginner": "BAŞLANGIÇ SEVİYESİ",
+        "beginner_title": "Başlangıç Methodu",
+        "beginner_p": "4×4 Rubik Küp'ü ilk kez çözecekler için hazırlanmış, merkezleri ve kenarları adım adım tamamlayan başlangıç eğitimi.",
+        "level_middle": "ORTA SEVİYESİ",
+        "middle_title": "Orta Seviye Methodu",
+        "middle_p": "Temel yöntemi bilenler için kenar eşleştirme, hızlı merkez çözümü ve gelişmiş algoritmalar üzerine hazırlanan eğitim.",
+        "level_advanced": "İLERİ SEVİYE",
+        "advanced_title": "İleri Seviye Methodu",
+        "advanced_p": "Daha hızlı süreler hedefleyenler için parity çözümleri, gelişmiş algoritmalar ve speedcubing teknikleri.",
+        "cta_start": "Eğitime Başla",
+        "bottom_title": "🧩 Seviyeni seç, küpünü hızlandır!",
+        "bottom_p": "Rubik Academy ile 4×4 çözüm becerilerini adım adım geliştir."
     },
-    en: {
-        navHome: "Home",
-        navContent: "Content",
-        back_btn: "← Go Back",
-        hero_title1: "4×4",
-        hero_titleAccent: "Tutorials",
-        hero_p: "Learn to solve the 4×4 Rubik's Cube (Rubik's Revenge) from scratch; develop yourself from edge pairing and center techniques through to advanced parity solutions.",
-        section_small: "LEARNING JOURNEY",
-        section_h2: "4×4 Methods",
-        section_p: "Pick your level and start your cube-solving journey.",
-        level_beginner: "BEGINNER LEVEL",
-        beginner_title: "Beginner Method",
-        beginner_p: "A step-by-step beginner tutorial for those solving the 4×4 Rubik's Cube for the first time, completing centers and edges step by step.",
-        level_middle: "INTERMEDIATE LEVEL",
-        middle_title: "Intermediate Method",
-        middle_p: "A tutorial on edge pairing, faster center solving, and advanced algorithms for those who already know the basic method.",
-        level_advanced: "ADVANCED LEVEL",
-        advanced_title: "Advanced Method",
-        advanced_p: "Parity solutions, advanced algorithms, and speedcubing techniques for those aiming for faster solve times.",
-        cta_start: "Start Learning",
-        bottom_title: "🧩 Pick your level, speed up your cube!",
-        bottom_p: "Develop your 4×4 solving skills step by step with Rubik Academy."
+    "en": {
+        "navHome": "Home",
+        "navContent": "Content",
+        "back_btn": "← Go Back",
+        "hero_title1": "4×4",
+        "hero_titleAccent": "Tutorials",
+        "hero_p": "Learn to solve the 4×4 Rubik's Cube (Rubik's Revenge) from scratch; develop yourself from edge pairing and center techniques through to advanced parity solutions.",
+        "section_small": "LEARNING JOURNEY",
+        "section_h2": "4×4 Methods",
+        "section_p": "Pick your level and start your cube-solving journey.",
+        "level_beginner": "BEGINNER LEVEL",
+        "beginner_title": "Beginner Method",
+        "beginner_p": "A step-by-step beginner tutorial for those solving the 4×4 Rubik's Cube for the first time, completing centers and edges step by step.",
+        "level_middle": "INTERMEDIATE LEVEL",
+        "middle_title": "Intermediate Method",
+        "middle_p": "A tutorial on edge pairing, faster center solving, and advanced algorithms for those who already know the basic method.",
+        "level_advanced": "ADVANCED LEVEL",
+        "advanced_title": "Advanced Method",
+        "advanced_p": "Parity solutions, advanced algorithms, and speedcubing techniques for those aiming for faster solve times.",
+        "cta_start": "Start Learning",
+        "bottom_title": "🧩 Pick your level, speed up your cube!",
+        "bottom_p": "Develop your 4×4 solving skills step by step with Rubik Academy."
+    },
+    "de": {
+        "navHome": "Startseite",
+        "navContent": "Inhalte",
+        "back_btn": "← Zurück",
+        "hero_title1": "4×4",
+        "hero_titleAccent": "Anleitungen",
+        "hero_p": "Lerne den 4×4 Zauberwürfel (Rubik's Revenge) von Grund auf zu lösen; entwickle dich von Center- und Kanten-Pairing-Techniken bis hin zu fortgeschrittenen Paritätslösungen.",
+        "section_small": "LERNREISE",
+        "section_h2": "4×4-Methoden",
+        "section_p": "Wähle dein Niveau und starte deine Würfel-Lösungsreise.",
+        "level_beginner": "EINSTEIGERSTUFE",
+        "beginner_title": "Einsteigermethode",
+        "beginner_p": "Eine Schritt-für-Schritt-Anleitung für alle, die den 4×4 Zauberwürfel zum ersten Mal lösen und dabei Center und Kanten Schritt für Schritt vervollständigen.",
+        "level_middle": "MITTELSTUFE",
+        "middle_title": "Methode für Fortgeschrittene",
+        "middle_p": "Eine Anleitung zum Kanten-Pairing, schnellerem Lösen der Center und fortgeschrittenen Algorithmen für alle, die die Grundmethode bereits kennen.",
+        "level_advanced": "FORTGESCHRITTENENSTUFE",
+        "advanced_title": "Fortgeschrittene Methode",
+        "advanced_p": "Paritätslösungen, fortgeschrittene Algorithmen und Speedcubing-Techniken für alle, die schnellere Lösungszeiten anstreben.",
+        "cta_start": "Jetzt lernen",
+        "bottom_title": "🧩 Wähle dein Niveau, beschleunige deinen Würfel!",
+        "bottom_p": "Entwickle deine 4×4-Lösungsfähigkeiten Schritt für Schritt mit Rubik Academy."
+    },
+    "ar": {
+        "navHome": "الرئيسية",
+        "navContent": "المحتوى",
+        "back_btn": "← رجوع",
+        "hero_title1": "4×4",
+        "hero_titleAccent": "دروس",
+        "hero_p": "تعلّم حل مكعب روبيك 4×4 (Rubik's Revenge) من الصفر؛ طوّر نفسك من تقنيات المراكز ومطابقة الحواف إلى حلول التعادل المتقدمة.",
+        "section_small": "رحلة التعلم",
+        "section_h2": "طرق حل 4×4",
+        "section_p": "اختر مستواك وابدأ رحلة حل المكعب.",
+        "level_beginner": "مستوى مبتدئ",
+        "beginner_title": "طريقة المبتدئين",
+        "beginner_p": "درس تدريجي للمبتدئين لمن يحلّون مكعب 4×4 لأول مرة، يكمل المراكز والحواف خطوة بخطوة.",
+        "level_middle": "مستوى متوسط",
+        "middle_title": "طريقة المستوى المتوسط",
+        "middle_p": "درس حول مطابقة الحواف وحل المراكز بشكل أسرع وخوارزميات متقدمة لمن يعرفون الطريقة الأساسية بالفعل.",
+        "level_advanced": "مستوى متقدم",
+        "advanced_title": "الطريقة المتقدمة",
+        "advanced_p": "حلول التعادل (parity) وخوارزميات متقدمة وتقنيات السبيدكيوبنج لمن يسعون لأوقات حل أسرع.",
+        "cta_start": "ابدأ التعلم",
+        "bottom_title": "🧩 اختر مستواك، سرّع مكعبك!",
+        "bottom_p": "طوّر مهاراتك في حل 4×4 خطوة بخطوة مع Rubik Academy."
+    },
+    "ru": {
+        "navHome": "Главная",
+        "navContent": "Контент",
+        "back_btn": "← Назад",
+        "hero_title1": "4×4",
+        "hero_titleAccent": "Обучение",
+        "hero_p": "Изучи сборку кубика 4×4 (Rubik's Revenge) с нуля; развивайся от техник центров и сопоставления рёбер до продвинутых решений паритета.",
+        "section_small": "ОБУЧАЮЩИЙ ПУТЬ",
+        "section_h2": "Методы 4×4",
+        "section_p": "Выбери свой уровень и начни путь сборки кубика.",
+        "level_beginner": "НАЧАЛЬНЫЙ УРОВЕНЬ",
+        "beginner_title": "Метод для начинающих",
+        "beginner_p": "Пошаговое обучение для новичков, впервые собирающих кубик 4×4, с последовательным завершением центров и рёбер.",
+        "level_middle": "СРЕДНИЙ УРОВЕНЬ",
+        "middle_title": "Метод среднего уровня",
+        "middle_p": "Обучение сопоставлению рёбер, более быстрой сборке центров и продвинутым алгоритмам для тех, кто уже знает базовый метод.",
+        "level_advanced": "ПРОДВИНУТЫЙ УРОВЕНЬ",
+        "advanced_title": "Продвинутый метод",
+        "advanced_p": "Решения паритетов, продвинутые алгоритмы и техники спидкубинга для тех, кто стремится к более быстрому времени сборки.",
+        "cta_start": "Начать обучение",
+        "bottom_title": "🧩 Выбери уровень, ускорь сборку своего кубика!",
+        "bottom_p": "Развивай свои навыки сборки 4×4 шаг за шагом с Rubik Academy."
     }
 };
 
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
 function applyLanguage(lang) {
-    var dict = translations[lang] || translations.tr;
+    if (!translations[lang]) lang = "tr";
+    var dict = translations[lang];
 
     document.querySelectorAll("[data-i18n]").forEach(function(el) {
         var key = el.getAttribute("data-i18n");
-        if (dict[key]) {
-            el.textContent = dict[key];
-        }
+        if (dict[key]) { el.textContent = dict[key]; }
     });
 
-    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "tr");
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
 
     var label = document.getElementById("langLabel");
-    if (label) {
-        label.textContent = lang === "tr" ? "EN" : "TR";
-    }
+    if (label) { label.textContent = langCodes[lang] || "TR"; }
 
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
     var btn = document.getElementById("langSwitchBtn");
-    if (btn) {
-        btn.setAttribute("aria-label", lang === "tr" ? "Switch to English" : "Türkçeye geç");
-    }
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
 }
 
-function toggleLanguage() {
-    var current = localStorage.getItem("site-lang") || "tr";
-    var next = current === "tr" ? "en" : "tr";
-    localStorage.setItem("site-lang", next);
-    applyLanguage(next);
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
 }
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) { closeLangMenu(); }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
 
 document.addEventListener("DOMContentLoaded", function() {
     var savedLang = localStorage.getItem("site-lang") || "tr";
     applyLanguage(savedLang);
 });
 
-/* =========================================================
-   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
-========================================================= */
-
 function toggleDarkMode() {
     var isDark = document.documentElement.classList.toggle("dark-mode");
     document.body.classList.toggle("dark-mode", isDark);
-    
     var btn = document.getElementById("darkModeBtn");
-
     if (isDark) {
         localStorage.setItem("theme", "dark");
-        if(btn) btn.innerHTML = "☀️";
+        if (btn) btn.innerHTML = "☀️";
     } else {
         localStorage.setItem("theme", "light");
-        if(btn) btn.innerHTML = "🌙";
+        if (btn) btn.innerHTML = "🌙";
     }
 }
 
-// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
 document.addEventListener("DOMContentLoaded", function() {
     var savedTheme = localStorage.getItem("theme");
     var btn = document.getElementById("darkModeBtn");
-    
     if (savedTheme === "dark") {
         document.documentElement.classList.add("dark-mode");
         document.body.classList.add("dark-mode");
-        if(btn) btn.innerHTML = "☀️";
+        if (btn) btn.innerHTML = "☀️";
     } else {
-        if(btn) btn.innerHTML = "🌙";
+        if (btn) btn.innerHTML = "🌙";
     }
 });
 </script>
-
 </body>
 </html>
