@@ -8,9 +8,10 @@
 <script>
   (function() {
     var savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark-mode");
-    }
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", "ltr");
   })();
 </script>
 
@@ -32,6 +33,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
+html {
+    overflow-x: hidden;
+}
+
 /* =========================================
    RENKLER VE DEĞİŞKENLER
 ========================================= */
@@ -220,7 +225,11 @@ body.dark-mode .navbar {
     transform: scale(1.08);
 }
 
-/* DİL SEÇİCİ BUTONU */
+/* DİL SEÇİCİ */
+.lang-switcher {
+    position: relative;
+}
+
 .lang-switch-btn {
     border: none;
     background: var(--surface-soft);
@@ -247,6 +256,70 @@ body.dark-mode .navbar {
 .lang-switch-btn .lang-globe {
     font-size: 15px;
     line-height: 1;
+}
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
+}
+
+.lang-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-menu-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.lang-menu-item.active .lang-check {
+    opacity: 1;
 }
 
 @media(max-width: 500px) {
@@ -516,6 +589,11 @@ body.dark-mode .navbar {
     transform: scale(1.08) translateY(-7px) rotate(-2deg);
 }
 
+.clock-svg {
+    width: 225px;
+    height: 225px;
+}
+
 .card-info { padding: 25px 25px 27px; }
 
 .card-info h3 {
@@ -586,6 +664,26 @@ body.dark-mode .navbar {
     .card-visual { height: 320px; }
     .section-title h2 { font-size: 27px; }
 }
+
+.number {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(10px);
+    font-size: 18px;
+    font-weight: 900;
+    color: #26374b;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, .12);
+}
+
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
@@ -606,42 +704,59 @@ body.dark-mode .navbar {
 <header class="navbar">
     <a href="http://rubikacademy.fun" class="nav-logo">
         <div class="nav-logo-mark">
-            <div></div>
-            <div></div>
-            <div></div>
-
-            <div></div>
-            <div></div>
-            <div></div>
-
-            <div></div>
-            <div></div>
-            <div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
         </div>
-
-        <span class="nav-logo-text">
-            Rubik Academy
-        </span>
+        <span class="nav-logo-text">Rubik Academy</span>
     </a>
 
     <div class="nav-right">
 
         <nav class="nav-links">
-            <a href="http://rubikacademy.fun" data-i18n="navHome">
-                Ana Sayfa
-            </a>
-            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">
-                İçerikler
-            </a>
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
         </nav>
 
-        <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLanguage()" aria-label="Dili değiştir / Switch language">
-            <span class="lang-globe">🌐</span><span id="langLabel">EN</span>
-        </button>
+        <div class="lang-switcher" id="langSwitcher">
 
-        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-            🌙
-        </button>
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Sprache wechseln / Сменить язык / تغيير اللغة">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+                    <span>Deutsch</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+                    <span>العربية</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+            </div>
+
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
 
     </div>
 </header>
@@ -772,60 +887,132 @@ Megaminx mekanizmasını ve temel çözüm algoritmalarını adım adım öğren
 
 <script>
 /* =========================================================
-   DİL SEÇİCİ (TR / EN)
+   DİL SEÇİCİ (TR / EN / RU / DE / AR)
 ========================================================= */
 
 var translations = {
-    tr: {
-        navHome: "Ana Sayfa",
-        navContent: "İçerikler",
-        back_btn: "← Geri Dön",
-        hero_title1: "Megaminx",
-        hero_titleAccent: "Eğitimleri",
-        hero_p: "Megaminx mekanizmasını ve temel çözüm algoritmalarını adım adım öğren; başlangıçtan ileri seviyeye küp çözme teknikleriyle kendini geliştir.",
-        section_small: "ÖĞRENME YOLCULUĞU",
-        section_h2: "Megaminx Methodları",
-        section_p: "Seviyeni seç ve küp çözme yolculuğuna başla.",
-        level_beginner: "BAŞLANGIÇ SEVİYESİ",
-        beginner_title: "Başlangıç Methodu",
-        beginner_p: "Megaminx'i ilk kez çözecekler için hazırlanmış, temel yüzey ve köşe parçalarını adım adım tamamlayan başlangıç eğitimi.",
-        level_middle: "ORTA SEVİYESİ",
-        middle_title: "Orta Seviye Methodu",
-        middle_p: "Temel yöntemi bilenler için daha pratik hamleler ve orta seviye çözüm algoritmaları üzerine hazırlanan eğitim.",
-        level_advanced: "İLERİ SEVİYE",
-        advanced_title: "İleri Seviye Methodu",
-        advanced_p: "Daha hızlı süreler hedefleyenler için gelişmiş Megaminx algoritmaları ve speedcubing teknikleri.",
-        cta_start: "Eğitime Başla",
-        bottom_title: "🧩 Seviyeni seç, küpünü hızlandır!",
-        bottom_p: "Rubik Academy ile Megaminx çözüm becerilerini adım adım geliştir."
+    "tr": {
+        "navHome": "Ana Sayfa",
+        "navContent": "İçerikler",
+        "back_btn": "← Geri Dön",
+        "hero_title1": "Megaminx",
+        "hero_titleAccent": "Eğitimleri",
+        "hero_p": "Megaminx mekanizmasını ve temel çözüm algoritmalarını adım adım öğren; başlangıçtan ileri seviyeye küp çözme teknikleriyle kendini geliştir.",
+        "section_small": "ÖĞRENME YOLCULUĞU",
+        "section_h2": "Megaminx Methodları",
+        "section_p": "Seviyeni seç ve küp çözme yolculuğuna başla.",
+        "level_beginner": "BAŞLANGIÇ SEVİYESİ",
+        "beginner_title": "Başlangıç Methodu",
+        "beginner_p": "Megaminx'i ilk kez çözecekler için hazırlanmış, temel yüzey ve köşe parçalarını adım adım tamamlayan başlangıç eğitimi.",
+        "level_middle": "ORTA SEVİYESİ",
+        "middle_title": "Orta Seviye Methodu",
+        "middle_p": "Temel yöntemi bilenler için daha pratik hamleler ve orta seviye çözüm algoritmaları üzerine hazırlanan eğitim.",
+        "level_advanced": "İLERİ SEVİYE",
+        "advanced_title": "İleri Seviye Methodu",
+        "advanced_p": "Daha hızlı süreler hedefleyenler için gelişmiş Megaminx algoritmaları ve speedcubing teknikleri.",
+        "cta_start": "Eğitime Başla",
+        "bottom_title": "🧩 Seviyeni seç, küpünü hızlandır!",
+        "bottom_p": "Rubik Academy ile Megaminx çözüm becerilerini adım adım geliştir."
     },
-    en: {
-        navHome: "Home",
-        navContent: "Content",
-        back_btn: "← Go Back",
-        hero_title1: "Megaminx",
-        hero_titleAccent: "Tutorials",
-        hero_p: "Learn the Megaminx mechanism and basic solving algorithms step by step; develop yourself from beginner to advanced cube solving techniques.",
-        section_small: "LEARNING JOURNEY",
-        section_h2: "Megaminx Methods",
-        section_p: "Pick your level and start your cube solving journey.",
-        level_beginner: "BEGINNER LEVEL",
-        beginner_title: "Beginner Method",
-        beginner_p: "A step-by-step beginner tutorial for those solving the Megaminx for the first time, completing basic faces and corner pieces.",
-        level_middle: "INTERMEDIATE LEVEL",
-        middle_title: "Intermediate Method",
-        middle_p: "A tutorial built on more practical moves and intermediate solving algorithms for those who already know the basic method.",
-        level_advanced: "ADVANCED LEVEL",
-        advanced_title: "Advanced Method",
-        advanced_p: "Advanced Megaminx algorithms and speedcubing techniques for those aiming for faster solve times.",
-        cta_start: "Start Learning",
-        bottom_title: "🧩 Pick your level, speed up your cube!",
-        bottom_p: "Develop your Megaminx solving skills step by step with Rubik Academy."
+    "en": {
+        "navHome": "Home",
+        "navContent": "Content",
+        "back_btn": "← Go Back",
+        "hero_title1": "Megaminx",
+        "hero_titleAccent": "Tutorials",
+        "hero_p": "Learn the Megaminx mechanism and basic solving algorithms step by step; develop yourself from beginner to advanced cube solving techniques.",
+        "section_small": "LEARNING JOURNEY",
+        "section_h2": "Megaminx Methods",
+        "section_p": "Pick your level and start your cube solving journey.",
+        "level_beginner": "BEGINNER LEVEL",
+        "beginner_title": "Beginner Method",
+        "beginner_p": "A step-by-step beginner tutorial for those solving the Megaminx for the first time, completing basic faces and corner pieces.",
+        "level_middle": "INTERMEDIATE LEVEL",
+        "middle_title": "Intermediate Method",
+        "middle_p": "A tutorial built on more practical moves and intermediate solving algorithms for those who already know the basic method.",
+        "level_advanced": "ADVANCED LEVEL",
+        "advanced_title": "Advanced Method",
+        "advanced_p": "Advanced Megaminx algorithms and speedcubing techniques for those aiming for faster solve times.",
+        "cta_start": "Start Learning",
+        "bottom_title": "🧩 Pick your level, speed up your cube!",
+        "bottom_p": "Develop your Megaminx solving skills step by step with Rubik Academy."
+    },
+    "ru": {
+        "navHome": "Главная",
+        "navContent": "Контент",
+        "back_btn": "← Назад",
+        "hero_title1": "Megaminx",
+        "hero_titleAccent": "Обучение",
+        "hero_p": "Изучи механизм Megaminx и базовые алгоритмы сборки шаг за шагом; развивайся от начального до продвинутого уровня техник сборки.",
+        "section_small": "ОБУЧАЮЩИЙ ПУТЬ",
+        "section_h2": "Методы Megaminx",
+        "section_p": "Выбери свой уровень и начни путь сборки кубика.",
+        "level_beginner": "НАЧАЛЬНЫЙ УРОВЕНЬ",
+        "beginner_title": "Метод для начинающих",
+        "beginner_p": "Пошаговое обучение для новичков, впервые собирающих Megaminx, с последовательным завершением базовых граней и угловых элементов.",
+        "level_middle": "СРЕДНИЙ УРОВЕНЬ",
+        "middle_title": "Метод среднего уровня",
+        "middle_p": "Обучение более практичным ходам и алгоритмам среднего уровня для тех, кто уже знает базовый метод.",
+        "level_advanced": "ПРОДВИНУТЫЙ УРОВЕНЬ",
+        "advanced_title": "Продвинутый метод",
+        "advanced_p": "Продвинутые алгоритмы Megaminx и техники спидкубинга для тех, кто стремится к более быстрому времени сборки.",
+        "cta_start": "Начать обучение",
+        "bottom_title": "🧩 Выбери уровень, ускорь свой кубик!",
+        "bottom_p": "Развивай навыки сборки Megaminx шаг за шагом вместе с Rubik Academy."
+    },
+    "de": {
+        "navHome": "Startseite",
+        "navContent": "Inhalte",
+        "back_btn": "← Zurück",
+        "hero_title1": "Megaminx",
+        "hero_titleAccent": "Anleitungen",
+        "hero_p": "Lerne den Megaminx-Mechanismus und grundlegende Lösealgorithmen Schritt für Schritt; entwickle dich vom Anfänger- bis zum Fortgeschrittenenniveau der Würfel-Lösetechniken.",
+        "section_small": "LERNREISE",
+        "section_h2": "Megaminx-Methoden",
+        "section_p": "Wähle dein Niveau und starte deine Würfel-Lösungsreise.",
+        "level_beginner": "EINSTEIGERSTUFE",
+        "beginner_title": "Einsteigermethode",
+        "beginner_p": "Eine Schritt-für-Schritt-Anleitung für alle, die den Megaminx zum ersten Mal lösen, mit Vervollständigung der Grundflächen und Eckstücke.",
+        "level_middle": "MITTELSTUFE",
+        "middle_title": "Methode für Fortgeschrittene",
+        "middle_p": "Eine Anleitung mit praktischeren Zügen und Algorithmen der Mittelstufe für alle, die die Grundmethode bereits kennen.",
+        "level_advanced": "FORTGESCHRITTENENSTUFE",
+        "advanced_title": "Fortgeschrittene Methode",
+        "advanced_p": "Fortgeschrittene Megaminx-Algorithmen und Speedcubing-Techniken für alle, die schnellere Lösungszeiten anstreben.",
+        "cta_start": "Jetzt lernen",
+        "bottom_title": "🧩 Wähle dein Niveau, beschleunige deinen Würfel!",
+        "bottom_p": "Entwickle deine Megaminx-Lösungsfähigkeiten Schritt für Schritt mit Rubik Academy."
+    },
+    "ar": {
+        "navHome": "الرئيسية",
+        "navContent": "المحتوى",
+        "back_btn": "← رجوع",
+        "hero_title1": "Megaminx",
+        "hero_titleAccent": "دروس",
+        "hero_p": "تعلّم آلية Megaminx وخوارزميات الحل الأساسية خطوة بخطوة؛ طوّر نفسك بتقنيات حل المكعب من مستوى المبتدئين إلى المتقدم.",
+        "section_small": "رحلة التعلم",
+        "section_h2": "طرق حل Megaminx",
+        "section_p": "اختر مستواك وابدأ رحلة حل المكعب.",
+        "level_beginner": "مستوى مبتدئ",
+        "beginner_title": "طريقة المبتدئين",
+        "beginner_p": "درس تدريجي للمبتدئين لمن يحلّون Megaminx لأول مرة، يكمل الأوجه الأساسية وقطع الزوايا.",
+        "level_middle": "مستوى متوسط",
+        "middle_title": "طريقة المستوى المتوسط",
+        "middle_p": "درس يعتمد على حركات أكثر عملية وخوارزميات حل متوسطة لمن يعرفون الطريقة الأساسية بالفعل.",
+        "level_advanced": "مستوى متقدم",
+        "advanced_title": "الطريقة المتقدمة",
+        "advanced_p": "خوارزميات Megaminx متقدمة وتقنيات السبيدكيوبنج لمن يسعون لأوقات حل أسرع.",
+        "cta_start": "ابدأ التعلم",
+        "bottom_title": "🧩 اختر مستواك، سرّع مكعبك!",
+        "bottom_p": "طوّر مهاراتك في حل Megaminx خطوة بخطوة مع Rubik Academy."
     }
 };
 
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
 function applyLanguage(lang) {
-    var dict = translations[lang] || translations.tr;
+    if (!translations[lang]) lang = "tr";
+    var dict = translations[lang];
 
     document.querySelectorAll("[data-i18n]").forEach(function(el) {
         var key = el.getAttribute("data-i18n");
@@ -834,25 +1021,53 @@ function applyLanguage(lang) {
         }
     });
 
-    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "tr");
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", "ltr");
 
     var label = document.getElementById("langLabel");
     if (label) {
-        label.textContent = lang === "tr" ? "EN" : "TR";
+        label.textContent = langCodes[lang] || "TR";
     }
 
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
     var btn = document.getElementById("langSwitchBtn");
-    if (btn) {
-        btn.setAttribute("aria-label", lang === "tr" ? "Switch to English" : "Türkçeye geç");
-    }
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
 }
 
-function toggleLanguage() {
-    var current = localStorage.getItem("site-lang") || "tr";
-    var next = current === "tr" ? "en" : "tr";
-    localStorage.setItem("site-lang", next);
-    applyLanguage(next);
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
 }
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) {
+        closeLangMenu();
+    }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
 
 document.addEventListener("DOMContentLoaded", function() {
     var savedLang = localStorage.getItem("site-lang") || "tr";
@@ -866,7 +1081,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function toggleDarkMode() {
     var isDark = document.documentElement.classList.toggle("dark-mode");
     document.body.classList.toggle("dark-mode", isDark);
-    
+
     var btn = document.getElementById("darkModeBtn");
 
     if (isDark) {
@@ -878,11 +1093,10 @@ function toggleDarkMode() {
     }
 }
 
-// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
 document.addEventListener("DOMContentLoaded", function() {
     var savedTheme = localStorage.getItem("theme");
     var btn = document.getElementById("darkModeBtn");
-    
+
     if (savedTheme === "dark") {
         document.documentElement.classList.add("dark-mode");
         document.body.classList.add("dark-mode");
