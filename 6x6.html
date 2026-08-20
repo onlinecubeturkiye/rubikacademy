@@ -7,6 +7,9 @@
   (function() {
     var savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
   })();
 </script>
 <title>Rubik Academy - 6x6 Eğitimi (V-Cube 6)</title>
@@ -66,6 +69,9 @@ body.dark-mode {
     --bottom-bg: #1e293b;
     --bottom-border: #334155;
     --bottom-text: #60a5fa;
+}
+html {
+    overflow-x: hidden;
 }
 
 * {
