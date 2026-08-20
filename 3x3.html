@@ -11,6 +11,9 @@
 					if (savedTheme === "dark") {
 					document.documentElement.classList.add("dark-mode");
 					}
+					var savedLang = localStorage.getItem("site-lang") || "tr";
+					document.documentElement.setAttribute("lang", savedLang);
+					document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
 					})();
 				</script>
 
@@ -85,6 +88,10 @@
 																	box-sizing: border-box;
 																	margin: 0;
 																	padding: 0;
+																	}
+
+																	html {
+																	overflow-x: hidden;
 																	}
 
 																	body {
