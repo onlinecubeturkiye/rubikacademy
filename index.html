@@ -1,2791 +1,2873 @@
 <!DOCTYPE html>
 <html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<head>
+		<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- TEMA VE SEO AYARLARI -->
-<script>
-  (function() {
-    var savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark-mode");
-    }
-  })();
-</script>
+				<!-- TEMA VE SEO AYARLARI -->
+				<script>
+					(function() {
+					var savedTheme = localStorage.getItem("theme");
+					if (savedTheme === "dark") {
+					document.documentElement.classList.add("dark-mode");
+					}
+					})();
+				</script>
 
-<title>Rubik Academy</title>
-<!-- TARAYICI SEKMESİ İÇİN LOGO (FAVICON) -->
-<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
+				<title>Rubik Academy</title>
+				<!-- TARAYICI SEKMESİ İÇİN LOGO (FAVICON) -->
+				<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
 
-<link rel="canonical" href="https://rubikacademy.fun/">
-<meta name="description" content="Rubik Academy - Rubik küp öğren, algoritmaları keşfet ve hızını geliştir.">
-<meta property="og:title" content="Rubik Academy">
-<meta property="og:description" content="Rubik küp çözmeyi adım adım öğren! Başlangıçtan profesyonel seviyeye kadar en iyi eğitimler.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://rubikacademy.fun/">
-<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
-<meta name="twitter:card" content="summary_large_image">
+					<link rel="canonical" href="https://rubikacademy.fun/">
+						<meta name="description" content="Rubik Academy - Rubik küp öğren, algoritmaları keşfet ve hızını geliştir.">
+							<meta property="og:title" content="Rubik Academy">
+								<meta property="og:description" content="Rubik küp çözmeyi adım adım öğren! Başlangıçtan profesyonel seviyeye kadar en iyi eğitimler.">
+									<meta property="og:type" content="website">
+										<meta property="og:url" content="https://rubikacademy.fun/">
+											<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
+												<meta name="twitter:card" content="summary_large_image">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+													<link rel="preconnect" href="https://fonts.googleapis.com">
+														<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 
-<link
-href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-rel="stylesheet"
+															<link
+															href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+															rel="stylesheet"
 >
 
-<style>
+																<style>
 
-/* =========================================
-   RENKLER VE ARKA PLAN EFEKTİ
-========================================= */
+																	/* =========================================
+																	RENKLER VE ARKA PLAN EFEKTİ
+																	========================================= */
 
-:root {
+																	:root {
 
-    --background: #f8fafc;
+																	--background: #f8fafc;
 
-    --surface: #ffffff;
+																	--surface: #ffffff;
 
-    --surface-soft: #f1f5f9;
+																	--surface-soft: #f1f5f9;
 
-    --primary: #2563eb;
+																	--primary: #2563eb;
 
-    --primary-dark: #1d4ed8;
+																	--primary-dark: #1d4ed8;
 
-    --primary-light: #eff6ff;
+																	--primary-light: #eff6ff;
 
-    --text: #172033;
+																	--text: #172033;
 
-    --text-soft: #64748b;
+																	--text-soft: #64748b;
 
-    --border: #e2e8f0;
+																	--border: #e2e8f0;
 
-    --shadow:
-        0 15px 40px rgba(15, 23, 42, 0.07);
-}
+																	--shadow:
+																	0 15px 40px rgba(15, 23, 42, 0.07);
+																	}
 
-.bg-glow {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    z-index: -999;
-    pointer-events: none;
-}
+																	.bg-glow {
+																	position: fixed;
+																	top: 0;
+																	left: 0;
+																	width: 100vw;
+																	height: 100vh;
+																	overflow: hidden;
+																	z-index: -999;
+																	pointer-events: none;
+																	}
 
-.bg-glow::before,
-.bg-glow::after {
-    content: "";
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.18;
-    animation: floatGlow 15s infinite alternate ease-in-out;
-}
+																	.bg-glow::before,
+																	.bg-glow::after {
+																	content: "";
+																	position: absolute;
+																	width: 500px;
+																	height: 500px;
+																	border-radius: 50%;
+																	filter: blur(120px);
+																	opacity: 0.18;
+																	animation: floatGlow 15s infinite alternate ease-in-out;
+																	}
 
-.bg-glow::before {
-    background: #2563eb;
-    top: -100px;
-    left: -100px;
-}
+																	.bg-glow::before {
+																	background: #2563eb;
+																	top: -100px;
+																	left: -100px;
+																	}
 
-.bg-glow::after {
-    background: #6366f1;
-    bottom: -100px;
-    right: -100px;
-    animation-delay: -7s;
-}
+																	.bg-glow::after {
+																	background: #6366f1;
+																	bottom: -100px;
+																	right: -100px;
+																	animation-delay: -7s;
+																	}
 
-@keyframes floatGlow {
-    0% { transform: translate(0px, 0px) scale(1); }
-    100% { transform: translate(150px, 200px) scale(1.25); }
-}
+																	@keyframes floatGlow {
+																	0% { transform: translate(0px, 0px) scale(1); }
+																	100% { transform: translate(150px, 200px) scale(1.25); }
+																	}
 
 
-/* =========================================
-   GENEL
-========================================= */
+																	/* =========================================
+																	GENEL
+																	========================================= */
 
-* {
+																	* {
 
-    margin: 0;
-    padding: 0;
+																	margin: 0;
+																	padding: 0;
 
-    box-sizing: border-box;
-}
+																	box-sizing: border-box;
+																	}
 
 
-html {
+																	html {
 
-    scroll-behavior: smooth;
-}
+																	scroll-behavior: smooth;
 
+																	overflow-x: hidden;
 
-body {
+																	width: 100%;
+																	}
 
-    font-family: "Inter", sans-serif;
 
-    background: var(--background);
+																	body {
 
-    color: var(--text);
+																	font-family: "Inter", sans-serif;
 
-    overflow-x: hidden;
+																	background: var(--background);
 
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
+																	color: var(--text);
 
+																	overflow-x: hidden;
 
-a {
+																	width: 100%;
 
-    text-decoration: none;
+																	transition: background-color 0.3s ease, color 0.3s ease;
+																	}
 
-    color: inherit;
-}
 
+																	a {
 
-/* =========================================
-   ÜST BAR (NAVBAR)
-========================================= */
+																	text-decoration: none;
 
-.navbar {
+																	color: inherit;
+																	}
 
-    position: sticky;
 
-    top: 0;
+																	/* =========================================
+																	ÜST BAR (NAVBAR)
+																	========================================= */
 
-    z-index: 1000;
+																	.navbar {
 
-    display: flex;
+																	position: sticky;
 
-    align-items: center;
+																	top: 0;
 
-    justify-content: space-between;
+																	z-index: 1000;
 
-    padding: 16px 7%;
+																	display: flex;
 
-    background: rgba(248, 250, 252, 0.85);
+																	align-items: center;
 
-    backdrop-filter: blur(12px);
+																	justify-content: space-between;
 
-    -webkit-backdrop-filter: blur(12px);
+																	padding: 16px 7%;
 
-    border-bottom: 1px solid var(--border);
+																	background: rgba(248, 250, 252, 0.85);
 
-    transition: background-color 0.3s, border-color 0.3s;
-}
+																	backdrop-filter: blur(12px);
 
+																	-webkit-backdrop-filter: blur(12px);
 
-.nav-logo {
+																	border-bottom: 1px solid var(--border);
 
-    display: flex;
+																	transition: background-color 0.3s, border-color 0.3s;
+																	}
 
-    align-items: center;
 
-    gap: 12px;
-}
+																	.nav-logo {
 
+																	display: flex;
 
-.nav-logo-mark {
+																	align-items: center;
 
-    width: 38px;
+																	gap: 12px;
+																	}
 
-    height: 38px;
 
-    display: grid;
+																	.nav-logo-mark {
 
-    grid-template-columns: repeat(3,1fr);
+																	width: 38px;
 
-    grid-template-rows: repeat(3,1fr);
+																	height: 38px;
 
-    gap: 2px;
+																	display: grid;
 
-    padding: 4px;
+																	grid-template-columns: repeat(3,1fr);
 
-    border-radius: 10px;
+																	grid-template-rows: repeat(3,1fr);
 
-    background: #1e293b;
+																	gap: 2px;
 
-    box-shadow:
-        0 8px 18px rgba(15,23,42,.18);
-}
+																	padding: 4px;
 
+																	border-radius: 10px;
 
-.nav-logo-mark div {
+																	background: #1e293b;
 
-    border-radius: 2px;
+																	box-shadow:
+																	0 8px 18px rgba(15,23,42,.18);
+																	}
 
-    background: #f8fafc;
-}
 
+																	.nav-logo-mark div {
 
-.nav-logo-mark div:nth-child(2),
-.nav-logo-mark div:nth-child(8) {
+																	border-radius: 2px;
 
-    background: #ef4444;
-}
+																	background: #f8fafc;
+																	}
 
 
-.nav-logo-mark div:nth-child(4),
-.nav-logo-mark div:nth-child(6) {
+																	.nav-logo-mark div:nth-child(2),
+																	.nav-logo-mark div:nth-child(8) {
 
-    background: #22c55e;
-}
+																	background: #ef4444;
+																	}
 
 
-.nav-logo-mark div:nth-child(5) {
+																	.nav-logo-mark div:nth-child(4),
+																	.nav-logo-mark div:nth-child(6) {
 
-    background: #3b82f6;
-}
+																	background: #22c55e;
+																	}
 
 
-.nav-logo-mark div:nth-child(1),
-.nav-logo-mark div:nth-child(9) {
+																	.nav-logo-mark div:nth-child(5) {
 
-    background: #facc15;
-}
+																	background: #3b82f6;
+																	}
 
 
-.nav-logo-text {
+																	.nav-logo-mark div:nth-child(1),
+																	.nav-logo-mark div:nth-child(9) {
 
-    font-size: 17px;
+																	background: #facc15;
+																	}
 
-    font-weight: 800;
 
-    letter-spacing: -0.5px;
+																	.nav-logo-text {
 
-    color: var(--text);
-}
+																	font-size: 17px;
 
+																	font-weight: 800;
 
-.nav-right {
+																	letter-spacing: -0.5px;
 
-    display: flex;
+																	color: var(--text);
+																	}
 
-    align-items: center;
 
-    gap: 10px;
-}
+																	.nav-right {
 
+																	display: flex;
 
-.nav-links {
+																	align-items: center;
 
-    display: flex;
+																	gap: 10px;
+																	}
 
-    align-items: center;
 
-    gap: 8px;
-}
+																	.nav-links {
 
+																	display: flex;
 
-.nav-links a {
+																	align-items: center;
 
-    padding: 9px 16px;
+																	gap: 8px;
+																	}
 
-    border-radius: 10px;
 
-    font-size: 14px;
+																	.nav-links a {
 
-    font-weight: 600;
+																	padding: 9px 16px;
 
-    color: var(--text-soft);
+																	border-radius: 10px;
 
-    transition: .25s;
-}
+																	font-size: 14px;
 
+																	font-weight: 600;
 
-.nav-links a:hover {
+																	color: var(--text-soft);
 
-    background: var(--primary-light);
+																	transition: .25s;
+																	}
 
-    color: var(--primary);
-}
 
+																	.nav-links a:hover {
 
-.nav-links a.active {
+																	background: var(--primary-light);
 
-    background: var(--primary-light);
+																	color: var(--primary);
+																	}
 
-    color: var(--primary);
-}
 
+																	.nav-links a.active {
 
-@media(max-width:500px) {
+																	background: var(--primary-light);
 
-    .navbar {
+																	color: var(--primary);
+																	}
 
-        padding: 14px 5%;
-    }
 
+																	@media(max-width:500px) {
 
-    .nav-logo-text {
+																	.navbar {
 
-        font-size: 15px;
-    }
+																	padding: 14px 5%;
+																	}
 
 
-    .nav-links a {
+																	.nav-logo-text {
 
-        padding: 8px 12px;
+																	font-size: 15px;
+																	}
 
-        font-size: 13px;
-    }
 
+																	.nav-links a {
 
-    .nav-right {
+																	padding: 8px 12px;
 
-        gap: 6px;
-    }
+																	font-size: 13px;
+																	}
 
 
-    .lang-switch-btn {
+																	.nav-right {
 
-        padding: 0 10px;
+																	gap: 6px;
+																	}
 
-        font-size: 12px;
-    }
-}
 
+																	.lang-switch-btn {
 
-/* =========================================
-   ANA GİRİŞ
-========================================= */
+																	padding: 0 10px;
 
-.hero {
+																	font-size: 12px;
+																	}
+																	}
 
-    min-height: 100vh;
 
-    display: flex;
+																	/* =========================================
+																	ANA GİRİŞ
+																	========================================= */
 
-    align-items: center;
+																	.hero {
 
-    padding: 90px 7%;
+																	min-height: 100vh;
 
-    background: transparent;
-    
-    transition: background-color 0.3s;
-}
+																	display: flex;
 
+																	align-items: center;
 
-.hero-container {
+																	padding: 90px 7%;
 
-    width: 100%;
+																	background: transparent;
 
-    max-width: 1200px;
+																	overflow-x: hidden;
 
-    margin: auto;
+																	transition: background-color 0.3s;
+																	}
 
-    display: grid;
 
-    grid-template-columns:
-        1.1fr
-        .9fr;
+																	.hero-container {
 
-    gap: 70px;
+																	width: 100%;
 
-    align-items: center;
-}
+																	max-width: 1200px;
 
+																	margin: auto;
 
-/* =========================================
-   ETİKET
-========================================= */
+																	display: grid;
 
-.badge {
+																	grid-template-columns:
+																	1.1fr
+																	.9fr;
 
-    display: inline-flex;
+																	gap: 70px;
 
-    align-items: center;
+																	align-items: center;
+																	}
 
-    gap: 8px;
 
-    padding: 9px 16px;
+																	/* =========================================
+																	ETİKET
+																	========================================= */
 
-    border-radius: 50px;
+																	.badge {
 
-    background:
-        var(--primary-light);
+																	display: inline-flex;
 
-    border:
-        1px solid #dbeafe;
+																	align-items: center;
 
-    color:
-        var(--primary);
+																	gap: 8px;
 
-    font-size: 13px;
+																	padding: 9px 16px;
 
-    font-weight: 700;
+																	border-radius: 50px;
 
-    margin-bottom: 25px;
-}
+																	background:
+																	var(--primary-light);
 
+																	border:
+																	1px solid #dbeafe;
 
-.badge::before {
+																	color:
+																	var(--primary);
 
-    content: "";
+																	font-size: 13px;
 
-    width: 7px;
+																	font-weight: 700;
 
-    height: 7px;
+																	margin-bottom: 25px;
+																	}
 
-    border-radius: 50%;
 
-    background: #22c55e;
-}
+																	.badge::before {
 
+																	content: "";
 
-/* =========================================
-   BAŞLIK
-========================================= */
+																	width: 7px;
 
-.hero h1 {
+																	height: 7px;
 
-    font-size:
-        clamp(45px, 6vw, 76px);
+																	border-radius: 50%;
 
-    line-height: 1.04;
+																	background: #22c55e;
+																	}
 
-    letter-spacing: -4px;
 
-    font-weight: 900;
+																	/* =========================================
+																	BAŞLIK
+																	========================================= */
 
-    color: var(--text);
+																	.hero h1 {
 
-    margin-bottom: 25px;
-}
+																	font-size:
+																	clamp(45px, 6vw, 76px);
 
+																	line-height: 1.04;
 
-.gradient-text {
+																	letter-spacing: -4px;
 
-    background:
+																	font-weight: 900;
 
-        linear-gradient(
-            90deg,
-            #2563eb,
-            #0891b2,
-            #6366f1
-        );
+																	color: var(--text);
 
-    -webkit-background-clip: text;
+																	margin-bottom: 25px;
+																	}
 
-    background-clip: text;
 
-    color: transparent;
-}
+																	.gradient-text {
 
+																	background:
 
-.hero p {
+																	linear-gradient(
+																	90deg,
+																	#2563eb,
+																	#0891b2,
+																	#6366f1
+																	);
 
-    max-width: 620px;
+																	-webkit-background-clip: text;
 
-    color: var(--text-soft);
+																	background-clip: text;
 
-    font-size: 18px;
+																	color: transparent;
+																	}
 
-    line-height: 1.75;
 
-    margin-bottom: 35px;
-}
+																	.hero p {
 
+																	max-width: 620px;
 
-/* =========================================
-   BUTON
-========================================= */
+																	color: var(--text-soft);
 
-.btn {
+																	font-size: 18px;
 
-    display: inline-flex;
+																	line-height: 1.75;
 
-    align-items: center;
+																	margin-bottom: 35px;
+																	}
 
-    justify-content: center;
 
-    padding: 15px 25px;
+																	/* =========================================
+																	BUTON
+																	========================================= */
 
-    border-radius: 12px;
+																	.btn {
 
-    font-size: 14px;
+																	display: inline-flex;
 
-    font-weight: 700;
+																	align-items: center;
 
-    transition: .3s;
-}
+																	justify-content: center;
 
+																	padding: 15px 25px;
 
-.btn-primary {
+																	border-radius: 12px;
 
-    color: white;
+																	font-size: 14px;
 
-    background:
+																	font-weight: 700;
 
-        linear-gradient(
-            135deg,
-            #2563eb,
-            #4f46e5
-        );
+																	transition: .3s;
+																	}
 
-    box-shadow:
 
-        0 12px 30px
-        rgba(37,99,235,.22);
-}
+																	.btn-primary {
 
+																	color: white;
 
-.btn-primary:hover {
+																	background:
 
-    transform:
-        translateY(-4px);
+																	linear-gradient(
+																	135deg,
+																	#2563eb,
+																	#4f46e5
+																	);
 
-    box-shadow:
+																	box-shadow:
 
-        0 18px 40px
-        rgba(37,99,235,.30);
-}
+																	0 12px 30px
+																	rgba(37,99,235,.22);
+																	}
 
 
-/* =========================================
-   RUBİK KÜP
-========================================= */
+																	.btn-primary:hover {
 
-.cube-area {
+																	transform:
+																	translateY(-4px);
 
-    display: flex;
+																	box-shadow:
 
-    justify-content: center;
+																	0 18px 40px
+																	rgba(37,99,235,.30);
+																	}
 
-    align-items: center;
-}
 
+																	/* =========================================
+																	RUBİK KÜP
+																	========================================= */
 
-.cube {
+																	.cube-area {
 
-    width: 280px;
+																	display: flex;
 
-    height: 280px;
+																	justify-content: center;
 
-    padding: 12px;
+																	align-items: center;
+																	}
 
-    display: grid;
 
-    grid-template-columns:
-        repeat(3,1fr);
+																	.cube {
 
-    grid-template-rows:
-        repeat(3,1fr);
+																	width: 280px;
 
-    gap: 7px;
+																	height: 280px;
 
-    border-radius: 28px;
+																	padding: 12px;
 
-    background: #1e293b;
+																	display: grid;
 
-    transform:
-        rotate(-7deg);
+																	grid-template-columns:
+																	repeat(3,1fr);
 
-    box-shadow:
+																	grid-template-rows:
+																	repeat(3,1fr);
 
-        0 35px 60px
-        rgba(15,23,42,.20),
+																	gap: 7px;
 
-        0 0 60px
-        rgba(37,99,235,.10);
+																	border-radius: 28px;
 
-    animation:
+																	background: #1e293b;
 
-        cubeFloat
-        5s
-        ease-in-out
-        infinite;
-}
+																	transform:
+																	rotate(-7deg);
 
+																	box-shadow:
 
-.cube div {
+																	0 35px 60px
+																	rgba(15,23,42,.20),
 
-    border-radius: 7px;
+																	0 0 60px
+																	rgba(37,99,235,.10);
 
-    background: #f8fafc;
+																	animation:
 
-    box-shadow:
+																	cubeFloat
+																	5s
+																	ease-in-out
+																	infinite;
+																	}
 
-        inset
-        0 0 0 2px
-        rgba(0,0,0,.08);
-}
 
+																	.cube div {
 
-.cube div:nth-child(2),
-.cube div:nth-child(8) {
+																	border-radius: 7px;
 
-    background: #ef4444;
-}
+																	background: #f8fafc;
 
+																	box-shadow:
 
-.cube div:nth-child(4),
-.cube div:nth-child(6) {
+																	inset
+																	0 0 0 2px
+																	rgba(0,0,0,.08);
+																	}
 
-    background: #22c55e;
-}
 
+																	.cube div:nth-child(2),
+																	.cube div:nth-child(8) {
 
-.cube div:nth-child(5) {
+																	background: #ef4444;
+																	}
 
-    background: #3b82f6;
-}
 
+																	.cube div:nth-child(4),
+																	.cube div:nth-child(6) {
 
-.cube div:nth-child(1),
-.cube div:nth-child(9) {
+																	background: #22c55e;
+																	}
 
-    background: #facc15;
-}
 
+																	.cube div:nth-child(5) {
 
-@keyframes cubeFloat {
+																	background: #3b82f6;
+																	}
 
-    0%,
-    100% {
 
-        transform:
-            rotate(-7deg)
-            translateY(0);
-    }
+																	.cube div:nth-child(1),
+																	.cube div:nth-child(9) {
 
-    50% {
+																	background: #facc15;
+																	}
 
-        transform:
-            rotate(-4deg)
-            translateY(-15px);
-    }
-}
 
+																	@keyframes cubeFloat {
 
-/* =========================================
-   BÖLÜMLER
-========================================= */
+																	0%,
+																	100% {
 
-section {
+																	transform:
+																	rotate(-7deg)
+																	translateY(0);
+																	}
 
-    padding:
-        100px 7%;
-    
-    background: transparent;
-}
+																	50% {
 
+																	transform:
+																	rotate(-4deg)
+																	translateY(-15px);
+																	}
+																	}
 
-.section-container {
 
-    max-width: 1200px;
+																	/* =========================================
+																	BÖLÜMLER
+																	========================================= */
 
-    margin: auto;
-}
+																	section {
 
+																	padding:
+																	100px 7%;
 
-.section-heading {
+																	background: transparent;
+																	}
 
-    text-align: center;
 
-    max-width: 700px;
+																	.section-container {
 
-    margin:
-        0 auto 55px;
-}
+																	max-width: 1200px;
 
+																	margin: auto;
+																	}
 
-.section-heading span {
 
-    color:
-        var(--primary);
+																	.section-heading {
 
-    font-size: 13px;
+																	text-align: center;
 
-    font-weight: 800;
+																	max-width: 700px;
 
-    letter-spacing: 2px;
+																	margin:
+																	0 auto 55px;
+																	}
 
-    text-transform: uppercase;
-}
 
+																	.section-heading span {
 
-.section-heading h2 {
+																	color:
+																	var(--primary);
 
-    font-size:
-        clamp(32px,4vw,48px);
+																	font-size: 13px;
 
-    line-height: 1.1;
+																	font-weight: 800;
 
-    letter-spacing: -2px;
+																	letter-spacing: 2px;
 
-    color:
-        var(--text);
+																	text-transform: uppercase;
+																	}
 
-    margin:
-        12px 0;
-}
 
+																	.section-heading h2 {
 
-.section-heading p {
+																	font-size:
+																	clamp(32px,4vw,48px);
 
-    color:
-        var(--text-soft);
+																	line-height: 1.1;
 
-    line-height: 1.7;
-}
+																	letter-spacing: -2px;
 
+																	color:
+																	var(--text);
 
-/* =========================================
-   AKADEMİ KARTLARI
-========================================= */
+																	margin:
+																	12px 0;
+																	}
 
-.cards {
 
-    display: grid;
+																	.section-heading p {
 
-    grid-template-columns:
-        repeat(3,1fr);
+																	color:
+																	var(--text-soft);
 
-    gap: 22px;
-}
+																	line-height: 1.7;
+																	}
 
 
-.card {
+																	/* =========================================
+																	AKADEMİ KARTLARI
+																	========================================= */
 
-    padding: 32px;
+																	.cards {
 
-    border-radius: 22px;
+																	display: grid;
 
-    background:
-        var(--surface);
+																	grid-template-columns:
+																	repeat(3,1fr);
 
-    border:
-        1px solid
-        var(--border);
+																	gap: 22px;
+																	}
 
-    box-shadow:
-        var(--shadow);
 
-    transition: .3s;
-}
+																	.card {
 
+																	padding: 32px;
 
-.card:hover {
+																	border-radius: 22px;
 
-    transform:
-        translateY(-8px);
+																	background:
+																	var(--surface);
 
-    border-color:
-        #bfdbfe;
+																	border:
+																	1px solid
+																	var(--border);
 
-    box-shadow:
+																	box-shadow:
+																	var(--shadow);
 
-        0 20px 45px
-        rgba(37,99,235,.10);
-}
+																	transition: .3s;
+																	}
 
 
-.card-icon {
+																	.card:hover {
 
-    width: 55px;
+																	transform:
+																	translateY(-8px);
 
-    height: 55px;
+																	border-color:
+																	#bfdbfe;
 
-    display: grid;
+																	box-shadow:
 
-    place-items: center;
+																	0 20px 45px
+																	rgba(37,99,235,.10);
+																	}
 
-    border-radius: 15px;
 
-    background:
-        var(--primary-light);
+																	.card-icon {
 
-    font-size: 25px;
+																	width: 55px;
 
-    margin-bottom: 20px;
-}
+																	height: 55px;
 
+																	display: grid;
 
-.card h3 {
+																	place-items: center;
 
-    font-size: 20px;
+																	border-radius: 15px;
 
-    color:
-        var(--text);
+																	background:
+																	var(--primary-light);
 
-    margin-bottom: 10px;
-}
+																	font-size: 25px;
 
+																	margin-bottom: 20px;
+																	}
 
-.card p {
 
-    color:
-        var(--text-soft);
+																	.card h3 {
 
-    font-size: 14px;
+																	font-size: 20px;
 
-    line-height: 1.7;
-}
+																	color:
+																	var(--text);
 
+																	margin-bottom: 10px;
+																	}
 
-/* =========================================
-   ÖNE ÇIKANLAR
-========================================= */
 
-.featured-section {
+																	.card p {
 
-    background: transparent;
+																	color:
+																	var(--text-soft);
 
-    transition: background-color 0.3s;
-}
+																	font-size: 14px;
 
+																	line-height: 1.7;
+																	}
 
-.featured-list {
 
-    display: flex;
+																	/* =========================================
+																	ÖNE ÇIKANLAR
+																	========================================= */
 
-    flex-direction: column;
+																	.featured-section {
 
-    gap: 20px;
+																	background: transparent;
 
-    max-width: 1000px;
+																	transition: background-color 0.3s;
+																	}
 
-    margin: 0 auto;
-}
 
+																	.featured-list {
 
-.featured-card {
+																	display: flex;
 
-    display: grid;
+																	flex-direction: column;
 
-    grid-template-columns:
-        auto 1fr auto;
+																	gap: 20px;
 
-    align-items: center;
+																	max-width: 1000px;
 
-    gap: 26px;
+																	margin: 0 auto;
+																	}
 
-    padding: 32px 36px;
 
-    border-radius: 24px;
+																	.featured-card {
 
-    background:
-        var(--surface);
+																	display: grid;
 
-    border:
-        1px solid
-        var(--border);
+																	grid-template-columns:
+																	auto 1fr auto;
 
-    box-shadow:
-        var(--shadow);
+																	align-items: center;
 
-    transition: .3s;
-}
+																	gap: 26px;
 
+																	padding: 32px 36px;
 
-.featured-card:hover {
+																	border-radius: 24px;
 
-    transform:
-        translateY(-6px);
+																	background:
+																	var(--surface);
 
-    border-color:
-        #bfdbfe;
+																	border:
+																	1px solid
+																	var(--border);
 
-    box-shadow:
+																	box-shadow:
+																	var(--shadow);
 
-        0 20px 45px
-        rgba(37,99,235,.10);
-}
+																	transition: .3s;
+																	}
 
-/* YAYINDA OLAN VİDEO - KIRMIZI ÇERÇEVE */
-.featured-card.live-video{
-    border: 3px solid #e6252f;
-    box-shadow: 0 0 0 4px rgba(230,37,47,.14), 0 24px 55px rgba(230,37,47,.18);
-}
 
-.featured-card.live-video:hover{
-    border-color:#e6252f;
-    box-shadow: 0 0 0 5px rgba(230,37,47,.20), 0 26px 60px rgba(230,37,47,.24);
-}
+																	.featured-card:hover {
 
-.featured-thumb{
-    position:relative;
-    width:150px;
-    height:110px;
-    flex-shrink:0;
-    border-radius:16px;
-    overflow:hidden;
-    box-shadow: 0 12px 25px rgba(15,23,42,.20);
-    background: linear-gradient(135deg, #eee8ff, #b39cff);
-}
+																	transform:
+																	translateY(-6px);
 
-.featured-thumb img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-}
+																	border-color:
+																	#bfdbfe;
 
-.featured-thumb .video-play-icon{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    background: rgba(230,37,47,.92);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    pointer-events:none;
-}
+																	box-shadow:
 
-.featured-thumb .video-play-icon::after{
-    content:"";
-    border-style: solid;
-    border-width: 8px 0 8px 14px;
-    border-color: transparent transparent transparent #fff;
-    margin-left:3px;
-}
+																	0 20px 45px
+																	rgba(37,99,235,.10);
+																	}
 
-.live-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    padding:6px 11px;
-    border-radius:8px;
-    background:#e6252f;
-    color:#fff;
-    font-size:10px;
-    font-weight:900;
-    letter-spacing:.6px;
-    margin-bottom:8px;
-}
+																	/* YAYINDA OLAN VİDEO - KIRMIZI ÇERÇEVE */
+																	.featured-card.live-video{
+																	border: 3px solid #e6252f;
+																	box-shadow: 0 0 0 4px rgba(230,37,47,.14), 0 24px 55px rgba(230,37,47,.18);
+																	}
 
-@media(max-width:700px){
-    .featured-thumb{
-        width:100%;
-        max-width:280px;
-        height:160px;
-    }
-}
+																	.featured-card.live-video:hover{
+																	border-color:#e6252f;
+																	box-shadow: 0 0 0 5px rgba(230,37,47,.20), 0 26px 60px rgba(230,37,47,.24);
+																	}
 
+																	.featured-thumb{
+																	position:relative;
+																	width:150px;
+																	height:110px;
+																	flex-shrink:0;
+																	border-radius:16px;
+																	overflow:hidden;
+																	box-shadow: 0 12px 25px rgba(15,23,42,.20);
+																	background: linear-gradient(135deg, #eee8ff, #b39cff);
+																	}
 
-.featured-date {
+																	.featured-thumb img{
+																	width:100%;
+																	height:100%;
+																	object-fit:cover;
+																	display:block;
+																	}
 
-    display: flex;
+																	.featured-thumb .video-play-icon{
+																	position:absolute;
+																	top:50%;
+																	left:50%;
+																	transform:translate(-50%,-50%);
+																	width:42px;
+																	height:42px;
+																	border-radius:50%;
+																	background: rgba(230,37,47,.92);
+																	display:flex;
+																	align-items:center;
+																	justify-content:center;
+																	pointer-events:none;
+																	}
 
-    flex-direction: column;
+																	.featured-thumb .video-play-icon::after{
+																	content:"";
+																	border-style: solid;
+																	border-width: 8px 0 8px 14px;
+																	border-color: transparent transparent transparent #fff;
+																	margin-left:3px;
+																	}
 
-    align-items: center;
+																	.live-badge{
+																	display:inline-flex;
+																	align-items:center;
+																	gap:6px;
+																	padding:6px 11px;
+																	border-radius:8px;
+																	background:#e6252f;
+																	color:#fff;
+																	font-size:10px;
+																	font-weight:900;
+																	letter-spacing:.6px;
+																	margin-bottom:8px;
+																	}
 
-    justify-content: center;
+																	@media(max-width:700px){
+																	.featured-thumb{
+																	width:100%;
+																	max-width:280px;
+																	height:160px;
+																	}
+																	}
 
-    width: 92px;
 
-    height: 92px;
+																	.featured-date {
 
-    flex-shrink: 0;
+																	display: flex;
 
-    border-radius: 18px;
+																	flex-direction: column;
 
-    background:
+																	align-items: center;
 
-        linear-gradient(
-            135deg,
-            #2563eb,
-            #4f46e5
-        );
+																	justify-content: center;
 
-    color: white;
+																	width: 92px;
 
-    box-shadow:
+																	height: 92px;
 
-        0 12px 30px
-        rgba(37,99,235,.25);
-}
+																	flex-shrink: 0;
 
+																	border-radius: 18px;
 
-.featured-date .fd-day {
+																	background:
 
-    font-size: 26px;
+																	linear-gradient(
+																	135deg,
+																	#2563eb,
+																	#4f46e5
+																	);
 
-    font-weight: 900;
+																	color: white;
 
-    line-height: 1;
-}
+																	box-shadow:
 
+																	0 12px 30px
+																	rgba(37,99,235,.25);
+																	}
 
-.featured-date .fd-month {
 
-    font-size: 12px;
+																	.featured-date .fd-day {
 
-    font-weight: 700;
+																	font-size: 26px;
 
-    letter-spacing: .5px;
+																	font-weight: 900;
 
-    text-transform: uppercase;
+																	line-height: 1;
+																	}
 
-    margin-top: 4px;
-}
 
+																	.featured-date .fd-month {
 
-.featured-body .featured-tag {
+																	font-size: 12px;
 
-    display: inline-flex;
+																	font-weight: 700;
 
-    align-items: center;
+																	letter-spacing: .5px;
 
-    gap: 8px;
+																	text-transform: uppercase;
 
-    color:
-        var(--primary);
+																	margin-top: 4px;
+																	}
 
-    font-size: 12px;
 
-    font-weight: 800;
+																	.featured-body .featured-tag {
 
-    letter-spacing: 1.5px;
+																	display: inline-flex;
 
-    text-transform: uppercase;
+																	align-items: center;
 
-    margin-bottom: 8px;
-}
+																	gap: 8px;
 
+																	color:
+																	var(--primary);
 
-.featured-body .featured-tag::before {
+																	font-size: 12px;
 
-    content: "";
+																	font-weight: 800;
 
-    width: 7px;
+																	letter-spacing: 1.5px;
 
-    height: 7px;
+																	text-transform: uppercase;
 
-    border-radius: 50%;
+																	margin-bottom: 8px;
+																	}
 
-    background: #2563eb;
-}
 
+																	.featured-body .featured-tag::before {
 
-.featured-body h3 {
+																	content: "";
 
-    font-size: 22px;
+																	width: 7px;
 
-    color:
-        var(--text);
+																	height: 7px;
 
-    margin-bottom: 8px;
-}
+																	border-radius: 50%;
 
+																	background: #2563eb;
+																	}
 
-.featured-body p {
 
-    color:
-        var(--text-soft);
+																	.featured-body h3 {
 
-    font-size: 14px;
+																	font-size: 22px;
 
-    line-height: 1.7;
-}
+																	color:
+																	var(--text);
 
+																	margin-bottom: 8px;
+																	}
 
-.featured-time {
 
-    display: flex;
+																	.featured-body p {
 
-    align-items: center;
+																	color:
+																	var(--text-soft);
 
-    gap: 8px;
+																	font-size: 14px;
 
-    padding: 10px 18px;
+																	line-height: 1.7;
+																	}
 
-    border-radius: 12px;
 
-    background:
-        var(--primary-light);
+																	.featured-time {
 
-    border:
-        1px solid #dbeafe;
+																	display: flex;
 
-    color:
-        var(--primary);
+																	align-items: center;
 
-    font-size: 15px;
+																	gap: 8px;
 
-    font-weight: 800;
+																	padding: 10px 18px;
 
-    white-space: nowrap;
-}
+																	border-radius: 12px;
 
+																	background:
+																	var(--primary-light);
 
-@media(max-width:700px) {
+																	border:
+																	1px solid #dbeafe;
 
-    .featured-card {
+																	color:
+																	var(--primary);
 
-        grid-template-columns:
-            1fr;
+																	font-size: 15px;
 
-        text-align: center;
+																	font-weight: 800;
 
-        justify-items: center;
-    }
+																	white-space: nowrap;
+																	}
 
-    .featured-body .featured-tag::before {
 
-        margin-right: 0;
-    }
+																	@media(max-width:700px) {
 
-}
+																	.featured-card {
 
+																	grid-template-columns:
+																	1fr;
 
-/* =========================================
-   EĞİTİM BÖLÜMÜ
-========================================= */
+																	text-align: center;
 
-.learning-section {
+																	justify-items: center;
+																	}
 
-    background: transparent;
+																	.featured-body .featured-tag::before {
 
-    transition: background-color 0.3s;
-}
+																	margin-right: 0;
+																	}
 
+																	}
 
-.learning-grid {
 
-    display: grid;
+																	/* =========================================
+																	EĞİTİM BÖLÜMÜ
+																	========================================= */
 
-    grid-template-columns:
-        repeat(2,1fr);
+																	.learning-section {
 
-    gap: 22px;
-}
+																	background: transparent;
 
+																	transition: background-color 0.3s;
+																	}
 
-.learning-card {
 
-    padding: 35px;
+																	.learning-grid {
 
-    border-radius: 22px;
+																	display: grid;
 
-    background:
-        var(--surface);
+																	grid-template-columns:
+																	repeat(2,1fr);
 
-    border:
-        1px solid
-        var(--border);
+																	gap: 22px;
+																	}
 
-    box-shadow:
-        0 10px 30px
-        rgba(15,23,42,.05);
 
-    transition: .3s;
-}
+																	.learning-card {
 
+																	padding: 35px;
 
-.learning-card:hover {
+																	border-radius: 22px;
 
-    transform:
-        translateY(-5px);
+																	background:
+																	var(--surface);
 
-    box-shadow:
-        0 18px 40px
-        rgba(15,23,42,.09);
-}
+																	border:
+																	1px solid
+																	var(--border);
 
+																	box-shadow:
+																	0 10px 30px
+																	rgba(15,23,42,.05);
 
-.learning-number {
+																	transition: .3s;
+																	}
 
-    color:
-        var(--primary);
 
-    font-size: 13px;
+																	.learning-card:hover {
 
-    font-weight: 800;
+																	transform:
+																	translateY(-5px);
 
-    letter-spacing: 1px;
+																	box-shadow:
+																	0 18px 40px
+																	rgba(15,23,42,.09);
+																	}
 
-    margin-bottom: 12px;
-}
 
+																	.learning-number {
 
-.learning-card h3 {
+																	color:
+																	var(--primary);
 
-    font-size: 24px;
+																	font-size: 13px;
 
-    color:
-        var(--text);
+																	font-weight: 800;
 
-    margin-bottom: 12px;
-}
+																	letter-spacing: 1px;
 
+																	margin-bottom: 12px;
+																	}
 
-.learning-card p {
 
-    color:
-        var(--text-soft);
+																	.learning-card h3 {
 
-    font-size: 14px;
+																	font-size: 24px;
 
-    line-height: 1.7;
-}
+																	color:
+																	var(--text);
 
+																	margin-bottom: 12px;
+																	}
 
-/* =========================================
-   SOSYAL MEDYA
-========================================= */
 
-.social-grid {
+																	.learning-card p {
 
-    display: grid;
+																	color:
+																	var(--text-soft);
 
-    grid-template-columns:
-        repeat(2,1fr);
+																	font-size: 14px;
 
-    gap: 22px;
-}
+																	line-height: 1.7;
+																	}
 
 
-.social-card {
+																	/* =========================================
+																	SOSYAL MEDYA
+																	========================================= */
 
-    padding: 30px;
+																	.social-grid {
 
-    display: flex;
+																	display: grid;
 
-    align-items: center;
+																	grid-template-columns:
+																	repeat(2,1fr);
 
-    gap: 20px;
+																	gap: 22px;
+																	}
 
-    border-radius: 20px;
 
-    background:
-        var(--surface);
+																	.social-card {
 
-    border:
-        1px solid
-        var(--border);
+																	padding: 30px;
 
-    box-shadow:
-        0 10px 30px
-        rgba(15,23,42,.05);
+																	display: flex;
 
-    transition: .3s;
-}
+																	align-items: center;
 
+																	gap: 20px;
 
-.social-card:hover {
+																	border-radius: 20px;
 
-    transform:
-        translateY(-5px);
+																	background:
+																	var(--surface);
 
-    box-shadow:
-        0 18px 40px
-        rgba(15,23,42,.09);
-}
+																	border:
+																	1px solid
+																	var(--border);
 
+																	box-shadow:
+																	0 10px 30px
+																	rgba(15,23,42,.05);
 
-.social-icon {
+																	transition: .3s;
+																	}
 
-    width: 55px;
 
-    height: 55px;
+																	.social-card:hover {
 
-    display: grid;
+																	transform:
+																	translateY(-5px);
 
-    place-items: center;
+																	box-shadow:
+																	0 18px 40px
+																	rgba(15,23,42,.09);
+																	}
 
-    border-radius: 15px;
 
-    background:
+																	.social-icon {
 
-        linear-gradient(
-            135deg,
-            #2563eb,
-            #6366f1
-        );
+																	width: 55px;
 
-    color: white;
+																	height: 55px;
 
-    font-size: 23px;
-}
+																	display: grid;
 
+																	place-items: center;
 
-.social-card h3 {
+																	border-radius: 15px;
 
-    font-size: 17px;
+																	background:
 
-    color:
-        var(--text);
-}
+																	linear-gradient(
+																	135deg,
+																	#2563eb,
+																	#6366f1
+																	);
 
+																	color: white;
 
-.social-card p {
+																	font-size: 23px;
+																	}
 
-    color:
-        var(--text-soft);
 
-    font-size: 13px;
+																	.social-card h3 {
 
-    margin-top: 3px;
-}
+																	font-size: 17px;
 
+																	color:
+																	var(--text);
+																	}
 
-/* =========================================
-   İLETİŞİM
-========================================= */
 
-.contact {
+																	.social-card p {
 
-    text-align: center;
+																	color:
+																	var(--text-soft);
 
-    background:
-        transparent;
+																	font-size: 13px;
 
-    transition: background-color 0.3s;
-}
+																	margin-top: 3px;
+																	}
 
 
-.contact-box {
+																	/* =========================================
+																	İLETİŞİM
+																	========================================= */
 
-    max-width: 800px;
+																	.contact {
 
-    margin: auto;
+																	text-align: center;
 
-    padding:
-        55px 30px;
+																	background:
+																	transparent;
 
-    border-radius: 25px;
+																	transition: background-color 0.3s;
+																	}
 
-    background:
-        var(--surface);
 
-    border:
-        1px solid
-        var(--border);
+																	.contact-box {
 
-    box-shadow:
-        var(--shadow);
+																	max-width: 800px;
 
-    transition: background-color 0.3s, border-color 0.3s;
-}
+																	margin: auto;
 
+																	padding:
+																	55px 30px;
 
-.contact-box h2 {
+																	border-radius: 25px;
 
-    font-size: 40px;
+																	background:
+																	var(--surface);
 
-    color:
-        var(--text);
+																	border:
+																	1px solid
+																	var(--border);
 
-    margin-bottom: 15px;
-}
+																	box-shadow:
+																	var(--shadow);
 
+																	transition: background-color 0.3s, border-color 0.3s;
+																	}
 
-.contact-box p {
 
-    color:
-        var(--text-soft);
+																	.contact-box h2 {
 
-    margin-bottom: 25px;
-}
+																	font-size: 40px;
 
+																	color:
+																	var(--text);
 
-.email {
+																	margin-bottom: 15px;
+																	}
 
-    display: inline-block;
 
-    padding:
-        14px 20px;
+																	.contact-box p {
 
-    border-radius: 12px;
+																	color:
+																	var(--text-soft);
 
-    background:
-        var(--primary-light);
+																	margin-bottom: 25px;
+																	}
 
-    color:
-        var(--primary);
 
-    font-weight: 700;
+																	.email {
 
-    border:
-        1px solid
-        #dbeafe;
-}
+																	display: inline-block;
 
+																	padding:
+																	14px 20px;
 
-/* =========================================
-   FOOTER
-========================================= */
+																	border-radius: 12px;
 
-footer {
+																	background:
+																	var(--primary-light);
 
-    padding: 35px;
+																	color:
+																	var(--primary);
 
-    text-align: center;
+																	font-weight: 700;
 
-    background:
-        transparent;
+																	border:
+																	1px solid
+																	#dbeafe;
+																	}
 
-    border-top:
-        1px solid
-        var(--border);
 
-    color:
-        var(--text-soft);
+																	/* =========================================
+																	FOOTER
+																	========================================= */
 
-    font-size: 13px;
+																	footer {
 
-    transition: background-color 0.3s, border-color 0.3s;
-}
+																	padding: 35px;
 
+																	text-align: center;
 
-/* =========================================
-   ANİMASYON
-========================================= */
+																	background:
+																	transparent;
 
-.reveal {
+																	border-top:
+																	1px solid
+																	var(--border);
 
-    opacity: 0;
+																	color:
+																	var(--text-soft);
 
-    transform:
-        translateY(30px);
+																	font-size: 13px;
 
-    transition:
-        .7s ease;
-}
+																	transition: background-color 0.3s, border-color 0.3s;
+																	}
 
 
-.reveal.active {
+																	/* =========================================
+																	ANİMASYON
+																	========================================= */
 
-    opacity: 1;
+																	.reveal {
 
-    transform:
-        translateY(0);
-}
+																	opacity: 0;
 
+																	transform:
+																	translateY(30px);
 
-/* =========================================
-   MOBİL
-========================================= */
+																	transition:
+																	.7s ease;
+																	}
 
-@media(max-width:900px) {
 
-    .hero {
+																	.reveal.active {
 
-        padding:
-            80px 6%;
-    }
+																	opacity: 1;
 
+																	transform:
+																	translateY(0);
+																	}
 
-    .hero-container {
 
-        grid-template-columns:
-            1fr;
+																	/* =========================================
+																	MOBİL
+																	========================================= */
 
-        text-align: center;
-    }
+																	@media(max-width:900px) {
 
+																	.hero {
 
-    .hero p {
+																	padding:
+																	80px 6%;
+																	}
 
-        margin-left: auto;
 
-        margin-right: auto;
-    }
+																	.hero-container {
 
+																	grid-template-columns:
+																	1fr;
 
-    .cube {
+																	text-align: center;
+																	}
 
-        width: 230px;
 
-        height: 230px;
-    }
+																	.hero p {
 
+																	margin-left: auto;
 
-    .cards {
+																	margin-right: auto;
+																	}
 
-        grid-template-columns:
-            1fr;
-    }
 
+																	.cube {
 
-    .learning-grid {
+																	width: 230px;
 
-        grid-template-columns:
-            1fr;
-    }
+																	height: 230px;
+																	}
 
 
-    .social-grid {
+																	.cards {
 
-        grid-template-columns:
-            1fr;
-    }
-}
+																	grid-template-columns:
+																	1fr;
+																	}
 
 
-@media(max-width:500px) {
+																	.learning-grid {
 
-    .hero h1 {
+																	grid-template-columns:
+																	1fr;
+																	}
 
-        font-size: 43px;
 
-        letter-spacing: -2px;
-    }
+																	.social-grid {
 
+																	grid-template-columns:
+																	1fr;
+																	}
+																	}
 
-    section {
 
-        padding:
-            75px 5%;
-    }
+																	@media(max-width:500px) {
 
+																	.hero h1 {
 
-    .contact-box h2 {
+																	font-size: 43px;
 
-        font-size: 32px;
-    }
+																	letter-spacing: -2px;
+																	}
 
-}
 
-/* =========================================
-   KARANLIK MOD
-========================================= */
+																	section {
 
-.dark-mode-btn {
-    border: none;
-    background: var(--surface-soft);
-    color: var(--text);
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: .3s;
-}
+																	padding:
+																	75px 5%;
+																	}
 
-.dark-mode-btn:hover {
-    transform: scale(1.08);
-}
 
-/* =========================================
-   DİL SEÇİCİ
-========================================= */
+																	.contact-box h2 {
 
-.lang-switcher {
-    position: relative;
-}
+																	font-size: 32px;
+																	}
 
-.lang-switch-btn {
-    border: none;
-    background: var(--surface-soft);
-    color: var(--text);
-    height: 42px;
-    padding: 0 16px;
-    border-radius: 21px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: .3px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    transition: .3s;
-}
+																	}
 
-.lang-switch-btn:hover {
-    transform: scale(1.06);
-    background: var(--primary-light);
-    color: var(--primary);
-}
+																	/* =========================================
+																	KARANLIK MOD
+																	========================================= */
 
-.lang-switch-btn .lang-globe {
-    font-size: 15px;
-    line-height: 1;
-}
+																	.dark-mode-btn {
+																	border: none;
+																	background: var(--surface-soft);
+																	color: var(--text);
+																	width: 42px;
+																	height: 42px;
+																	border-radius: 50%;
+																	font-size: 20px;
+																	cursor: pointer;
+																	display: flex;
+																	align-items: center;
+																	justify-content: center;
+																	transition: .3s;
+																	}
 
-.lang-menu {
-    position: absolute;
-    top: calc(100% + 10px);
-    right: 0;
-    min-width: 168px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 7px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition: .2s ease;
-    z-index: 1100;
-}
+																	.dark-mode-btn:hover {
+																	transform: scale(1.08);
+																	}
 
-.lang-menu.open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
+																	/* =========================================
+																	DİL SEÇİCİ
+																	========================================= */
 
-.lang-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    text-align: left;
-    padding: 10px 14px;
-    border-radius: 11px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .2s;
-    width: 100%;
-}
+																	.lang-switcher {
+																	position: relative;
+																	}
 
-.lang-menu-item:hover {
-    background: var(--primary-light);
-    color: var(--primary);
-}
+																	.lang-switch-btn {
+																	border: none;
+																	background: var(--surface-soft);
+																	color: var(--text);
+																	height: 42px;
+																	padding: 0 16px;
+																	border-radius: 21px;
+																	font-size: 13px;
+																	font-weight: 700;
+																	letter-spacing: .3px;
+																	cursor: pointer;
+																	display: flex;
+																	align-items: center;
+																	gap: 7px;
+																	transition: .3s;
+																	}
 
-.lang-menu-item.active {
-    background: var(--primary-light);
-    color: var(--primary);
-    font-weight: 800;
-}
+																	.lang-switch-btn:hover {
+																	transform: scale(1.06);
+																	background: var(--primary-light);
+																	color: var(--primary);
+																	}
 
-.lang-menu-item .lang-check {
-    margin-left: auto;
-    font-size: 12px;
-    opacity: 0;
-}
+																	.lang-switch-btn .lang-globe {
+																	font-size: 15px;
+																	line-height: 1;
+																	}
 
-.lang-menu-item.active .lang-check {
-    opacity: 1;
-}
+																	.lang-menu {
+																	position: absolute;
+																	top: calc(100% + 10px);
+																	right: 0;
+																	min-width: 168px;
+																	background: var(--surface);
+																	border: 1px solid var(--border);
+																	border-radius: 16px;
+																	box-shadow: var(--shadow);
+																	padding: 7px;
+																	display: flex;
+																	flex-direction: column;
+																	gap: 3px;
+																	opacity: 0;
+																	visibility: hidden;
+																	transform: translateY(-8px);
+																	transition: .2s ease;
+																	z-index: 1100;
+																	}
 
-/* Karanlık mod renkleri */
+																	.lang-menu.open {
+																	opacity: 1;
+																	visibility: visible;
+																	transform: translateY(0);
+																	}
 
-html.dark-mode,
-body.dark-mode {
-    --background: #0f172a;
-    --surface: #1e293b;
-    --surface-soft: #334155;
-    --text: #f8fafc;
-    --text-soft: #cbd5e1;
-    --border: #334155;
-    --primary-light: #1e3a8a;
-    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
-}
+																	.lang-menu-item {
+																	display: flex;
+																	align-items: center;
+																	gap: 10px;
+																	border: none;
+																	background: transparent;
+																	color: var(--text);
+																	text-align: left;
+																	padding: 10px 14px;
+																	border-radius: 11px;
+																	font-size: 14px;
+																	font-weight: 600;
+																	cursor: pointer;
+																	transition: .2s;
+																	width: 100%;
+																	}
 
-html.dark-mode body,
-body.dark-mode {
-    background: var(--background);
-    color: var(--text);
-}
+																	.lang-menu-item:hover {
+																	background: var(--primary-light);
+																	color: var(--primary);
+																	}
 
-html.dark-mode .navbar,
-body.dark-mode .navbar {
-    background: rgba(15, 23, 42, 0.90);
-}
+																	.lang-menu-item.active {
+																	background: var(--primary-light);
+																	color: var(--primary);
+																	font-weight: 800;
+																	}
 
-html.dark-mode .hero,
-body.dark-mode .hero {
-    background: transparent;
-}
+																	.lang-menu-item .lang-check {
+																	margin-left: auto;
+																	font-size: 12px;
+																	opacity: 0;
+																	}
 
-html.dark-mode .learning-section,
-body.dark-mode .learning-section,
-html.dark-mode .contact,
-body.dark-mode .contact {
-    background: transparent;
-}
+																	.lang-menu-item.active .lang-check {
+																	opacity: 1;
+																	}
 
-html.dark-mode .card,
-body.dark-mode .card,
-html.dark-mode .learning-card,
-body.dark-mode .learning-card,
-html.dark-mode .social-card,
-body.dark-mode .social-card,
-html.dark-mode .contact-box,
-body.dark-mode .contact-box,
-html.dark-mode footer,
-body.dark-mode footer {
-    background: var(--surface);
-}
+																	/* Karanlık mod renkleri */
 
-html.dark-mode .card,
-body.dark-mode .card,
-html.dark-mode .learning-card,
-body.dark-mode .learning-card,
-html.dark-mode .social-card,
-body.dark-mode .social-card,
-html.dark-mode .contact-box,
-body.dark-mode .contact-box {
-    border-color: var(--border);
-}
+																	html.dark-mode,
+																	body.dark-mode {
+																	--background: #0f172a;
+																	--surface: #1e293b;
+																	--surface-soft: #334155;
+																	--text: #f8fafc;
+																	--text-soft: #cbd5e1;
+																	--border: #334155;
+																	--primary-light: #1e3a8a;
+																	--shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+																	}
 
-html.dark-mode .featured-card,
-body.dark-mode .featured-card {
-    background: var(--surface);
-    border-color: var(--border);
-}
+																	html.dark-mode body,
+																	body.dark-mode {
+																	background: var(--background);
+																	color: var(--text);
+																	}
 
-html.dark-mode .featured-card.live-video,
-body.dark-mode .featured-card.live-video {
-    border-color: #e6252f;
-    box-shadow: 0 0 0 4px rgba(230,37,47,.22), 0 24px 55px rgba(230,37,47,.22);
-}
+																	html.dark-mode .navbar,
+																	body.dark-mode .navbar {
+																	background: rgba(15, 23, 42, 0.90);
+																	}
 
-html.dark-mode .bg-glow::before,
-html.dark-mode .bg-glow::after {
-    opacity: 0.25;
-}
-    
-</style>
+																	html.dark-mode .hero,
+																	body.dark-mode .hero {
+																	background: transparent;
+																	}
 
-    <!-- Schema Kodu -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Rubik Academy",
-      "url": "https://rubikacademy.fun",
-      "logo": "https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png",
-      "sameAs": [
-        "https://www.instagram.com/erenrubiks",
-        "https://www.youtube.com/@rubikacademyy"
-      ],
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "muhammederenyalcin@gmail.com",
-        "contactType": "customer service"
-      }
-    }
-    </script>
+																	html.dark-mode .learning-section,
+																	body.dark-mode .learning-section,
+																	html.dark-mode .contact,
+																	body.dark-mode .contact {
+																	background: transparent;
+																	}
 
-    <!-- Google Analytics Kodu -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-F7KXWC8B5N');
-    </script>
-</head>
+																	html.dark-mode .card,
+																	body.dark-mode .card,
+																	html.dark-mode .learning-card,
+																	body.dark-mode .learning-card,
+																	html.dark-mode .social-card,
+																	body.dark-mode .social-card,
+																	html.dark-mode .contact-box,
+																	body.dark-mode .contact-box,
+																	html.dark-mode footer,
+																	body.dark-mode footer {
+																	background: var(--surface);
+																	}
 
+																	html.dark-mode .card,
+																	body.dark-mode .card,
+																	html.dark-mode .learning-card,
+																	body.dark-mode .learning-card,
+																	html.dark-mode .social-card,
+																	body.dark-mode .social-card,
+																	html.dark-mode .contact-box,
+																	body.dark-mode .contact-box {
+																	border-color: var(--border);
+																	}
 
-<body>
+																	html.dark-mode .featured-card,
+																	body.dark-mode .featured-card {
+																	background: var(--surface);
+																	border-color: var(--border);
+																	}
 
-    <!-- Arka Plan Işık Efektleri -->
-    <div class="bg-glow"></div>
+																	html.dark-mode .featured-card.live-video,
+																	body.dark-mode .featured-card.live-video {
+																	border-color: #e6252f;
+																	box-shadow: 0 0 0 4px rgba(230,37,47,.22), 0 24px 55px rgba(230,37,47,.22);
+																	}
 
+																	html.dark-mode .bg-glow::before,
+																	html.dark-mode .bg-glow::after {
+																	opacity: 0.25;
+																	}
 
-<!-- =========================================
+																</style>
+
+																<!-- Schema Kodu -->
+																<script type="application/ld+json">
+																	{
+																	"@context": "https://schema.org",
+																	"@type": "Organization",
+																	"name": "Rubik Academy",
+																	"url": "https://rubikacademy.fun",
+																	"logo": "https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png",
+																	"sameAs": [
+																	"https://www.instagram.com/erenrubiks",
+																	"https://www.youtube.com/@rubikacademyy"
+																	],
+																	"contactPoint": {
+																	"@type": "ContactPoint",
+																	"email": "muhammederenyalcin@gmail.com",
+																	"contactType": "customer service"
+																	}
+																	}
+																</script>
+
+																<!-- Google Analytics Kodu -->
+																<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+																<script>
+																	window.dataLayer = window.dataLayer || [];
+																	function gtag(){dataLayer.push(arguments);}
+																	gtag('js', new Date());
+																	gtag('config', 'G-F7KXWC8B5N');
+																</script>
+															</head>
+
+
+	<body>
+
+		<!-- Arka Plan Işık Efektleri -->
+		<div class="bg-glow"></div>
+
+
+		<!-- =========================================
      ÜST BAR
 ========================================= -->
 
-<header class="navbar">
+		<header class="navbar">
 
-    <a href="/" class="nav-logo">
+			<a href="/" class="nav-logo">
 
-        <div class="nav-logo-mark">
+				<div class="nav-logo-mark">
 
-            <div></div>
-            <div></div>
-            <div></div>
+					<div></div>
+					<div></div>
+					<div></div>
 
-            <div></div>
-            <div></div>
-            <div></div>
+					<div></div>
+					<div></div>
+					<div></div>
 
-            <div></div>
-            <div></div>
-            <div></div>
+					<div></div>
+					<div></div>
+					<div></div>
 
-        </div>
-
-
-        <span class="nav-logo-text">
-            Rubik Academy
-        </span>
-
-    </a>
+				</div>
 
 
-    <div class="nav-right">
+				<span class="nav-logo-text">
+					Rubik Academy
+				</span>
 
-        <nav class="nav-links">
-
-            <a href="http://rubikacademy.fun" class="active" data-i18n="navHome">
-                Ana Sayfa
-            </a>
-
-            <a href="http://rubikacademy.fun/icerikler" data-i18n="navContent">
-                İçerikler
-            </a>
-
-        </nav>
-
-        <div class="lang-switcher" id="langSwitcher">
-
-            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
-                <span class="lang-globe">🌐</span><span id="langLabel">TR</span>
-            </button>
-
-            <div class="lang-menu" id="langMenu" role="menu">
-
-                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
-                    <span>Türkçe</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
-                    <span>English</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
-                    <span>Русский</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-            </div>
-
-        </div>
-
-        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-            🌙
-        </button>
-
-    </div>
-    
-</header>
+			</a>
 
 
+			<div class="nav-right">
 
-<!-- =========================================
+				<nav class="nav-links">
+
+					<a href="http://rubikacademy.fun" class="active" data-i18n="navHome">
+						Ana Sayfa
+					</a>
+
+					<a href="http://rubikacademy.fun/icerikler" data-i18n="navContent">
+						İçerikler
+					</a>
+
+				</nav>
+
+				<div class="lang-switcher" id="langSwitcher">
+
+					<button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
+						<span class="lang-globe">🌐</span>
+						<span id="langLabel">TR</span>
+					</button>
+
+					<div class="lang-menu" id="langMenu" role="menu">
+
+						<button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+							<span>Türkçe</span>
+							<span class="lang-check">✓</span>
+						</button>
+
+						<button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+							<span>English</span>
+							<span class="lang-check">✓</span>
+						</button>
+
+						<button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+							<span>Русский</span>
+							<span class="lang-check">✓</span>
+						</button>
+
+						<button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+							<span>Deutsch</span>
+							<span class="lang-check">✓</span>
+						</button>
+
+						<button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+							<span>العربية</span>
+							<span class="lang-check">✓</span>
+						</button>
+
+					</div>
+
+				</div>
+
+				<button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+					🌙
+				</button>
+
+			</div>
+
+		</header>
+
+
+
+		<!-- =========================================
      GİRİŞ
 ========================================= -->
 
-<section class="hero">
+		<section class="hero">
 
-    <div class="hero-container">
-
-
-        <div class="hero-content reveal">
+			<div class="hero-container">
 
 
-            <div class="badge" data-i18n="badge">
-
-                Speedcubing'e Hoş Geldin
-
-            </div>
+				<div class="hero-content reveal">
 
 
-            <h1>
+					<div class="badge" data-i18n="badge">
 
-                <span data-i18n="heroTitle1">Rubik Küpü</span>
+						Speedcubing'e Hoş Geldin
 
-                <span class="gradient-text" data-i18n="heroTitleGradient">
-                    öğren.
-                </span>
-
-                <br>
-
-                <span data-i18n="heroTitle2">Hızını geliştir.</span>
-
-            </h1>
+					</div>
 
 
-            <p data-i18n="heroP">
+					<h1>
 
-                Rubik Academy, Rubik küp çözmeyi öğrenmek
-                ve çözüm sürelerini geliştirmek isteyenler
-                için hazırlanmış modern ve sistemli bir
-                eğitim platformudur.
+						<span data-i18n="heroTitle1">Rubik Küpü</span>
 
-            </p>
+						<span class="gradient-text" data-i18n="heroTitleGradient">
+							öğren.
+						</span>
+
+						<br>
+
+							<span data-i18n="heroTitle2">Hızını geliştir.</span>
+
+						</h1>
 
 
-            <a
-                href="#academy"
-                class="btn btn-primary"
-                data-i18n="heroBtn"
+					<p data-i18n="heroP">
+
+						Rubik Academy, Rubik küp çözmeyi öğrenmek
+						ve çözüm sürelerini geliştirmek isteyenler
+						için hazırlanmış modern ve sistemli bir
+						eğitim platformudur.
+
+					</p>
+
+
+					<a
+						href="#academy"
+						class="btn btn-primary"
+						data-i18n="heroBtn"
             >
 
-                Öğrenmeye Başla →
+						Öğrenmeye Başla →
 
-            </a>
-
-
-        </div>
+					</a>
 
 
-        <!-- KÜP -->
-
-        <div class="cube-area reveal">
-
-            <div class="cube">
-
-                <div></div>
-                <div></div>
-                <div></div>
-
-                <div></div>
-                <div></div>
-                <div></div>
-
-                <div></div>
-                <div></div>
-                <div></div>
-
-            </div>
-
-        </div>
+				</div>
 
 
-    </div>
+				<!-- KÜP -->
 
-</section>
+				<div class="cube-area reveal">
+
+					<div class="cube">
+
+						<div></div>
+						<div></div>
+						<div></div>
+
+						<div></div>
+						<div></div>
+						<div></div>
+
+						<div></div>
+						<div></div>
+						<div></div>
+
+					</div>
+
+				</div>
+
+
+			</div>
+
+		</section>
 
 
 
-<!-- =========================================
+		<!-- =========================================
      ÖNE ÇIKANLAR
 ========================================= -->
 
-<section class="featured-section">
+		<section class="featured-section">
 
-    <div class="section-container">
-
-
-        <div class="section-heading reveal">
-
-            <span data-i18n="featuredSpan">
-                Öne Çıkanlar
-            </span>
+			<div class="section-container">
 
 
-            <h2 data-i18n="featuredH2">
-                Yeni videoyu kaçırma.
-            </h2>
+				<div class="section-heading reveal">
 
-        </div>
-
-
-        <div class="featured-list">
+					<span data-i18n="featuredSpan">
+						Öne Çıkanlar
+					</span>
 
 
-            <a
-                href="https://m.youtube.com/watch?v=rBXQqvlVrs0"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="featured-card live-video reveal"
-            >
+					<h2 data-i18n="featuredH2">
+						Yeni videoyu kaçırma.
+					</h2>
 
-                <div class="featured-thumb">
-                    <img
-                        src="https://i.ytimg.com/vi/rBXQqvlVrs0/hqdefault.jpg"
-                        alt="FTO Nasıl Çözülür? Video Thumbnail"
-                        referrerpolicy="no-referrer"
-                        loading="eager"
-                        onerror="this.onerror=null; var t=['https://i.ytimg.com/vi/rBXQqvlVrs0/mqdefault.jpg','https://i.ytimg.com/vi/rBXQqvlVrs0/0.jpg','https://img.youtube.com/vi/rBXQqvlVrs0/hqdefault.jpg']; var i=parseInt(this.dataset.i||0); if(i<t.length){this.dataset.i=i+1; this.src=t[i];}"
-                    >
-                    <span class="video-play-icon"></span>
-                </div>
-
-                <div class="featured-body">
-
-                    <span class="live-badge">🎥 YAYINDA</span>
-
-                    <span class="featured-tag" data-i18n="featuredTag">
-                        Yeni Video · Pazar
-                    </span>
-
-                    <h3 data-i18n="featuredTitle">
-                        FTO Nasıl Çözülür? - Bencisco Method
-                    </h3>
-
-                    <p data-i18n="featuredDesc">
-                        Bencisco metoduyla FTO'yu ileri seviyede çözmeyi öğren.
-                    </p>
-
-                </div>
-
-                <div class="featured-time" data-i18n="featuredTime">
-                    15:00
-                </div>
-
-            </a>
+				</div>
 
 
-            <div class="featured-card reveal">
-
-                <div class="featured-date">
-                    <span class="fd-day">17</span>
-                    <span class="fd-month" data-i18n="featuredMonth2">Ağu</span>
-                </div>
-
-                <div class="featured-body">
-
-                    <span class="featured-tag" data-i18n="featuredTag2">
-                        Yeni Video · Pazartesi
-                    </span>
-
-                    <h3 data-i18n="featuredTitle2">
-                        FTO Nasıl Karıştırılır?
-                    </h3>
-
-                    <p data-i18n="featuredDesc2">
-                        FTO küpünü doğru ve dengeli şekilde karıştırmayı öğren.
-                    </p>
-
-                </div>
-
-                <div class="featured-time" data-i18n="featuredTime2">
-                    15:00
-                </div>
-
-            </div>
+				<div class="featured-list">
 
 
-        </div>
+					<div class="featured-card reveal">
 
-    </div>
+						<div class="featured-date">
+							<span class="fd-day">23</span>
+							<span class="fd-month" data-i18n="featuredMonth2">Ağu</span>
+						</div>
 
-</section>
+						<div class="featured-body">
+
+							<span class="featured-tag" data-i18n="featuredTag2">
+								Yeni Video · Pazar
+							</span>
+
+							<h3 data-i18n="featuredTitle2">
+								FTO Nasıl Karıştırılır?
+							</h3>
+
+							<p data-i18n="featuredDesc2">
+								FTO küpünü doğru ve dengeli şekilde karıştırmayı öğren.
+							</p>
+
+						</div>
+
+						<div class="featured-time" data-i18n="featuredTime2">
+							15:00
+						</div>
+
+					</div>
+
+
+				</div>
+
+			</div>
+
+		</section>
 
 
 
-<!-- =========================================
+		<!-- =========================================
      AKADEMİ
 ========================================= -->
 
-<section id="academy">
+		<section id="academy">
 
-    <div class="section-container">
-
-
-        <div class="section-heading reveal">
-
-            <span data-i18n="academySpan">
-                Rubik Academy
-            </span>
+			<div class="section-container">
 
 
-            <h2 data-i18n="academyH2">
+				<div class="section-heading reveal">
 
-                Küp çözmeyi
-                sistemli şekilde öğren.
-
-            </h2>
-
-
-            <p data-i18n="academyP">
-
-                Temelden başlayıp speedcubing seviyesine
-                kadar ilerleyebileceğin içerikler.
-
-            </p>
-
-        </div>
+					<span data-i18n="academySpan">
+						Rubik Academy
+					</span>
 
 
+					<h2 data-i18n="academyH2">
 
-        <div class="cards">
+						Küp çözmeyi
+						sistemli şekilde öğren.
 
-
-            <div class="card reveal">
-
-                <div class="card-icon">
-                    🧩
-                </div>
+					</h2>
 
 
-                <h3 data-i18n="card1Title">
-                    3x3 Rubik Küp
-                </h3>
+					<p data-i18n="academyP">
 
+						Temelden başlayıp speedcubing seviyesine
+						kadar ilerleyebileceğin içerikler.
 
-                <p data-i18n="card1P">
+					</p>
 
-                    3x3 Rubik küpü adım adım öğren.
-                    Temel hareketlerden ileri seviyeye
-                    kadar kendini geliştir.
-
-                </p>
-
-            </div>
+				</div>
 
 
 
-            <div class="card reveal">
-
-                <div class="card-icon">
-                    ⚡
-                </div>
+				<div class="cards">
 
 
-                <h3 data-i18n="card2Title">
-                    Algoritmalar
-                </h3>
+					<div class="card reveal">
+
+						<div class="card-icon">
+							🧩
+						</div>
 
 
-                <p data-i18n="card2P">
-
-                    Daha hızlı çözüm yapabilmek için
-                    gerekli algoritmaları öğren ve
-                    pratik yap.
-
-                </p>
-
-            </div>
+						<h3 data-i18n="card1Title">
+							3x3 Rubik Küp
+						</h3>
 
 
+						<p data-i18n="card1P">
 
-            <div class="card reveal">
+							3x3 Rubik küpü adım adım öğren.
+							Temel hareketlerden ileri seviyeye
+							kadar kendini geliştir.
 
-                <div class="card-icon">
-                    🚀
-                </div>
+						</p>
 
-
-                <h3 data-i18n="card3Title">
-                    Speedcubing
-                </h3>
-
-
-                <p data-i18n="card3P">
-
-                    Çözüm sürelerini geliştir,
-                    kendi rekorlarını kır ve
-                    speedcubing dünyasında ilerle.
-
-                </p>
-
-            </div>
-
-
-        </div>
-
-    </div>
-
-</section>
+					</div>
 
 
 
-<!-- =========================================
+					<div class="card reveal">
+
+						<div class="card-icon">
+							⚡
+						</div>
+
+
+						<h3 data-i18n="card2Title">
+							Algoritmalar
+						</h3>
+
+
+						<p data-i18n="card2P">
+
+							Daha hızlı çözüm yapabilmek için
+							gerekli algoritmaları öğren ve
+							pratik yap.
+
+						</p>
+
+					</div>
+
+
+
+					<div class="card reveal">
+
+						<div class="card-icon">
+							🚀
+						</div>
+
+
+						<h3 data-i18n="card3Title">
+							Speedcubing
+						</h3>
+
+
+						<p data-i18n="card3P">
+
+							Çözüm sürelerini geliştir,
+							kendi rekorlarını kır ve
+							speedcubing dünyasında ilerle.
+
+						</p>
+
+					</div>
+
+
+				</div>
+
+			</div>
+
+		</section>
+
+
+
+		<!-- =========================================
      EĞİTİM
 ========================================= -->
 
-<section class="learning-section">
+		<section class="learning-section">
 
-    <div class="section-container">
+			<div class="section-container">
 
 
-        <div class="section-heading reveal">
+				<div class="section-heading reveal">
 
-            <span data-i18n="learningSpan">
-                Eğitim
-            </span>
+					<span data-i18n="learningSpan">
+						Eğitim
+					</span>
 
 
-            <h2 data-i18n="learningH2">
-                Adım adım ilerle.
-            </h2>
+					<h2 data-i18n="learningH2">
+						Adım adım ilerle.
+					</h2>
 
 
-            <p data-i18n="learningP">
+					<p data-i18n="learningP">
 
-                Rubik küp öğrenme sürecini
-                kolay ve anlaşılır hale getir.
+						Rubik küp öğrenme sürecini
+						kolay ve anlaşılır hale getir.
 
-            </p>
+					</p>
 
-        </div>
+				</div>
 
 
 
-        <div class="learning-grid">
+				<div class="learning-grid">
 
 
-            <div class="learning-card reveal">
+					<div class="learning-card reveal">
 
-                <div class="learning-number" data-i18n="l1num">
-                    01 — BAŞLANGIÇ
-                </div>
+						<div class="learning-number" data-i18n="l1num">
+							01 — BAŞLANGIÇ
+						</div>
 
 
-                <h3 data-i18n="l1title">
-                    Küpü Tanı
-                </h3>
+						<h3 data-i18n="l1title">
+							Küpü Tanı
+						</h3>
 
 
-                <p data-i18n="l1p">
+						<p data-i18n="l1p">
 
-                    Rubik küpün yapısını,
-                    yüzlerini, merkez parçalarını,
-                    köşe ve kenar parçalarını öğren.
+							Rubik küpün yapısını,
+							yüzlerini, merkez parçalarını,
+							köşe ve kenar parçalarını öğren.
 
-                </p>
+						</p>
 
-            </div>
+					</div>
 
 
 
-            <div class="learning-card reveal">
+					<div class="learning-card reveal">
 
-                <div class="learning-number" data-i18n="l2num">
-                    02 — TEMEL
-                </div>
+						<div class="learning-number" data-i18n="l2num">
+							02 — TEMEL
+						</div>
 
 
-                <h3 data-i18n="l2title">
-                    İlk Çözümünü Yap
-                </h3>
+						<h3 data-i18n="l2title">
+							İlk Çözümünü Yap
+						</h3>
 
 
-                <p data-i18n="l2p">
+						<p data-i18n="l2p">
 
-                    Temel hareketleri öğrenerek
-                    Rubik küpünü baştan sona
-                    çözmeyi öğren.
+							Temel hareketleri öğrenerek
+							Rubik küpünü baştan sona
+							çözmeyi öğren.
 
-                </p>
+						</p>
 
-            </div>
+					</div>
 
 
 
-            <div class="learning-card reveal">
+					<div class="learning-card reveal">
 
-                <div class="learning-number" data-i18n="l3num">
-                    03 — GELİŞİM
-                </div>
+						<div class="learning-number" data-i18n="l3num">
+							03 — GELİŞİM
+						</div>
 
 
-                <h3 data-i18n="l3title">
-                    Algoritmaları Öğren
-                </h3>
+						<h3 data-i18n="l3title">
+							Algoritmaları Öğren
+						</h3>
 
 
-                <p data-i18n="l3p">
+						<p data-i18n="l3p">
 
-                    Çözüm süreni azaltmak için
-                    gerekli algoritmaları
-                    çalışmaya başla.
+							Çözüm süreni azaltmak için
+							gerekli algoritmaları
+							çalışmaya başla.
 
-                </p>
+						</p>
 
-            </div>
+					</div>
 
 
 
-            <div class="learning-card reveal">
+					<div class="learning-card reveal">
 
-                <div class="learning-number" data-i18n="l4num">
-                    04 — SPEEDCUBING
-                </div>
+						<div class="learning-number" data-i18n="l4num">
+							04 — SPEEDCUBING
+						</div>
 
 
-                <h3 data-i18n="l4title">
-                    Hızını Geliştir
-                </h3>
+						<h3 data-i18n="l4title">
+							Hızını Geliştir
+						</h3>
 
 
-                <p data-i18n="l4p">
+						<p data-i18n="l4p">
 
-                    Farklı teknikleri kullan,
-                    pratik yap ve kendi en iyi
-                    dereceni oluşturmaya çalış.
+							Farklı teknikleri kullan,
+							pratik yap ve kendi en iyi
+							dereceni oluşturmaya çalış.
 
-                </p>
+						</p>
 
-            </div>
+					</div>
 
 
-        </div>
+				</div>
 
-    </div>
+			</div>
 
-</section>
+		</section>
 
 
 
-<!-- =========================================
+		<!-- =========================================
      SOSYAL MEDYA
 ========================================= -->
 
-<section>
+		<section>
 
-    <div class="section-container">
-
-
-        <div class="section-heading reveal">
-
-            <span data-i18n="socialSpan">
-                Sosyal Medya
-            </span>
+			<div class="section-container">
 
 
-            <h2 data-i18n="socialH2">
-                Rubik Academy'yi takip et.
-            </h2>
+				<div class="section-heading reveal">
+
+					<span data-i18n="socialSpan">
+						Sosyal Medya
+					</span>
 
 
-            <p data-i18n="socialP">
-
-                Yeni içerikleri ve speedcubing
-                paylaşımlarını kaçırma.
-
-            </p>
-
-        </div>
+					<h2 data-i18n="socialH2">
+						Rubik Academy'yi takip et.
+					</h2>
 
 
+					<p data-i18n="socialP">
 
-        <div class="social-grid">
+						Yeni içerikleri ve speedcubing
+						paylaşımlarını kaçırma.
+
+					</p>
+
+				</div>
 
 
-            <a
-                href="https://www.instagram.com/erenrubiks"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-card reveal"
+
+				<div class="social-grid">
+
+
+					<a
+						href="https://www.instagram.com/erenrubiks"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="social-card reveal"
             >
 
-                <div class="social-icon">
-                    ◎
-                </div>
+						<div class="social-icon">
+							◎
+						</div>
 
 
-                <div>
+						<div>
 
-                    <h3>
-                        Instagram
-                    </h3>
+							<h3>
+								Instagram
+							</h3>
 
-                    <p>
-                        @erenrubiks
-                    </p>
+							<p>
+								@erenrubiks
+							</p>
 
-                </div>
+						</div>
 
-            </a>
+					</a>
 
 
 
-            <a
-                href="https://www.youtube.com/@rubikacademyy"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-card reveal"
+					<a
+						href="https://www.youtube.com/@rubikacademyy"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="social-card reveal"
             >
 
-                <div class="social-icon">
-                    ▶
-                </div>
+						<div class="social-icon">
+							▶
+						</div>
 
 
-                <div>
+						<div>
 
-                    <h3>
-                        YouTube
-                    </h3>
+							<h3>
+								YouTube
+							</h3>
 
-                    <p>
-                        @rubikacademyy
-                    </p>
+							<p>
+								@rubikacademyy
+							</p>
 
-                </div>
+						</div>
 
-            </a>
-
-
-        </div>
-
-    </div>
-
-</section>
+					</a>
 
 
+				</div>
 
-<!-- =========================================
+			</div>
+
+		</section>
+
+
+
+		<!-- =========================================
      İLETİŞİM
 ========================================= -->
 
-<section class="contact">
+		<section class="contact">
 
-    <div class="section-container">
-
-
-        <div class="contact-box reveal">
+			<div class="section-container">
 
 
-            <h2 data-i18n="contactH2">
-                Bir sorunuz mu var?
-            </h2>
+				<div class="contact-box reveal">
 
 
-            <p data-i18n="contactP">
-
-                Sorularınız, önerileriniz veya
-                iş birlikleri için bizimle
-                iletişime geçebilirsiniz.
-
-            </p>
+					<h2 data-i18n="contactH2">
+						Bir sorunuz mu var?
+					</h2>
 
 
-            <a
-                href="mailto:muhammederenyalcin@gmail.com"
-                class="email"
+					<p data-i18n="contactP">
+
+						Sorularınız, önerileriniz veya
+						iş birlikleri için bizimle
+						iletişime geçebilirsiniz.
+
+					</p>
+
+
+					<a
+						href="mailto:muhammederenyalcin@gmail.com"
+						class="email"
             >
 
-                ✉
-                muhammederenyalcin@gmail.com
+						✉
+						muhammederenyalcin@gmail.com
 
-            </a>
-
-
-        </div>
-
-    </div>
-
-</section>
+					</a>
 
 
+				</div>
 
-<!-- =========================================
+			</div>
+
+		</section>
+
+
+
+		<!-- =========================================
      FOOTER
 ========================================= -->
 
-<footer>
+		<footer>
 
-    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+			<span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
 
-</footer>
-
-
-
-<script>
-
-/* =========================================
-   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
-========================================= */
-
-function toggleDarkMode() {
-    var isDark = document.documentElement.classList.toggle("dark-mode");
-    document.body.classList.toggle("dark-mode", isDark);
-    
-    var btn = document.getElementById("darkModeBtn");
-
-    if (isDark) {
-        localStorage.setItem("theme", "dark");
-        if(btn) btn.innerHTML = "☀️";
-    } else {
-        localStorage.setItem("theme", "light");
-        if(btn) btn.innerHTML = "🌙";
-    }
-}
-
-// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
-document.addEventListener("DOMContentLoaded", function() {
-    var savedTheme = localStorage.getItem("theme");
-    var btn = document.getElementById("darkModeBtn");
-    
-    if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark-mode");
-        document.body.classList.add("dark-mode");
-        if(btn) btn.innerHTML = "☀️";
-    } else {
-        if(btn) btn.innerHTML = "🌙";
-    }
-});
-
-/* =========================================
-   DİL SEÇİCİ (TR / EN / RU)
-========================================= */
-
-var translations = {
-    tr: {
-        navHome: "Ana Sayfa",
-        navContent: "İçerikler",
-        badge: "Speedcubing'e Hoş Geldin",
-        heroTitle1: "Rubik Küpü",
-        heroTitleGradient: "öğren.",
-        heroTitle2: "Hızını geliştir.",
-        heroP: "Rubik Academy, Rubik küp çözmeyi öğrenmek ve çözüm sürelerini geliştirmek isteyenler için hazırlanmış modern ve sistemli bir eğitim platformudur.",
-        heroBtn: "Öğrenmeye Başla →",
-        featuredSpan: "Öne Çıkanlar",
-        featuredH2: "Yeni videoyu kaçırma.",
-        featuredMonth: "Ağu",
-        featuredTag: "Yeni Video · Pazar",
-        featuredTitle: "FTO Nasıl Çözülür? - Bencisco Method",
-        featuredDesc: "Bencisco metoduyla FTO'yu ileri seviyede çözmeyi öğren.",
-        featuredTime: "15:00",
-        featuredMonth2: "Ağu",
-        featuredTag2: "Yeni Video · Pazartesi",
-        featuredTitle2: "FTO Nasıl Karıştırılır?",
-        featuredDesc2: "FTO küpünü doğru ve dengeli şekilde karıştırmayı öğren.",
-        featuredTime2: "15:00",
-        academySpan: "Rubik Academy",
-        academyH2: "Küp çözmeyi sistemli şekilde öğren.",
-        academyP: "Temelden başlayıp speedcubing seviyesine kadar ilerleyebileceğin içerikler.",
-        card1Title: "3x3 Rubik Küp",
-        card1P: "3x3 Rubik küpü adım adım öğren. Temel hareketlerden ileri seviyeye kadar kendini geliştir.",
-        card2Title: "Algoritmalar",
-        card2P: "Daha hızlı çözüm yapabilmek için gerekli algoritmaları öğren ve pratik yap.",
-        card3Title: "Speedcubing",
-        card3P: "Çözüm sürelerini geliştir, kendi rekorlarını kır ve speedcubing dünyasında ilerle.",
-        learningSpan: "Eğitim",
-        learningH2: "Adım adım ilerle.",
-        learningP: "Rubik küp öğrenme sürecini kolay ve anlaşılır hale getir.",
-        l1num: "01 — BAŞLANGIÇ",
-        l1title: "Küpü Tanı",
-        l1p: "Rubik küpün yapısını, yüzlerini, merkez parçalarını, köşe ve kenar parçalarını öğren.",
-        l2num: "02 — TEMEL",
-        l2title: "İlk Çözümünü Yap",
-        l2p: "Temel hareketleri öğrenerek Rubik küpünü baştan sona çözmeyi öğren.",
-        l3num: "03 — GELİŞİM",
-        l3title: "Algoritmaları Öğren",
-        l3p: "Çözüm süreni azaltmak için gerekli algoritmaları çalışmaya başla.",
-        l4num: "04 — SPEEDCUBING",
-        l4title: "Hızını Geliştir",
-        l4p: "Farklı teknikleri kullan, pratik yap ve kendi en iyi dereceni oluşturmaya çalış.",
-        socialSpan: "Sosyal Medya",
-        socialH2: "Rubik Academy'yi takip et.",
-        socialP: "Yeni içerikleri ve speedcubing paylaşımlarını kaçırma.",
-        contactH2: "Bir sorunuz mu var?",
-        contactP: "Sorularınız, önerileriniz veya iş birlikleri için bizimle iletişime geçebilirsiniz.",
-        footer: "© 2026 Rubik Academy. Tüm hakları saklıdır."
-    },
-    en: {
-        navHome: "Home",
-        navContent: "Content",
-        badge: "Welcome to Speedcubing",
-        heroTitle1: "Learn the",
-        heroTitleGradient: "Rubik's Cube.",
-        heroTitle2: "Boost your speed.",
-        heroP: "Rubik Academy is a modern, structured learning platform for anyone who wants to learn how to solve the Rubik's Cube and improve their solve times.",
-        heroBtn: "Start Learning →",
-        featuredSpan: "Featured",
-        featuredH2: "Don't miss the new video.",
-        featuredMonth: "Aug",
-        featuredTag: "New Video · Sunday",
-        featuredTitle: "How to Solve the FTO? - Bencisco Method",
-        featuredDesc: "Learn to solve the FTO at an advanced level with the Bencisco method.",
-        featuredTime: "3:00 PM",
-        featuredMonth2: "Aug",
-        featuredTag2: "New Video · Monday",
-        featuredTitle2: "How to Scramble the FTO?",
-        featuredDesc2: "Learn how to scramble the FTO cube properly and evenly.",
-        featuredTime2: "3:00 PM",
-        academySpan: "Rubik Academy",
-        academyH2: "Learn to solve the cube, step by step.",
-        academyP: "Content that takes you from the basics all the way to speedcubing level.",
-        card1Title: "3x3 Rubik's Cube",
-        card1P: "Learn the 3x3 Rubik's Cube step by step. Progress from basic moves to advanced techniques.",
-        card2Title: "Algorithms",
-        card2P: "Learn the algorithms you need for faster solves and put them into practice.",
-        card3Title: "Speedcubing",
-        card3P: "Improve your solve times, beat your own records, and advance in the world of speedcubing.",
-        learningSpan: "Learning Path",
-        learningH2: "Progress step by step.",
-        learningP: "Make the process of learning the Rubik's Cube simple and clear.",
-        l1num: "01 — GETTING STARTED",
-        l1title: "Meet the Cube",
-        l1p: "Learn the structure of the Rubik's Cube: its faces, center pieces, corner pieces, and edge pieces.",
-        l2num: "02 — BASICS",
-        l2title: "Solve It for the First Time",
-        l2p: "Learn the basic moves and solve the Rubik's Cube from start to finish.",
-        l3num: "03 — PROGRESS",
-        l3title: "Learn the Algorithms",
-        l3p: "Start practicing the algorithms you need to bring your solve time down.",
-        l4num: "04 — SPEEDCUBING",
-        l4title: "Boost Your Speed",
-        l4p: "Use different techniques, practice consistently, and work toward your personal best.",
-        socialSpan: "Social Media",
-        socialH2: "Follow Rubik Academy.",
-        socialP: "Don't miss new content and speedcubing updates.",
-        contactH2: "Got a question?",
-        contactP: "Feel free to reach out for questions, suggestions, or collaborations.",
-        footer: "© 2026 Rubik Academy. All rights reserved."
-    },
-    ru: {
-        navHome: "Главная",
-        navContent: "Контент",
-        badge: "Добро пожаловать в спидкубинг",
-        heroTitle1: "Изучи",
-        heroTitleGradient: "кубик Рубика.",
-        heroTitle2: "Развивай скорость.",
-        heroP: "Rubik Academy — современная и структурированная образовательная платформа для тех, кто хочет научиться собирать кубик Рубика и улучшить своё время сборки.",
-        heroBtn: "Начать обучение →",
-        featuredSpan: "Рекомендуем",
-        featuredH2: "Не пропусти новое видео.",
-        featuredMonth: "авг",
-        featuredTag: "Новое видео · Воскресенье",
-        featuredTitle: "Как собрать FTO? - Метод Bencisco",
-        featuredDesc: "Научись собирать FTO на продвинутом уровне методом Bencisco.",
-        featuredTime: "15:00",
-        featuredMonth2: "авг",
-        featuredTag2: "Новое видео · Понедельник",
-        featuredTitle2: "Как перемешать FTO?",
-        featuredDesc2: "Научись правильно и равномерно перемешивать кубик FTO.",
-        featuredTime2: "15:00",
-        academySpan: "Rubik Academy",
-        academyH2: "Изучай сборку кубика системно.",
-        academyP: "Контент, который проведёт тебя от основ до уровня спидкубинга.",
-        card1Title: "Кубик Рубика 3x3",
-        card1P: "Изучи кубик 3x3 шаг за шагом. Развивайся от базовых движений до продвинутого уровня.",
-        card2Title: "Алгоритмы",
-        card2P: "Изучи алгоритмы, необходимые для более быстрой сборки, и практикуйся.",
-        card3Title: "Спидкубинг",
-        card3P: "Улучшай время сборки, побеждай свои рекорды и развивайся в мире спидкубинга.",
-        learningSpan: "Обучение",
-        learningH2: "Двигайся шаг за шагом.",
-        learningP: "Сделай процесс изучения кубика Рубика простым и понятным.",
-        l1num: "01 — НАЧАЛО",
-        l1title: "Познакомься с кубиком",
-        l1p: "Изучи структуру кубика Рубика: грани, центральные, угловые и рёберные элементы.",
-        l2num: "02 — ОСНОВЫ",
-        l2title: "Собери его в первый раз",
-        l2p: "Изучи базовые движения и собери кубик Рубика от начала до конца.",
-        l3num: "03 — РАЗВИТИЕ",
-        l3title: "Изучи алгоритмы",
-        l3p: "Начни изучать алгоритмы, необходимые для сокращения времени сборки.",
-        l4num: "04 — СПИДКУБИНГ",
-        l4title: "Развивай скорость",
-        l4p: "Используй разные техники, практикуйся и стремись установить свой личный рекорд.",
-        socialSpan: "Социальные сети",
-        socialH2: "Подпишись на Rubik Academy.",
-        socialP: "Не пропускай новый контент и обновления по спидкубингу.",
-        contactH2: "Есть вопрос?",
-        contactP: "Свяжись с нами по любым вопросам, предложениям или сотрудничеству.",
-        footer: "© 2026 Rubik Academy. Все права защищены."
-    }
-};
-
-var langCodes = { tr: "TR", en: "EN", ru: "RU" };
-
-function applyLanguage(lang) {
-    if (!translations[lang]) lang = "tr";
-
-    var dict = translations[lang];
-
-    document.querySelectorAll("[data-i18n]").forEach(function(el) {
-        var key = el.getAttribute("data-i18n");
-        if (dict[key]) {
-            el.textContent = dict[key];
-        }
-    });
-
-    document.documentElement.setAttribute("lang", lang);
-
-    var label = document.getElementById("langLabel");
-    if (label) {
-        label.textContent = langCodes[lang] || "TR";
-    }
-
-    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
-        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
-    });
-
-    localStorage.setItem("site-lang", lang);
-}
-
-function toggleLangMenu(e) {
-    if (e) e.stopPropagation();
-    var menu = document.getElementById("langMenu");
-    var btn = document.getElementById("langSwitchBtn");
-    if (!menu) return;
-    var willOpen = !menu.classList.contains("open");
-    menu.classList.toggle("open", willOpen);
-    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
-}
-
-function closeLangMenu() {
-    var menu = document.getElementById("langMenu");
-    var btn = document.getElementById("langSwitchBtn");
-    if (menu) menu.classList.remove("open");
-    if (btn) btn.setAttribute("aria-expanded", "false");
-}
-
-function selectLanguage(lang) {
-    applyLanguage(lang);
-    closeLangMenu();
-}
-
-document.addEventListener("click", function(e) {
-    var switcher = document.getElementById("langSwitcher");
-    if (switcher && !switcher.contains(e.target)) {
-        closeLangMenu();
-    }
-});
-
-document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") closeLangMenu();
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-    var savedLang = localStorage.getItem("site-lang") || "tr";
-    applyLanguage(savedLang);
-});
-
-/* =========================================
-   SCROLL ANIMATION
-========================================= */
-
-const observer =
-    new IntersectionObserver(
-
-        (entries) => {
-
-            entries.forEach(
-                (entry) => {
-
-                    if (
-                        entry.isIntersecting
-                    ) {
-
-                        entry.target
-                            .classList
-                            .add("active");
-
-                    }
-
-                }
-            );
-
-        },
-
-        {
-            threshold: 0.15
-        }
-
-    );
+		</footer>
 
 
-document
-    .querySelectorAll(".reveal")
-    .forEach(
-        (element) => {
 
-            observer.observe(element);
+		<script>
 
-        }
-    );
+			/* =========================================
+			KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
+			========================================= */
 
-</script>
+			function toggleDarkMode() {
+			var isDark = document.documentElement.classList.toggle("dark-mode");
+			document.body.classList.toggle("dark-mode", isDark);
+
+			var btn = document.getElementById("darkModeBtn");
+
+			if (isDark) {
+			localStorage.setItem("theme", "dark");
+			if(btn) btn.innerHTML = "☀️";
+			} else {
+			localStorage.setItem("theme", "light");
+			if(btn) btn.innerHTML = "🌙";
+			}
+			}
+
+			// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
+			document.addEventListener("DOMContentLoaded", function() {
+			var savedTheme = localStorage.getItem("theme");
+			var btn = document.getElementById("darkModeBtn");
+
+			if (savedTheme === "dark") {
+			document.documentElement.classList.add("dark-mode");
+			document.body.classList.add("dark-mode");
+			if(btn) btn.innerHTML = "☀️";
+			} else {
+			if(btn) btn.innerHTML = "🌙";
+			}
+			});
+
+			/* =========================================
+			DİL SEÇİCİ (TR / EN / RU)
+			========================================= */
+
+			var translations = {
+			tr: {
+			navHome: "Ana Sayfa",
+			navContent: "İçerikler",
+			badge: "Speedcubing'e Hoş Geldin",
+			heroTitle1: "Rubik Küpü",
+			heroTitleGradient: "öğren.",
+			heroTitle2: "Hızını geliştir.",
+			heroP: "Rubik Academy, Rubik küp çözmeyi öğrenmek ve çözüm sürelerini geliştirmek isteyenler için hazırlanmış modern ve sistemli bir eğitim platformudur.",
+			heroBtn: "Öğrenmeye Başla →",
+			featuredSpan: "Öne Çıkanlar",
+			featuredH2: "Yeni videoyu kaçırma.",
+			featuredMonth: "Ağu",
+			featuredTag: "Yeni Video · Pazar",
+			featuredTitle: "FTO Nasıl Çözülür? - Bencisco Method",
+			featuredDesc: "Bencisco metoduyla FTO'yu ileri seviyede çözmeyi öğren.",
+			featuredTime: "15:00",
+			featuredMonth2: "Ağu",
+			featuredTag2: "Yeni Video · Pazar",
+			featuredTitle2: "FTO Nasıl Karıştırılır?",
+			featuredDesc2: "FTO küpünü doğru ve dengeli şekilde karıştırmayı öğren.",
+			featuredTime2: "15:00",
+			academySpan: "Rubik Academy",
+			academyH2: "Küp çözmeyi sistemli şekilde öğren.",
+			academyP: "Temelden başlayıp speedcubing seviyesine kadar ilerleyebileceğin içerikler.",
+			card1Title: "3x3 Rubik Küp",
+			card1P: "3x3 Rubik küpü adım adım öğren. Temel hareketlerden ileri seviyeye kadar kendini geliştir.",
+			card2Title: "Algoritmalar",
+			card2P: "Daha hızlı çözüm yapabilmek için gerekli algoritmaları öğren ve pratik yap.",
+			card3Title: "Speedcubing",
+			card3P: "Çözüm sürelerini geliştir, kendi rekorlarını kır ve speedcubing dünyasında ilerle.",
+			learningSpan: "Eğitim",
+			learningH2: "Adım adım ilerle.",
+			learningP: "Rubik küp öğrenme sürecini kolay ve anlaşılır hale getir.",
+			l1num: "01 — BAŞLANGIÇ",
+			l1title: "Küpü Tanı",
+			l1p: "Rubik küpün yapısını, yüzlerini, merkez parçalarını, köşe ve kenar parçalarını öğren.",
+			l2num: "02 — TEMEL",
+			l2title: "İlk Çözümünü Yap",
+			l2p: "Temel hareketleri öğrenerek Rubik küpünü baştan sona çözmeyi öğren.",
+			l3num: "03 — GELİŞİM",
+			l3title: "Algoritmaları Öğren",
+			l3p: "Çözüm süreni azaltmak için gerekli algoritmaları çalışmaya başla.",
+			l4num: "04 — SPEEDCUBING",
+			l4title: "Hızını Geliştir",
+			l4p: "Farklı teknikleri kullan, pratik yap ve kendi en iyi dereceni oluşturmaya çalış.",
+			socialSpan: "Sosyal Medya",
+			socialH2: "Rubik Academy'yi takip et.",
+			socialP: "Yeni içerikleri ve speedcubing paylaşımlarını kaçırma.",
+			contactH2: "Bir sorunuz mu var?",
+			contactP: "Sorularınız, önerileriniz veya iş birlikleri için bizimle iletişime geçebilirsiniz.",
+			footer: "© 2026 Rubik Academy. Tüm hakları saklıdır."
+			},
+			en: {
+			navHome: "Home",
+			navContent: "Content",
+			badge: "Welcome to Speedcubing",
+			heroTitle1: "Learn the",
+			heroTitleGradient: "Rubik's Cube.",
+			heroTitle2: "Boost your speed.",
+			heroP: "Rubik Academy is a modern, structured learning platform for anyone who wants to learn how to solve the Rubik's Cube and improve their solve times.",
+			heroBtn: "Start Learning →",
+			featuredSpan: "Featured",
+			featuredH2: "Don't miss the new video.",
+			featuredMonth: "Aug",
+			featuredTag: "New Video · Sunday",
+			featuredTitle: "How to Solve the FTO? - Bencisco Method",
+			featuredDesc: "Learn to solve the FTO at an advanced level with the Bencisco method.",
+			featuredTime: "3:00 PM",
+			featuredMonth2: "Aug",
+			featuredTag2: "New Video · Sunday",
+			featuredTitle2: "How to Scramble the FTO?",
+			featuredDesc2: "Learn how to scramble the FTO cube properly and evenly.",
+			featuredTime2: "3:00 PM",
+			academySpan: "Rubik Academy",
+			academyH2: "Learn to solve the cube, step by step.",
+			academyP: "Content that takes you from the basics all the way to speedcubing level.",
+			card1Title: "3x3 Rubik's Cube",
+			card1P: "Learn the 3x3 Rubik's Cube step by step. Progress from basic moves to advanced techniques.",
+			card2Title: "Algorithms",
+			card2P: "Learn the algorithms you need for faster solves and put them into practice.",
+			card3Title: "Speedcubing",
+			card3P: "Improve your solve times, beat your own records, and advance in the world of speedcubing.",
+			learningSpan: "Learning Path",
+			learningH2: "Progress step by step.",
+			learningP: "Make the process of learning the Rubik's Cube simple and clear.",
+			l1num: "01 — GETTING STARTED",
+			l1title: "Meet the Cube",
+			l1p: "Learn the structure of the Rubik's Cube: its faces, center pieces, corner pieces, and edge pieces.",
+			l2num: "02 — BASICS",
+			l2title: "Solve It for the First Time",
+			l2p: "Learn the basic moves and solve the Rubik's Cube from start to finish.",
+			l3num: "03 — PROGRESS",
+			l3title: "Learn the Algorithms",
+			l3p: "Start practicing the algorithms you need to bring your solve time down.",
+			l4num: "04 — SPEEDCUBING",
+			l4title: "Boost Your Speed",
+			l4p: "Use different techniques, practice consistently, and work toward your personal best.",
+			socialSpan: "Social Media",
+			socialH2: "Follow Rubik Academy.",
+			socialP: "Don't miss new content and speedcubing updates.",
+			contactH2: "Got a question?",
+			contactP: "Feel free to reach out for questions, suggestions, or collaborations.",
+			footer: "© 2026 Rubik Academy. All rights reserved."
+			},
+			ru: {
+			navHome: "Главная",
+			navContent: "Контент",
+			badge: "Добро пожаловать в спидкубинг",
+			heroTitle1: "Изучи",
+			heroTitleGradient: "кубик Рубика.",
+			heroTitle2: "Развивай скорость.",
+			heroP: "Rubik Academy — современная и структурированная образовательная платформа для тех, кто хочет научиться собирать кубик Рубика и улучшить своё время сборки.",
+			heroBtn: "Начать обучение →",
+			featuredSpan: "Рекомендуем",
+			featuredH2: "Не пропусти новое видео.",
+			featuredMonth: "авг",
+			featuredTag: "Новое видео · Воскресенье",
+			featuredTitle: "Как собрать FTO? - Метод Bencisco",
+			featuredDesc: "Научись собирать FTO на продвинутом уровне методом Bencisco.",
+			featuredTime: "15:00",
+			featuredMonth2: "авг",
+			featuredTag2: "Новое видео · Воскресенье",
+			featuredTitle2: "Как скрамблить FTO?",
+			featuredDesc2: "Научись правильно скрамблить FTO.",
+			featuredTime2: "15:00",
+			academySpan: "Rubik Academy",
+			academyH2: "Изучай сборку кубика системно.",
+			academyP: "Контент, который проведёт тебя от основ до профессионального уровня.",
+			card1Title: "Кубик Рубика 3x3",
+			card1P: "Изучи кубик 3x3 шаг за шагом. Развивайся от базовых движений до продвинутого уровня.",
+			card2Title: "Алгоритмы",
+			card2P: "Изучи алгоритмы, необходимые для более быстрой сборки, и практикуйся.",
+			card3Title: "Спидкубинг",
+			card3P: "Улучшай время сборки, побеждай свои рекорды и развивайся в мире спидкубинга.",
+			learningSpan: "Обучение",
+			learningH2: "Двигайся шаг за шагом.",
+			learningP: "Не пропускай новый контент и новости спидкубинга.",
+			l1num: "01 — НАЧАЛО",
+			l1title: "Познакомься с кубиком",
+			l1p: "Изучи структуру кубика Рубика: грани, центральные, угловые и рёберные элементы.",
+			l2num: "02 — ОСНОВЫ",
+			l2title: "Собери его в первый раз",
+			l2p: "Изучи базовые движения и собери кубик Рубика от начала до конца.",
+			l3num: "03 — РАЗВИТИЕ",
+			l3title: "Изучи алгоритмы",
+			l3p: "Начни изучать алгоритмы, необходимые для сокращения времени сборки.",
+			l4num: "04 — СПИДКУБИНГ",
+			l4title: "Развивай скорость",
+			l4p: "Используй разные техники, практикуйся и стремись установить свой личный рекорд.",
+			socialSpan: "Социальные сети",
+			socialH2: "Подпишись на Rubik Academy.",
+			socialP: "Не пропускай новый контент и обновления по спидкубингу.",
+			contactH2: "Есть вопрос?",
+			contactP: "Свяжись с нами по любым вопросам, предложениям или сотрудничеству.",
+			footer: "© 2026 Rubik Academy. Все права защищены."
+			},
+			de: {
+			navHome: "Startseite",
+			navContent: "Inhalte",
+			badge: "Willkommen beim Speedcubing",
+			heroTitle1: "Lerne den",
+			heroTitleGradient: "Zauberwürfel.",
+			heroTitle2: "Verbessere deine Geschwindigkeit.",
+			heroP: "Rubik Academy ist eine moderne und strukturierte Lernplattform für alle, die lernen möchten, den Zauberwürfel zu lösen und ihre Lösungszeiten zu verbessern.",
+			heroBtn: "Jetzt lernen →",
+			featuredSpan: "Empfohlen",
+			featuredH2: "Verpasse nicht das neue Video.",
+			featuredMonth: "Aug",
+			featuredTag: "Neues Video · Sonntag",
+			featuredTitle: "Wie löst man den FTO? - Bencisco-Methode",
+			featuredDesc: "Lerne, den FTO auf fortgeschrittenem Niveau mit der Bencisco-Methode zu lösen.",
+			featuredTime: "15:00",
+			featuredMonth2: "Aug",
+			featuredTag2: "Neues Video · Sonntag",
+			featuredTitle2: "Wie scrambelt man den FTO?",
+			featuredDesc2: "Lerne, den FTO-Würfel richtig und gleichmäßig zu scramblen.",
+			featuredTime2: "15:00",
+			academySpan: "Rubik Academy",
+			academyH2: "Lerne systematisch, den Würfel zu lösen.",
+			academyP: "Inhalte, die dich von den Grundlagen bis zum professionellen Speedcubing-Niveau begleiten.",
+			card1Title: "3x3 Zauberwürfel",
+			card1P: "Lerne den 3x3 Zauberwürfel Schritt für Schritt. Entwickle dich von den Grundbewegungen bis zum fortgeschrittenen Niveau.",
+			card2Title: "Algorithmen",
+			card2P: "Lerne die Algorithmen, die du für schnellere Lösungen brauchst, und übe sie.",
+			card3Title: "Speedcubing",
+			card3P: "Verbessere deine Lösungszeiten, breche deine eigenen Rekorde und entwickle dich in der Welt des Speedcubings weiter.",
+			learningSpan: "Lernpfad",
+			learningH2: "Schritt für Schritt vorankommen.",
+			learningP: "Verpasse keine neuen Inhalte und Speedcubing-News.",
+			l1num: "01 — EINSTIEG",
+			l1title: "Lerne den Würfel kennen",
+			l1p: "Lerne den Aufbau des Zauberwürfels kennen: Seiten, Mittelsteine, Eckensteine und Kantensteine.",
+			l2num: "02 — GRUNDLAGEN",
+			l2title: "Löse ihn zum ersten Mal",
+			l2p: "Lerne die Grundbewegungen und löse den Zauberwürfel von Anfang bis Ende.",
+			l3num: "03 — FORTSCHRITT",
+			l3title: "Lerne die Algorithmen",
+			l3p: "Beginne mit dem Üben der Algorithmen, die du brauchst, um deine Lösungszeit zu verkürzen.",
+			l4num: "04 — SPEEDCUBING",
+			l4title: "Verbessere deine Geschwindigkeit",
+			l4p: "Nutze verschiedene Techniken, übe regelmäßig und arbeite an deiner persönlichen Bestzeit.",
+			socialSpan: "Soziale Medien",
+			socialH2: "Folge Rubik Academy.",
+			socialP: "Verpasse keine neuen Inhalte und Speedcubing-Beiträge.",
+			contactH2: "Hast du eine Frage?",
+			contactP: "Kontaktiere uns gerne bei Fragen, Vorschlägen oder für Kooperationen.",
+			footer: "© 2026 Rubik Academy. Alle Rechte vorbehalten."
+			},
+			ar: {
+			navHome: "الرئيسية",
+			navContent: "المحتوى",
+			badge: "مرحبًا بك في السبيدكيوبنج",
+			heroTitle1: "تعلّم",
+			heroTitleGradient: "مكعب روبيك.",
+			heroTitle2: "طوّر سرعتك.",
+			heroP: "روبيك أكاديمي هي منصة تعليمية حديثة ومنظمة لكل من يريد تعلّم حل مكعب روبيك وتحسين وقت الحل لديه.",
+			heroBtn: "ابدأ التعلم ←",
+			featuredSpan: "الأبرز",
+			featuredH2: "لا تفوّت الفيديو الجديد.",
+			featuredMonth: "أغسطس",
+			featuredTag: "فيديو جديد · الأحد",
+			featuredTitle: "كيف تحل مكعب FTO؟ - طريقة Bencisco",
+			featuredDesc: "تعلّم حل مكعب FTO بمستوى متقدم باستخدام طريقة Bencisco.",
+			featuredTime: "15:00",
+			featuredMonth2: "أغسطس",
+			featuredTag2: "فيديو جديد · الأحد",
+			featuredTitle2: "كيف تُخلط مكعب FTO؟",
+			featuredDesc2: "تعلّم كيفية خلط مكعب FTO بشكل صحيح ومتوازن.",
+			featuredTime2: "15:00",
+			academySpan: "روبيك أكاديمي",
+			academyH2: "تعلّم حل المكعب بطريقة منظمة.",
+			academyP: "محتوى يأخذك من الأساسيات إلى مستوى احترافي في السبيدكيوبنج.",
+			card1Title: "مكعب روبيك 3×3",
+			card1P: "تعلّم مكعب روبيك 3×3 خطوة بخطوة. طوّر نفسك من الحركات الأساسية إلى المستوى المتقدم.",
+			card2Title: "الخوارزميات",
+			card2P: "تعلّم الخوارزميات اللازمة لحل أسرع ومارسها.",
+			card3Title: "السبيدكيوبنج",
+			card3P: "حسّن وقت حلك، اكسر أرقامك القياسية، وتقدّم في عالم السبيدكيوبنج.",
+			learningSpan: "التعلّم",
+			learningH2: "تقدّم خطوة بخطوة.",
+			learningP: "لا تفوّت المحتوى الجديد وأخبار السبيدكيوبنج.",
+			l1num: "01 — البداية",
+			l1title: "تعرّف على المكعب",
+			l1p: "تعرّف على بنية مكعب روبيك: أوجهه، القطع المركزية، قطع الزوايا وقطع الحواف.",
+			l2num: "02 — الأساسيات",
+			l2title: "احلّه لأول مرة",
+			l2p: "تعلّم الحركات الأساسية وحلّ مكعب روبيك من البداية إلى النهاية.",
+			l3num: "03 — التطور",
+			l3title: "تعلّم الخوارزميات",
+			l3p: "ابدأ بممارسة الخوارزميات اللازمة لتقليل وقت حلّك.",
+			l4num: "04 — السبيدكيوبنج",
+			l4title: "طوّر سرعتك",
+			l4p: "استخدم تقنيات مختلفة، مارس باستمرار، واسعَ لتحقيق أفضل وقت لك.",
+			socialSpan: "وسائل التواصل",
+			socialH2: "تابع روبيك أكاديمي.",
+			socialP: "لا تفوّت المحتوى الجديد ومنشورات السبيدكيوبنج.",
+			contactH2: "هل لديك سؤال؟",
+			contactP: "لا تتردد في التواصل معنا للأسئلة أو الاقتراحات أو التعاون.",
+			footer: "© 2026 روبيك أكاديمي. جميع الحقوق محفوظة."
+			}
+			};
+
+			var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
+			function applyLanguage(lang) {
+			if (!translations[lang]) lang = "tr";
+
+			var dict = translations[lang];
+
+			document.querySelectorAll("[data-i18n]").forEach(function(el) {
+			var key = el.getAttribute("data-i18n");
+			if (dict[key]) {
+			el.textContent = dict[key];
+			}
+			});
+
+			document.documentElement.setAttribute("lang", lang);
+
+			document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+
+			var label = document.getElementById("langLabel");
+			if (label) {
+			label.textContent = langCodes[lang] || "TR";
+			}
+
+			document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+			item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+			});
+
+			localStorage.setItem("site-lang", lang);
+			}
+
+			function toggleLangMenu(e) {
+			if (e) e.stopPropagation();
+			var menu = document.getElementById("langMenu");
+			var btn = document.getElementById("langSwitchBtn");
+			if (!menu) return;
+			var willOpen = !menu.classList.contains("open");
+			menu.classList.toggle("open", willOpen);
+			if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+			}
+
+			function closeLangMenu() {
+			var menu = document.getElementById("langMenu");
+			var btn = document.getElementById("langSwitchBtn");
+			if (menu) menu.classList.remove("open");
+			if (btn) btn.setAttribute("aria-expanded", "false");
+			}
+
+			function selectLanguage(lang) {
+			applyLanguage(lang);
+			closeLangMenu();
+			}
+
+			document.addEventListener("click", function(e) {
+			var switcher = document.getElementById("langSwitcher");
+			if (switcher && !switcher.contains(e.target)) {
+			closeLangMenu();
+			}
+			});
+
+			document.addEventListener("keydown", function(e) {
+			if (e.key === "Escape") closeLangMenu();
+			});
+
+			document.addEventListener("DOMContentLoaded", function() {
+			var savedLang = localStorage.getItem("site-lang") || "tr";
+			applyLanguage(savedLang);
+			});
+
+			/* =========================================
+			SCROLL ANIMATION
+			========================================= */
+
+			const observer =
+			new IntersectionObserver(
+
+			(entries) => {
+
+			entries.forEach(
+			(entry) => {
+
+			if (
+			entry.isIntersecting
+			) {
+
+			entry.target
+			.classList
+			.add("active");
+
+			}
+
+			}
+			);
+
+			},
+
+			{
+			threshold: 0.15
+			}
+
+			);
 
 
-</body>
+			document
+			.querySelectorAll(".reveal")
+			.forEach(
+			(element) => {
+
+			observer.observe(element);
+
+			}
+			);
+
+		</script>
+
+
+	</body>
 </html>
