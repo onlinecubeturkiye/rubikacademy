@@ -7,6 +7,9 @@
   (function() {
     var savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
   })();
 </script>
 <title>Rubik Academy - One Hand (Tek El) Eğitimi</title>
@@ -72,6 +75,10 @@ body.dark-mode {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+html {
+    overflow-x: hidden;
 }
 
 body {
