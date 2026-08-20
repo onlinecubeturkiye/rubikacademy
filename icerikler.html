@@ -5,14 +5,15 @@
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 				<!-- TEMA VE SEO AYARLARI -->
-				<script>
-					(function() {
-					var savedTheme = localStorage.getItem("theme");
-					if (savedTheme === "dark") {
-					document.documentElement.classList.add("dark-mode");
-					}
-					})();
-				</script>
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
 
 				<title>Rubik Academy - İçerikler</title>
 				<!-- TARAYICI SEKMESİ İÇİN LOGO -->
@@ -119,12 +120,15 @@
 																	0% { transform: translate(0px, 0px) scale(1); }
 																	100% { transform: translate(150px, 200px) scale(1.25); }
 																	}
-
-																	*{
-																	box-sizing:border-box;
-																	margin:0;
-																	padding:0;
+																	html {
+																    overflow-x: hidden;
 																	}
+
+																	* {
+																    box-sizing: border-box;
+																    margin: 0;
+																    padding: 0;
+																    }
 
 																	html{
 																	scroll-behavior:smooth;
