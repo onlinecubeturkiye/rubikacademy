@@ -8,9 +8,10 @@
 <script>
   (function() {
     var savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark-mode");
-    }
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", "ltr");
   })();
 </script>
 
@@ -32,6 +33,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
+html {
+    overflow-x: hidden;
+}
+
 /* =========================================
    RENKLER VE DEĞİŞKENLER
 ========================================= */
@@ -220,7 +225,11 @@ body.dark-mode .navbar {
     transform: scale(1.08);
 }
 
-/* DİL SEÇİCİ BUTONU */
+/* DİL SEÇİCİ */
+.lang-switcher {
+    position: relative;
+}
+
 .lang-switch-btn {
     border: none;
     background: var(--surface-soft);
@@ -247,6 +256,70 @@ body.dark-mode .navbar {
 .lang-switch-btn .lang-globe {
     font-size: 15px;
     line-height: 1;
+}
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
+}
+
+.lang-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-menu-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.lang-menu-item.active .lang-check {
+    opacity: 1;
 }
 
 @media(max-width: 500px) {
@@ -587,42 +660,59 @@ body.dark-mode .navbar {
 <header class="navbar">
     <a href="http://rubikacademy.fun" class="nav-logo">
         <div class="nav-logo-mark">
-            <div></div>
-            <div></div>
-            <div></div>
-
-            <div></div>
-            <div></div>
-            <div></div>
-
-            <div></div>
-            <div></div>
-            <div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
         </div>
-
-        <span class="nav-logo-text">
-            Rubik Academy
-        </span>
+        <span class="nav-logo-text">Rubik Academy</span>
     </a>
 
     <div class="nav-right">
 
         <nav class="nav-links">
-            <a href="http://rubikacademy.fun" data-i18n="navHome">
-                Ana Sayfa
-            </a>
-            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">
-                İçerikler
-            </a>
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
         </nav>
 
-        <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLanguage()" aria-label="Dili değiştir / Switch language">
-            <span class="lang-globe">🌐</span><span id="langLabel">EN</span>
-        </button>
+        <div class="lang-switcher" id="langSwitcher">
 
-        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-            🌙
-        </button>
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Sprache wechseln / Сменить язык / تغيير اللغة">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+                    <span>Deutsch</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+                    <span>العربية</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+            </div>
+
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
 
     </div>
 </header>
@@ -765,60 +855,132 @@ PYRAMINX
 
 <script>
 /* =========================================================
-   DİL SEÇİCİ (TR / EN)
+   DİL SEÇİCİ (TR / EN / RU / DE / AR)
 ========================================================= */
 
 var translations = {
-    tr: {
-        navHome: "Ana Sayfa",
-        navContent: "İçerikler",
-        back_btn: "← Geri Dön",
-        hero_title1: "Pyraminx",
-        hero_titleAccent: "Eğitimleri",
-        hero_p: "Üçgen yapılı Pyraminx bulmacasını çözmeyi sıfırdan öğren; tepe köşelerini hizalamaktan kenar eşleştirmeye, ileri seviye algoritmalara kadar kendini geliştir.",
-        section_small: "ÖĞRENME YOLCULUĞU",
-        section_h2: "Pyraminx Methodları",
-        section_p: "Seviyeni seç ve küp çözme yolculuğuna başla.",
-        level_beginner: "BAŞLANGIÇ SEVİYESİ",
-        beginner_title: "Başlangıç Methodu",
-        beginner_p: "Pyraminx'i ilk kez çözecekler için hazırlanmış, tepe köşelerini ve kenarları adım adım tamamlayan başlangıç eğitimi.",
-        level_middle: "ORTA SEVİYESİ",
-        middle_title: "Orta Seviye Methodu",
-        middle_p: "Temel yöntemi bilenler için kenar eşleştirme, hızlı köşe çözümü ve gelişmiş algoritmalar üzerine hazırlanan eğitim.",
-        level_advanced: "İLERİ SEVİYE",
-        advanced_title: "İleri Seviye Methodu",
-        advanced_p: "Daha hızlı süreler hedefleyenler için gelişmiş algoritmalar ve speedcubing teknikleri.",
-        cta_start: "Eğitime Başla",
-        bottom_title: "🧩 Seviyeni seç, küpünü hızlandır!",
-        bottom_p: "Rubik Academy ile Pyraminx çözüm becerilerini adım adım geliştir."
+    "tr": {
+        "navHome": "Ana Sayfa",
+        "navContent": "İçerikler",
+        "back_btn": "← Geri Dön",
+        "hero_title1": "Pyraminx",
+        "hero_titleAccent": "Eğitimleri",
+        "hero_p": "Üçgen yapılı Pyraminx bulmacasını çözmeyi sıfırdan öğren; tepe köşelerini hizalamaktan kenar eşleştirmeye, ileri seviye algoritmalara kadar kendini geliştir.",
+        "section_small": "ÖĞRENME YOLCULUĞU",
+        "section_h2": "Pyraminx Methodları",
+        "section_p": "Seviyeni seç ve küp çözme yolculuğuna başla.",
+        "level_beginner": "BAŞLANGIÇ SEVİYESİ",
+        "beginner_title": "Başlangıç Methodu",
+        "beginner_p": "Pyraminx'i ilk kez çözecekler için hazırlanmış, tepe köşelerini ve kenarları adım adım tamamlayan başlangıç eğitimi.",
+        "level_middle": "ORTA SEVİYESİ",
+        "middle_title": "Orta Seviye Methodu",
+        "middle_p": "Temel yöntemi bilenler için kenar eşleştirme, hızlı köşe çözümü ve gelişmiş algoritmalar üzerine hazırlanan eğitim.",
+        "level_advanced": "İLERİ SEVİYE",
+        "advanced_title": "İleri Seviye Methodu",
+        "advanced_p": "Daha hızlı süreler hedefleyenler için gelişmiş algoritmalar ve speedcubing teknikleri.",
+        "cta_start": "Eğitime Başla",
+        "bottom_title": "🧩 Seviyeni seç, küpünü hızlandır!",
+        "bottom_p": "Rubik Academy ile Pyraminx çözüm becerilerini adım adım geliştir."
     },
-    en: {
-        navHome: "Home",
-        navContent: "Content",
-        back_btn: "← Go Back",
-        hero_title1: "Pyraminx",
-        hero_titleAccent: "Tutorials",
-        hero_p: "Learn to solve the triangular Pyraminx puzzle from scratch; develop yourself from aligning tip corners to edge matching and advanced algorithms.",
-        section_small: "LEARNING JOURNEY",
-        section_h2: "Pyraminx Methods",
-        section_p: "Pick your level and start your cube solving journey.",
-        level_beginner: "BEGINNER LEVEL",
-        beginner_title: "Beginner Method",
-        beginner_p: "A step-by-step beginner tutorial for those solving the Pyraminx for the first time, completing tip corners and edges.",
-        level_middle: "INTERMEDIATE LEVEL",
-        middle_title: "Intermediate Method",
-        middle_p: "A tutorial on edge matching, fast corner solving and advanced algorithms for those who already know the basic method.",
-        level_advanced: "ADVANCED LEVEL",
-        advanced_title: "Advanced Method",
-        advanced_p: "Advanced algorithms and speedcubing techniques for those aiming for faster solve times.",
-        cta_start: "Start Learning",
-        bottom_title: "🧩 Pick your level, speed up your cube!",
-        bottom_p: "Develop your Pyraminx solving skills step by step with Rubik Academy."
+    "en": {
+        "navHome": "Home",
+        "navContent": "Content",
+        "back_btn": "← Go Back",
+        "hero_title1": "Pyraminx",
+        "hero_titleAccent": "Tutorials",
+        "hero_p": "Learn to solve the triangular Pyraminx puzzle from scratch; develop yourself from aligning tip corners to edge matching and advanced algorithms.",
+        "section_small": "LEARNING JOURNEY",
+        "section_h2": "Pyraminx Methods",
+        "section_p": "Pick your level and start your cube solving journey.",
+        "level_beginner": "BEGINNER LEVEL",
+        "beginner_title": "Beginner Method",
+        "beginner_p": "A step-by-step beginner tutorial for those solving the Pyraminx for the first time, completing tip corners and edges.",
+        "level_middle": "INTERMEDIATE LEVEL",
+        "middle_title": "Intermediate Method",
+        "middle_p": "A tutorial on edge matching, fast corner solving and advanced algorithms for those who already know the basic method.",
+        "level_advanced": "ADVANCED LEVEL",
+        "advanced_title": "Advanced Method",
+        "advanced_p": "Advanced algorithms and speedcubing techniques for those aiming for faster solve times.",
+        "cta_start": "Start Learning",
+        "bottom_title": "🧩 Pick your level, speed up your cube!",
+        "bottom_p": "Develop your Pyraminx solving skills step by step with Rubik Academy."
+    },
+    "ru": {
+        "navHome": "Главная",
+        "navContent": "Контент",
+        "back_btn": "← Назад",
+        "hero_title1": "Pyraminx",
+        "hero_titleAccent": "Обучение",
+        "hero_p": "Изучи, как решать треугольную головоломку Pyraminx с нуля; развивайся от выравнивания верхних углов и сборки рёбер до продвинутых алгоритмов.",
+        "section_small": "ОБУЧАЮЩИЙ ПУТЬ",
+        "section_h2": "Методы Pyraminx",
+        "section_p": "Выбери свой уровень и начни путь сборки головоломки.",
+        "level_beginner": "НАЧАЛЬНЫЙ УРОВЕНЬ",
+        "beginner_title": "Метод для начинающих",
+        "beginner_p": "Пошаговое обучение для новичков, впервые собирающих Pyraminx, с последовательным завершением верхних углов и рёбер.",
+        "level_middle": "СРЕДНИЙ УРОВЕНЬ",
+        "middle_title": "Метод среднего уровня",
+        "middle_p": "Обучение сборке рёбер, быстрому решению углов и продвинутым алгоритмам для тех, кто уже знает базовый метод.",
+        "level_advanced": "ПРОДВИНУТЫЙ УРОВЕНЬ",
+        "advanced_title": "Продвинутый метод",
+        "advanced_p": "Продвинутые алгоритмы и техники спидкубинга для тех, кто стремится к более быстрому времени сборки.",
+        "cta_start": "Начать обучение",
+        "bottom_title": "🧩 Выбери уровень, ускорь свой кубик!",
+        "bottom_p": "Развивай навыки сборки Pyraminx шаг за шагом вместе с Rubik Academy."
+    },
+    "de": {
+        "navHome": "Startseite",
+        "navContent": "Inhalte",
+        "back_btn": "← Zurück",
+        "hero_title1": "Pyraminx",
+        "hero_titleAccent": "Anleitungen",
+        "hero_p": "Lerne von Grund auf, das dreieckige Pyraminx-Puzzle zu lösen; entwickle dich vom Ausrichten der oberen Ecken über das Zuordnen der Kanten bis zu fortgeschrittenen Algorithmen.",
+        "section_small": "LERNREISE",
+        "section_h2": "Pyraminx-Methoden",
+        "section_p": "Wähle dein Niveau und starte deine Würfel-Lösungsreise.",
+        "level_beginner": "EINSTEIGERSTUFE",
+        "beginner_title": "Einsteigermethode",
+        "beginner_p": "Eine Schritt-für-Schritt-Anleitung für alle, die den Pyraminx zum ersten Mal lösen, mit Vervollständigung der oberen Ecken und Kanten.",
+        "level_middle": "MITTELSTUFE",
+        "middle_title": "Methode für Fortgeschrittene",
+        "middle_p": "Eine Anleitung zum Zuordnen der Kanten, schnellen Lösen der Ecken und fortgeschrittenen Algorithmen für alle, die die Grundmethode bereits kennen.",
+        "level_advanced": "FORTGESCHRITTENENSTUFE",
+        "advanced_title": "Fortgeschrittene Methode",
+        "advanced_p": "Fortgeschrittene Algorithmen und Speedcubing-Techniken für alle, die schnellere Lösungszeiten anstreben.",
+        "cta_start": "Jetzt lernen",
+        "bottom_title": "🧩 Wähle dein Niveau, beschleunige deinen Würfel!",
+        "bottom_p": "Entwickle deine Pyraminx-Lösungsfähigkeiten Schritt für Schritt mit Rubik Academy."
+    },
+    "ar": {
+        "navHome": "الرئيسية",
+        "navContent": "المحتوى",
+        "back_btn": "← رجوع",
+        "hero_title1": "Pyraminx",
+        "hero_titleAccent": "دروس",
+        "hero_p": "تعلّم حل أحجية Pyraminx المثلثية من الصفر؛ طوّر نفسك من محاذاة الزوايا العلوية إلى مطابقة الأضلاع وصولاً إلى الخوارزميات المتقدمة.",
+        "section_small": "رحلة التعلم",
+        "section_h2": "طرق حل Pyraminx",
+        "section_p": "اختر مستواك وابدأ رحلة حل المكعب.",
+        "level_beginner": "مستوى مبتدئ",
+        "beginner_title": "طريقة المبتدئين",
+        "beginner_p": "درس تدريجي للمبتدئين لمن يحلّون Pyraminx لأول مرة، يكمل الزوايا العلوية والأضلاع خطوة بخطوة.",
+        "level_middle": "مستوى متوسط",
+        "middle_title": "طريقة المستوى المتوسط",
+        "middle_p": "درس حول مطابقة الأضلاع وحل الزوايا بسرعة وخوارزميات متقدمة لمن يعرفون الطريقة الأساسية بالفعل.",
+        "level_advanced": "مستوى متقدم",
+        "advanced_title": "الطريقة المتقدمة",
+        "advanced_p": "خوارزميات متقدمة وتقنيات السبيدكيوبنج لمن يسعون لأوقات حل أسرع.",
+        "cta_start": "ابدأ التعلم",
+        "bottom_title": "🧩 اختر مستواك، سرّع مكعبك!",
+        "bottom_p": "طوّر مهاراتك في حل Pyraminx خطوة بخطوة مع Rubik Academy."
     }
 };
 
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
 function applyLanguage(lang) {
-    var dict = translations[lang] || translations.tr;
+    if (!translations[lang]) lang = "tr";
+    var dict = translations[lang];
 
     document.querySelectorAll("[data-i18n]").forEach(function(el) {
         var key = el.getAttribute("data-i18n");
@@ -827,25 +989,53 @@ function applyLanguage(lang) {
         }
     });
 
-    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "tr");
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", "ltr");
 
     var label = document.getElementById("langLabel");
     if (label) {
-        label.textContent = lang === "tr" ? "EN" : "TR";
+        label.textContent = langCodes[lang] || "TR";
     }
 
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
     var btn = document.getElementById("langSwitchBtn");
-    if (btn) {
-        btn.setAttribute("aria-label", lang === "tr" ? "Switch to English" : "Türkçeye geç");
-    }
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
 }
 
-function toggleLanguage() {
-    var current = localStorage.getItem("site-lang") || "tr";
-    var next = current === "tr" ? "en" : "tr";
-    localStorage.setItem("site-lang", next);
-    applyLanguage(next);
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
 }
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) {
+        closeLangMenu();
+    }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
 
 document.addEventListener("DOMContentLoaded", function() {
     var savedLang = localStorage.getItem("site-lang") || "tr";
@@ -859,7 +1049,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function toggleDarkMode() {
     var isDark = document.documentElement.classList.toggle("dark-mode");
     document.body.classList.toggle("dark-mode", isDark);
-    
+
     var btn = document.getElementById("darkModeBtn");
 
     if (isDark) {
@@ -871,11 +1061,10 @@ function toggleDarkMode() {
     }
 }
 
-// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
 document.addEventListener("DOMContentLoaded", function() {
     var savedTheme = localStorage.getItem("theme");
     var btn = document.getElementById("darkModeBtn");
-    
+
     if (savedTheme === "dark") {
         document.documentElement.classList.add("dark-mode");
         document.body.classList.add("dark-mode");
