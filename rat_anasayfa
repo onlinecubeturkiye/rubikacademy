@@ -95,15 +95,21 @@ a { text-decoration: none; color: inherit; }
   border-bottom: 1px solid var(--border);
   transition: background-color 0.3s, border-color 0.3s;
 }
-.nav-left { display: flex; align-items: center; gap: 14px; }
+.nav-left { display: flex; align-items: center; gap: 16px; }
 .back-btn {
-  display: flex; align-items: center; justify-content: center;
-  width: 38px; height: 38px; border-radius: 50%;
-  background: var(--surface-soft); color: var(--text-soft);
+  display: flex; align-items: center; gap: 7px;
+  height: 38px; padding: 0 16px 0 12px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff; font-size: 13px; font-weight: 700;
   flex-shrink: 0; transition: .25s;
+  box-shadow: 0 8px 18px rgba(230,37,47,.28);
 }
-.back-btn svg { width: 18px; height: 18px; }
-.back-btn:hover { background: var(--primary-light); color: var(--primary); transform: translateX(-3px); }
+.back-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+.back-btn:hover { transform: translateX(-3px); box-shadow: 0 10px 22px rgba(230,37,47,.36); }
+@media(max-width:500px) {
+  .back-btn span { display: none; }
+  .back-btn { padding: 0; width: 38px; justify-content: center; }
+}
 .nav-logo { display: flex; align-items: center; gap: 12px; }
 .nav-logo-mark {
   width: 38px; height: 38px;
@@ -389,6 +395,7 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
 
     <a href="https://rubikacademy.fun/" class="back-btn" aria-label="Ana sayfaya dön">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span data-i18n="backBtn">Geri Dön</span>
     </a>
 
     <a href="https://rubikacademy.fun/" class="nav-logo">
@@ -410,8 +417,7 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
   <div class="nav-right">
 
     <nav class="nav-links">
-      <a href="https://rubikacademy.fun/" data-i18n="navHome">Ana Sayfa</a>
-      <a href="#etkinlikler" class="active" data-i18n="navEvents">Etkinlikler</a>
+      <a href="#" class="active" data-i18n="navHome">Ana Sayfa</a>
     </nav>
 
     <div class="lang-switcher" id="langSwitcher">
@@ -661,7 +667,7 @@ document.addEventListener("DOMContentLoaded", function() {
 /* DİL SEÇİCİ */
 var translations = {
   tr: {
-    navHome: "Ana Sayfa", navEvents: "Etkinlikler",
+    navHome: "Ana Sayfa", backBtn: "Geri Dön",
     badge: "Türkiye Speedcubing Topluluğu",
     heroTitle1: "Türkiye'nin", heroTitleGradient: "Rubik topluluğu.", heroTitle2: "Buluş, yarış, gelişin.",
     heroP: "RAT (Rubik Academy Türkiye), Türkiye genelindeki Rubik küp tutkunlarını bir araya getiren bir topluluktur. Şehir buluşmalarında mini yarışmalar, evden katılabileceğin online yarışmalar düzenliyoruz.",
@@ -682,7 +688,7 @@ var translations = {
     footer: "© 2026 RAT — Rubik Academy Türkiye. Tüm hakları saklıdır."
   },
   en: {
-    navHome: "Home", navEvents: "Events",
+    navHome: "Home", backBtn: "Back",
     badge: "Turkey's Speedcubing Community",
     heroTitle1: "Turkey's", heroTitleGradient: "Rubik's Cube community.", heroTitle2: "Meet up, compete, grow.",
     heroP: "RAT (Rubik Academy Turkey) brings together Rubik's Cube enthusiasts from across Turkey. We run mini-competitions at our city meetups, plus online competitions anyone can join from home.",
@@ -703,7 +709,7 @@ var translations = {
     footer: "© 2026 RAT — Rubik Academy Turkey. All rights reserved."
   },
   ru: {
-    navHome: "Главная", navEvents: "Мероприятия",
+    navHome: "Главная", backBtn: "Назад",
     badge: "Сообщество спидкубинга Турции",
     heroTitle1: "Турецкое", heroTitleGradient: "сообщество кубика Рубика.", heroTitle2: "Встречайся, соревнуйся, расти.",
     heroP: "RAT (Rubik Academy Türkiye) объединяет любителей кубика Рубика со всей Турции. Мы проводим мини-турниры на городских встречах и онлайн-соревнования, в которых может участвовать каждый из дома.",
@@ -724,7 +730,7 @@ var translations = {
     footer: "© 2026 RAT — Rubik Academy Türkiye. Все права защищены."
   },
   de: {
-    navHome: "Startseite", navEvents: "Veranstaltungen",
+    navHome: "Startseite", backBtn: "Zurück",
     badge: "Speedcubing-Community der Türkei",
     heroTitle1: "Die Rubik's-Cube-", heroTitleGradient: "Community der Türkei.", heroTitle2: "Triff dich, tritt an, wachse.",
     heroP: "RAT (Rubik Academy Türkiye) bringt Rubik's-Cube-Fans aus der ganzen Türkei zusammen. Wir veranstalten Mini-Wettbewerbe bei unseren Stadttreffen sowie Online-Wettbewerbe, an denen jeder von zu Hause teilnehmen kann.",
@@ -745,7 +751,7 @@ var translations = {
     footer: "© 2026 RAT — Rubik Academy Türkiye. Alle Rechte vorbehalten."
   },
   ar: {
-    navHome: "الرئيسية", navEvents: "الفعاليات",
+    navHome: "الرئيسية", backBtn: "رجوع",
     badge: "مجتمع السبيدكيوبنج في تركيا",
     heroTitle1: "مجتمع مكعب روبيك", heroTitleGradient: "في تركيا.", heroTitle2: "التقِ، تنافس، تطوّر.",
     heroP: "RAT (روبيك أكاديمي تركيا) يجمع عشّاق مكعب روبيك من جميع أنحاء تركيا. ننظّم مسابقات صغيرة في لقاءات المدن ومسابقات عبر الإنترنت يمكن للجميع المشاركة فيها من المنزل.",
