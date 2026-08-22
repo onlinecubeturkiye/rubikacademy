@@ -838,6 +838,139 @@
 
 
 																	/* =========================================
+																	RAT TANITIM BANDI
+																	========================================= */
+
+																	.rat-promo {
+																	padding: 0 7% 70px;
+																	background: transparent;
+																	}
+
+																	.rat-promo-card {
+																	display: flex;
+																	align-items: center;
+																	gap: 26px;
+																	max-width: 1200px;
+																	margin: 0 auto;
+																	padding: 26px 32px;
+																	border-radius: 22px;
+																	position: relative;
+																	overflow: hidden;
+																	background: linear-gradient(120deg, #e6252f, #b91c1c 65%);
+																	box-shadow: 0 20px 45px rgba(230,37,47,.28);
+																	transition: .3s;
+																	}
+
+																	.rat-promo-card::before {
+																	content: "";
+																	position: absolute;
+																	top: -60%;
+																	right: -10%;
+																	width: 320px;
+																	height: 320px;
+																	border-radius: 50%;
+																	background: rgba(255,255,255,.10);
+																	}
+
+																	.rat-promo-card:hover {
+																	transform: translateY(-4px);
+																	box-shadow: 0 26px 55px rgba(230,37,47,.34);
+																	}
+
+																	.rat-promo-badge {
+																	position: absolute;
+																	top: 16px;
+																	left: 20px;
+																	padding: 5px 12px;
+																	border-radius: 20px;
+																	background: rgba(255,255,255,.18);
+																	color: #fff;
+																	font-size: 10px;
+																	font-weight: 900;
+																	letter-spacing: .8px;
+																	text-transform: uppercase;
+																	}
+
+																	.rat-promo-body {
+																	display: flex;
+																	align-items: center;
+																	gap: 20px;
+																	flex: 1;
+																	min-width: 0;
+																	position: relative;
+																	z-index: 1;
+																	}
+
+																	.rat-promo-mark {
+																	width: 56px;
+																	height: 56px;
+																	flex-shrink: 0;
+																	border-radius: 16px;
+																	background: rgba(255,255,255,.14);
+																	display: flex;
+																	align-items: center;
+																	justify-content: center;
+																	}
+
+																	.rat-promo-mark svg {
+																	width: 36px;
+																	height: 36px;
+																	}
+
+																	.rat-promo-text h3 {
+																	color: #fff;
+																	font-size: 19px;
+																	font-weight: 800;
+																	margin-bottom: 4px;
+																	letter-spacing: -.3px;
+																	}
+
+																	.rat-promo-text p {
+																	color: rgba(255,255,255,.88);
+																	font-size: 14px;
+																	line-height: 1.6;
+																	max-width: 560px;
+																	}
+
+																	.rat-promo-cta {
+																	display: flex;
+																	align-items: center;
+																	gap: 8px;
+																	flex-shrink: 0;
+																	padding: 12px 20px;
+																	border-radius: 12px;
+																	background: #fff;
+																	color: #b91c1c;
+																	font-size: 14px;
+																	font-weight: 800;
+																	position: relative;
+																	z-index: 1;
+																	transition: .25s;
+																	}
+
+																	.rat-promo-cta svg {
+																	width: 16px;
+																	height: 16px;
+																	transition: .25s;
+																	}
+
+																	.rat-promo-card:hover .rat-promo-cta svg {
+																	transform: translateX(3px);
+																	}
+
+																	@media(max-width:700px) {
+																	.rat-promo-card {
+																	flex-direction: column;
+																	align-items: flex-start;
+																	padding-top: 44px;
+																	}
+																	.rat-promo-cta {
+																	align-self: stretch;
+																	justify-content: center;
+																	}
+																	}
+
+																	/* =========================================
 																	ÖNE ÇIKANLAR
 																	========================================= */
 
@@ -1758,6 +1891,11 @@
 																	opacity: 0.25;
 																	}
 
+																	html.dark-mode .rat-promo-card,
+																	body.dark-mode .rat-promo-card {
+																	box-shadow: 0 20px 45px rgba(0,0,0,.45);
+																	}
+
 																</style>
 
 																<!-- Schema Kodu -->
@@ -1971,6 +2109,51 @@
 
 				</div>
 
+
+			</div>
+
+		</section>
+
+
+
+		<!-- =========================================
+     RAT TANITIM BANDI
+========================================= -->
+
+		<section class="rat-promo">
+
+			<div class="section-container">
+
+				<a href="/rat" class="rat-promo-card reveal">
+
+					<div class="rat-promo-badge" data-i18n="ratPromoBadge">Yeni · RAT</div>
+
+					<div class="rat-promo-body">
+
+						<div class="rat-promo-mark">
+							<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<circle cx="11" cy="11" r="7" fill="white"/>
+								<circle cx="29" cy="11" r="7" fill="white"/>
+								<ellipse cx="20" cy="23" rx="14.5" ry="12.5" fill="white"/>
+								<circle cx="14.5" cy="22" r="2" fill="#172033"/>
+								<circle cx="25.5" cy="22" r="2" fill="#172033"/>
+								<circle cx="20" cy="28" r="2" fill="#e6252f"/>
+							</svg>
+						</div>
+
+						<div class="rat-promo-text">
+							<h3 data-i18n="ratPromoTitle">RAT — Rubik Academy Türkiye</h3>
+							<p data-i18n="ratPromoP">Şehir buluşmalarında mini yarışmalar, evden katılabileceğin online yarışmalar. Türkiye'nin Rubik topluluğuna katıl.</p>
+						</div>
+
+					</div>
+
+					<div class="rat-promo-cta" data-i18n="ratPromoCta">
+						Keşfet
+						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</div>
+
+				</a>
 
 			</div>
 
@@ -2501,6 +2684,10 @@
 			heroTitle2: "Hızını geliştir.",
 			heroP: "Rubik Academy, Rubik küp çözmeyi öğrenmek ve çözüm sürelerini geliştirmek isteyenler için hazırlanmış modern ve sistemli bir eğitim platformudur.",
 			heroBtn: "Öğrenmeye Başla →",
+			ratPromoBadge: "Yeni · RAT",
+			ratPromoTitle: "RAT — Rubik Academy Türkiye",
+			ratPromoP: "Şehir buluşmalarında mini yarışmalar, evden katılabileceğin online yarışmalar. Türkiye'nin Rubik topluluğuna katıl.",
+			ratPromoCta: "Keşfet",
 			featuredSpan: "Öne Çıkanlar",
 			featuredH2: "Yeni videoyu kaçırma.",
 			featuredMonth: "Ağu",
@@ -2553,6 +2740,10 @@
 			heroTitle2: "Boost your speed.",
 			heroP: "Rubik Academy is a modern, structured learning platform for anyone who wants to learn how to solve the Rubik's Cube and improve their solve times.",
 			heroBtn: "Start Learning →",
+			ratPromoBadge: "New · RAT",
+			ratPromoTitle: "RAT — Rubik Academy Turkey",
+			ratPromoP: "Mini-competitions at city meetups, plus online competitions you can join from home. Join Turkey's Rubik's Cube community.",
+			ratPromoCta: "Explore",
 			featuredSpan: "Featured",
 			featuredH2: "Don't miss the new video.",
 			featuredMonth: "Aug",
@@ -2605,6 +2796,10 @@
 			heroTitle2: "Развивай скорость.",
 			heroP: "Rubik Academy — современная и структурированная образовательная платформа для тех, кто хочет научиться собирать кубик Рубика и улучшить своё время сборки.",
 			heroBtn: "Начать обучение →",
+			ratPromoBadge: "Новое · RAT",
+			ratPromoTitle: "RAT — Rubik Academy Турция",
+			ratPromoP: "Мини-турниры на городских встречах и онлайн-соревнования из дома. Присоединяйся к сообществу кубика Рубика в Турции.",
+			ratPromoCta: "Смотреть",
 			featuredSpan: "Рекомендуем",
 			featuredH2: "Не пропусти новое видео.",
 			featuredMonth: "авг",
@@ -2657,6 +2852,10 @@
 			heroTitle2: "Verbessere deine Geschwindigkeit.",
 			heroP: "Rubik Academy ist eine moderne und strukturierte Lernplattform für alle, die lernen möchten, den Zauberwürfel zu lösen und ihre Lösungszeiten zu verbessern.",
 			heroBtn: "Jetzt lernen →",
+			ratPromoBadge: "Neu · RAT",
+			ratPromoTitle: "RAT — Rubik Academy Türkei",
+			ratPromoP: "Mini-Wettbewerbe bei Stadttreffen und Online-Wettbewerbe von zu Hause. Werde Teil der türkischen Zauberwürfel-Community.",
+			ratPromoCta: "Entdecken",
 			featuredSpan: "Empfohlen",
 			featuredH2: "Verpasse nicht das neue Video.",
 			featuredMonth: "Aug",
@@ -2709,6 +2908,10 @@
 			heroTitle2: "طوّر سرعتك.",
 			heroP: "روبيك أكاديمي هي منصة تعليمية حديثة ومنظمة لكل من يريد تعلّم حل مكعب روبيك وتحسين وقت الحل لديه.",
 			heroBtn: "ابدأ التعلم ←",
+			ratPromoBadge: "جديد · RAT",
+			ratPromoTitle: "RAT — روبيك أكاديمي تركيا",
+			ratPromoP: "مسابقات صغيرة في لقاءات المدن، ومسابقات عبر الإنترنت من المنزل. انضم إلى مجتمع مكعب روبيك في تركيا.",
+			ratPromoCta: "اكتشف",
 			featuredSpan: "الأبرز",
 			featuredH2: "لا تفوّت الفيديو الجديد.",
 			featuredMonth: "أغسطس",
