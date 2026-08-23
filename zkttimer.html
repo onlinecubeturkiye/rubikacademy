@@ -128,22 +128,43 @@ a { text-decoration: none; color: inherit; }
 .nav-logo-mark {
     width: 38px;
     height: 38px;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    grid-template-rows: repeat(3,1fr);
+    gap: 2px;
+    padding: 4px;
     border-radius: 10px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: #1e293b;
     box-shadow: 0 8px 18px rgba(15,23,42,.18);
 }
 
-.nav-logo-mark img { width: 100%; height: 100%; object-fit: cover; }
+.nav-logo-mark div {
+    border-radius: 2px;
+    background: #f8fafc;
+}
+
+.nav-logo-mark div:nth-child(2),
+.nav-logo-mark div:nth-child(8) { background: #ef4444; }
+
+.nav-logo-mark div:nth-child(4),
+.nav-logo-mark div:nth-child(6) { background: #22c55e; }
+
+.nav-logo-mark div:nth-child(5) { background: #3b82f6; }
+
+.nav-logo-mark div:nth-child(1),
+.nav-logo-mark div:nth-child(9) { background: #facc15; }
 
 .nav-logo-text {
     font-size: 17px;
     font-weight: 800;
     letter-spacing: -0.5px;
     color: var(--text);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .nav-back {
@@ -180,6 +201,85 @@ a { text-decoration: none; color: inherit; }
 
 .dark-mode-btn:hover { transform: scale(1.08); }
 
+/* DİL SEÇİCİ */
+
+.lang-switcher { position: relative; }
+
+.lang-switch-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 21px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: .3s;
+}
+
+.lang-switch-btn:hover {
+    transform: scale(1.06);
+    background: var(--zkt-light);
+    color: var(--zkt);
+}
+
+.lang-switch-btn .lang-globe { font-size: 15px; line-height: 1; }
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
+}
+
+.lang-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover { background: var(--zkt-light); color: var(--zkt); }
+
+.lang-menu-item.active {
+    background: var(--zkt-light);
+    color: var(--zkt);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check { margin-left: auto; font-size: 12px; opacity: 0; }
+.lang-menu-item.active .lang-check { opacity: 1; }
+
 /* HERO */
 
 .hero {
@@ -207,9 +307,9 @@ a { text-decoration: none; color: inherit; }
 }
 
 .logo-mark img {
-    width: 68px;
-    height: 68px;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 @keyframes logoFloat {
@@ -302,9 +402,7 @@ a { text-decoration: none; color: inherit; }
     box-shadow: 0 15px 35px rgba(124,58,237,.30);
 }
 
-.link-card.primary:hover {
-    box-shadow: 0 20px 45px rgba(124,58,237,.38);
-}
+.link-card.primary:hover { box-shadow: 0 20px 45px rgba(124,58,237,.38); }
 
 .link-icon {
     width: 38px;
@@ -318,10 +416,7 @@ a { text-decoration: none; color: inherit; }
     font-size: 18px;
 }
 
-.link-card.primary .link-icon {
-    background: rgba(255,255,255,.18);
-    color: #fff;
-}
+.link-card.primary .link-icon { background: rgba(255,255,255,.18); color: #fff; }
 
 .link-text { display: flex; flex-direction: column; align-items: flex-start; }
 
@@ -337,9 +432,7 @@ a { text-decoration: none; color: inherit; }
 
 /* SECTIONS */
 
-section.info {
-    padding: 70px 7%;
-}
+section.info { padding: 70px 7%; }
 
 .section-container { max-width: 1000px; margin: auto; }
 
@@ -365,10 +458,7 @@ section.info {
     margin: 12px 0;
 }
 
-.section-heading p {
-    color: var(--text-soft);
-    line-height: 1.7;
-}
+.section-heading p { color: var(--text-soft); line-height: 1.7; }
 
 .feature-grid {
     display: grid;
@@ -385,10 +475,7 @@ section.info {
     transition: .3s;
 }
 
-.feature-card:hover {
-    transform: translateY(-6px);
-    border-color: #ddd6fe;
-}
+.feature-card:hover { transform: translateY(-6px); border-color: #ddd6fe; }
 
 .feature-icon {
     width: 50px;
@@ -423,6 +510,10 @@ footer {
 @media(max-width:500px) {
     .hero { padding: 70px 5% 50px; }
     .navbar { padding: 14px 5%; }
+    .nav-logo-text { font-size: 15px; }
+    .nav-back { padding: 8px 12px; font-size: 12px; }
+    .nav-right { gap: 6px; }
+    .lang-switch-btn { padding: 0 10px; font-size: 12px; }
 }
 
 /* DARK MODE */
@@ -462,14 +553,57 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.25;
 <header class="navbar">
     <a href="/" class="nav-logo">
         <div class="nav-logo-mark">
-            <img src="/RubikAcademyLogoBlack-Photoroom.png" alt="Rubik Academy">
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
         </div>
         <span class="nav-logo-text">Rubik Academy</span>
     </a>
 
-    <div style="display:flex; align-items:center; gap:10px;">
-        <a href="/" class="nav-back">← Ana Sayfa</a>
+    <div class="nav-right">
+
+        <a href="/" class="nav-back" data-i18n="navBack">← Ana Sayfa</a>
+
+        <div class="lang-switcher" id="langSwitcher">
+
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+                    <span>Deutsch</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+                    <span>العربية</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+            </div>
+
+        </div>
+
         <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
     </div>
 </header>
 
@@ -480,13 +614,13 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.25;
             <img src="/zkttimer.jpeg" alt="ZKT Timer">
         </div>
 
-        <div class="badge">Yeni · ZKT Timer</div>
+        <div class="badge" data-i18n="badge">Yeni · ZKT Timer</div>
 
         <h1>ZKT Timer</h1>
 
         <span class="hero-author">İbrahim Yıldız</span>
 
-        <p>
+        <p data-i18n="heroP">
             Türkiye'nin en kapsamlı küp zamanlayıcısı. Sürelerini kaydet,
             istatistiklerini takip et ve arkadaşlarınla online küp çöz —
             web, Android ve iOS'ta senin cebinde.
@@ -494,27 +628,27 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.25;
 
         <div class="link-menu">
 
-            <a href="https://zkttimer.com" target="_blank" rel="noopener noreferrer" class="link-card primary">
+            <a href="https://zktimer.com" target="_blank" rel="noopener noreferrer" class="link-card primary">
                 <div class="link-icon">🌐</div>
                 <div class="link-text">
-                    <small>Tarayıcıda Aç</small>
-                    Web Sitesi
+                    <small data-i18n="linkSiteSmall">Tarayıcıda Aç</small>
+                    <span data-i18n="linkSiteText">Web Sitesi</span>
                 </div>
             </a>
 
             <a href="https://play.google.com/store/apps/details?id=com.zktimer.app&pcampaignid=web_share" target="_blank" rel="noopener noreferrer" class="link-card">
                 <div class="link-icon">▶</div>
                 <div class="link-text">
-                    <small>Google Play</small>
-                    Android'de İndir
+                    <small data-i18n="linkPlaySmall">Google Play</small>
+                    <span data-i18n="linkPlayText">Android'de İndir</span>
                 </div>
             </a>
 
             <a href="https://apps.apple.com/tr/app/zkt-timer/id6760920873?l=tr" target="_blank" rel="noopener noreferrer" class="link-card">
                 <div class="link-icon"></div>
                 <div class="link-text">
-                    <small>App Store</small>
-                    iOS'ta İndir
+                    <small data-i18n="linkAppSmall">App Store</small>
+                    <span data-i18n="linkAppText">iOS'ta İndir</span>
                 </div>
             </a>
 
@@ -527,29 +661,29 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.25;
     <div class="section-container">
 
         <div class="section-heading reveal">
-            <span>Neden ZKT Timer</span>
-            <h2>Küp çözme sürecini bir üst seviyeye taşı.</h2>
-            <p>Antrenmanlarını düzenli hale getirmek ve gelişimini net şekilde görmek için tasarlandı.</p>
+            <span data-i18n="infoSpan">Neden ZKT Timer</span>
+            <h2 data-i18n="infoH2">Küp çözme sürecini bir üst seviyeye taşı.</h2>
+            <p data-i18n="infoP">Antrenmanlarını düzenli hale getirmek ve gelişimini net şekilde görmek için tasarlandı.</p>
         </div>
 
         <div class="feature-grid">
 
             <div class="feature-card reveal">
                 <div class="feature-icon">⏱</div>
-                <h3>Hassas Zamanlayıcı</h3>
-                <p>Inspection süresi, hızlı başlatma ve doğru ölçüm ile antrenmanlarını kesintisiz sürdür.</p>
+                <h3 data-i18n="feature1H3">Hassas Zamanlayıcı</h3>
+                <p data-i18n="feature1P">Inspection süresi, hızlı başlatma ve doğru ölçüm ile antrenmanlarını kesintisiz sürdür.</p>
             </div>
 
             <div class="feature-card reveal">
                 <div class="feature-icon">📊</div>
-                <h3>Detaylı İstatistikler</h3>
-                <p>Ao5, Ao12, Ao100 ve gelişim grafiklerinle zaman içindeki ilerlemeni takip et.</p>
+                <h3 data-i18n="feature2H3">Detaylı İstatistikler</h3>
+                <p data-i18n="feature2P">Ao5, Ao12, Ao100 ve gelişim grafiklerinle zaman içindeki ilerlemeni takip et.</p>
             </div>
 
             <div class="feature-card reveal">
                 <div class="feature-icon">🤝</div>
-                <h3>Arkadaşlarınla Yarış</h3>
-                <p>Online odalar oluştur, arkadaşlarını davet et ve gerçek zamanlı olarak küp çöz.</p>
+                <h3 data-i18n="feature3H3">Arkadaşlarınla Yarış</h3>
+                <p data-i18n="feature3P">Online odalar oluştur, arkadaşlarını davet et ve gerçek zamanlı olarak küp çöz.</p>
             </div>
 
         </div>
@@ -558,10 +692,13 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.25;
 </section>
 
 <footer>
-    © 2026 Rubik Academy. Tüm hakları saklıdır.
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
 </footer>
 
 <script>
+
+/* KARANLIK MOD */
+
 function toggleDarkMode() {
     var isDark = document.documentElement.classList.toggle("dark-mode");
     document.body.classList.toggle("dark-mode", isDark);
@@ -586,6 +723,185 @@ document.addEventListener("DOMContentLoaded", function() {
         if(btn) btn.innerHTML = "🌙";
     }
 });
+
+/* DİL SEÇİCİ (TR / EN / RU / DE / AR) */
+
+var translations = {
+    tr: {
+        navBack: "← Ana Sayfa",
+        badge: "Yeni · ZKT Timer",
+        heroP: "Türkiye'nin en kapsamlı küp zamanlayıcısı. Sürelerini kaydet, istatistiklerini takip et ve arkadaşlarınla online küp çöz — web, Android ve iOS'ta senin cebinde.",
+        linkSiteSmall: "Tarayıcıda Aç",
+        linkSiteText: "Web Sitesi",
+        linkPlaySmall: "Google Play",
+        linkPlayText: "Android'de İndir",
+        linkAppSmall: "App Store",
+        linkAppText: "iOS'ta İndir",
+        infoSpan: "Neden ZKT Timer",
+        infoH2: "Küp çözme sürecini bir üst seviyeye taşı.",
+        infoP: "Antrenmanlarını düzenli hale getirmek ve gelişimini net şekilde görmek için tasarlandı.",
+        feature1H3: "Hassas Zamanlayıcı",
+        feature1P: "Inspection süresi, hızlı başlatma ve doğru ölçüm ile antrenmanlarını kesintisiz sürdür.",
+        feature2H3: "Detaylı İstatistikler",
+        feature2P: "Ao5, Ao12, Ao100 ve gelişim grafiklerinle zaman içindeki ilerlemeni takip et.",
+        feature3H3: "Arkadaşlarınla Yarış",
+        feature3P: "Online odalar oluştur, arkadaşlarını davet et ve gerçek zamanlı olarak küp çöz.",
+        footer: "© 2026 Rubik Academy. Tüm hakları saklıdır."
+    },
+    en: {
+        navBack: "← Home",
+        badge: "New · ZKT Timer",
+        heroP: "Turkey's most comprehensive cube timer. Log your times, track your stats, and solve cubes online with your friends — with you on web, Android and iOS.",
+        linkSiteSmall: "Open in Browser",
+        linkSiteText: "Website",
+        linkPlaySmall: "Google Play",
+        linkPlayText: "Download on Android",
+        linkAppSmall: "App Store",
+        linkAppText: "Download on iOS",
+        infoSpan: "Why ZKT Timer",
+        infoH2: "Take your cubing to the next level.",
+        infoP: "Designed to make your practice consistent and your progress easy to see.",
+        feature1H3: "Precise Timer",
+        feature1P: "Keep your sessions smooth with inspection time, fast start, and accurate measurement.",
+        feature2H3: "Detailed Statistics",
+        feature2P: "Track your progress over time with Ao5, Ao12, Ao100 and progress charts.",
+        feature3H3: "Race Your Friends",
+        feature3P: "Create online rooms, invite your friends, and solve cubes together in real time.",
+        footer: "© 2026 Rubik Academy. All rights reserved."
+    },
+    ru: {
+        navBack: "← Главная",
+        badge: "Новое · ZKT Timer",
+        heroP: "Самый полнофункциональный таймер для кубика в Турции. Сохраняй время, отслеживай статистику и собирай кубик онлайн с друзьями — на сайте, Android и iOS.",
+        linkSiteSmall: "Открыть в браузере",
+        linkSiteText: "Веб-сайт",
+        linkPlaySmall: "Google Play",
+        linkPlayText: "Скачать для Android",
+        linkAppSmall: "App Store",
+        linkAppText: "Скачать для iOS",
+        infoSpan: "Почему ZKT Timer",
+        infoH2: "Выведи сборку кубика на новый уровень.",
+        infoP: "Создан для того, чтобы сделать твои тренировки регулярными, а прогресс — наглядным.",
+        feature1H3: "Точный таймер",
+        feature1P: "Время инспекции, быстрый старт и точные замеры — тренируйся без перерывов.",
+        feature2H3: "Подробная статистика",
+        feature2P: "Отслеживай прогресс с помощью Ao5, Ao12, Ao100 и графиков развития.",
+        feature3H3: "Соревнуйся с друзьями",
+        feature3P: "Создавай онлайн-комнаты, приглашай друзей и собирай кубик в реальном времени вместе.",
+        footer: "© 2026 Rubik Academy. Все права защищены."
+    },
+    de: {
+        navBack: "← Startseite",
+        badge: "Neu · ZKT Timer",
+        heroP: "Der umfangreichste Würfel-Timer der Türkei. Speichere deine Zeiten, verfolge deine Statistiken und löse Würfel online mit deinen Freunden — im Web, auf Android und iOS.",
+        linkSiteSmall: "Im Browser öffnen",
+        linkSiteText: "Webseite",
+        linkPlaySmall: "Google Play",
+        linkPlayText: "Für Android herunterladen",
+        linkAppSmall: "App Store",
+        linkAppText: "Für iOS herunterladen",
+        infoSpan: "Warum ZKT Timer",
+        infoH2: "Bring dein Würfeln auf das nächste Level.",
+        infoP: "Entwickelt, um dein Training regelmäßig zu machen und deinen Fortschritt klar sichtbar zu zeigen.",
+        feature1H3: "Präziser Timer",
+        feature1P: "Inspektionszeit, schneller Start und genaue Messung für ununterbrochenes Training.",
+        feature2H3: "Detaillierte Statistiken",
+        feature2P: "Verfolge deinen Fortschritt mit Ao5, Ao12, Ao100 und Entwicklungsdiagrammen.",
+        feature3H3: "Tritt gegen Freunde an",
+        feature3P: "Erstelle Online-Räume, lade deine Freunde ein und löst Würfel in Echtzeit gemeinsam.",
+        footer: "© 2026 Rubik Academy. Alle Rechte vorbehalten."
+    },
+    ar: {
+        navBack: "الرئيسية ←",
+        badge: "جديد · ZKT Timer",
+        heroP: "أشمل ساعة توقيت لمكعب روبيك في تركيا. سجّل أوقاتك، تابع إحصائياتك، وحلّ المكعب أونلاين مع أصدقائك — على الموقع وأندرويد و iOS.",
+        linkSiteSmall: "افتح في المتصفح",
+        linkSiteText: "الموقع الإلكتروني",
+        linkPlaySmall: "Google Play",
+        linkPlayText: "تحميل لأندرويد",
+        linkAppSmall: "App Store",
+        linkAppText: "تحميل لـ iOS",
+        infoSpan: "لماذا ZKT Timer",
+        infoH2: "ارتقِ بحل المكعب إلى مستوى أعلى.",
+        infoP: "صُمم لجعل تدريباتك منتظمة ولإظهار تقدّمك بوضوح.",
+        feature1H3: "ساعة توقيت دقيقة",
+        feature1P: "وقت الفحص، بداية سريعة، وقياس دقيق لتدريب متواصل دون انقطاع.",
+        feature2H3: "إحصائيات مفصّلة",
+        feature2P: "تابع تقدّمك عبر الزمن باستخدام Ao5 وAo12 وAo100 والرسوم البيانية.",
+        feature3H3: "نافس أصدقاءك",
+        feature3P: "أنشئ غرفًا أونلاين، وادعُ أصدقاءك، وحلّوا المكعب معًا في الوقت الفعلي.",
+        footer: "© 2026 روبيك أكاديمي. جميع الحقوق محفوظة."
+    }
+};
+
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
+function applyLanguage(lang) {
+    if (!translations[lang]) lang = "tr";
+
+    var dict = translations[lang];
+
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+
+    var label = document.getElementById("langLabel");
+    if (label) {
+        label.textContent = langCodes[lang] || "TR";
+    }
+
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) {
+        closeLangMenu();
+    }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
+});
+
+/* SCROLL ANIMATION */
 
 const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
