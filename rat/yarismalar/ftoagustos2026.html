@@ -161,11 +161,58 @@ a { text-decoration: none; color: inherit; }
 .page-head-intro { color: var(--text-soft); font-size: 16px; line-height: 1.8; }
 
 /* =========================================
+   SEKME (TAB) BAR
+========================================= */
+
+.tabbar-wrap {
+  padding: 8px 7% 26px;
+}
+.tabbar {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 6px;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+.tabbar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex: 1 0 auto;
+  border: none;
+  border-radius: 11px;
+  background: transparent;
+  cursor: pointer;
+  padding: 11px 16px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-soft);
+  transition: color .2s, background-color .2s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text); background: var(--surface-soft); }
+.tab-btn.active { color: #fff; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); font-weight: 700; box-shadow: 0 8px 18px rgba(230,37,47,.28); }
+
+@media(max-width:640px) {
+  .tabbar-wrap { padding: 6px 5% 20px; }
+  .tabbar { padding: 5px; border-radius: 14px; }
+  .tab-btn { padding: 10px 12px; font-size: 12.5px; }
+}
+
+/* =========================================
    İÇERİK
 ========================================= */
 
 .content { padding: 50px 7% 120px; }
 .content-inner { max-width: 800px; margin: auto; display: flex; flex-direction: column; gap: 26px; }
+
+.tab-panel { display: none; flex-direction: column; gap: 26px; }
+.tab-panel.active { display: flex; }
 
 .info-card {
   padding: 36px 38px;
@@ -243,6 +290,29 @@ a { text-decoration: none; color: inherit; }
   font-style: italic;
 }
 
+/* YARIŞMACILAR */
+.participant-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.participant-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+}
+.participant-rank {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  font-size: 14px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.participant-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.participant-name { font-size: 14.5px; font-weight: 700; color: var(--text); }
+.participant-id { font-size: 12.5px; color: var(--text-soft); font-weight: 600; }
+.empty-note { color: var(--text-soft); font-size: 13.5px; font-style: italic; padding: 8px 2px; }
+
 /* KAYIT CTA */
 .register-card {
   text-align: center;
@@ -266,9 +336,14 @@ a { text-decoration: none; color: inherit; }
 .register-btn:hover svg { transform: translateX(3px); }
 
 @media(max-width:640px) {
-  .info-card { padding: 28px 22px; }
+  .page-head { padding: 40px 6% 6px; }
+  .content { padding: 30px 6% 80px; }
+  .info-card { padding: 24px 18px; border-radius: 18px; }
   .schedule-grid { grid-template-columns: 1fr; }
-  .register-card { padding: 36px 24px; }
+  .register-card { padding: 32px 20px; border-radius: 20px; }
+  .register-btn { width: 100%; justify-content: center; }
+  .participant-row { padding: 13px 14px; gap: 12px; }
+  .participant-name { font-size: 13.5px; }
 }
 
 footer { padding: 35px; text-align: center; border-top: 1px solid var(--border); color: var(--text-soft); font-size: 13px; }
@@ -328,7 +403,8 @@ html.dark-mode body, body.dark-mode { background: var(--background); color: var(
 html.dark-mode .navbar, body.dark-mode .navbar { background: rgba(15, 23, 42, 0.90); }
 html.dark-mode .info-card, body.dark-mode .info-card,
 html.dark-mode footer, body.dark-mode footer { background: var(--surface); border-color: var(--border); }
-html.dark-mode .schedule-day, body.dark-mode .schedule-day { background: var(--surface-soft); border-color: var(--border); }
+html.dark-mode .schedule-day, body.dark-mode .schedule-day,
+html.dark-mode .participant-row, body.dark-mode .participant-row { background: var(--surface-soft); border-color: var(--border); }
 html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22; }
 </style>
 
@@ -421,94 +497,148 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
   </div>
 </section>
 
+<!-- SEKME (TAB) BAR -->
+<div class="tabbar-wrap">
+  <nav class="tabbar">
+    <button class="tab-btn" data-tab="kayit" onclick="switchTab('kayit')">Kayıt</button>
+    <button class="tab-btn active" data-tab="sartlar" onclick="switchTab('sartlar')">Şartlar/Kurallar</button>
+    <button class="tab-btn" data-tab="yarismacilar" onclick="switchTab('yarismacilar')">Yarışmacılar</button>
+    <button class="tab-btn" data-tab="kategoriler" onclick="switchTab('kategoriler')">Kategoriler</button>
+    <button class="tab-btn" data-tab="program" onclick="switchTab('program')">Program</button>
+    <button class="tab-btn" data-tab="sonuclar" onclick="switchTab('sonuclar')">Sonuçlar</button>
+  </nav>
+</div>
+
 <!-- İÇERİK -->
 <section class="content">
   <div class="content-inner">
 
-    <!-- TARİH VE SAATLER -->
-    <div class="info-card reveal">
-      <h2>📅 Tarih ve Saatler</h2>
-      <div class="schedule-meta">
-        <span>🧩 Küp: FTO</span>
-        <span>💻 Format: Online</span>
+    <!-- ŞARTLAR/KURALLAR -->
+    <div class="tab-panel active" id="panel-sartlar">
+      <div class="info-card reveal">
+        <h2>📝 RAT Ağustos 2026 Yarışması - Katılım Şartları</h2>
+        <p class="lead">Yarışmaya başvuran her katılımcı aşağıdaki şartları peşinen kabul etmiş sayılır:</p>
+
+        <ol class="rules-list">
+          <li>
+            <span class="rule-num">1</span>
+            <span class="rule-text"><strong>Ekipman Gereksinimi:</strong> Katılımcı, yarışma süresince kullanmak üzere ZKT Timer sistemine sahip olmalıdır.</span>
+          </li>
+          <li>
+            <span class="rule-num">2</span>
+            <span class="rule-text"><strong>Kapak (Cover) Kullanımı ve Başlangıç Prosedürü:</strong> Videoda net bir şekilde görüleceği üzere; katılımcı küpü scramble (karıştırma) yaptıktan hemen sonra derhal cover'a (kapağa) koymak zorundadır. Hazır olduğunda kapağı kaldırarak süreci başlatır.</span>
+          </li>
+          <li>
+            <span class="rule-num">3</span>
+            <span class="rule-text"><strong>ZKT Timer Inspection (İnceleme) Zorunluluğu:</strong> 1. tur canlı (görüntülü) gerçekleşmeyeceği için anlık +2 veya DNF cezası uygulanamamaktadır. Bu nedenle, ZKT Timer odaya/çözüme girildiği anda inspection (inceleme) özelliği açılmak zorundadır. Inspection özelliğini açmayan veya kurala uymayan katılımcılar moderatörler tarafından tespit edilerek diskalifiye edilecektir.</span>
+          </li>
+          <li>
+            <span class="rule-num">4</span>
+            <span class="rule-text"><strong>Kamera ve Çekim Açısı:</strong> 1. turdaki video kayıtlarında ve sonraki turlardaki canlı yayın/görüntülü aşamalarda; elleri, masayı ve ZKT Timer'ı net bir şekilde gösteren uygun bir kamera açısı sağlanmalıdır. Açı standartlarına uymayan veya ellerin/küpün görünmediği kayıtlar geçersiz sayılır.</span>
+          </li>
+          <li>
+            <span class="rule-num">5</span>
+            <span class="rule-text"><strong>1. Tur Video Kaydı Yükümlülüğü:</strong> Görüntüsüz gerçekleşecek olan 1. turda, her katılımcı çözüm anının videosunu eksiksiz kaydetmek ve 2. tura geçilmeden önce hakem incelemesine sunmak zorundadır.</span>
+          </li>
+          <li>
+            <span class="rule-num">6</span>
+            <span class="rule-text"><strong>Adil Oyun (Fair-Play) Kuralı:</strong> Hile, manipülasyon veya kural dışı herhangi bir girişim tespit edildiğinde katılımcı doğrudan diskalifiye edilir. Hakem komitesinin kararları kesindir.</span>
+          </li>
+          <li>
+            <span class="rule-num">7</span>
+            <span class="rule-text"><strong>İletişim ve Takip:</strong> Yarışma odası linkleri, grup eşleşmeleri ve saat bilgileri başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır. Belirtilen saatlerde hazır bulunmak katılımcının sorumluluğudur.</span>
+          </li>
+        </ol>
       </div>
-
-      <div class="schedule-grid">
-
-        <div class="schedule-day">
-          <h3>29 Ağustos Cumartesi</h3>
-          <div class="schedule-row">
-            <span class="round-name">1. Round</span>
-            <span class="round-time">14:00 – 14:30</span>
-          </div>
-          <div class="schedule-row">
-            <span class="round-name">2. Round</span>
-            <span class="round-time">15:00 – 15:20</span>
-          </div>
-        </div>
-
-        <div class="schedule-day">
-          <h3>30 Ağustos Pazar</h3>
-          <div class="schedule-row">
-            <span class="round-name">Yarı Final</span>
-            <span class="round-time">15:00 – 15:20</span>
-          </div>
-          <div class="schedule-row">
-            <span class="round-name">Final</span>
-            <span class="round-time">15:30 – 16:20</span>
-          </div>
-        </div>
-
-      </div>
-
-      <p class="schedule-note">Belirtilen saatlerde küçük sapmalar olabilir. Güncel bilgiler başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır.</p>
     </div>
 
     <!-- KAYIT -->
-    <div class="register-card reveal">
-      <h2>Katılmaya hazır mısın?</h2>
-      <p>Aşağıdaki formu doldurarak RAT Ağustos 2026 yarışmasına kaydını tamamla.</p>
-      <a href="https://forms.gle/HQB3hFdPDfLe1y4PA" target="_blank" rel="noopener noreferrer" class="register-btn">
-        Kayıt Ol
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
+    <div class="tab-panel" id="panel-kayit">
+      <div class="register-card reveal">
+        <h2>Katılmaya hazır mısın?</h2>
+        <p>Aşağıdaki formu doldurarak RAT Ağustos 2026 yarışmasına kaydını tamamla.</p>
+        <a href="https://forms.gle/HQB3hFdPDfLe1y4PA" target="_blank" rel="noopener noreferrer" class="register-btn">
+          Kayıt Ol
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
     </div>
 
-    <!-- KATILIM ŞARTLARI -->
-    <div class="info-card reveal">
-      <h2>📝 RAT Ağustos 2026 Yarışması - Katılım Şartları</h2>
-      <p class="lead">Yarışmaya başvuran her katılımcı aşağıdaki şartları peşinen kabul etmiş sayılır:</p>
+    <!-- YARIŞMACILAR -->
+    <div class="tab-panel" id="panel-yarismacilar">
+      <div class="info-card reveal">
+        <h2>🧑‍🤝‍🧑 Yarışmacılar</h2>
+        <p class="lead">RAT Ağustos 2026 yarışmasına kayıt olan katılımcılar aşağıda listelenmiştir.</p>
+        <ul class="participant-list">
+          <li class="participant-row">
+            <span class="participant-rank">1</span>
+            <span class="participant-info">
+              <span class="participant-name">Muhammed Eren Yalçın</span>
+              <span class="participant-id">ID: 1</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
 
-      <ol class="rules-list">
-        <li>
-          <span class="rule-num">1</span>
-          <span class="rule-text"><strong>Ekipman Gereksinimi:</strong> Katılımcı, yarışma süresince kullanmak üzere ZKT Timer sistemine sahip olmalıdır.</span>
-        </li>
-        <li>
-          <span class="rule-num">2</span>
-          <span class="rule-text"><strong>Kapak (Cover) Kullanımı ve Başlangıç Prosedürü:</strong> Videoda net bir şekilde görüleceği üzere; katılımcı küpü scramble (karıştırma) yaptıktan hemen sonra derhal cover'a (kapağa) koymak zorundadır. Hazır olduğunda kapağı kaldırarak süreci başlatır.</span>
-        </li>
-        <li>
-          <span class="rule-num">3</span>
-          <span class="rule-text"><strong>ZKT Timer Inspection (İnceleme) Zorunluluğu:</strong> 1. tur canlı (görüntülü) gerçekleşmeyeceği için anlık +2 veya DNF cezası uygulanamamaktadır. Bu nedenle, ZKT Timer odaya/çözüme girildiği anda inspection (inceleme) özelliği açılmak zorundadır. Inspection özelliğini açmayan veya kurala uymayan katılımcılar moderatörler tarafından tespit edilerek diskalifiye edilecektir.</span>
-        </li>
-        <li>
-          <span class="rule-num">4</span>
-          <span class="rule-text"><strong>Kamera ve Çekim Açısı:</strong> 1. turdaki video kayıtlarında ve sonraki turlardaki canlı yayın/görüntülü aşamalarda; elleri, masayı ve ZKT Timer'ı net bir şekilde gösteren uygun bir kamera açısı sağlanmalıdır. Açı standartlarına uymayan veya ellerin/küpün görünmediği kayıtlar geçersiz sayılır.</span>
-        </li>
-        <li>
-          <span class="rule-num">5</span>
-          <span class="rule-text"><strong>1. Tur Video Kaydı Yükümlülüğü:</strong> Görüntüsüz gerçekleşecek olan 1. turda, her katılımcı çözüm anının videosunu eksiksiz kaydetmek ve 2. tura geçilmeden önce hakem incelemesine sunmak zorundadır.</span>
-        </li>
-        <li>
-          <span class="rule-num">6</span>
-          <span class="rule-text"><strong>Adil Oyun (Fair-Play) Kuralı:</strong> Hile, manipülasyon veya kural dışı herhangi bir girişim tespit edildiğinde katılımcı doğrudan diskalifiye edilir. Hakem komitesinin kararları kesindir.</span>
-        </li>
-        <li>
-          <span class="rule-num">7</span>
-          <span class="rule-text"><strong>İletişim ve Takip:</strong> Yarışma odası linkleri, grup eşleşmeleri ve saat bilgileri başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır. Belirtilen saatlerde hazır bulunmak katılımcının sorumluluğundadır.</span>
-        </li>
-      </ol>
+    <!-- KATEGORİLER -->
+    <div class="tab-panel" id="panel-kategoriler">
+      <div class="info-card reveal">
+        <h2>🧩 Kategoriler</h2>
+        <p class="lead">Bu yarışma tek kategoride gerçekleştirilmektedir.</p>
+        <div class="schedule-meta">
+          <span>🧩 Küp: FTO</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRAM -->
+    <div class="tab-panel" id="panel-program">
+      <div class="info-card reveal">
+        <h2>📅 Tarih ve Saatler</h2>
+        <div class="schedule-meta">
+          <span>🧩 Küp: FTO</span>
+          <span>💻 Format: Online</span>
+        </div>
+
+        <div class="schedule-grid">
+
+          <div class="schedule-day">
+            <h3>29 Ağustos Cumartesi</h3>
+            <div class="schedule-row">
+              <span class="round-name">1. Round</span>
+              <span class="round-time">14:00 – 14:30</span>
+            </div>
+            <div class="schedule-row">
+              <span class="round-name">2. Round</span>
+              <span class="round-time">15:00 – 15:20</span>
+            </div>
+          </div>
+
+          <div class="schedule-day">
+            <h3>30 Ağustos Pazar</h3>
+            <div class="schedule-row">
+              <span class="round-name">Yarı Final</span>
+              <span class="round-time">15:00 – 15:20</span>
+            </div>
+            <div class="schedule-row">
+              <span class="round-name">Final</span>
+              <span class="round-time">15:30 – 16:20</span>
+            </div>
+          </div>
+
+        </div>
+
+        <p class="schedule-note">Belirtilen saatlerde küçük sapmalar olabilir. Güncel bilgiler başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır.</p>
+      </div>
+    </div>
+
+    <!-- SONUÇLAR -->
+    <div class="tab-panel" id="panel-sonuclar">
+      <div class="info-card reveal">
+        <h2>🏆 Sonuçlar</h2>
+        <p class="empty-note">Yarışma henüz tamamlanmadı. Sonuçlar burada yayınlanacaktır.</p>
+      </div>
     </div>
 
   </div>
@@ -520,6 +650,18 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
 </footer>
 
 <script>
+
+function switchTab(tab) {
+  document.querySelectorAll(".tab-btn").forEach(function(btn) {
+    btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
+  });
+  document.querySelectorAll(".tab-panel").forEach(function(panel) {
+    panel.classList.toggle("active", panel.id === "panel-" + tab);
+  });
+  document.querySelectorAll("#panel-" + tab + " .reveal").forEach(function(el) {
+    el.classList.add("active");
+  });
+}
 
 function toggleDarkMode() {
   var isDark = document.documentElement.classList.toggle("dark-mode");
