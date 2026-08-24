@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+(function() {
+  var savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    document.documentElement.classList.add("dark-mode");
+  }
+})();
+</script>
+
+<title>Yarışmalar — RAT | Rubik Academy Türkiye</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%23e6252f'/%3E%3Ccircle cx='11' cy='11' r='7' fill='white'/%3E%3Ccircle cx='29' cy='11' r='7' fill='white'/%3E%3Cellipse cx='20' cy='22' rx='14.5' ry='12.5' fill='white'/%3E%3Ccircle cx='15' cy='21' r='2' fill='%23172033'/%3E%3Ccircle cx='25' cy='21' r='2' fill='%23172033'/%3E%3Ccircle cx='20' cy='27' r='2' fill='%23e6252f'/%3E%3C/svg%3E" type="image/svg+xml">
+
+<meta name="description" content="RAT — Rubik Academy Türkiye yarışmaları. Şehir buluşmalarındaki mini yarışmalar ve online yarışmalara katıl.">
+<meta property="og:title" content="Yarışmalar — RAT">
+<meta property="og:description" content="Türkiye'nin Rubik küp topluluğunun düzenlediği yarışmalara göz at ve kayıt ol.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+
+/* =========================================
+   RENKLER (KIRMIZI / BEYAZ TEMA)
+========================================= */
+
+:root {
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --surface-soft: #f1f5f9;
+  --primary: #e6252f;
+  --primary-dark: #b91c1c;
+  --primary-light: #fef2f2;
+  --text: #172033;
+  --text-soft: #64748b;
+  --border: #f0d9db;
+  --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+}
+
+.bg-glow {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  z-index: -999;
+  pointer-events: none;
+}
+.bg-glow::before, .bg-glow::after {
+  content: "";
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.16;
+  animation: floatGlow 15s infinite alternate ease-in-out;
+}
+.bg-glow::before { background: #e6252f; top: -100px; left: -100px; }
+.bg-glow::after { background: #b91c1c; bottom: -100px; right: -100px; animation-delay: -7s; }
+@keyframes floatGlow {
+  0% { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(150px, 200px) scale(1.25); }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--background);
+  color: var(--text);
+  overflow-x: hidden;
+  width: 100%;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+a { text-decoration: none; color: inherit; }
+
+/* =========================================
+   ÜST BAR
+========================================= */
+
+.navbar {
+  position: sticky; top: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 7%;
+  background: rgba(248, 250, 252, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.3s, border-color 0.3s;
+}
+.nav-left { display: flex; align-items: center; gap: 16px; }
+.back-btn {
+  display: flex; align-items: center; gap: 7px;
+  height: 38px; padding: 0 16px 0 12px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff; font-size: 13px; font-weight: 700;
+  flex-shrink: 0; transition: .25s;
+  box-shadow: 0 8px 18px rgba(230,37,47,.28);
+}
+.back-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+.back-btn:hover { transform: translateX(-3px); box-shadow: 0 10px 22px rgba(230,37,47,.36); }
+@media(max-width:500px) {
+  .back-btn span { display: none; }
+  .back-btn { padding: 0; width: 38px; justify-content: center; }
+}
+.nav-logo { display: flex; align-items: center; gap: 12px; }
+.nav-logo-mark {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  box-shadow: 0 8px 18px rgba(230,37,47,.25);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.nav-logo-mark svg { width: 26px; height: 26px; }
+.nav-logo-text { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-links { display: flex; align-items: center; gap: 8px; }
+.nav-links a { padding: 9px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-soft); transition: .25s; }
+.nav-links a:hover, .nav-links a.active { background: var(--primary-light); color: var(--primary); }
+
+@media(max-width:500px) {
+  .navbar { padding: 14px 5%; }
+  .nav-logo-text { font-size: 14px; }
+  .nav-links a { padding: 8px 12px; font-size: 13px; }
+  .nav-right { gap: 6px; }
+  .lang-switch-btn { padding: 0 10px; font-size: 12px; }
+}
+
+/* =========================================
+   SAYFA BAŞLIĞI
+========================================= */
+
+.page-head { padding: 80px 7% 20px; }
+.page-head-inner { max-width: 1200px; margin: auto; text-align: center; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px; border-radius: 50px;
+  background: var(--primary-light);
+  border: 1px solid #fbd0d4;
+  color: var(--primary);
+  font-size: 13px; font-weight: 700;
+  margin-bottom: 22px;
+}
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--primary); }
+
+.page-head h1 {
+  font-size: clamp(38px, 5vw, 60px);
+  line-height: 1.06; letter-spacing: -3px; font-weight: 900;
+  color: var(--text); margin-bottom: 18px;
+}
+.gradient-text {
+  background: linear-gradient(90deg, var(--primary), #ef4444, var(--primary-dark));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.page-head p { max-width: 600px; margin: 0 auto; color: var(--text-soft); font-size: 17px; line-height: 1.75; }
+
+/* =========================================
+   YARIŞMA LİSTESİ
+========================================= */
+
+.competitions { padding: 60px 7% 120px; }
+.competitions-inner { max-width: 900px; margin: auto; display: flex; flex-direction: column; gap: 22px; }
+
+.competition-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 30px;
+  padding: 36px 40px;
+  border-radius: 26px;
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  box-shadow: 0 0 0 4px rgba(230,37,47,.10), 0 24px 55px rgba(230,37,47,.16);
+  transition: .3s;
+}
+.competition-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 0 5px rgba(230,37,47,.14), 0 28px 60px rgba(230,37,47,.22);
+}
+
+.competition-body { min-width: 0; }
+.competition-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 8px;
+  background: var(--primary); color: #fff;
+  font-size: 10px; font-weight: 900; letter-spacing: .7px; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.competition-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: pulseDot 1.4s infinite; }
+@keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+.competition-body h3 { font-size: 24px; color: var(--text); margin-bottom: 8px; letter-spacing: -.5px; }
+.competition-body p { color: var(--text-soft); font-size: 14px; line-height: 1.7; max-width: 480px; margin-bottom: 14px; }
+
+.competition-meta { display: flex; flex-wrap: wrap; gap: 10px; }
+.competition-meta span {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 8px;
+  background: var(--primary-light); color: var(--primary);
+  font-size: 12px; font-weight: 700;
+}
+
+.competition-cta {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 15px 26px; border-radius: 12px;
+  font-size: 14px; font-weight: 800; white-space: nowrap;
+  transition: .3s;
+  flex-shrink: 0;
+}
+.competition-cta svg { width: 16px; height: 16px; transition: .25s; }
+
+.competition-actions { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+
+.competition-cta-secondary {
+  color: var(--primary);
+  background: var(--primary-light);
+  border: 1px solid #fbd0d4;
+}
+.competition-cta-secondary:hover { transform: translateY(-3px); background: #fde3e5; }
+
+.competition-cta-primary {
+  color: white;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  box-shadow: 0 12px 28px rgba(230,37,47,.30);
+}
+.competition-cta-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(230,37,47,.38); }
+.competition-cta-primary:hover svg { transform: translateX(3px); }
+
+@media(max-width:760px) {
+  .competition-card { grid-template-columns: 1fr; text-align: center; justify-items: center; padding: 32px 26px; }
+  .competition-meta { justify-content: center; }
+  .competition-actions { flex-direction: row; width: 100%; }
+  .competition-cta { flex: 1; }
+}
+
+/* Boş durum (gelecekte kullanılabilir) */
+.competitions-empty {
+  max-width: 560px; margin: 0 auto; text-align: center;
+  padding: 60px 40px; border-radius: 24px;
+  background: var(--surface); border: 1px dashed var(--border);
+}
+
+footer { padding: 35px; text-align: center; border-top: 1px solid var(--border); color: var(--text-soft); font-size: 13px; }
+
+/* ANİMASYON */
+.reveal { opacity: 0; transform: translateY(30px); transition: .7s ease; }
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+/* =========================================
+   KARANLIK MOD
+========================================= */
+.dark-mode-btn {
+  border: none; background: var(--surface-soft); color: var(--text);
+  width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: .3s;
+}
+.dark-mode-btn:hover { transform: scale(1.08); }
+
+/* DİL SEÇİCİ */
+.lang-switcher { position: relative; }
+.lang-switch-btn {
+  border: none; background: var(--surface-soft); color: var(--text);
+  height: 42px; padding: 0 16px; border-radius: 21px; font-size: 13px; font-weight: 700;
+  letter-spacing: .3px; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: .3s;
+}
+.lang-switch-btn:hover { transform: scale(1.06); background: var(--primary-light); color: var(--primary); }
+.lang-switch-btn .lang-globe { font-size: 15px; line-height: 1; }
+.lang-menu {
+  position: absolute; top: calc(100% + 10px); right: 0; min-width: 168px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow);
+  padding: 7px; display: flex; flex-direction: column; gap: 3px;
+  opacity: 0; visibility: hidden; transform: translateY(-8px); transition: .2s ease; z-index: 1100;
+}
+.lang-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+.lang-menu-item {
+  display: flex; align-items: center; gap: 10px; border: none; background: transparent; color: var(--text);
+  text-align: left; padding: 10px 14px; border-radius: 11px; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: .2s; width: 100%;
+}
+.lang-menu-item:hover { background: var(--primary-light); color: var(--primary); }
+.lang-menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 800; }
+.lang-menu-item .lang-check { margin-left: auto; font-size: 12px; opacity: 0; }
+.lang-menu-item.active .lang-check { opacity: 1; }
+
+/* Karanlık mod renkleri */
+html.dark-mode, body.dark-mode {
+  --background: #0f172a;
+  --surface: #1e293b;
+  --surface-soft: #334155;
+  --text: #f8fafc;
+  --text-soft: #cbd5e1;
+  --border: #3f2329;
+  --primary-light: #4c1116;
+  --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+}
+html.dark-mode body, body.dark-mode { background: var(--background); color: var(--text); }
+html.dark-mode .navbar, body.dark-mode .navbar { background: rgba(15, 23, 42, 0.90); }
+html.dark-mode .competition-card, body.dark-mode .competition-card,
+html.dark-mode .competitions-empty, body.dark-mode .competitions-empty,
+html.dark-mode footer, body.dark-mode footer { background: var(--surface); }
+html.dark-mode .competition-card, body.dark-mode .competition-card {
+  box-shadow: 0 0 0 4px rgba(230,37,47,.18), 0 24px 55px rgba(0,0,0,.35);
+}
+html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22; }
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SportsEvent",
+  "name": "FTO Ağustos 2026 (Online)",
+  "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+  "organizer": {
+    "@type": "Organization",
+    "name": "RAT — Rubik Academy Türkiye",
+    "url": "https://rubikacademy.fun/rat"
+  },
+  "url": "https://rubikacademy.fun/rat/yarismalar/ftoagustos2026"
+}
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- ÜST BAR -->
+<header class="navbar">
+
+  <div class="nav-left">
+
+    <a href="https://rubikacademy.fun/rat" class="back-btn" aria-label="RAT sayfasına dön">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span data-i18n="backBtn">Geri Dön</span>
+    </a>
+
+    <a href="https://rubikacademy.fun/rat" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="11" r="7" fill="white"/>
+          <circle cx="29" cy="11" r="7" fill="white"/>
+          <ellipse cx="20" cy="23" rx="14.5" ry="12.5" fill="white"/>
+          <circle cx="14.5" cy="22" r="2" fill="#172033"/>
+          <circle cx="25.5" cy="22" r="2" fill="#172033"/>
+          <circle cx="20" cy="28" r="2" fill="#e6252f"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">RAT</span>
+    </a>
+
+  </div>
+
+  <div class="nav-right">
+
+    <nav class="nav-links">
+      <a href="https://rubikacademy.fun/rat" data-i18n="navHome">Ana Sayfa</a>
+      <a href="#" class="active" data-i18n="navCompetitions">Yarışmalar</a>
+    </nav>
+
+    <div class="lang-switcher" id="langSwitcher">
+      <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language">
+        <span class="lang-globe">🌐</span>
+        <span id="langLabel">TR</span>
+      </button>
+      <div class="lang-menu" id="langMenu" role="menu">
+        <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')"><span>Türkçe</span><span class="lang-check">✓</span></button>
+        <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')"><span>English</span><span class="lang-check">✓</span></button>
+        <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')"><span>Русский</span><span class="lang-check">✓</span></button>
+        <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')"><span>Deutsch</span><span class="lang-check">✓</span></button>
+        <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')"><span>العربية</span><span class="lang-check">✓</span></button>
+      </div>
+    </div>
+
+    <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
+  </div>
+
+</header>
+
+<!-- SAYFA BAŞLIĞI -->
+<section class="page-head">
+  <div class="page-head-inner reveal">
+    <div class="badge" data-i18n="badge">RAT Yarışmaları</div>
+    <h1>
+      <span data-i18n="pageTitle1">Yarış,</span>
+      <span class="gradient-text" data-i18n="pageTitleGradient">sıralamada yüksel.</span>
+    </h1>
+    <p data-i18n="pageP">Şehir buluşmalarındaki mini yarışmalar ve evden katılabileceğin online yarışmalar burada listelenir.</p>
+  </div>
+</section>
+
+<!-- YARIŞMA LİSTESİ -->
+<section class="competitions">
+  <div class="competitions-inner">
+
+    <div class="competition-card reveal">
+
+      <div class="competition-body">
+        <span class="competition-status" data-i18n="compStatus">Kayıtlar Açık</span>
+        <h3 data-i18n="compTitle">FTO Ağustos 2026 (Online)</h3>
+        <p data-i18n="compDesc">Evden katılabileceğin online FTO yarışması. Süreni gönder, Türkiye sıralamasında yerini al.</p>
+        <div class="competition-meta">
+          <span data-i18n="compMetaEvent">FTO</span>
+          <span data-i18n="compMetaFormat">💻 Online</span>
+          <span data-i18n="compMetaDate">📅 Ağustos 2026</span>
+        </div>
+      </div>
+
+      <div class="competition-actions">
+
+        <a href="https://rubikacademy.fun/rat/yarismalar/ftoagustos2026" class="competition-cta competition-cta-secondary" data-i18n="compAbout">
+          Hakkında
+        </a>
+
+        <a href="https://forms.gle/HQB3hFdPDfLe1y4PA" target="_blank" rel="noopener noreferrer" class="competition-cta competition-cta-primary" data-i18n="compCta">
+          Kayıt Ol
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span data-i18n="footer">© 2026 RAT — Rubik Academy Türkiye. Tüm hakları saklıdır.</span>
+</footer>
+
+<script>
+
+function toggleDarkMode() {
+  var isDark = document.documentElement.classList.toggle("dark-mode");
+  document.body.classList.toggle("dark-mode", isDark);
+  var btn = document.getElementById("darkModeBtn");
+  if (isDark) {
+    localStorage.setItem("theme", "dark");
+    if (btn) btn.innerHTML = "☀️";
+  } else {
+    localStorage.setItem("theme", "light");
+    if (btn) btn.innerHTML = "🌙";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = localStorage.getItem("theme");
+  var btn = document.getElementById("darkModeBtn");
+  if (savedTheme === "dark") {
+    document.documentElement.classList.add("dark-mode");
+    document.body.classList.add("dark-mode");
+    if (btn) btn.innerHTML = "☀️";
+  } else {
+    if (btn) btn.innerHTML = "🌙";
+  }
+});
+
+/* DİL SEÇİCİ */
+var translations = {
+  tr: {
+    navHome: "Ana Sayfa", backBtn: "Geri Dön", navCompetitions: "Yarışmalar",
+    badge: "RAT Yarışmaları",
+    pageTitle1: "Yarış,", pageTitleGradient: "sıralamada yüksel.",
+    pageP: "Şehir buluşmalarındaki mini yarışmalar ve evden katılabileceğin online yarışmalar burada listelenir.",
+    compStatus: "Kayıtlar Açık",
+    compTitle: "FTO Ağustos 2026 (Online)",
+    compDesc: "Evden katılabileceğin online FTO yarışması. Süreni gönder, Türkiye sıralamasında yerini al.",
+    compMetaEvent: "FTO", compMetaFormat: "💻 Online", compMetaDate: "📅 Ağustos 2026",
+    compAbout: "Hakkında",
+    compCta: "Kayıt Ol",
+    footer: "© 2026 RAT — Rubik Academy Türkiye. Tüm hakları saklıdır."
+  },
+  en: {
+    navHome: "Home", backBtn: "Back", navCompetitions: "Competitions",
+    badge: "RAT Competitions",
+    pageTitle1: "Compete,", pageTitleGradient: "climb the leaderboard.",
+    pageP: "Mini-competitions from our city meetups and online competitions you can join from home are listed here.",
+    compStatus: "Registration Open",
+    compTitle: "FTO August 2026 (Online)",
+    compDesc: "An online FTO competition you can join from home. Submit your times and climb the Turkey leaderboard.",
+    compMetaEvent: "FTO", compMetaFormat: "💻 Online", compMetaDate: "📅 August 2026",
+    compAbout: "About",
+    compCta: "Register",
+    footer: "© 2026 RAT — Rubik Academy Turkey. All rights reserved."
+  },
+  ru: {
+    navHome: "Главная", backBtn: "Назад", navCompetitions: "Соревнования",
+    badge: "Соревнования RAT",
+    pageTitle1: "Соревнуйся,", pageTitleGradient: "поднимайся в рейтинге.",
+    pageP: "Здесь собраны мини-турниры с городских встреч и онлайн-соревнования, в которых можно участвовать из дома.",
+    compStatus: "Регистрация открыта",
+    compTitle: "FTO Август 2026 (Онлайн)",
+    compDesc: "Онлайн-соревнование по FTO, в котором можно участвовать из дома. Отправь своё время и поднимись в рейтинге Турции.",
+    compMetaEvent: "FTO", compMetaFormat: "💻 Онлайн", compMetaDate: "📅 Август 2026",
+    compAbout: "Подробнее",
+    compCta: "Зарегистрироваться",
+    footer: "© 2026 RAT — Rubik Academy Türkiye. Все права защищены."
+  },
+  de: {
+    navHome: "Startseite", backBtn: "Zurück", navCompetitions: "Wettbewerbe",
+    badge: "RAT-Wettbewerbe",
+    pageTitle1: "Tritt an,", pageTitleGradient: "steig in der Rangliste auf.",
+    pageP: "Hier findest du Mini-Wettbewerbe von unseren Stadttreffen und Online-Wettbewerbe, an denen du von zu Hause teilnehmen kannst.",
+    compStatus: "Anmeldung offen",
+    compTitle: "FTO August 2026 (Online)",
+    compDesc: "Ein Online-FTO-Wettbewerb, an dem du von zu Hause teilnehmen kannst. Reiche deine Zeiten ein und steige in der Türkei-Rangliste auf.",
+    compMetaEvent: "FTO", compMetaFormat: "💻 Online", compMetaDate: "📅 August 2026",
+    compAbout: "Details",
+    compCta: "Anmelden",
+    footer: "© 2026 RAT — Rubik Academy Türkiye. Alle Rechte vorbehalten."
+  },
+  ar: {
+    navHome: "الرئيسية", backBtn: "رجوع", navCompetitions: "المسابقات",
+    badge: "مسابقات RAT",
+    pageTitle1: "نافس،", pageTitleGradient: "واصعد في الترتيب.",
+    pageP: "هنا تجد المسابقات الصغيرة من لقاءات المدن والمسابقات عبر الإنترنت التي يمكنك المشاركة فيها من المنزل.",
+    compStatus: "التسجيل مفتوح",
+    compTitle: "FTO أغسطس 2026 (عبر الإنترنت)",
+    compDesc: "مسابقة FTO عبر الإنترنت يمكنك المشاركة فيها من المنزل. أرسل وقتك واصعد في ترتيب تركيا.",
+    compMetaEvent: "FTO", compMetaFormat: "💻 عبر الإنترنت", compMetaDate: "📅 أغسطس 2026",
+    compAbout: "حول المسابقة",
+    compCta: "سجّل الآن",
+    footer: "© 2026 RAT — روبيك أكاديمي تركيا. جميع الحقوق محفوظة."
+  }
+};
+
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
+function applyLanguage(lang) {
+  if (!translations[lang]) lang = "tr";
+  var dict = translations[lang];
+  document.querySelectorAll("[data-i18n]").forEach(function(el) {
+    var key = el.getAttribute("data-i18n");
+    if (dict[key]) el.textContent = dict[key];
+  });
+  document.documentElement.setAttribute("lang", lang);
+  document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+  var label = document.getElementById("langLabel");
+  if (label) label.textContent = langCodes[lang] || "TR";
+  document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+    item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+  });
+  localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+  if (e) e.stopPropagation();
+  var menu = document.getElementById("langMenu");
+  var btn = document.getElementById("langSwitchBtn");
+  if (!menu) return;
+  var willOpen = !menu.classList.contains("open");
+  menu.classList.toggle("open", willOpen);
+  if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+
+function closeLangMenu() {
+  var menu = document.getElementById("langMenu");
+  var btn = document.getElementById("langSwitchBtn");
+  if (menu) menu.classList.remove("open");
+  if (btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function selectLanguage(lang) {
+  applyLanguage(lang);
+  closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+  var switcher = document.getElementById("langSwitcher");
+  if (switcher && !switcher.contains(e.target)) closeLangMenu();
+});
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") closeLangMenu();
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  var savedLang = localStorage.getItem("site-lang") || "tr";
+  applyLanguage(savedLang);
+});
+
+/* SCROLL ANIMASYONU */
+var observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) entry.target.classList.add("active");
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+</script>
+
+</body>
+</html>
