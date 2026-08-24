@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Notasyon ve Rotasyonlar</title>
+<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
+
+<link rel="canonical" href="https://rubikacademy.fun/fto/notasyon">
+<meta name="description" content="FTO'nun temel hareket notasyonunu ve küp rotasyonlarını öğren. Yakında yayında.">
+<meta property="og:title" content="Rubik Academy - Notasyon ve Rotasyonlar">
+<meta property="og:description" content="FTO'nun temel hareket notasyonunu ve küp rotasyonlarını öğren.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/fto/notasyon">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+html { overflow-x: hidden; }
+
+:root {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-soft: #f1f5f9;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #e2e8f0;
+    --card-border: #dfebf5;
+    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+    --hero-bg: linear-gradient(120deg, #e8f7ff, #c8eaff);
+    --hero-border: #cce8fa;
+    --btn-bg: #eef8ff;
+    --btn-hover-bg: #dff2ff;
+    --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
+    --bottom-border: #d5eafa;
+    --bottom-text: #18578c;
+}
+
+html.dark-mode, body.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --card-border: #334155;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+    --hero-bg: linear-gradient(120deg, #1e293b, #0f172a);
+    --hero-border: #334155;
+    --btn-bg: #334155;
+    --btn-hover-bg: #1e3a8a;
+    --bottom-bg: #1e293b;
+    --bottom-border: #334155;
+    --bottom-text: #60a5fa;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: "Inter", sans-serif;
+    background: var(--background);
+    color: var(--text);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* NAVBAR */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 7%;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .navbar, body.dark-mode .navbar { background: rgba(15, 23, 42, 0.90); }
+
+.nav-logo { display: flex; align-items: center; gap: 12px; }
+
+.nav-logo-mark {
+    width: 38px; height: 38px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px; padding: 4px;
+    border-radius: 10px;
+    background: #1e293b;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+}
+.nav-logo-mark div { border-radius: 2px; background: #f8fafc; }
+.nav-logo-mark div:nth-child(2), .nav-logo-mark div:nth-child(8) { background: #ef4444; }
+.nav-logo-mark div:nth-child(4), .nav-logo-mark div:nth-child(6) { background: #22c55e; }
+.nav-logo-mark div:nth-child(5) { background: #3b82f6; }
+.nav-logo-mark div:nth-child(1), .nav-logo-mark div:nth-child(9) { background: #facc15; }
+
+.nav-logo-text { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-links { display: flex; align-items: center; gap: 8px; }
+.nav-links a { padding: 9px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-soft); transition: .25s; }
+.nav-links a:hover, .nav-links a.active { background: var(--primary-light); color: var(--primary); }
+
+.dark-mode-btn {
+    border: none; background: var(--surface-soft); color: var(--text);
+    width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: .3s;
+}
+.dark-mode-btn:hover { transform: scale(1.08); }
+
+.lang-switcher { position: relative; }
+.lang-switch-btn {
+    border: none; background: var(--surface-soft); color: var(--text);
+    height: 42px; padding: 0 16px; border-radius: 21px; font-size: 13px; font-weight: 700;
+    letter-spacing: .3px; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: .3s;
+}
+.lang-switch-btn:hover { transform: scale(1.06); background: var(--primary-light); color: var(--primary); }
+.lang-switch-btn .lang-globe { font-size: 15px; line-height: 1; }
+
+.lang-menu {
+    position: absolute; top: calc(100% + 10px); right: 0; min-width: 168px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 7px; display: flex; flex-direction: column; gap: 3px;
+    opacity: 0; visibility: hidden; transform: translateY(-8px); transition: .2s ease; z-index: 1100;
+}
+.lang-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+.lang-menu-item {
+    display: flex; align-items: center; gap: 10px; border: none; background: transparent;
+    color: var(--text); text-align: left; padding: 10px 14px; border-radius: 11px; font-size: 14px;
+    font-weight: 600; cursor: pointer; transition: .2s; width: 100%;
+}
+.lang-menu-item:hover { background: var(--primary-light); color: var(--primary); }
+.lang-menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 800; }
+.lang-menu-item .lang-check { margin-left: auto; font-size: 12px; opacity: 0; }
+.lang-menu-item.active .lang-check { opacity: 1; }
+
+@media(max-width: 500px) {
+    .navbar { padding: 14px 5%; }
+    .nav-logo-text { font-size: 15px; }
+    .nav-links a { padding: 8px 12px; font-size: 13px; }
+    .nav-right { gap: 6px; }
+    .lang-switch-btn { padding: 0 10px; font-size: 12px; }
+}
+
+/* PAGE */
+.page {
+    min-height: calc(100vh - 71px);
+    padding: 45px 5% 80px;
+    background: var(--background);
+    transition: background-color 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-bar { max-width: 900px; margin: 0 auto 25px; width: 100%; }
+.back-btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 12px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--primary);
+    font-size: 13px; font-weight: 800; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); transition: all .25s ease;
+}
+.back-btn:hover { transform: translateX(-4px); border-color: #c0e0fc; background: var(--primary-light); }
+
+/* SOON SECTION */
+.soon-wrap {
+    max-width: 780px;
+    margin: 30px auto auto;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.soon-card {
+    width: 100%;
+    background: var(--hero-bg);
+    border: 1px solid var(--hero-border);
+    border-radius: 34px;
+    box-shadow: var(--shadow);
+    padding: 70px 45px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.soon-card::before {
+    content: "";
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    border: 60px solid rgba(255, 255, 255, .15);
+    left: -160px;
+    top: -160px;
+}
+
+.badge {
+    display: inline-flex; align-items: center; gap: 9px; padding: 9px 15px; border-radius: 50px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--primary);
+    font-size: 10px; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 22px;
+    position: relative; z-index: 2;
+}
+.badge i { width: 7px; height: 7px; background: #168ee0; border-radius: 50%; }
+
+.soon-icon {
+    width: 96px; height: 96px;
+    margin: 0 auto 24px;
+    border-radius: 26px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, .08);
+    position: relative;
+    z-index: 2;
+    animation: floating 4s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+.soon-card h1 {
+    font-size: clamp(28px, 4vw, 40px);
+    letter-spacing: -1.5px;
+    font-weight: 950;
+    color: var(--text);
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 2;
+}
+
+.soon-card p {
+    color: var(--text-soft);
+    font-size: 15px;
+    line-height: 1.75;
+    max-width: 480px;
+    margin: 0 auto 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.soon-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text);
+    position: relative;
+    z-index: 2;
+}
+
+.soon-status .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: #f59e0b;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, .2);
+    animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(245, 158, 11, .2); }
+    50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, .08); }
+}
+
+.soon-back {
+    margin-top: 34px;
+    position: relative;
+    z-index: 2;
+}
+
+.soon-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 24px;
+    border-radius: 13px;
+    background: var(--btn-bg);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 900;
+    transition: all .25s ease;
+}
+.soon-back a:hover { background: var(--btn-hover-bg); transform: translateY(-2px); }
+
+@media(max-width: 700px) {
+    .page { padding: 25px 4% 55px; }
+    .soon-card { padding: 50px 24px; border-radius: 27px; }
+    .soon-icon { width: 80px; height: 80px; font-size: 34px; }
+}
+</style>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <div class="nav-logo-mark">
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+        </div>
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu">
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')"><span>Türkçe</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')"><span>English</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')"><span>Русский</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')"><span>Deutsch</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')"><span>العربية</span><span class="lang-check">✓</span></button>
+            </div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="http://rubikacademy.fun/fto" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<section class="soon-wrap">
+    <div class="soon-card">
+        <div class="badge"><i></i>NOTASYON</div>
+        <div class="soon-icon">🚧</div>
+        <h1 data-i18n="page_h1">Notasyon ve Rotasyonlar</h1>
+        <p data-i18n="page_p">Bu eğitim şu anda hazırlanıyor. FTO'nun temel hareket notasyonunu ve küp rotasyonlarını içeren içerik çok yakında burada yayında olacak.</p>
+        <div class="soon-status">
+            <span class="dot"></span>
+            <span data-i18n="status_text">Henüz Yayınlanmadı</span>
+        </div>
+        <div class="soon-back">
+            <a href="http://rubikacademy.fun/fto" data-i18n="back_link">← FTO Sayfasına Dön</a>
+        </div>
+    </div>
+</section>
+
+</div>
+
+<script>
+var translations = {
+    "tr": {
+        navHome: "Ana Sayfa", navContent: "İçerikler", back_btn: "← Geri Dön",
+        page_h1: "Notasyon ve Rotasyonlar",
+        page_p: "Bu eğitim şu anda hazırlanıyor. FTO'nun temel hareket notasyonunu ve küp rotasyonlarını içeren içerik çok yakında burada yayında olacak.",
+        status_text: "Henüz Yayınlanmadı",
+        back_link: "← FTO Sayfasına Dön"
+    },
+    "en": {
+        navHome: "Home", navContent: "Content", back_btn: "← Go Back",
+        page_h1: "Notation and Rotations",
+        page_p: "This lesson is currently being prepared. Content covering the basic move notation and cube rotations of the FTO will be published here very soon.",
+        status_text: "Not Published Yet",
+        back_link: "← Back to FTO Page"
+    },
+    "ru": {
+        navHome: "Главная", navContent: "Контент", back_btn: "← Назад",
+        page_h1: "Нотация и повороты",
+        page_p: "Этот урок сейчас готовится. Материал об основной нотации ходов и поворотах кубика FTO будет опубликован здесь очень скоро.",
+        status_text: "Ещё не опубликовано",
+        back_link: "← Назад к странице FTO"
+    },
+    "de": {
+        navHome: "Startseite", navContent: "Inhalte", back_btn: "← Zurück",
+        page_h1: "Notation und Rotationen",
+        page_p: "Diese Lektion wird derzeit vorbereitet. Inhalte zur grundlegenden Zugnotation und den Würfelrotationen des FTO werden bald hier veröffentlicht.",
+        status_text: "Noch nicht veröffentlicht",
+        back_link: "← Zurück zur FTO-Seite"
+    },
+    "ar": {
+        navHome: "الرئيسية", navContent: "المحتوى", back_btn: "← رجوع",
+        page_h1: "الترميز والدورانات",
+        page_p: "يتم حاليًا إعداد هذا الدرس. سيتم نشر المحتوى الخاص بترميز الحركات الأساسي ودورانات مكعب FTO هنا قريبًا جدًا.",
+        status_text: "لم يُنشر بعد",
+        back_link: "← العودة إلى صفحة FTO"
+    }
+};
+
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
+function applyLanguage(lang) {
+    if (!translations[lang]) lang = "tr";
+    var dict = translations[lang];
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+    });
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", "ltr");
+    var label = document.getElementById("langLabel");
+    if (label) label.textContent = langCodes[lang] || "TR";
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+}
+function selectLanguage(lang) { applyLanguage(lang); closeLangMenu(); }
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) closeLangMenu();
+});
+document.addEventListener("keydown", function(e) { if (e.key === "Escape") closeLangMenu(); });
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
+});
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+    var btn = document.getElementById("darkModeBtn");
+    if (isDark) { localStorage.setItem("theme", "dark"); if(btn) btn.innerHTML = "☀️"; }
+    else { localStorage.setItem("theme", "light"); if(btn) btn.innerHTML = "🌙"; }
+}
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        if(btn) btn.innerHTML = "🌙";
+    }
+});
+</script>
+
+</body>
+</html>
