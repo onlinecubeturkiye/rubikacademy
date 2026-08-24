@@ -1,1 +1,624 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<script>
+(function() {
+  var savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    document.documentElement.classList.add("dark-mode");
+  }
+})();
+</script>
+
+<title>FTO Ağustos 2026 (Online) — RAT | Rubik Academy Türkiye</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%23e6252f'/%3E%3Ccircle cx='11' cy='11' r='7' fill='white'/%3E%3Ccircle cx='29' cy='11' r='7' fill='white'/%3E%3Cellipse cx='20' cy='22' rx='14.5' ry='12.5' fill='white'/%3E%3Ccircle cx='15' cy='21' r='2' fill='%23172033'/%3E%3Ccircle cx='25' cy='21' r='2' fill='%23172033'/%3E%3Ccircle cx='20' cy='27' r='2' fill='%23e6252f'/%3E%3C/svg%3E" type="image/svg+xml">
+
+<meta name="description" content="Rubik Academy Türkiye (RAT) tarafından düzenlenen RAT Ağustos 2026 yarışmasının katılım şartları, tarihleri ve kayıt formu.">
+<meta property="og:title" content="FTO Ağustos 2026 (Online) — RAT">
+<meta property="og:description" content="RAT Ağustos 2026 yarışması katılım şartları, tarihler ve kayıt formu.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+
+/* =========================================
+   RENKLER (KIRMIZI / BEYAZ TEMA)
+========================================= */
+
+:root {
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --surface-soft: #f1f5f9;
+  --primary: #e6252f;
+  --primary-dark: #b91c1c;
+  --primary-light: #fef2f2;
+  --text: #172033;
+  --text-soft: #64748b;
+  --border: #f0d9db;
+  --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+}
+
+.bg-glow {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  z-index: -999;
+  pointer-events: none;
+}
+.bg-glow::before, .bg-glow::after {
+  content: "";
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.16;
+  animation: floatGlow 15s infinite alternate ease-in-out;
+}
+.bg-glow::before { background: #e6252f; top: -100px; left: -100px; }
+.bg-glow::after { background: #b91c1c; bottom: -100px; right: -100px; animation-delay: -7s; }
+@keyframes floatGlow {
+  0% { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(150px, 200px) scale(1.25); }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--background);
+  color: var(--text);
+  overflow-x: hidden;
+  width: 100%;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+a { text-decoration: none; color: inherit; }
+
+/* =========================================
+   ÜST BAR
+========================================= */
+
+.navbar {
+  position: sticky; top: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 7%;
+  background: rgba(248, 250, 252, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.3s, border-color 0.3s;
+}
+.nav-left { display: flex; align-items: center; gap: 16px; }
+.back-btn {
+  display: flex; align-items: center; gap: 7px;
+  height: 38px; padding: 0 16px 0 12px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff; font-size: 13px; font-weight: 700;
+  flex-shrink: 0; transition: .25s;
+  box-shadow: 0 8px 18px rgba(230,37,47,.28);
+}
+.back-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+.back-btn:hover { transform: translateX(-3px); box-shadow: 0 10px 22px rgba(230,37,47,.36); }
+@media(max-width:500px) {
+  .back-btn span { display: none; }
+  .back-btn { padding: 0; width: 38px; justify-content: center; }
+}
+.nav-logo { display: flex; align-items: center; gap: 12px; }
+.nav-logo-mark {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  box-shadow: 0 8px 18px rgba(230,37,47,.25);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.nav-logo-mark svg { width: 26px; height: 26px; }
+.nav-logo-text { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-links { display: flex; align-items: center; gap: 8px; }
+.nav-links a { padding: 9px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-soft); transition: .25s; }
+.nav-links a:hover, .nav-links a.active { background: var(--primary-light); color: var(--primary); }
+
+@media(max-width:500px) {
+  .navbar { padding: 14px 5%; }
+  .nav-logo-text { font-size: 14px; }
+  .nav-links a { padding: 8px 12px; font-size: 13px; }
+  .nav-right { gap: 6px; }
+  .lang-switch-btn { padding: 0 10px; font-size: 12px; }
+}
+
+/* =========================================
+   SAYFA BAŞLIĞI
+========================================= */
+
+.page-head { padding: 70px 7% 10px; }
+.page-head-inner { max-width: 800px; margin: auto; text-align: center; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px; border-radius: 50px;
+  background: var(--primary-light);
+  border: 1px solid #fbd0d4;
+  color: var(--primary);
+  font-size: 13px; font-weight: 700;
+  margin-bottom: 22px;
+}
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--primary); }
+
+.page-head h1 {
+  font-size: clamp(32px, 4.5vw, 50px);
+  line-height: 1.1; letter-spacing: -2px; font-weight: 900;
+  color: var(--text); margin-bottom: 18px;
+}
+.page-head-intro { color: var(--text-soft); font-size: 16px; line-height: 1.8; }
+
+/* =========================================
+   İÇERİK
+========================================= */
+
+.content { padding: 50px 7% 120px; }
+.content-inner { max-width: 800px; margin: auto; display: flex; flex-direction: column; gap: 26px; }
+
+.info-card {
+  padding: 36px 38px;
+  border-radius: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.info-card h2 {
+  font-size: 21px;
+  color: var(--text);
+  margin-bottom: 10px;
+  letter-spacing: -.4px;
+}
+
+.info-card > p.lead {
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+
+.rules-list { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+.rules-list li {
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.rules-list .rule-num {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  border-radius: 9px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 13px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+}
+.rules-list .rule-text { color: var(--text); font-size: 14.5px; line-height: 1.75; }
+.rules-list .rule-text strong { color: var(--primary-dark); }
+
+/* TAKVİM */
+.schedule-meta {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px;
+}
+.schedule-meta span {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 13px; border-radius: 8px;
+  background: var(--primary-light); color: var(--primary);
+  font-size: 12.5px; font-weight: 700;
+}
+
+.schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.schedule-day {
+  padding: 22px; border-radius: 16px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+}
+.schedule-day h3 {
+  font-size: 15px; color: var(--text); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.schedule-day h3::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--primary); }
+.schedule-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-top: 1px dashed var(--border);
+  font-size: 13.5px;
+}
+.schedule-row:first-of-type { border-top: none; }
+.schedule-row .round-name { color: var(--text-soft); font-weight: 600; }
+.schedule-row .round-time { color: var(--primary-dark); font-weight: 800; }
+
+.schedule-note {
+  margin-top: 18px;
+  font-size: 12.5px;
+  color: var(--text-soft);
+  font-style: italic;
+}
+
+/* KAYIT CTA */
+.register-card {
+  text-align: center;
+  padding: 46px 38px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  box-shadow: 0 24px 55px rgba(230,37,47,.30);
+}
+.register-card h2 { color: #fff; font-size: 24px; margin-bottom: 10px; letter-spacing: -.5px; }
+.register-card p { color: rgba(255,255,255,.88); font-size: 14px; margin-bottom: 26px; }
+.register-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 16px 30px; border-radius: 12px;
+  background: #fff; color: var(--primary-dark);
+  font-size: 15px; font-weight: 800;
+  box-shadow: 0 12px 28px rgba(0,0,0,.18);
+  transition: .3s;
+}
+.register-btn svg { width: 17px; height: 17px; transition: .25s; }
+.register-btn:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(0,0,0,.24); }
+.register-btn:hover svg { transform: translateX(3px); }
+
+@media(max-width:640px) {
+  .info-card { padding: 28px 22px; }
+  .schedule-grid { grid-template-columns: 1fr; }
+  .register-card { padding: 36px 24px; }
+}
+
+footer { padding: 35px; text-align: center; border-top: 1px solid var(--border); color: var(--text-soft); font-size: 13px; }
+
+/* ANİMASYON */
+.reveal { opacity: 0; transform: translateY(30px); transition: .7s ease; }
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+/* =========================================
+   KARANLIK MOD
+========================================= */
+.dark-mode-btn {
+  border: none; background: var(--surface-soft); color: var(--text);
+  width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: .3s;
+}
+.dark-mode-btn:hover { transform: scale(1.08); }
+
+/* DİL SEÇİCİ */
+.lang-switcher { position: relative; }
+.lang-switch-btn {
+  border: none; background: var(--surface-soft); color: var(--text);
+  height: 42px; padding: 0 16px; border-radius: 21px; font-size: 13px; font-weight: 700;
+  letter-spacing: .3px; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: .3s;
+}
+.lang-switch-btn:hover { transform: scale(1.06); background: var(--primary-light); color: var(--primary); }
+.lang-switch-btn .lang-globe { font-size: 15px; line-height: 1; }
+.lang-menu {
+  position: absolute; top: calc(100% + 10px); right: 0; min-width: 168px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow);
+  padding: 7px; display: flex; flex-direction: column; gap: 3px;
+  opacity: 0; visibility: hidden; transform: translateY(-8px); transition: .2s ease; z-index: 1100;
+}
+.lang-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+.lang-menu-item {
+  display: flex; align-items: center; gap: 10px; border: none; background: transparent; color: var(--text);
+  text-align: left; padding: 10px 14px; border-radius: 11px; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: .2s; width: 100%;
+}
+.lang-menu-item:hover { background: var(--primary-light); color: var(--primary); }
+.lang-menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 800; }
+.lang-menu-item .lang-check { margin-left: auto; font-size: 12px; opacity: 0; }
+.lang-menu-item.active .lang-check { opacity: 1; }
+
+/* Karanlık mod renkleri */
+html.dark-mode, body.dark-mode {
+  --background: #0f172a;
+  --surface: #1e293b;
+  --surface-soft: #334155;
+  --text: #f8fafc;
+  --text-soft: #cbd5e1;
+  --border: #3f2329;
+  --primary-light: #4c1116;
+  --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+}
+html.dark-mode body, body.dark-mode { background: var(--background); color: var(--text); }
+html.dark-mode .navbar, body.dark-mode .navbar { background: rgba(15, 23, 42, 0.90); }
+html.dark-mode .info-card, body.dark-mode .info-card,
+html.dark-mode footer, body.dark-mode footer { background: var(--surface); border-color: var(--border); }
+html.dark-mode .schedule-day, body.dark-mode .schedule-day { background: var(--surface-soft); border-color: var(--border); }
+html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22; }
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SportsEvent",
+  "name": "RAT Ağustos 2026 Yarışması - FTO",
+  "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+  "organizer": {
+    "@type": "Organization",
+    "name": "RAT — Rubik Academy Türkiye",
+    "url": "https://rubikacademy.fun/rat"
+  },
+  "startDate": "2026-08-29T14:00:00+03:00",
+  "endDate": "2026-08-30T16:20:00+03:00",
+  "url": "https://rubikacademy.fun/rat/yarismalar/ftoagustos2026"
+}
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- ÜST BAR -->
+<header class="navbar">
+
+  <div class="nav-left">
+
+    <a href="https://rubikacademy.fun/rat/yarismalar" class="back-btn" aria-label="Yarışmalara dön">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span data-i18n="backBtn">Geri Dön</span>
+    </a>
+
+    <a href="https://rubikacademy.fun/rat" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="11" r="7" fill="white"/>
+          <circle cx="29" cy="11" r="7" fill="white"/>
+          <ellipse cx="20" cy="23" rx="14.5" ry="12.5" fill="white"/>
+          <circle cx="14.5" cy="22" r="2" fill="#172033"/>
+          <circle cx="25.5" cy="22" r="2" fill="#172033"/>
+          <circle cx="20" cy="28" r="2" fill="#e6252f"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">RAT</span>
+    </a>
+
+  </div>
+
+  <div class="nav-right">
+
+    <nav class="nav-links">
+      <a href="https://rubikacademy.fun/rat" data-i18n="navHome">Ana Sayfa</a>
+      <a href="https://rubikacademy.fun/rat/yarismalar" class="active" data-i18n="navCompetitions">Yarışmalar</a>
+    </nav>
+
+    <div class="lang-switcher" id="langSwitcher">
+      <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language">
+        <span class="lang-globe">🌐</span>
+        <span id="langLabel">TR</span>
+      </button>
+      <div class="lang-menu" id="langMenu" role="menu">
+        <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')"><span>Türkçe</span><span class="lang-check">✓</span></button>
+        <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')"><span>English</span><span class="lang-check">✓</span></button>
+        <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')"><span>Русский</span><span class="lang-check">✓</span></button>
+        <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')"><span>Deutsch</span><span class="lang-check">✓</span></button>
+        <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')"><span>العربية</span><span class="lang-check">✓</span></button>
+      </div>
+    </div>
+
+    <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
+  </div>
+
+</header>
+
+<!-- SAYFA BAŞLIĞI -->
+<section class="page-head">
+  <div class="page-head-inner reveal">
+    <div class="badge">FTO · Ağustos 2026 · Online</div>
+    <h1>RAT Ağustos 2026 Yarışması</h1>
+    <p class="page-head-intro">
+      Rubik Academy Türkiye (RAT) tarafından düzenlenen RAT Ağustos 2026
+      yarışmasının katılım şartlarını, tarih ve saatlerini bu sayfada
+      bulabilirsin. Yarışma, evden katılabileceğin online bir FTO
+      yarışmasıdır.
+    </p>
+  </div>
+</section>
+
+<!-- İÇERİK -->
+<section class="content">
+  <div class="content-inner">
+
+    <!-- TARİH VE SAATLER -->
+    <div class="info-card reveal">
+      <h2>📅 Tarih ve Saatler</h2>
+      <div class="schedule-meta">
+        <span>🧩 Küp: FTO</span>
+        <span>💻 Format: Online</span>
+      </div>
+
+      <div class="schedule-grid">
+
+        <div class="schedule-day">
+          <h3>29 Ağustos Cumartesi</h3>
+          <div class="schedule-row">
+            <span class="round-name">1. Round</span>
+            <span class="round-time">14:00 – 14:30</span>
+          </div>
+          <div class="schedule-row">
+            <span class="round-name">2. Round</span>
+            <span class="round-time">15:00 – 15:20</span>
+          </div>
+        </div>
+
+        <div class="schedule-day">
+          <h3>30 Ağustos Pazar</h3>
+          <div class="schedule-row">
+            <span class="round-name">Yarı Final</span>
+            <span class="round-time">15:00 – 15:20</span>
+          </div>
+          <div class="schedule-row">
+            <span class="round-name">Final</span>
+            <span class="round-time">15:30 – 16:20</span>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="schedule-note">Belirtilen saatlerde küçük sapmalar olabilir. Güncel bilgiler başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır.</p>
+    </div>
+
+    <!-- KAYIT -->
+    <div class="register-card reveal">
+      <h2>Katılmaya hazır mısın?</h2>
+      <p>Aşağıdaki formu doldurarak RAT Ağustos 2026 yarışmasına kaydını tamamla.</p>
+      <a href="https://forms.gle/HQB3hFdPDfLe1y4PA" target="_blank" rel="noopener noreferrer" class="register-btn">
+        Kayıt Ol
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <!-- KATILIM ŞARTLARI -->
+    <div class="info-card reveal">
+      <h2>📝 RAT Ağustos 2026 Yarışması - Katılım Şartları</h2>
+      <p class="lead">Yarışmaya başvuran her katılımcı aşağıdaki şartları peşinen kabul etmiş sayılır:</p>
+
+      <ol class="rules-list">
+        <li>
+          <span class="rule-num">1</span>
+          <span class="rule-text"><strong>Ekipman Gereksinimi:</strong> Katılımcı, yarışma süresince kullanmak üzere ZKT Timer sistemine sahip olmalıdır.</span>
+        </li>
+        <li>
+          <span class="rule-num">2</span>
+          <span class="rule-text"><strong>Kapak (Cover) Kullanımı ve Başlangıç Prosedürü:</strong> Videoda net bir şekilde görüleceği üzere; katılımcı küpü scramble (karıştırma) yaptıktan hemen sonra derhal cover'a (kapağa) koymak zorundadır. Hazır olduğunda kapağı kaldırarak süreci başlatır.</span>
+        </li>
+        <li>
+          <span class="rule-num">3</span>
+          <span class="rule-text"><strong>ZKT Timer Inspection (İnceleme) Zorunluluğu:</strong> 1. tur canlı (görüntülü) gerçekleşmeyeceği için anlık +2 veya DNF cezası uygulanamamaktadır. Bu nedenle, ZKT Timer odaya/çözüme girildiği anda inspection (inceleme) özelliği açılmak zorundadır. Inspection özelliğini açmayan veya kurala uymayan katılımcılar moderatörler tarafından tespit edilerek diskalifiye edilecektir.</span>
+        </li>
+        <li>
+          <span class="rule-num">4</span>
+          <span class="rule-text"><strong>Kamera ve Çekim Açısı:</strong> 1. turdaki video kayıtlarında ve sonraki turlardaki canlı yayın/görüntülü aşamalarda; elleri, masayı ve ZKT Timer'ı net bir şekilde gösteren uygun bir kamera açısı sağlanmalıdır. Açı standartlarına uymayan veya ellerin/küpün görünmediği kayıtlar geçersiz sayılır.</span>
+        </li>
+        <li>
+          <span class="rule-num">5</span>
+          <span class="rule-text"><strong>1. Tur Video Kaydı Yükümlülüğü:</strong> Görüntüsüz gerçekleşecek olan 1. turda, her katılımcı çözüm anının videosunu eksiksiz kaydetmek ve 2. tura geçilmeden önce hakem incelemesine sunmak zorundadır.</span>
+        </li>
+        <li>
+          <span class="rule-num">6</span>
+          <span class="rule-text"><strong>Adil Oyun (Fair-Play) Kuralı:</strong> Hile, manipülasyon veya kural dışı herhangi bir girişim tespit edildiğinde katılımcı doğrudan diskalifiye edilir. Hakem komitesinin kararları kesindir.</span>
+        </li>
+        <li>
+          <span class="rule-num">7</span>
+          <span class="rule-text"><strong>İletişim ve Takip:</strong> Yarışma odası linkleri, grup eşleşmeleri ve saat bilgileri başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır. Belirtilen saatlerde hazır bulunmak katılımcının sorumluluğundadır.</span>
+        </li>
+      </ol>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span data-i18n="footer">© 2026 RAT — Rubik Academy Türkiye. Tüm hakları saklıdır.</span>
+</footer>
+
+<script>
+
+function toggleDarkMode() {
+  var isDark = document.documentElement.classList.toggle("dark-mode");
+  document.body.classList.toggle("dark-mode", isDark);
+  var btn = document.getElementById("darkModeBtn");
+  if (isDark) {
+    localStorage.setItem("theme", "dark");
+    if (btn) btn.innerHTML = "☀️";
+  } else {
+    localStorage.setItem("theme", "light");
+    if (btn) btn.innerHTML = "🌙";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = localStorage.getItem("theme");
+  var btn = document.getElementById("darkModeBtn");
+  if (savedTheme === "dark") {
+    document.documentElement.classList.add("dark-mode");
+    document.body.classList.add("dark-mode");
+    if (btn) btn.innerHTML = "☀️";
+  } else {
+    if (btn) btn.innerHTML = "🌙";
+  }
+});
+
+/* DİL SEÇİCİ (yalnızca menü metinleri; içerik Türkçedir) */
+var translations = {
+  tr: { navHome: "Ana Sayfa", backBtn: "Geri Dön", navCompetitions: "Yarışmalar", footer: "© 2026 RAT — Rubik Academy Türkiye. Tüm hakları saklıdır." },
+  en: { navHome: "Home", backBtn: "Back", navCompetitions: "Competitions", footer: "© 2026 RAT — Rubik Academy Turkey. All rights reserved." },
+  ru: { navHome: "Главная", backBtn: "Назад", navCompetitions: "Соревнования", footer: "© 2026 RAT — Rubik Academy Türkiye. Все права защищены." },
+  de: { navHome: "Startseite", backBtn: "Zurück", navCompetitions: "Wettbewerbe", footer: "© 2026 RAT — Rubik Academy Türkiye. Alle Rechte vorbehalten." },
+  ar: { navHome: "الرئيسية", backBtn: "رجوع", navCompetitions: "المسابقات", footer: "© 2026 RAT — روبيك أكاديمي تركيا. جميع الحقوق محفوظة." }
+};
+
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
+function applyLanguage(lang) {
+  if (!translations[lang]) lang = "tr";
+  var dict = translations[lang];
+  document.querySelectorAll("[data-i18n]").forEach(function(el) {
+    var key = el.getAttribute("data-i18n");
+    if (dict[key]) el.textContent = dict[key];
+  });
+  document.documentElement.setAttribute("lang", lang === "tr" ? "tr" : lang);
+  var label = document.getElementById("langLabel");
+  if (label) label.textContent = langCodes[lang] || "TR";
+  document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+    item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+  });
+  localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+  if (e) e.stopPropagation();
+  var menu = document.getElementById("langMenu");
+  var btn = document.getElementById("langSwitchBtn");
+  if (!menu) return;
+  var willOpen = !menu.classList.contains("open");
+  menu.classList.toggle("open", willOpen);
+  if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+
+function closeLangMenu() {
+  var menu = document.getElementById("langMenu");
+  var btn = document.getElementById("langSwitchBtn");
+  if (menu) menu.classList.remove("open");
+  if (btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function selectLanguage(lang) {
+  applyLanguage(lang);
+  closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+  var switcher = document.getElementById("langSwitcher");
+  if (switcher && !switcher.contains(e.target)) closeLangMenu();
+});
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") closeLangMenu();
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  var savedLang = localStorage.getItem("site-lang") || "tr";
+  applyLanguage(savedLang);
+});
+
+/* SCROLL ANIMASYONU */
+var observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) entry.target.classList.add("active");
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+</script>
+
+</body>
+</html>
