@@ -576,10 +576,19 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
               <span class="participant-name">Muhammed Eren Yalçın</span>
               <span class="participant-id">ID: 1</span>
             </span>
+          </li>
+          <li class="participant-row">
             <span class="participant-rank">2</span>
             <span class="participant-info">
               <span class="participant-name">Abdussamet Bozbay</span>
               <span class="participant-id">ID: 2</span>
+            </span>
+          </li>
+          <li class="participant-row">
+            <span class="participant-rank">3</span>
+            <span class="participant-info">
+              <span class="participant-name">Ömer Eymen Akar</span>
+              <span class="participant-id">ID: 3</span>
             </span>
           </li>
         </ul>
@@ -666,7 +675,16 @@ function switchTab(tab) {
   document.querySelectorAll("#panel-" + tab + " .reveal").forEach(function(el) {
     el.classList.add("active");
   });
+  localStorage.setItem("active-tab", tab);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+  var validTabs = ["kayit", "sartlar", "yarismacilar", "kategoriler", "program", "sonuclar"];
+  var savedTab = localStorage.getItem("active-tab");
+  if (savedTab && validTabs.indexOf(savedTab) !== -1) {
+    switchTab(savedTab);
+  }
+});
 
 function toggleDarkMode() {
   var isDark = document.documentElement.classList.toggle("dark-mode");
