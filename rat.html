@@ -214,16 +214,6 @@ section { padding: 100px 7%; }
 .card h3 { font-size: 20px; color: var(--text); margin-bottom: 10px; }
 .card p { color: var(--text-soft); font-size: 14px; line-height: 1.7; }
 
-/* ÖNE ÇIKAN ETKİNLİKLER */
-.featured-list { display: flex; flex-direction: column; gap: 20px; max-width: 1000px; margin: 0 auto; }
-.featured-empty {
-  max-width: 560px; margin: 0 auto; text-align: center;
-  padding: 60px 40px; border-radius: 24px;
-  background: var(--surface); border: 1px dashed var(--border);
-}
-.featured-empty-icon { font-size: 40px; margin-bottom: 18px; }
-.featured-empty h3 { font-size: 20px; color: var(--text); margin-bottom: 10px; }
-.featured-empty p { color: var(--text-soft); font-size: 14px; line-height: 1.7; }
 .featured-card {
   display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 26px;
   padding: 32px 36px; border-radius: 24px;
@@ -463,7 +453,7 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
         online yarışmalar düzenliyoruz.
       </p>
 
-      <a href="#etkinlikler" class="btn btn-primary" data-i18n="heroBtn">Topluluğa Katıl →</a>
+      <a href="https://rubikacademy.fun/rat/yarismalar" class="btn btn-primary" data-i18n="heroBtn">Yarışmalara Git →</a>
 
     </div>
 
@@ -495,23 +485,6 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
   </div>
 </section>
 
-<!-- YAKLAŞAN ETKİNLİKLER -->
-<section id="etkinlikler" class="featured-section">
-  <div class="section-container">
-
-    <div class="section-heading reveal">
-      <span data-i18n="featuredSpan">Yaklaşan Etkinlikler</span>
-      <h2 data-i18n="featuredH2">Bir sonraki buluşmayı kaçırma.</h2>
-    </div>
-
-    <div class="featured-empty reveal">
-      <div class="featured-empty-icon">🐭</div>
-      <h3 data-i18n="emptyTitle">Şu an planlanmış bir etkinlik yok</h3>
-      <p data-i18n="emptyP">Yeni buluşma ve yarışma duyuruları burada yayınlanacak. Takipte kal!</p>
-    </div>
-
-  </div>
-</section>
 
 <!-- RAT NEDİR -->
 <section id="rat-nedir">
@@ -672,9 +645,7 @@ var translations = {
     badge: "Türkiye Speedcubing Topluluğu",
     heroTitle1: "Türkiye'nin", heroTitleGradient: "Rubik topluluğu.", heroTitle2: "Buluş, yarış, gelişin.",
     heroP: "RAT (Rubik Academy Türkiye), Türkiye genelindeki Rubik küp tutkunlarını bir araya getiren bir topluluktur. Şehir buluşmalarında mini yarışmalar, evden katılabileceğin online yarışmalar düzenliyoruz.",
-    heroBtn: "Topluluğa Katıl →",
-    featuredSpan: "Yaklaşan Etkinlikler", featuredH2: "Bir sonraki buluşmayı kaçırma.",
-    emptyTitle: "Şu an planlanmış bir etkinlik yok", emptyP: "Yeni buluşma ve yarışma duyuruları burada yayınlanacak. Takipte kal!",
+    heroBtn: "Yarışmalara Git →",
     aboutSpan: "RAT Nedir?", aboutH2: "Türkiye'nin her yerinde, ekranın önünde.", aboutP: "Buluşmalar, mini yarışmalar ve online yarışmalarla büyüyen bir topluluk.",
     card1Title: "Şehir Buluşmaları", card1P: "Türkiye'nin farklı şehirlerinde düzenli buluşmalar yapıyoruz; tanış, pratik yap, birlikte gelişin.",
     card2Title: "Mini Yarışmalar", card2P: "Buluşmalarda düzenlediğimiz mini yarışmalarda derecene göre sıralamana gir, ödül kazan.",
@@ -693,9 +664,7 @@ var translations = {
     badge: "Turkey's Speedcubing Community",
     heroTitle1: "Turkey's", heroTitleGradient: "Rubik's Cube community.", heroTitle2: "Meet up, compete, grow.",
     heroP: "RAT (Rubik Academy Turkey) brings together Rubik's Cube enthusiasts from across Turkey. We run mini-competitions at our city meetups, plus online competitions anyone can join from home.",
-    heroBtn: "Join the Community →",
-    featuredSpan: "Upcoming Events", featuredH2: "Don't miss the next meetup.",
-    emptyTitle: "No events scheduled right now", emptyP: "New meetup and competition announcements will be posted here. Stay tuned!",
+    heroBtn: "Go to Competitions →",
     aboutSpan: "What is RAT?", aboutH2: "Everywhere in Turkey, right on your screen.", aboutP: "A community that grows through meetups, mini-competitions and online competitions.",
     card1Title: "City Meetups", card1P: "We hold regular meetups in cities across Turkey — meet other cubers, practice and improve together.",
     card2Title: "Mini-competitions", card2P: "Compete in the mini-competitions we run at our meetups, place on the podium and win prizes.",
@@ -714,9 +683,7 @@ var translations = {
     badge: "Сообщество спидкубинга Турции",
     heroTitle1: "Турецкое", heroTitleGradient: "сообщество кубика Рубика.", heroTitle2: "Встречайся, соревнуйся, расти.",
     heroP: "RAT (Rubik Academy Türkiye) объединяет любителей кубика Рубика со всей Турции. Мы проводим мини-турниры на городских встречах и онлайн-соревнования, в которых может участвовать каждый из дома.",
-    heroBtn: "Присоединиться →",
-    featuredSpan: "Ближайшие мероприятия", featuredH2: "Не пропусти следующую встречу.",
-    emptyTitle: "Пока нет запланированных мероприятий", emptyP: "Новые встречи и соревнования будут анонсированы здесь. Следи за обновлениями!",
+    heroBtn: "К соревнованиям →",
     aboutSpan: "Что такое RAT?", aboutH2: "По всей Турции и прямо у экрана.", aboutP: "Сообщество, которое растёт благодаря встречам, мини-турнирам и онлайн-соревнованиям.",
     card1Title: "Городские встречи", card1P: "Мы регулярно проводим встречи в разных городах Турции — знакомься, тренируйся и развивайся вместе.",
     card2Title: "Мини-турниры", card2P: "Участвуй в мини-турнирах на наших встречах, занимай места и выигрывай призы.",
@@ -735,9 +702,7 @@ var translations = {
     badge: "Speedcubing-Community der Türkei",
     heroTitle1: "Die Rubik's-Cube-", heroTitleGradient: "Community der Türkei.", heroTitle2: "Triff dich, tritt an, wachse.",
     heroP: "RAT (Rubik Academy Türkiye) bringt Rubik's-Cube-Fans aus der ganzen Türkei zusammen. Wir veranstalten Mini-Wettbewerbe bei unseren Stadttreffen sowie Online-Wettbewerbe, an denen jeder von zu Hause teilnehmen kann.",
-    heroBtn: "Der Community beitreten →",
-    featuredSpan: "Kommende Veranstaltungen", featuredH2: "Verpasse nicht das nächste Treffen.",
-    emptyTitle: "Aktuell sind keine Veranstaltungen geplant", emptyP: "Neue Treffen und Wettbewerbe werden hier angekündigt. Bleib dran!",
+    heroBtn: "Zu den Wettbewerben →",
     aboutSpan: "Was ist RAT?", aboutH2: "Überall in der Türkei, direkt vor deinem Bildschirm.", aboutP: "Eine Community, die durch Treffen, Mini-Wettbewerbe und Online-Wettbewerbe wächst.",
     card1Title: "Stadttreffen", card1P: "Wir veranstalten regelmäßige Treffen in Städten in der ganzen Türkei — lerne andere Cuber kennen und entwickle dich gemeinsam.",
     card2Title: "Mini-Wettbewerbe", card2P: "Tritt bei den Mini-Wettbewerben auf unseren Treffen an, platziere dich und gewinne Preise.",
@@ -756,9 +721,7 @@ var translations = {
     badge: "مجتمع السبيدكيوبنج في تركيا",
     heroTitle1: "مجتمع مكعب روبيك", heroTitleGradient: "في تركيا.", heroTitle2: "التقِ، تنافس، تطوّر.",
     heroP: "RAT (روبيك أكاديمي تركيا) يجمع عشّاق مكعب روبيك من جميع أنحاء تركيا. ننظّم مسابقات صغيرة في لقاءات المدن ومسابقات عبر الإنترنت يمكن للجميع المشاركة فيها من المنزل.",
-    heroBtn: "انضم إلى المجتمع ←",
-    featuredSpan: "الفعاليات القادمة", featuredH2: "لا تفوّت اللقاء القادم.",
-    emptyTitle: "لا توجد فعاليات مقررة حاليًا", emptyP: "سيتم نشر إعلانات اللقاءات والمسابقات الجديدة هنا. تابعنا!",
+    heroBtn: "اذهب إلى المسابقات ←",
     aboutSpan: "ما هو RAT؟", aboutH2: "في كل مكان بتركيا، وأمام شاشتك أيضًا.", aboutP: "مجتمع ينمو من خلال اللقاءات والمسابقات الصغيرة والمسابقات عبر الإنترنت.",
     card1Title: "لقاءات المدن", card1P: "ننظّم لقاءات منتظمة في مدن مختلفة بتركيا؛ تعرّف على الآخرين وتمرّنوا وتطوّروا معًا.",
     card2Title: "مسابقات صغيرة", card2P: "شارك في المسابقات الصغيرة التي ننظّمها في اللقاءات واحصل على مركز واربح جوائز.",
