@@ -6,7 +6,7 @@
 
 <script>
 (function() {
-  var savedTheme = localStorage.getItem("rat-theme");
+  var savedTheme = localStorage.getItem("theme");
   if (savedTheme === "dark") {
     document.documentElement.classList.add("dark-mode");
   }
@@ -398,7 +398,7 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
       <span data-i18n="backBtn">Geri Dön</span>
     </a>
 
-    <a href="https://rubikacademy.fun/" class="nav-logo">
+    <a href="https://rubikacademy.fun/rat" class="nav-logo">
       <div class="nav-logo-mark">
         <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="11" cy="11" r="7" fill="white"/>
@@ -418,6 +418,7 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
 
     <nav class="nav-links">
       <a href="#" class="active" data-i18n="navHome">Ana Sayfa</a>
+      <a href="https://rubikacademy.fun/rat/yarismalar" data-i18n="navCompetitions">Yarışmalar</a>
     </nav>
 
     <div class="lang-switcher" id="langSwitcher">
@@ -644,16 +645,16 @@ function toggleDarkMode() {
   document.body.classList.toggle("dark-mode", isDark);
   var btn = document.getElementById("darkModeBtn");
   if (isDark) {
-    localStorage.setItem("rat-theme", "dark");
+    localStorage.setItem("theme", "dark");
     if (btn) btn.innerHTML = "☀️";
   } else {
-    localStorage.setItem("rat-theme", "light");
+    localStorage.setItem("theme", "light");
     if (btn) btn.innerHTML = "🌙";
   }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  var savedTheme = localStorage.getItem("rat-theme");
+  var savedTheme = localStorage.getItem("theme");
   var btn = document.getElementById("darkModeBtn");
   if (savedTheme === "dark") {
     document.documentElement.classList.add("dark-mode");
@@ -667,7 +668,7 @@ document.addEventListener("DOMContentLoaded", function() {
 /* DİL SEÇİCİ */
 var translations = {
   tr: {
-    navHome: "Ana Sayfa", backBtn: "Geri Dön",
+    navHome: "Ana Sayfa", backBtn: "Geri Dön", navCompetitions: "Yarışmalar",
     badge: "Türkiye Speedcubing Topluluğu",
     heroTitle1: "Türkiye'nin", heroTitleGradient: "Rubik topluluğu.", heroTitle2: "Buluş, yarış, gelişin.",
     heroP: "RAT (Rubik Academy Türkiye), Türkiye genelindeki Rubik küp tutkunlarını bir araya getiren bir topluluktur. Şehir buluşmalarında mini yarışmalar, evden katılabileceğin online yarışmalar düzenliyoruz.",
@@ -688,7 +689,7 @@ var translations = {
     footer: "© 2026 RAT — Rubik Academy Türkiye. Tüm hakları saklıdır."
   },
   en: {
-    navHome: "Home", backBtn: "Back",
+    navHome: "Home", backBtn: "Back", navCompetitions: "Competitions",
     badge: "Turkey's Speedcubing Community",
     heroTitle1: "Turkey's", heroTitleGradient: "Rubik's Cube community.", heroTitle2: "Meet up, compete, grow.",
     heroP: "RAT (Rubik Academy Turkey) brings together Rubik's Cube enthusiasts from across Turkey. We run mini-competitions at our city meetups, plus online competitions anyone can join from home.",
@@ -709,7 +710,7 @@ var translations = {
     footer: "© 2026 RAT — Rubik Academy Turkey. All rights reserved."
   },
   ru: {
-    navHome: "Главная", backBtn: "Назад",
+    navHome: "Главная", backBtn: "Назад", navCompetitions: "Соревнования",
     badge: "Сообщество спидкубинга Турции",
     heroTitle1: "Турецкое", heroTitleGradient: "сообщество кубика Рубика.", heroTitle2: "Встречайся, соревнуйся, расти.",
     heroP: "RAT (Rubik Academy Türkiye) объединяет любителей кубика Рубика со всей Турции. Мы проводим мини-турниры на городских встречах и онлайн-соревнования, в которых может участвовать каждый из дома.",
@@ -730,7 +731,7 @@ var translations = {
     footer: "© 2026 RAT — Rubik Academy Türkiye. Все права защищены."
   },
   de: {
-    navHome: "Startseite", backBtn: "Zurück",
+    navHome: "Startseite", backBtn: "Zurück", navCompetitions: "Wettbewerbe",
     badge: "Speedcubing-Community der Türkei",
     heroTitle1: "Die Rubik's-Cube-", heroTitleGradient: "Community der Türkei.", heroTitle2: "Triff dich, tritt an, wachse.",
     heroP: "RAT (Rubik Academy Türkiye) bringt Rubik's-Cube-Fans aus der ganzen Türkei zusammen. Wir veranstalten Mini-Wettbewerbe bei unseren Stadttreffen sowie Online-Wettbewerbe, an denen jeder von zu Hause teilnehmen kann.",
@@ -751,7 +752,7 @@ var translations = {
     footer: "© 2026 RAT — Rubik Academy Türkiye. Alle Rechte vorbehalten."
   },
   ar: {
-    navHome: "الرئيسية", backBtn: "رجوع",
+    navHome: "الرئيسية", backBtn: "رجوع", navCompetitions: "المسابقات",
     badge: "مجتمع السبيدكيوبنج في تركيا",
     heroTitle1: "مجتمع مكعب روبيك", heroTitleGradient: "في تركيا.", heroTitle2: "التقِ، تنافس، تطوّر.",
     heroP: "RAT (روبيك أكاديمي تركيا) يجمع عشّاق مكعب روبيك من جميع أنحاء تركيا. ننظّم مسابقات صغيرة في لقاءات المدن ومسابقات عبر الإنترنت يمكن للجميع المشاركة فيها من المنزل.",
@@ -789,7 +790,7 @@ function applyLanguage(lang) {
   document.querySelectorAll(".lang-menu-item").forEach(function(item) {
     item.classList.toggle("active", item.getAttribute("data-lang") === lang);
   });
-  localStorage.setItem("rat-lang", lang);
+  localStorage.setItem("site-lang", lang);
 }
 
 function toggleLangMenu(e) {
@@ -824,7 +825,7 @@ document.addEventListener("keydown", function(e) {
 });
 
 document.addEventListener("DOMContentLoaded", function() {
-  var savedLang = localStorage.getItem("rat-lang") || "tr";
+  var savedLang = localStorage.getItem("site-lang") || "tr";
   applyLanguage(savedLang);
 });
 
