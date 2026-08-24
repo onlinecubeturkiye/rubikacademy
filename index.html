@@ -991,313 +991,158 @@ section {
 }
 
 /* =========================================
-   ÖNE ÇIKANLAR
+   RAT YARIŞMA TANITIM BANDI (KIRMIZI)
 ========================================= */
 
-.featured-section {
-
+.rat-promo {
+    padding: 0 7% 70px;
     background: transparent;
-
-    transition: background-color 0.3s;
 }
 
-
-.featured-list {
-
+.rat-promo-card {
     display: flex;
-
     flex-direction: column;
-
-    gap: 20px;
-
-    max-width: 1000px;
-
+    gap: 14px;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 24px 32px 28px;
+    border-radius: 22px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(120deg, #e6252f, #b91c1c 65%);
+    box-shadow: 0 20px 45px rgba(230,37,47,.30);
+    transition: .3s, background-color 0.3s;
 }
 
-
-.featured-card {
-
-    display: grid;
-
-    grid-template-columns:
-        auto 1fr auto;
-
-    align-items: center;
-
-    gap: 26px;
-
-    padding: 32px 36px;
-
-    border-radius: 24px;
-
-    background:
-        var(--surface);
-
-    border:
-        1px solid
-        var(--border);
-
-    box-shadow:
-        var(--shadow);
-
-    transition: .3s;
-}
-
-
-.featured-card:hover {
-
-    transform:
-        translateY(-6px);
-
-    border-color:
-        #bfdbfe;
-
-    box-shadow:
-
-        0 20px 45px
-        rgba(37,99,235,.10);
-}
-
-/* YAYINDA OLAN VİDEO - KIRMIZI ÇERÇEVE */
-.featured-card.live-video{
-    border: 3px solid #e6252f;
-    box-shadow: 0 0 0 4px rgba(230,37,47,.14), 0 24px 55px rgba(230,37,47,.18);
-}
-
-.featured-card.live-video:hover{
-    border-color:#e6252f;
-    box-shadow: 0 0 0 5px rgba(230,37,47,.20), 0 26px 60px rgba(230,37,47,.24);
-}
-
-.featured-thumb{
-    position:relative;
-    width:150px;
-    height:110px;
-    flex-shrink:0;
-    border-radius:16px;
-    overflow:hidden;
-    box-shadow: 0 12px 25px rgba(15,23,42,.20);
-    background: linear-gradient(135deg, #eee8ff, #b39cff);
-}
-
-.featured-thumb img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-}
-
-.featured-thumb .video-play-icon{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    background: rgba(230,37,47,.92);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    pointer-events:none;
-}
-
-.featured-thumb .video-play-icon::after{
-    content:"";
-    border-style: solid;
-    border-width: 8px 0 8px 14px;
-    border-color: transparent transparent transparent #fff;
-    margin-left:3px;
-}
-
-.live-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    padding:6px 11px;
-    border-radius:8px;
-    background:#e6252f;
-    color:#fff;
-    font-size:10px;
-    font-weight:900;
-    letter-spacing:.6px;
-    margin-bottom:8px;
-}
-
-@media(max-width:700px){
-    .featured-thumb{
-        width:100%;
-        max-width:280px;
-        height:160px;
-    }
-}
-
-
-.featured-date {
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    width: 92px;
-
-    height: 92px;
-
-    flex-shrink: 0;
-
-    border-radius: 18px;
-
-    background:
-
-        linear-gradient(
-            135deg,
-            #2563eb,
-            #4f46e5
-        );
-
-    color: white;
-
-    box-shadow:
-
-        0 12px 30px
-        rgba(37,99,235,.25);
-}
-
-
-.featured-date .fd-day {
-
-    font-size: 26px;
-
-    font-weight: 900;
-
-    line-height: 1;
-}
-
-
-.featured-date .fd-month {
-
-    font-size: 12px;
-
-    font-weight: 700;
-
-    letter-spacing: .5px;
-
-    text-transform: uppercase;
-
-    margin-top: 4px;
-}
-
-
-.featured-body .featured-tag {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    color:
-        var(--primary);
-
-    font-size: 12px;
-
-    font-weight: 800;
-
-    letter-spacing: 1.5px;
-
-    text-transform: uppercase;
-
-    margin-bottom: 8px;
-}
-
-
-.featured-body .featured-tag::before {
-
+.rat-promo-card::before {
     content: "";
-
-    width: 7px;
-
-    height: 7px;
-
+    position: absolute;
+    top: -60%;
+    right: -10%;
+    width: 320px;
+    height: 320px;
     border-radius: 50%;
-
-    background: #2563eb;
+    background: rgba(255,255,255,.12);
+    pointer-events: none;
 }
 
-
-.featured-body h3 {
-
-    font-size: 22px;
-
-    color:
-        var(--text);
-
-    margin-bottom: 8px;
+.rat-promo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 26px 55px rgba(230,37,47,.36);
 }
 
-
-.featured-body p {
-
-    color:
-        var(--text-soft);
-
-    font-size: 14px;
-
-    line-height: 1.7;
+.rat-promo-top {
+    position: relative;
+    z-index: 1;
 }
 
+.rat-promo-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: #172033;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+}
 
-.featured-time {
-
+.rat-promo-row {
     display: flex;
-
     align-items: center;
-
-    gap: 8px;
-
-    padding: 10px 18px;
-
-    border-radius: 12px;
-
-    background:
-        var(--primary-light);
-
-    border:
-        1px solid #dbeafe;
-
-    color:
-        var(--primary);
-
-    font-size: 15px;
-
-    font-weight: 800;
-
-    white-space: nowrap;
+    gap: 26px;
+    position: relative;
+    z-index: 1;
 }
 
+.rat-promo-body {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    min-width: 0;
+}
+
+.rat-promo-mark {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: rgba(255,255,255,.16);
+    font-size: 27px;
+}
+
+.rat-promo-mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.rat-promo-text h3 {
+    color: #fff;
+    font-size: 19px;
+    font-weight: 800;
+    margin-bottom: 2px;
+    letter-spacing: -.3px;
+    transition: color 0.3s;
+}
+
+.rat-promo-author {
+    display: block;
+    color: rgba(255,255,255,.75);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    transition: color 0.3s;
+}
+
+.rat-promo-text p {
+    color: rgba(255,255,255,.90);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 560px;
+    transition: color 0.3s;
+}
+
+.rat-promo-cta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: #fff;
+    color: #b91c1c;
+    font-size: 14px;
+    font-weight: 800;
+    transition: .25s, background-color 0.25s, color 0.25s;
+}
+
+.rat-promo-cta svg {
+    width: 16px;
+    height: 16px;
+    transition: .25s;
+}
+
+.rat-promo-card:hover .rat-promo-cta svg {
+    transform: translateX(3px);
+}
 
 @media(max-width:700px) {
-
-    .featured-card {
-
-        grid-template-columns:
-            1fr;
-
-        text-align: center;
-
-        justify-items: center;
+    .rat-promo-row {
+        flex-direction: column;
+        align-items: flex-start;
     }
-
-    .featured-body .featured-tag::before {
-
-        margin-right: 0;
+    .rat-promo-cta {
+        align-self: stretch;
+        justify-content: center;
     }
-
 }
 
 
@@ -1894,18 +1739,6 @@ body.dark-mode .contact-box {
     border-color: var(--border);
 }
 
-html.dark-mode .featured-card,
-body.dark-mode .featured-card {
-    background: var(--surface);
-    border-color: var(--border);
-}
-
-html.dark-mode .featured-card.live-video,
-body.dark-mode .featured-card.live-video {
-    border-color: #e6252f;
-    box-shadow: 0 0 0 4px rgba(230,37,47,.22), 0 24px 55px rgba(230,37,47,.22);
-}
-
 html.dark-mode .bg-glow::before,
 html.dark-mode .bg-glow::after {
     opacity: 0.25;
@@ -2214,62 +2047,43 @@ body.dark-mode .zkt-promo-cta {
 
 
 <!-- =========================================
-     ÖNE ÇIKANLAR
+     RAT YARIŞMA TANITIM BANDI
 ========================================= -->
 
-<section class="featured-section">
+<section class="rat-promo">
 
     <div class="section-container">
 
+        <a href="https://rubikacademy.fun/rat" class="rat-promo-card reveal">
 
-        <div class="section-heading reveal">
+            <div class="rat-promo-top">
+                <span class="rat-promo-badge" data-i18n="ratPromoBadge">Yarışma · RAT</span>
+            </div>
 
-            <span data-i18n="featuredSpan">
-                Öne Çıkanlar
-            </span>
+            <div class="rat-promo-row">
 
+                <div class="rat-promo-body">
 
-            <h2 data-i18n="featuredH2">
-                Yeni videoyu kaçırma.
-            </h2>
+                    <div class="rat-promo-mark">
+                        🏆
+                    </div>
 
-        </div>
-
-
-        <div class="featured-list">
-
-
-            <div class="featured-card reveal">
-
-                <div class="featured-date">
-                    <span class="fd-day">24</span>
-                    <span class="fd-month" data-i18n="featuredMonth2">Ağu</span>
-                </div>
-
-                <div class="featured-body">
-
-                    <span class="featured-tag" data-i18n="featuredTag2">
-                        Yeni Video · Pazartesi
-                    </span>
-
-                    <h3 data-i18n="featuredTitle2">
-                        FTO Nasıl Karıştırılır?
-                    </h3>
-
-                    <p data-i18n="featuredDesc2">
-                        FTO küpünü doğru ve dengeli şekilde karıştırmayı öğren.
-                    </p>
+                    <div class="rat-promo-text">
+                        <h3 data-i18n="ratPromoTitle">RAT — Rubik Academy Türkiye Yarışmaları</h3>
+                        <span class="rat-promo-author" data-i18n="ratPromoAuthor">Online Yarışmalar</span>
+                        <p data-i18n="ratPromoP">FTO Ağustos 2026 yarışmasına katıl, diğer speedcuber'larla yarış ve derecelerini kaydet.</p>
+                    </div>
 
                 </div>
 
-                <div class="featured-time" data-i18n="featuredTime2">
-                    15:00
+                <div class="rat-promo-cta" data-i18n="ratPromoCta">
+                    Keşfet
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
 
             </div>
 
-
-        </div>
+        </a>
 
     </div>
 
@@ -2741,18 +2555,11 @@ var translations = {
         zktPromoAuthor: "İbrahim Yıldız",
         zktPromoP: "Türkiye'nin en kapsamlı küp zamanlayıcısı. Sürelerini kaydet, istatistiklerini takip et ve arkadaşlarınla online küp çöz.",
         zktPromoCta: "Keşfet",
-        featuredSpan: "Öne Çıkanlar",
-        featuredH2: "Yeni videoyu kaçırma.",
-        featuredMonth: "Ağu",
-        featuredTag: "Yeni Video · Pazar",
-        featuredTitle: "FTO Nasıl Çözülür? - Bencisco Method",
-        featuredDesc: "Bencisco metoduyla FTO'yu ileri seviyede çözmeyi öğren.",
-        featuredTime: "15:00",
-        featuredMonth2: "Ağu",
-        featuredTag2: "Yeni Video · Pazartesi",
-        featuredTitle2: "FTO Nasıl Karıştırılır?",
-        featuredDesc2: "FTO küpünü doğru ve dengeli şekilde karıştırmayı öğren.",
-        featuredTime2: "15:00",
+        ratPromoBadge: "Yarışma · RAT",
+        ratPromoTitle: "RAT — Rubik Academy Türkiye Yarışmaları",
+        ratPromoAuthor: "Online Yarışmalar",
+        ratPromoP: "FTO Ağustos 2026 yarışmasına katıl, diğer speedcuber'larla yarış ve derecelerini kaydet.",
+        ratPromoCta: "Keşfet",
         academySpan: "Rubik Academy",
         academyH2: "Küp çözmeyi sistemli şekilde öğren.",
         academyP: "Temelden başlayıp speedcubing seviyesine kadar ilerleyebileceğin içerikler.",
@@ -2798,18 +2605,11 @@ var translations = {
         zktPromoAuthor: "İbrahim Yıldız",
         zktPromoP: "Turkey's most comprehensive cube timer. Log your times, track your stats, and solve cubes online with your friends.",
         zktPromoCta: "Explore",
-        featuredSpan: "Featured",
-        featuredH2: "Don't miss the new video.",
-        featuredMonth: "Aug",
-        featuredTag: "New Video · Sunday",
-        featuredTitle: "How to Solve the FTO? - Bencisco Method",
-        featuredDesc: "Learn to solve the FTO at an advanced level with the Bencisco method.",
-        featuredTime: "3:00 PM",
-        featuredMonth2: "Aug",
-        featuredTag2: "New Video · Monday",
-        featuredTitle2: "How to Scramble the FTO?",
-        featuredDesc2: "Learn how to scramble the FTO cube properly and evenly.",
-        featuredTime2: "3:00 PM",
+        ratPromoBadge: "Competition · RAT",
+        ratPromoTitle: "RAT — Rubik Academy Turkey Competitions",
+        ratPromoAuthor: "Online Competitions",
+        ratPromoP: "Join the FTO August 2026 competition, race against other speedcubers, and record your results.",
+        ratPromoCta: "Explore",
         academySpan: "Rubik Academy",
         academyH2: "Learn to solve the cube, step by step.",
         academyP: "Content that takes you from the basics all the way to speedcubing level.",
@@ -2855,18 +2655,11 @@ var translations = {
         zktPromoAuthor: "İbrahim Yıldız",
         zktPromoP: "Самый полнофункциональный таймер для кубика в Турции. Сохраняй время, отслеживай статистику и собирай кубик онлайн с друзьями.",
         zktPromoCta: "Смотреть",
-        featuredSpan: "Рекомендуем",
-        featuredH2: "Не пропусти новое видео.",
-        featuredMonth: "авг",
-        featuredTag: "Новое видео · Воскресенье",
-        featuredTitle: "Как собрать FTO? - Метод Bencisco",
-        featuredDesc: "Научись собирать FTO на продвинутом уровне методом Bencisco.",
-        featuredTime: "15:00",
-        featuredMonth2: "авг",
-        featuredTag2: "Новое видео · Понедельник",
-        featuredTitle2: "Как скрамблить FTO?",
-        featuredDesc2: "Научись правильно скрамблить FTO.",
-        featuredTime2: "15:00",
+        ratPromoBadge: "Соревнование · RAT",
+        ratPromoTitle: "RAT — Соревнования Rubik Academy Türkiye",
+        ratPromoAuthor: "Онлайн-соревнования",
+        ratPromoP: "Прими участие в соревновании FTO Август 2026, посоревнуйся с другими спидкуберами и зафиксируй свои результаты.",
+        ratPromoCta: "Смотреть",
         academySpan: "Rubik Academy",
         academyH2: "Изучай сборку кубика системно.",
         academyP: "Контент, который проведёт тебя от основ до профессионального уровня.",
@@ -2912,18 +2705,11 @@ var translations = {
         zktPromoAuthor: "İbrahim Yıldız",
         zktPromoP: "Der umfangreichste Würfel-Timer der Türkei. Speichere deine Zeiten, verfolge deine Statistiken und löse Würfel online mit deinen Freunden.",
         zktPromoCta: "Entdecken",
-        featuredSpan: "Empfohlen",
-        featuredH2: "Verpasse nicht das neue Video.",
-        featuredMonth: "Aug",
-        featuredTag: "Neues Video · Sonntag",
-        featuredTitle: "Wie löst man den FTO? - Bencisco-Methode",
-        featuredDesc: "Lerne, den FTO auf fortgeschrittenem Niveau mit der Bencisco-Methode zu lösen.",
-        featuredTime: "15:00",
-        featuredMonth2: "Aug",
-        featuredTag2: "Neues Video · Montag",
-        featuredTitle2: "Wie scrambelt man den FTO?",
-        featuredDesc2: "Lerne, den FTO-Würfel richtig und gleichmäßig zu scramblen.",
-        featuredTime2: "15:00",
+        ratPromoBadge: "Wettbewerb · RAT",
+        ratPromoTitle: "RAT — Rubik Academy Türkiye Wettbewerbe",
+        ratPromoAuthor: "Online-Wettbewerbe",
+        ratPromoP: "Nimm am FTO-Wettbewerb im August 2026 teil, tritt gegen andere Speedcuber an und halte deine Ergebnisse fest.",
+        ratPromoCta: "Entdecken",
         academySpan: "Rubik Academy",
         academyH2: "Lerne systematisch, den Würfel zu lösen.",
         academyP: "Inhalte, die dich von den Grundlagen bis zum professionellen Speedcubing-Niveau begleiten.",
@@ -2969,18 +2755,11 @@ var translations = {
         zktPromoAuthor: "İbrahim Yıldız",
         zktPromoP: "أشمل ساعة توقيت لمكعب روبيك في تركيا. سجّل أوقاتك، تابع إحصائياتك، وحلّ المكعب أونلاين مع أصدقائك.",
         zktPromoCta: "اكتشف",
-        featuredSpan: "الأبرز",
-        featuredH2: "لا تفوّت الفيديو الجديد.",
-        featuredMonth: "أغسطس",
-        featuredTag: "فيديو جديد · الأحد",
-        featuredTitle: "كيف تحل مكعب FTO؟ - طريقة Bencisco",
-        featuredDesc: "تعلّم حل مكعب FTO بمستوى متقدم باستخدام طريقة Bencisco.",
-        featuredTime: "15:00",
-        featuredMonth2: "أغسطس",
-        featuredTag2: "فيديو جديد · الاثنين",
-        featuredTitle2: "كيف تُخلط مكعب FTO؟",
-        featuredDesc2: "تعلّم كيفية خلط مكعب FTO بشكل صحيح ومتوازن.",
-        featuredTime2: "15:00",
+        ratPromoBadge: "مسابقة · RAT",
+        ratPromoTitle: "RAT — مسابقات روبيك أكاديمي تركيا",
+        ratPromoAuthor: "مسابقات أونلاين",
+        ratPromoP: "شارك في مسابقة FTO أغسطس 2026، نافس محلّي مكعبات آخرين وسجّل نتائجك.",
+        ratPromoCta: "اكتشف",
         academySpan: "روبيك أكاديمي",
         academyH2: "تعلّم حل المكعب بطريقة منظمة.",
         academyP: "محتوى يأخذك من الأساسيات إلى مستوى احترافي في السبيدكيوبنج.",
