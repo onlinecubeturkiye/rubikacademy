@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- TEMA VE SEO AYARLARI -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - FTO Eğitimi</title>
+<!-- TARAYICI SEKMESİ İÇİN LOGO -->
+<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
+
+<link rel="canonical" href="https://rubikacademy.fun/fto">
+<meta name="description" content="Rubik Academy - FTO çözme tekniklerini, mekanizmasını ve temel çözüm algoritmalarını adım adım öğren.">
+<meta property="og:title" content="Rubik Academy - FTO Eğitimi">
+<meta property="og:description" content="FTO bulmacasını adım adım çöz! Başlangıçtan ileri seviyeye küp çözme teknikleri ve ipuçları.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/fto">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+html {
+    overflow-x: hidden;
+}
+
+/* =========================================
+   RENKLER VE DEĞİŞKENLER
+========================================= */
+:root {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-soft: #f1f5f9;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #e2e8f0;
+    --card-border: #dfebf5;
+    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+    --hero-bg: linear-gradient(120deg, #e8f7ff, #c8eaff);
+    --hero-border: #cce8fa;
+    --btn-bg: #eef8ff;
+    --btn-hover-bg: #dff2ff;
+    --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
+    --bottom-border: #d5eafa;
+    --bottom-text: #18578c;
+}
+
+/* Karanlık Mod Değişkenleri */
+html.dark-mode,
+body.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --card-border: #334155;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+    --hero-bg: linear-gradient(120deg, #1e293b, #0f172a);
+    --hero-border: #334155;
+    --btn-bg: #334155;
+    --btn-hover-bg: #1e3a8a;
+    --bottom-bg: #1e293b;
+    --bottom-border: #334155;
+    --bottom-text: #60a5fa;
+}
+
+/* =========================================
+   GENEL SIFIRLAMA
+========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    background: var(--background);
+    color: var(--text);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* =========================================
+   ÜST BAR (NAVBAR)
+========================================= */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 7%;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .navbar,
+body.dark-mode .navbar {
+    background: rgba(15, 23, 42, 0.90);
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo-mark {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    padding: 4px;
+    border-radius: 10px;
+    background: #1e293b;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+}
+
+.nav-logo-mark div {
+    border-radius: 2px;
+    background: #f8fafc;
+}
+
+.nav-logo-mark div:nth-child(2),
+.nav-logo-mark div:nth-child(8) {
+    background: #ef4444;
+}
+
+.nav-logo-mark div:nth-child(4),
+.nav-logo-mark div:nth-child(6) {
+    background: #22c55e;
+}
+
+.nav-logo-mark div:nth-child(5) {
+    background: #3b82f6;
+}
+
+.nav-logo-mark div:nth-child(1),
+.nav-logo-mark div:nth-child(9) {
+    background: #facc15;
+}
+
+.nav-logo-text {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links a {
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    transition: .25s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* KARANLIK MOD BUTONU */
+.dark-mode-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+}
+
+.dark-mode-btn:hover {
+    transform: scale(1.08);
+}
+
+/* DİL SEÇİCİ */
+.lang-switcher {
+    position: relative;
+}
+
+.lang-switch-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 21px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: .3s;
+}
+
+.lang-switch-btn:hover {
+    transform: scale(1.06);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-switch-btn .lang-globe {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
+}
+
+.lang-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-menu-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.lang-menu-item.active .lang-check {
+    opacity: 1;
+}
+
+@media(max-width: 500px) {
+    .navbar {
+        padding: 14px 5%;
+    }
+    .nav-logo-text {
+        font-size: 15px;
+    }
+    .nav-links a {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    .nav-right {
+        gap: 6px;
+    }
+    .lang-switch-btn {
+        padding: 0 10px;
+        font-size: 12px;
+    }
+}
+
+/* =========================================
+   SAYFA İÇERİK DÜZENİ
+========================================= */
+.page {
+    min-height: calc(100vh - 71px);
+    padding: 45px 5% 80px;
+    background: var(--background);
+    transition: background-color 0.3s;
+}
+
+/* NAV / GERİ DÖN */
+.nav-bar {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: all .25s ease;
+}
+
+.back-btn:hover {
+    transform: translateX(-4px);
+    border-color: #c0e0fc;
+    background: var(--primary-light);
+}
+
+/* HERO */
+.hero {
+    max-width: 1250px;
+    min-height: 390px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 55px 65px;
+    background: var(--hero-bg);
+    border: 1px solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    left: -180px;
+    top: -180px;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 3;
+    max-width: 590px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 15px;
+    border-radius: 50px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    margin-bottom: 18px;
+}
+
+.badge i {
+    width: 7px;
+    height: 7px;
+    background: #168ee0;
+    border-radius: 50%;
+}
+
+.hero h1 {
+    font-size: clamp(42px, 5vw, 68px);
+    line-height: .98;
+    letter-spacing: -3px;
+    font-weight: 950;
+    margin-bottom: 18px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 15px;
+    line-height: 1.75;
+    max-width: 560px;
+}
+
+.hero-cube {
+    width: 300px;
+    height: 300px;
+    position: relative;
+    z-index: 3;
+    flex-shrink: 0;
+    filter: drop-shadow(0 25px 22px rgba(0, 0, 0, .23));
+    animation: floating 5s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+.section-title {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.section-title small {
+    display: block;
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.7px;
+    margin-bottom: 8px;
+}
+
+.section-title h2 {
+    font-size: 30px;
+    letter-spacing: -1px;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.section-title p {
+    color: var(--text-soft);
+    font-size: 13px;
+    margin-top: 7px;
+}
+
+.methods {
+    max-width: 1250px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 27px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease, background-color 0.3s;
+    display: block;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    border-color: #c7e5fa;
+    box-shadow: 0 25px 50px rgba(35, 108, 162, .14);
+}
+
+.card-visual {
+    height: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.card-visual::before {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    border: 40px solid rgba(255, 255, 255, .25);
+    top: -140px;
+    right: -90px;
+}
+
+.beginner { background: linear-gradient(135deg, #e2f5ff, #91d8ff); }
+.middle { background: linear-gradient(135deg, #e9e4ff, #b7a5ff); }
+.advanced { background: linear-gradient(135deg, #dffaf1, #73d8c3); }
+
+.level {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    padding: 8px 11px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(10px);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #26374b;
+}
+
+.number {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(10px);
+    font-size: 18px;
+    font-weight: 900;
+    color: #26374b;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, .12);
+}
+
+.cube {
+    width: 225px;
+    height: 225px;
+    transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+    filter: drop-shadow(0 20px 18px rgba(16, 35, 53, .22));
+}
+
+.card:hover .cube {
+    transform: scale(1.08) translateY(-7px) rotate(-2deg);
+}
+
+.clock-svg {
+    width: 225px;
+    height: 225px;
+}
+
+.card-info { padding: 25px 25px 27px; }
+
+.card-info h3 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -.5px;
+    margin-bottom: 9px;
+    color: var(--text);
+}
+
+.card-info p {
+    color: var(--text-soft);
+    font-size: 13px;
+    line-height: 1.65;
+    min-height: 64px;
+    margin-bottom: 20px;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 13px 15px;
+    border-radius: 13px;
+    background: var(--btn-bg);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 900;
+    transition: background .25s ease, padding .25s ease, color .25s ease;
+}
+
+.card:hover .button {
+    background: var(--btn-hover-bg);
+    padding-left: 19px;
+}
+
+.arrow { font-size: 18px; }
+
+.bottom {
+    max-width: 1250px;
+    margin: 38px auto 0;
+    padding: 32px;
+    text-align: center;
+    border-radius: 25px;
+    background: var(--bottom-bg);
+    border: 1px solid var(--bottom-border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.bottom h3 { color: var(--bottom-text); font-size: 21px; margin-bottom: 7px; }
+.bottom p { color: var(--text-soft); font-size: 13px; }
+
+@media(max-width: 1000px) {
+    .hero { padding: 45px; }
+    .hero-cube { width: 250px; height: 250px; }
+}
+
+@media(max-width: 700px) {
+    .page { padding: 25px 4% 55px; }
+    .hero { min-height: auto; padding: 38px 25px 25px; flex-direction: column; text-align: center; border-radius: 27px; }
+    .hero-text { max-width: 100%; }
+    .hero h1 { font-size: 43px; }
+    .hero p { font-size: 14px; }
+    .hero-cube { width: 235px; height: 235px; margin-top: 15px; }
+    .methods { grid-template-columns: 1fr; gap: 20px; }
+    .card-visual { height: 320px; }
+    .section-title h2 { font-size: 27px; }
+}
+
+.number {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(10px);
+    font-size: 18px;
+    font-weight: 900;
+    color: #26374b;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, .12);
+}
+
+</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<!-- =========================================
+     ÜST BAR (NAVBAR)
+========================================= -->
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <div class="nav-logo-mark">
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+        </div>
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Sprache wechseln / Сменить язык / تغيير اللغة">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+                    <span>Deutsch</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+                    <span>العربية</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+            </div>
+
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
+    </div>
+</header>
+
+<div class="page">
+
+<!-- NAVIGATION -->
+<nav class="nav-bar">
+    <a href="http://rubikacademy.fun/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+FTO
+</div>
+<h1><span data-i18n="hero_title1">FTO</span> <span data-i18n="hero_titleAccent">Eğitimleri</span></h1>
+<p data-i18n="hero_p">
+FTO mekanizmasını ve temel çözüm algoritmalarını adım adım öğren; başlangıçtan ileri seviyeye küp çözme teknikleriyle kendini geliştir.
+</p>
+</div>
+
+<!-- HERO FTO (2D) -->
+<svg class="hero-cube" viewBox="0 0 250 250">
+<rect x="13.0" y="13.0" width="224.0" height="224.0" rx="28.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<polygon points="125.0,125.0 36.4,36.4 213.7,36.4" fill="#d1d5db" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="125.0,125.0 213.7,36.4 213.7,213.7" fill="#1e6fe6" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="125.0,125.0 213.7,213.7 36.4,213.7" fill="#f97316" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="125.0,125.0 36.4,213.7 36.4,36.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<g stroke="#111827" stroke-width="2" stroke-linecap="round">
+<line x1="95.5" y1="95.5" x2="154.5" y2="95.5"/>
+<line x1="65.9" y1="65.9" x2="184.1" y2="65.9"/>
+<line x1="154.5" y1="95.5" x2="95.5" y2="36.4"/>
+<line x1="184.1" y1="65.9" x2="154.6" y2="36.4"/>
+<line x1="95.5" y1="95.5" x2="154.6" y2="36.4"/>
+<line x1="65.9" y1="65.9" x2="95.5" y2="36.4"/>
+<line x1="95.5" y1="154.5" x2="95.5" y2="95.5"/>
+<line x1="65.9" y1="184.1" x2="65.9" y2="65.9"/>
+<line x1="95.5" y1="95.5" x2="36.4" y2="154.5"/>
+<line x1="65.9" y1="65.9" x2="36.4" y2="95.4"/>
+<line x1="95.5" y1="154.5" x2="36.4" y2="95.4"/>
+<line x1="65.9" y1="184.1" x2="36.4" y2="154.5"/>
+<line x1="154.5" y1="154.5" x2="95.5" y2="154.5"/>
+<line x1="184.1" y1="184.1" x2="65.9" y2="184.1"/>
+<line x1="95.5" y1="154.5" x2="154.5" y2="213.6"/>
+<line x1="65.9" y1="184.1" x2="95.4" y2="213.6"/>
+<line x1="154.5" y1="154.5" x2="95.4" y2="213.6"/>
+<line x1="184.1" y1="184.1" x2="154.5" y2="213.6"/>
+<line x1="154.5" y1="95.5" x2="154.5" y2="154.5"/>
+<line x1="184.1" y1="65.9" x2="184.1" y2="184.1"/>
+<line x1="154.5" y1="154.5" x2="213.6" y2="95.5"/>
+<line x1="184.1" y1="184.1" x2="213.6" y2="154.6"/>
+<line x1="154.5" y1="95.5" x2="213.6" y2="154.6"/>
+<line x1="184.1" y1="65.9" x2="213.6" y2="95.5"/>
+</g>
+<g fill="#111827">
+<circle cx="125.0" cy="125.0" r="4"/>
+<circle cx="95.5" cy="95.5" r="4"/>
+<circle cx="65.9" cy="65.9" r="4"/>
+<circle cx="154.5" cy="95.5" r="4"/>
+<circle cx="184.1" cy="65.9" r="4"/>
+<circle cx="154.5" cy="154.5" r="4"/>
+<circle cx="184.1" cy="184.1" r="4"/>
+<circle cx="95.5" cy="154.5" r="4"/>
+<circle cx="65.9" cy="184.1" r="4"/>
+<circle cx="125.0" cy="95.5" r="4"/>
+<circle cx="154.5" cy="125.0" r="4"/>
+<circle cx="125.0" cy="154.5" r="4"/>
+<circle cx="95.5" cy="125.0" r="4"/>
+</g>
+</svg>
+</section>
+
+<!-- BAŞLIK -->
+<section class="section-title">
+<small data-i18n="section_small">ÖĞRENME YOLCULUĞU</small>
+<h2 data-i18n="section_h2">FTO Methodları</h2>
+<p data-i18n="section_p">Seviyeni seç ve küp çözme yolculuğuna başla.</p>
+</section>
+
+<!-- KARTLAR -->
+<section class="methods">
+
+<!-- BENCISCO METHODU -->
+<a href="http://rubikacademy.fun/fto/bencisco_method" class="card">
+<div class="card-visual beginner">
+<div class="level" data-i18n="level_beginner">BENCISCO METHODU</div>
+<svg class="cube" viewBox="0 0 250 250">
+<rect x="13.0" y="13.0" width="224.0" height="224.0" rx="28.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<polygon points="125.0,125.0 36.4,36.4 213.7,36.4" fill="#d1d5db" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="125.0,125.0 213.7,36.4 213.7,213.7" fill="#1e6fe6" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="125.0,125.0 213.7,213.7 36.4,213.7" fill="#f97316" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="125.0,125.0 36.4,213.7 36.4,36.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<g stroke="#111827" stroke-width="2" stroke-linecap="round">
+<line x1="95.5" y1="95.5" x2="154.5" y2="95.5"/>
+<line x1="65.9" y1="65.9" x2="184.1" y2="65.9"/>
+<line x1="154.5" y1="95.5" x2="95.5" y2="36.4"/>
+<line x1="184.1" y1="65.9" x2="154.6" y2="36.4"/>
+<line x1="95.5" y1="95.5" x2="154.6" y2="36.4"/>
+<line x1="65.9" y1="65.9" x2="95.5" y2="36.4"/>
+<line x1="95.5" y1="154.5" x2="95.5" y2="95.5"/>
+<line x1="65.9" y1="184.1" x2="65.9" y2="65.9"/>
+<line x1="95.5" y1="95.5" x2="36.4" y2="154.5"/>
+<line x1="65.9" y1="65.9" x2="36.4" y2="95.4"/>
+<line x1="95.5" y1="154.5" x2="36.4" y2="95.4"/>
+<line x1="65.9" y1="184.1" x2="36.4" y2="154.5"/>
+<line x1="154.5" y1="154.5" x2="95.5" y2="154.5"/>
+<line x1="184.1" y1="184.1" x2="65.9" y2="184.1"/>
+<line x1="95.5" y1="154.5" x2="154.5" y2="213.6"/>
+<line x1="65.9" y1="184.1" x2="95.4" y2="213.6"/>
+<line x1="154.5" y1="154.5" x2="95.4" y2="213.6"/>
+<line x1="184.1" y1="184.1" x2="154.5" y2="213.6"/>
+<line x1="154.5" y1="95.5" x2="154.5" y2="154.5"/>
+<line x1="184.1" y1="65.9" x2="184.1" y2="184.1"/>
+<line x1="154.5" y1="154.5" x2="213.6" y2="95.5"/>
+<line x1="184.1" y1="184.1" x2="213.6" y2="154.6"/>
+<line x1="154.5" y1="95.5" x2="213.6" y2="154.6"/>
+<line x1="184.1" y1="65.9" x2="213.6" y2="95.5"/>
+</g>
+<g fill="#111827">
+<circle cx="125.0" cy="125.0" r="4"/>
+<circle cx="95.5" cy="95.5" r="4"/>
+<circle cx="65.9" cy="65.9" r="4"/>
+<circle cx="154.5" cy="95.5" r="4"/>
+<circle cx="184.1" cy="65.9" r="4"/>
+<circle cx="154.5" cy="154.5" r="4"/>
+<circle cx="184.1" cy="184.1" r="4"/>
+<circle cx="95.5" cy="154.5" r="4"/>
+<circle cx="65.9" cy="184.1" r="4"/>
+<circle cx="125.0" cy="95.5" r="4"/>
+<circle cx="154.5" cy="125.0" r="4"/>
+<circle cx="125.0" cy="154.5" r="4"/>
+<circle cx="95.5" cy="125.0" r="4"/>
+</g>
+</svg>
+</div>
+<div class="card-info">
+<h3 data-i18n="beginner_title">Bencisco Methodu</h3>
+<p data-i18n="beginner_p">Bencisco Methodu ile FTO'yu adım adım, temel yüzey ve köşe parçalarını tamamlayarak çözmeyi öğren.</p>
+<div class="button">
+<span data-i18n="cta_start">Eğitime Başla</span>
+<span class="arrow">→</span>
+</div>
+</div>
+</a>
+
+<!-- NOTASYON VE ROTASYONLAR -->
+<a href="http://rubikacademy.fun/fto/notasyon" class="card">
+<div class="card-visual middle">
+<div class="level" data-i18n="level_middle">NOTASYON</div>
+<svg class="cube" viewBox="0 0 250 250">
+<rect x="13.0" y="13.0" width="224.0" height="224.0" rx="28.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+<polygon points="125.0,125.0 36.4,36.4 213.7,36.4" fill="#d1d5db" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="125.0,125.0 213.7,36.4 213.7,213.7" fill="#1e6fe6" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="125.0,125.0 213.7,213.7 36.4,213.7" fill="#f97316" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="125.0,125.0 36.4,213.7 36.4,36.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+<g stroke="#111827" stroke-width="2" stroke-linecap="round">
+<line x1="95.5" y1="95.5" x2="154.5" y2="95.5"/>
+<line x1="65.9" y1="65.9" x2="184.1" y2="65.9"/>
+<line x1="154.5" y1="95.5" x2="95.5" y2="36.4"/>
+<line x1="184.1" y1="65.9" x2="154.6" y2="36.4"/>
+<line x1="95.5" y1="95.5" x2="154.6" y2="36.4"/>
+<line x1="65.9" y1="65.9" x2="95.5" y2="36.4"/>
+<line x1="95.5" y1="154.5" x2="95.5" y2="95.5"/>
+<line x1="65.9" y1="184.1" x2="65.9" y2="65.9"/>
+<line x1="95.5" y1="95.5" x2="36.4" y2="154.5"/>
+<line x1="65.9" y1="65.9" x2="36.4" y2="95.4"/>
+<line x1="95.5" y1="154.5" x2="36.4" y2="95.4"/>
+<line x1="65.9" y1="184.1" x2="36.4" y2="154.5"/>
+<line x1="154.5" y1="154.5" x2="95.5" y2="154.5"/>
+<line x1="184.1" y1="184.1" x2="65.9" y2="184.1"/>
+<line x1="95.5" y1="154.5" x2="154.5" y2="213.6"/>
+<line x1="65.9" y1="184.1" x2="95.4" y2="213.6"/>
+<line x1="154.5" y1="154.5" x2="95.4" y2="213.6"/>
+<line x1="184.1" y1="184.1" x2="154.5" y2="213.6"/>
+<line x1="154.5" y1="95.5" x2="154.5" y2="154.5"/>
+<line x1="184.1" y1="65.9" x2="184.1" y2="184.1"/>
+<line x1="154.5" y1="154.5" x2="213.6" y2="95.5"/>
+<line x1="184.1" y1="184.1" x2="213.6" y2="154.6"/>
+<line x1="154.5" y1="95.5" x2="213.6" y2="154.6"/>
+<line x1="184.1" y1="65.9" x2="213.6" y2="95.5"/>
+</g>
+<g fill="#111827">
+<circle cx="125.0" cy="125.0" r="4"/>
+<circle cx="95.5" cy="95.5" r="4"/>
+<circle cx="65.9" cy="65.9" r="4"/>
+<circle cx="154.5" cy="95.5" r="4"/>
+<circle cx="184.1" cy="65.9" r="4"/>
+<circle cx="154.5" cy="154.5" r="4"/>
+<circle cx="184.1" cy="184.1" r="4"/>
+<circle cx="95.5" cy="154.5" r="4"/>
+<circle cx="65.9" cy="184.1" r="4"/>
+<circle cx="125.0" cy="95.5" r="4"/>
+<circle cx="154.5" cy="125.0" r="4"/>
+<circle cx="125.0" cy="154.5" r="4"/>
+<circle cx="95.5" cy="125.0" r="4"/>
+</g>
+</svg>
+</div>
+<div class="card-info">
+<h3 data-i18n="middle_title">Notasyon ve Rotasyonlar</h3>
+<p data-i18n="middle_p">FTO'nun temel hareket notasyonunu ve küp rotasyonlarını öğren, çözüme sağlam bir başlangıç yap.</p>
+<div class="button">
+<span data-i18n="cta_start">Eğitime Başla</span>
+<span class="arrow">→</span>
+</div>
+</div>
+</a>
+
+</section>
+
+<!-- ALT -->
+<section class="bottom">
+<h3 data-i18n="bottom_title">🧩 Seviyeni seç, küpünü hızlandır!</h3>
+<p data-i18n="bottom_p">Rubik Academy ile FTO çözüm becerilerini adım adım geliştir.</p>
+</section>
+
+</div>
+
+<script>
+/* =========================================================
+   DİL SEÇİCİ (TR / EN / RU / DE / AR)
+========================================================= */
+
+var translations = {
+    "tr": {
+        "navHome": "Ana Sayfa",
+        "navContent": "İçerikler",
+        "back_btn": "← Geri Dön",
+        "hero_title1": "FTO",
+        "hero_titleAccent": "Eğitimleri",
+        "hero_p": "FTO mekanizmasını ve temel çözüm algoritmalarını adım adım öğren; başlangıçtan ileri seviyeye küp çözme teknikleriyle kendini geliştir.",
+        "section_small": "ÖĞRENME YOLCULUĞU",
+        "section_h2": "FTO Methodları",
+        "section_p": "Seviyeni seç ve küp çözme yolculuğuna başla.",
+        "level_beginner": "BENCISCO METHODU",
+        "beginner_title": "Bencisco Methodu",
+        "beginner_p": "Bencisco Methodu ile FTO'yu adım adım, temel yüzey ve köşe parçalarını tamamlayarak çözmeyi öğren.",
+        "level_middle": "NOTASYON",
+        "middle_title": "Notasyon ve Rotasyonlar",
+        "middle_p": "FTO'nun temel hareket notasyonunu ve küp rotasyonlarını öğren, çözüme sağlam bir başlangıç yap.",
+        "cta_start": "Eğitime Başla",
+        "bottom_title": "🧩 Seviyeni seç, küpünü hızlandır!",
+        "bottom_p": "Rubik Academy ile FTO çözüm becerilerini adım adım geliştir."
+    },
+    "en": {
+        "navHome": "Home",
+        "navContent": "Content",
+        "back_btn": "← Go Back",
+        "hero_title1": "FTO",
+        "hero_titleAccent": "Tutorials",
+        "hero_p": "Learn the FTO mechanism and basic solving algorithms step by step; develop yourself with cube-solving techniques from beginner to advanced level.",
+        "section_small": "LEARNING JOURNEY",
+        "section_h2": "FTO Methods",
+        "section_p": "Pick your level and start your cube-solving journey.",
+        "level_beginner": "BENCISCO METHOD",
+        "beginner_title": "Bencisco Method",
+        "beginner_p": "Learn to solve the FTO step by step with the Bencisco Method, completing the basic face and corner pieces along the way.",
+        "level_middle": "NOTATION",
+        "middle_title": "Notation and Rotations",
+        "middle_p": "Learn the basic move notation and cube rotations for the FTO, and build a solid foundation for solving.",
+        "cta_start": "Start Learning",
+        "bottom_title": "🧩 Pick your level, speed up your cube!",
+        "bottom_p": "Develop your FTO solving skills step by step with Rubik Academy."
+    },
+    "ru": {
+        "navHome": "Главная",
+        "navContent": "Контент",
+        "back_btn": "← Назад",
+        "hero_title1": "FTO",
+        "hero_titleAccent": "Обучение",
+        "hero_p": "Изучи механизм FTO и базовые алгоритмы сборки шаг за шагом; развивайся от начального до продвинутого уровня техник сборки.",
+        "section_small": "ОБУЧАЮЩИЙ ПУТЬ",
+        "section_h2": "Методы FTO",
+        "section_p": "Выбери свой уровень и начни путь сборки кубика.",
+        "level_beginner": "МЕТОД BENCISCO",
+        "beginner_title": "Метод Bencisco",
+        "beginner_p": "Изучи метод Bencisco и собери FTO шаг за шагом, последовательно завершая базовые грани и угловые элементы.",
+        "level_middle": "НОТАЦИЯ",
+        "middle_title": "Нотация и повороты",
+        "middle_p": "Изучи базовую нотацию ходов и повороты кубика FTO, чтобы заложить прочную основу для сборки.",
+        "cta_start": "Начать обучение",
+        "bottom_title": "🧩 Выбери уровень, ускорь свой кубик!",
+        "bottom_p": "Развивай навыки сборки FTO шаг за шагом вместе с Rubik Academy."
+    },
+    "de": {
+        "navHome": "Startseite",
+        "navContent": "Inhalte",
+        "back_btn": "← Zurück",
+        "hero_title1": "FTO",
+        "hero_titleAccent": "Anleitungen",
+        "hero_p": "Lerne den FTO-Mechanismus und grundlegende Lösealgorithmen Schritt für Schritt; entwickle dich mit Würfel-Lösetechniken vom Anfänger- bis zum Fortgeschrittenenniveau.",
+        "section_small": "LERNREISE",
+        "section_h2": "FTO-Methoden",
+        "section_p": "Wähle dein Niveau und starte deine Würfel-Lösungsreise.",
+        "level_beginner": "BENCISCO METHODE",
+        "beginner_title": "Bencisco Methode",
+        "beginner_p": "Lerne mit der Bencisco Methode, das FTO Schritt für Schritt zu lösen, mit schrittweisem Zusammensetzen der Grundflächen und Eckstücke.",
+        "level_middle": "NOTATION",
+        "middle_title": "Notation und Rotationen",
+        "middle_p": "Lerne die grundlegende Zugnotation und die Würfelrotationen des FTO, und schaffe eine solide Basis fürs Lösen.",
+        "cta_start": "Jetzt lernen",
+        "bottom_title": "🧩 Wähle dein Niveau, beschleunige deinen Würfel!",
+        "bottom_p": "Entwickle deine FTO-Lösungsfähigkeiten Schritt für Schritt mit Rubik Academy."
+    },
+    "ar": {
+        "navHome": "الرئيسية",
+        "navContent": "المحتوى",
+        "back_btn": "← رجوع",
+        "hero_title1": "FTO",
+        "hero_titleAccent": "دروس",
+        "hero_p": "تعلّم آلية FTO وخوارزميات الحل الأساسية خطوة بخطوة؛ طوّر نفسك بتقنيات حل المكعب من مستوى المبتدئين إلى المتقدم.",
+        "section_small": "رحلة التعلم",
+        "section_h2": "طرق حل FTO",
+        "section_p": "اختر مستواك وابدأ رحلة حل المكعب.",
+        "level_beginner": "طريقة بينسيسكو",
+        "beginner_title": "طريقة بينسيسكو",
+        "beginner_p": "تعلّم حل FTO خطوة بخطوة باستخدام طريقة بينسيسكو، مع إكمال الأوجه الأساسية وقطع الزوايا.",
+        "level_middle": "الترميز",
+        "middle_title": "الترميز والدورانات",
+        "middle_p": "تعلّم ترميز الحركات الأساسي ودورانات المكعب في FTO، وابنِ أساسًا متينًا للحل.",
+        "cta_start": "ابدأ التعلم",
+        "bottom_title": "🧩 اختر مستواك، سرّع مكعبك!",
+        "bottom_p": "طوّر مهاراتك في حل FTO خطوة بخطوة مع Rubik Academy."
+    }
+};
+
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
+function applyLanguage(lang) {
+    if (!translations[lang]) lang = "tr";
+    var dict = translations[lang];
+
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", "ltr");
+
+    var label = document.getElementById("langLabel");
+    if (label) {
+        label.textContent = langCodes[lang] || "TR";
+    }
+
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) {
+        closeLangMenu();
+    }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
+});
+
+/* =========================================================
+   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
+========================================================= */
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+
+    var btn = document.getElementById("darkModeBtn");
+
+    if (isDark) {
+        localStorage.setItem("theme", "dark");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        localStorage.setItem("theme", "light");
+        if(btn) btn.innerHTML = "🌙";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        if(btn) btn.innerHTML = "🌙";
+    }
+});
+</script>
+
+</body>
+</html>
