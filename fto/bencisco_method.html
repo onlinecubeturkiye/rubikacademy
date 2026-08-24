@@ -1,1 +1,465 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Bencisco Methodu</title>
+<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
+
+<link rel="canonical" href="https://rubikacademy.fun/fto/bencisco_method">
+<meta name="description" content="Bencisco Methodu ile FTO'yu adım adım çöz. Video anlatımlı eğitim.">
+<meta property="og:title" content="Rubik Academy - Bencisco Methodu">
+<meta property="og:description" content="Bencisco Methodu ile FTO'yu adım adım çöz.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/fto/bencisco_method">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+html { overflow-x: hidden; }
+
+:root {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-soft: #f1f5f9;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #e2e8f0;
+    --card-border: #dfebf5;
+    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+    --hero-bg: linear-gradient(120deg, #e8f7ff, #c8eaff);
+    --hero-border: #cce8fa;
+    --btn-bg: #eef8ff;
+    --btn-hover-bg: #dff2ff;
+    --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
+    --bottom-border: #d5eafa;
+    --bottom-text: #18578c;
+}
+
+html.dark-mode, body.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --card-border: #334155;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+    --hero-bg: linear-gradient(120deg, #1e293b, #0f172a);
+    --hero-border: #334155;
+    --btn-bg: #334155;
+    --btn-hover-bg: #1e3a8a;
+    --bottom-bg: #1e293b;
+    --bottom-border: #334155;
+    --bottom-text: #60a5fa;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: "Inter", sans-serif;
+    background: var(--background);
+    color: var(--text);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* NAVBAR */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 7%;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .navbar, body.dark-mode .navbar { background: rgba(15, 23, 42, 0.90); }
+
+.nav-logo { display: flex; align-items: center; gap: 12px; }
+
+.nav-logo-mark {
+    width: 38px; height: 38px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px; padding: 4px;
+    border-radius: 10px;
+    background: #1e293b;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+}
+.nav-logo-mark div { border-radius: 2px; background: #f8fafc; }
+.nav-logo-mark div:nth-child(2), .nav-logo-mark div:nth-child(8) { background: #ef4444; }
+.nav-logo-mark div:nth-child(4), .nav-logo-mark div:nth-child(6) { background: #22c55e; }
+.nav-logo-mark div:nth-child(5) { background: #3b82f6; }
+.nav-logo-mark div:nth-child(1), .nav-logo-mark div:nth-child(9) { background: #facc15; }
+
+.nav-logo-text { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-links { display: flex; align-items: center; gap: 8px; }
+.nav-links a { padding: 9px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-soft); transition: .25s; }
+.nav-links a:hover, .nav-links a.active { background: var(--primary-light); color: var(--primary); }
+
+.dark-mode-btn {
+    border: none; background: var(--surface-soft); color: var(--text);
+    width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: .3s;
+}
+.dark-mode-btn:hover { transform: scale(1.08); }
+
+.lang-switcher { position: relative; }
+.lang-switch-btn {
+    border: none; background: var(--surface-soft); color: var(--text);
+    height: 42px; padding: 0 16px; border-radius: 21px; font-size: 13px; font-weight: 700;
+    letter-spacing: .3px; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: .3s;
+}
+.lang-switch-btn:hover { transform: scale(1.06); background: var(--primary-light); color: var(--primary); }
+.lang-switch-btn .lang-globe { font-size: 15px; line-height: 1; }
+
+.lang-menu {
+    position: absolute; top: calc(100% + 10px); right: 0; min-width: 168px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 7px; display: flex; flex-direction: column; gap: 3px;
+    opacity: 0; visibility: hidden; transform: translateY(-8px); transition: .2s ease; z-index: 1100;
+}
+.lang-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+.lang-menu-item {
+    display: flex; align-items: center; gap: 10px; border: none; background: transparent;
+    color: var(--text); text-align: left; padding: 10px 14px; border-radius: 11px; font-size: 14px;
+    font-weight: 600; cursor: pointer; transition: .2s; width: 100%;
+}
+.lang-menu-item:hover { background: var(--primary-light); color: var(--primary); }
+.lang-menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 800; }
+.lang-menu-item .lang-check { margin-left: auto; font-size: 12px; opacity: 0; }
+.lang-menu-item.active .lang-check { opacity: 1; }
+
+@media(max-width: 500px) {
+    .navbar { padding: 14px 5%; }
+    .nav-logo-text { font-size: 15px; }
+    .nav-links a { padding: 8px 12px; font-size: 13px; }
+    .nav-right { gap: 6px; }
+    .lang-switch-btn { padding: 0 10px; font-size: 12px; }
+}
+
+/* PAGE */
+.page { min-height: calc(100vh - 71px); padding: 45px 5% 80px; background: var(--background); transition: background-color 0.3s; }
+
+.nav-bar { max-width: 900px; margin: 0 auto 25px; }
+.back-btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 12px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--primary);
+    font-size: 13px; font-weight: 800; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); transition: all .25s ease;
+    cursor: pointer;
+}
+.back-btn:hover { transform: translateX(-4px); border-color: #c0e0fc; background: var(--primary-light); }
+
+/* HEADER */
+.method-header { max-width: 900px; margin: 0 auto 30px; text-align: center; }
+.badge {
+    display: inline-flex; align-items: center; gap: 9px; padding: 9px 15px; border-radius: 50px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--primary);
+    font-size: 10px; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 18px;
+}
+.badge i { width: 7px; height: 7px; background: #168ee0; border-radius: 50%; }
+.method-header h1 {
+    font-size: clamp(32px, 5vw, 48px); letter-spacing: -2px; font-weight: 950;
+    margin-bottom: 14px; color: var(--text);
+}
+.method-header h1 span { color: var(--primary); }
+.method-header p { color: var(--text-soft); font-size: 15px; line-height: 1.75; max-width: 600px; margin: 0 auto; }
+
+/* VIDEO CARD */
+.video-wrap { max-width: 900px; margin: 0 auto 30px; }
+.video-card {
+    background: var(--surface); border: 1px solid var(--card-border); border-radius: 27px;
+    overflow: hidden; box-shadow: var(--shadow);
+}
+.video-frame {
+    position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; cursor: pointer;
+    overflow: hidden;
+}
+.video-frame img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform .4s ease, filter .4s ease;
+}
+.video-frame:hover img { transform: scale(1.03); filter: brightness(.85); }
+.video-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+.play-btn {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 78px; height: 78px; border-radius: 50%;
+    background: rgba(255, 255, 255, .92); display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, .35); transition: transform .3s ease, background .3s ease;
+}
+.video-frame:hover .play-btn { transform: translate(-50%, -50%) scale(1.08); background: #fff; }
+.play-btn svg { width: 30px; height: 30px; margin-left: 4px; fill: #ef4444; }
+
+.video-info { padding: 22px 25px 26px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+.video-info h3 { font-size: 18px; font-weight: 900; letter-spacing: -.3px; color: var(--text); }
+.video-info p { color: var(--text-soft); font-size: 12.5px; margin-top: 4px; }
+
+.video-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.action-btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 13px;
+    font-size: 12.5px; font-weight: 900; transition: all .25s ease; border: 1px solid transparent;
+}
+.action-btn.primary { background: #ef4444; color: #fff; }
+.action-btn.primary:hover { background: #dc2626; transform: translateY(-2px); }
+.action-btn.secondary { background: var(--btn-bg); color: var(--primary); border-color: var(--border); }
+.action-btn.secondary:hover { background: var(--btn-hover-bg); transform: translateY(-2px); }
+
+/* BOTTOM */
+.bottom {
+    max-width: 900px; margin: 0 auto; padding: 32px; text-align: center; border-radius: 25px;
+    background: var(--bottom-bg); border: 1px solid var(--bottom-border); transition: background-color 0.3s, border-color 0.3s;
+}
+.bottom h3 { color: var(--bottom-text); font-size: 20px; margin-bottom: 7px; }
+.bottom p { color: var(--text-soft); font-size: 13px; }
+
+@media(max-width: 700px) {
+    .page { padding: 25px 4% 55px; }
+    .method-header h1 { font-size: 34px; }
+    .play-btn { width: 62px; height: 62px; }
+    .play-btn svg { width: 24px; height: 24px; }
+    .video-info { flex-direction: column; align-items: flex-start; }
+}
+</style>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <div class="nav-logo-mark">
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+        </div>
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu">
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')"><span>Türkçe</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')"><span>English</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')"><span>Русский</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')"><span>Deutsch</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')"><span>العربية</span><span class="lang-check">✓</span></button>
+            </div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="http://rubikacademy.fun/fto" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<section class="method-header">
+    <div class="badge"><i></i>BENCISCO METHODU</div>
+    <h1 data-i18n="page_h1">Bencisco <span>Methodu</span></h1>
+    <p data-i18n="page_p">FTO'yu Bencisco Methodu ile adım adım çözmeyi öğren. Aşağıdaki videoyu izleyerek temel yüzey ve köşe parçalarını tamamla.</p>
+</section>
+
+<section class="video-wrap">
+    <div class="video-card">
+        <div class="video-frame" id="videoFrame" onclick="playVideo()">
+            <img src="https://i.ytimg.com/vi/rBXQqvlVrs0/maxresdefault.jpg" alt="Bencisco Methodu video kapağı" id="videoThumb"
+                 onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/rBXQqvlVrs0/hqdefault.jpg';">
+            <div class="play-btn" id="playBtn">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+        </div>
+        <div class="video-info">
+            <div>
+                <h3 data-i18n="video_title">Bencisco Methodu Anlatımı</h3>
+                <p data-i18n="video_sub">Adım adım FTO çözüm videosu</p>
+            </div>
+            <div class="video-actions">
+                <a class="action-btn primary" href="https://www.youtube.com/watch?v=rBXQqvlVrs0" target="_blank" rel="noopener">
+                    ▶ <span data-i18n="watch_yt">YouTube'da İzle</span>
+                </a>
+                <a class="action-btn secondary" href="https://www.youtube.com/watch?v=rBXQqvlVrs0" target="_blank" rel="noopener">
+                    🔗 <span data-i18n="go_channel">Kanala Git</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bottom">
+    <h3 data-i18n="bottom_title">🧩 Adım adım öğren, hızını artır!</h3>
+    <p data-i18n="bottom_p">Rubik Academy ile Bencisco Methodunu izleyerek FTO çözüm becerini geliştir.</p>
+</section>
+
+</div>
+
+<script>
+function playVideo() {
+    var frame = document.getElementById("videoFrame");
+    var iframe = document.createElement("iframe");
+    iframe.src = "https://www.youtube-nocookie.com/embed/rBXQqvlVrs0?autoplay=1&rel=0";
+    iframe.title = "Bencisco Methodu";
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    iframe.allowFullscreen = true;
+    frame.innerHTML = "";
+    frame.appendChild(iframe);
+    frame.onclick = null;
+    frame.style.cursor = "default";
+}
+
+var translations = {
+    "tr": {
+        navHome: "Ana Sayfa", navContent: "İçerikler", back_btn: "← Geri Dön",
+        page_h1: "Bencisco Methodu", page_p: "FTO'yu Bencisco Methodu ile adım adım çözmeyi öğren. Aşağıdaki videoyu izleyerek temel yüzey ve köşe parçalarını tamamla.",
+        video_title: "Bencisco Methodu Anlatımı", video_sub: "Adım adım FTO çözüm videosu",
+        watch_yt: "YouTube'da İzle", go_channel: "Kanala Git",
+        bottom_title: "🧩 Adım adım öğren, hızını artır!", bottom_p: "Rubik Academy ile Bencisco Methodunu izleyerek FTO çözüm becerini geliştir."
+    },
+    "en": {
+        navHome: "Home", navContent: "Content", back_btn: "← Go Back",
+        page_h1: "Bencisco Method", page_p: "Learn to solve the FTO step by step with the Bencisco Method. Watch the video below to complete the basic faces and corner pieces.",
+        video_title: "Bencisco Method Tutorial", video_sub: "Step-by-step FTO solving video",
+        watch_yt: "Watch on YouTube", go_channel: "Go to Channel",
+        bottom_title: "🧩 Learn step by step, speed up!", bottom_p: "Develop your FTO solving skills by watching the Bencisco Method with Rubik Academy."
+    },
+    "ru": {
+        navHome: "Главная", navContent: "Контент", back_btn: "← Назад",
+        page_h1: "Метод Bencisco", page_p: "Изучи метод Bencisco и собери FTO шаг за шагом. Посмотри видео ниже, чтобы завершить базовые грани и угловые элементы.",
+        video_title: "Обучение методу Bencisco", video_sub: "Пошаговое видео сборки FTO",
+        watch_yt: "Смотреть на YouTube", go_channel: "Перейти на канал",
+        bottom_title: "🧩 Учись шаг за шагом, ускоряйся!", bottom_p: "Развивай навыки сборки FTO, изучая метод Bencisco вместе с Rubik Academy."
+    },
+    "de": {
+        navHome: "Startseite", navContent: "Inhalte", back_btn: "← Zurück",
+        page_h1: "Bencisco Methode", page_p: "Lerne mit der Bencisco Methode, das FTO Schritt für Schritt zu lösen. Schau dir das Video unten an, um die Grundflächen und Eckstücke zu vervollständigen.",
+        video_title: "Bencisco Methode Anleitung", video_sub: "Schritt-für-Schritt FTO Lösungsvideo",
+        watch_yt: "Auf YouTube ansehen", go_channel: "Zum Kanal",
+        bottom_title: "🧩 Schritt für Schritt lernen, schneller werden!", bottom_p: "Entwickle deine FTO-Fähigkeiten mit der Bencisco Methode bei Rubik Academy."
+    },
+    "ar": {
+        navHome: "الرئيسية", navContent: "المحتوى", back_btn: "← رجوع",
+        page_h1: "طريقة بينسيسكو", page_p: "تعلّم حل FTO خطوة بخطوة باستخدام طريقة بينسيسكو. شاهد الفيديو أدناه لإكمال الأوجه الأساسية وقطع الزوايا.",
+        video_title: "شرح طريقة بينسيسكو", video_sub: "فيديو حل FTO خطوة بخطوة",
+        watch_yt: "شاهد على يوتيوب", go_channel: "الذهاب إلى القناة",
+        bottom_title: "🧩 تعلّم خطوة بخطوة، سرّع نفسك!", bottom_p: "طوّر مهاراتك في حل FTO بمشاهدة طريقة بينسيسكو مع Rubik Academy."
+    }
+};
+
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
+function applyLanguage(lang) {
+    if (!translations[lang]) lang = "tr";
+    var dict = translations[lang];
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+    });
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", "ltr");
+    var label = document.getElementById("langLabel");
+    if (label) label.textContent = langCodes[lang] || "TR";
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+}
+function selectLanguage(lang) { applyLanguage(lang); closeLangMenu(); }
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) closeLangMenu();
+});
+document.addEventListener("keydown", function(e) { if (e.key === "Escape") closeLangMenu(); });
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
+});
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+    var btn = document.getElementById("darkModeBtn");
+    if (isDark) { localStorage.setItem("theme", "dark"); if(btn) btn.innerHTML = "☀️"; }
+    else { localStorage.setItem("theme", "light"); if(btn) btn.innerHTML = "🌙"; }
+}
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        if(btn) btn.innerHTML = "🌙";
+    }
+});
+</script>
+
+</body>
+</html>
