@@ -263,7 +263,7 @@ a { text-decoration: none; color: inherit; }
   font-size: 12.5px; font-weight: 700;
 }
 
-.schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.schedule-grid { display: grid; grid-template-columns: 1fr; gap: 18px; max-width: 420px; }
 .schedule-day {
   padding: 22px; border-radius: 16px;
   background: var(--surface-soft);
@@ -339,7 +339,7 @@ a { text-decoration: none; color: inherit; }
   .page-head { padding: 40px 6% 6px; }
   .content { padding: 30px 6% 80px; }
   .info-card { padding: 24px 18px; border-radius: 18px; }
-  .schedule-grid { grid-template-columns: 1fr; }
+  .schedule-grid { grid-template-columns: 1fr; max-width: none; }
   .register-card { padding: 32px 20px; border-radius: 20px; }
   .register-btn { width: 100%; justify-content: center; }
   .participant-row { padding: 13px 14px; gap: 12px; }
@@ -406,6 +406,8 @@ html.dark-mode footer, body.dark-mode footer { background: var(--surface); borde
 html.dark-mode .schedule-day, body.dark-mode .schedule-day,
 html.dark-mode .participant-row, body.dark-mode .participant-row { background: var(--surface-soft); border-color: var(--border); }
 html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22; }
+
+/* AR (sağdan sola) uyumu için gerekli değil; içerik yönü sabit tutulur */
 </style>
 
 <script type="application/ld+json">
@@ -420,7 +422,7 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
     "url": "https://rubikacademy.fun/rat"
   },
   "startDate": "2026-08-29T14:00:00+03:00",
-  "endDate": "2026-08-30T16:20:00+03:00",
+  "endDate": "2026-08-29T15:45:00+03:00",
   "url": "https://rubikacademy.fun/rat/yarismalar/ftoagustos2026"
 }
 </script>
@@ -486,9 +488,9 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
 <!-- SAYFA BAŞLIĞI -->
 <section class="page-head">
   <div class="page-head-inner reveal">
-    <div class="badge">FTO · Ağustos 2026 · Online</div>
-    <h1>RAT Ağustos 2026 Yarışması</h1>
-    <p class="page-head-intro">
+    <div class="badge" data-i18n="badge">FTO · Ağustos 2026 · Online</div>
+    <h1 data-i18n="h1">RAT Ağustos 2026 Yarışması</h1>
+    <p class="page-head-intro" data-i18n="intro">
       Rubik Academy Türkiye (RAT) tarafından düzenlenen RAT Ağustos 2026
       yarışmasının katılım şartlarını, tarih ve saatlerini bu sayfada
       bulabilirsin. Yarışma, evden katılabileceğin online bir FTO
@@ -500,12 +502,12 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
 <!-- SEKME (TAB) BAR -->
 <div class="tabbar-wrap">
   <nav class="tabbar">
-    <button class="tab-btn" data-tab="kayit" onclick="switchTab('kayit')">Kayıt</button>
-    <button class="tab-btn active" data-tab="sartlar" onclick="switchTab('sartlar')">Şartlar/Kurallar</button>
-    <button class="tab-btn" data-tab="yarismacilar" onclick="switchTab('yarismacilar')">Yarışmacılar</button>
-    <button class="tab-btn" data-tab="kategoriler" onclick="switchTab('kategoriler')">Kategoriler</button>
-    <button class="tab-btn" data-tab="program" onclick="switchTab('program')">Program</button>
-    <button class="tab-btn" data-tab="sonuclar" onclick="switchTab('sonuclar')">Sonuçlar</button>
+    <button class="tab-btn" data-tab="kayit" data-i18n="tabKayit" onclick="switchTab('kayit')">Kayıt</button>
+    <button class="tab-btn active" data-tab="sartlar" data-i18n="tabSartlar" onclick="switchTab('sartlar')">Şartlar/Kurallar</button>
+    <button class="tab-btn" data-tab="yarismacilar" data-i18n="tabYarismacilar" onclick="switchTab('yarismacilar')">Yarışmacılar</button>
+    <button class="tab-btn" data-tab="kategoriler" data-i18n="tabKategoriler" onclick="switchTab('kategoriler')">Kategoriler</button>
+    <button class="tab-btn" data-tab="program" data-i18n="tabProgram" onclick="switchTab('program')">Program</button>
+    <button class="tab-btn" data-tab="sonuclar" data-i18n="tabSonuclar" onclick="switchTab('sonuclar')">Sonuçlar</button>
   </nav>
 </div>
 
@@ -516,37 +518,37 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
     <!-- ŞARTLAR/KURALLAR -->
     <div class="tab-panel active" id="panel-sartlar">
       <div class="info-card reveal">
-        <h2>📝 RAT Ağustos 2026 Yarışması - Katılım Şartları</h2>
-        <p class="lead">Yarışmaya başvuran her katılımcı aşağıdaki şartları peşinen kabul etmiş sayılır:</p>
+        <h2 data-i18n="rulesTitle">📝 RAT Ağustos 2026 Yarışması - Katılım Şartları</h2>
+        <p class="lead" data-i18n="rulesLead">Yarışmaya başvuran her katılımcı aşağıdaki şartları peşinen kabul etmiş sayılır:</p>
 
         <ol class="rules-list">
           <li>
             <span class="rule-num">1</span>
-            <span class="rule-text"><strong>Ekipman Gereksinimi:</strong> Katılımcı, yarışma süresince kullanmak üzere ZKT Timer sistemine sahip olmalıdır.</span>
+            <span class="rule-text" data-i18n-html="rule1"><strong>Ekipman Gereksinimi:</strong> Katılımcı, yarışma süresince kullanmak üzere ZKT Timer sistemine sahip olmalıdır.</span>
           </li>
           <li>
             <span class="rule-num">2</span>
-            <span class="rule-text"><strong>Kapak (Cover) Kullanımı ve Başlangıç Prosedürü:</strong> Videoda net bir şekilde görüleceği üzere; katılımcı küpü scramble (karıştırma) yaptıktan hemen sonra derhal cover'a (kapağa) koymak zorundadır. Hazır olduğunda kapağı kaldırarak süreci başlatır.</span>
+            <span class="rule-text" data-i18n-html="rule2"><strong>Kapak (Cover) Kullanımı ve Başlangıç Prosedürü:</strong> Videoda net bir şekilde görüleceği üzere; katılımcı küpü scramble (karıştırma) yaptıktan hemen sonra derhal cover'a (kapağa) koymak zorundadır. Hazır olduğunda kapağı kaldırarak süreci başlatır.</span>
           </li>
           <li>
             <span class="rule-num">3</span>
-            <span class="rule-text"><strong>ZKT Timer Inspection (İnceleme) Zorunluluğu:</strong> 1. tur canlı (görüntülü) gerçekleşmeyeceği için anlık +2 veya DNF cezası uygulanamamaktadır. Bu nedenle, ZKT Timer odaya/çözüme girildiği anda inspection (inceleme) özelliği açılmak zorundadır. Inspection özelliğini açmayan veya kurala uymayan katılımcılar moderatörler tarafından tespit edilerek diskalifiye edilecektir.</span>
+            <span class="rule-text" data-i18n-html="rule3"><strong>ZKT Timer Inspection (İnceleme) Zorunluluğu:</strong> 1. tur canlı (görüntülü) gerçekleşmeyeceği için anlık +2 veya DNF cezası uygulanamamaktadır. Bu nedenle, ZKT Timer odaya/çözüme girildiği anda inspection (inceleme) özelliği açılmak zorundadır. Inspection özelliğini açmayan veya kurala uymayan katılımcılar moderatörler tarafından tespit edilerek diskalifiye edilecektir.</span>
           </li>
           <li>
             <span class="rule-num">4</span>
-            <span class="rule-text"><strong>Kamera ve Çekim Açısı:</strong> 1. turdaki video kayıtlarında ve sonraki turlardaki canlı yayın/görüntülü aşamalarda; elleri, masayı ve ZKT Timer'ı net bir şekilde gösteren uygun bir kamera açısı sağlanmalıdır. Açı standartlarına uymayan veya ellerin/küpün görünmediği kayıtlar geçersiz sayılır.</span>
+            <span class="rule-text" data-i18n-html="rule4"><strong>Kamera ve Çekim Açısı:</strong> 1. turdaki video kayıtlarında ve sonraki turlardaki canlı yayın/görüntülü aşamalarda; elleri, masayı ve ZKT Timer'ı net bir şekilde gösteren uygun bir kamera açısı sağlanmalıdır. Açı standartlarına uymayan veya ellerin/küpün görünmediği kayıtlar geçersiz sayılır.</span>
           </li>
           <li>
             <span class="rule-num">5</span>
-            <span class="rule-text"><strong>1. Tur Video Kaydı Yükümlülüğü:</strong> Görüntüsüz gerçekleşecek olan 1. turda, her katılımcı çözüm anının videosunu eksiksiz kaydetmek ve 2. tura geçilmeden önce hakem incelemesine sunmak zorundadır.</span>
+            <span class="rule-text" data-i18n-html="rule5"><strong>1. Tur Video Kaydı Yükümlülüğü:</strong> Görüntüsüz gerçekleşecek olan 1. turda, her katılımcı çözüm anının videosunu eksiksiz kaydetmek ve 2. tura geçilmeden önce hakem incelemesine sunmak zorundadır.</span>
           </li>
           <li>
             <span class="rule-num">6</span>
-            <span class="rule-text"><strong>Adil Oyun (Fair-Play) Kuralı:</strong> Hile, manipülasyon veya kural dışı herhangi bir girişim tespit edildiğinde katılımcı doğrudan diskalifiye edilir. Hakem komitesinin kararları kesindir.</span>
+            <span class="rule-text" data-i18n-html="rule6"><strong>Adil Oyun (Fair-Play) Kuralı:</strong> Hile, manipülasyon veya kural dışı herhangi bir girişim tespit edildiğinde katılımcı doğrudan diskalifiye edilir. Hakem komitesinin kararları kesindir.</span>
           </li>
           <li>
             <span class="rule-num">7</span>
-            <span class="rule-text"><strong>İletişim ve Takip:</strong> Yarışma odası linkleri, grup eşleşmeleri ve saat bilgileri başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır. Belirtilen saatlerde hazır bulunmak katılımcının sorumluluğudur.</span>
+            <span class="rule-text" data-i18n-html="rule7"><strong>İletişim ve Takip:</strong> Yarışma odası linkleri, grup eşleşmeleri ve saat bilgileri başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır. Belirtilen saatlerde hazır bulunmak katılımcının sorumluluğudur.</span>
           </li>
         </ol>
       </div>
@@ -555,10 +557,10 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
     <!-- KAYIT -->
     <div class="tab-panel" id="panel-kayit">
       <div class="register-card reveal">
-        <h2>Katılmaya hazır mısın?</h2>
-        <p>Aşağıdaki formu doldurarak RAT Ağustos 2026 yarışmasına kaydını tamamla.</p>
+        <h2 data-i18n="registerTitle">Katılmaya hazır mısın?</h2>
+        <p data-i18n="registerDesc">Aşağıdaki formu doldurarak RAT Ağustos 2026 yarışmasına kaydını tamamla.</p>
         <a href="https://forms.gle/HQB3hFdPDfLe1y4PA" target="_blank" rel="noopener noreferrer" class="register-btn">
-          Kayıt Ol
+          <span data-i18n="registerBtn">Kayıt Ol</span>
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
@@ -567,8 +569,8 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
     <!-- YARIŞMACILAR -->
     <div class="tab-panel" id="panel-yarismacilar">
       <div class="info-card reveal">
-        <h2>🧑‍🤝‍🧑 Yarışmacılar</h2>
-        <p class="lead">RAT Ağustos 2026 yarışmasına kayıt olan katılımcılar aşağıda listelenmiştir.</p>
+        <h2 data-i18n="participantsTitle">🧑‍🤝‍🧑 Yarışmacılar</h2>
+        <p class="lead" data-i18n="participantsLead">RAT Ağustos 2026 yarışmasına kayıt olan katılımcılar aşağıda listelenmiştir.</p>
         <ul class="participant-list">
           <li class="participant-row">
             <span class="participant-rank">1</span>
@@ -590,7 +592,6 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
               <span class="participant-name">Ömer Eymen Akar</span>
               <span class="participant-id">ID: 3</span>
             </span>
-          </li>
           </li>
           <li class="participant-row">
             <span class="participant-rank">4</span>
@@ -620,10 +621,10 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
     <!-- KATEGORİLER -->
     <div class="tab-panel" id="panel-kategoriler">
       <div class="info-card reveal">
-        <h2>🧩 Kategoriler</h2>
-        <p class="lead">Bu yarışma tek kategoride gerçekleştirilmektedir.</p>
+        <h2 data-i18n="categoriesTitle">🧩 Kategoriler</h2>
+        <p class="lead" data-i18n="categoriesLead">Bu yarışma tek kategoride gerçekleştirilmektedir.</p>
         <div class="schedule-meta">
-          <span>🧩 Küp: FTO</span>
+          <span data-i18n="categoryCube">🧩 Küp: FTO</span>
         </div>
       </div>
     </div>
@@ -631,49 +632,41 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
     <!-- PROGRAM -->
     <div class="tab-panel" id="panel-program">
       <div class="info-card reveal">
-        <h2>📅 Tarih ve Saatler</h2>
+        <h2 data-i18n="scheduleTitle">📅 Tarih ve Saatler</h2>
         <div class="schedule-meta">
-          <span>🧩 Küp: FTO</span>
-          <span>💻 Format: Online</span>
+          <span data-i18n="categoryCube">🧩 Küp: FTO</span>
+          <span data-i18n="scheduleFormat">💻 Format: Online</span>
         </div>
 
         <div class="schedule-grid">
 
           <div class="schedule-day">
-            <h3>29 Ağustos Cumartesi</h3>
+            <h3 data-i18n="scheduleSaturday">29 Ağustos Cumartesi</h3>
             <div class="schedule-row">
-              <span class="round-name">1. Round</span>
-              <span class="round-time">14:00 – 14:30</span>
+              <span class="round-name" data-i18n="round1">1. Round</span>
+              <span class="round-time">14:00 – 14:20</span>
             </div>
             <div class="schedule-row">
-              <span class="round-name">2. Round</span>
-              <span class="round-time">15:00 – 15:20</span>
-            </div>
-          </div>
-
-          <div class="schedule-day">
-            <h3>30 Ağustos Pazar</h3>
-            <div class="schedule-row">
-              <span class="round-name">Yarı Final</span>
-              <span class="round-time">15:00 – 15:20</span>
+              <span class="round-name" data-i18n="roundSemifinal">Yarı Final</span>
+              <span class="round-time">14:30 – 15:00</span>
             </div>
             <div class="schedule-row">
-              <span class="round-name">Final</span>
-              <span class="round-time">15:30 – 16:20</span>
+              <span class="round-name" data-i18n="roundFinal">Final</span>
+              <span class="round-time">15:15 – 15:45</span>
             </div>
           </div>
 
         </div>
 
-        <p class="schedule-note">Belirtilen saatlerde küçük sapmalar olabilir. Güncel bilgiler başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır.</p>
+        <p class="schedule-note" data-i18n="scheduleNote">Belirtilen saatlerde küçük sapmalar olabilir. Güncel bilgiler başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır.</p>
       </div>
     </div>
 
     <!-- SONUÇLAR -->
     <div class="tab-panel" id="panel-sonuclar">
       <div class="info-card reveal">
-        <h2>🏆 Sonuçlar</h2>
-        <p class="empty-note">Yarışma henüz tamamlanmadı. Sonuçlar burada yayınlanacaktır.</p>
+        <h2 data-i18n="resultsTitle">🏆 Sonuçlar</h2>
+        <p class="empty-note" data-i18n="resultsEmpty">Yarışma henüz tamamlanmadı. Sonuçlar burada yayınlanacaktır.</p>
       </div>
     </div>
 
@@ -733,13 +726,175 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
-/* DİL SEÇİCİ (yalnızca menü metinleri; içerik Türkçedir) */
+/* =========================================
+   DİL SEÇİCİ — TÜM SAYFA İÇERİĞİ ÇEVRİLİR
+========================================= */
 var translations = {
-  tr: { navHome: "Ana Sayfa", backBtn: "Geri Dön", navCompetitions: "Yarışmalar", footer: "© 2026 RAT — Rubik Academy Türkiye. Tüm hakları saklıdır." },
-  en: { navHome: "Home", backBtn: "Back", navCompetitions: "Competitions", footer: "© 2026 RAT — Rubik Academy Turkey. All rights reserved." },
-  ru: { navHome: "Главная", backBtn: "Назад", navCompetitions: "Соревнования", footer: "© 2026 RAT — Rubik Academy Türkiye. Все права защищены." },
-  de: { navHome: "Startseite", backBtn: "Zurück", navCompetitions: "Wettbewerbe", footer: "© 2026 RAT — Rubik Academy Türkiye. Alle Rechte vorbehalten." },
-  ar: { navHome: "الرئيسية", backBtn: "رجوع", navCompetitions: "المسابقات", footer: "© 2026 RAT — روبيك أكاديمي تركيا. جميع الحقوق محفوظة." }
+  tr: {
+    backBtn: "Geri Dön", navHome: "Ana Sayfa", navCompetitions: "Yarışmalar",
+    badge: "FTO · Ağustos 2026 · Online",
+    h1: "RAT Ağustos 2026 Yarışması",
+    intro: "Rubik Academy Türkiye (RAT) tarafından düzenlenen RAT Ağustos 2026 yarışmasının katılım şartlarını, tarih ve saatlerini bu sayfada bulabilirsin. Yarışma, evden katılabileceğin online bir FTO yarışmasıdır.",
+    tabKayit: "Kayıt", tabSartlar: "Şartlar/Kurallar", tabYarismacilar: "Yarışmacılar",
+    tabKategoriler: "Kategoriler", tabProgram: "Program", tabSonuclar: "Sonuçlar",
+    rulesTitle: "📝 RAT Ağustos 2026 Yarışması - Katılım Şartları",
+    rulesLead: "Yarışmaya başvuran her katılımcı aşağıdaki şartları peşinen kabul etmiş sayılır:",
+    rule1: "<strong>Ekipman Gereksinimi:</strong> Katılımcı, yarışma süresince kullanmak üzere ZKT Timer sistemine sahip olmalıdır.",
+    rule2: "<strong>Kapak (Cover) Kullanımı ve Başlangıç Prosedürü:</strong> Videoda net bir şekilde görüleceği üzere; katılımcı küpü scramble (karıştırma) yaptıktan hemen sonra derhal cover'a (kapağa) koymak zorundadır. Hazır olduğunda kapağı kaldırarak süreci başlatır.",
+    rule3: "<strong>ZKT Timer Inspection (İnceleme) Zorunluluğu:</strong> 1. tur canlı (görüntülü) gerçekleşmeyeceği için anlık +2 veya DNF cezası uygulanamamaktadır. Bu nedenle, ZKT Timer odaya/çözüme girildiği anda inspection (inceleme) özelliği açılmak zorundadır. Inspection özelliğini açmayan veya kurala uymayan katılımcılar moderatörler tarafından tespit edilerek diskalifiye edilecektir.",
+    rule4: "<strong>Kamera ve Çekim Açısı:</strong> 1. turdaki video kayıtlarında ve sonraki turlardaki canlı yayın/görüntülü aşamalarda; elleri, masayı ve ZKT Timer'ı net bir şekilde gösteren uygun bir kamera açısı sağlanmalıdır. Açı standartlarına uymayan veya ellerin/küpün görünmediği kayıtlar geçersiz sayılır.",
+    rule5: "<strong>1. Tur Video Kaydı Yükümlülüğü:</strong> Görüntüsüz gerçekleşecek olan 1. turda, her katılımcı çözüm anının videosunu eksiksiz kaydetmek ve 2. tura geçilmeden önce hakem incelemesine sunmak zorundadır.",
+    rule6: "<strong>Adil Oyun (Fair-Play) Kuralı:</strong> Hile, manipülasyon veya kural dışı herhangi bir girişim tespit edildiğinde katılımcı doğrudan diskalifiye edilir. Hakem komitesinin kararları kesindir.",
+    rule7: "<strong>İletişim ve Takip:</strong> Yarışma odası linkleri, grup eşleşmeleri ve saat bilgileri başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır. Belirtilen saatlerde hazır bulunmak katılımcının sorumluluğudur.",
+    registerTitle: "Katılmaya hazır mısın?",
+    registerDesc: "Aşağıdaki formu doldurarak RAT Ağustos 2026 yarışmasına kaydını tamamla.",
+    registerBtn: "Kayıt Ol",
+    participantsTitle: "🧑‍🤝‍🧑 Yarışmacılar",
+    participantsLead: "RAT Ağustos 2026 yarışmasına kayıt olan katılımcılar aşağıda listelenmiştir.",
+    categoriesTitle: "🧩 Kategoriler",
+    categoriesLead: "Bu yarışma tek kategoride gerçekleştirilmektedir.",
+    categoryCube: "🧩 Küp: FTO",
+    scheduleTitle: "📅 Tarih ve Saatler",
+    scheduleFormat: "💻 Format: Online",
+    scheduleSaturday: "29 Ağustos Cumartesi",
+    round1: "1. Round", roundSemifinal: "Yarı Final", roundFinal: "Final",
+    scheduleNote: "Belirtilen saatlerde küçük sapmalar olabilir. Güncel bilgiler başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır.",
+    resultsTitle: "🏆 Sonuçlar",
+    resultsEmpty: "Yarışma henüz tamamlanmadı. Sonuçlar burada yayınlanacaktır.",
+    footer: "© 2026 RAT — Rubik Academy Türkiye. Tüm hakları saklıdır."
+  },
+  en: {
+    backBtn: "Back", navHome: "Home", navCompetitions: "Competitions",
+    badge: "FTO · August 2026 · Online",
+    h1: "RAT August 2026 Competition",
+    intro: "On this page you can find the entry requirements, dates and times for the RAT August 2026 competition, organized by Rubik Academy Turkey (RAT). This is an online FTO competition you can join from home.",
+    tabKayit: "Register", tabSartlar: "Rules", tabYarismacilar: "Competitors",
+    tabKategoriler: "Categories", tabProgram: "Schedule", tabSonuclar: "Results",
+    rulesTitle: "📝 RAT August 2026 Competition - Entry Requirements",
+    rulesLead: "Every competitor who applies is considered to have accepted the following rules in advance:",
+    rule1: "<strong>Equipment Requirement:</strong> Competitors must have a ZKT Timer system to use throughout the competition.",
+    rule2: "<strong>Cover Use and Starting Procedure:</strong> As will be clearly visible in the video, the competitor must immediately place the cube under the cover right after scrambling. They lift the cover when ready to start solving.",
+    rule3: "<strong>ZKT Timer Inspection Requirement:</strong> Since round 1 will not be held live (on camera), instant +2 or DNF penalties cannot be applied. Therefore, the inspection feature of ZKT Timer must be turned on as soon as the room/solve is entered. Competitors who do not enable inspection or who break this rule will be identified by the moderators and disqualified.",
+    rule4: "<strong>Camera and Filming Angle:</strong> In round 1 video recordings and in the live/on-camera stages of later rounds, an appropriate camera angle must clearly show the hands, the table and the ZKT Timer. Recordings that do not meet the angle standards, or where the hands/cube are not visible, are invalid.",
+    rule5: "<strong>Round 1 Video Recording Obligation:</strong> In round 1, which takes place without a live camera, every competitor must fully record a video of the solve and submit it for referee review before moving on to round 2.",
+    rule6: "<strong>Fair-Play Rule:</strong> A competitor is immediately disqualified if cheating, manipulation, or any other attempt to break the rules is detected. Decisions of the referee committee are final.",
+    rule7: "<strong>Communication and Follow-up:</strong> Competition room links, group pairings and time information will be announced through the contact channels specified on the registration form. It is the competitor's responsibility to be present at the specified times.",
+    registerTitle: "Ready to join?",
+    registerDesc: "Fill out the form below to complete your registration for the RAT August 2026 competition.",
+    registerBtn: "Register",
+    participantsTitle: "🧑‍🤝‍🧑 Competitors",
+    participantsLead: "Competitors registered for the RAT August 2026 competition are listed below.",
+    categoriesTitle: "🧩 Categories",
+    categoriesLead: "This competition is held in a single category.",
+    categoryCube: "🧩 Puzzle: FTO",
+    scheduleTitle: "📅 Dates and Times",
+    scheduleFormat: "💻 Format: Online",
+    scheduleSaturday: "Saturday, August 29",
+    round1: "Round 1", roundSemifinal: "Semifinal", roundFinal: "Final",
+    scheduleNote: "Times may shift slightly. Up-to-date information will be announced through the contact channels specified on the registration form.",
+    resultsTitle: "🏆 Results",
+    resultsEmpty: "The competition has not finished yet. Results will be published here.",
+    footer: "© 2026 RAT — Rubik Academy Turkey. All rights reserved."
+  },
+  ru: {
+    backBtn: "Назад", navHome: "Главная", navCompetitions: "Соревнования",
+    badge: "FTO · Август 2026 · Онлайн",
+    h1: "Соревнование RAT — Август 2026",
+    intro: "На этой странице вы найдёте условия участия, даты и время соревнования RAT август 2026, организованного Rubik Academy Turkey (RAT). Это онлайн-соревнование по FTO, в котором можно участвовать из дома.",
+    tabKayit: "Регистрация", tabSartlar: "Правила", tabYarismacilar: "Участники",
+    tabKategoriler: "Категории", tabProgram: "Расписание", tabSonuclar: "Результаты",
+    rulesTitle: "📝 Соревнование RAT август 2026 — Условия участия",
+    rulesLead: "Считается, что каждый участник, подавший заявку, заранее принимает следующие правила:",
+    rule1: "<strong>Требование к оборудованию:</strong> Участник должен иметь систему ZKT Timer для использования на протяжении всего соревнования.",
+    rule2: "<strong>Использование крышки (cover) и порядок старта:</strong> Как будет чётко видно на видео, участник обязан сразу после скремблирования кубика немедленно накрыть его крышкой. Когда участник готов, он поднимает крышку и начинает решение.",
+    rule3: "<strong>Обязательное использование Inspection в ZKT Timer:</strong> Поскольку 1-й раунд не проводится вживую (по видео), мгновенные штрафы +2 или DNF применить нельзя. Поэтому функция inspection в ZKT Timer должна быть включена сразу при входе в комнату/решение. Участники, не включившие inspection или нарушившие это правило, будут выявлены модераторами и дисквалифицированы.",
+    rule4: "<strong>Камера и угол съёмки:</strong> В видеозаписях 1-го раунда и на этапах прямой трансляции последующих раундов должен быть обеспечен угол камеры, чётко показывающий руки, стол и ZKT Timer. Записи, не соответствующие стандартам угла съёмки, или где не видны руки/кубик, считаются недействительными.",
+    rule5: "<strong>Обязанность видеозаписи 1-го раунда:</strong> В 1-м раунде, который проходит без прямой трансляции, каждый участник обязан полностью записать видео решения и предоставить его на проверку судьям перед переходом ко 2-му раунду.",
+    rule6: "<strong>Правило честной игры (Fair-Play):</strong> При обнаружении жульничества, манипуляций или любой другой попытки нарушить правила участник немедленно дисквалифицируется. Решения судейского комитета окончательны.",
+    rule7: "<strong>Связь и информирование:</strong> Ссылки на комнаты соревнования, распределение по группам и информация о времени будут объявлены через каналы связи, указанные в форме регистрации. Присутствие в указанное время — ответственность участника.",
+    registerTitle: "Готовы принять участие?",
+    registerDesc: "Заполните форму ниже, чтобы завершить регистрацию на соревнование RAT август 2026.",
+    registerBtn: "Зарегистрироваться",
+    participantsTitle: "🧑‍🤝‍🧑 Участники",
+    participantsLead: "Ниже перечислены участники, зарегистрированные на соревнование RAT август 2026.",
+    categoriesTitle: "🧩 Категории",
+    categoriesLead: "Это соревнование проводится в одной категории.",
+    categoryCube: "🧩 Головоломка: FTO",
+    scheduleTitle: "📅 Даты и время",
+    scheduleFormat: "💻 Формат: Онлайн",
+    scheduleSaturday: "Суббота, 29 августа",
+    round1: "1-й раунд", roundSemifinal: "Полуфинал", roundFinal: "Финал",
+    scheduleNote: "Возможны небольшие изменения во времени. Актуальная информация будет объявлена через каналы связи, указанные в форме регистрации.",
+    resultsTitle: "🏆 Результаты",
+    resultsEmpty: "Соревнование ещё не завершено. Результаты будут опубликованы здесь.",
+    footer: "© 2026 RAT — Rubik Academy Türkiye. Все права защищены."
+  },
+  de: {
+    backBtn: "Zurück", navHome: "Startseite", navCompetitions: "Wettbewerbe",
+    badge: "FTO · August 2026 · Online",
+    h1: "RAT-Wettbewerb August 2026",
+    intro: "Auf dieser Seite findest du die Teilnahmebedingungen, Termine und Uhrzeiten für den RAT-Wettbewerb August 2026, veranstaltet von Rubik Academy Turkey (RAT). Es handelt sich um einen Online-FTO-Wettbewerb, an dem du von zu Hause aus teilnehmen kannst.",
+    tabKayit: "Anmeldung", tabSartlar: "Regeln", tabYarismacilar: "Teilnehmer",
+    tabKategoriler: "Kategorien", tabProgram: "Zeitplan", tabSonuclar: "Ergebnisse",
+    rulesTitle: "📝 RAT-Wettbewerb August 2026 - Teilnahmebedingungen",
+    rulesLead: "Jeder Teilnehmer, der sich anmeldet, gilt als im Voraus mit den folgenden Regeln einverstanden:",
+    rule1: "<strong>Ausrüstungsanforderung:</strong> Der Teilnehmer muss während des gesamten Wettbewerbs über ein ZKT-Timer-System verfügen.",
+    rule2: "<strong>Verwendung der Abdeckung (Cover) und Startablauf:</strong> Wie im Video deutlich zu sehen sein wird, muss der Teilnehmer den Würfel sofort nach dem Scrambeln unter die Abdeckung legen. Wenn er bereit ist, hebt er die Abdeckung an und beginnt den Lösungsvorgang.",
+    rule3: "<strong>Pflicht zur ZKT-Timer-Inspection:</strong> Da Runde 1 nicht live (per Video) stattfindet, können sofortige +2- oder DNF-Strafen nicht angewendet werden. Daher muss die Inspection-Funktion des ZKT-Timers sofort beim Betreten des Raums/der Lösung aktiviert werden. Teilnehmer, die Inspection nicht aktivieren oder gegen diese Regel verstoßen, werden von den Moderatoren erkannt und disqualifiziert.",
+    rule4: "<strong>Kamera und Aufnahmewinkel:</strong> Bei den Videoaufnahmen von Runde 1 sowie bei den Live-/Video-Phasen der folgenden Runden muss ein geeigneter Kamerawinkel gewählt werden, der Hände, Tisch und ZKT-Timer deutlich zeigt. Aufnahmen, die den Winkelstandards nicht entsprechen oder bei denen Hände/Würfel nicht sichtbar sind, gelten als ungültig.",
+    rule5: "<strong>Pflicht zur Videoaufzeichnung in Runde 1:</strong> In Runde 1, die ohne Live-Bild stattfindet, muss jeder Teilnehmer ein vollständiges Video des Lösungsvorgangs aufzeichnen und es vor dem Übergang zu Runde 2 zur Prüfung durch die Schiedsrichter einreichen.",
+    rule6: "<strong>Fair-Play-Regel:</strong> Wird Betrug, Manipulation oder ein sonstiger regelwidriger Versuch festgestellt, wird der Teilnehmer sofort disqualifiziert. Entscheidungen des Schiedsrichterkomitees sind endgültig.",
+    rule7: "<strong>Kommunikation und Nachverfolgung:</strong> Links zu den Wettbewerbsräumen, Gruppenzuordnungen und Zeitangaben werden über die im Anmeldeformular angegebenen Kontaktkanäle bekannt gegeben. Es liegt in der Verantwortung des Teilnehmers, zu den angegebenen Zeiten anwesend zu sein.",
+    registerTitle: "Bereit zur Teilnahme?",
+    registerDesc: "Fülle das folgende Formular aus, um deine Anmeldung für den RAT-Wettbewerb August 2026 abzuschließen.",
+    registerBtn: "Anmelden",
+    participantsTitle: "🧑‍🤝‍🧑 Teilnehmer",
+    participantsLead: "Nachfolgend sind die für den RAT-Wettbewerb August 2026 angemeldeten Teilnehmer aufgeführt.",
+    categoriesTitle: "🧩 Kategorien",
+    categoriesLead: "Dieser Wettbewerb findet in einer einzigen Kategorie statt.",
+    categoryCube: "🧩 Puzzle: FTO",
+    scheduleTitle: "📅 Termine und Uhrzeiten",
+    scheduleFormat: "💻 Format: Online",
+    scheduleSaturday: "Samstag, 29. August",
+    round1: "Runde 1", roundSemifinal: "Halbfinale", roundFinal: "Finale",
+    scheduleNote: "Bei den angegebenen Zeiten kann es zu kleinen Abweichungen kommen. Aktuelle Informationen werden über die im Anmeldeformular angegebenen Kontaktkanäle bekannt gegeben.",
+    resultsTitle: "🏆 Ergebnisse",
+    resultsEmpty: "Der Wettbewerb ist noch nicht abgeschlossen. Die Ergebnisse werden hier veröffentlicht.",
+    footer: "© 2026 RAT — Rubik Academy Türkiye. Alle Rechte vorbehalten."
+  },
+  ar: {
+    backBtn: "رجوع", navHome: "الرئيسية", navCompetitions: "المسابقات",
+    badge: "FTO · أغسطس 2026 · عبر الإنترنت",
+    h1: "مسابقة RAT أغسطس 2026",
+    intro: "في هذه الصفحة يمكنك الاطلاع على شروط المشاركة والتواريخ والأوقات الخاصة بمسابقة RAT أغسطس 2026 التي تنظمها أكاديمية روبيك تركيا (RAT). هذه مسابقة FTO عبر الإنترنت يمكنك المشاركة فيها من المنزل.",
+    tabKayit: "التسجيل", tabSartlar: "الشروط والقواعد", tabYarismacilar: "المتسابقون",
+    tabKategoriler: "الفئات", tabProgram: "الجدول الزمني", tabSonuclar: "النتائج",
+    rulesTitle: "📝 مسابقة RAT أغسطس 2026 - شروط المشاركة",
+    rulesLead: "يُعتبر كل متسابق يتقدم بطلب مشاركة قد وافق مسبقًا على الشروط التالية:",
+    rule1: "<strong>متطلبات المعدات:</strong> يجب أن يمتلك المتسابق نظام ZKT Timer لاستخدامه طوال فترة المسابقة.",
+    rule2: "<strong>استخدام الغطاء (Cover) وإجراء البدء:</strong> كما سيظهر بوضوح في الفيديو، يجب على المتسابق وضع المكعب تحت الغطاء فور الانتهاء من الخلط مباشرة. وعند الاستعداد يقوم برفع الغطاء لبدء الحل.",
+    rule3: "<strong>إلزامية تفعيل خاصية Inspection في ZKT Timer:</strong> نظرًا لأن الجولة الأولى لن تُجرى بثًا مباشرًا (بالفيديو)، لا يمكن تطبيق عقوبات +2 أو DNF الفورية. لذلك يجب تفعيل خاصية inspection في ZKT Timer فور الدخول إلى الغرفة/الحل. سيتم اكتشاف المتسابقين الذين لا يفعّلون هذه الخاصية أو يخالفون هذه القاعدة من قبل المشرفين واستبعادهم.",
+    rule4: "<strong>الكاميرا وزاوية التصوير:</strong> في تسجيلات فيديو الجولة الأولى وفي مراحل البث المباشر للجولات اللاحقة، يجب توفير زاوية كاميرا مناسبة تُظهر بوضوح اليدين والطاولة وجهاز ZKT Timer. التسجيلات التي لا تتوافق مع معايير الزاوية أو التي لا تظهر فيها اليدان/المكعب تُعتبر غير صالحة.",
+    rule5: "<strong>وجوب تسجيل فيديو الجولة الأولى:</strong> في الجولة الأولى التي تُجرى دون بث مباشر، يجب على كل متسابق تسجيل فيديو كامل للحل وتقديمه لمراجعة الحكام قبل الانتقال إلى الجولة الثانية.",
+    rule6: "<strong>قاعدة اللعب النظيف (Fair-Play):</strong> عند اكتشاف أي غش أو تلاعب أو أي محاولة مخالفة للقواعد، يتم استبعاد المتسابق مباشرة. قرارات لجنة الحكام نهائية.",
+    rule7: "<strong>التواصل والمتابعة:</strong> سيتم الإعلان عن روابط غرف المسابقة وتوزيع المجموعات ومعلومات الأوقات عبر قنوات التواصل المحددة في استمارة التسجيل. يقع على عاتق المتسابق التواجد في الأوقات المحددة.",
+    registerTitle: "هل أنت مستعد للمشاركة؟",
+    registerDesc: "املأ النموذج أدناه لإكمال تسجيلك في مسابقة RAT أغسطس 2026.",
+    registerBtn: "سجّل الآن",
+    participantsTitle: "🧑‍🤝‍🧑 المتسابقون",
+    participantsLead: "فيما يلي قائمة بالمتسابقين المسجلين في مسابقة RAT أغسطس 2026.",
+    categoriesTitle: "🧩 الفئات",
+    categoriesLead: "تُقام هذه المسابقة في فئة واحدة فقط.",
+    categoryCube: "🧩 المكعب: FTO",
+    scheduleTitle: "📅 التواريخ والأوقات",
+    scheduleFormat: "💻 الصيغة: عبر الإنترنت",
+    scheduleSaturday: "السبت 29 أغسطس",
+    round1: "الجولة 1", roundSemifinal: "نصف النهائي", roundFinal: "النهائي",
+    scheduleNote: "قد تحدث تغييرات طفيفة في الأوقات المحددة. سيتم الإعلان عن المعلومات المحدثة عبر قنوات التواصل المحددة في استمارة التسجيل.",
+    resultsTitle: "🏆 النتائج",
+    resultsEmpty: "لم تنتهِ المسابقة بعد. سيتم نشر النتائج هنا.",
+    footer: "© 2026 RAT — أكاديمية روبيك تركيا. جميع الحقوق محفوظة."
+  }
 };
 
 var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
@@ -747,16 +902,27 @@ var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
 function applyLanguage(lang) {
   if (!translations[lang]) lang = "tr";
   var dict = translations[lang];
+
   document.querySelectorAll("[data-i18n]").forEach(function(el) {
     var key = el.getAttribute("data-i18n");
     if (dict[key]) el.textContent = dict[key];
   });
-  document.documentElement.setAttribute("lang", lang === "tr" ? "tr" : lang);
+
+  document.querySelectorAll("[data-i18n-html]").forEach(function(el) {
+    var key = el.getAttribute("data-i18n-html");
+    if (dict[key]) el.innerHTML = dict[key];
+  });
+
+  document.documentElement.setAttribute("lang", lang);
+  document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+
   var label = document.getElementById("langLabel");
   if (label) label.textContent = langCodes[lang] || "TR";
+
   document.querySelectorAll(".lang-menu-item").forEach(function(item) {
     item.classList.toggle("active", item.getAttribute("data-lang") === lang);
   });
+
   localStorage.setItem("site-lang", lang);
 }
 
