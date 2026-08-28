@@ -506,6 +506,7 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
     <button class="tab-btn active" data-tab="sartlar" data-i18n="tabSartlar" onclick="switchTab('sartlar')">Şartlar/Kurallar</button>
     <button class="tab-btn" data-tab="yarismacilar" data-i18n="tabYarismacilar" onclick="switchTab('yarismacilar')">Yarışmacılar</button>
     <button class="tab-btn" data-tab="kategoriler" data-i18n="tabKategoriler" onclick="switchTab('kategoriler')">Kategoriler</button>
+    <button class="tab-btn" data-tab="format" data-i18n="tabFormat" onclick="switchTab('format')">Format</button>
     <button class="tab-btn" data-tab="program" data-i18n="tabProgram" onclick="switchTab('program')">Program</button>
     <button class="tab-btn" data-tab="sonuclar" data-i18n="tabSonuclar" onclick="switchTab('sonuclar')">Sonuçlar</button>
   </nav>
@@ -614,6 +615,13 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
               <span class="participant-id">ID: 6</span>
             </span>
           </li>
+          <li class="participant-row">
+            <span class="participant-rank">7</span>
+            <span class="participant-info">
+              <span class="participant-name">Ömer Eymen Akar</span>
+              <span class="participant-id">ID: 7</span>
+            </span>
+          </li>
         </ul>
       </div>
     </div>
@@ -626,6 +634,42 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
         <div class="schedule-meta">
           <span data-i18n="categoryCube">🧩 Küp: FTO</span>
         </div>
+      </div>
+    </div>
+
+    <!-- FORMAT -->
+    <div class="tab-panel" id="panel-format">
+      <div class="info-card reveal">
+        <h2 data-i18n="formatTitle">🏆 Turnuva Formatı</h2>
+        <p class="lead" data-i18n="formatLead">Yarışma, eleme turundan finale kadar dört aşamalı bir eleme sistemiyle gerçekleştirilir. Aşağıda her turun katılımcı sayısı, işleyişi ve bir sonraki tura yükselme kriterleri yer almaktadır.</p>
+
+        <div class="schedule-meta">
+          <span data-i18n="formatBadgeQualify">👥 Eleme Turu: 10 Kişi</span>
+          <span data-i18n="formatBadgeRound2">➡️ 2. Tur: 6 Kişi</span>
+          <span data-i18n="formatBadgeSemi">➡️ Yarı Final: 4 Kişi</span>
+          <span data-i18n="formatBadgeFinal">➡️ Final: 2 Kişi</span>
+        </div>
+
+        <ol class="rules-list">
+          <li>
+            <span class="rule-num">1</span>
+            <span class="rule-text" data-i18n-html="formatStage1"><strong>Eleme Turu — 10 Katılımcı:</strong> Katılımcılar A ve B olmak üzere iki gruba ayrılır. Bu tur görüntüsüz gerçekleştirilir; her katılımcı çözümünü ayrı bir ZKT Timer grup odasında, video kaydı alarak tamamlar. 2. Tur'a geçilmeden önce tüm kayıtlar hakem ekibi tarafından incelenerek hile kontrolü yapılır.</span>
+          </li>
+          <li>
+            <span class="rule-num">2</span>
+            <span class="rule-text" data-i18n-html="formatStage2"><strong>2. Tur — 6 Katılımcı:</strong> Her iki gruptan ilk 3 sırayı alan katılımcılar (toplam 6 kişi) bir üst tura yükselir. Bu aşamadan itibaren yarışma görüntülü olarak devam eder. Tur sonunda en düşük performansı gösteren 2 katılımcı elenir ve 4 katılımcı bir sonraki tura ilerler.</span>
+          </li>
+          <li>
+            <span class="rule-num">3</span>
+            <span class="rule-text" data-i18n-html="formatStage3"><strong>Yarı Final — 4 Katılımcı:</strong> Kalan 4 katılımcı görüntülü olarak yarışır. Bu turun sonunda en iyi performansı gösteren 2 katılımcı finale yükselir.</span>
+          </li>
+          <li>
+            <span class="rule-num">4</span>
+            <span class="rule-text" data-i18n-html="formatStage4"><strong>Final — 2 Katılımcı:</strong> Final, 9 setlik bir seri (Best of 9) formatında oynanır. 5 seti ilk kazanan katılımcı şampiyon olur.</span>
+          </li>
+        </ol>
+
+        <p class="schedule-note" data-i18n="formatNote">Katılımcı sayısına bağlı olarak grup dağılımı ve tur geçiş kriterleri değişebilir. Nihai düzenlemeler ve elemeler hakem komitesi tarafından belirlenir.</p>
       </div>
     </div>
 
@@ -694,7 +738,7 @@ function switchTab(tab) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  var validTabs = ["kayit", "sartlar", "yarismacilar", "kategoriler", "program", "sonuclar"];
+  var validTabs = ["kayit", "sartlar", "yarismacilar", "kategoriler", "format", "program", "sonuclar"];
   var savedTab = localStorage.getItem("active-tab");
   if (savedTab && validTabs.indexOf(savedTab) !== -1) {
     switchTab(savedTab);
@@ -736,7 +780,7 @@ var translations = {
     h1: "RAT Ağustos 2026 Yarışması",
     intro: "Rubik Academy Türkiye (RAT) tarafından düzenlenen RAT Ağustos 2026 yarışmasının katılım şartlarını, tarih ve saatlerini bu sayfada bulabilirsin. Yarışma, evden katılabileceğin online bir FTO yarışmasıdır.",
     tabKayit: "Kayıt", tabSartlar: "Şartlar/Kurallar", tabYarismacilar: "Yarışmacılar",
-    tabKategoriler: "Kategoriler", tabProgram: "Program", tabSonuclar: "Sonuçlar",
+    tabKategoriler: "Kategoriler", tabFormat: "Format", tabProgram: "Program", tabSonuclar: "Sonuçlar",
     rulesTitle: "📝 RAT Ağustos 2026 Yarışması - Katılım Şartları",
     rulesLead: "Yarışmaya başvuran her katılımcı aşağıdaki şartları peşinen kabul etmiş sayılır:",
     rule1: "<strong>Ekipman Gereksinimi:</strong> Katılımcı, yarışma süresince kullanmak üzere ZKT Timer sistemine sahip olmalıdır.",
@@ -754,6 +798,17 @@ var translations = {
     categoriesTitle: "🧩 Kategoriler",
     categoriesLead: "Bu yarışma tek kategoride gerçekleştirilmektedir.",
     categoryCube: "🧩 Küp: FTO",
+    formatTitle: "🏆 Turnuva Formatı",
+    formatLead: "Yarışma, eleme turundan finale kadar dört aşamalı bir eleme sistemiyle gerçekleştirilir. Aşağıda her turun katılımcı sayısı, işleyişi ve bir sonraki tura yükselme kriterleri yer almaktadır.",
+    formatBadgeQualify: "👥 Eleme Turu: 10 Kişi",
+    formatBadgeRound2: "➡️ 2. Tur: 6 Kişi",
+    formatBadgeSemi: "➡️ Yarı Final: 4 Kişi",
+    formatBadgeFinal: "➡️ Final: 2 Kişi",
+    formatStage1: "<strong>Eleme Turu — 10 Katılımcı:</strong> Katılımcılar A ve B olmak üzere iki gruba ayrılır. Bu tur görüntüsüz gerçekleştirilir; her katılımcı çözümünü ayrı bir ZKT Timer grup odasında, video kaydı alarak tamamlar. 2. Tur'a geçilmeden önce tüm kayıtlar hakem ekibi tarafından incelenerek hile kontrolü yapılır.",
+    formatStage2: "<strong>2. Tur — 6 Katılımcı:</strong> Her iki gruptan ilk 3 sırayı alan katılımcılar (toplam 6 kişi) bir üst tura yükselir. Bu aşamadan itibaren yarışma görüntülü olarak devam eder. Tur sonunda en düşük performansı gösteren 2 katılımcı elenir ve 4 katılımcı bir sonraki tura ilerler.",
+    formatStage3: "<strong>Yarı Final — 4 Katılımcı:</strong> Kalan 4 katılımcı görüntülü olarak yarışır. Bu turun sonunda en iyi performansı gösteren 2 katılımcı finale yükselir.",
+    formatStage4: "<strong>Final — 2 Katılımcı:</strong> Final, 9 setlik bir seri (Best of 9) formatında oynanır. 5 seti ilk kazanan katılımcı şampiyon olur.",
+    formatNote: "Katılımcı sayısına bağlı olarak grup dağılımı ve tur geçiş kriterleri değişebilir. Nihai düzenlemeler ve elemeler hakem komitesi tarafından belirlenir.",
     scheduleTitle: "📅 Tarih ve Saatler",
     scheduleFormat: "💻 Format: Online",
     scheduleSaturday: "29 Ağustos Cumartesi",
@@ -769,7 +824,7 @@ var translations = {
     h1: "RAT August 2026 Competition",
     intro: "On this page you can find the entry requirements, dates and times for the RAT August 2026 competition, organized by Rubik Academy Turkey (RAT). This is an online FTO competition you can join from home.",
     tabKayit: "Register", tabSartlar: "Rules", tabYarismacilar: "Competitors",
-    tabKategoriler: "Categories", tabProgram: "Schedule", tabSonuclar: "Results",
+    tabKategoriler: "Categories", tabFormat: "Format", tabProgram: "Schedule", tabSonuclar: "Results",
     rulesTitle: "📝 RAT August 2026 Competition - Entry Requirements",
     rulesLead: "Every competitor who applies is considered to have accepted the following rules in advance:",
     rule1: "<strong>Equipment Requirement:</strong> Competitors must have a ZKT Timer system to use throughout the competition.",
@@ -787,6 +842,17 @@ var translations = {
     categoriesTitle: "🧩 Categories",
     categoriesLead: "This competition is held in a single category.",
     categoryCube: "🧩 Puzzle: FTO",
+    formatTitle: "🏆 Tournament Format",
+    formatLead: "The competition runs through a four-stage elimination system from the qualifying round to the final. Below is the number of competitors, structure, and advancement criteria for each round.",
+    formatBadgeQualify: "👥 Qualifying: 10 Players",
+    formatBadgeRound2: "➡️ Round 2: 6 Players",
+    formatBadgeSemi: "➡️ Semifinal: 4 Players",
+    formatBadgeFinal: "➡️ Final: 2 Players",
+    formatStage1: "<strong>Qualifying Round — 10 Competitors:</strong> Competitors are split into Group A and Group B. This round takes place without live video; each competitor completes their solve in a separate ZKT Timer room while recording a video. Before proceeding to Round 2, all recordings are reviewed by the referee team to check for any rule violations.",
+    formatStage2: "<strong>Round 2 — 6 Competitors:</strong> The top 3 competitors from each group (6 in total) advance to this round. From this stage onward, the competition is held live/on camera. At the end of the round, the 2 lowest-performing competitors are eliminated, leaving 4 competitors to advance.",
+    formatStage3: "<strong>Semifinal — 4 Competitors:</strong> The remaining 4 competitors compete live. The top 2 competitors from this round advance to the final.",
+    formatStage4: "<strong>Final — 2 Competitors:</strong> The final is played as a best-of-9 series. The first competitor to win 5 sets is crowned champion.",
+    formatNote: "Group distribution and advancement criteria may vary depending on the number of competitors. Final arrangements and eliminations are determined by the referee committee.",
     scheduleTitle: "📅 Dates and Times",
     scheduleFormat: "💻 Format: Online",
     scheduleSaturday: "Saturday, August 29",
@@ -802,7 +868,7 @@ var translations = {
     h1: "Соревнование RAT — Август 2026",
     intro: "На этой странице вы найдёте условия участия, даты и время соревнования RAT август 2026, организованного Rubik Academy Turkey (RAT). Это онлайн-соревнование по FTO, в котором можно участвовать из дома.",
     tabKayit: "Регистрация", tabSartlar: "Правила", tabYarismacilar: "Участники",
-    tabKategoriler: "Категории", tabProgram: "Расписание", tabSonuclar: "Результаты",
+    tabKategoriler: "Категории", tabFormat: "Формат", tabProgram: "Расписание", tabSonuclar: "Результаты",
     rulesTitle: "📝 Соревнование RAT август 2026 — Условия участия",
     rulesLead: "Считается, что каждый участник, подавший заявку, заранее принимает следующие правила:",
     rule1: "<strong>Требование к оборудованию:</strong> Участник должен иметь систему ZKT Timer для использования на протяжении всего соревнования.",
@@ -820,6 +886,17 @@ var translations = {
     categoriesTitle: "🧩 Категории",
     categoriesLead: "Это соревнование проводится в одной категории.",
     categoryCube: "🧩 Головоломка: FTO",
+    formatTitle: "🏆 Формат турнира",
+    formatLead: "Соревнование проходит по четырёхэтапной системе на выбывание — от квалификации до финала. Ниже указано количество участников, структура и критерии выхода в следующий раунд для каждого этапа.",
+    formatBadgeQualify: "👥 Квалификация: 10 участников",
+    formatBadgeRound2: "➡️ 2-й раунд: 6 участников",
+    formatBadgeSemi: "➡️ Полуфинал: 4 участника",
+    formatBadgeFinal: "➡️ Финал: 2 участника",
+    formatStage1: "<strong>Квалификационный раунд — 10 участников:</strong> Участники делятся на группы A и B. Этот раунд проходит без прямой трансляции; каждый участник выполняет решение в отдельной комнате ZKT Timer, записывая видео. Перед переходом ко 2-му раунду все записи проверяются судейской командой на предмет нарушений.",
+    formatStage2: "<strong>2-й раунд — 6 участников:</strong> Первые 3 участника из каждой группы (всего 6 человек) проходят в этот раунд. Начиная с этого этапа соревнование проводится вживую. По итогам раунда 2 участника с наименьшим результатом выбывают, и 4 участника проходят дальше.",
+    formatStage3: "<strong>Полуфинал — 4 участника:</strong> Оставшиеся 4 участника соревнуются вживую. Лучшие 2 участника этого раунда выходят в финал.",
+    formatStage4: "<strong>Финал — 2 участника:</strong> Финал проводится в формате до 9 сетов (best of 9). Победителем становится участник, первым выигравший 5 сетов.",
+    formatNote: "Распределение по группам и критерии перехода в следующий раунд могут меняться в зависимости от количества участников. Итоговые решения и результаты отбора определяются судейским комитетом.",
     scheduleTitle: "📅 Даты и время",
     scheduleFormat: "💻 Формат: Онлайн",
     scheduleSaturday: "Суббота, 29 августа",
@@ -835,7 +912,7 @@ var translations = {
     h1: "RAT-Wettbewerb August 2026",
     intro: "Auf dieser Seite findest du die Teilnahmebedingungen, Termine und Uhrzeiten für den RAT-Wettbewerb August 2026, veranstaltet von Rubik Academy Turkey (RAT). Es handelt sich um einen Online-FTO-Wettbewerb, an dem du von zu Hause aus teilnehmen kannst.",
     tabKayit: "Anmeldung", tabSartlar: "Regeln", tabYarismacilar: "Teilnehmer",
-    tabKategoriler: "Kategorien", tabProgram: "Zeitplan", tabSonuclar: "Ergebnisse",
+    tabKategoriler: "Kategorien", tabFormat: "Format", tabProgram: "Zeitplan", tabSonuclar: "Ergebnisse",
     rulesTitle: "📝 RAT-Wettbewerb August 2026 - Teilnahmebedingungen",
     rulesLead: "Jeder Teilnehmer, der sich anmeldet, gilt als im Voraus mit den folgenden Regeln einverstanden:",
     rule1: "<strong>Ausrüstungsanforderung:</strong> Der Teilnehmer muss während des gesamten Wettbewerbs über ein ZKT-Timer-System verfügen.",
@@ -853,6 +930,17 @@ var translations = {
     categoriesTitle: "🧩 Kategorien",
     categoriesLead: "Dieser Wettbewerb findet in einer einzigen Kategorie statt.",
     categoryCube: "🧩 Puzzle: FTO",
+    formatTitle: "🏆 Wettbewerbsformat",
+    formatLead: "Der Wettbewerb läuft über ein vierstufiges K.-o.-System von der Qualifikation bis zum Finale. Nachfolgend findest du die Teilnehmerzahl, den Ablauf und die Aufstiegskriterien jeder Runde.",
+    formatBadgeQualify: "👥 Qualifikation: 10 Teilnehmer",
+    formatBadgeRound2: "➡️ Runde 2: 6 Teilnehmer",
+    formatBadgeSemi: "➡️ Halbfinale: 4 Teilnehmer",
+    formatBadgeFinal: "➡️ Finale: 2 Teilnehmer",
+    formatStage1: "<strong>Qualifikationsrunde — 10 Teilnehmer:</strong> Die Teilnehmer werden in Gruppe A und Gruppe B aufgeteilt. Diese Runde findet ohne Live-Übertragung statt; jeder Teilnehmer absolviert seine Lösung in einem separaten ZKT-Timer-Raum und zeichnet dabei ein Video auf. Vor dem Übergang zu Runde 2 werden alle Aufnahmen vom Schiedsrichterteam auf Regelverstöße überprüft.",
+    formatStage2: "<strong>Runde 2 — 6 Teilnehmer:</strong> Die besten 3 Teilnehmer jeder Gruppe (insgesamt 6) erreichen diese Runde. Ab dieser Phase wird der Wettbewerb live übertragen. Am Ende der Runde scheiden die 2 leistungsschwächsten Teilnehmer aus, 4 Teilnehmer kommen weiter.",
+    formatStage3: "<strong>Halbfinale — 4 Teilnehmer:</strong> Die verbleibenden 4 Teilnehmer treten live gegeneinander an. Die besten 2 Teilnehmer dieser Runde erreichen das Finale.",
+    formatStage4: "<strong>Finale — 2 Teilnehmer:</strong> Das Finale wird im Best-of-9-Format ausgetragen. Der Teilnehmer, der zuerst 5 Sätze gewinnt, wird Champion.",
+    formatNote: "Die Gruppenaufteilung und die Aufstiegskriterien können je nach Teilnehmerzahl variieren. Die endgültigen Regelungen und Ausscheidungen werden vom Schiedsrichterkomitee festgelegt.",
     scheduleTitle: "📅 Termine und Uhrzeiten",
     scheduleFormat: "💻 Format: Online",
     scheduleSaturday: "Samstag, 29. August",
@@ -868,7 +956,7 @@ var translations = {
     h1: "مسابقة RAT أغسطس 2026",
     intro: "في هذه الصفحة يمكنك الاطلاع على شروط المشاركة والتواريخ والأوقات الخاصة بمسابقة RAT أغسطس 2026 التي تنظمها أكاديمية روبيك تركيا (RAT). هذه مسابقة FTO عبر الإنترنت يمكنك المشاركة فيها من المنزل.",
     tabKayit: "التسجيل", tabSartlar: "الشروط والقواعد", tabYarismacilar: "المتسابقون",
-    tabKategoriler: "الفئات", tabProgram: "الجدول الزمني", tabSonuclar: "النتائج",
+    tabKategoriler: "الفئات", tabFormat: "الصيغة", tabProgram: "الجدول الزمني", tabSonuclar: "النتائج",
     rulesTitle: "📝 مسابقة RAT أغسطس 2026 - شروط المشاركة",
     rulesLead: "يُعتبر كل متسابق يتقدم بطلب مشاركة قد وافق مسبقًا على الشروط التالية:",
     rule1: "<strong>متطلبات المعدات:</strong> يجب أن يمتلك المتسابق نظام ZKT Timer لاستخدامه طوال فترة المسابقة.",
@@ -886,6 +974,17 @@ var translations = {
     categoriesTitle: "🧩 الفئات",
     categoriesLead: "تُقام هذه المسابقة في فئة واحدة فقط.",
     categoryCube: "🧩 المكعب: FTO",
+    formatTitle: "🏆 صيغة المسابقة",
+    formatLead: "تُقام المسابقة وفق نظام إقصائي من أربع مراحل، بدءًا من التصفيات وصولًا إلى النهائي. فيما يلي عدد المتسابقين وآلية العمل ومعايير التأهل لكل جولة.",
+    formatBadgeQualify: "👥 التصفيات: 10 متسابقين",
+    formatBadgeRound2: "➡️ الجولة الثانية: 6 متسابقين",
+    formatBadgeSemi: "➡️ نصف النهائي: 4 متسابقين",
+    formatBadgeFinal: "➡️ النهائي: متسابقان",
+    formatStage1: "<strong>جولة التصفيات — 10 متسابقين:</strong> يُقسَّم المتسابقون إلى مجموعتين A وB. تُجرى هذه الجولة دون بث مباشر؛ يقوم كل متسابق بإجراء الحل في غرفة ZKT Timer منفصلة مع تسجيل فيديو للعملية. وقبل الانتقال إلى الجولة الثانية، يقوم فريق الحكام بمراجعة جميع التسجيلات للتأكد من عدم وجود أي مخالفات.",
+    formatStage2: "<strong>الجولة الثانية — 6 متسابقين:</strong> يتأهل أفضل 3 متسابقين من كل مجموعة (6 متسابقين إجمالاً) إلى هذه الجولة. ابتداءً من هذه المرحلة، تُقام المسابقة بثًا مباشرًا. وفي نهاية الجولة، يتم استبعاد المتسابقَين الأقل أداءً، ليتأهل 4 متسابقين إلى المرحلة التالية.",
+    formatStage3: "<strong>نصف النهائي — 4 متسابقين:</strong> يتنافس المتسابقون الأربعة المتبقون بثًا مباشرًا. يتأهل أفضل متسابقين من هذه الجولة إلى النهائي.",
+    formatStage4: "<strong>النهائي — متسابقان:</strong> يُقام النهائي بنظام أفضل من 9 أشواط (Best of 9)، ويُتوَّج بالبطولة أول متسابق يفوز بـ 5 أشواط.",
+    formatNote: "قد يختلف توزيع المجموعات ومعايير التأهل حسب عدد المتسابقين. تُحدَّد الترتيبات النهائية والاستبعادات من قبل لجنة الحكام.",
     scheduleTitle: "📅 التواريخ والأوقات",
     scheduleFormat: "💻 الصيغة: عبر الإنترنت",
     scheduleSaturday: "السبت 29 أغسطس",
