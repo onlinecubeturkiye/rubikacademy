@@ -407,6 +407,67 @@ html.dark-mode .schedule-day, body.dark-mode .schedule-day,
 html.dark-mode .participant-row, body.dark-mode .participant-row { background: var(--surface-soft); border-color: var(--border); }
 html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22; }
 
+/* =========================================
+   SONUÇLAR — ALT SEKMELER VE SIRALAMA
+========================================= */
+.results-subtabs {
+  display: flex; gap: 6px; margin-bottom: 22px;
+  padding: 5px; border-radius: 13px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.results-subtab-btn {
+  flex: 1 0 auto;
+  border: none; border-radius: 9px;
+  background: transparent; cursor: pointer;
+  padding: 10px 14px; font-family: inherit;
+  font-size: 13px; font-weight: 700; color: var(--text-soft);
+  transition: .2s; white-space: nowrap;
+}
+.results-subtab-btn:hover { color: var(--text); background: var(--surface); }
+.results-subtab-btn.active {
+  color: #fff; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  box-shadow: 0 6px 14px rgba(230,37,47,.25);
+}
+.results-subpanel { display: none; }
+.results-subpanel.active { display: block; }
+
+.results-list { display: flex; flex-direction: column; gap: 12px; }
+.result-row {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px 18px; border-radius: 14px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+}
+.result-row.result-red { border-color: #fbb4b9; }
+.result-badge { font-size: 16px; line-height: 1; margin-top: 2px; flex-shrink: 0; }
+.result-main { flex: 1; min-width: 0; }
+.result-top {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;
+  margin-bottom: 4px;
+}
+.result-rank { font-weight: 900; color: var(--primary-dark); font-size: 14.5px; }
+.result-name { font-weight: 700; color: var(--text); font-size: 14.5px; }
+.result-avg { margin-left: auto; font-weight: 800; color: var(--primary); font-size: 13.5px; white-space: nowrap; }
+.result-times { color: var(--text-soft); font-size: 12.5px; letter-spacing: .2px; }
+.result-row.result-empty { opacity: .6; }
+.result-row.result-empty .result-avg { color: var(--text-soft); font-weight: 700; }
+
+.results-soon {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-soft);
+}
+.results-soon .soon-icon { font-size: 34px; margin-bottom: 12px; }
+.results-soon .soon-title { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.results-soon .soon-desc { font-size: 13.5px; line-height: 1.7; max-width: 380px; margin: auto; }
+
+@media(max-width:640px) {
+  .result-top { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .result-avg { margin-left: 0; }
+}
+
 /* AR (sağdan sola) uyumu için gerekli değil; içerik yönü sabit tutulur */
 </style>
 
@@ -710,7 +771,121 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.22;
     <div class="tab-panel" id="panel-sonuclar">
       <div class="info-card reveal">
         <h2 data-i18n="resultsTitle">🏆 Sonuçlar</h2>
-        <p class="empty-note" data-i18n="resultsEmpty">Yarışma henüz tamamlanmadı. Sonuçlar burada yayınlanacaktır.</p>
+        <p class="lead" data-i18n="resultsLead">Her tur için sonuçları aşağıdaki sekmelerden inceleyebilirsin.</p>
+
+        <div class="results-subtabs">
+          <button class="results-subtab-btn active" data-subtab="round1" data-i18n="resultsTabRound1" onclick="switchResultsTab('round1')">1. Round</button>
+          <button class="results-subtab-btn" data-subtab="semifinal" data-i18n="resultsTabSemi" onclick="switchResultsTab('semifinal')">Yarı Final</button>
+          <button class="results-subtab-btn" data-subtab="final" data-i18n="resultsTabFinal" onclick="switchResultsTab('final')">Final</button>
+        </div>
+
+        <!-- 1. ROUND SONUÇLARI -->
+        <div class="results-subpanel active" id="results-round1">
+          <div class="results-list">
+
+            <div class="result-row result-green">
+              <span class="result-badge">🟢</span>
+              <div class="result-main">
+                <div class="result-top">
+                  <span class="result-rank">1.</span>
+                  <span class="result-name">Muhammed Eren Yalçın</span>
+                  <span class="result-avg">Ao5: 1:06.66</span>
+                </div>
+                <div class="result-times">1:03.62 | 1:06.40 | 1:09.96 | (55.95) | (1:33.14)</div>
+              </div>
+            </div>
+
+            <div class="result-row result-green">
+              <span class="result-badge">🟢</span>
+              <div class="result-main">
+                <div class="result-top">
+                  <span class="result-rank">2.</span>
+                  <span class="result-name">Ömer Eymen Akar</span>
+                  <span class="result-avg">Ao5: 1:09.12</span>
+                </div>
+                <div class="result-times">1:15.92 | (1:58.78) | 1:01.94 | 1:09.49 | (48.98)</div>
+              </div>
+            </div>
+
+            <div class="result-row result-green">
+              <span class="result-badge">🟢</span>
+              <div class="result-main">
+                <div class="result-top">
+                  <span class="result-rank">3.</span>
+                  <span class="result-name">Barış Kaya</span>
+                  <span class="result-avg">Ao5: 1:18.58</span>
+                </div>
+                <div class="result-times">(1:10.69) | (1:37.90) | 1:21.14 | 1:13.89 | 1:20.72</div>
+              </div>
+            </div>
+
+            <div class="result-row result-green">
+              <span class="result-badge">🟢</span>
+              <div class="result-main">
+                <div class="result-top">
+                  <span class="result-rank">4.</span>
+                  <span class="result-name">Mert Ali Köroğlu</span>
+                  <span class="result-avg">Ao5: 1:20.13</span>
+                </div>
+                <div class="result-times">1:36.33 | (48.07) | (DNF) | 1:17.23 | 1:06.83</div>
+              </div>
+            </div>
+
+            <div class="result-row result-red">
+              <span class="result-badge">🔴</span>
+              <div class="result-main">
+                <div class="result-top">
+                  <span class="result-rank">5.</span>
+                  <span class="result-name">Abdussamet Bozbay</span>
+                  <span class="result-avg">Ao5: 1:21.45</span>
+                </div>
+                <div class="result-times">1:35.53 | 1:49.80 | 1:07.40 | 1:10.00 | 1:18.81</div>
+              </div>
+            </div>
+
+            <div class="result-row result-empty">
+              <span class="result-badge">⚪</span>
+              <div class="result-main">
+                <div class="result-top">
+                  <span class="result-rank">—</span>
+                  <span class="result-name">Yahya Mavituna</span>
+                  <span class="result-avg" data-i18n="resultsDns">Katılmadı</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-row result-empty">
+              <span class="result-badge">⚪</span>
+              <div class="result-main">
+                <div class="result-top">
+                  <span class="result-rank">—</span>
+                  <span class="result-name">Ömer Çavuş</span>
+                  <span class="result-avg" data-i18n="resultsDns">Katılmadı</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- YARI FİNAL SONUÇLARI -->
+        <div class="results-subpanel" id="results-semifinal">
+          <div class="results-soon">
+            <div class="soon-icon">⏳</div>
+            <div class="soon-title" data-i18n="resultsSoonTitle">Yakında Eklenecek</div>
+            <div class="soon-desc" data-i18n="resultsSoonDesc">Yarı final sonuçları henüz mevcut değil. Tur tamamlandığında burada yayınlanacaktır.</div>
+          </div>
+        </div>
+
+        <!-- FİNAL SONUÇLARI -->
+        <div class="results-subpanel" id="results-final">
+          <div class="results-soon">
+            <div class="soon-icon">⏳</div>
+            <div class="soon-title" data-i18n="resultsSoonTitle">Yakında Eklenecek</div>
+            <div class="soon-desc" data-i18n="resultsSoonDescFinal">Final sonuçları henüz mevcut değil. Final tamamlandığında burada yayınlanacaktır.</div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -737,11 +912,27 @@ function switchTab(tab) {
   localStorage.setItem("active-tab", tab);
 }
 
+function switchResultsTab(sub) {
+  document.querySelectorAll(".results-subtab-btn").forEach(function(btn) {
+    btn.classList.toggle("active", btn.getAttribute("data-subtab") === sub);
+  });
+  document.querySelectorAll(".results-subpanel").forEach(function(panel) {
+    panel.classList.toggle("active", panel.id === "results-" + sub);
+  });
+  localStorage.setItem("active-results-subtab", sub);
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   var validTabs = ["kayit", "sartlar", "yarismacilar", "kategoriler", "format", "program", "sonuclar"];
   var savedTab = localStorage.getItem("active-tab");
   if (savedTab && validTabs.indexOf(savedTab) !== -1) {
     switchTab(savedTab);
+  }
+
+  var validResultTabs = ["round1", "semifinal", "final"];
+  var savedResultTab = localStorage.getItem("active-results-subtab");
+  if (savedResultTab && validResultTabs.indexOf(savedResultTab) !== -1) {
+    switchResultsTab(savedResultTab);
   }
 });
 
@@ -815,6 +1006,12 @@ var translations = {
     round1: "1. Round", roundSemifinal: "Yarı Final", roundFinal: "Final",
     scheduleNote: "Belirtilen saatlerde küçük sapmalar olabilir. Güncel bilgiler başvuru formunda belirtilen iletişim kanalları üzerinden duyurulacaktır.",
     resultsTitle: "🏆 Sonuçlar",
+    resultsLead: "Her tur için sonuçları aşağıdaki sekmelerden inceleyebilirsin.",
+    resultsTabRound1: "1. Round", resultsTabSemi: "Yarı Final", resultsTabFinal: "Final",
+    resultsDns: "Katılmadı",
+    resultsSoonTitle: "Yakında Eklenecek",
+    resultsSoonDesc: "Yarı final sonuçları henüz mevcut değil. Tur tamamlandığında burada yayınlanacaktır.",
+    resultsSoonDescFinal: "Final sonuçları henüz mevcut değil. Final tamamlandığında burada yayınlanacaktır.",
     resultsEmpty: "Yarışma henüz tamamlanmadı. Sonuçlar burada yayınlanacaktır.",
     footer: "© 2026 RAT — Rubik Academy Türkiye. Tüm hakları saklıdır."
   },
@@ -859,6 +1056,12 @@ var translations = {
     round1: "Round 1", roundSemifinal: "Semifinal", roundFinal: "Final",
     scheduleNote: "Times may shift slightly. Up-to-date information will be announced through the contact channels specified on the registration form.",
     resultsTitle: "🏆 Results",
+    resultsLead: "You can check the results for each round in the tabs below.",
+    resultsTabRound1: "Round 1", resultsTabSemi: "Semifinal", resultsTabFinal: "Final",
+    resultsDns: "Did not attend",
+    resultsSoonTitle: "Coming Soon",
+    resultsSoonDesc: "Semifinal results are not available yet. They will be published here once the round is completed.",
+    resultsSoonDescFinal: "Final results are not available yet. They will be published here once the final is completed.",
     resultsEmpty: "The competition has not finished yet. Results will be published here.",
     footer: "© 2026 RAT — Rubik Academy Turkey. All rights reserved."
   },
@@ -903,6 +1106,12 @@ var translations = {
     round1: "1-й раунд", roundSemifinal: "Полуфинал", roundFinal: "Финал",
     scheduleNote: "Возможны небольшие изменения во времени. Актуальная информация будет объявлена через каналы связи, указанные в форме регистрации.",
     resultsTitle: "🏆 Результаты",
+    resultsLead: "Результаты по каждому раунду можно посмотреть во вкладках ниже.",
+    resultsTabRound1: "1-й раунд", resultsTabSemi: "Полуфинал", resultsTabFinal: "Финал",
+    resultsDns: "Не участвовал(а)",
+    resultsSoonTitle: "Скоро будет добавлено",
+    resultsSoonDesc: "Результаты полуфинала пока недоступны. Они будут опубликованы здесь после завершения раунда.",
+    resultsSoonDescFinal: "Результаты финала пока недоступны. Они будут опубликованы здесь после завершения финала.",
     resultsEmpty: "Соревнование ещё не завершено. Результаты будут опубликованы здесь.",
     footer: "© 2026 RAT — Rubik Academy Türkiye. Все права защищены."
   },
@@ -947,6 +1156,12 @@ var translations = {
     round1: "Runde 1", roundSemifinal: "Halbfinale", roundFinal: "Finale",
     scheduleNote: "Bei den angegebenen Zeiten kann es zu kleinen Abweichungen kommen. Aktuelle Informationen werden über die im Anmeldeformular angegebenen Kontaktkanäle bekannt gegeben.",
     resultsTitle: "🏆 Ergebnisse",
+    resultsLead: "Die Ergebnisse jeder Runde findest du in den folgenden Tabs.",
+    resultsTabRound1: "Runde 1", resultsTabSemi: "Halbfinale", resultsTabFinal: "Finale",
+    resultsDns: "Nicht angetreten",
+    resultsSoonTitle: "Demnächst verfügbar",
+    resultsSoonDesc: "Die Ergebnisse des Halbfinales liegen noch nicht vor. Sie werden hier veröffentlicht, sobald die Runde abgeschlossen ist.",
+    resultsSoonDescFinal: "Die Ergebnisse des Finales liegen noch nicht vor. Sie werden hier veröffentlicht, sobald das Finale abgeschlossen ist.",
     resultsEmpty: "Der Wettbewerb ist noch nicht abgeschlossen. Die Ergebnisse werden hier veröffentlicht.",
     footer: "© 2026 RAT — Rubik Academy Türkiye. Alle Rechte vorbehalten."
   },
@@ -991,6 +1206,12 @@ var translations = {
     round1: "الجولة 1", roundSemifinal: "نصف النهائي", roundFinal: "النهائي",
     scheduleNote: "قد تحدث تغييرات طفيفة في الأوقات المحددة. سيتم الإعلان عن المعلومات المحدثة عبر قنوات التواصل المحددة في استمارة التسجيل.",
     resultsTitle: "🏆 النتائج",
+    resultsLead: "يمكنك الاطلاع على نتائج كل جولة من التبويبات أدناه.",
+    resultsTabRound1: "الجولة 1", resultsTabSemi: "نصف النهائي", resultsTabFinal: "النهائي",
+    resultsDns: "لم يشارك",
+    resultsSoonTitle: "قريبًا",
+    resultsSoonDesc: "نتائج نصف النهائي غير متوفرة بعد. سيتم نشرها هنا عند اكتمال الجولة.",
+    resultsSoonDescFinal: "نتائج النهائي غير متوفرة بعد. سيتم نشرها هنا عند اكتمال النهائي.",
     resultsEmpty: "لم تنتهِ المسابقة بعد. سيتم نشر النتائج هنا.",
     footer: "© 2026 RAT — أكاديمية روبيك تركيا. جميع الحقوق محفوظة."
   }
