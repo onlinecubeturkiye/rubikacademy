@@ -76,7 +76,7 @@ body{
 .nav-logo-text{font-size:17px;font-weight:800;letter-spacing:-.5px;}
 .nav-logo-text span{display:block;font-size:11px;font-weight:600;color:var(--text-soft);letter-spacing:0;}
 
-.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .dark-mode-btn{
   border:none;background:var(--surface-soft);color:var(--text);
   width:42px;height:42px;border-radius:50%;font-size:19px;cursor:pointer;
@@ -111,7 +111,14 @@ body{
   font-size:8px;font-weight:800;border-radius:4px;padding:0 2px;line-height:1.3;
 }
 
-/* ---------- cube picker modal ---------- */
+/* session selector button — reuses the cube-select-btn shell, swaps the icon for a
+   coloured initial "avatar" so the two pickers stay visually related but distinct */
+.session-avatar{
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:#fff;flex:none;line-height:1;
+}
+
+/* ---------- cube / session picker modal ---------- */
 .overlay{
   position:fixed;inset:0;background:rgba(15,23,42,.55);
   display:none;align-items:flex-start;justify-content:center;z-index:80;
@@ -140,6 +147,27 @@ body{
   margin-top:18px;width:100%;padding:11px;border-radius:11px;border:1px solid var(--border);
   background:var(--surface-soft);color:var(--text);font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;
 }
+
+/* session list rows, inside the session picker modal */
+.session-sub{font-weight:600;font-size:12.5px;color:var(--text-soft);margin-left:4px;}
+.session-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;
+  border:1.5px solid var(--border);background:var(--surface-soft);cursor:pointer;transition:.15s;
+}
+.session-row:hover{border-color:var(--primary);}
+.session-row.active{border-color:var(--primary);background:var(--primary-light);}
+.session-row .sname{flex:1;font-weight:700;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.session-row input.rename-input{
+  flex:1;min-width:0;font-family:'Inter',sans-serif;font-weight:700;font-size:14px;
+  border:1px solid var(--primary);border-radius:8px;padding:5px 8px;background:var(--surface);color:var(--text);
+}
+.session-row .sbtns{display:flex;gap:4px;flex:none;}
+.session-add-row{display:flex;gap:8px;margin-top:14px;}
+.session-add-row input{
+  flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);
+  background:var(--surface-soft);color:var(--text);font-family:'Inter',sans-serif;font-size:13.5px;
+}
+.session-add-row input:focus{outline:none;border-color:var(--primary);}
 
 /* ---------- main layout: tabbed views ---------- */
 /* Desktop/tablet: compact, lives inline inside the navbar next to the logo */
@@ -201,9 +229,21 @@ body{
   border-radius:9px;padding:6px 11px;color:var(--text);box-shadow:0 2px 6px rgba(15,23,42,.05);
 }
 
+/* current session strip, shown above the timer so it's always clear which
+   session solves will be recorded into */
+.session-strip{
+  display:flex;align-items:center;gap:8px;margin:14px 2px 0;font-size:12.5px;color:var(--text-soft);font-weight:600;
+}
+.session-strip .pill{
+  display:inline-flex;align-items:center;gap:6px;background:var(--surface-soft);
+  border:1px solid var(--border);border-radius:999px;padding:4px 10px 4px 6px;cursor:pointer;
+}
+.session-strip .pill:hover{border-color:var(--primary);}
+.session-strip .pill .session-avatar{width:16px;height:16px;font-size:9px;}
+
 /* timer zone */
 .timer-zone{
-  margin-top:18px;border-radius:20px;border:2px solid var(--border);
+  margin-top:10px;border-radius:20px;border:2px solid var(--border);
   background:var(--surface);min-height:270px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
   cursor:pointer;user-select:none;-webkit-touch-callout:none;-webkit-user-select:none;touch-action:none;
@@ -264,6 +304,8 @@ body{
 .mini-btn.on-dnf{background:#ef4444;border-color:#ef4444;color:#fff;}
 .mini-btn:hover{color:var(--primary);}
 .mini-btn.del:hover{background:#ef4444;border-color:#ef4444;color:#fff;}
+.mini-btn:disabled{opacity:.35;cursor:not-allowed;}
+.mini-btn:disabled:hover{background:var(--surface);border-color:var(--border);color:var(--text-soft);}
 .empty-hist{color:var(--text-soft);font-size:13px;padding:16px 4px;text-align:center;}
 
 /* generic confirm/settings modal */
@@ -307,6 +349,11 @@ body{
         <span class="name" id="selectBtnName">3x3x3</span>
         <span class="chev">▾</span>
       </button>
+      <button class="cube-select-btn" id="sessionSelectBtn" title="Oturum seç">
+        <span class="session-avatar" id="sessionBtnAvatar" style="width:20px;height:20px;"></span>
+        <span class="name" id="sessionBtnName">Normal</span>
+        <span class="chev">▾</span>
+      </button>
       <button class="gear-btn dark-mode-btn" id="gearBtn" title="Ayarlar">⚙</button>
       <button class="dark-mode-btn" id="darkModeBtn" title="Tema">🌙</button>
     </div>
@@ -322,6 +369,14 @@ body{
         <button class="icon-btn" id="newScrambleBtn" title="Yeni karışım">⟳</button>
       </div>
       <div class="scramble-box" id="scrambleChips"></div>
+
+      <div class="session-strip">
+        <span>Kayıt edilecek oturum:</span>
+        <span class="pill" id="sessionStripPill">
+          <span class="session-avatar" id="sessionStripAvatar" style="width:16px;height:16px;"></span>
+          <span id="sessionStripName">Normal</span>
+        </span>
+      </div>
     </div>
 
     <div class="timer-zone" id="timerZone">
@@ -339,7 +394,13 @@ body{
 
   <section class="view" id="viewStats">
     <div class="card">
-      <div class="side-title">İstatistikler</div>
+      <div class="side-title">
+        İstatistikler
+        <span class="pill" id="sessionStripPill2" style="cursor:pointer;">
+          <span class="session-avatar" id="sessionStripAvatar2" style="width:16px;height:16px;"></span>
+          <span id="sessionStripName2" style="font-weight:700;"></span>
+        </span>
+      </div>
       <div class="stats-grid" id="statsGrid"></div>
 
       <div class="side-title">
@@ -358,6 +419,19 @@ body{
     <h3>Küp türü seç</h3>
     <div class="picker-grid" id="pickerGrid"></div>
     <button class="picker-close" id="pickerCloseBtn">Kapat</button>
+  </div>
+</div>
+
+<!-- session picker -->
+<div class="overlay" id="sessionOverlay">
+  <div class="picker-modal" style="max-width:440px;">
+    <h3>Oturumlar <span class="session-sub" id="sessionCubeLabel"></span></h3>
+    <div id="sessionList" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <div class="session-add-row">
+      <input id="newSessionInput" type="text" placeholder="Yeni oturum adı (örn. Ao100 denemesi)" maxlength="24">
+      <button class="btn primary" id="addSessionBtn" style="flex:none;padding:10px 16px;">Ekle</button>
+    </div>
+    <button class="picker-close" id="sessionCloseBtn">Kapat</button>
   </div>
 </div>
 
@@ -561,12 +635,36 @@ async function storageSet(key, value){
   }
   try{ localStorage.setItem(key, value); } catch(e){}
 }
-async function loadSolves(cubeId){
-  const raw = await storageGet('cube:'+cubeId+':times');
+
+/* --- sessions: each cube type keeps its own independent list of named
+   sessions (default: a single "Normal" session), its own active-session
+   pointer, and each session keeps its own solve list. Nothing is shared
+   across cube types. --- */
+async function loadSessions(cubeId){
+  const raw = await storageGet('cube:'+cubeId+':sessions');
+  try{
+    const parsed = raw ? JSON.parse(raw) : null;
+    if(parsed && Array.isArray(parsed) && parsed.length) return parsed;
+  }catch(e){}
+  return [{id:'default', name:'Normal'}];
+}
+async function saveSessions(cubeId, sessionsList){
+  await storageSet('cube:'+cubeId+':sessions', JSON.stringify(sessionsList));
+}
+async function loadActiveSession(cubeId, sessionsList){
+  const raw = await storageGet('cube:'+cubeId+':active-session');
+  if(raw && sessionsList.find(s=>s.id===raw)) return raw;
+  return sessionsList[0].id;
+}
+async function saveActiveSession(cubeId, sessionId){
+  await storageSet('cube:'+cubeId+':active-session', sessionId);
+}
+async function loadSolves(cubeId, sessionId){
+  const raw = await storageGet('cube:'+cubeId+':session:'+sessionId+':times');
   try{ return raw ? JSON.parse(raw) : []; } catch(e){ return []; }
 }
-async function saveSolves(cubeId, solves){
-  await storageSet('cube:'+cubeId+':times', JSON.stringify(solves));
+async function saveSolves(cubeId, sessionId, solvesList){
+  await storageSet('cube:'+cubeId+':session:'+sessionId+':times', JSON.stringify(solvesList));
 }
 async function loadSettings(){
   const raw = await storageGet('settings-v1');
@@ -586,6 +684,8 @@ async function saveTheme(v){ await storageSet('ui-theme', v); }
 
 /* ================= STATE ================= */
 let currentCube = '333';
+let sessions = [{id:'default', name:'Normal'}];
+let currentSession = 'default';
 let solves = [];
 let settings = {inspection:false};
 let scramble = '';
@@ -597,6 +697,7 @@ let inspectStart = 0;
 let runStart = 0;
 let runIntervalId = null;
 let pendingPenalty = null;
+let confirmCallback = null;
 const HOLD_MS = 300;
 
 /* ================= HELPERS ================= */
@@ -652,6 +753,11 @@ function showToast(msg){
   showToast._id = setTimeout(()=>t.classList.remove('show'), 1800);
 }
 function isTouchDevice(){ return 'ontouchstart' in window || navigator.maxTouchPoints > 0; }
+function openConfirm(text, cb){
+  document.getElementById('confirmText').textContent = text;
+  confirmCallback = cb;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
 
 /* ================= RENDER ================= */
 function shapeClassFor(type){
@@ -683,6 +789,135 @@ function renderSelectBtn(){
   document.getElementById('selectBtnIcon').outerHTML = iconHTML(t,22).replace('<span class="wheel','<span id="selectBtnIcon" class="wheel"');
   document.getElementById('selectBtnName').textContent = t.name;
 }
+
+/* --- session avatar: a small coloured square with the session's first
+   letter. Colour is derived from the session name so each one is visually
+   distinct without needing the user to pick a colour. --- */
+function hashHue(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){ h = str.charCodeAt(i) + ((h<<5)-h); }
+  return Math.abs(h)%360;
+}
+function sessionAvatarHTML(name, size, idAttr){
+  const letter = (name||'?').trim().charAt(0).toUpperCase() || '?';
+  const color = `hsl(${hashHue(name||'')},60%,46%)`;
+  const id = idAttr ? ` id="${idAttr}"` : '';
+  return `<span${id} class="session-avatar" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.5)}px;background:${color};">${letter}</span>`;
+}
+function currentSessionObj(){
+  return sessions.find(s=>s.id===currentSession) || sessions[0];
+}
+function renderSessionBtn(){
+  const s = currentSessionObj();
+  document.getElementById('sessionBtnAvatar').outerHTML = sessionAvatarHTML(s.name,20,'sessionBtnAvatar');
+  document.getElementById('sessionBtnName').textContent = s.name;
+  document.getElementById('sessionStripAvatar').outerHTML = sessionAvatarHTML(s.name,16,'sessionStripAvatar');
+  document.getElementById('sessionStripName').textContent = s.name;
+  document.getElementById('sessionStripAvatar2').outerHTML = sessionAvatarHTML(s.name,16,'sessionStripAvatar2');
+  document.getElementById('sessionStripName2').textContent = s.name;
+}
+function renderSessionList(){
+  const list = document.getElementById('sessionList');
+  document.getElementById('sessionCubeLabel').textContent = '· ' + CUBE_TYPES.find(c=>c.id===currentCube).name;
+  list.innerHTML = sessions.map(s=>{
+    const disabled = sessions.length<=1;
+    return `<div class="session-row ${s.id===currentSession?'active':''}" data-id="${s.id}">
+      ${sessionAvatarHTML(s.name,26)}
+      <span class="sname" data-id="${s.id}">${s.name}</span>
+      <div class="sbtns">
+        <button class="mini-btn" data-act="rename" data-id="${s.id}" title="Yeniden adlandır">✎</button>
+        <button class="mini-btn del" data-act="delsession" data-id="${s.id}" title="Sil" ${disabled?'disabled':''}>✕</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.session-row').forEach(row=>{
+    row.addEventListener('click', (e)=>{
+      if(e.target.closest('.mini-btn')) return;
+      const id = row.dataset.id;
+      document.getElementById('sessionOverlay').classList.remove('open');
+      if(id !== currentSession){ selectSession(id); }
+    });
+  });
+  list.querySelectorAll('.mini-btn[data-act="rename"]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); startRenameSession(btn.dataset.id); });
+  });
+  list.querySelectorAll('.mini-btn[data-act="delsession"]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if(btn.disabled) return;
+      requestDeleteSession(btn.dataset.id);
+    });
+  });
+}
+function startRenameSession(id){
+  const row = document.querySelector(`.session-row[data-id="${id}"]`);
+  const s = sessions.find(x=>x.id===id);
+  if(!row || !s) return;
+  const nameSpan = row.querySelector('.sname');
+  const input = document.createElement('input');
+  input.className = 'rename-input';
+  input.value = s.name;
+  input.maxLength = 24;
+  nameSpan.replaceWith(input);
+  input.focus();
+  input.select();
+  let settled = false;
+  const commit = async ()=>{
+    if(settled) return;
+    settled = true;
+    const val = input.value.trim();
+    if(val && val !== s.name){
+      s.name = val;
+      await saveSessions(currentCube, sessions);
+      if(id===currentSession) renderSessionBtn();
+    }
+    renderSessionList();
+  };
+  input.addEventListener('click', e=>e.stopPropagation());
+  input.addEventListener('keydown', (e)=>{
+    e.stopPropagation();
+    if(e.key==='Enter'){ input.blur(); }
+    else if(e.key==='Escape'){ settled = true; renderSessionList(); }
+  });
+  input.addEventListener('blur', commit);
+}
+function requestDeleteSession(id){
+  const s = sessions.find(x=>x.id===id);
+  if(!s || sessions.length<=1) return;
+  openConfirm(`"${s.name}" oturumunu ve içindeki tüm çözümleri silmek istediğine emin misin?`, async ()=>{
+    sessions = sessions.filter(x=>x.id!==id);
+    await saveSessions(currentCube, sessions);
+    await storageSet('cube:'+currentCube+':session:'+id+':times', JSON.stringify([]));
+    if(currentSession===id){
+      await selectSession(sessions[0].id);
+    }
+    renderSessionList();
+    showToast('Oturum silindi');
+  });
+}
+async function selectSession(id){
+  currentSession = id;
+  await saveActiveSession(currentCube, id);
+  resetToIdle();
+  solves = await loadSolves(currentCube, currentSession);
+  renderSessionBtn();
+  renderStats();
+  renderHistory();
+}
+async function addSessionFromInput(){
+  const input = document.getElementById('newSessionInput');
+  const name = input.value.trim();
+  if(!name){ input.focus(); return; }
+  const id = 's-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+  sessions.push({id, name});
+  await saveSessions(currentCube, sessions);
+  input.value = '';
+  renderSessionList();
+  await selectSession(id);
+  showToast('"'+name+'" oturumu eklendi');
+}
+
 function renderScramble(){
   const wrap = document.getElementById('scrambleChips');
   wrap.innerHTML = '';
@@ -793,7 +1028,8 @@ function buildShareText(n){
   const avg = trimmedAverage(n, solves);
   const avgText = avg===null ? '-' : (avg===Infinity ? 'DNF' : formatTime(avg));
   const dateStr = new Date().toISOString().slice(0,10);
-  return `RA Timer tarafından ${dateStr} günü oluşturuldu\n${n} çözümün ortalaması: ${avgText}\nSüreler:\n${lines.join('\n')}`;
+  const sessionName = currentSessionObj().name;
+  return `RA Timer tarafından ${dateStr} günü oluşturuldu\nOturum: ${sessionName}\n${n} çözümün ortalaması: ${avgText}\nSüreler:\n${lines.join('\n')}`;
 }
 const shareOverlay = document.getElementById('shareOverlay');
 const shareTextEl = document.getElementById('shareText');
@@ -850,7 +1086,7 @@ function renderHistory(){
       if(act==='del'){ solves = solves.filter(x=>x.id!==id); }
       else if(act==='plus2'){ sv.penalty = sv.penalty==='+2' ? 'ok' : '+2'; }
       else if(act==='dnf'){ sv.penalty = sv.penalty==='dnf' ? 'ok' : 'dnf'; }
-      saveSolves(currentCube, solves);
+      saveSolves(currentCube, currentSession, solves);
       renderStats();
       renderHistory();
     });
@@ -862,9 +1098,12 @@ async function switchCube(id){
   currentCube = id;
   saveLastCube(id);
   resetToIdle();
-  solves = await loadSolves(currentCube);
+  sessions = await loadSessions(currentCube);
+  currentSession = await loadActiveSession(currentCube, sessions);
+  solves = await loadSolves(currentCube, currentSession);
   renderSelectBtn();
   renderPicker();
+  renderSessionBtn();
   newScramble();
   renderStats();
   renderHistory();
@@ -954,7 +1193,7 @@ async function stopAndRecord(){
   renderStats();
   renderHistory();
   // Persist to storage in the background — state is already safely reset.
-  await saveSolves(currentCube, solves);
+  await saveSolves(currentCube, currentSession, solves);
 }
 function engage(){
   if(timerState==='running'){ stopAndRecord(); return; }
@@ -1024,6 +1263,20 @@ document.getElementById('cubeSelectBtn').addEventListener('click', ()=>{ renderP
 document.getElementById('pickerCloseBtn').addEventListener('click', ()=>pickerOverlay.classList.remove('open'));
 pickerOverlay.addEventListener('click', (e)=>{ if(e.target===pickerOverlay) pickerOverlay.classList.remove('open'); });
 
+/* ================= SESSION PICKER MODAL ================= */
+const sessionOverlay = document.getElementById('sessionOverlay');
+function openSessionPicker(){ renderSessionList(); sessionOverlay.classList.add('open'); }
+document.getElementById('sessionSelectBtn').addEventListener('click', openSessionPicker);
+document.getElementById('sessionStripPill').addEventListener('click', openSessionPicker);
+document.getElementById('sessionStripPill2').addEventListener('click', openSessionPicker);
+document.getElementById('sessionCloseBtn').addEventListener('click', ()=>sessionOverlay.classList.remove('open'));
+sessionOverlay.addEventListener('click', (e)=>{ if(e.target===sessionOverlay) sessionOverlay.classList.remove('open'); });
+document.getElementById('addSessionBtn').addEventListener('click', addSessionFromInput);
+document.getElementById('newSessionInput').addEventListener('keydown', (e)=>{
+  e.stopPropagation();
+  if(e.key==='Enter') addSessionFromInput();
+});
+
 /* ================= SETTINGS MODAL ================= */
 const settingsOverlay = document.getElementById('settingsOverlay');
 document.getElementById('gearBtn').addEventListener('click', ()=>settingsOverlay.classList.add('open'));
@@ -1040,18 +1293,23 @@ inspectSwitch.addEventListener('click', ()=>{
 const confirmOverlay = document.getElementById('confirmOverlay');
 document.getElementById('clearAllBtn').addEventListener('click', ()=>{
   if(!solves.length){ showToast('Silinecek çözüm yok'); return; }
-  document.getElementById('confirmText').textContent =
-    CUBE_TYPES.find(c=>c.id===currentCube).name + ' için tüm çözümleri silmek istediğine emin misin?';
-  confirmOverlay.classList.add('open');
+  openConfirm(
+    CUBE_TYPES.find(c=>c.id===currentCube).name + ' · ' + currentSessionObj().name + ' oturumundaki tüm çözümleri silmek istediğine emin misin?',
+    async ()=>{
+      solves = [];
+      await saveSolves(currentCube, currentSession, solves);
+      renderStats();
+      renderHistory();
+      showToast('Tüm çözümler silindi');
+    }
+  );
 });
-document.getElementById('confirmCancelBtn').addEventListener('click', ()=>confirmOverlay.classList.remove('open'));
+document.getElementById('confirmCancelBtn').addEventListener('click', ()=>{ confirmOverlay.classList.remove('open'); confirmCallback = null; });
 document.getElementById('confirmOkBtn').addEventListener('click', async ()=>{
-  solves = [];
-  await saveSolves(currentCube, solves);
-  renderStats();
-  renderHistory();
+  const cb = confirmCallback;
   confirmOverlay.classList.remove('open');
-  showToast('Tüm çözümler silindi');
+  confirmCallback = null;
+  if(cb) await cb();
 });
 
 /* new scramble */
@@ -1072,9 +1330,12 @@ async function init(){
   inspectSwitch.classList.toggle('on', !!settings.inspection);
   currentCube = await loadLastCube();
   if(!CUBE_TYPES.find(c=>c.id===currentCube)) currentCube = '333';
-  solves = await loadSolves(currentCube);
+  sessions = await loadSessions(currentCube);
+  currentSession = await loadActiveSession(currentCube, sessions);
+  solves = await loadSolves(currentCube, currentSession);
   renderSelectBtn();
   renderPicker();
+  renderSessionBtn();
   newScramble();
   renderStats();
   renderHistory();
