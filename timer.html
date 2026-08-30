@@ -330,6 +330,11 @@ body{
       <div class="pending-pen" id="pendingPen" style="display:none;"></div>
       <div class="hint" id="hintText">Boşluk tuşuna basılı tut, bıraktığında zamanlayıcı başlar</div>
     </div>
+
+    <div class="card" style="margin-top:18px;">
+      <div class="side-title">İstatistikler</div>
+      <div class="stats-grid" id="statsGridTimer"></div>
+    </div>
   </section>
 
   <section class="view" id="viewStats">
@@ -729,7 +734,7 @@ function renderStats(){
     ['Ortalama', fmtStat(s.mean), {}],
     ['Çözüm', String(s.count), {}],
   ];
-  document.getElementById('statsGrid').innerHTML = tiles.map(([label,val,opts])=>{
+  const html = tiles.map(([label,val,opts])=>{
     const clickable = (opts.pb && pbSolve) || (opts.avgN && opts.has);
     const attrs = [
       opts.pb ? 'data-pb="1"' : '',
@@ -741,9 +746,16 @@ function renderStats(){
       <div class="value">${val}</div>
     </div>`;
   }).join('');
+  // Stats are shown in both the Timer tab (stats only) and the Stats tab
+  // (stats + history) — render the same tiles into both containers.
+  ['statsGrid','statsGridTimer'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = html;
+  });
   if(pbSolve){
-    const pbTile = document.querySelector('.stat-tile[data-pb="1"]');
-    if(pbTile) pbTile.addEventListener('click', ()=>showSolveDetail(pbSolve));
+    document.querySelectorAll('.stat-tile[data-pb="1"]').forEach(pbTile=>{
+      pbTile.addEventListener('click', ()=>showSolveDetail(pbSolve));
+    });
   }
   document.querySelectorAll('.stat-tile[data-avg]').forEach(tile=>{
     const n = parseInt(tile.dataset.avg, 10);
