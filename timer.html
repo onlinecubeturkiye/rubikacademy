@@ -205,6 +205,9 @@ main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
 .stat-tile .value{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:19px;margin-top:3px;}
 .stat-tile.pb{background:var(--primary-light);border-color:#bfdbfe;}
 .stat-tile.pb .value{color:var(--primary);}
+.stat-tile.clickable{cursor:pointer;transition:.15s;}
+.stat-tile.clickable:hover{border-color:var(--primary);transform:translateY(-1px);}
+.share-ic{font-size:10px;opacity:.55;margin-left:3px;}
 
 .side-title{
   font-size:12.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-soft);font-weight:800;
@@ -372,6 +375,18 @@ main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
   </div>
 </div>
 
+<!-- share -->
+<div class="overlay" id="shareOverlay">
+  <div class="modal" style="max-width:480px;">
+    <h3 id="shareModalTitle">Paylaş</h3>
+    <textarea id="shareText" readonly style="width:100%;min-height:220px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.5;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface-soft);color:var(--text);resize:vertical;"></textarea>
+    <div class="modal-btns">
+      <button class="btn" id="shareCloseBtn">Kapat</button>
+      <button class="btn primary" id="shareCopyBtn">Kopyala</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 
@@ -493,29 +508,48 @@ function generateScramble(typeId){
 }
 
 /* ================= STORAGE ================= */
+/* Uses window.storage when running inside Claude.ai (persists server-side per user).
+   Falls back to real localStorage automatically when window.storage isn't available
+   (e.g. this file opened directly in a browser or hosted on your own site) so times
+   still survive a refresh in either environment. */
+function hasCloudStorage(){
+  return typeof window !== 'undefined' && !!window.storage && typeof window.storage.get === 'function';
+}
+async function storageGet(key){
+  if(hasCloudStorage()){
+    try{ const r = await window.storage.get(key, false); return r ? r.value : null; }
+    catch(e){ return null; }
+  }
+  try{ return localStorage.getItem(key); } catch(e){ return null; }
+}
+async function storageSet(key, value){
+  if(hasCloudStorage()){
+    try{ await window.storage.set(key, value, false); return; } catch(e){}
+  }
+  try{ localStorage.setItem(key, value); } catch(e){}
+}
 async function loadSolves(cubeId){
-  try{ const r = await window.storage.get('cube:'+cubeId+':times', false); return r ? JSON.parse(r.value) : []; }
-  catch(e){ return []; }
+  const raw = await storageGet('cube:'+cubeId+':times');
+  try{ return raw ? JSON.parse(raw) : []; } catch(e){ return []; }
 }
 async function saveSolves(cubeId, solves){
-  try{ await window.storage.set('cube:'+cubeId+':times', JSON.stringify(solves), false); }
-  catch(e){ console.error('save fail', e); }
+  await storageSet('cube:'+cubeId+':times', JSON.stringify(solves));
 }
 async function loadSettings(){
-  try{ const r = await window.storage.get('settings-v1', false); return r?JSON.parse(r.value):{inspection:false}; }
-  catch(e){ return {inspection:false}; }
+  const raw = await storageGet('settings-v1');
+  try{ return raw ? JSON.parse(raw) : {inspection:false}; } catch(e){ return {inspection:false}; }
 }
-async function saveSettings(s){ try{ await window.storage.set('settings-v1', JSON.stringify(s), false); } catch(e){} }
+async function saveSettings(s){ await storageSet('settings-v1', JSON.stringify(s)); }
 async function loadLastCube(){
-  try{ const r = await window.storage.get('last-cube-id', false); return r?r.value:'333'; }
-  catch(e){ return '333'; }
+  const raw = await storageGet('last-cube-id');
+  return raw || '333';
 }
-async function saveLastCube(id){ try{ await window.storage.set('last-cube-id', id, false); } catch(e){} }
+async function saveLastCube(id){ await storageSet('last-cube-id', id); }
 async function loadTheme(){
-  try{ const r = await window.storage.get('ui-theme', false); return r?r.value:'light'; }
-  catch(e){ return 'light'; }
+  const raw = await storageGet('ui-theme');
+  return raw || 'light';
 }
-async function saveTheme(v){ try{ await window.storage.set('ui-theme', v, false); } catch(e){} }
+async function saveTheme(v){ await storageSet('ui-theme', v); }
 
 /* ================= STATE ================= */
 let currentCube = '333';
@@ -659,25 +693,86 @@ function renderStats(){
   const s = computeStats();
   const pbSolve = s.pb!==null ? solves.find(sv=>getFinal(sv)===s.pb) : null;
   const tiles = [
-    ['PB', fmtStat(s.pb), true],
-    ['Ao5', fmtStat(s.ao5)],
-    ['Ao12', fmtStat(s.ao12)],
-    ['Ao50', fmtStat(s.ao50)],
-    ['Ao100', fmtStat(s.ao100)],
-    ['Ortalama', fmtStat(s.mean)],
-    ['Çözüm', String(s.count)],
+    ['PB', fmtStat(s.pb), {pb:true}],
+    ['Ao5', fmtStat(s.ao5), {avgN:5, has:s.ao5!==null}],
+    ['Ao12', fmtStat(s.ao12), {avgN:12, has:s.ao12!==null}],
+    ['Ao50', fmtStat(s.ao50), {avgN:50, has:s.ao50!==null}],
+    ['Ao100', fmtStat(s.ao100), {avgN:100, has:s.ao100!==null}],
+    ['Ortalama', fmtStat(s.mean), {}],
+    ['Çözüm', String(s.count), {}],
   ];
-  document.getElementById('statsGrid').innerHTML = tiles.map(([label,val,pb])=>`
-    <div class="stat-tile ${pb?'pb':''}" ${pb && pbSolve ? 'style="cursor:pointer;" data-pb="1"' : ''}>
-      <div class="label">${label}</div>
+  document.getElementById('statsGrid').innerHTML = tiles.map(([label,val,opts])=>{
+    const clickable = (opts.pb && pbSolve) || (opts.avgN && opts.has);
+    const attrs = [
+      opts.pb ? 'data-pb="1"' : '',
+      opts.avgN ? `data-avg="${opts.avgN}"` : ''
+    ].filter(Boolean).join(' ');
+    return `
+    <div class="stat-tile ${opts.pb?'pb':''} ${clickable?'clickable':''}" ${attrs}>
+      <div class="label">${label}${opts.avgN && opts.has ? '<span class="share-ic">⇪</span>' : ''}</div>
       <div class="value">${val}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   if(pbSolve){
     const pbTile = document.querySelector('.stat-tile[data-pb="1"]');
     if(pbTile) pbTile.addEventListener('click', ()=>showSolveDetail(pbSolve));
   }
+  document.querySelectorAll('.stat-tile[data-avg]').forEach(tile=>{
+    const n = parseInt(tile.dataset.avg, 10);
+    tile.addEventListener('click', ()=>{
+      const text = buildShareText(n);
+      if(text) openShareModal(text, 'Ao'+n);
+    });
+  });
   document.getElementById('histCount').textContent = '('+solves.length+')';
 }
+
+/* ================= SHARE ================= */
+function buildShareText(n){
+  if(solves.length < n) return null;
+  const recent = solves.slice(0, n);           // en yeni ilk
+  const chronological = [...recent].reverse(); // eskiden yeniye
+  const finals = chronological.map(getFinal);
+  const validFinals = finals.filter(f=>f!==Infinity);
+  const minVal = validFinals.length ? Math.min(...validFinals) : null;
+  const maxVal = validFinals.length ? Math.max(...validFinals) : null;
+  const hasDNF = finals.some(f=>f===Infinity);
+  let minMarked = false, maxMarked = false;
+  const lines = chronological.map((sv, i)=>{
+    const f = finals[i];
+    let text = f===Infinity ? 'DNF' : formatTime(f);
+    const isBest = !minMarked && minVal!==null && f===minVal;
+    let isWorst = false;
+    if(!isBest){
+      isWorst = hasDNF ? (!maxMarked && f===Infinity) : (!maxMarked && maxVal!==null && f===maxVal);
+    }
+    if(isBest){ text = '('+text+')'; minMarked = true; }
+    else if(isWorst){ text = '('+text+')'; maxMarked = true; }
+    return `${i+1}. ${text}   ${sv.scramble}`;
+  });
+  const avg = trimmedAverage(n, solves);
+  const avgText = avg===null ? '-' : (avg===Infinity ? 'DNF' : formatTime(avg));
+  const dateStr = new Date().toISOString().slice(0,10);
+  return `RA Timer tarafından ${dateStr} günü oluşturuldu\n${n} çözümün ortalaması: ${avgText}\nSüreler:\n${lines.join('\n')}`;
+}
+const shareOverlay = document.getElementById('shareOverlay');
+const shareTextEl = document.getElementById('shareText');
+function openShareModal(text, label){
+  document.getElementById('shareModalTitle').textContent = label ? label + ' Paylaş' : 'Paylaş';
+  shareTextEl.value = text;
+  shareOverlay.classList.add('open');
+}
+document.getElementById('shareCloseBtn').addEventListener('click', ()=>shareOverlay.classList.remove('open'));
+shareOverlay.addEventListener('click', (e)=>{ if(e.target===shareOverlay) shareOverlay.classList.remove('open'); });
+document.getElementById('shareCopyBtn').addEventListener('click', async ()=>{
+  shareTextEl.focus();
+  shareTextEl.select();
+  shareTextEl.setSelectionRange(0, 999999);
+  let copied = false;
+  try{ await navigator.clipboard.writeText(shareTextEl.value); copied = true; }
+  catch(e){ try{ copied = document.execCommand('copy'); }catch(e2){ copied = false; } }
+  showToast(copied ? 'Panoya kopyalandı' : 'Kopyalanamadı, metni elle seçip kopyalayabilirsin');
+});
 function renderHistory(){
   const list = document.getElementById('historyList');
   if(!solves.length){
