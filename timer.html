@@ -350,7 +350,30 @@ main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
   </div>
 </div>
 
+<!-- solve detail -->
+<div class="overlay" id="detailOverlay">
+  <div class="modal">
+    <h3>Çözüm Detayı</h3>
+    <div class="row-set" style="border-bottom:none;padding-bottom:4px;">
+      <span>Süre</span>
+      <span class="value" id="detailTime" style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:20px;"></span>
+    </div>
+    <div class="row-set">
+      <span>Tarih</span>
+      <span id="detailDate" style="font-weight:600;font-size:13px;color:var(--text-soft);"></span>
+    </div>
+    <div style="margin-top:12px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-soft);font-weight:700;margin-bottom:8px;">Karışım</div>
+      <div class="scramble-box" id="detailScramble" style="min-height:auto;"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn primary" id="closeDetailBtn">Kapat</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
+
 
 <script>
 /* ================= CUBE TYPES ================= */
@@ -607,8 +630,33 @@ function renderScramble(){
     wrap.appendChild(span);
   });
 }
+function renderScrambleInto(container, scrambleStr){
+  container.innerHTML = '';
+  scrambleStr.split(' ').filter(Boolean).forEach(tok=>{
+    const m = tok.match(/BR|BL|[UDLRFB]/);
+    const color = m ? FACE_COLOR[m[0]] : '#94a3b8';
+    const span = document.createElement('span');
+    span.className = 'chip';
+    span.style.borderLeftColor = color;
+    span.textContent = tok;
+    container.appendChild(span);
+  });
+}
+function showSolveDetail(solve){
+  const timeText = solve.penalty==='dnf' ? 'DNF' : formatTime(getFinal(solve)) + (solve.penalty==='+2' ? ' (+2)' : '');
+  document.getElementById('detailTime').textContent = timeText;
+  document.getElementById('detailDate').textContent = new Date(solve.date).toLocaleString('tr-TR',{
+    day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'
+  });
+  renderScrambleInto(document.getElementById('detailScramble'), solve.scramble);
+  document.getElementById('detailOverlay').classList.add('open');
+}
+document.getElementById('closeDetailBtn').addEventListener('click', ()=>document.getElementById('detailOverlay').classList.remove('open'));
+document.getElementById('detailOverlay').addEventListener('click', (e)=>{ if(e.target===document.getElementById('detailOverlay')) e.currentTarget.classList.remove('open'); });
+
 function renderStats(){
   const s = computeStats();
+  const pbSolve = s.pb!==null ? solves.find(sv=>getFinal(sv)===s.pb) : null;
   const tiles = [
     ['PB', fmtStat(s.pb), true],
     ['Ao5', fmtStat(s.ao5)],
@@ -619,10 +667,14 @@ function renderStats(){
     ['Çözüm', String(s.count)],
   ];
   document.getElementById('statsGrid').innerHTML = tiles.map(([label,val,pb])=>`
-    <div class="stat-tile ${pb?'pb':''}">
+    <div class="stat-tile ${pb?'pb':''}" ${pb && pbSolve ? 'style="cursor:pointer;" data-pb="1"' : ''}>
       <div class="label">${label}</div>
       <div class="value">${val}</div>
     </div>`).join('');
+  if(pbSolve){
+    const pbTile = document.querySelector('.stat-tile[data-pb="1"]');
+    if(pbTile) pbTile.addEventListener('click', ()=>showSolveDetail(pbSolve));
+  }
   document.getElementById('histCount').textContent = '('+solves.length+')';
 }
 function renderHistory(){
@@ -635,10 +687,9 @@ function renderHistory(){
     const idx = solves.length - i;
     const cls = sv.penalty==='dnf' ? 'dnf' : sv.penalty==='+2' ? 'plus2' : '';
     const timeText = sv.penalty==='dnf' ? 'DNF' : formatTime(getFinal(sv));
-    const dateStr = new Date(sv.date).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
     return `<div class="solve-row">
       <div class="idx">${idx}.</div>
-      <div class="t ${cls}" title="${sv.scramble} — ${dateStr}">${timeText}</div>
+      <div class="t ${cls}" data-id="${sv.id}" title="Detay için tıkla">${timeText}</div>
       <div class="btns">
         <button class="mini-btn ${sv.penalty==='+2'?'on-plus2':''}" data-act="plus2" data-id="${sv.id}">+2</button>
         <button class="mini-btn ${sv.penalty==='dnf'?'on-dnf':''}" data-act="dnf" data-id="${sv.id}">DNF</button>
@@ -647,6 +698,12 @@ function renderHistory(){
     </div>`;
   }).join('');
 
+  list.querySelectorAll('.t').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const sv = solves.find(x=>x.id===el.dataset.id);
+      if(sv) showSolveDetail(sv);
+    });
+  });
   list.querySelectorAll('.mini-btn').forEach(btn=>{
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
@@ -739,7 +796,8 @@ function startStopwatch(){
 async function stopAndRecord(){
   clearInterval(runIntervalId);
   const raw = Date.now()-runStart;
-  bigTime.textContent = formatTime(pendingPenalty==='+2' ? raw+2000 : raw);
+  const finalMs = pendingPenalty==='+2' ? raw+2000 : raw;
+  const displayText = formatTime(finalMs);
   const solve = {
     id: Date.now()+'-'+Math.random().toString(36).slice(2,8),
     raw, penalty: pendingPenalty || 'ok', scramble, date: new Date().toISOString()
@@ -749,7 +807,11 @@ async function stopAndRecord(){
   renderStats();
   renderHistory();
   pendingPenalty = null;
-  setTimeout(()=>{ resetToIdle(); newScramble(); }, 600);
+  // reset the state machine immediately so a quick re-press starts a fresh
+  // attempt instead of re-stopping the same (already finished) solve
+  resetToIdle();
+  bigTime.textContent = displayText;
+  newScramble();
 }
 function engage(){
   if(timerState==='running'){ stopAndRecord(); return; }
