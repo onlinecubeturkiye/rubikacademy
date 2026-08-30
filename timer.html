@@ -399,8 +399,9 @@ function randInt(n){return Math.floor(Math.random()*n);}
 function gen222(){
   const faces=['U','R','F'];
   const mods=['',"'",'2'];
+  const length = 7 + randInt(2); // 7-8 hamle
   const moves=[]; let last=-1;
-  for(let i=0;i<11;i++){
+  for(let i=0;i<length;i++){
     let f; do{f=randInt(3);}while(f===last);
     last=f;
     moves.push(faces[f]+mods[randInt(3)]);
@@ -794,6 +795,9 @@ function startStopwatch(){
   runIntervalId = setInterval(()=>{ bigTime.textContent = formatTime(Date.now()-runStart); }, 30);
 }
 async function stopAndRecord(){
+  // Guard against re-entrancy: bail immediately if we're not actually running,
+  // or if this has already been called for the current run.
+  if(timerState !== 'running') return;
   clearInterval(runIntervalId);
   const raw = Date.now()-runStart;
   const finalMs = pendingPenalty==='+2' ? raw+2000 : raw;
@@ -803,15 +807,19 @@ async function stopAndRecord(){
     raw, penalty: pendingPenalty || 'ok', scramble, date: new Date().toISOString()
   };
   solves.unshift(solve);
-  await saveSolves(currentCube, solves);
-  renderStats();
-  renderHistory();
   pendingPenalty = null;
-  // reset the state machine immediately so a quick re-press starts a fresh
-  // attempt instead of re-stopping the same (already finished) solve
+  // Reset the state machine SYNCHRONOUSLY, right away (before the storage
+  // write below, which is async). This closes the window where a very fast
+  // second press/click right after stopping could see timerState still
+  // 'running' and call stopAndRecord() a second time, recording a duplicate
+  // solve for the same attempt.
   resetToIdle();
   bigTime.textContent = displayText;
   newScramble();
+  renderStats();
+  renderHistory();
+  // Persist to storage in the background — state is already safely reset.
+  await saveSolves(currentCube, solves);
 }
 function engage(){
   if(timerState==='running'){ stopAndRecord(); return; }
