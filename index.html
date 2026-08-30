@@ -141,12 +141,39 @@ body{
   background:var(--surface-soft);color:var(--text);font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;
 }
 
-/* ---------- main layout ---------- */
-main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
-@media (max-width:880px){main{grid-template-columns:1fr;}}
+/* ---------- main layout: tabbed views ---------- */
+/* Desktop/tablet: compact, lives inline inside the navbar next to the logo */
+.tabbar{
+  display:flex;gap:4px;background:var(--surface-soft);border:1px solid var(--border);
+  border-radius:14px;padding:4px;flex:none;
+}
+.tab-btn{
+  flex:none;border:none;background:transparent;color:var(--text-soft);
+  font-family:'Inter',sans-serif;font-weight:700;font-size:13.5px;
+  padding:9px 15px;border-radius:10px;cursor:pointer;white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s;
+}
+.tab-btn .ic{font-size:15px;}
+.tab-btn.active{background:var(--primary);color:#fff;}
+.tab-btn:not(.active):hover{background:var(--surface);color:var(--text);}
+
+.view{display:none;max-width:640px;margin:0 auto;}
+.view.active{display:block;}
+
 .card{
   background:var(--surface);border:1px solid var(--border);border-radius:20px;
   padding:20px;box-shadow:var(--shadow);
+}
+
+/* Phones: pull the tab bar out of the navbar into a fixed bottom bar, app-style */
+@media (max-width:600px){
+  .wrap{padding-bottom:96px;}
+  .tabbar{
+    position:fixed;left:12px;right:12px;bottom:14px;z-index:70;
+    background:var(--surface);padding:6px;border-radius:16px;
+    box-shadow:0 12px 32px rgba(15,23,42,.22);
+  }
+  .tab-btn{flex:1;padding:12px 10px;font-size:14px;}
 }
 
 /* scramble */
@@ -200,11 +227,17 @@ main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
 
 /* stats */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media (min-width:520px){
+  .stats-grid{grid-template-columns:repeat(4,1fr);}
+}
 .stat-tile{background:var(--surface-soft);border:1px solid var(--border);border-radius:14px;padding:11px 13px;}
 .stat-tile .label{font-size:11px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
 .stat-tile .value{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:19px;margin-top:3px;}
 .stat-tile.pb{background:var(--primary-light);border-color:#bfdbfe;}
 .stat-tile.pb .value{color:var(--primary);}
+.stat-tile.clickable{cursor:pointer;transition:.15s;}
+.stat-tile.clickable:hover{border-color:var(--primary);transform:translateY(-1px);}
+.share-ic{font-size:10px;opacity:.55;margin-left:3px;}
 
 .side-title{
   font-size:12.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-soft);font-weight:800;
@@ -213,7 +246,7 @@ main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
 .side-title button{background:none;border:none;color:var(--text-soft);font-size:12px;cursor:pointer;text-decoration:underline;padding:0;font-family:'Inter',sans-serif;}
 .side-title button:hover{color:#dc2626;}
 
-.history{display:flex;flex-direction:column;gap:6px;max-height:420px;overflow-y:auto;}
+.history{display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 340px);min-height:160px;overflow-y:auto;}
 .solve-row{
   display:flex;align-items:center;gap:8px;background:var(--surface-soft);
   border:1px solid var(--border);border-radius:12px;padding:8px 10px;font-size:13px;
@@ -232,10 +265,6 @@ main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
 .mini-btn:hover{color:var(--primary);}
 .mini-btn.del:hover{background:#ef4444;border-color:#ef4444;color:#fff;}
 .empty-hist{color:var(--text-soft);font-size:13px;padding:16px 4px;text-align:center;}
-
-@media (max-width:880px){
-  .stats-grid{grid-template-columns:repeat(3,1fr);}
-}
 
 /* generic confirm/settings modal */
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px;width:100%;max-width:360px;box-shadow:0 25px 60px rgba(15,23,42,.25);}
@@ -268,6 +297,10 @@ main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
       <div class="nav-logo-mark"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       <div class="nav-logo-text">Küp Zamanlayıcı<span>Rubik Academy</span></div>
     </div>
+    <nav class="tabbar" id="tabbar">
+      <button class="tab-btn active" id="tabTimerBtn" data-view="timer"><span class="ic">⏱️</span> Zamanlayıcı</button>
+      <button class="tab-btn" id="tabStatsBtn" data-view="stats"><span class="ic">📊</span> İstatistikler</button>
+    </nav>
     <div class="nav-right">
       <button class="cube-select-btn" id="cubeSelectBtn">
         <span class="wheel" id="selectBtnIcon" style="width:22px;height:22px;"></span>
@@ -279,40 +312,43 @@ main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
     </div>
   </header>
 
-  <main>
-    <div>
-      <div class="card">
-        <div class="scramble-head">
-          <div class="scramble-title">
-            <h3>Karışım</h3>
-            <span class="move-badge" id="moveBadge">0 hamle</span>
-          </div>
-          <button class="icon-btn" id="newScrambleBtn" title="Yeni karışım">⟳</button>
+  <section class="view active" id="viewTimer">
+    <div class="card">
+      <div class="scramble-head">
+        <div class="scramble-title">
+          <h3>Karışım</h3>
+          <span class="move-badge" id="moveBadge">0 hamle</span>
         </div>
-        <div class="scramble-box" id="scrambleChips"></div>
+        <button class="icon-btn" id="newScrambleBtn" title="Yeni karışım">⟳</button>
       </div>
-
-      <div class="timer-zone" id="timerZone">
-        <div class="big-time" id="bigTime">0.00</div>
-        <div class="inspect-num" id="inspectNum" style="display:none;"></div>
-        <div class="pending-pen" id="pendingPen" style="display:none;"></div>
-        <div class="hint" id="hintText">Boşluk tuşuna basılı tut, bıraktığında zamanlayıcı başlar</div>
-      </div>
+      <div class="scramble-box" id="scrambleChips"></div>
     </div>
 
-    <div>
-      <div class="card">
-        <div class="side-title">İstatistikler</div>
-        <div class="stats-grid" id="statsGrid"></div>
-
-        <div class="side-title">
-          Geçmiş <span id="histCount"></span>
-          <button id="clearAllBtn">tümünü sil</button>
-        </div>
-        <div class="history" id="historyList"></div>
-      </div>
+    <div class="timer-zone" id="timerZone">
+      <div class="big-time" id="bigTime">0.00</div>
+      <div class="inspect-num" id="inspectNum" style="display:none;"></div>
+      <div class="pending-pen" id="pendingPen" style="display:none;"></div>
+      <div class="hint" id="hintText">Boşluk tuşuna basılı tut, bıraktığında zamanlayıcı başlar</div>
     </div>
-  </main>
+
+    <div class="card" style="margin-top:18px;">
+      <div class="side-title">İstatistikler</div>
+      <div class="stats-grid" id="statsGridTimer"></div>
+    </div>
+  </section>
+
+  <section class="view" id="viewStats">
+    <div class="card">
+      <div class="side-title">İstatistikler</div>
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <div class="side-title">
+        Geçmiş <span id="histCount"></span>
+        <button id="clearAllBtn">tümünü sil</button>
+      </div>
+      <div class="history" id="historyList"></div>
+    </div>
+  </section>
 
 </div>
 
@@ -350,13 +386,49 @@ main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
   </div>
 </div>
 
+<!-- solve detail -->
+<div class="overlay" id="detailOverlay">
+  <div class="modal">
+    <h3>Çözüm Detayı</h3>
+    <div class="row-set" style="border-bottom:none;padding-bottom:4px;">
+      <span>Süre</span>
+      <span class="value" id="detailTime" style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:20px;"></span>
+    </div>
+    <div class="row-set">
+      <span>Tarih</span>
+      <span id="detailDate" style="font-weight:600;font-size:13px;color:var(--text-soft);"></span>
+    </div>
+    <div style="margin-top:12px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-soft);font-weight:700;margin-bottom:8px;">Karışım</div>
+      <div class="scramble-box" id="detailScramble" style="min-height:auto;"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn primary" id="closeDetailBtn">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- share -->
+<div class="overlay" id="shareOverlay">
+  <div class="modal" style="max-width:480px;">
+    <h3 id="shareModalTitle">Paylaş</h3>
+    <textarea id="shareText" readonly style="width:100%;min-height:220px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.5;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface-soft);color:var(--text);resize:vertical;"></textarea>
+    <div class="modal-btns">
+      <button class="btn" id="shareCloseBtn">Kapat</button>
+      <button class="btn primary" id="shareCopyBtn">Kopyala</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
+
 
 <script>
 /* ================= CUBE TYPES ================= */
 const CUBE_TYPES = [
   {id:'222', name:'2x2x2', sub:'Karışım: U R F', cat:'222'},
   {id:'333', name:'3x3x3', sub:'Klasik küp', cat:'nxn', n:3},
+  {id:'333oh', name:'3x3 OH', sub:'Tek elle çözüm', cat:'nxn', n:3},
   {id:'444', name:'4x4x4', sub:'Geniş hamleler', cat:'nxn', n:4},
   {id:'555', name:'5x5x5', sub:'Geniş hamleler', cat:'nxn', n:5},
   {id:'666', name:'6x6x6', sub:'Büyük küp', cat:'nxn', n:6},
@@ -375,8 +447,9 @@ function randInt(n){return Math.floor(Math.random()*n);}
 function gen222(){
   const faces=['U','R','F'];
   const mods=['',"'",'2'];
+  const length = 7 + randInt(2); // 7-8 hamle
   const moves=[]; let last=-1;
-  for(let i=0;i<11;i++){
+  for(let i=0;i<length;i++){
     let f; do{f=randInt(3);}while(f===last);
     last=f;
     moves.push(faces[f]+mods[randInt(3)]);
@@ -468,29 +541,48 @@ function generateScramble(typeId){
 }
 
 /* ================= STORAGE ================= */
+/* Uses window.storage when running inside Claude.ai (persists server-side per user).
+   Falls back to real localStorage automatically when window.storage isn't available
+   (e.g. this file opened directly in a browser or hosted on your own site) so times
+   still survive a refresh in either environment. */
+function hasCloudStorage(){
+  return typeof window !== 'undefined' && !!window.storage && typeof window.storage.get === 'function';
+}
+async function storageGet(key){
+  if(hasCloudStorage()){
+    try{ const r = await window.storage.get(key, false); return r ? r.value : null; }
+    catch(e){ return null; }
+  }
+  try{ return localStorage.getItem(key); } catch(e){ return null; }
+}
+async function storageSet(key, value){
+  if(hasCloudStorage()){
+    try{ await window.storage.set(key, value, false); return; } catch(e){}
+  }
+  try{ localStorage.setItem(key, value); } catch(e){}
+}
 async function loadSolves(cubeId){
-  try{ const r = await window.storage.get('cube:'+cubeId+':times', false); return r ? JSON.parse(r.value) : []; }
-  catch(e){ return []; }
+  const raw = await storageGet('cube:'+cubeId+':times');
+  try{ return raw ? JSON.parse(raw) : []; } catch(e){ return []; }
 }
 async function saveSolves(cubeId, solves){
-  try{ await window.storage.set('cube:'+cubeId+':times', JSON.stringify(solves), false); }
-  catch(e){ console.error('save fail', e); }
+  await storageSet('cube:'+cubeId+':times', JSON.stringify(solves));
 }
 async function loadSettings(){
-  try{ const r = await window.storage.get('settings-v1', false); return r?JSON.parse(r.value):{inspection:false}; }
-  catch(e){ return {inspection:false}; }
+  const raw = await storageGet('settings-v1');
+  try{ return raw ? JSON.parse(raw) : {inspection:false}; } catch(e){ return {inspection:false}; }
 }
-async function saveSettings(s){ try{ await window.storage.set('settings-v1', JSON.stringify(s), false); } catch(e){} }
+async function saveSettings(s){ await storageSet('settings-v1', JSON.stringify(s)); }
 async function loadLastCube(){
-  try{ const r = await window.storage.get('last-cube-id', false); return r?r.value:'333'; }
-  catch(e){ return '333'; }
+  const raw = await storageGet('last-cube-id');
+  return raw || '333';
 }
-async function saveLastCube(id){ try{ await window.storage.set('last-cube-id', id, false); } catch(e){} }
+async function saveLastCube(id){ await storageSet('last-cube-id', id); }
 async function loadTheme(){
-  try{ const r = await window.storage.get('ui-theme', false); return r?r.value:'light'; }
-  catch(e){ return 'light'; }
+  const raw = await storageGet('ui-theme');
+  return raw || 'light';
 }
-async function saveTheme(v){ try{ await window.storage.set('ui-theme', v, false); } catch(e){} }
+async function saveTheme(v){ await storageSet('ui-theme', v); }
 
 /* ================= STATE ================= */
 let currentCube = '333';
@@ -606,24 +698,121 @@ function renderScramble(){
     wrap.appendChild(span);
   });
 }
+function renderScrambleInto(container, scrambleStr){
+  container.innerHTML = '';
+  scrambleStr.split(' ').filter(Boolean).forEach(tok=>{
+    const m = tok.match(/BR|BL|[UDLRFB]/);
+    const color = m ? FACE_COLOR[m[0]] : '#94a3b8';
+    const span = document.createElement('span');
+    span.className = 'chip';
+    span.style.borderLeftColor = color;
+    span.textContent = tok;
+    container.appendChild(span);
+  });
+}
+function showSolveDetail(solve){
+  const timeText = solve.penalty==='dnf' ? 'DNF' : formatTime(getFinal(solve)) + (solve.penalty==='+2' ? ' (+2)' : '');
+  document.getElementById('detailTime').textContent = timeText;
+  document.getElementById('detailDate').textContent = new Date(solve.date).toLocaleString('tr-TR',{
+    day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'
+  });
+  renderScrambleInto(document.getElementById('detailScramble'), solve.scramble);
+  document.getElementById('detailOverlay').classList.add('open');
+}
+document.getElementById('closeDetailBtn').addEventListener('click', ()=>document.getElementById('detailOverlay').classList.remove('open'));
+document.getElementById('detailOverlay').addEventListener('click', (e)=>{ if(e.target===document.getElementById('detailOverlay')) e.currentTarget.classList.remove('open'); });
+
 function renderStats(){
   const s = computeStats();
+  const pbSolve = s.pb!==null ? solves.find(sv=>getFinal(sv)===s.pb) : null;
   const tiles = [
-    ['PB', fmtStat(s.pb), true],
-    ['Ao5', fmtStat(s.ao5)],
-    ['Ao12', fmtStat(s.ao12)],
-    ['Ao50', fmtStat(s.ao50)],
-    ['Ao100', fmtStat(s.ao100)],
-    ['Ortalama', fmtStat(s.mean)],
-    ['Çözüm', String(s.count)],
+    ['PB', fmtStat(s.pb), {pb:true}],
+    ['Ao5', fmtStat(s.ao5), {avgN:5, has:s.ao5!==null}],
+    ['Ao12', fmtStat(s.ao12), {avgN:12, has:s.ao12!==null}],
+    ['Ao50', fmtStat(s.ao50), {avgN:50, has:s.ao50!==null}],
+    ['Ao100', fmtStat(s.ao100), {avgN:100, has:s.ao100!==null}],
+    ['Ortalama', fmtStat(s.mean), {}],
+    ['Çözüm', String(s.count), {}],
   ];
-  document.getElementById('statsGrid').innerHTML = tiles.map(([label,val,pb])=>`
-    <div class="stat-tile ${pb?'pb':''}">
-      <div class="label">${label}</div>
+  const html = tiles.map(([label,val,opts])=>{
+    const clickable = (opts.pb && pbSolve) || (opts.avgN && opts.has);
+    const attrs = [
+      opts.pb ? 'data-pb="1"' : '',
+      opts.avgN ? `data-avg="${opts.avgN}"` : ''
+    ].filter(Boolean).join(' ');
+    return `
+    <div class="stat-tile ${opts.pb?'pb':''} ${clickable?'clickable':''}" ${attrs}>
+      <div class="label">${label}${opts.avgN && opts.has ? '<span class="share-ic">⇪</span>' : ''}</div>
       <div class="value">${val}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+  // Stats are shown in both the Timer tab (stats only) and the Stats tab
+  // (stats + history) — render the same tiles into both containers.
+  ['statsGrid','statsGridTimer'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = html;
+  });
+  if(pbSolve){
+    document.querySelectorAll('.stat-tile[data-pb="1"]').forEach(pbTile=>{
+      pbTile.addEventListener('click', ()=>showSolveDetail(pbSolve));
+    });
+  }
+  document.querySelectorAll('.stat-tile[data-avg]').forEach(tile=>{
+    const n = parseInt(tile.dataset.avg, 10);
+    tile.addEventListener('click', ()=>{
+      const text = buildShareText(n);
+      if(text) openShareModal(text, 'Ao'+n);
+    });
+  });
   document.getElementById('histCount').textContent = '('+solves.length+')';
 }
+
+/* ================= SHARE ================= */
+function buildShareText(n){
+  if(solves.length < n) return null;
+  const recent = solves.slice(0, n);           // en yeni ilk
+  const chronological = [...recent].reverse(); // eskiden yeniye
+  const finals = chronological.map(getFinal);
+  const validFinals = finals.filter(f=>f!==Infinity);
+  const minVal = validFinals.length ? Math.min(...validFinals) : null;
+  const maxVal = validFinals.length ? Math.max(...validFinals) : null;
+  const hasDNF = finals.some(f=>f===Infinity);
+  let minMarked = false, maxMarked = false;
+  const lines = chronological.map((sv, i)=>{
+    const f = finals[i];
+    let text = f===Infinity ? 'DNF' : formatTime(f);
+    const isBest = !minMarked && minVal!==null && f===minVal;
+    let isWorst = false;
+    if(!isBest){
+      isWorst = hasDNF ? (!maxMarked && f===Infinity) : (!maxMarked && maxVal!==null && f===maxVal);
+    }
+    if(isBest){ text = '('+text+')'; minMarked = true; }
+    else if(isWorst){ text = '('+text+')'; maxMarked = true; }
+    return `${i+1}. ${text}   ${sv.scramble}`;
+  });
+  const avg = trimmedAverage(n, solves);
+  const avgText = avg===null ? '-' : (avg===Infinity ? 'DNF' : formatTime(avg));
+  const dateStr = new Date().toISOString().slice(0,10);
+  return `RA Timer tarafından ${dateStr} günü oluşturuldu\n${n} çözümün ortalaması: ${avgText}\nSüreler:\n${lines.join('\n')}`;
+}
+const shareOverlay = document.getElementById('shareOverlay');
+const shareTextEl = document.getElementById('shareText');
+function openShareModal(text, label){
+  document.getElementById('shareModalTitle').textContent = label ? label + ' Paylaş' : 'Paylaş';
+  shareTextEl.value = text;
+  shareOverlay.classList.add('open');
+}
+document.getElementById('shareCloseBtn').addEventListener('click', ()=>shareOverlay.classList.remove('open'));
+shareOverlay.addEventListener('click', (e)=>{ if(e.target===shareOverlay) shareOverlay.classList.remove('open'); });
+document.getElementById('shareCopyBtn').addEventListener('click', async ()=>{
+  shareTextEl.focus();
+  shareTextEl.select();
+  shareTextEl.setSelectionRange(0, 999999);
+  let copied = false;
+  try{ await navigator.clipboard.writeText(shareTextEl.value); copied = true; }
+  catch(e){ try{ copied = document.execCommand('copy'); }catch(e2){ copied = false; } }
+  showToast(copied ? 'Panoya kopyalandı' : 'Kopyalanamadı, metni elle seçip kopyalayabilirsin');
+});
 function renderHistory(){
   const list = document.getElementById('historyList');
   if(!solves.length){
@@ -634,10 +823,9 @@ function renderHistory(){
     const idx = solves.length - i;
     const cls = sv.penalty==='dnf' ? 'dnf' : sv.penalty==='+2' ? 'plus2' : '';
     const timeText = sv.penalty==='dnf' ? 'DNF' : formatTime(getFinal(sv));
-    const dateStr = new Date(sv.date).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
     return `<div class="solve-row">
       <div class="idx">${idx}.</div>
-      <div class="t ${cls}" title="${sv.scramble} — ${dateStr}">${timeText}</div>
+      <div class="t ${cls}" data-id="${sv.id}" title="Detay için tıkla">${timeText}</div>
       <div class="btns">
         <button class="mini-btn ${sv.penalty==='+2'?'on-plus2':''}" data-act="plus2" data-id="${sv.id}">+2</button>
         <button class="mini-btn ${sv.penalty==='dnf'?'on-dnf':''}" data-act="dnf" data-id="${sv.id}">DNF</button>
@@ -646,6 +834,12 @@ function renderHistory(){
     </div>`;
   }).join('');
 
+  list.querySelectorAll('.t').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const sv = solves.find(x=>x.id===el.dataset.id);
+      if(sv) showSolveDetail(sv);
+    });
+  });
   list.querySelectorAll('.mini-btn').forEach(btn=>{
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
@@ -722,7 +916,7 @@ function startInspection(){
 function armHold(){
   clearTimeout(holdTimeoutId);
   const priorState = timerState;
-  if(priorState==='idle'){ timerState='hold'; setZoneClass('state-hold'); hintText.textContent='Hazırlanıyor...'; }
+  if(priorState==='idle'){ timerState='hold'; setZoneClass('state-hold'); hintText.textContent='Hazırlanıyor...'; bigTime.textContent='0.00'; }
   holdTimeoutId = setTimeout(()=>{
     if(timerState==='hold'){ timerState='ready'; setZoneClass('state-ready'); hintText.textContent='Bırak ve başlat!'; }
     else if(timerState==='inspect'){ timerState='readyInspect'; setZoneClass('state-ready'); hintText.textContent='Bırak ve başlat!'; }
@@ -736,19 +930,31 @@ function startStopwatch(){
   runIntervalId = setInterval(()=>{ bigTime.textContent = formatTime(Date.now()-runStart); }, 30);
 }
 async function stopAndRecord(){
+  // Guard against re-entrancy: bail immediately if we're not actually running,
+  // or if this has already been called for the current run.
+  if(timerState !== 'running') return;
   clearInterval(runIntervalId);
   const raw = Date.now()-runStart;
-  bigTime.textContent = formatTime(pendingPenalty==='+2' ? raw+2000 : raw);
+  const finalMs = pendingPenalty==='+2' ? raw+2000 : raw;
+  const displayText = formatTime(finalMs);
   const solve = {
     id: Date.now()+'-'+Math.random().toString(36).slice(2,8),
     raw, penalty: pendingPenalty || 'ok', scramble, date: new Date().toISOString()
   };
   solves.unshift(solve);
-  await saveSolves(currentCube, solves);
+  pendingPenalty = null;
+  // Reset the state machine SYNCHRONOUSLY, right away (before the storage
+  // write below, which is async). This closes the window where a very fast
+  // second press/click right after stopping could see timerState still
+  // 'running' and call stopAndRecord() a second time, recording a duplicate
+  // solve for the same attempt.
+  resetToIdle();
+  bigTime.textContent = displayText;
+  newScramble();
   renderStats();
   renderHistory();
-  pendingPenalty = null;
-  setTimeout(()=>{ resetToIdle(); newScramble(); }, 600);
+  // Persist to storage in the background — state is already safely reset.
+  await saveSolves(currentCube, solves);
 }
 function engage(){
   if(timerState==='running'){ stopAndRecord(); return; }
@@ -781,6 +987,7 @@ function release(){
 document.addEventListener('keydown', (e)=>{
   if(e.code!=='Space') return;
   if(document.querySelector('.overlay.open')) return;
+  if(!document.getElementById('viewTimer').classList.contains('active')) return;
   e.preventDefault();
   if(e.repeat) return;
   engage();
@@ -788,6 +995,7 @@ document.addEventListener('keydown', (e)=>{
 document.addEventListener('keyup', (e)=>{
   if(e.code!=='Space') return;
   if(document.querySelector('.overlay.open')) return;
+  if(!document.getElementById('viewTimer').classList.contains('active')) return;
   e.preventDefault();
   release();
 });
@@ -795,6 +1003,20 @@ zone.addEventListener('touchstart', (e)=>{ e.preventDefault(); engage(); }, {pas
 zone.addEventListener('touchend', (e)=>{ e.preventDefault(); release(); }, {passive:false});
 zone.addEventListener('mousedown', ()=>engage());
 zone.addEventListener('mouseup', ()=>release());
+
+/* ================= TAB NAVIGATION ================= */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    const target = btn.dataset.view === 'timer' ? 'viewTimer' : 'viewStats';
+    document.getElementById(target).classList.add('active');
+    // If we're switching away from the timer mid-run/hold, don't leave a
+    // dangling timer state behind — reset it so it's not silently running.
+    if(target !== 'viewTimer' && timerState !== 'idle'){ resetToIdle(); }
+  });
+});
 
 /* ================= CUBE PICKER MODAL ================= */
 const pickerOverlay = document.getElementById('pickerOverlay');
