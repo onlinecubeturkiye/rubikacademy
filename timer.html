@@ -142,19 +142,20 @@ body{
 }
 
 /* ---------- main layout: tabbed views ---------- */
+/* Desktop/tablet: compact, lives inline inside the navbar next to the logo */
 .tabbar{
-  display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);
-  border-radius:16px;padding:6px;margin-bottom:20px;box-shadow:var(--shadow);
+  display:flex;gap:4px;background:var(--surface-soft);border:1px solid var(--border);
+  border-radius:14px;padding:4px;flex:none;
 }
 .tab-btn{
-  flex:1;border:none;background:transparent;color:var(--text-soft);
-  font-family:'Inter',sans-serif;font-weight:700;font-size:14px;
-  padding:12px 10px;border-radius:11px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:7px;transition:.15s;
+  flex:none;border:none;background:transparent;color:var(--text-soft);
+  font-family:'Inter',sans-serif;font-weight:700;font-size:13.5px;
+  padding:9px 15px;border-radius:10px;cursor:pointer;white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s;
 }
-.tab-btn .ic{font-size:16px;}
+.tab-btn .ic{font-size:15px;}
 .tab-btn.active{background:var(--primary);color:#fff;}
-.tab-btn:not(.active):hover{background:var(--surface-soft);color:var(--text);}
+.tab-btn:not(.active):hover{background:var(--surface);color:var(--text);}
 
 .view{display:none;max-width:640px;margin:0 auto;}
 .view.active{display:block;}
@@ -164,13 +165,15 @@ body{
   padding:20px;box-shadow:var(--shadow);
 }
 
-/* Phones: move the tab bar to a fixed bottom bar, app-style */
+/* Phones: pull the tab bar out of the navbar into a fixed bottom bar, app-style */
 @media (max-width:600px){
   .wrap{padding-bottom:96px;}
   .tabbar{
-    position:fixed;left:12px;right:12px;bottom:14px;margin-bottom:0;z-index:70;
+    position:fixed;left:12px;right:12px;bottom:14px;z-index:70;
+    background:var(--surface);padding:6px;border-radius:16px;
     box-shadow:0 12px 32px rgba(15,23,42,.22);
   }
+  .tab-btn{flex:1;padding:12px 10px;font-size:14px;}
 }
 
 /* scramble */
@@ -294,6 +297,10 @@ body{
       <div class="nav-logo-mark"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       <div class="nav-logo-text">Küp Zamanlayıcı<span>Rubik Academy</span></div>
     </div>
+    <nav class="tabbar" id="tabbar">
+      <button class="tab-btn active" id="tabTimerBtn" data-view="timer"><span class="ic">⏱️</span> Zamanlayıcı</button>
+      <button class="tab-btn" id="tabStatsBtn" data-view="stats"><span class="ic">📊</span> İstatistikler</button>
+    </nav>
     <div class="nav-right">
       <button class="cube-select-btn" id="cubeSelectBtn">
         <span class="wheel" id="selectBtnIcon" style="width:22px;height:22px;"></span>
@@ -304,11 +311,6 @@ body{
       <button class="dark-mode-btn" id="darkModeBtn" title="Tema">🌙</button>
     </div>
   </header>
-
-  <nav class="tabbar" id="tabbar">
-    <button class="tab-btn active" id="tabTimerBtn" data-view="timer"><span class="ic">⏱️</span> Zamanlayıcı</button>
-    <button class="tab-btn" id="tabStatsBtn" data-view="stats"><span class="ic">📊</span> İstatistikler</button>
-  </nav>
 
   <section class="view active" id="viewTimer">
     <div class="card">
