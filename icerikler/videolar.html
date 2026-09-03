@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="tr">
+	<head>
+		<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+				<!-- TEMA VE SEO AYARLARI -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+				<title>Rubik Academy - Videolar</title>
+				<!-- TARAYICI SEKMESİ İÇİN LOGO -->
+				<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
+
+					<link rel="canonical" href="https://rubikacademy.fun/videolar">
+						<meta name="description" content="Rubik Academy - 2x2, 3x3, 4x4 ve daha birçok Rubik küp video eğitimini adım adım keşfet.">
+							<meta property="og:title" content="Rubik Academy - Videolar">
+								<meta property="og:description" content="Rubik küp çözmeyi videolarla adım adım öğren! Başlangıçtan profesyonel seviyeye kadar tüm video eğitimleri.">
+									<meta property="og:type" content="website">
+										<meta property="og:url" content="https://rubikacademy.fun/videolar">
+											<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
+												<meta name="twitter:card" content="summary_large_image">
+													<link rel="preconnect" href="https://fonts.googleapis.com">
+														<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+
+															<link
+															href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+															rel="stylesheet"
+>
+
+																<style>
+
+																	/* =========================================================
+																	GENEL & RENK DEĞİŞKENLERİ
+																	========================================================= */
+
+																	:root {
+																	--background: #f8fbff;
+																	--surface: #ffffff;
+																	--surface-soft: #f1f5f9;
+																	--text: #172033;
+																	--text-soft: #728197;
+																	--border: #e2e8f0;
+																	--card-border: #e0eaf4;
+																	--shadow: 0 10px 30px rgba(39,84,125,.07);
+																	--bottom-bg: linear-gradient(135deg, #edf8ff, #e8f4ff);
+																	--bottom-border: #d4eaff;
+																	--bottom-text: #18558a;
+																	--badge-bg: #edf7ff;
+																	--badge-border: #cfe8ff;
+																	--primary-light: #eff6ff;
+																	--primary: #2563eb;
+																	}
+
+																	/* Karanlık mod değişkenleri - Hem html hem body seçicilerini kapsar */
+																	html.dark-mode, body.dark-mode {
+																	--background: #0f172a;
+																	--surface: #1e293b;
+																	--surface-soft: #334155;
+																	--text: #f8fafc;
+																	--text-soft: #cbd5e1;
+																	--border: #334155;
+																	--card-border: #334155;
+																	--shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+																	--bottom-bg: #1e293b;
+																	--bottom-border: #334155;
+																	--bottom-text: #60a5fa;
+																	--badge-bg: #1e3a8a;
+																	--badge-border: #1d4ed8;
+																	--primary-light: #1e3a8a;
+																	--primary: #3b82f6;
+																	}
+
+																	/* =========================================================
+																	ARKA PLAN IŞIK EFEKTİ (AMBIENT GLOW)
+																	========================================================= */
+																	.bg-glow {
+																	position: fixed;
+																	top: 0;
+																	left: 0;
+																	width: 100vw;
+																	height: 100vh;
+																	overflow: hidden;
+																	z-index: -999;
+																	pointer-events: none;
+																	}
+
+																	.bg-glow::before, .bg-glow::after {
+																	content: "";
+																	position: absolute;
+																	width: 500px;
+																	height: 500px;
+																	border-radius: 50%;
+																	filter: blur(120px);
+																	opacity: 0.18;
+																	animation: floatGlow 15s infinite alternate ease-in-out;
+																	}
+
+																	.bg-glow::before {
+																	background: #2563eb;
+																	top: -100px;
+																	left: -100px;
+																	}
+
+																	.bg-glow::after {
+																	background: #6366f1;
+																	bottom: -100px;
+																	right: -100px;
+																	animation-delay: -7s;
+																	}
+
+																	@keyframes floatGlow {
+																	0% { transform: translate(0px, 0px) scale(1); }
+																	100% { transform: translate(150px, 200px) scale(1.25); }
+																	}
+																	html {
+																    overflow-x: hidden;
+																	}
+
+																	* {
+																    box-sizing: border-box;
+																    margin: 0;
+																    padding: 0;
+																    }
+
+																	html{
+																	scroll-behavior:smooth;
+																	}
+
+																	body{
+																	font-family:
+																	Inter,
+																	Arial,
+																	Helvetica,
+																	sans-serif;
+
+																	background: var(--background);
+																	color: var(--text);
+																	transition: background-color 0.3s ease, color 0.3s ease;
+																	overflow-x: hidden;
+																	}
+
+																	a{
+																	text-decoration:none;
+																	color:inherit;
+																	}
+
+																	/* =========================================================
+																	ÜST BAR (NAVBAR)
+																	========================================================= */
+
+																	.navbar {
+																	position: sticky;
+																	top: 0;
+																	z-index: 1000;
+																	display: flex;
+																	align-items: center;
+																	justify-content: space-between;
+																	padding: 16px 7%;
+																	background: rgba(248, 250, 252, 0.85);
+																	backdrop-filter: blur(12px);
+																	-webkit-backdrop-filter: blur(12px);
+																	border-bottom: 1px solid var(--border);
+																	transition: background-color 0.3s, border-color 0.3s;
+																	}
+
+																	html.dark-mode .navbar,
+																	body.dark-mode .navbar {
+																	background: rgba(15, 23, 42, 0.90);
+																	}
+
+																	.nav-logo {
+																	display: flex;
+																	align-items: center;
+																	gap: 12px;
+																	}
+
+																	.nav-logo-mark {
+																	width: 38px;
+																	height: 38px;
+																	display: grid;
+																	grid-template-columns: repeat(3,1fr);
+																	grid-template-rows: repeat(3,1fr);
+																	gap: 2px;
+																	padding: 4px;
+																	border-radius: 10px;
+																	background: #1e293b;
+																	box-shadow: 0 8px 18px rgba(15,23,42,.18);
+																	}
+
+																	.nav-logo-mark div {
+																	border-radius: 2px;
+																	background: #f8fafc;
+																	}
+
+																	.nav-logo-mark div:nth-child(2),
+																	.nav-logo-mark div:nth-child(8) {
+																	background: #ef4444;
+																	}
+
+																	.nav-logo-mark div:nth-child(4),
+																	.nav-logo-mark div:nth-child(6) {
+																	background: #22c55e;
+																	}
+
+																	.nav-logo-mark div:nth-child(5) {
+																	background: #3b82f6;
+																	}
+
+																	.nav-logo-mark div:nth-child(1),
+																	.nav-logo-mark div:nth-child(9) {
+																	background: #facc15;
+																	}
+
+																	.nav-logo-text {
+																	font-size: 17px;
+																	font-weight: 800;
+																	letter-spacing: -0.5px;
+																	color: var(--text);
+																	}
+
+																	.nav-right {
+																	display: flex;
+																	align-items: center;
+																	gap: 10px;
+																	}
+
+																	.nav-links {
+																	display: flex;
+																	align-items: center;
+																	gap: 8px;
+																	}
+
+																	.nav-links a {
+																	padding: 9px 16px;
+																	border-radius: 10px;
+																	font-size: 14px;
+																	font-weight: 600;
+																	color: var(--text-soft);
+																	transition: .25s;
+																	}
+
+																	.nav-links a:hover {
+																	background: var(--primary-light);
+																	color: var(--primary);
+																	}
+
+																	.nav-links a.active {
+																	background: var(--primary-light);
+																	color: var(--primary);
+																	}
+
+																	/* KARANLIK MOD BUTONU */
+																	.dark-mode-btn {
+																	border: none;
+																	background: var(--surface-soft);
+																	color: var(--text);
+																	width: 42px;
+																	height: 42px;
+																	border-radius: 50%;
+																	font-size: 20px;
+																	cursor: pointer;
+																	display: flex;
+																	align-items: center;
+																	justify-content: center;
+																	transition: .3s;
+																	}
+
+																	.dark-mode-btn:hover {
+																	transform: scale(1.08);
+																	}
+
+																	/* DİL SEÇİCİ */
+																	.lang-switcher {
+																	position: relative;
+																	}
+
+																	.lang-switch-btn {
+																	border: none;
+																	background: var(--surface-soft);
+																	color: var(--text);
+																	height: 42px;
+																	padding: 0 16px;
+																	border-radius: 21px;
+																	font-size: 13px;
+																	font-weight: 700;
+																	letter-spacing: .3px;
+																	cursor: pointer;
+																	display: flex;
+																	align-items: center;
+																	gap: 7px;
+																	transition: .3s;
+																	}
+
+																	.lang-switch-btn:hover {
+																	transform: scale(1.06);
+																	background: var(--primary-light);
+																	color: var(--primary);
+																	}
+
+																	.lang-switch-btn .lang-globe {
+																	font-size: 15px;
+																	line-height: 1;
+																	}
+
+																	.lang-menu {
+																	position: absolute;
+																	top: calc(100% + 10px);
+																	right: 0;
+																	min-width: 168px;
+																	background: var(--surface);
+																	border: 1px solid var(--border);
+																	border-radius: 16px;
+																	box-shadow: var(--shadow);
+																	padding: 7px;
+																	display: flex;
+																	flex-direction: column;
+																	gap: 3px;
+																	opacity: 0;
+																	visibility: hidden;
+																	transform: translateY(-8px);
+																	transition: .2s ease;
+																	z-index: 1100;
+																	}
+
+																	.lang-menu.open {
+																	opacity: 1;
+																	visibility: visible;
+																	transform: translateY(0);
+																	}
+
+																	.lang-menu-item {
+																	display: flex;
+																	align-items: center;
+																	gap: 10px;
+																	border: none;
+																	background: transparent;
+																	color: var(--text);
+																	text-align: left;
+																	padding: 10px 14px;
+																	border-radius: 11px;
+																	font-size: 14px;
+																	font-weight: 600;
+																	cursor: pointer;
+																	transition: .2s;
+																	width: 100%;
+																	}
+
+																	.lang-menu-item:hover {
+																	background: var(--primary-light);
+																	color: var(--primary);
+																	}
+
+																	.lang-menu-item.active {
+																	background: var(--primary-light);
+																	color: var(--primary);
+																	font-weight: 800;
+																	}
+
+																	.lang-menu-item .lang-check {
+																	margin-left: auto;
+																	font-size: 12px;
+																	opacity: 0;
+																	}
+
+																	.lang-menu-item.active .lang-check {
+																	opacity: 1;
+																	}
+
+																	@media(max-width:500px) {
+																	.navbar {
+																	padding: 14px 5%;
+																	}
+
+																	.nav-logo-text {
+																	font-size: 15px;
+																	}
+
+																	.nav-links a {
+																	padding: 8px 12px;
+																	font-size: 13px;
+																	}
+
+																	.nav-right {
+																	gap: 6px;
+																	}
+
+																	.lang-switch-btn {
+																	padding: 0 10px;
+																	font-size: 12px;
+																	}
+																	}
+
+																	.page{
+																	width:100%;
+																	min-height:100vh;
+																	padding: 30px 5% 90px;
+																	background: transparent;
+																	}
+
+																	/* =========================================================
+																	KIRINTI (BREADCRUMB)
+																	========================================================= */
+
+																	.crumb{
+																	max-width:1350px;
+																	margin:0 auto 22px;
+																	display:flex;
+																	align-items:center;
+																	gap:8px;
+																	font-size:13px;
+																	font-weight:700;
+																	color: var(--text-soft);
+																	}
+
+																	.crumb a{
+																	color: var(--text-soft);
+																	transition: color .2s;
+																	}
+
+																	.crumb a:hover{
+																	color: var(--primary);
+																	}
+
+																	.crumb span.sep{
+																	opacity:.5;
+																	}
+
+																	.crumb span.current{
+																	color: var(--primary);
+																	}
+
+																	/* =========================================================
+																	BAŞLIK
+																	========================================================= */
+
+																	.intro{
+																	max-width:850px;
+																	margin:0 auto 55px;
+																	text-align:center;
+																	}
+
+																	.intro-badge{
+																	display:inline-flex;
+																	align-items:center;
+																	gap:9px;
+																	padding:9px 17px;
+																	border-radius:50px;
+																	background: var(--badge-bg);
+																	border:1px solid var(--badge-border);
+																	color: var(--primary);
+																	font-size:11px;
+																	font-weight:800;
+																	letter-spacing:1.7px;
+																	margin-bottom:18px;
+																	}
+
+																	.intro-badge i{
+																	width:7px;
+																	height:7px;
+																	display:block;
+																	border-radius:50%;
+																	background:#20a4f3;
+																	box-shadow: 0 0 0 5px rgba(32,164,243,.12);
+																	}
+
+																	.intro h1{
+																	font-size: clamp(40px,5vw,65px);
+																	line-height:1;
+																	letter-spacing:-3px;
+																	font-weight:900;
+																	color: var(--text);
+																	margin-bottom:18px;
+																	}
+
+																	.intro h1 span{
+																	color: var(--primary);
+																	}
+
+																	.intro p{
+																	max-width:700px;
+																	margin:auto;
+																	color: var(--text-soft);
+																	line-height:1.8;
+																	font-size:15px;
+																	}
+
+																	/* =========================================================
+																	GRID & KARTLAR
+																	========================================================= */
+
+																	.cards{
+																	width:100%;
+																	max-width:1350px;
+																	margin:auto;
+																	display:grid;
+																	grid-template-columns: repeat(3,1fr);
+																	gap:28px;
+																	}
+
+																	.card{
+																	position:relative;
+																	overflow:hidden;
+																	border-radius:28px;
+																	background: var(--surface);
+																	border:1px solid var(--card-border);
+																	box-shadow: var(--shadow);
+																	transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease, background-color 0.3s;
+																	}
+
+																	.card:hover{
+																	transform:translateY(-8px);
+																	border-color: #bfdbfe;
+																	box-shadow: 0 24px 55px rgba(34,111,168,.14);
+																	}
+
+																	.visual{
+																	height:355px;
+																	position:relative;
+																	overflow:hidden;
+																	display:flex;
+																	align-items:center;
+																	justify-content:center;
+																	isolation:isolate;
+																	}
+
+																	.visual::before{
+																	content:"";
+																	position:absolute;
+																	width:390px;
+																	height:390px;
+																	border-radius:50%;
+																	border: 55px solid rgba(255,255,255,.25);
+																	top:-190px;
+																	left:-130px;
+																	z-index:-3;
+																	}
+
+																	.visual::after{
+																	content:"";
+																	position:absolute;
+																	width:190px;
+																	height:190px;
+																	border-radius:45px;
+																	background: rgba(255,255,255,.19);
+																	right:-75px;
+																	bottom:-80px;
+																	transform:rotate(32deg);
+																	z-index:-3;
+																	}
+
+																	/* ARKA PLAN RENKLERİ */
+																	.blue{ background: linear-gradient(135deg, #e1f3ff, #8bd4ff); }
+																	.purple{ background: linear-gradient(135deg, #eee8ff, #b39cff); }
+																	.cyan{ background: linear-gradient(135deg, #d8fbff, #5cdae5); }
+																	.green{ background: linear-gradient(135deg, #e5f9e8, #79df87); }
+																	.red{ background: linear-gradient(135deg, #ffe8e9, #ff7f89); }
+																	.pink{ background: linear-gradient(135deg, #ffe7f2, #f783b5); }
+																	.orange{ background: linear-gradient(135deg, #fff0df, #ffac5b); }
+																	.yellow{ background: linear-gradient(135deg, #fffbd9, #f7dc50); }
+																	.navy{ background: linear-gradient(135deg, #e3efff, #72a9ee); }
+																	.teal{ background: linear-gradient(135deg, #ddfaf5, #63d5c3); }
+
+																	/* NUMARA VE ETİKETLER */
+																	.number{
+																	position:absolute;
+																	top:20px;
+																	left:20px;
+																	z-index:30;
+																	padding: 8px 12px;
+																	border-radius:11px;
+																	background: rgba(255,255,255,.72);
+																	border: 1px solid rgba(255,255,255,.8);
+																	backdrop-filter: blur(10px);
+																	font-size:11px;
+																	font-weight:900;
+																	color:#26364d;
+																	box-shadow: 0 7px 18px rgba(20,45,70,.08);
+																	}
+
+																	.visual-label{
+																	position:absolute;
+																	bottom:18px;
+																	left:20px;
+																	z-index:30;
+																	padding: 9px 13px;
+																	border-radius:10px;
+																	background: rgba(255,255,255,.76);
+																	backdrop-filter: blur(10px);
+																	font-size:10px;
+																	font-weight:900;
+																	letter-spacing:1.3px;
+																	color:#25344a;
+																	}
+
+																	/* OYNAT RÜMÜZÜ (video ipucu) */
+																	.play-badge{
+																	position:absolute;
+																	top:20px;
+																	right:20px;
+																	z-index:30;
+																	width:34px;
+																	height:34px;
+																	border-radius:50%;
+																	background: rgba(255,255,255,.76);
+																	backdrop-filter: blur(10px);
+																	display:flex;
+																	align-items:center;
+																	justify-content:center;
+																	box-shadow: 0 7px 18px rgba(20,45,70,.08);
+																	}
+
+																	.play-badge svg{
+																	width:13px;
+																	height:13px;
+																	fill:#1e293b;
+																	margin-left:2px;
+																	}
+
+																	.cube-wrap{
+																	width:260px;
+																	height:260px;
+																	position:relative;
+																	display:flex;
+																	align-items:center;
+																	justify-content:center;
+																	transition: transform .5s cubic-bezier(.2,.8,.2,1);
+																	}
+
+																	.card:hover .cube-wrap{
+																	transform: translateY(-8px) scale(1.06) rotate(-1deg);
+																	}
+
+																	.cube-svg{
+																	width:100%;
+																	height:100%;
+																	overflow:visible;
+																	filter: drop-shadow(0 25px 18px rgba(16,36,58,.24));
+																	}
+
+																	.info{
+																	padding: 24px 26px 27px;
+																	}
+
+																	.tag{
+																	display:inline-block;
+																	padding: 6px 10px;
+																	border-radius:7px;
+																	background: var(--badge-bg);
+																	color: var(--primary);
+																	font-size:9px;
+																	font-weight:900;
+																	letter-spacing:1px;
+																	margin-bottom:11px;
+																	}
+
+																	.info h2{
+																	font-size:22px;
+																	font-weight:850;
+																	letter-spacing:-.5px;
+																	color: var(--text);
+																	margin-bottom:8px;
+																	}
+
+																	.info p{
+																	font-size:13px;
+																	line-height:1.65;
+																	color: var(--text-soft);
+																	min-height:43px;
+																	margin-bottom:17px;
+																	}
+
+																	.start{
+																	display:inline-flex;
+																	align-items:center;
+																	gap:7px;
+																	color: var(--primary);
+																	font-size:13px;
+																	font-weight:800;
+																	transition: gap .25s ease;
+																	}
+
+																	.card:hover .start{
+																	gap:12px;
+																	}
+
+																	.special{
+																	width:250px;
+																	height:250px;
+																	transition: transform .5s ease;
+																	filter: drop-shadow(0 25px 18px rgba(15,30,50,.20));
+																	}
+
+																	.card:hover .special{
+																	transform: translateY(-9px) scale(1.06);
+																	}
+
+																	.pyraminx-svg{ width:230px; height:230px; }
+																	.skewb-svg{ width:240px; height:240px; }
+																	.square-svg{ width:240px; height:240px; }
+																	.megaminx-svg{ width:250px; height:250px; }
+																	.clock-svg{ width:245px; height:245px; }
+																	.fto-svg{ width:240px; height:240px; }
+
+																	/* =========================================================
+																	ALT BANNER
+																	========================================================= */
+
+																	.bottom{
+																	width:100%;
+																	max-width:1350px;
+																	margin: 45px auto 0;
+																	padding: 35px 25px;
+																	border-radius:25px;
+																	text-align:center;
+																	background: var(--bottom-bg);
+																	border: 1px solid var(--bottom-border);
+																	transition: background-color 0.3s, border-color 0.3s;
+																	}
+
+																	.bottom h3{
+																	font-size:24px;
+																	font-weight:850;
+																	color: var(--bottom-text);
+																	margin-bottom:8px;
+																	}
+
+																	.bottom p{
+																	font-size:13px;
+																	line-height:1.7;
+																	color: var(--text-soft);
+																	}
+
+																	html.dark-mode .bg-glow::before,
+																	html.dark-mode .bg-glow::after {
+																	opacity: 0.25;
+																	}
+
+																	/* RESPONSIVE */
+																	@media(max-width:1050px){
+																	.cards{ grid-template-columns: repeat(2,1fr); }
+																	}
+
+																	@media(max-width:680px){
+																	.page{ padding: 22px 4% 60px; }
+																	.intro{ margin-bottom:35px; }
+																	.intro h1{ font-size:40px; }
+																	.intro p{ font-size:14px; }
+																	.cards{ grid-template-columns:1fr; gap:22px; }
+																	.visual{ height:330px; }
+																	.card{ border-radius:23px; }
+																	}
+
+																	@media(max-width:390px){
+																	.visual{ height:310px; }
+																	.cube-wrap{ width:230px; height:230px; }
+																	.special{ width:220px; height:220px; }
+																	}
+
+																</style>
+
+																<!-- Google tag (gtag.js) -->
+																<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+																<script>
+																	window.dataLayer = window.dataLayer || [];
+																	function gtag(){dataLayer.push(arguments);}
+																	gtag('js', new Date());
+
+																	gtag('config', 'G-F7KXWC8B5N');
+																</script>
+															</head>
+
+	<body>
+
+		<!-- Arka Plan Işık Efektleri -->
+		<div class="bg-glow"></div>
+
+		<!-- =========================================
+     ÜST BAR
+========================================= -->
+
+		<header class="navbar">
+
+			<a href="http://rubikacademy.fun" class="nav-logo">
+
+				<div class="nav-logo-mark">
+
+					<div></div>
+					<div></div>
+					<div></div>
+
+					<div></div>
+					<div></div>
+					<div></div>
+
+					<div></div>
+					<div></div>
+					<div></div>
+
+				</div>
+
+				<span class="nav-logo-text">
+					Rubik Academy
+				</span>
+
+			</a>
+
+			<div class="nav-right">
+
+				<nav class="nav-links">
+
+					<a href="http://rubikacademy.fun" data-i18n="navHome">
+						Ana Sayfa
+					</a>
+
+					<a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">
+						İçerikler
+					</a>
+
+				</nav>
+
+				<div class="lang-switcher" id="langSwitcher">
+
+					<button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
+						<span class="lang-globe">🌐</span>
+						<span id="langLabel">TR</span>
+					</button>
+
+					<div class="lang-menu" id="langMenu" role="menu">
+
+						<button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+							<span>Türkçe</span>
+							<span class="lang-check">✓</span>
+						</button>
+
+						<button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+							<span>English</span>
+							<span class="lang-check">✓</span>
+						</button>
+
+						<button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+							<span>Русский</span>
+							<span class="lang-check">✓</span>
+						</button>
+
+						<button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+							<span>Deutsch</span>
+							<span class="lang-check">✓</span>
+						</button>
+
+						<button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+							<span>العربية</span>
+							<span class="lang-check">✓</span>
+						</button>
+
+					</div>
+
+				</div>
+
+				<button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+					🌙
+				</button>
+
+			</div>
+
+		</header>
+
+		<div class="page">
+
+			<!-- ======================================================
+     KIRINTI
+====================================================== -->
+
+			<nav class="crumb">
+				<a href="http://rubikacademy.fun" data-i18n="crumbHome">Ana Sayfa</a>
+				<span class="sep">/</span>
+				<a href="http://rubikacademy.fun/icerikler" data-i18n="crumbContent">İçerikler</a>
+				<span class="sep">/</span>
+				<span class="current" data-i18n="crumbVideos">Videolar</span>
+			</nav>
+
+			<!-- ======================================================
+     BAŞLIK
+====================================================== -->
+
+			<section class="intro">
+
+				<div class="intro-badge">
+					<i></i>
+					RUBIK ACADEMY
+				</div>
+
+				<h1>
+					<span data-i18n="ic_title1">Video</span>
+					<span data-i18n="ic_titleAccent">Eğitimleri</span>
+				</h1>
+
+				<p data-i18n="ic_intro">
+					Rubik küplerini ve farklı twisty puzzle türlerini
+					videolarla adım adım öğren. Başlangıç seviyesinden ileri
+					seviyeye kadar tüm video eğitimlerine buradan ulaş.
+				</p>
+
+			</section>
+
+			<!-- ======================================================
+     KARTLAR
+====================================================== -->
+
+			<section class="cards">
+
+				<!-- 2X2 -->
+				<a href="http://rubikacademy.fun/2x2" class="card">
+					<div class="visual blue">
+						<div class="number">01</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<div class="cube-wrap">
+							<svg class="cube-svg" viewBox="0 0 300 300">
+								<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+								<rect x="60.7" y="60.7" width="84.6" height="84.6" rx="18.6" fill="#1e6fe6" stroke="#111827" stroke-width="3.8"/>
+								<rect x="154.7" y="60.7" width="84.6" height="84.6" rx="18.6" fill="#12a04a" stroke="#111827" stroke-width="3.8"/>
+								<rect x="60.7" y="154.7" width="84.6" height="84.6" rx="18.6" fill="#12a04a" stroke="#111827" stroke-width="3.8"/>
+								<rect x="154.7" y="154.7" width="84.6" height="84.6" rx="18.6" fill="#ffd21f" stroke="#111827" stroke-width="3.8"/>
+							</svg>
+						</div>
+						<div class="visual-label">2×2 RUBİK KÜP</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_beginner">BAŞLANGIÇ</span>
+						<h2 data-i18n="c_2x2_title">2×2 Rubik Küp</h2>
+						<p data-i18n="c_2x2_p">2×2 küpün temel çözümünü adım adım öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- 3X3 -->
+				<a href="http://rubikacademy.fun/3x3" class="card">
+					<div class="visual purple">
+						<div class="number">02</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<div class="cube-wrap">
+							<svg class="cube-svg" viewBox="0 0 300 300">
+								<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+								<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
+								<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+								<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+								<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+								<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+								<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+								<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+								<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+								<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+							</svg>
+						</div>
+						<div class="visual-label">3×3 RUBİK KÜP</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_popular">EN POPÜLER</span>
+						<h2 data-i18n="c_3x3_title">3×3 Rubik Küp</h2>
+						<p data-i18n="c_3x3_p">Klasik Rubik küpünü başlangıçtan ileri seviyeye kadar öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- 4X4 -->
+				<a href="http://rubikacademy.fun/4x4" class="card">
+					<div class="visual cyan">
+						<div class="number">03</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<div class="cube-wrap">
+							<svg class="cube-svg" viewBox="0 0 300 300">
+								<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+								<rect x="58.4" y="58.4" width="42.3" height="42.3" rx="9.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.9"/>
+								<rect x="105.3" y="58.4" width="42.3" height="42.3" rx="9.3" fill="#12a04a" stroke="#111827" stroke-width="1.9"/>
+								<rect x="152.3" y="58.4" width="42.3" height="42.3" rx="9.3" fill="#ffd21f" stroke="#111827" stroke-width="1.9"/>
+								<rect x="199.3" y="58.4" width="42.3" height="42.3" rx="9.3" fill="#f97316" stroke="#111827" stroke-width="1.9"/>
+								<rect x="58.4" y="105.3" width="42.3" height="42.3" rx="9.3" fill="#12a04a" stroke="#111827" stroke-width="1.9"/>
+								<rect x="105.3" y="105.3" width="42.3" height="42.3" rx="9.3" fill="#ffd21f" stroke="#111827" stroke-width="1.9"/>
+								<rect x="152.3" y="105.3" width="42.3" height="42.3" rx="9.3" fill="#f97316" stroke="#111827" stroke-width="1.9"/>
+								<rect x="199.3" y="105.3" width="42.3" height="42.3" rx="9.3" fill="#e6252f" stroke="#111827" stroke-width="1.9"/>
+								<rect x="58.4" y="152.3" width="42.3" height="42.3" rx="9.3" fill="#ffd21f" stroke="#111827" stroke-width="1.9"/>
+								<rect x="105.3" y="152.3" width="42.3" height="42.3" rx="9.3" fill="#f97316" stroke="#111827" stroke-width="1.9"/>
+								<rect x="152.3" y="152.3" width="42.3" height="42.3" rx="9.3" fill="#e6252f" stroke="#111827" stroke-width="1.9"/>
+								<rect x="199.3" y="152.3" width="42.3" height="42.3" rx="9.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.9"/>
+								<rect x="58.4" y="199.3" width="42.3" height="42.3" rx="9.3" fill="#f97316" stroke="#111827" stroke-width="1.9"/>
+								<rect x="105.3" y="199.3" width="42.3" height="42.3" rx="9.3" fill="#e6252f" stroke="#111827" stroke-width="1.9"/>
+								<rect x="152.3" y="199.3" width="42.3" height="42.3" rx="9.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.9"/>
+								<rect x="199.3" y="199.3" width="42.3" height="42.3" rx="9.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.9"/>
+							</svg>
+						</div>
+						<div class="visual-label">4×4 RUBİK KÜP</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_intermediate">ORTA SEVİYE</span>
+						<h2 data-i18n="c_4x4_title">4×4 Rubik Küp</h2>
+						<p data-i18n="c_4x4_p">Merkezleri ve kenarları çözerek 4×4 çözümünü öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- 5X5 -->
+				<a href="http://rubikacademy.fun/5x5" class="card">
+					<div class="visual green">
+						<div class="number">04</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<div class="cube-wrap">
+							<svg class="cube-svg" viewBox="0 0 300 300">
+								<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+								<rect x="57.9" y="57.9" width="33.8" height="33.8" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="95.5" y="57.9" width="33.8" height="33.8" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="133.1" y="57.9" width="33.8" height="33.8" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="170.7" y="57.9" width="33.8" height="33.8" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="208.3" y="57.9" width="33.8" height="33.8" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.9" y="95.5" width="33.8" height="33.8" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="95.5" y="95.5" width="33.8" height="33.8" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="133.1" y="95.5" width="33.8" height="33.8" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="170.7" y="95.5" width="33.8" height="33.8" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="208.3" y="95.5" width="33.8" height="33.8" rx="7.4" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.9" y="133.1" width="33.8" height="33.8" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="95.5" y="133.1" width="33.8" height="33.8" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="133.1" y="133.1" width="33.8" height="33.8" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="170.7" y="133.1" width="33.8" height="33.8" rx="7.4" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="208.3" y="133.1" width="33.8" height="33.8" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.9" y="170.7" width="33.8" height="33.8" rx="7.4" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="95.5" y="170.7" width="33.8" height="33.8" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="133.1" y="170.7" width="33.8" height="33.8" rx="7.4" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="170.7" y="170.7" width="33.8" height="33.8" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="208.3" y="170.7" width="33.8" height="33.8" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.9" y="208.3" width="33.8" height="33.8" rx="7.4" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="95.5" y="208.3" width="33.8" height="33.8" rx="7.4" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="133.1" y="208.3" width="33.8" height="33.8" rx="7.4" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="170.7" y="208.3" width="33.8" height="33.8" rx="7.4" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="208.3" y="208.3" width="33.8" height="33.8" rx="7.4" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+							</svg>
+						</div>
+						<div class="visual-label">5×5 RUBİK KÜP</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_advanced">İLERİ</span>
+						<h2 data-i18n="c_5x5_title">5×5 Rubik Küp</h2>
+						<p data-i18n="c_5x5_p">Büyük küplerin merkez ve kenar çözüm tekniklerini öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- 6X6 -->
+				<a href="http://rubikacademy.fun/6x6" class="card">
+					<div class="visual red">
+						<div class="number">05</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<div class="cube-wrap">
+							<svg class="cube-svg" viewBox="0 0 300 300">
+								<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+								<rect x="57.6" y="57.6" width="28.2" height="28.2" rx="6.2" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="88.9" y="57.6" width="28.2" height="28.2" rx="6.2" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="120.2" y="57.6" width="28.2" height="28.2" rx="6.2" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="151.6" y="57.6" width="28.2" height="28.2" rx="6.2" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="182.9" y="57.6" width="28.2" height="28.2" rx="6.2" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="214.2" y="57.6" width="28.2" height="28.2" rx="6.2" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.6" y="88.9" width="28.2" height="28.2" rx="6.2" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="88.9" y="88.9" width="28.2" height="28.2" rx="6.2" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="120.2" y="88.9" width="28.2" height="28.2" rx="6.2" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="151.6" y="88.9" width="28.2" height="28.2" rx="6.2" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="182.9" y="88.9" width="28.2" height="28.2" rx="6.2" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="214.2" y="88.9" width="28.2" height="28.2" rx="6.2" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.6" y="120.2" width="28.2" height="28.2" rx="6.2" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="88.9" y="120.2" width="28.2" height="28.2" rx="6.2" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="120.2" y="120.2" width="28.2" height="28.2" rx="6.2" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="151.6" y="120.2" width="28.2" height="28.2" rx="6.2" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="182.9" y="120.2" width="28.2" height="28.2" rx="6.2" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="214.2" y="120.2" width="28.2" height="28.2" rx="6.2" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.6" y="151.6" width="28.2" height="28.2" rx="6.2" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="88.9" y="151.6" width="28.2" height="28.2" rx="6.2" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="120.2" y="151.6" width="28.2" height="28.2" rx="6.2" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="151.6" y="151.6" width="28.2" height="28.2" rx="6.2" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="182.9" y="151.6" width="28.2" height="28.2" rx="6.2" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="214.2" y="151.6" width="28.2" height="28.2" rx="6.2" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.6" y="182.9" width="28.2" height="28.2" rx="6.2" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="88.9" y="182.9" width="28.2" height="28.2" rx="6.2" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="120.2" y="182.9" width="28.2" height="28.2" rx="6.2" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="151.6" y="182.9" width="28.2" height="28.2" rx="6.2" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="182.9" y="182.9" width="28.2" height="28.2" rx="6.2" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="214.2" y="182.9" width="28.2" height="28.2" rx="6.2" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.6" y="214.2" width="28.2" height="28.2" rx="6.2" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="88.9" y="214.2" width="28.2" height="28.2" rx="6.2" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="120.2" y="214.2" width="28.2" height="28.2" rx="6.2" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="151.6" y="214.2" width="28.2" height="28.2" rx="6.2" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="182.9" y="214.2" width="28.2" height="28.2" rx="6.2" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="214.2" y="214.2" width="28.2" height="28.2" rx="6.2" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+							</svg>
+						</div>
+						<div class="visual-label">6×6 RUBİK KÜP</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_expert">UZMAN</span>
+						<h2 data-i18n="c_6x6_title">6×6 Rubik Küp</h2>
+						<p data-i18n="c_6x6_p">6×6 merkezlerini ve kenarlarını çözmeyi öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- 7X7 -->
+				<a href="http://rubikacademy.fun/7x7" class="card">
+					<div class="visual pink">
+						<div class="number">06</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<div class="cube-wrap">
+							<svg class="cube-svg" viewBox="0 0 300 300">
+								<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+								<rect x="57.3" y="57.3" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="84.2" y="57.3" width="24.2" height="24.2" rx="5.3" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="111.1" y="57.3" width="24.2" height="24.2" rx="5.3" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="137.9" y="57.3" width="24.2" height="24.2" rx="5.3" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="164.8" y="57.3" width="24.2" height="24.2" rx="5.3" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="191.6" y="57.3" width="24.2" height="24.2" rx="5.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="218.5" y="57.3" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.3" y="84.2" width="24.2" height="24.2" rx="5.3" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="84.2" y="84.2" width="24.2" height="24.2" rx="5.3" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="111.1" y="84.2" width="24.2" height="24.2" rx="5.3" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="137.9" y="84.2" width="24.2" height="24.2" rx="5.3" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="164.8" y="84.2" width="24.2" height="24.2" rx="5.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="191.6" y="84.2" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="218.5" y="84.2" width="24.2" height="24.2" rx="5.3" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.3" y="111.1" width="24.2" height="24.2" rx="5.3" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="84.2" y="111.1" width="24.2" height="24.2" rx="5.3" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="111.1" y="111.1" width="24.2" height="24.2" rx="5.3" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="137.9" y="111.1" width="24.2" height="24.2" rx="5.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="164.8" y="111.1" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="191.6" y="111.1" width="24.2" height="24.2" rx="5.3" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="218.5" y="111.1" width="24.2" height="24.2" rx="5.3" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.3" y="137.9" width="24.2" height="24.2" rx="5.3" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="84.2" y="137.9" width="24.2" height="24.2" rx="5.3" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="111.1" y="137.9" width="24.2" height="24.2" rx="5.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="137.9" y="137.9" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="164.8" y="137.9" width="24.2" height="24.2" rx="5.3" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="191.6" y="137.9" width="24.2" height="24.2" rx="5.3" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="218.5" y="137.9" width="24.2" height="24.2" rx="5.3" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.3" y="164.8" width="24.2" height="24.2" rx="5.3" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="84.2" y="164.8" width="24.2" height="24.2" rx="5.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="111.1" y="164.8" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="137.9" y="164.8" width="24.2" height="24.2" rx="5.3" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="164.8" y="164.8" width="24.2" height="24.2" rx="5.3" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="191.6" y="164.8" width="24.2" height="24.2" rx="5.3" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="218.5" y="164.8" width="24.2" height="24.2" rx="5.3" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.3" y="191.6" width="24.2" height="24.2" rx="5.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="84.2" y="191.6" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="111.1" y="191.6" width="24.2" height="24.2" rx="5.3" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="137.9" y="191.6" width="24.2" height="24.2" rx="5.3" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="164.8" y="191.6" width="24.2" height="24.2" rx="5.3" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="191.6" y="191.6" width="24.2" height="24.2" rx="5.3" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="218.5" y="191.6" width="24.2" height="24.2" rx="5.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="57.3" y="218.5" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+								<rect x="84.2" y="218.5" width="24.2" height="24.2" rx="5.3" fill="#12a04a" stroke="#111827" stroke-width="1.5"/>
+								<rect x="111.1" y="218.5" width="24.2" height="24.2" rx="5.3" fill="#ffd21f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="137.9" y="218.5" width="24.2" height="24.2" rx="5.3" fill="#f97316" stroke="#111827" stroke-width="1.5"/>
+								<rect x="164.8" y="218.5" width="24.2" height="24.2" rx="5.3" fill="#e6252f" stroke="#111827" stroke-width="1.5"/>
+								<rect x="191.6" y="218.5" width="24.2" height="24.2" rx="5.3" fill="#f3f5fa" stroke="#111827" stroke-width="1.5"/>
+								<rect x="218.5" y="218.5" width="24.2" height="24.2" rx="5.3" fill="#1e6fe6" stroke="#111827" stroke-width="1.5"/>
+							</svg>
+						</div>
+						<div class="visual-label">7×7 RUBİK KÜP</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_expert">UZMAN</span>
+						<h2 data-i18n="c_7x7_title">7×7 Rubik Küp</h2>
+						<p data-i18n="c_7x7_p">En büyük küplerden biri olan 7×7'nin çözümünü öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- 3X3 ONE HAND -->
+				<a href="http://rubikacademy.fun/3x3onehand" class="card">
+					<div class="visual orange">
+						<div class="number">07</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<div class="cube-wrap">
+							<svg class="cube-svg" viewBox="0 0 300 300">
+								<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+								<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+								<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+								<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#f3f5fa" stroke="#111827" stroke-width="2.5"/>
+								<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+								<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#f3f5fa" stroke="#111827" stroke-width="2.5"/>
+								<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
+								<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f3f5fa" stroke="#111827" stroke-width="2.5"/>
+								<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
+								<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+							</svg>
+						</div>
+						<div class="visual-label">3×3 ONE HANDED</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_speedcubing">SPEEDCUBING</span>
+						<h2 data-i18n="c_oneHand_title">3×3 One Handed</h2>
+						<p data-i18n="c_oneHand_p">Tek elle küp çözme ve hız geliştirme tekniklerini öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- PYRAMINX -->
+				<a href="http://rubikacademy.fun/pyraminx" class="card">
+					<div class="visual yellow">
+						<div class="number">08</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<svg class="special pyraminx-svg" viewBox="0 0 250 250">
+							<polygon points="125.0,8.0 238.0,222.0 12.0,222.0" fill="#111827" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="125.0,26.3 94.7,83.9 155.3,83.9" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="94.7,88.1 125.0,145.7 155.3,88.1" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="158.7,90.3 128.4,147.9 189.0,147.9" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="128.4,152.1 158.7,209.7 189.0,152.1" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="192.3,154.3 162.0,211.9 222.6,211.9" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="91.3,90.3 61.0,147.9 121.6,147.9" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="61.0,152.1 91.3,209.7 121.6,152.1" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="125.0,154.3 94.7,211.9 155.3,211.9" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="57.7,154.3 27.4,211.9 88.0,211.9" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+						</svg>
+						<div class="visual-label">PYRAMINX</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_puzzle">PUZZLE</span>
+						<h2 data-i18n="c_pyraminx_title">Pyraminx</h2>
+						<p data-i18n="c_pyraminx_p">Üçgen yapılı Pyraminx'i kolay yöntemlerle çözmeyi öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- SKEWB -->
+				<a href="http://rubikacademy.fun/skewb" class="card">
+					<div class="visual navy">
+						<div class="number">09</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<svg class="special skewb-svg" viewBox="0 0 250 250">
+							<rect x="13.0" y="13.0" width="224.0" height="224.0" rx="28.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+							<polygon points="36.4,36.4 123.7,36.4 123.7,123.7 36.4,123.7" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="213.7,36.4 213.7,123.7 126.3,123.7 126.3,36.4" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="213.7,213.7 126.3,213.7 126.3,126.3 213.7,126.3" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="36.4,213.7 36.4,126.3 123.7,126.3 123.7,213.7" fill="#1e6fe6" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="125.0,37.7 212.3,125.0 125.0,212.3 37.7,125.0" fill="#f3f5fa" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+						</svg>
+						<div class="visual-label">SKEWB</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_puzzle">PUZZLE</span>
+						<h2 data-i18n="c_skewb_title">Skewb</h2>
+						<p data-i18n="c_skewb_p">Skewb mekanizmasını ve temel çözüm algoritmalarını öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- SQUARE 1 -->
+				<a href="http://rubikacademy.fun/square1" class="card">
+					<div class="visual orange">
+						<div class="number">10</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" class="special square-svg">
+							<defs>
+								<filter id="sq1-real-shadow" x="-10%" y="-10%" width="120%" height="120%">
+									<feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
+								</filter>
+							</defs>
+							<g filter="url(#sq1-real-shadow)">
+								<rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
+								<g fill="#ffe600" stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+									<path d="M 150 148 L 133 41 L 167 41 Z"/>
+									<path d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
+									<path d="M 152 150 L 259 133 L 259 167 Z"/>
+									<path d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
+									<path d="M 150 152 L 167 259 L 133 259 Z"/>
+									<path d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
+									<path d="M 148 150 L 41 167 L 41 133 Z"/>
+									<path d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
+								</g>
+							</g>
+						</svg>
+						<div class="visual-label">SQUARE-1</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_advanced">İLERİ</span>
+						<h2 data-i18n="c_square1_title">Square-1</h2>
+						<p data-i18n="c_square1_p">Şekil değiştiren küpler dünyasına Square-1 ile giriş yap.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- MEGAMINX -->
+				<a href="http://rubikacademy.fun/megaminx" class="card">
+					<div class="visual teal">
+						<div class="number">11</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<svg class="special megaminx-svg" viewBox="0 0 250 250">
+							<polygon points="125.0,20.6 230.9,97.6 190.5,222.1 59.5,222.1 19.1,97.6" fill="#111827" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="125.0,91.7 163.3,119.5 148.7,164.6 101.3,164.6 86.7,119.5" fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="125.0,91.7 125.0,36.0 163.3,119.5" fill="#1e6fe6" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="163.3,119.5 216.3,102.3 148.7,164.6" fill="#12a04a" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="148.7,164.6 181.4,209.7 101.3,164.6" fill="#f97316" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="101.3,164.6 68.6,209.7 86.7,119.5" fill="#e6252f" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+							<polygon points="86.7,119.5 33.7,102.3 125.0,91.7" fill="#f3f5fa" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+						</svg>
+						<div class="visual-label">MEGAMINX</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_advanced">İLERİ</span>
+						<h2 data-i18n="c_megaminx_title">Megaminx</h2>
+						<p data-i18n="c_megaminx_p">Çok yüzlü yapıyı ve Megaminx çözüm mantığını öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- CLOCK -->
+				<a href="http://rubikacademy.fun/clock" class="card">
+					<div class="visual blue">
+						<div class="number">12</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<svg class="special clock-svg" viewBox="0 0 250 250">
+							<rect x="22" y="22" width="206" height="206" rx="26" fill="#101827"/>
+							<g fill="#f8fafc" stroke="#0f172a" stroke-width="5">
+								<circle cx="63" cy="63" r="31"/>
+								<circle cx="125" cy="63" r="31"/>
+								<circle cx="187" cy="63" r="31"/>
+								<circle cx="63" cy="125" r="31"/>
+								<circle cx="125" cy="125" r="31"/>
+								<circle cx="187" cy="125" r="31"/>
+								<circle cx="63" cy="187" r="31"/>
+								<circle cx="125" cy="187" r="31"/>
+								<circle cx="187" cy="187" r="31"/>
+							</g>
+							<g stroke="#101827" stroke-width="5" stroke-linecap="round">
+								<path d="M63 63 L63 43"/>
+								<path d="M125 63 L139 48"/>
+								<path d="M187 63 L174 73"/>
+								<path d="M63 125 L81 125"/>
+								<path d="M125 125 L125 103"/>
+								<path d="M187 125 L169 137"/>
+								<path d="M63 187 L76 173"/>
+								<path d="M125 187 L125 205"/>
+								<path d="M187 187 L204 187"/>
+							</g>
+						</svg>
+						<div class="visual-label">RUBIK'S CLOCK</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_puzzle">PUZZLE</span>
+						<h2 data-i18n="c_clock_title">Rubik's Clock</h2>
+						<p data-i18n="c_clock_p">Clock mekanizmasını ve çözüm adımlarını öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+				<!-- FTO -->
+				<a href="http://rubikacademy.fun/fto" class="card">
+					<div class="visual purple">
+						<div class="number">13</div>
+						<div class="play-badge"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg></div>
+						<svg class="special fto-svg" viewBox="0 0 250 250">
+							<rect x="13.0" y="13.0" width="224.0" height="224.0" rx="28.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+							<polygon points="125.0,125.0 36.4,36.4 213.7,36.4" fill="#d1d5db" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+							<polygon points="125.0,125.0 213.7,36.4 213.7,213.7" fill="#1e6fe6" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+							<polygon points="125.0,125.0 213.7,213.7 36.4,213.7" fill="#f97316" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+							<polygon points="125.0,125.0 36.4,213.7 36.4,36.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+							<g stroke="#111827" stroke-width="2" stroke-linecap="round">
+								<line x1="95.5" y1="95.5" x2="154.5" y2="95.5"/>
+								<line x1="65.9" y1="65.9" x2="184.1" y2="65.9"/>
+								<line x1="154.5" y1="95.5" x2="95.5" y2="36.4"/>
+								<line x1="184.1" y1="65.9" x2="154.6" y2="36.4"/>
+								<line x1="95.5" y1="95.5" x2="154.6" y2="36.4"/>
+								<line x1="65.9" y1="65.9" x2="95.5" y2="36.4"/>
+								<line x1="95.5" y1="154.5" x2="95.5" y2="95.5"/>
+								<line x1="65.9" y1="184.1" x2="65.9" y2="65.9"/>
+								<line x1="95.5" y1="95.5" x2="36.4" y2="154.5"/>
+								<line x1="65.9" y1="65.9" x2="36.4" y2="95.4"/>
+								<line x1="95.5" y1="154.5" x2="36.4" y2="95.4"/>
+								<line x1="65.9" y1="184.1" x2="36.4" y2="154.5"/>
+								<line x1="154.5" y1="154.5" x2="95.5" y2="154.5"/>
+								<line x1="184.1" y1="184.1" x2="65.9" y2="184.1"/>
+								<line x1="95.5" y1="154.5" x2="154.5" y2="213.6"/>
+								<line x1="65.9" y1="184.1" x2="95.4" y2="213.6"/>
+								<line x1="154.5" y1="154.5" x2="95.4" y2="213.6"/>
+								<line x1="184.1" y1="184.1" x2="154.5" y2="213.6"/>
+								<line x1="154.5" y1="95.5" x2="154.5" y2="154.5"/>
+								<line x1="184.1" y1="65.9" x2="184.1" y2="184.1"/>
+								<line x1="154.5" y1="154.5" x2="213.6" y2="95.5"/>
+								<line x1="184.1" y1="184.1" x2="213.6" y2="154.6"/>
+								<line x1="154.5" y1="95.5" x2="213.6" y2="154.6"/>
+								<line x1="184.1" y1="65.9" x2="213.6" y2="95.5"/>
+							</g>
+							<g fill="#111827">
+								<circle cx="125.0" cy="125.0" r="4"/>
+								<circle cx="95.5" cy="95.5" r="4"/>
+								<circle cx="65.9" cy="65.9" r="4"/>
+								<circle cx="154.5" cy="95.5" r="4"/>
+								<circle cx="184.1" cy="65.9" r="4"/>
+								<circle cx="154.5" cy="154.5" r="4"/>
+								<circle cx="184.1" cy="184.1" r="4"/>
+								<circle cx="95.5" cy="154.5" r="4"/>
+								<circle cx="65.9" cy="184.1" r="4"/>
+								<circle cx="125.0" cy="95.5" r="4"/>
+								<circle cx="154.5" cy="125.0" r="4"/>
+								<circle cx="125.0" cy="154.5" r="4"/>
+								<circle cx="95.5" cy="125.0" r="4"/>
+							</g>
+						</svg>
+						<div class="visual-label">FTO</div>
+					</div>
+					<div class="info">
+						<span class="tag" data-i18n="tag_puzzle">PUZZLE</span>
+						<h2 data-i18n="c_fto_title">FTO</h2>
+						<p data-i18n="c_fto_p">Face Turning Octahedron'un sekiz yüzlü yapısını ve temel çözüm mantığını öğren.</p>
+						<span class="start" data-i18n="cta_start">Videoyu İzle →</span>
+					</div>
+				</a>
+
+			</section>
+
+			<!-- ======================================================
+     ALT ALAN
+====================================================== -->
+
+			<section class="bottom">
+				<h3 data-i18n="bottom_title">🎬 Küpünü seç ve izlemeye başla!</h3>
+				<p data-i18n="bottom_p">Başlangıç seviyesinden speedcubing seviyesine kadar Rubik Academy video eğitimleriyle kendini geliştir.</p>
+			</section>
+
+		</div>
+
+		<script>
+			/* =========================================================
+			DİL SEÇİCİ (TR / EN / RU / DE / AR)
+			========================================================= */
+
+			var translations = {
+			tr: {
+			navHome: "Ana Sayfa",
+			navContent: "İçerikler",
+			crumbHome: "Ana Sayfa",
+			crumbContent: "İçerikler",
+			crumbVideos: "Videolar",
+			ic_title1: "Video",
+			ic_titleAccent: "Eğitimleri",
+			ic_intro: "Rubik küplerini ve farklı twisty puzzle türlerini videolarla adım adım öğren. Başlangıç seviyesinden ileri seviyeye kadar tüm video eğitimlerine buradan ulaş.",
+			tag_beginner: "BAŞLANGIÇ",
+			c_2x2_title: "2×2 Rubik Küp",
+			c_2x2_p: "2×2 küpün temel çözümünü adım adım öğren.",
+			cta_start: "Videoyu İzle →",
+			tag_popular: "EN POPÜLER",
+			c_3x3_title: "3×3 Rubik Küp",
+			c_3x3_p: "Klasik Rubik küpünü başlangıçtan ileri seviyeye kadar öğren.",
+			tag_intermediate: "ORTA SEVİYE",
+			c_4x4_title: "4×4 Rubik Küp",
+			c_4x4_p: "Merkezleri ve kenarları çözerek 4×4 çözümünü öğren.",
+			tag_advanced: "İLERİ",
+			c_5x5_title: "5×5 Rubik Küp",
+			c_5x5_p: "Büyük küplerin merkez ve kenar çözüm tekniklerini öğren.",
+			tag_expert: "UZMAN",
+			c_6x6_title: "6×6 Rubik Küp",
+			c_6x6_p: "6×6 merkezlerini ve kenarlarını çözmeyi öğren.",
+			c_7x7_title: "7×7 Rubik Küp",
+			c_7x7_p: "En büyük küplerden biri olan 7×7'nin çözümünü öğren.",
+			tag_speedcubing: "SPEEDCUBING",
+			c_oneHand_title: "3×3 One Handed",
+			c_oneHand_p: "Tek elle küp çözme ve hız geliştirme tekniklerini öğren.",
+			tag_puzzle: "PUZZLE",
+			c_pyraminx_title: "Pyraminx",
+			c_pyraminx_p: "Üçgen yapılı Pyraminx'i kolay yöntemlerle çözmeyi öğren.",
+			c_skewb_title: "Skewb",
+			c_skewb_p: "Skewb mekanizmasını ve temel çözüm algoritmalarını öğren.",
+			c_square1_title: "Square-1",
+			c_square1_p: "Şekil değiştiren küpler dünyasına Square-1 ile giriş yap.",
+			c_megaminx_title: "Megaminx",
+			c_megaminx_p: "Çok yüzlü yapıyı ve Megaminx çözüm mantığını öğren.",
+			c_clock_title: "Rubik's Clock",
+			c_clock_p: "Clock mekanizmasını ve çözüm adımlarını öğren.",
+			c_fto_title: "FTO",
+			c_fto_p: "Face Turning Octahedron'un sekiz yüzlü yapısını ve temel çözüm mantığını öğren.",
+			bottom_title: "🎬 Küpünü seç ve izlemeye başla!",
+			bottom_p: "Başlangıç seviyesinden speedcubing seviyesine kadar Rubik Academy video eğitimleriyle kendini geliştir."
+			},
+			en: {
+			navHome: "Home",
+			navContent: "Content",
+			crumbHome: "Home",
+			crumbContent: "Content",
+			crumbVideos: "Videos",
+			ic_title1: "Video",
+			ic_titleAccent: "Tutorials",
+			ic_intro: "Learn Rubik's cubes and different twisty puzzle types step by step through video. Access all video tutorials here, from beginner to advanced level.",
+			tag_beginner: "BEGINNER",
+			c_2x2_title: "2×2 Rubik's Cube",
+			c_2x2_p: "Learn the basic solution of the 2×2 cube step by step.",
+			cta_start: "Watch Video →",
+			tag_popular: "MOST POPULAR",
+			c_3x3_title: "3×3 Rubik's Cube",
+			c_3x3_p: "Learn the classic Rubik's Cube from beginner to advanced level.",
+			tag_intermediate: "INTERMEDIATE",
+			c_4x4_title: "4×4 Rubik's Cube",
+			c_4x4_p: "Learn the 4×4 solution by solving centers and edges.",
+			tag_advanced: "ADVANCED",
+			c_5x5_title: "5×5 Rubik's Cube",
+			c_5x5_p: "Learn center and edge solving techniques for big cubes.",
+			tag_expert: "EXPERT",
+			c_6x6_title: "6×6 Rubik's Cube",
+			c_6x6_p: "Learn to solve the centers and edges of the 6×6.",
+			c_7x7_title: "7×7 Rubik's Cube",
+			c_7x7_p: "Learn to solve the 7×7, one of the largest cubes.",
+			tag_speedcubing: "SPEEDCUBING",
+			c_oneHand_title: "3×3 One Handed",
+			c_oneHand_p: "Learn one-handed solving and speed-building techniques.",
+			tag_puzzle: "PUZZLE",
+			c_pyraminx_title: "Pyraminx",
+			c_pyraminx_p: "Learn to solve the triangular Pyraminx with easy methods.",
+			c_skewb_title: "Skewb",
+			c_skewb_p: "Learn the Skewb mechanism and basic solving algorithms.",
+			c_square1_title: "Square-1",
+			c_square1_p: "Step into the world of shape-shifting cubes with Square-1.",
+			c_megaminx_title: "Megaminx",
+			c_megaminx_p: "Learn the multi-faced structure and Megaminx solving logic.",
+			c_clock_title: "Rubik's Clock",
+			c_clock_p: "Learn the Clock mechanism and solving steps.",
+			c_fto_title: "FTO",
+			c_fto_p: "Learn the eight-faced structure of the Face Turning Octahedron and basic solving logic.",
+			bottom_title: "🎬 Pick your cube and start watching!",
+			bottom_p: "Develop yourself with Rubik Academy video tutorials, from beginner level to speedcubing level."
+			},
+			ru: {
+			navHome: "Главная",
+			navContent: "Контент",
+			crumbHome: "Главная",
+			crumbContent: "Контент",
+			crumbVideos: "Видео",
+			ic_title1: "Видео",
+			ic_titleAccent: "уроки",
+			ic_intro: "Изучай кубики Рубика и другие виды твисти-пазлов шаг за шагом с помощью видео. Доступ ко всем видеоурокам — от начального до продвинутого уровня.",
+			tag_beginner: "НАЧАЛЬНЫЙ",
+			c_2x2_title: "Кубик Рубика 2×2",
+			c_2x2_p: "Изучи базовую сборку кубика 2×2 шаг за шагом.",
+			cta_start: "Смотреть видео →",
+			tag_popular: "САМЫЙ ПОПУЛЯРНЫЙ",
+			c_3x3_title: "Кубик Рубика 3×3",
+			c_3x3_p: "Изучи классический кубик Рубика от начального до продвинутого уровня.",
+			tag_intermediate: "СРЕДНИЙ УРОВЕНЬ",
+			c_4x4_title: "Кубик Рубика 4×4",
+			c_4x4_p: "Изучи сборку 4×4, решая центры и рёбра.",
+			tag_advanced: "ПРОДВИНУТЫЙ",
+			c_5x5_title: "Кубик Рубика 5×5",
+			c_5x5_p: "Изучи техники сборки центров и рёбер больших кубиков.",
+			tag_expert: "ЭКСПЕРТ",
+			c_6x6_title: "Кубик Рубика 6×6",
+			c_6x6_p: "Научись собирать центры и рёбра кубика 6×6.",
+			c_7x7_title: "Кубик Рубика 7×7",
+			c_7x7_p: "Научись собирать 7×7 — один из самых больших кубиков.",
+			tag_speedcubing: "СПИДКУБИНГ",
+			c_oneHand_title: "3×3 одной рукой",
+			c_oneHand_p: "Изучи сборку одной рукой и техники увеличения скорости.",
+			tag_puzzle: "ПАЗЛ",
+			c_pyraminx_title: "Пирамидка",
+			c_pyraminx_p: "Изучи сборку треугольной Пирамидки простыми методами.",
+			c_skewb_title: "Skewb",
+			c_skewb_p: "Изучи механизм Skewb и базовые алгоритмы сборки.",
+			c_square1_title: "Square-1",
+			c_square1_p: "Войди в мир кубиков, меняющих форму, вместе со Square-1.",
+			c_megaminx_title: "Мегаминкс",
+			c_megaminx_p: "Изучи многогранную структуру и логику сборки Мегаминкса.",
+			c_clock_title: "Rubik's Clock",
+			c_clock_p: "Изучи механизм Clock и шаги сборки.",
+			c_fto_title: "FTO",
+			c_fto_p: "Изучи восьмигранную структуру Face Turning Octahedron и базовую логику сборки.",
+			bottom_title: "🎬 Выбери свой кубик и начни смотреть!",
+			bottom_p: "Развивайся вместе с видеоуроками Rubik Academy — от начального уровня до спидкубинга."
+			},
+			de: {
+			navHome: "Startseite",
+			navContent: "Inhalte",
+			crumbHome: "Startseite",
+			crumbContent: "Inhalte",
+			crumbVideos: "Videos",
+			ic_title1: "Video-",
+			ic_titleAccent: "Anleitungen",
+			ic_intro: "Lerne Zauberwürfel und verschiedene Twisty-Puzzle-Arten Schritt für Schritt per Video. Finde hier alle Videoanleitungen, vom Einsteiger- bis zum fortgeschrittenen Niveau.",
+			tag_beginner: "EINSTEIGER",
+			c_2x2_title: "2×2 Zauberwürfel",
+			c_2x2_p: "Lerne die Grundlösung des 2×2-Würfels Schritt für Schritt.",
+			cta_start: "Video ansehen →",
+			tag_popular: "AM BELIEBTESTEN",
+			c_3x3_title: "3×3 Zauberwürfel",
+			c_3x3_p: "Lerne den klassischen Zauberwürfel vom Einsteiger- bis zum fortgeschrittenen Niveau.",
+			tag_intermediate: "MITTELSTUFE",
+			c_4x4_title: "4×4 Zauberwürfel",
+			c_4x4_p: "Lerne die 4×4-Lösung durch das Lösen von Mittelsteinen und Kanten.",
+			tag_advanced: "FORTGESCHRITTEN",
+			c_5x5_title: "5×5 Zauberwürfel",
+			c_5x5_p: "Lerne Techniken zum Lösen von Mittelsteinen und Kanten großer Würfel.",
+			tag_expert: "EXPERTE",
+			c_6x6_title: "6×6 Zauberwürfel",
+			c_6x6_p: "Lerne, die Mittelsteine und Kanten des 6×6 zu lösen.",
+			c_7x7_title: "7×7 Zauberwürfel",
+			c_7x7_p: "Lerne, den 7×7 zu lösen – einen der größten Würfel.",
+			tag_speedcubing: "SPEEDCUBING",
+			c_oneHand_title: "3×3 Einhändig",
+			c_oneHand_p: "Lerne einhändiges Lösen und Techniken zur Geschwindigkeitssteigerung.",
+			tag_puzzle: "PUZZLE",
+			c_pyraminx_title: "Pyraminx",
+			c_pyraminx_p: "Lerne, den dreieckigen Pyraminx mit einfachen Methoden zu lösen.",
+			c_skewb_title: "Skewb",
+			c_skewb_p: "Lerne den Skewb-Mechanismus und grundlegende Lösungsalgorithmen.",
+			c_square1_title: "Square-1",
+			c_square1_p: "Steig mit Square-1 in die Welt der formverändernden Würfel ein.",
+			c_megaminx_title: "Megaminx",
+			c_megaminx_p: "Lerne die vielflächige Struktur und die Lösungslogik des Megaminx.",
+			c_clock_title: "Rubik's Clock",
+			c_clock_p: "Lerne den Clock-Mechanismus und die Lösungsschritte.",
+			c_fto_title: "FTO",
+			c_fto_p: "Lerne die achtflächige Struktur des Face Turning Octahedron und die grundlegende Lösungslogik.",
+			bottom_title: "🎬 Wähle deinen Würfel und schau los!",
+			bottom_p: "Entwickle dich mit den Videoanleitungen von Rubik Academy weiter – vom Einsteiger- bis zum Speedcubing-Niveau."
+			},
+			ar: {
+			navHome: "الرئيسية",
+			navContent: "المحتوى",
+			crumbHome: "الرئيسية",
+			crumbContent: "المحتوى",
+			crumbVideos: "الفيديوهات",
+			ic_title1: "دروس",
+			ic_titleAccent: "فيديو",
+			ic_intro: "تعلّم مكعبات روبيك وأنواع بازلات Twisty المختلفة خطوة بخطوة عبر الفيديو. اطّلع على جميع دروس الفيديو هنا، من مستوى المبتدئين إلى المستوى المتقدم.",
+			tag_beginner: "مبتدئ",
+			c_2x2_title: "مكعب روبيك 2×2",
+			c_2x2_p: "تعلّم الحل الأساسي لمكعب 2×2 خطوة بخطوة.",
+			cta_start: "شاهد الفيديو ←",
+			tag_popular: "الأكثر شهرة",
+			c_3x3_title: "مكعب روبيك 3×3",
+			c_3x3_p: "تعلّم مكعب روبيك الكلاسيكي من مستوى المبتدئين إلى المتقدم.",
+			tag_intermediate: "متوسط",
+			c_4x4_title: "مكعب روبيك 4×4",
+			c_4x4_p: "تعلّم حل مكعب 4×4 عبر حل المراكز والحواف.",
+			tag_advanced: "متقدم",
+			c_5x5_title: "مكعب روبيك 5×5",
+			c_5x5_p: "تعلّم تقنيات حل المراكز والحواف للمكعبات الكبيرة.",
+			tag_expert: "خبير",
+			c_6x6_title: "مكعب روبيك 6×6",
+			c_6x6_p: "تعلّم حل مراكز وحواف مكعب 6×6.",
+			c_7x7_title: "مكعب روبيك 7×7",
+			c_7x7_p: "تعلّم حل مكعب 7×7، أحد أكبر المكعبات.",
+			tag_speedcubing: "سبيدكيوبنج",
+			c_oneHand_title: "3×3 بيد واحدة",
+			c_oneHand_p: "تعلّم الحل بيد واحدة وتقنيات زيادة السرعة.",
+			tag_puzzle: "بازل",
+			c_pyraminx_title: "Pyraminx",
+			c_pyraminx_p: "تعلّم حل الـ Pyraminx المثلث بطرق سهلة.",
+			c_skewb_title: "Skewb",
+			c_skewb_p: "تعلّم آلية Skewb وخوارزميات الحل الأساسية.",
+			c_square1_title: "Square-1",
+			c_square1_p: "ادخل عالم المكعبات متغيرة الشكل مع Square-1.",
+			c_megaminx_title: "Megaminx",
+			c_megaminx_p: "تعلّم البنية متعددة الأوجه ومنطق حل Megaminx.",
+			c_clock_title: "Rubik's Clock",
+			c_clock_p: "تعلّم آلية الساعة وخطوات الحل.",
+			c_fto_title: "FTO",
+			c_fto_p: "تعلّم البنية الثمانية الأوجه لمكعب Face Turning Octahedron ومنطق الحل الأساسي.",
+			bottom_title: "🎬 اختر مكعبك وابدأ المشاهدة!",
+			bottom_p: "طوّر نفسك مع فيديوهات Rubik Academy، من مستوى المبتدئين إلى مستوى السبيدكيوبنج."
+			}
+			};
+
+			var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
+			function applyLanguage(lang) {
+			if (!translations[lang]) lang = "tr";
+
+			var dict = translations[lang];
+
+			document.querySelectorAll("[data-i18n]").forEach(function(el) {
+			var key = el.getAttribute("data-i18n");
+			if (dict[key]) {
+			el.textContent = dict[key];
+			}
+			});
+
+			document.documentElement.setAttribute("lang", lang);
+
+			document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+
+			var label = document.getElementById("langLabel");
+			if (label) {
+			label.textContent = langCodes[lang] || "TR";
+			}
+
+			document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+			item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+			});
+
+			localStorage.setItem("site-lang", lang);
+			}
+
+			function toggleLangMenu(e) {
+			if (e) e.stopPropagation();
+			var menu = document.getElementById("langMenu");
+			var btn = document.getElementById("langSwitchBtn");
+			if (!menu) return;
+			var willOpen = !menu.classList.contains("open");
+			menu.classList.toggle("open", willOpen);
+			if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+			}
+
+			function closeLangMenu() {
+			var menu = document.getElementById("langMenu");
+			var btn = document.getElementById("langSwitchBtn");
+			if (menu) menu.classList.remove("open");
+			if (btn) btn.setAttribute("aria-expanded", "false");
+			}
+
+			function selectLanguage(lang) {
+			applyLanguage(lang);
+			closeLangMenu();
+			}
+
+			document.addEventListener("click", function(e) {
+			var switcher = document.getElementById("langSwitcher");
+			if (switcher && !switcher.contains(e.target)) {
+			closeLangMenu();
+			}
+			});
+
+			document.addEventListener("keydown", function(e) {
+			if (e.key === "Escape") closeLangMenu();
+			});
+
+			document.addEventListener("DOMContentLoaded", function() {
+			var savedLang = localStorage.getItem("site-lang") || "tr";
+			applyLanguage(savedLang);
+			});
+
+			/* =========================================================
+			KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
+			========================================================= */
+
+			function toggleDarkMode() {
+			var isDark = document.documentElement.classList.toggle("dark-mode");
+			document.body.classList.toggle("dark-mode", isDark);
+
+			var btn = document.getElementById("darkModeBtn");
+
+			if (isDark) {
+			localStorage.setItem("theme", "dark");
+			if(btn) btn.innerHTML = "☀️";
+			} else {
+			localStorage.setItem("theme", "light");
+			if(btn) btn.innerHTML = "🌙";
+			}
+			}
+
+			// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
+			document.addEventListener("DOMContentLoaded", function() {
+			var savedTheme = localStorage.getItem("theme");
+			var btn = document.getElementById("darkModeBtn");
+
+			if (savedTheme === "dark") {
+			document.documentElement.classList.add("dark-mode");
+			document.body.classList.add("dark-mode");
+			if(btn) btn.innerHTML = "☀️";
+			} else {
+			if(btn) btn.innerHTML = "🌙";
+			}
+			});
+
+			/* =========================================================
+			KART HAREKETİ (3D Efekt)
+			========================================================= */
+
+			document.querySelectorAll(".card").forEach(function(card) {
+			card.addEventListener("mousemove", function(e) {
+			if(window.innerWidth < 800) return;
+
+        var rect = card.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+
+        var rotateY = ((x / rect.width) - .5) * 2.2;
+        var rotateX = ((y / rect.height) - .5) * -2.2;
+
+        card.style.transform = `
+            translateY(-8px)
+            perspective(1200px)
+            rotateX(${rotateX}deg)
+            rotateY(${rotateY}deg)
+        `;
+    });
+
+    card.addEventListener("mouseleave", function() {
+        card.style.transform = "";
+    });
+});
+
+window.addEventListener("resize", function() {
+    if(window.innerWidth < 800){
+        document.querySelectorAll(".card").forEach(function(card) {
+            card.style.transform = "";
+        });
+    }
+});
+		</script>
+
+	</body>
+</html>
