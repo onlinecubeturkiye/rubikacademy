@@ -29,143 +29,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+<link rel="stylesheet" href="/styles/common.css">
+
 <style>
-
-:root {
-    --background: #f8fafc;
-    --surface: #ffffff;
-    --surface-soft: #f1f5f9;
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-    --primary-light: #eff6ff;
-    --text: #172033;
-    --text-soft: #64748b;
-    --border: #e2e8f0;
-    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
-    --zkt: #7c3aed;
-    --zkt-light: #f5f3ff;
-}
-
-.bg-glow {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    z-index: -999;
-    pointer-events: none;
-}
-
-.bg-glow::before,
-.bg-glow::after {
-    content: "";
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.18;
-    animation: floatGlow 15s infinite alternate ease-in-out;
-}
-
-.bg-glow::before {
-    background: #7c3aed;
-    top: -100px;
-    left: -100px;
-}
-
-.bg-glow::after {
-    background: #2563eb;
-    bottom: -100px;
-    right: -100px;
-    animation-delay: -7s;
-}
-
-@keyframes floatGlow {
-    0% { transform: translate(0px, 0px) scale(1); }
-    100% { transform: translate(150px, 200px) scale(1.25); }
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
 
 html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
 
-body {
-    font-family: "Inter", sans-serif;
-    background: var(--background);
-    color: var(--text);
-    overflow-x: hidden;
-    width: 100%;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-a { text-decoration: none; color: inherit; }
-
-/* NAVBAR */
-
-.navbar {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 7%;
-    background: rgba(248, 250, 252, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    transition: background-color 0.3s, border-color 0.3s;
-}
-
-.nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.nav-logo-mark {
-    width: 38px;
-    height: 38px;
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    grid-template-rows: repeat(3,1fr);
-    gap: 2px;
-    padding: 4px;
-    border-radius: 10px;
-    background: #1e293b;
-    box-shadow: 0 8px 18px rgba(15,23,42,.18);
-}
-
-.nav-logo-mark div {
-    border-radius: 2px;
-    background: #f8fafc;
-}
-
-.nav-logo-mark div:nth-child(2),
-.nav-logo-mark div:nth-child(8) { background: #ef4444; }
-
-.nav-logo-mark div:nth-child(4),
-.nav-logo-mark div:nth-child(6) { background: #22c55e; }
-
-.nav-logo-mark div:nth-child(5) { background: #3b82f6; }
-
-.nav-logo-mark div:nth-child(1),
-.nav-logo-mark div:nth-child(9) { background: #facc15; }
-
-.nav-logo-text {
-    font-size: 17px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--text);
-}
-
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+/* NAV-BACK (sayfaya özel geri dön butonu) */
 
 .nav-back {
     font-size: 13px;
@@ -183,102 +53,6 @@ a { text-decoration: none; color: inherit; }
     background: var(--zkt-light);
     color: var(--zkt);
 }
-
-.dark-mode-btn {
-    border: none;
-    background: var(--surface-soft);
-    color: var(--text);
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: .3s;
-}
-
-.dark-mode-btn:hover { transform: scale(1.08); }
-
-/* DİL SEÇİCİ */
-
-.lang-switcher { position: relative; }
-
-.lang-switch-btn {
-    border: none;
-    background: var(--surface-soft);
-    color: var(--text);
-    height: 42px;
-    padding: 0 16px;
-    border-radius: 21px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: .3px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    transition: .3s;
-}
-
-.lang-switch-btn:hover {
-    transform: scale(1.06);
-    background: var(--zkt-light);
-    color: var(--zkt);
-}
-
-.lang-switch-btn .lang-globe { font-size: 15px; line-height: 1; }
-
-.lang-menu {
-    position: absolute;
-    top: calc(100% + 10px);
-    right: 0;
-    min-width: 168px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 7px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition: .2s ease;
-    z-index: 1100;
-}
-
-.lang-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
-
-.lang-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    text-align: left;
-    padding: 10px 14px;
-    border-radius: 11px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .2s;
-    width: 100%;
-}
-
-.lang-menu-item:hover { background: var(--zkt-light); color: var(--zkt); }
-
-.lang-menu-item.active {
-    background: var(--zkt-light);
-    color: var(--zkt);
-    font-weight: 800;
-}
-
-.lang-menu-item .lang-check { margin-left: auto; font-size: 12px; opacity: 0; }
-.lang-menu-item.active .lang-check { opacity: 1; }
 
 /* HERO */
 
@@ -491,17 +265,6 @@ section.info { padding: 70px 7%; }
 .feature-card h3 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
 .feature-card p { color: var(--text-soft); font-size: 14px; line-height: 1.65; }
 
-footer {
-    padding: 35px;
-    text-align: center;
-    border-top: 1px solid var(--border);
-    color: var(--text-soft);
-    font-size: 13px;
-}
-
-.reveal { opacity: 0; transform: translateY(30px); transition: .7s ease; }
-.reveal.active { opacity: 1; transform: translateY(0); }
-
 @media(max-width:700px) {
     .feature-grid { grid-template-columns: 1fr; }
     .link-card { width: 100%; }
@@ -509,31 +272,13 @@ footer {
 
 @media(max-width:500px) {
     .hero { padding: 70px 5% 50px; }
-    .navbar { padding: 14px 5%; }
-    .nav-logo-text { font-size: 15px; }
     .nav-back { padding: 8px 12px; font-size: 12px; }
-    .nav-right { gap: 6px; }
-    .lang-switch-btn { padding: 0 10px; font-size: 12px; }
 }
 
-/* DARK MODE */
+/* DARK MODE (sayfaya özel bileşenler) */
 
-html.dark-mode, body.dark-mode {
-    --background: #0f172a;
-    --surface: #1e293b;
-    --surface-soft: #334155;
-    --text: #f8fafc;
-    --text-soft: #cbd5e1;
-    --border: #334155;
-    --zkt-light: #2e1065;
-    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
-}
-
-html.dark-mode body, body.dark-mode { background: var(--background); color: var(--text); }
-html.dark-mode .navbar, body.dark-mode .navbar { background: rgba(15, 23, 42, 0.90); }
 html.dark-mode .feature-card, body.dark-mode .feature-card,
-html.dark-mode .link-card, body.dark-mode .link-card,
-html.dark-mode footer, body.dark-mode footer {
+html.dark-mode .link-card, body.dark-mode .link-card {
     background: var(--surface);
     border-color: var(--border);
 }
@@ -541,7 +286,6 @@ html.dark-mode .link-card.primary, body.dark-mode .link-card.primary {
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
     border: none;
 }
-html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.25; }
 
 </style>
 </head>
@@ -552,11 +296,7 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.25;
 
 <header class="navbar">
     <a href="/" class="nav-logo">
-        <div class="nav-logo-mark">
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-        </div>
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
         <span class="nav-logo-text">Rubik Academy</span>
     </a>
 
@@ -697,34 +437,7 @@ html.dark-mode .bg-glow::before, html.dark-mode .bg-glow::after { opacity: 0.25;
 
 <script>
 
-/* KARANLIK MOD */
-
-function toggleDarkMode() {
-    var isDark = document.documentElement.classList.toggle("dark-mode");
-    document.body.classList.toggle("dark-mode", isDark);
-    var btn = document.getElementById("darkModeBtn");
-    if (isDark) {
-        localStorage.setItem("theme", "dark");
-        if(btn) btn.innerHTML = "☀️";
-    } else {
-        localStorage.setItem("theme", "light");
-        if(btn) btn.innerHTML = "🌙";
-    }
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-    var savedTheme = localStorage.getItem("theme");
-    var btn = document.getElementById("darkModeBtn");
-    if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark-mode");
-        document.body.classList.add("dark-mode");
-        if(btn) btn.innerHTML = "☀️";
-    } else {
-        if(btn) btn.innerHTML = "🌙";
-    }
-});
-
-/* DİL SEÇİCİ (TR / EN / RU / DE / AR) */
+/* DİL METİNLERİ (TR / EN / RU / DE / AR) — common.js applyLanguage() tarafından kullanılır */
 
 var translations = {
     tr: {
@@ -834,83 +547,9 @@ var translations = {
     }
 };
 
-var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
-
-function applyLanguage(lang) {
-    if (!translations[lang]) lang = "tr";
-
-    var dict = translations[lang];
-
-    document.querySelectorAll("[data-i18n]").forEach(function(el) {
-        var key = el.getAttribute("data-i18n");
-        if (dict[key]) {
-            el.textContent = dict[key];
-        }
-    });
-
-    document.documentElement.setAttribute("lang", lang);
-    document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
-
-    var label = document.getElementById("langLabel");
-    if (label) {
-        label.textContent = langCodes[lang] || "TR";
-    }
-
-    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
-        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
-    });
-
-    localStorage.setItem("site-lang", lang);
-}
-
-function toggleLangMenu(e) {
-    if (e) e.stopPropagation();
-    var menu = document.getElementById("langMenu");
-    var btn = document.getElementById("langSwitchBtn");
-    if (!menu) return;
-    var willOpen = !menu.classList.contains("open");
-    menu.classList.toggle("open", willOpen);
-    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
-}
-
-function closeLangMenu() {
-    var menu = document.getElementById("langMenu");
-    var btn = document.getElementById("langSwitchBtn");
-    if (menu) menu.classList.remove("open");
-    if (btn) btn.setAttribute("aria-expanded", "false");
-}
-
-function selectLanguage(lang) {
-    applyLanguage(lang);
-    closeLangMenu();
-}
-
-document.addEventListener("click", function(e) {
-    var switcher = document.getElementById("langSwitcher");
-    if (switcher && !switcher.contains(e.target)) {
-        closeLangMenu();
-    }
-});
-
-document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") closeLangMenu();
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-    var savedLang = localStorage.getItem("site-lang") || "tr";
-    applyLanguage(savedLang);
-});
-
-/* SCROLL ANIMATION */
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-        if (entry.isIntersecting) entry.target.classList.add("active");
-    });
-}, { threshold: 0.15 });
-
-document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 </script>
+
+<script src="/js/common.js"></script>
 
 </body>
 </html>
