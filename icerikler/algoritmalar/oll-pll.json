@@ -1,0 +1,665 @@
+{
+  "oll": [
+    {
+      "subset": "Edges oriented",
+      "cases": [
+        {
+          "name": "OLL 21",
+          "alg": "R U R' U R U' R' U R U2 R'",
+          "alts": [
+            "R U2 R' U' R U R' U' R U' R'",
+            "F (R U R' U') (R U R' U') (R U R' U') F'"
+          ],
+          "pattern": "BUBUUUFUFLFRULULRRUBU"
+        },
+        {
+          "name": "OLL 22",
+          "alg": "R U2 R2 U' R2 U' R2 U2 R",
+          "alts": [],
+          "pattern": "FULUUUBULRBUFRBRLUUFU"
+        },
+        {
+          "name": "OLL 23",
+          "alg": "R2 D R' U2 R D' R' U2 R'",
+          "alts": [],
+          "pattern": "UUUUUURUFUFUFRLBBRLLB"
+        },
+        {
+          "name": "OLL 24",
+          "alg": "r U R' U' r' F R F'",
+          "alts": [],
+          "pattern": "FUUUUURUUUFFBRRUBLLLB"
+        },
+        {
+          "name": "OLL 25",
+          "alg": "F' r U R' U' r' F R",
+          "alts": [],
+          "pattern": "FUUUUUUUBFFUBRRRBLULL"
+        },
+        {
+          "name": "OLL 26",
+          "alg": "R U2 R' U' R U' R'",
+          "alts": [],
+          "pattern": "FUUUUURUBUFLLLURRFUBB"
+        },
+        {
+          "name": "OLL 27",
+          "alg": "R U R' U R U2 R'",
+          "alts": [],
+          "pattern": "RUFUUUUULBFUUBBULLFRR"
+        }
+      ]
+    },
+    {
+      "subset": "Corners oriented",
+      "cases": [
+        {
+          "name": "OLL 28",
+          "alg": "R' F R S R' F' R S'",
+          "alts": [
+            "M' U' M U2 M' U' M",
+            "r U R' U' M U R U' R'"
+          ],
+          "pattern": "UUUUULURUFUFRURBBBLFL"
+        },
+        {
+          "name": "OLL 57",
+          "alg": "S R' F R S' R' F' R",
+          "alts": [
+            "R U R' U' M' U R U' r'"
+          ],
+          "pattern": "UUURUFUUUFLFRURBBBLUL"
+        }
+      ]
+    },
+    {
+      "subset": "Dot",
+      "cases": [
+        {
+          "name": "OLL 1",
+          "alg": "R U2 R2 F R F' U2 R' F R F'",
+          "alts": [
+            "R U' R2 D' r U' r' D R2 U R'"
+          ],
+          "pattern": "BLFBUFRRRFUBUUULULUUU"
+        },
+        {
+          "name": "OLL 2",
+          "alg": "(r U r') U2 (R U2 R') U2 (r U' r')",
+          "alts": [
+            "R U' R2 D' r U r' D R2 U R'",
+            "F R U R' U' S R U R' U' f'"
+          ],
+          "pattern": "RLLBUFBRBRULFUUUUUFUU"
+        },
+        {
+          "name": "OLL 3",
+          "alg": "R' F2 R2 U2 R' F R U2 R2 F2 R",
+          "alts": [
+            "f (R U R' U') f' U' F (R U R' U') F'",
+            "r' R2 U R' U r U2 r' U M'"
+          ],
+          "pattern": "ULFFUBRRLFUUUUBRULBUU"
+        },
+        {
+          "name": "OLL 4",
+          "alg": "R' F2 R2 U2 R' F' R U2 R2 F2 R",
+          "alts": [
+            "f R U R' U' f' U F R U R' U' F'",
+            "M U' r U2 r' U' R U' R' M'"
+          ],
+          "pattern": "FRUBUFRLLUUFBUURULUUB"
+        },
+        {
+          "name": "OLL 17",
+          "alg": "F R' F' R U S' R U' R' S",
+          "alts": [
+            "F R' F' R2 r' U R U' R' U' M'",
+            "(R U R' U) (R' F R F') U2 (R' F R F')",
+            "F' r U r' U' S r' F r S'"
+          ],
+          "pattern": "UFFRULBBUUUFUURRULBUL"
+        },
+        {
+          "name": "OLL 18",
+          "alg": "R U2 R2 F R F' U2 M' U R U' r'",
+          "alts": [
+            "r U R' U R U2 r2 U' R U' R' U2 r"
+          ],
+          "pattern": "RLUBUFRRUFULBUFBULUUU"
+        },
+        {
+          "name": "OLL 19",
+          "alg": "S' R U R' S U' R' F R F'",
+          "alts": [
+            "R' U2 F R U R' U' F2 U2 F R",
+            "r U2 R' U' R U' r2 U2 R U R' U r"
+          ],
+          "pattern": "FFURULRBUUUFBURUULLUB"
+        },
+        {
+          "name": "OLL 20",
+          "alg": "S R' U' R U R U R U' R' S'",
+          "alts": [
+            "r U R' U' M2 U R U' R' U' M'"
+          ],
+          "pattern": "ULUFUBURULULFUFRURBUB"
+        }
+      ]
+    },
+    {
+      "subset": "Square",
+      "cases": [
+        {
+          "name": "OLL 5",
+          "alg": "r' U2 R U R' U r",
+          "alts": [],
+          "pattern": "RRFBUUBUURFBULLUULFUU"
+        },
+        {
+          "name": "OLL 6",
+          "alg": "r U2 R' U' R U' r'",
+          "alts": [],
+          "pattern": "FUUFUURRBUULLLURBFUUB"
+        }
+      ]
+    },
+    {
+      "subset": "Line",
+      "cases": [
+        {
+          "name": "OLL 51",
+          "alg": "F (U R U' R') (U R U' R') F'",
+          "alts": [],
+          "pattern": "LFBUUULRFUURUBUUURBLF"
+        },
+        {
+          "name": "OLL 52",
+          "alg": "R' F' U' F U' R U R' U R",
+          "alts": [],
+          "pattern": "RUBLURRUFFFULULBBUUUU"
+        },
+        {
+          "name": "OLL 55",
+          "alg": "R' F U R U' R2 F' R2 U R' U' R",
+          "alts": [
+            "R U2 R2 U' R U' R' U2 F R F'",
+            "R' F R U R U' R2 F' R2 U' R' U R U R'",
+            "F U' R2 D R' U2 R D' R2 U F'"
+          ],
+          "pattern": "FFBUUURRRUUULBFUUULLB"
+        },
+        {
+          "name": "OLL 56",
+          "alg": "r U r' U R U' R' U R U' R' r U' r'",
+          "alts": [
+            "F R U R' U' R F' r U R' U' r'"
+          ],
+          "pattern": "BFBUUUFRFLURUBULURULU"
+        }
+      ]
+    },
+    {
+      "subset": "Fish",
+      "cases": [
+        {
+          "name": "OLL 9",
+          "alg": "(R U R' U') R' F R2 U R' U' F'",
+          "alts": [
+            "R U2 R' U' S' R U' R' S",
+            "F' U' F r U' r' U r U r'"
+          ],
+          "pattern": "FURUUFBBUUULBUFRRUULL"
+        },
+        {
+          "name": "OLL 10",
+          "alg": "R U R' U R' F R F' R U2 R'",
+          "alts": [
+            "F U F' R' F R U' R' F' R"
+          ],
+          "pattern": "BBUUURRUFFFUBULUULRLU"
+        },
+        {
+          "name": "OLL 35",
+          "alg": "R U2 R2 F R F' R U2 R'",
+          "alts": [],
+          "pattern": "URRBUUBUUUFRULBLUFFUL"
+        },
+        {
+          "name": "OLL 37",
+          "alg": "F R U' R' U' R U R' F'",
+          "alts": [
+            "F R' F' R U R U' R'"
+          ],
+          "pattern": "UUFUUFBBUUURUUBFLLRRL"
+        }
+      ]
+    },
+    {
+      "subset": "Lightning",
+      "cases": [
+        {
+          "name": "OLL 7",
+          "alg": "r U R' U R U2 r'",
+          "alts": [],
+          "pattern": "RUFUUFULLBUUUUBUBLFRR"
+        },
+        {
+          "name": "OLL 8",
+          "alg": "r' U' R U' R' U2 r",
+          "alts": [],
+          "pattern": "ULLUUBRUBUFLFUUFUURRB"
+        },
+        {
+          "name": "OLL 11",
+          "alg": "S R U R' U R U2 R' U2 S'",
+          "alts": [
+            "r' R2 U R' U R U2 R' U M'"
+          ],
+          "pattern": "LLBFUUUURFBUURFUURBUL"
+        },
+        {
+          "name": "OLL 12",
+          "alg": "S R' U' R U' R' U2 R U2 S'",
+          "alts": [
+            "r R2' U' R U' R' U2 R U' M",
+            "F (R U R' U') F' U F (R U R' U') F'"
+          ],
+          "pattern": "UURBUULLFUURBRUBFULUF"
+        },
+        {
+          "name": "OLL 39",
+          "alg": "f' r U r' U' r' F r S",
+          "alts": [
+            "L F' L' U' L U F U' L'",
+            "R U R' F' U' F U R U2 R'"
+          ],
+          "pattern": "FRUUUUUBBFUUBFRRULULL"
+        },
+        {
+          "name": "OLL 40",
+          "alg": "R' F R U R' U' F' U R",
+          "alts": [
+            "f R' F' R U R U' R' S'"
+          ],
+          "pattern": "ULBUUUFFULUFLRRRUUBBU"
+        }
+      ]
+    },
+    {
+      "subset": "Knight",
+      "cases": [
+        {
+          "name": "OLL 13",
+          "alg": "F U R U' R2 F' R U R U' R'",
+          "alts": [
+            "F U R U2 R' U' R U R' F'"
+          ],
+          "pattern": "FFBUUUURLRUUUBBUURLLF"
+        },
+        {
+          "name": "OLL 14",
+          "alg": "(R' F R) U (R' F' R) (F U' F')",
+          "alts": [],
+          "pattern": "RFLUUUBRUUUFFBRBUUULL"
+        },
+        {
+          "name": "OLL 15",
+          "alg": "l' U' l L' U' L U l' U l",
+          "alts": [],
+          "pattern": "UFFUUUBLLRUUURBFULRBU"
+        },
+        {
+          "name": "OLL 16",
+          "alg": "r U r' R U R' U' r U' r'",
+          "alts": [],
+          "pattern": "FFUUUURRBUULLBURUFULB"
+        }
+      ]
+    },
+    {
+      "subset": "Awkward",
+      "cases": [
+        {
+          "name": "OLL 29",
+          "alg": "r2 D' r U r' D r2 U' r' U' r",
+          "alts": [],
+          "pattern": "UBUUUFBUFRRRLUUBUFLLU"
+        },
+        {
+          "name": "OLL 30",
+          "alg": "r' D' r U' r' D r2 U' r' U r U r'",
+          "alts": [
+            "F R' F R2 U' R' U' R U R' F2",
+            "F U R U2 R' U' R U2 R' U' F'"
+          ],
+          "pattern": "UUFFUUUBBLUURRRLLUFUB"
+        },
+        {
+          "name": "OLL 41",
+          "alg": "R U R' U R U2 R' F R U R' U' F'",
+          "alts": [
+            "F U R2 D R' U' R D' R2 F'"
+          ],
+          "pattern": "FUFUUFURULURRUBULULBB"
+        },
+        {
+          "name": "OLL 42",
+          "alg": "R' U' R U' R' U2 R F R U R' U' F'",
+          "alts": [],
+          "pattern": "UFUUURBUBULUFURLURFBL"
+        }
+      ]
+    },
+    {
+      "subset": "P shape",
+      "cases": [
+        {
+          "name": "OLL 31",
+          "alg": "R' U' F U R U' R' F' R",
+          "alts": [],
+          "pattern": "BUUBUULFUUUFBRRULLRUF"
+        },
+        {
+          "name": "OLL 32",
+          "alg": "S R U R' U' R' F R f'",
+          "alts": [
+            "L U F' U' L' U L F L'"
+          ],
+          "pattern": "FFUBUURUUULFBRRUULLUB"
+        },
+        {
+          "name": "OLL 43",
+          "alg": "R' U' F' U F R",
+          "alts": [
+            "F' U' L' U L F"
+          ],
+          "pattern": "UUUUULBRBUUUFURLBRFFL"
+        },
+        {
+          "name": "OLL 44",
+          "alg": "F U R U' R' F'",
+          "alts": [],
+          "pattern": "UULUUFUBLRUFUUURRBBLF"
+        }
+      ]
+    },
+    {
+      "subset": "T shape",
+      "cases": [
+        {
+          "name": "OLL 33",
+          "alg": "(R U R' U') (R' F R F')",
+          "alts": [],
+          "pattern": "FFUUUURRUUUFBBRUULLLB"
+        },
+        {
+          "name": "OLL 45",
+          "alg": "F R U R' U' F'",
+          "alts": [],
+          "pattern": "RFUUUURRUFULBBFBULULU"
+        }
+      ]
+    },
+    {
+      "subset": "C shape",
+      "cases": [
+        {
+          "name": "OLL 34",
+          "alg": "f R f' U' r' U' R U M'",
+          "alts": [
+            "R U R2 U' R' F R U R U' F'",
+            "F R U R' U' R' F' r U R U' r'"
+          ],
+          "pattern": "RUURUBBUUUFLRUFULBFUL"
+        },
+        {
+          "name": "OLL 46",
+          "alg": "R' U' R' F R F' U R",
+          "alts": [],
+          "pattern": "UULFULUULRRFUUURBBBUF"
+        }
+      ]
+    },
+    {
+      "subset": "L shape",
+      "cases": [
+        {
+          "name": "OLL 47",
+          "alg": "F' (L' U' L U) (L' U' L U) F",
+          "alts": [],
+          "pattern": "LUBFUULBFUURURUULRBUF"
+        },
+        {
+          "name": "OLL 48",
+          "alg": "F (R U R' U') (R U R' U') F'",
+          "alts": [],
+          "pattern": "BURUUFFBRLUUBUFLRUULU"
+        },
+        {
+          "name": "OLL 49",
+          "alg": "r U' r2 U r2 U r2 U' r",
+          "alts": [],
+          "pattern": "FULBUUBLLRUUFRBRFUUUU"
+        },
+        {
+          "name": "OLL 50",
+          "alg": "r' U r2 U' r2 U' r2 U r'",
+          "alts": [],
+          "pattern": "FLLFUUBULRBUFRBRUUUUU"
+        },
+        {
+          "name": "OLL 53",
+          "alg": "r' U' R U' R' U R U' R' U2 r",
+          "alts": [],
+          "pattern": "BRBBUUFUFLFRULULURUUU"
+        },
+        {
+          "name": "OLL 54",
+          "alg": "r U R' U R U' R' U R U2 r'",
+          "alts": [],
+          "pattern": "BUBFUUFRFLURULULBRUUU"
+        }
+      ]
+    },
+    {
+      "subset": "W shape",
+      "cases": [
+        {
+          "name": "OLL 36",
+          "alg": "R U R' F' R U R' U' R' F R U' R' F R F'",
+          "alts": [
+            "R' F' U' F2 U R U' R' F' R",
+            "R U R2 F' U' F U R2 U2 R'"
+          ],
+          "pattern": "UURFUUFRULUFBLRBBULUU"
+        },
+        {
+          "name": "OLL 38",
+          "alg": "R U R' U R U' R' U' R' F R F'",
+          "alts": [
+            "F R U' R' S U' R U R' f'"
+          ],
+          "pattern": "RUUUUFURLLUFRUUULBFBB"
+        }
+      ]
+    }
+  ],
+  "pll": [
+    {
+      "subset": "Adj corners",
+      "cases": [
+        {
+          "name": "Aa perm",
+          "alg": "x (R' U R') D2 (R U' R') D2 R2 x'",
+          "alts": [],
+          "pattern": "UUUUUUUUUFFBFRLRBRBLL"
+        },
+        {
+          "name": "Ab perm",
+          "alg": "x R2' D2 (R U R') D2 (R U' R) x'",
+          "alts": [],
+          "pattern": "UUUUUUUUUFFRBRBFBLRLL"
+        },
+        {
+          "name": "F perm",
+          "alg": "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R",
+          "alts": [],
+          "pattern": "UUUUUUUUUFBRFRBBFRLLL"
+        },
+        {
+          "name": "Ja perm",
+          "alg": "x R2 F R F' R U2 r' U r U2 x'",
+          "alts": [
+            "L' U' L F L' U' L U L F' L2 U L",
+            "R' U L' U2 R U' R' U2 R L",
+            "R' U2 R U R' U2 L U' R U L'"
+          ],
+          "pattern": "UUUUUUUUUFFRFBBBRRLLL"
+        },
+        {
+          "name": "Jb perm",
+          "alg": "(R U R' F') (R U R' U') R' F R2 U' R' U'",
+          "alts": [],
+          "pattern": "UUUUUUUUUFRRFFBBBRLLL"
+        },
+        {
+          "name": "Ra perm",
+          "alg": "(R U' R' U') R U (R D R') U' (R D' R') U2 R' U'",
+          "alts": [
+            "R U R' F' R U2 R' U2 R' F R U R U2 R'"
+          ],
+          "pattern": "UUUUUUUUUFFRFRBBLRLBL"
+        },
+        {
+          "name": "Rb perm",
+          "alg": "(R' U2 R U2) R' F (R U R' U') R' F' R2",
+          "alts": [],
+          "pattern": "UUUUUUUUULFLRLFFRBRBB"
+        },
+        {
+          "name": "T perm",
+          "alg": "(R U R' U') R' F R2 U' R' U' (R U R' F')",
+          "alts": [],
+          "pattern": "UUUUUUUUUFFRFLBBBRLRL"
+        }
+      ]
+    },
+    {
+      "subset": "Diag corners",
+      "cases": [
+        {
+          "name": "E perm",
+          "alg": "x' (R U' R' D) (R U R' D') (R U R' D) (R U' R' D') x",
+          "alts": [
+            "R' U' R' D' R U' R' D R U R' D' R U R' D R2"
+          ],
+          "pattern": "UUUUUUUUULFRFRBLBRFLB"
+        },
+        {
+          "name": "Na perm",
+          "alg": "(R U R' U) (R U R' F' R U R' U' R' F R2 U' R') (U2 R U' R')",
+          "alts": [
+            "F' R U R' U' R' F R2 F U' R' U' R U F' R'",
+            "R F U' R' U R U F' R2 F' R U R U' R' F",
+            "r' D r U2 r' D r U2 r' D r U2 r' D r U2 r' D r"
+          ],
+          "pattern": "UUUUUUUUUBFFLLRBBFLRR"
+        },
+        {
+          "name": "Nb perm",
+          "alg": "r' D' F r U' r' F' D r2 U r' U' r' F r F'",
+          "alts": [
+            "R' U R U' R' F' U' F R U R' F R' F' R U' R",
+            "R' U L' U2 R U' L R' U L' U2 R U' L"
+          ],
+          "pattern": "UUUUUUUUUFFBRLLFBBRRL"
+        },
+        {
+          "name": "V perm",
+          "alg": "(R' U R' U') (R D' R' D) R' U D' R2 U' R2 D R2",
+          "alts": [
+            "R' U R' U' y R' F' R2 U' R' U R' F R F"
+          ],
+          "pattern": "UUUUUUUUUFFBRBLFRBRLL"
+        },
+        {
+          "name": "Y perm",
+          "alg": "F (R U' R' U') (R U R' F') (R U R' U') (R' F R F')",
+          "alts": [
+            "F R' F R2 U' R' U' R U R' F' R U R' U' F'"
+          ],
+          "pattern": "UUUUUUUUUFFBRRLFLBRBL"
+        }
+      ]
+    },
+    {
+      "subset": "G perm",
+      "cases": [
+        {
+          "name": "Ga perm",
+          "alg": "R2 U R' U R' U' R U' R2 D U' R' U R D'",
+          "alts": [],
+          "pattern": "UUUUUUUUUFRRFLBBFRLBL"
+        },
+        {
+          "name": "Gb perm",
+          "alg": "R' U' R U D' R2 U R' U R U' R U' R2 D",
+          "alts": [],
+          "pattern": "UUUUUUUUUFBRFFBBLRLRL"
+        },
+        {
+          "name": "Gc perm",
+          "alg": "R2 F2 R U2 R U2 R' F R U R' U' R' F R2",
+          "alts": [
+            "R2 U' R U' R U R' U R2 D' U R U' R' D"
+          ],
+          "pattern": "UUUUUUUUUFFRBLBFRLRBL"
+        },
+        {
+          "name": "Gd perm",
+          "alg": "R U R' U' D R2 U' R U' R' U R' U R2 D'",
+          "alts": [],
+          "pattern": "UUUUUUUUUFLRFBBBFRLRL"
+        }
+      ]
+    },
+    {
+      "subset": "Edge perm",
+      "cases": [
+        {
+          "name": "H perm",
+          "alg": "M2 U' M2 U2 M2 U' M2",
+          "alts": [],
+          "pattern": "UUUUUUUUUFBFRLRBFBLRL"
+        },
+        {
+          "name": "Ua perm",
+          "alg": "M2 U M U2 M' U M2",
+          "alts": [
+            "R U' R U R U R U' R' U' R2",
+            "R U R' U R' U' R2 U' R' U R' U R"
+          ],
+          "pattern": "UUUUUUUUUFRFRLRBBBLFL"
+        },
+        {
+          "name": "Ub perm",
+          "alg": "M2 U' M U2 M' U' M2",
+          "alts": [
+            "R2' U R U R' U' R3 U' R' U R'",
+            "R' U R' U' R' U' R' U R U R2"
+          ],
+          "pattern": "UUUUUUUUUFLFRFRBBBLRL"
+        },
+        {
+          "name": "Z perm",
+          "alg": "M2 U' M2 U' M' U2 M2 U2 M' U2",
+          "alts": [
+            "M' U' M2 U' M2 U' M' U2 M2"
+          ],
+          "pattern": "UUUUUUUUUFLFRBRBRBLFL"
+        }
+      ]
+    }
+  ]
+}
