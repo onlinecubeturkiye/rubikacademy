@@ -19,12 +19,12 @@
 <!-- TARAYICI SEKMESİ İÇİN LOGO -->
 <link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
 
-<link rel="canonical" href="https://rubikacademy.fun/algoritmalar/oll">
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/oll">
 <meta name="description" content="Rubik Academy - 57 OLL algoritmasını, her biri kendi diyagramı ve alternatifleriyle öğren.">
 <meta property="og:title" content="Rubik Academy - OLL Algoritmaları">
 <meta property="og:description" content="Son katman yüzeyini oryante etmek için tüm 57 OLL case'i diyagramlarıyla öğren.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://rubikacademy.fun/algoritmalar/oll">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/oll">
 <meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -681,7 +681,7 @@ body.dark-mode .navbar {
 
 <!-- NAVIGATION -->
 <nav class="nav-bar">
-    <a href="/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+    <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
 </nav>
 
 <!-- HERO -->
@@ -713,7 +713,7 @@ Son katman yüzeyini tek hamlede oryante etmek için gereken 57 case, her biri k
 
 </div>
 
-<script src="/algoritmalar/ll.js"></script>
+<script src="/icerikler/algoritmalar/ll.js"></script>
 <script>
 /* =========================================================
    DİL SEÇİCİ (TR / EN / RU / DE / AR)
@@ -976,7 +976,7 @@ function escapeHtml(str) {
         .replace(/>/g, "&gt;");
 }
 
-fetch("/algoritmalar/oll-pll.json")
+fetch("/icerikler/algoritmalar/oll-pll.json")
     .then(function(res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
         return res.json();
