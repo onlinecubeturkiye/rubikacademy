@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- TEMA VE SEO AYARLARI -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - OLL Algoritmaları (57 Case)</title>
+<!-- TARAYICI SEKMESİ İÇİN LOGO -->
+<link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
+
+<link rel="canonical" href="https://rubikacademy.fun/algoritmalar/oll">
+<meta name="description" content="Rubik Academy - 57 OLL algoritmasını, her biri kendi diyagramı ve alternatifleriyle öğren.">
+<meta property="og:title" content="Rubik Academy - OLL Algoritmaları">
+<meta property="og:description" content="Son katman yüzeyini oryante etmek için tüm 57 OLL case'i diyagramlarıyla öğren.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/algoritmalar/oll">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+html {
+    overflow-x: hidden;
+}
+
+/* =========================================
+   RENKLER VE DEĞİŞKENLER
+========================================= */
+:root {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-soft: #f1f5f9;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #e2e8f0;
+    --card-border: #dfebf5;
+    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+    --hero-bg: linear-gradient(120deg, #fff6d9, #ffe28a);
+    --hero-border: #f6e0a3;
+    --btn-bg: #eef8ff;
+    --btn-hover-bg: #dff2ff;
+    --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
+    --bottom-border: #d5eafa;
+    --bottom-text: #18578c;
+    --diagram-bg: #f1f5f9;
+}
+
+/* Karanlık Mod Değişkenleri */
+html.dark-mode,
+body.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --card-border: #334155;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+    --hero-bg: linear-gradient(120deg, #3a3115, #1e293b);
+    --hero-border: #334155;
+    --btn-bg: #334155;
+    --btn-hover-bg: #1e3a8a;
+    --bottom-bg: #1e293b;
+    --bottom-border: #334155;
+    --bottom-text: #60a5fa;
+    --diagram-bg: #0f172a;
+}
+
+/* =========================================
+   GENEL SIFIRLAMA
+========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    background: var(--background);
+    color: var(--text);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* =========================================
+   ÜST BAR (NAVBAR)
+========================================= */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 7%;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .navbar,
+body.dark-mode .navbar {
+    background: rgba(15, 23, 42, 0.90);
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo-mark {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    padding: 4px;
+    border-radius: 10px;
+    background: #1e293b;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+}
+
+.nav-logo-mark div {
+    border-radius: 2px;
+    background: #f8fafc;
+}
+
+.nav-logo-mark div:nth-child(2),
+.nav-logo-mark div:nth-child(8) {
+    background: #ef4444;
+}
+
+.nav-logo-mark div:nth-child(4),
+.nav-logo-mark div:nth-child(6) {
+    background: #22c55e;
+}
+
+.nav-logo-mark div:nth-child(5) {
+    background: #3b82f6;
+}
+
+.nav-logo-mark div:nth-child(1),
+.nav-logo-mark div:nth-child(9) {
+    background: #facc15;
+}
+
+.nav-logo-text {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links a {
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    transition: .25s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* KARANLIK MOD BUTONU */
+.dark-mode-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+}
+
+.dark-mode-btn:hover {
+    transform: scale(1.08);
+}
+
+/* DİL SEÇİCİ */
+.lang-switcher {
+    position: relative;
+}
+
+.lang-switch-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 21px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: .3s;
+}
+
+.lang-switch-btn:hover {
+    transform: scale(1.06);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-switch-btn .lang-globe {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
+}
+
+.lang-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-menu-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.lang-menu-item.active .lang-check {
+    opacity: 1;
+}
+
+@media(max-width: 500px) {
+    .navbar {
+        padding: 14px 5%;
+    }
+    .nav-logo-text {
+        font-size: 15px;
+    }
+    .nav-links a {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    .nav-right {
+        gap: 6px;
+    }
+    .lang-switch-btn {
+        padding: 0 10px;
+        font-size: 12px;
+    }
+}
+
+/* =========================================
+   SAYFA İÇERİK DÜZENİ
+========================================= */
+.page {
+    min-height: calc(100vh - 71px);
+    padding: 45px 5% 80px;
+    background: var(--background);
+    transition: background-color 0.3s;
+}
+
+/* NAV / GERİ DÖN */
+.nav-bar {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: all .25s ease;
+}
+
+.back-btn:hover {
+    transform: translateX(-4px);
+    border-color: #c0e0fc;
+    background: var(--primary-light);
+}
+
+/* HERO */
+.hero {
+    max-width: 1250px;
+    min-height: 220px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 45px 65px;
+    background: var(--hero-bg);
+    border: 1px solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    right: -180px;
+    top: -180px;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 3;
+    max-width: 700px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 15px;
+    border-radius: 50px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary-dark);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    margin-bottom: 18px;
+}
+
+.badge i {
+    width: 7px;
+    height: 7px;
+    background: #168ee0;
+    border-radius: 50%;
+}
+
+.hero h1 {
+    font-size: clamp(36px, 4.5vw, 54px);
+    line-height: 1;
+    letter-spacing: -2.5px;
+    font-weight: 950;
+    margin-bottom: 14px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary-dark); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 560px;
+}
+
+/* CASE GRID SECTIONS */
+.subsets-wrap {
+    max-width: 1250px;
+    margin: 0 auto;
+}
+
+.subset-block {
+    margin-bottom: 48px;
+}
+
+.subset-heading {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding-left: 2px;
+    border-left: 5px solid var(--primary);
+    padding-left: 14px;
+}
+
+.case-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+@media(max-width: 1000px) {
+    .case-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media(max-width: 700px) {
+    .case-grid { grid-template-columns: 1fr; }
+}
+
+.case-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.case-card:hover {
+    transform: translateY(-4px);
+    border-color: #dcbb5c;
+    box-shadow: 0 16px 32px rgba(180, 140, 20, .12);
+}
+
+.case-diagram {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    background: var(--diagram-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+.case-diagram svg {
+    width: 62px;
+    height: 62px;
+}
+
+.case-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.case-name {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+}
+
+.case-alg {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--primary-dark);
+    font-weight: 600;
+    overflow-wrap: break-word;
+}
+
+.case-alts {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.case-alt-line {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-soft);
+    overflow-wrap: break-word;
+}
+
+.load-error {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    text-align: center;
+    font-size: 14px;
+}
+
+.bottom {
+    max-width: 1250px;
+    margin: 38px auto 0;
+    padding: 32px;
+    text-align: center;
+    border-radius: 25px;
+    background: var(--bottom-bg);
+    border: 1px solid var(--bottom-border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.bottom h3 { color: var(--bottom-text); font-size: 21px; margin-bottom: 7px; }
+.bottom p { color: var(--text-soft); font-size: 13px; }
+
+@media(max-width: 1000px) {
+    .hero { padding: 40px; }
+}
+
+@media(max-width: 700px) {
+    .page { padding: 25px 4% 55px; }
+    .hero { min-height: auto; padding: 34px 24px; border-radius: 27px; }
+    .hero h1 { font-size: 38px; }
+    .hero p { font-size: 13px; }
+    .subset-heading { font-size: 19px; }
+}
+</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<!-- =========================================
+     ÜST BAR (NAVBAR)
+========================================= -->
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <div class="nav-logo-mark">
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+        </div>
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Sprache wechseln / Сменить язык / تغيير اللغة">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+                    <span>Deutsch</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+                    <span>العربية</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+            </div>
+
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
+    </div>
+</header>
+
+<div class="page">
+
+<!-- NAVIGATION -->
+<nav class="nav-bar">
+    <a href="/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+<span data-i18n="badge_text">OLL &middot; 57 CASE</span>
+</div>
+<h1><span data-i18n="hero_title1">OLL</span> <span data-i18n="hero_titleAccent">Algoritmaları</span></h1>
+<p data-i18n="hero_p">
+Son katman yüzeyini tek hamlede oryante etmek için gereken 57 case, her biri kendi diyagramı ve alternatifleriyle.
+</p>
+</div>
+</section>
+
+<!-- CASE'LER -->
+<div class="subsets-wrap" id="subsetsWrap"></div>
+
+<div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">
+    Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.
+</div>
+
+<!-- ALT -->
+<section class="bottom">
+<h3 data-i18n="bottom_title">🧩 Tüm case'leri ezberledin mi?</h3>
+<p data-i18n="bottom_p">Şimdi sıra PLL'de. Parçaları doğru yerine taşımayı öğren.</p>
+</section>
+
+</div>
+
+<script src="/algoritmalar/ll.js"></script>
+<script>
+/* =========================================================
+   DİL SEÇİCİ (TR / EN / RU / DE / AR)
+========================================================= */
+
+var translations = {
+    "tr": {
+        "navHome": "Ana Sayfa",
+        "navContent": "İçerikler",
+        "back_btn": "← Geri Dön",
+        "badge_text": "OLL · 57 CASE",
+        "hero_title1": "OLL",
+        "hero_titleAccent": "Algoritmaları",
+        "hero_p": "Son katman yüzeyini tek hamlede oryante etmek için gereken 57 case, her biri kendi diyagramı ve alternatifleriyle.",
+        "load_error": "Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.",
+        "bottom_title": "🧩 Tüm case'leri ezberledin mi?",
+        "bottom_p": "Şimdi sıra PLL'de. Parçaları doğru yerine taşımayı öğren.",
+        "subset_Edges oriented": "Kenarlar Oryante",
+        "subset_Corners oriented": "Köşeler Oryante",
+        "subset_Dot": "Nokta (Dot)",
+        "subset_Square": "Kare (Square)",
+        "subset_Line": "Çizgi (Line)",
+        "subset_Fish": "Balık (Fish)",
+        "subset_Lightning": "Şimşek (Lightning)",
+        "subset_Knight": "At (Knight)",
+        "subset_Awkward": "Awkward",
+        "subset_P shape": "P Şekli",
+        "subset_T shape": "T Şekli",
+        "subset_C shape": "C Şekli",
+        "subset_L shape": "L Şekli",
+        "subset_W shape": "W Şekli",
+        "subset_Adj corners": "Komşu Köşeler (Adj)",
+        "subset_Diag corners": "Çapraz Köşeler (Diag)",
+        "subset_G perm": "G Permütasyonu",
+        "subset_Edge perm": "Kenar Permütasyonu"
+    },
+    "en": {
+        "navHome": "Home",
+        "navContent": "Content",
+        "back_btn": "← Go Back",
+        "badge_text": "OLL · 57 CASES",
+        "hero_title1": "OLL",
+        "hero_titleAccent": "Algorithms",
+        "hero_p": "57 cases for orienting the last layer in a single set of moves, each with its own diagram and alternatives.",
+        "load_error": "Couldn't load the algorithm data. Please try again later.",
+        "bottom_title": "🧩 Got every case memorized?",
+        "bottom_p": "PLL is next. Learn to move the pieces into their correct spots.",
+        "subset_Edges oriented": "Edges Oriented",
+        "subset_Corners oriented": "Corners Oriented",
+        "subset_Dot": "Dot",
+        "subset_Square": "Square",
+        "subset_Line": "Line",
+        "subset_Fish": "Fish",
+        "subset_Lightning": "Lightning",
+        "subset_Knight": "Knight",
+        "subset_Awkward": "Awkward",
+        "subset_P shape": "P Shape",
+        "subset_T shape": "T Shape",
+        "subset_C shape": "C Shape",
+        "subset_L shape": "L Shape",
+        "subset_W shape": "W Shape",
+        "subset_Adj corners": "Adjacent Corners",
+        "subset_Diag corners": "Diagonal Corners",
+        "subset_G perm": "G Perm",
+        "subset_Edge perm": "Edge Perm"
+    },
+    "ru": {
+        "navHome": "Главная",
+        "navContent": "Контент",
+        "back_btn": "← Назад",
+        "badge_text": "OLL · 57 КЕЙСОВ",
+        "hero_title1": "OLL",
+        "hero_titleAccent": "Алгоритмы",
+        "hero_p": "57 кейсов для ориентации последнего слоя за один подход, каждый со своей диаграммой и альтернативами.",
+        "load_error": "Не удалось загрузить данные алгоритмов. Попробуй позже.",
+        "bottom_title": "🧩 Выучил все кейсы?",
+        "bottom_p": "Дальше PLL. Научись расставлять элементы по местам.",
+        "subset_Edges oriented": "Рёбра ориентированы",
+        "subset_Corners oriented": "Углы ориентированы",
+        "subset_Dot": "Точка (Dot)",
+        "subset_Square": "Квадрат (Square)",
+        "subset_Line": "Линия (Line)",
+        "subset_Fish": "Рыба (Fish)",
+        "subset_Lightning": "Молния (Lightning)",
+        "subset_Knight": "Конь (Knight)",
+        "subset_Awkward": "Awkward",
+        "subset_P shape": "Форма P",
+        "subset_T shape": "Форма T",
+        "subset_C shape": "Форма C",
+        "subset_L shape": "Форма L",
+        "subset_W shape": "Форма W",
+        "subset_Adj corners": "Соседние углы (Adj)",
+        "subset_Diag corners": "Диагональные углы (Diag)",
+        "subset_G perm": "G перестановка",
+        "subset_Edge perm": "Перестановка рёбер"
+    },
+    "de": {
+        "navHome": "Startseite",
+        "navContent": "Inhalte",
+        "back_btn": "← Zurück",
+        "badge_text": "OLL · 57 FÄLLE",
+        "hero_title1": "OLL",
+        "hero_titleAccent": "Algorithmen",
+        "hero_p": "57 Fälle, um die letzte Ebene in einem Zug zu orientieren, jeweils mit eigenem Diagramm und Alternativen.",
+        "load_error": "Algorithmusdaten konnten nicht geladen werden. Bitte versuche es später erneut.",
+        "bottom_title": "🧩 Schon alle Fälle auswendig?",
+        "bottom_p": "Als Nächstes kommt PLL. Lerne, die Teile an ihren richtigen Platz zu bringen.",
+        "subset_Edges oriented": "Kanten orientiert",
+        "subset_Corners oriented": "Ecken orientiert",
+        "subset_Dot": "Punkt (Dot)",
+        "subset_Square": "Quadrat (Square)",
+        "subset_Line": "Linie (Line)",
+        "subset_Fish": "Fisch (Fish)",
+        "subset_Lightning": "Blitz (Lightning)",
+        "subset_Knight": "Springer (Knight)",
+        "subset_Awkward": "Awkward",
+        "subset_P shape": "P-Form",
+        "subset_T shape": "T-Form",
+        "subset_C shape": "C-Form",
+        "subset_L shape": "L-Form",
+        "subset_W shape": "W-Form",
+        "subset_Adj corners": "Benachbarte Ecken (Adj)",
+        "subset_Diag corners": "Diagonale Ecken (Diag)",
+        "subset_G perm": "G-Permutation",
+        "subset_Edge perm": "Kanten-Permutation"
+    },
+    "ar": {
+        "navHome": "الرئيسية",
+        "navContent": "المحتوى",
+        "back_btn": "← رجوع",
+        "badge_text": "OLL · 57 حالة",
+        "hero_title1": "OLL",
+        "hero_titleAccent": "خوارزميات",
+        "hero_p": "57 حالة لتوجيه الطبقة الأخيرة بحركة واحدة، كل حالة برسمها التوضيحي وبدائلها.",
+        "load_error": "تعذّر تحميل بيانات الخوارزميات. حاول مرة أخرى لاحقًا.",
+        "bottom_title": "🧩 هل حفظت كل الحالات؟",
+        "bottom_p": "التالي هو PLL. تعلّم نقل القطع إلى مكانها الصحيح.",
+        "subset_Edges oriented": "توجيه الأطراف",
+        "subset_Corners oriented": "توجيه الزوايا",
+        "subset_Dot": "نقطة (Dot)",
+        "subset_Square": "مربع (Square)",
+        "subset_Line": "خط (Line)",
+        "subset_Fish": "سمكة (Fish)",
+        "subset_Lightning": "برق (Lightning)",
+        "subset_Knight": "الفارس (Knight)",
+        "subset_Awkward": "Awkward",
+        "subset_P shape": "شكل P",
+        "subset_T shape": "شكل T",
+        "subset_C shape": "شكل C",
+        "subset_L shape": "شكل L",
+        "subset_W shape": "شكل W",
+        "subset_Adj corners": "زوايا متجاورة (Adj)",
+        "subset_Diag corners": "زوايا قطرية (Diag)",
+        "subset_G perm": "تبديل G",
+        "subset_Edge perm": "تبديل الأطراف"
+    }
+};
+
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+
+function applyLanguage(lang) {
+    if (!translations[lang]) lang = "tr";
+    var dict = translations[lang];
+
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+
+    var label = document.getElementById("langLabel");
+    if (label) {
+        label.textContent = langCodes[lang] || "TR";
+    }
+
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) {
+        closeLangMenu();
+    }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
+
+/* =========================================================
+   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
+========================================================= */
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+
+    var btn = document.getElementById("darkModeBtn");
+
+    if (isDark) {
+        localStorage.setItem("theme", "dark");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        localStorage.setItem("theme", "light");
+        if(btn) btn.innerHTML = "🌙";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        if(btn) btn.innerHTML = "🌙";
+    }
+});
+
+/* =========================================================
+   OLL VERİSİNİ YÜKLE VE SAYFAYI OLUŞTUR
+========================================================= */
+
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+fetch("/algoritmalar/oll-pll.json")
+    .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .then(function(data) {
+        var groups = data.oll;
+        var wrap = document.getElementById("subsetsWrap");
+        var html = "";
+
+        for (var i = 0; i < groups.length; i++) {
+            var group = groups[i];
+            var i18nKey = "subset_" + group.subset;
+
+            html += '<div class="subset-block">';
+            html += '  <h2 class="subset-heading" data-i18n="' + i18nKey + '">' + escapeHtml(group.subset) + '</h2>';
+            html += '  <div class="case-grid">';
+
+            for (var j = 0; j < group.cases.length; j++) {
+                var c = group.cases[j];
+                var diagram = llSvg(c.pattern, "oll", 72);
+
+                html += '<div class="case-card">';
+                html += '  <div class="case-diagram" dir="ltr">' + diagram + '</div>';
+                html += '  <div class="case-body">';
+                html += '    <div class="case-name">' + escapeHtml(c.name) + '</div>';
+                html += '    <div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>';
+
+                if (c.alts && c.alts.length > 0) {
+                    html += '    <div class="case-alts" dir="ltr">';
+                    for (var k = 0; k < c.alts.length; k++) {
+                        html += '      <div class="case-alt-line">' + escapeHtml(c.alts[k]) + '</div>';
+                    }
+                    html += '    </div>';
+                }
+
+                html += '  </div>';
+                html += '</div>';
+            }
+
+            html += '  </div>';
+            html += '</div>';
+        }
+
+        wrap.innerHTML = html;
+
+        // Kartlar DOM'a eklendikten sonra dili tekrar uygula (başlıklar çevrilsin)
+        var savedLang = localStorage.getItem("site-lang") || "tr";
+        applyLanguage(savedLang);
+    })
+    .catch(function(err) {
+        var errBox = document.getElementById("loadError");
+        if (errBox) errBox.style.display = "block";
+        console.error("oll-pll.json yüklenemedi:", err);
+    });
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
+});
+</script>
+
+</body>
+</html>
