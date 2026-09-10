@@ -137,38 +137,9 @@ body.dark-mode .navbar {
 .nav-logo-mark {
     width: 38px;
     height: 38px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 2px;
-    padding: 4px;
     border-radius: 10px;
-    background: #1e293b;
+    object-fit: cover;
     box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
-}
-
-.nav-logo-mark div {
-    border-radius: 2px;
-    background: #f8fafc;
-}
-
-.nav-logo-mark div:nth-child(2),
-.nav-logo-mark div:nth-child(8) {
-    background: #ef4444;
-}
-
-.nav-logo-mark div:nth-child(4),
-.nav-logo-mark div:nth-child(6) {
-    background: #22c55e;
-}
-
-.nav-logo-mark div:nth-child(5) {
-    background: #3b82f6;
-}
-
-.nav-logo-mark div:nth-child(1),
-.nav-logo-mark div:nth-child(9) {
-    background: #facc15;
 }
 
 .nav-logo-text {
@@ -485,6 +456,36 @@ body.dark-mode .navbar {
     margin-top: 7px;
 }
 
+/* =========================================
+   ALT-BAŞLIK (3x3, Diğerleri vb.)
+========================================= */
+.category-block {
+    max-width: 1250px;
+    margin: 0 auto 55px;
+}
+
+.category-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 22px;
+    padding-left: 14px;
+    border-left: 5px solid var(--primary);
+}
+
+.category-heading h3 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+
+.category-heading span {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-soft);
+}
+
 .methods {
     max-width: 900px;
     margin: auto;
@@ -616,6 +617,74 @@ body.dark-mode .navbar {
 
 .arrow { font-size: 18px; }
 
+/* =========================================
+   YAKINDA (SOON) KARTLARI
+========================================= */
+.soon-grid {
+    max-width: 1250px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.soon-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px dashed var(--card-border);
+    border-radius: 20px;
+    padding: 18px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0.7;
+    cursor: default;
+    transition: opacity .25s ease, border-color .25s ease;
+}
+
+.soon-card:hover {
+    opacity: 0.95;
+    border-color: #c7d7ea;
+}
+
+.soon-card-icon {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: var(--surface-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--text-soft);
+}
+
+.soon-card-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.soon-card-text h4 {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.2px;
+    margin-bottom: 3px;
+}
+
+.soon-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .8px;
+    color: var(--text-soft);
+    background: var(--surface-soft);
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
 .bottom {
     max-width: 1250px;
     margin: 38px auto 0;
@@ -644,6 +713,7 @@ body.dark-mode .navbar {
 
 @media(max-width: 1000px) {
     .hero { padding: 45px; }
+    .soon-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media(max-width: 700px) {
@@ -654,6 +724,11 @@ body.dark-mode .navbar {
     .methods { grid-template-columns: 1fr; gap: 20px; }
     .card-visual { height: 260px; }
     .section-title h2 { font-size: 27px; }
+    .soon-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media(max-width: 420px) {
+    .soon-grid { grid-template-columns: 1fr; }
 }
 </style>
 <!-- Google tag (gtag.js) -->
@@ -674,11 +749,7 @@ body.dark-mode .navbar {
 ========================================= -->
 <header class="navbar">
     <a href="http://rubikacademy.fun" class="nav-logo">
-        <div class="nav-logo-mark">
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-        </div>
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
         <span class="nav-logo-text">Rubik Academy</span>
     </a>
 
@@ -760,9 +831,81 @@ Son katman algoritmalarını, her biri kendi diyagramıyla adım adım öğren: 
 <p data-i18n="section_p">Kategorini seç ve tüm case'lere diyagramlarıyla göz at.</p>
 </section>
 
-<!-- KARTLAR -->
-<section class="methods" id="cardsSection">
-</section>
+<!-- 3x3 KATEGORİSİ -->
+<div class="category-block">
+    <div class="category-heading">
+        <h3 data-i18n="cat_3x3_title">3x3</h3>
+        <span data-i18n="cat_3x3_sub">Son katman algoritmaları</span>
+    </div>
+    <section class="methods" id="cardsSection">
+    </section>
+</div>
+
+<!-- DİĞERLERİ YAKINDA -->
+<div class="category-block">
+    <div class="category-heading">
+        <h3 data-i18n="cat_soon_title">Diğerleri</h3>
+        <span data-i18n="cat_soon_sub">Yakında eklenecek</span>
+    </div>
+    <div class="soon-grid" id="soonGrid">
+        <div class="soon-card">
+            <div class="soon-card-icon">2×2</div>
+            <div class="soon-card-text">
+                <h4 data-i18n="soon_2x2">2×2 Algoritmaları</h4>
+                <span class="soon-tag" data-i18n="soon_tag">YAKINDA</span>
+            </div>
+        </div>
+        <div class="soon-card">
+            <div class="soon-card-icon">4×4</div>
+            <div class="soon-card-text">
+                <h4 data-i18n="soon_4x4">4×4 Algoritmaları</h4>
+                <span class="soon-tag" data-i18n="soon_tag">YAKINDA</span>
+            </div>
+        </div>
+        <div class="soon-card">
+            <div class="soon-card-icon">5×5</div>
+            <div class="soon-card-text">
+                <h4 data-i18n="soon_5x5">5×5 Algoritmaları</h4>
+                <span class="soon-tag" data-i18n="soon_tag">YAKINDA</span>
+            </div>
+        </div>
+        <div class="soon-card">
+            <div class="soon-card-icon">▲</div>
+            <div class="soon-card-text">
+                <h4 data-i18n="soon_pyra">Pyraminx</h4>
+                <span class="soon-tag" data-i18n="soon_tag">YAKINDA</span>
+            </div>
+        </div>
+        <div class="soon-card">
+            <div class="soon-card-icon">◆</div>
+            <div class="soon-card-text">
+                <h4 data-i18n="soon_skewb">Skewb</h4>
+                <span class="soon-tag" data-i18n="soon_tag">YAKINDA</span>
+            </div>
+        </div>
+        <div class="soon-card">
+            <div class="soon-card-icon">■</div>
+            <div class="soon-card-text">
+                <h4 data-i18n="soon_sq1">Square-1</h4>
+                <span class="soon-tag" data-i18n="soon_tag">YAKINDA</span>
+            </div>
+        </div>
+        <div class="soon-card">
+            <div class="soon-card-icon">⬠</div>
+            <div class="soon-card-text">
+                <h4 data-i18n="soon_mega">Megaminx</h4>
+                <span class="soon-tag" data-i18n="soon_tag">YAKINDA</span>
+            </div>
+        </div>
+        <div class="soon-card">
+            <div class="soon-card-icon">⏱</div>
+            <div class="soon-card-text">
+                <h4 data-i18n="soon_clock">Rubik's Clock</h4>
+                <span class="soon-tag" data-i18n="soon_tag">YAKINDA</span>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">
     Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.
@@ -794,6 +937,19 @@ var translations = {
         "section_small": "ALGORİTMA KÜTÜPHANESİ",
         "section_h2": "OLL & PLL Algoritmaları",
         "section_p": "Kategorini seç ve tüm case'lere diyagramlarıyla göz at.",
+        "cat_3x3_title": "3x3",
+        "cat_3x3_sub": "Son katman algoritmaları",
+        "cat_soon_title": "Diğerleri",
+        "cat_soon_sub": "Yakında eklenecek",
+        "soon_tag": "YAKINDA",
+        "soon_2x2": "2×2 Algoritmaları",
+        "soon_4x4": "4×4 Algoritmaları",
+        "soon_5x5": "5×5 Algoritmaları",
+        "soon_pyra": "Pyraminx",
+        "soon_skewb": "Skewb",
+        "soon_sq1": "Square-1",
+        "soon_mega": "Megaminx",
+        "soon_clock": "Rubik's Clock",
         "oll_level": "OLL",
         "oll_title": "OLL Algoritmaları",
         "oll_p": "Son katman yüzeyini tek hamlede oryante etmek için gereken tüm case'ler.",
@@ -817,6 +973,19 @@ var translations = {
         "section_small": "ALGORITHM LIBRARY",
         "section_h2": "OLL & PLL Algorithms",
         "section_p": "Pick a category and browse every case with its diagram.",
+        "cat_3x3_title": "3x3",
+        "cat_3x3_sub": "Last-layer algorithms",
+        "cat_soon_title": "Others",
+        "cat_soon_sub": "Coming soon",
+        "soon_tag": "SOON",
+        "soon_2x2": "2×2 Algorithms",
+        "soon_4x4": "4×4 Algorithms",
+        "soon_5x5": "5×5 Algorithms",
+        "soon_pyra": "Pyraminx",
+        "soon_skewb": "Skewb",
+        "soon_sq1": "Square-1",
+        "soon_mega": "Megaminx",
+        "soon_clock": "Rubik's Clock",
         "oll_level": "OLL",
         "oll_title": "OLL Algorithms",
         "oll_p": "Every case you need to orient the last layer in a single set of moves.",
@@ -840,6 +1009,19 @@ var translations = {
         "section_small": "БИБЛИОТЕКА АЛГОРИТМОВ",
         "section_h2": "Алгоритмы OLL и PLL",
         "section_p": "Выбери категорию и просмотри все кейсы с диаграммами.",
+        "cat_3x3_title": "3x3",
+        "cat_3x3_sub": "Алгоритмы последнего слоя",
+        "cat_soon_title": "Другие",
+        "cat_soon_sub": "Скоро появится",
+        "soon_tag": "СКОРО",
+        "soon_2x2": "Алгоритмы 2×2",
+        "soon_4x4": "Алгоритмы 4×4",
+        "soon_5x5": "Алгоритмы 5×5",
+        "soon_pyra": "Пирамидка",
+        "soon_skewb": "Skewb",
+        "soon_sq1": "Square-1",
+        "soon_mega": "Мегаминкс",
+        "soon_clock": "Rubik's Clock",
         "oll_level": "OLL",
         "oll_title": "Алгоритмы OLL",
         "oll_p": "Все кейсы, необходимые для ориентации последнего слоя за один подход.",
@@ -863,6 +1045,19 @@ var translations = {
         "section_small": "ALGORITHMEN-BIBLIOTHEK",
         "section_h2": "OLL- & PLL-Algorithmen",
         "section_p": "Wähle eine Kategorie und durchsuche alle Fälle mit Diagramm.",
+        "cat_3x3_title": "3x3",
+        "cat_3x3_sub": "Last-Layer-Algorithmen",
+        "cat_soon_title": "Andere",
+        "cat_soon_sub": "Demnächst",
+        "soon_tag": "BALD",
+        "soon_2x2": "2×2-Algorithmen",
+        "soon_4x4": "4×4-Algorithmen",
+        "soon_5x5": "5×5-Algorithmen",
+        "soon_pyra": "Pyraminx",
+        "soon_skewb": "Skewb",
+        "soon_sq1": "Square-1",
+        "soon_mega": "Megaminx",
+        "soon_clock": "Rubik's Clock",
         "oll_level": "OLL",
         "oll_title": "OLL-Algorithmen",
         "oll_p": "Alle Fälle, die du brauchst, um die letzte Ebene in einem Zug zu orientieren.",
@@ -886,6 +1081,19 @@ var translations = {
         "section_small": "مكتبة الخوارزميات",
         "section_h2": "خوارزميات OLL و PLL",
         "section_p": "اختر فئة وتصفّح كل الحالات برسومها التوضيحية.",
+        "cat_3x3_title": "3x3",
+        "cat_3x3_sub": "خوارزميات الطبقة الأخيرة",
+        "cat_soon_title": "أخرى",
+        "cat_soon_sub": "قريبًا",
+        "soon_tag": "قريبًا",
+        "soon_2x2": "خوارزميات 2×2",
+        "soon_4x4": "خوارزميات 4×4",
+        "soon_5x5": "خوارزميات 5×5",
+        "soon_pyra": "Pyraminx",
+        "soon_skewb": "Skewb",
+        "soon_sq1": "Square-1",
+        "soon_mega": "Megaminx",
+        "soon_clock": "Rubik's Clock",
         "oll_level": "OLL",
         "oll_title": "خوارزميات OLL",
         "oll_p": "كل الحالات اللازمة لتوجيه الطبقة الأخيرة بحركة واحدة.",
