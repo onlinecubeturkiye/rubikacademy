@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- TEMA VE SEO AYARLARI -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - OLL ve PLL Algoritmaları</title>
+<!-- TARAYICI SEKMESİ İÇİN LOGO -->
+<link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
+
+<link rel="canonical" href="https://rubikacademy.fun/algoritmalar">
+<meta name="description" content="Rubik Academy - 57 OLL ve 21 PLL algoritmasını, her biri kendi diyagramıyla adım adım öğren.">
+<meta property="og:title" content="Rubik Academy - OLL ve PLL Algoritmaları">
+<meta property="og:description" content="Son katman algoritmalarını diyagramlarıyla öğren: 57 OLL ve 21 PLL case.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/algoritmalar">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+html {
+    overflow-x: hidden;
+}
+
+/* =========================================
+   RENKLER VE DEĞİŞKENLER
+========================================= */
+:root {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-soft: #f1f5f9;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #e2e8f0;
+    --card-border: #dfebf5;
+    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+    --hero-bg: linear-gradient(120deg, #e8f7ff, #c8eaff);
+    --hero-border: #cce8fa;
+    --btn-bg: #eef8ff;
+    --btn-hover-bg: #dff2ff;
+    --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
+    --bottom-border: #d5eafa;
+    --bottom-text: #18578c;
+}
+
+/* Karanlık Mod Değişkenleri */
+html.dark-mode,
+body.dark-mode {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --text: #f8fafc;
+    --text-soft: #cbd5e1;
+    --border: #334155;
+    --card-border: #334155;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
+    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+    --hero-bg: linear-gradient(120deg, #1e293b, #0f172a);
+    --hero-border: #334155;
+    --btn-bg: #334155;
+    --btn-hover-bg: #1e3a8a;
+    --bottom-bg: #1e293b;
+    --bottom-border: #334155;
+    --bottom-text: #60a5fa;
+}
+
+/* =========================================
+   GENEL SIFIRLAMA
+========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    background: var(--background);
+    color: var(--text);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* =========================================
+   ÜST BAR (NAVBAR)
+========================================= */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 7%;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .navbar,
+body.dark-mode .navbar {
+    background: rgba(15, 23, 42, 0.90);
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo-mark {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    padding: 4px;
+    border-radius: 10px;
+    background: #1e293b;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+}
+
+.nav-logo-mark div {
+    border-radius: 2px;
+    background: #f8fafc;
+}
+
+.nav-logo-mark div:nth-child(2),
+.nav-logo-mark div:nth-child(8) {
+    background: #ef4444;
+}
+
+.nav-logo-mark div:nth-child(4),
+.nav-logo-mark div:nth-child(6) {
+    background: #22c55e;
+}
+
+.nav-logo-mark div:nth-child(5) {
+    background: #3b82f6;
+}
+
+.nav-logo-mark div:nth-child(1),
+.nav-logo-mark div:nth-child(9) {
+    background: #facc15;
+}
+
+.nav-logo-text {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links a {
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    transition: .25s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* KARANLIK MOD BUTONU */
+.dark-mode-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+}
+
+.dark-mode-btn:hover {
+    transform: scale(1.08);
+}
+
+/* DİL SEÇİCİ */
+.lang-switcher {
+    position: relative;
+}
+
+.lang-switch-btn {
+    border: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 21px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: .3s;
+}
+
+.lang-switch-btn:hover {
+    transform: scale(1.06);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-switch-btn .lang-globe {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 168px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: .2s ease;
+    z-index: 1100;
+}
+
+.lang-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    width: 100%;
+}
+
+.lang-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.lang-menu-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.lang-menu-item .lang-check {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.lang-menu-item.active .lang-check {
+    opacity: 1;
+}
+
+@media(max-width: 500px) {
+    .navbar {
+        padding: 14px 5%;
+    }
+    .nav-logo-text {
+        font-size: 15px;
+    }
+    .nav-links a {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    .nav-right {
+        gap: 6px;
+    }
+    .lang-switch-btn {
+        padding: 0 10px;
+        font-size: 12px;
+    }
+}
+
+/* =========================================
+   SAYFA İÇERİK DÜZENİ
+========================================= */
+.page {
+    min-height: calc(100vh - 71px);
+    padding: 45px 5% 80px;
+    background: var(--background);
+    transition: background-color 0.3s;
+}
+
+/* NAV / GERİ DÖN */
+.nav-bar {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: all .25s ease;
+}
+
+.back-btn:hover {
+    transform: translateX(-4px);
+    border-color: #c0e0fc;
+    background: var(--primary-light);
+}
+
+/* HERO */
+.hero {
+    max-width: 1250px;
+    min-height: 320px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 55px 65px;
+    background: var(--hero-bg);
+    border: 1px solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
+    text-align: center;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    left: -180px;
+    top: -180px;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 3;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 15px;
+    border-radius: 50px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    margin-bottom: 18px;
+}
+
+.badge i {
+    width: 7px;
+    height: 7px;
+    background: #168ee0;
+    border-radius: 50%;
+}
+
+.hero h1 {
+    font-size: clamp(42px, 5vw, 64px);
+    line-height: .98;
+    letter-spacing: -3px;
+    font-weight: 950;
+    margin-bottom: 18px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 15px;
+    line-height: 1.75;
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+.section-title {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+    text-align: center;
+}
+
+.section-title small {
+    display: block;
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.7px;
+    margin-bottom: 8px;
+}
+
+.section-title h2 {
+    font-size: 30px;
+    letter-spacing: -1px;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.section-title p {
+    color: var(--text-soft);
+    font-size: 13px;
+    margin-top: 7px;
+}
+
+.methods {
+    max-width: 900px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 27px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease, background-color 0.3s;
+    display: block;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    border-color: #c7e5fa;
+    box-shadow: 0 25px 50px rgba(35, 108, 162, .14);
+}
+
+.card-visual {
+    height: 240px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.card-visual::before {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    border: 40px solid rgba(255, 255, 255, .25);
+    top: -140px;
+    right: -90px;
+}
+
+.oll-visual { background: linear-gradient(135deg, #fff6d9, #ffe28a); }
+.pll-visual { background: linear-gradient(135deg, #e2f5ff, #91d8ff); }
+
+.level {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    padding: 8px 11px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(10px);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #26374b;
+}
+
+.count-badge {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    z-index: 5;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(10px);
+    font-size: 12px;
+    font-weight: 900;
+    color: #26374b;
+}
+
+.card-visual .diagram-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 20px 18px rgba(16, 35, 53, .18));
+}
+
+.card-visual .diagram-wrap svg {
+    width: 150px;
+    height: 150px;
+}
+
+.card:hover .diagram-wrap {
+    transform: scale(1.06) translateY(-5px);
+}
+
+.card-info { padding: 25px 25px 27px; }
+
+.card-info h3 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -.5px;
+    margin-bottom: 9px;
+    color: var(--text);
+}
+
+.card-info p {
+    color: var(--text-soft);
+    font-size: 13px;
+    line-height: 1.65;
+    min-height: 64px;
+    margin-bottom: 20px;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 13px 15px;
+    border-radius: 13px;
+    background: var(--btn-bg);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 900;
+    transition: background .25s ease, padding .25s ease, color .25s ease;
+}
+
+.card:hover .button {
+    background: var(--btn-hover-bg);
+    padding-left: 19px;
+}
+
+.arrow { font-size: 18px; }
+
+.bottom {
+    max-width: 1250px;
+    margin: 38px auto 0;
+    padding: 32px;
+    text-align: center;
+    border-radius: 25px;
+    background: var(--bottom-bg);
+    border: 1px solid var(--bottom-border);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.bottom h3 { color: var(--bottom-text); font-size: 21px; margin-bottom: 7px; }
+.bottom p { color: var(--text-soft); font-size: 13px; }
+
+.load-error {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    text-align: center;
+    font-size: 14px;
+}
+
+@media(max-width: 1000px) {
+    .hero { padding: 45px; }
+}
+
+@media(max-width: 700px) {
+    .page { padding: 25px 4% 55px; }
+    .hero { min-height: auto; padding: 38px 25px; border-radius: 27px; }
+    .hero h1 { font-size: 43px; }
+    .hero p { font-size: 14px; }
+    .methods { grid-template-columns: 1fr; gap: 20px; }
+    .card-visual { height: 260px; }
+    .section-title h2 { font-size: 27px; }
+}
+</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<!-- =========================================
+     ÜST BAR (NAVBAR)
+========================================= -->
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <div class="nav-logo-mark">
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+            <div></div><div></div><div></div>
+        </div>
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Sprache wechseln / Сменить язык / تغيير اللغة">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+                    <span>Deutsch</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+                    <span>العربية</span>
+                    <span class="lang-check">✓</span>
+                </button>
+
+            </div>
+
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
+    </div>
+</header>
+
+<div class="page">
+
+<!-- NAVIGATION -->
+<nav class="nav-bar">
+    <a href="http://rubikacademy.fun/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+<span data-i18n="badge_text">ALGORİTMALAR</span>
+</div>
+<h1><span data-i18n="hero_title1">Algoritmaları</span> <span data-i18n="hero_titleAccent">Öğren</span></h1>
+<p data-i18n="hero_p">
+Son katman algoritmalarını, her biri kendi diyagramıyla adım adım öğren: 57 OLL ve 21 PLL case.
+</p>
+</div>
+</section>
+
+<!-- BAŞLIK -->
+<section class="section-title">
+<small data-i18n="section_small">ALGORİTMA KÜTÜPHANESİ</small>
+<h2 data-i18n="section_h2">OLL &amp; PLL Algoritmaları</h2>
+<p data-i18n="section_p">Kategorini seç ve tüm case'lere diyagramlarıyla göz at.</p>
+</section>
+
+<!-- KARTLAR -->
+<section class="methods" id="cardsSection">
+</section>
+
+<div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">
+    Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.
+</div>
+
+<!-- ALT -->
+<section class="bottom">
+<h3 data-i18n="bottom_title">🧩 Hangi kategoriden başlıyorsun?</h3>
+<p data-i18n="bottom_p">Rubik Academy ile son katman algoritmalarını adım adım öğren.</p>
+</section>
+
+</div>
+
+<script src="/algoritmalar/ll.js"></script>
+<script>
+/* =========================================================
+   DİL SEÇİCİ (TR / EN / RU / DE / AR)
+========================================================= */
+
+var translations = {
+    "tr": {
+        "navHome": "Ana Sayfa",
+        "navContent": "İçerikler",
+        "back_btn": "← Geri Dön",
+        "badge_text": "ALGORİTMALAR",
+        "hero_title1": "Algoritmaları",
+        "hero_titleAccent": "Öğren",
+        "hero_p": "Son katman algoritmalarını, her biri kendi diyagramıyla adım adım öğren: 57 OLL ve 21 PLL case.",
+        "section_small": "ALGORİTMA KÜTÜPHANESİ",
+        "section_h2": "OLL & PLL Algoritmaları",
+        "section_p": "Kategorini seç ve tüm case'lere diyagramlarıyla göz at.",
+        "oll_level": "OLL",
+        "oll_title": "OLL Algoritmaları",
+        "oll_p": "Son katman yüzeyini tek hamlede oryante etmek için gereken tüm case'ler.",
+        "pll_level": "PLL",
+        "pll_title": "PLL Algoritmaları",
+        "pll_p": "Son katman parçalarını doğru yerine permute etmek için gereken tüm case'ler.",
+        "cta_start": "Case'lere Git",
+        "case_word": "case",
+        "load_error": "Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.",
+        "bottom_title": "🧩 Hangi kategoriden başlıyorsun?",
+        "bottom_p": "Rubik Academy ile son katman algoritmalarını adım adım öğren."
+    },
+    "en": {
+        "navHome": "Home",
+        "navContent": "Content",
+        "back_btn": "← Go Back",
+        "badge_text": "ALGORITHMS",
+        "hero_title1": "Learn the",
+        "hero_titleAccent": "Algorithms",
+        "hero_p": "Learn the last-layer algorithms step by step, each with its own diagram: 57 OLL and 21 PLL cases.",
+        "section_small": "ALGORITHM LIBRARY",
+        "section_h2": "OLL & PLL Algorithms",
+        "section_p": "Pick a category and browse every case with its diagram.",
+        "oll_level": "OLL",
+        "oll_title": "OLL Algorithms",
+        "oll_p": "Every case you need to orient the last layer in a single set of moves.",
+        "pll_level": "PLL",
+        "pll_title": "PLL Algorithms",
+        "pll_p": "Every case you need to permute the last-layer pieces into place.",
+        "cta_start": "View Cases",
+        "case_word": "cases",
+        "load_error": "Couldn't load the algorithm data. Please try again later.",
+        "bottom_title": "🧩 Which category are you starting with?",
+        "bottom_p": "Learn the last-layer algorithms step by step with Rubik Academy."
+    },
+    "ru": {
+        "navHome": "Главная",
+        "navContent": "Контент",
+        "back_btn": "← Назад",
+        "badge_text": "АЛГОРИТМЫ",
+        "hero_title1": "Изучи",
+        "hero_titleAccent": "алгоритмы",
+        "hero_p": "Изучи алгоритмы последнего слоя шаг за шагом, каждый со своей диаграммой: 57 OLL и 21 PLL кейс.",
+        "section_small": "БИБЛИОТЕКА АЛГОРИТМОВ",
+        "section_h2": "Алгоритмы OLL и PLL",
+        "section_p": "Выбери категорию и просмотри все кейсы с диаграммами.",
+        "oll_level": "OLL",
+        "oll_title": "Алгоритмы OLL",
+        "oll_p": "Все кейсы, необходимые для ориентации последнего слоя за один подход.",
+        "pll_level": "PLL",
+        "pll_title": "Алгоритмы PLL",
+        "pll_p": "Все кейсы, необходимые для перестановки элементов последнего слоя.",
+        "cta_start": "Смотреть кейсы",
+        "case_word": "кейсов",
+        "load_error": "Не удалось загрузить данные алгоритмов. Попробуй позже.",
+        "bottom_title": "🧩 С какой категории начнёшь?",
+        "bottom_p": "Изучай алгоритмы последнего слоя шаг за шагом вместе с Rubik Academy."
+    },
+    "de": {
+        "navHome": "Startseite",
+        "navContent": "Inhalte",
+        "back_btn": "← Zurück",
+        "badge_text": "ALGORITHMEN",
+        "hero_title1": "Lerne die",
+        "hero_titleAccent": "Algorithmen",
+        "hero_p": "Lerne die Last-Layer-Algorithmen Schritt für Schritt, jeder mit eigenem Diagramm: 57 OLL- und 21 PLL-Fälle.",
+        "section_small": "ALGORITHMEN-BIBLIOTHEK",
+        "section_h2": "OLL- & PLL-Algorithmen",
+        "section_p": "Wähle eine Kategorie und durchsuche alle Fälle mit Diagramm.",
+        "oll_level": "OLL",
+        "oll_title": "OLL-Algorithmen",
+        "oll_p": "Alle Fälle, die du brauchst, um die letzte Ebene in einem Zug zu orientieren.",
+        "pll_level": "PLL",
+        "pll_title": "PLL-Algorithmen",
+        "pll_p": "Alle Fälle, die du brauchst, um die Teile der letzten Ebene richtig zu positionieren.",
+        "cta_start": "Fälle ansehen",
+        "case_word": "Fälle",
+        "load_error": "Algorithmusdaten konnten nicht geladen werden. Bitte versuche es später erneut.",
+        "bottom_title": "🧩 Mit welcher Kategorie fängst du an?",
+        "bottom_p": "Lerne die Last-Layer-Algorithmen Schritt für Schritt mit Rubik Academy."
+    },
+    "ar": {
+        "navHome": "الرئيسية",
+        "navContent": "المحتوى",
+        "back_btn": "← رجوع",
+        "badge_text": "الخوارزميات",
+        "hero_title1": "تعلّم",
+        "hero_titleAccent": "الخوارزميات",
+        "hero_p": "تعلّم خوارزميات الطبقة الأخيرة خطوة بخطوة، كل حالة برسمها التوضيحي: 57 حالة OLL و21 حالة PLL.",
+        "section_small": "مكتبة الخوارزميات",
+        "section_h2": "خوارزميات OLL و PLL",
+        "section_p": "اختر فئة وتصفّح كل الحالات برسومها التوضيحية.",
+        "oll_level": "OLL",
+        "oll_title": "خوارزميات OLL",
+        "oll_p": "كل الحالات اللازمة لتوجيه الطبقة الأخيرة بحركة واحدة.",
+        "pll_level": "PLL",
+        "pll_title": "خوارزميات PLL",
+        "pll_p": "كل الحالات اللازمة لتبديل قطع الطبقة الأخيرة إلى مكانها الصحيح.",
+        "cta_start": "عرض الحالات",
+        "case_word": "حالة",
+        "load_error": "تعذّر تحميل بيانات الخوارزميات. حاول مرة أخرى لاحقًا.",
+        "bottom_title": "🧩 من أي فئة تبدأ؟",
+        "bottom_p": "تعلّم خوارزميات الطبقة الأخيرة خطوة بخطوة مع Rubik Academy."
+    }
+};
+
+var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
+var caseCounts = null; // { oll: n, pll: n }
+
+function applyLanguage(lang) {
+    if (!translations[lang]) lang = "tr";
+    var dict = translations[lang];
+
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        var key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+
+    var label = document.getElementById("langLabel");
+    if (label) {
+        label.textContent = langCodes[lang] || "TR";
+    }
+
+    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
+        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
+    });
+
+    localStorage.setItem("site-lang", lang);
+
+    if (caseCounts) {
+        updateCountBadges(dict);
+    }
+}
+
+function updateCountBadges(dict) {
+    var ollBadge = document.getElementById("ollCountBadge");
+    var pllBadge = document.getElementById("pllCountBadge");
+    if (ollBadge) ollBadge.textContent = caseCounts.oll + " " + dict.case_word;
+    if (pllBadge) pllBadge.textContent = caseCounts.pll + " " + dict.case_word;
+}
+
+function toggleLangMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+
+function closeLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var btn = document.getElementById("langSwitchBtn");
+    if (menu) menu.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function selectLanguage(lang) {
+    applyLanguage(lang);
+    closeLangMenu();
+}
+
+document.addEventListener("click", function(e) {
+    var switcher = document.getElementById("langSwitcher");
+    if (switcher && !switcher.contains(e.target)) {
+        closeLangMenu();
+    }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLangMenu();
+});
+
+/* =========================================================
+   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
+========================================================= */
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
+    document.body.classList.toggle("dark-mode", isDark);
+
+    var btn = document.getElementById("darkModeBtn");
+
+    if (isDark) {
+        localStorage.setItem("theme", "dark");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        localStorage.setItem("theme", "light");
+        if(btn) btn.innerHTML = "🌙";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedTheme = localStorage.getItem("theme");
+    var btn = document.getElementById("darkModeBtn");
+
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
+        if(btn) btn.innerHTML = "☀️";
+    } else {
+        if(btn) btn.innerHTML = "🌙";
+    }
+});
+
+/* =========================================================
+   OLL / PLL VERİSİNİ YÜKLE VE KARTLARI OLUŞTUR
+========================================================= */
+
+function findCaseByName(groups, name) {
+    for (var i = 0; i < groups.length; i++) {
+        var cases = groups[i].cases;
+        for (var j = 0; j < cases.length; j++) {
+            if (cases[j].name === name) return cases[j];
+        }
+    }
+    return null;
+}
+
+function countCases(groups) {
+    var total = 0;
+    for (var i = 0; i < groups.length; i++) total += groups[i].cases.length;
+    return total;
+}
+
+fetch("/algoritmalar/oll-pll.json")
+    .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .then(function(data) {
+        var ollCount = countCases(data.oll);
+        var pllCount = countCases(data.pll);
+        caseCounts = { oll: ollCount, pll: pllCount };
+
+        var ollCase = findCaseByName(data.oll, "OLL 27");
+        var pllCase = findCaseByName(data.pll, "T perm");
+
+        var ollDiagram = ollCase ? llSvg(ollCase.pattern, "oll", 150) : "";
+        var pllDiagram = pllCase ? llSvg(pllCase.pattern, "pll", 150) : "";
+
+        var lang = localStorage.getItem("site-lang") || "tr";
+        var dict = translations[lang] || translations.tr;
+
+        var html = "";
+
+        html += '<a href="/algoritmalar/oll" class="card">';
+        html += '  <div class="card-visual oll-visual">';
+        html += '    <div class="level" data-i18n="oll_level">' + dict.oll_level + '</div>';
+        html += '    <div class="count-badge" id="ollCountBadge">' + ollCount + ' ' + dict.case_word + '</div>';
+        html += '    <div class="diagram-wrap">' + ollDiagram + '</div>';
+        html += '  </div>';
+        html += '  <div class="card-info">';
+        html += '    <h3 data-i18n="oll_title">' + dict.oll_title + '</h3>';
+        html += '    <p data-i18n="oll_p">' + dict.oll_p + '</p>';
+        html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
+        html += '  </div>';
+        html += '</a>';
+
+        html += '<a href="/algoritmalar/pll" class="card">';
+        html += '  <div class="card-visual pll-visual">';
+        html += '    <div class="level" data-i18n="pll_level">' + dict.pll_level + '</div>';
+        html += '    <div class="count-badge" id="pllCountBadge">' + pllCount + ' ' + dict.case_word + '</div>';
+        html += '    <div class="diagram-wrap">' + pllDiagram + '</div>';
+        html += '  </div>';
+        html += '  <div class="card-info">';
+        html += '    <h3 data-i18n="pll_title">' + dict.pll_title + '</h3>';
+        html += '    <p data-i18n="pll_p">' + dict.pll_p + '</p>';
+        html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
+        html += '  </div>';
+        html += '</a>';
+
+        document.getElementById("cardsSection").innerHTML = html;
+
+        // Kartlar DOM'a eklendikten sonra dili tekrar uygula
+        applyLanguage(lang);
+    })
+    .catch(function(err) {
+        var errBox = document.getElementById("loadError");
+        if (errBox) errBox.style.display = "block";
+        console.error("oll-pll.json yüklenemedi:", err);
+    });
+
+document.addEventListener("DOMContentLoaded", function() {
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    applyLanguage(savedLang);
+});
+</script>
+
+</body>
+</html>
