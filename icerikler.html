@@ -35,342 +35,16 @@
 															rel="stylesheet"
 >
 
+	<link rel="stylesheet" href="/styles/common.css">
+
 																<style>
-
-																	/* =========================================================
-																	GENEL & RENK DEĞİŞKENLERİ
-																	========================================================= */
-
-																	:root {
-																	--background: #f8fbff;
-																	--surface: #ffffff;
-																	--surface-soft: #f1f5f9;
-																	--text: #172033;
-																	--text-soft: #728197;
-																	--border: #e2e8f0;
-																	--card-border: #e0eaf4;
-																	--shadow: 0 10px 30px rgba(39,84,125,.07);
-																	--bottom-bg: linear-gradient(135deg, #edf8ff, #e8f4ff);
-																	--bottom-border: #d4eaff;
-																	--bottom-text: #18558a;
-																	--badge-bg: #edf7ff;
-																	--badge-border: #cfe8ff;
-																	--primary-light: #eff6ff;
-																	--primary: #2563eb;
-																	}
-
-																	html.dark-mode, body.dark-mode {
-																	--background: #0f172a;
-																	--surface: #1e293b;
-																	--surface-soft: #334155;
-																	--text: #f8fafc;
-																	--text-soft: #cbd5e1;
-																	--border: #334155;
-																	--card-border: #334155;
-																	--shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
-																	--bottom-bg: #1e293b;
-																	--bottom-border: #334155;
-																	--bottom-text: #60a5fa;
-																	--badge-bg: #1e3a8a;
-																	--badge-border: #1d4ed8;
-																	--primary-light: #1e3a8a;
-																	--primary: #3b82f6;
-																	}
-
-																	.bg-glow {
-																	position: fixed;
-																	top: 0;
-																	left: 0;
-																	width: 100vw;
-																	height: 100vh;
-																	overflow: hidden;
-																	z-index: -999;
-																	pointer-events: none;
-																	}
-
-																	.bg-glow::before, .bg-glow::after {
-																	content: "";
-																	position: absolute;
-																	width: 500px;
-																	height: 500px;
-																	border-radius: 50%;
-																	filter: blur(120px);
-																	opacity: 0.18;
-																	animation: floatGlow 15s infinite alternate ease-in-out;
-																	}
-
-																	.bg-glow::before {
-																	background: #2563eb;
-																	top: -100px;
-																	left: -100px;
-																	}
-
-																	.bg-glow::after {
-																	background: #6366f1;
-																	bottom: -100px;
-																	right: -100px;
-																	animation-delay: -7s;
-																	}
-
-																	@keyframes floatGlow {
-																	0% { transform: translate(0px, 0px) scale(1); }
-																	100% { transform: translate(150px, 200px) scale(1.25); }
-																	}
-
-																	html.dark-mode .bg-glow::before,
-																	html.dark-mode .bg-glow::after {
-																	opacity: 0.25;
-																	}
 
 																	html {
 																    overflow-x: hidden;
 																	}
 
-																	* {
-																    box-sizing: border-box;
-																    margin: 0;
-																    padding: 0;
-																    }
-
 																	html{
 																	scroll-behavior:smooth;
-																	}
-
-																	body{
-																	font-family:
-																	Inter,
-																	Arial,
-																	Helvetica,
-																	sans-serif;
-
-																	background: var(--background);
-																	color: var(--text);
-																	transition: background-color 0.3s ease, color 0.3s ease;
-																	overflow-x: hidden;
-																	}
-
-																	a{
-																	text-decoration:none;
-																	color:inherit;
-																	}
-
-																	/* =========================================================
-																	ÜST BAR (NAVBAR)
-																	========================================================= */
-
-																	.navbar {
-																	position: sticky;
-																	top: 0;
-																	z-index: 1000;
-																	display: flex;
-																	align-items: center;
-																	justify-content: space-between;
-																	padding: 16px 7%;
-																	background: rgba(248, 250, 252, 0.85);
-																	backdrop-filter: blur(12px);
-																	-webkit-backdrop-filter: blur(12px);
-																	border-bottom: 1px solid var(--border);
-																	transition: background-color 0.3s, border-color 0.3s;
-																	}
-
-																	html.dark-mode .navbar,
-																	body.dark-mode .navbar {
-																	background: rgba(15, 23, 42, 0.90);
-																	}
-
-																	.nav-logo {
-																	display: flex;
-																	align-items: center;
-																	gap: 12px;
-																	}
-
-																	.nav-logo-mark {
-																	width: 38px;
-																	height: 38px;
-																	}
-
-																	.nav-logo-mark img {
-																	width: 100%;
-																	height: 100%;
-																	object-fit: contain;
-																	display: block;
-																	}
-
-																	.nav-logo-text {
-																	font-size: 17px;
-																	font-weight: 800;
-																	letter-spacing: -0.5px;
-																	color: var(--text);
-																	}
-
-																	.nav-right {
-																	display: flex;
-																	align-items: center;
-																	gap: 10px;
-																	}
-
-																	.nav-links {
-																	display: flex;
-																	align-items: center;
-																	gap: 8px;
-																	}
-
-																	.nav-links a {
-																	padding: 9px 16px;
-																	border-radius: 10px;
-																	font-size: 14px;
-																	font-weight: 600;
-																	color: var(--text-soft);
-																	transition: .25s;
-																	}
-
-																	.nav-links a:hover {
-																	background: var(--primary-light);
-																	color: var(--primary);
-																	}
-
-																	.nav-links a.active {
-																	background: var(--primary-light);
-																	color: var(--primary);
-																	}
-
-																	.dark-mode-btn {
-																	border: none;
-																	background: var(--surface-soft);
-																	color: var(--text);
-																	width: 42px;
-																	height: 42px;
-																	border-radius: 50%;
-																	font-size: 20px;
-																	cursor: pointer;
-																	display: flex;
-																	align-items: center;
-																	justify-content: center;
-																	transition: .3s;
-																	}
-
-																	.dark-mode-btn:hover {
-																	transform: scale(1.08);
-																	}
-
-																	.lang-switcher {
-																	position: relative;
-																	}
-
-																	.lang-switch-btn {
-																	border: none;
-																	background: var(--surface-soft);
-																	color: var(--text);
-																	height: 42px;
-																	padding: 0 16px;
-																	border-radius: 21px;
-																	font-size: 13px;
-																	font-weight: 700;
-																	letter-spacing: .3px;
-																	cursor: pointer;
-																	display: flex;
-																	align-items: center;
-																	gap: 7px;
-																	transition: .3s;
-																	}
-
-																	.lang-switch-btn:hover {
-																	transform: scale(1.06);
-																	background: var(--primary-light);
-																	color: var(--primary);
-																	}
-
-																	.lang-switch-btn .lang-globe {
-																	font-size: 15px;
-																	line-height: 1;
-																	}
-
-																	.lang-menu {
-																	position: absolute;
-																	top: calc(100% + 10px);
-																	right: 0;
-																	min-width: 168px;
-																	background: var(--surface);
-																	border: 1px solid var(--border);
-																	border-radius: 16px;
-																	box-shadow: var(--shadow);
-																	padding: 7px;
-																	display: flex;
-																	flex-direction: column;
-																	gap: 3px;
-																	opacity: 0;
-																	visibility: hidden;
-																	transform: translateY(-8px);
-																	transition: .2s ease;
-																	z-index: 1100;
-																	}
-
-																	.lang-menu.open {
-																	opacity: 1;
-																	visibility: visible;
-																	transform: translateY(0);
-																	}
-
-																	.lang-menu-item {
-																	display: flex;
-																	align-items: center;
-																	gap: 10px;
-																	border: none;
-																	background: transparent;
-																	color: var(--text);
-																	text-align: left;
-																	padding: 10px 14px;
-																	border-radius: 11px;
-																	font-size: 14px;
-																	font-weight: 600;
-																	cursor: pointer;
-																	transition: .2s;
-																	width: 100%;
-																	}
-
-																	.lang-menu-item:hover {
-																	background: var(--primary-light);
-																	color: var(--primary);
-																	}
-
-																	.lang-menu-item.active {
-																	background: var(--primary-light);
-																	color: var(--primary);
-																	font-weight: 800;
-																	}
-
-																	.lang-menu-item .lang-check {
-																	margin-left: auto;
-																	font-size: 12px;
-																	opacity: 0;
-																	}
-
-																	.lang-menu-item.active .lang-check {
-																	opacity: 1;
-																	}
-
-																	@media(max-width:500px) {
-																	.navbar {
-																	padding: 14px 5%;
-																	}
-
-																	.nav-logo-text {
-																	font-size: 15px;
-																	}
-
-																	.nav-links a {
-																	padding: 8px 12px;
-																	font-size: 13px;
-																	}
-
-																	.nav-right {
-																	gap: 6px;
-																	}
-
-																	.lang-switch-btn {
-																	padding: 0 10px;
-																	font-size: 12px;
-																	}
 																	}
 
 																	.page{
@@ -378,38 +52,6 @@
 																	min-height:100vh;
 																	padding: 30px 5% 90px;
 																	background: transparent;
-																	}
-
-																	/* =========================================================
-																	KIRINTI (BREADCRUMB)
-																	========================================================= */
-
-																	.crumb{
-																	max-width:1150px;
-																	margin:0 auto 22px;
-																	display:flex;
-																	align-items:center;
-																	gap:8px;
-																	font-size:13px;
-																	font-weight:700;
-																	color: var(--text-soft);
-																	}
-
-																	.crumb a{
-																	color: var(--text-soft);
-																	transition: color .2s;
-																	}
-
-																	.crumb a:hover{
-																	color: var(--primary);
-																	}
-
-																	.crumb span.sep{
-																	opacity:.5;
-																	}
-
-																	.crumb span.current{
-																	color: var(--primary);
 																	}
 
 																	/* =========================================================
@@ -651,15 +293,10 @@
 		<header class="navbar">
 
 			<a href="http://rubikacademy.fun" class="nav-logo">
-
-				<div class="nav-logo-mark">
-					<img src="/RubikAcademyLogo.png" alt="Rubik Academy">
-				</div>
-
+				<img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
 				<span class="nav-logo-text">
 					Rubik Academy
 				</span>
-
 			</a>
 
 			<div class="nav-right">
@@ -723,16 +360,6 @@
 		</header>
 
 		<div class="page">
-
-			<!-- ======================================================
-     KIRINTI
-====================================================== -->
-
-			<nav class="crumb">
-				<a href="http://rubikacademy.fun" data-i18n="crumbHome">Ana Sayfa</a>
-				<span class="sep">/</span>
-				<span class="current" data-i18n="crumbContent">İçerikler</span>
-			</nav>
 
 			<!-- ======================================================
      BAŞLIK
@@ -820,15 +447,13 @@
 
 		<script>
 			/* =========================================================
-			DİL SEÇİCİ (TR / EN / RU / DE / AR)
+			DİL METİNLERİ (TR / EN / RU / DE / AR) — common.js applyLanguage() tarafından kullanılır
 			========================================================= */
 
 			var translations = {
 			tr: {
 			navHome: "Ana Sayfa",
 			navContent: "İçerikler",
-			crumbHome: "Ana Sayfa",
-			crumbContent: "İçerikler",
 			ic_title: "Eğitim İçerikleri",
 			ic_intro: "Küp çözmeyi öğrenmek için ihtiyacın olan her şey burada: adım adım video anlatımlar, ezberlemen gereken algoritmalar ve gelişimini takip edeceğin zamanlayıcı aracı.",
 			tag_video: "VİDEO ANLATIM",
@@ -844,8 +469,6 @@
 			en: {
 			navHome: "Home",
 			navContent: "Content",
-			crumbHome: "Home",
-			crumbContent: "Content",
 			ic_title: "Learning Content",
 			ic_intro: "Everything you need to learn to solve cubes: step-by-step video tutorials, the algorithms you'll need to memorize, and a timer to track your progress.",
 			tag_video: "VIDEO TUTORIALS",
@@ -861,8 +484,6 @@
 			ru: {
 			navHome: "Главная",
 			navContent: "Контент",
-			crumbHome: "Главная",
-			crumbContent: "Контент",
 			ic_title: "Учебные материалы",
 			ic_intro: "Всё, что нужно для обучения сборке кубиков: пошаговые видеоуроки, алгоритмы для запоминания и таймер для отслеживания прогресса.",
 			tag_video: "ВИДЕОУРОКИ",
@@ -878,8 +499,6 @@
 			de: {
 			navHome: "Startseite",
 			navContent: "Inhalte",
-			crumbHome: "Startseite",
-			crumbContent: "Inhalte",
 			ic_title: "Lerninhalte",
 			ic_intro: "Alles, was du zum Würfellösen brauchst: Schritt-für-Schritt-Videoanleitungen, die Algorithmen, die du auswendig lernen musst, und ein Timer, um deinen Fortschritt zu verfolgen.",
 			tag_video: "VIDEOANLEITUNGEN",
@@ -895,8 +514,6 @@
 			ar: {
 			navHome: "الرئيسية",
 			navContent: "المحتوى",
-			crumbHome: "الرئيسية",
-			crumbContent: "المحتوى",
 			ic_title: "المحتوى التعليمي",
 			ic_intro: "كل ما تحتاجه لتعلّم حل المكعبات: دروس فيديو خطوة بخطوة، الخوارزميات التي يجب حفظها، وأداة توقيت لتتبع تقدّمك.",
 			tag_video: "دروس فيديو",
@@ -911,108 +528,8 @@
 			}
 			};
 
-			var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
-
-			function applyLanguage(lang) {
-			if (!translations[lang]) lang = "tr";
-
-			var dict = translations[lang];
-
-			document.querySelectorAll("[data-i18n]").forEach(function(el) {
-			var key = el.getAttribute("data-i18n");
-			if (dict[key]) {
-			el.textContent = dict[key];
-			}
-			});
-
-			document.documentElement.setAttribute("lang", lang);
-
-			document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
-
-			var label = document.getElementById("langLabel");
-			if (label) {
-			label.textContent = langCodes[lang] || "TR";
-			}
-
-			document.querySelectorAll(".lang-menu-item").forEach(function(item) {
-			item.classList.toggle("active", item.getAttribute("data-lang") === lang);
-			});
-
-			localStorage.setItem("site-lang", lang);
-			}
-
-			function toggleLangMenu(e) {
-			if (e) e.stopPropagation();
-			var menu = document.getElementById("langMenu");
-			var btn = document.getElementById("langSwitchBtn");
-			if (!menu) return;
-			var willOpen = !menu.classList.contains("open");
-			menu.classList.toggle("open", willOpen);
-			if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
-			}
-
-			function closeLangMenu() {
-			var menu = document.getElementById("langMenu");
-			var btn = document.getElementById("langSwitchBtn");
-			if (menu) menu.classList.remove("open");
-			if (btn) btn.setAttribute("aria-expanded", "false");
-			}
-
-			function selectLanguage(lang) {
-			applyLanguage(lang);
-			closeLangMenu();
-			}
-
-			document.addEventListener("click", function(e) {
-			var switcher = document.getElementById("langSwitcher");
-			if (switcher && !switcher.contains(e.target)) {
-			closeLangMenu();
-			}
-			});
-
-			document.addEventListener("keydown", function(e) {
-			if (e.key === "Escape") closeLangMenu();
-			});
-
-			document.addEventListener("DOMContentLoaded", function() {
-			var savedLang = localStorage.getItem("site-lang") || "tr";
-			applyLanguage(savedLang);
-			});
-
 			/* =========================================================
-			KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
-			========================================================= */
-
-			function toggleDarkMode() {
-			var isDark = document.documentElement.classList.toggle("dark-mode");
-			document.body.classList.toggle("dark-mode", isDark);
-
-			var btn = document.getElementById("darkModeBtn");
-
-			if (isDark) {
-			localStorage.setItem("theme", "dark");
-			if(btn) btn.innerHTML = "☀️";
-			} else {
-			localStorage.setItem("theme", "light");
-			if(btn) btn.innerHTML = "🌙";
-			}
-			}
-
-			document.addEventListener("DOMContentLoaded", function() {
-			var savedTheme = localStorage.getItem("theme");
-			var btn = document.getElementById("darkModeBtn");
-
-			if (savedTheme === "dark") {
-			document.documentElement.classList.add("dark-mode");
-			document.body.classList.add("dark-mode");
-			if(btn) btn.innerHTML = "☀️";
-			} else {
-			if(btn) btn.innerHTML = "🌙";
-			}
-			});
-
-			/* =========================================================
-			KART HAREKETİ (3D Efekt)
+			KART HAREKETİ (3D Efekt) — sayfaya özel
 			========================================================= */
 
 			document.querySelectorAll(".item").forEach(function(card) {
@@ -1047,6 +564,8 @@ window.addEventListener("resize", function() {
     }
 });
 		</script>
+
+		<script src="/js/common.js"></script>
 
 	</body>
 </html>
