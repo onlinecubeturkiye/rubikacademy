@@ -53,8 +53,8 @@ html {
     --border: #e2e8f0;
     --card-border: #dfebf5;
     --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
-    --hero-bg: linear-gradient(120deg, #fff6d9, #ffe28a);
-    --hero-border: #f6e0a3;
+    --hero-bg: linear-gradient(120deg, #eef1ff, #dbe3ff);
+    --hero-border: #cdd8fb;
     --btn-bg: #eef8ff;
     --btn-hover-bg: #dff2ff;
     --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
@@ -76,7 +76,7 @@ body.dark-mode {
     --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
     --primary-light: #1e3a8a;
     --primary: #3b82f6;
-    --hero-bg: linear-gradient(120deg, #3a3115, #1e293b);
+    --hero-bg: linear-gradient(120deg, #1e2247, #1e293b);
     --hero-border: #334155;
     --btn-bg: #334155;
     --btn-hover-bg: #1e3a8a;
@@ -140,38 +140,9 @@ body.dark-mode .navbar {
 .nav-logo-mark {
     width: 38px;
     height: 38px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 2px;
-    padding: 4px;
     border-radius: 10px;
-    background: #1e293b;
+    object-fit: cover;
     box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
-}
-
-.nav-logo-mark div {
-    border-radius: 2px;
-    background: #f8fafc;
-}
-
-.nav-logo-mark div:nth-child(2),
-.nav-logo-mark div:nth-child(8) {
-    background: #ef4444;
-}
-
-.nav-logo-mark div:nth-child(4),
-.nav-logo-mark div:nth-child(6) {
-    background: #22c55e;
-}
-
-.nav-logo-mark div:nth-child(5) {
-    background: #3b82f6;
-}
-
-.nav-logo-mark div:nth-child(1),
-.nav-logo-mark div:nth-child(9) {
-    background: #facc15;
 }
 
 .nav-logo-text {
@@ -619,11 +590,7 @@ body.dark-mode .navbar {
 ========================================= -->
 <header class="navbar">
     <a href="http://rubikacademy.fun" class="nav-logo">
-        <div class="nav-logo-mark">
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-        </div>
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
         <span class="nav-logo-text">Rubik Academy</span>
     </a>
 
