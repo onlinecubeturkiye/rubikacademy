@@ -4,18 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- TEMA VE SEO AYARLARI -->
-<script>
-  (function() {
-    var savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark-mode");
-    }
-  })();
-</script>
-
 <title>Rubik Academy</title>
-<!-- TARAYICI SEKMESİ İÇİN LOGO (FAVICON) -->
 <link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
 
 <link rel="canonical" href="https://rubikacademy.fun/">
@@ -29,818 +18,229 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<link
-href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-rel="stylesheet"
->
+<!-- ORTAK STİLLER (tüm sitede aynı) -->
+<link rel="stylesheet" href="/styles/common.css">
 
+<!-- BU SAYFAYA ÖZEL STİLLER -->
 <style>
 
 /* =========================================
-   RENKLER VE ARKA PLAN EFEKTİ
+   ANA GİRİŞ (HERO)
 ========================================= */
-
-:root {
-
-    --background: #f8fafc;
-
-    --surface: #ffffff;
-
-    --surface-soft: #f1f5f9;
-
-    --primary: #2563eb;
-
-    --primary-dark: #1d4ed8;
-
-    --primary-light: #eff6ff;
-
-    --text: #172033;
-
-    --text-soft: #64748b;
-
-    --border: #e2e8f0;
-
-    --shadow:
-        0 15px 40px rgba(15, 23, 42, 0.07);
-}
-
-.bg-glow {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    z-index: -999;
-    pointer-events: none;
-}
-
-.bg-glow::before,
-.bg-glow::after {
-    content: "";
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.18;
-    animation: floatGlow 15s infinite alternate ease-in-out;
-}
-
-.bg-glow::before {
-    background: #2563eb;
-    top: -100px;
-    left: -100px;
-}
-
-.bg-glow::after {
-    background: #6366f1;
-    bottom: -100px;
-    right: -100px;
-    animation-delay: -7s;
-}
-
-@keyframes floatGlow {
-    0% { transform: translate(0px, 0px) scale(1); }
-    100% { transform: translate(150px, 200px) scale(1.25); }
-}
-
-
-/* =========================================
-   GENEL
-========================================= */
-
-* {
-
-    margin: 0;
-    padding: 0;
-
-    box-sizing: border-box;
-}
-
-
-html {
-
-    scroll-behavior: smooth;
-
-    overflow-x: hidden;
-
-    width: 100%;
-}
-
-
-body {
-
-    font-family: "Inter", sans-serif;
-
-    background: var(--background);
-
-    color: var(--text);
-
-    overflow-x: hidden;
-
-    width: 100%;
-
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-
-a {
-
-    text-decoration: none;
-
-    color: inherit;
-}
-
-
-/* =========================================
-   ÜST BAR (NAVBAR)
-========================================= */
-
-.navbar {
-
-    position: sticky;
-
-    top: 0;
-
-    z-index: 1000;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 16px 7%;
-
-    background: rgba(248, 250, 252, 0.85);
-
-    backdrop-filter: blur(12px);
-
-    -webkit-backdrop-filter: blur(12px);
-
-    border-bottom: 1px solid var(--border);
-
-    transition: background-color 0.3s, border-color 0.3s;
-}
-
-
-.nav-logo {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-}
-
-
-.nav-logo-mark {
-
-    width: 38px;
-
-    height: 38px;
-
-    display: grid;
-
-    grid-template-columns: repeat(3,1fr);
-
-    grid-template-rows: repeat(3,1fr);
-
-    gap: 2px;
-
-    padding: 4px;
-
-    border-radius: 10px;
-
-    background: #1e293b;
-
-    box-shadow:
-        0 8px 18px rgba(15,23,42,.18);
-}
-
-
-.nav-logo-mark div {
-
-    border-radius: 2px;
-
-    background: #f8fafc;
-}
-
-
-.nav-logo-mark div:nth-child(2),
-.nav-logo-mark div:nth-child(8) {
-
-    background: #ef4444;
-}
-
-
-.nav-logo-mark div:nth-child(4),
-.nav-logo-mark div:nth-child(6) {
-
-    background: #22c55e;
-}
-
-
-.nav-logo-mark div:nth-child(5) {
-
-    background: #3b82f6;
-}
-
-
-.nav-logo-mark div:nth-child(1),
-.nav-logo-mark div:nth-child(9) {
-
-    background: #facc15;
-}
-
-
-.nav-logo-text {
-
-    font-size: 17px;
-
-    font-weight: 800;
-
-    letter-spacing: -0.5px;
-
-    color: var(--text);
-}
-
-
-.nav-right {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-}
-
-
-.nav-links {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-}
-
-
-.nav-links a {
-
-    padding: 9px 16px;
-
-    border-radius: 10px;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    color: var(--text-soft);
-
-    transition: .25s;
-}
-
-
-.nav-links a:hover {
-
-    background: var(--primary-light);
-
-    color: var(--primary);
-}
-
-
-.nav-links a.active {
-
-    background: var(--primary-light);
-
-    color: var(--primary);
-}
-
-
-@media(max-width:500px) {
-
-    .navbar {
-
-        padding: 14px 5%;
-    }
-
-
-    .nav-logo-text {
-
-        font-size: 15px;
-    }
-
-
-    .nav-links a {
-
-        padding: 8px 12px;
-
-        font-size: 13px;
-    }
-
-
-    .nav-right {
-
-        gap: 6px;
-    }
-
-
-    .lang-switch-btn {
-
-        padding: 0 10px;
-
-        font-size: 12px;
-    }
-}
-
-
-/* =========================================
-   ANA GİRİŞ
-========================================= */
-
 .hero {
-
     min-height: 100vh;
-
     display: flex;
-
     align-items: center;
-
     padding: 90px 7%;
-
     background: transparent;
-
     overflow-x: hidden;
-
     transition: background-color 0.3s;
 }
 
-
 .hero-container {
-
     width: 100%;
-
     max-width: 1200px;
-
     margin: auto;
-
     display: grid;
-
-    grid-template-columns:
-        1.1fr
-        .9fr;
-
+    grid-template-columns: 1.1fr .9fr;
     gap: 70px;
-
     align-items: center;
 }
 
-
-/* =========================================
-   ETİKET
-========================================= */
-
 .badge {
-
     display: inline-flex;
-
     align-items: center;
-
     gap: 8px;
-
     padding: 9px 16px;
-
     border-radius: 50px;
-
-    background:
-        var(--primary-light);
-
-    border:
-        1px solid #dbeafe;
-
-    color:
-        var(--primary);
-
+    background: var(--primary-light);
+    border: 1px solid #dbeafe;
+    color: var(--primary);
     font-size: 13px;
-
     font-weight: 700;
-
     margin-bottom: 25px;
 }
 
-
 .badge::before {
-
     content: "";
-
     width: 7px;
-
     height: 7px;
-
     border-radius: 50%;
-
     background: #22c55e;
 }
 
-
-/* =========================================
-   BAŞLIK
-========================================= */
-
 .hero h1 {
-
-    font-size:
-        clamp(45px, 6vw, 76px);
-
+    font-size: clamp(45px, 6vw, 76px);
     line-height: 1.04;
-
     letter-spacing: -4px;
-
     font-weight: 900;
-
     color: var(--text);
-
     margin-bottom: 25px;
 }
 
-
 .gradient-text {
-
-    background:
-
-        linear-gradient(
-            90deg,
-            #2563eb,
-            #0891b2,
-            #6366f1
-        );
-
+    background: linear-gradient(90deg, #2563eb, #0891b2, #6366f1);
     -webkit-background-clip: text;
-
     background-clip: text;
-
     color: transparent;
 }
 
-
 .hero p {
-
     max-width: 620px;
-
     color: var(--text-soft);
-
     font-size: 18px;
-
     line-height: 1.75;
-
     margin-bottom: 35px;
 }
 
-
-/* =========================================
-   BUTON
-========================================= */
-
 .btn {
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
     padding: 15px 25px;
-
     border-radius: 12px;
-
     font-size: 14px;
-
     font-weight: 700;
-
     transition: .3s;
 }
 
-
 .btn-primary {
-
     color: white;
-
-    background:
-
-        linear-gradient(
-            135deg,
-            #2563eb,
-            #4f46e5
-        );
-
-    box-shadow:
-
-        0 12px 30px
-        rgba(37,99,235,.22);
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    box-shadow: 0 12px 30px rgba(37,99,235,.22);
 }
-
 
 .btn-primary:hover {
-
-    transform:
-        translateY(-4px);
-
-    box-shadow:
-
-        0 18px 40px
-        rgba(37,99,235,.30);
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px rgba(37,99,235,.30);
 }
 
-
-/* =========================================
-   RUBİK KÜP
-========================================= */
-
+/* KÜP */
 .cube-area {
-
     display: flex;
-
     justify-content: center;
-
     align-items: center;
 }
 
-
 .cube {
-
     width: 280px;
-
     height: 280px;
-
     padding: 12px;
-
     display: grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
-    grid-template-rows:
-        repeat(3,1fr);
-
+    grid-template-columns: repeat(3,1fr);
+    grid-template-rows: repeat(3,1fr);
     gap: 7px;
-
     border-radius: 28px;
-
     background: #1e293b;
-
-    transform:
-        rotate(-7deg);
-
-    box-shadow:
-
-        0 35px 60px
-        rgba(15,23,42,.20),
-
-        0 0 60px
-        rgba(37,99,235,.10);
-
-    animation:
-
-        cubeFloat
-        5s
-        ease-in-out
-        infinite;
+    transform: rotate(-7deg);
+    box-shadow: 0 35px 60px rgba(15,23,42,.20), 0 0 60px rgba(37,99,235,.10);
+    animation: cubeFloat 5s ease-in-out infinite;
 }
-
 
 .cube div {
-
     border-radius: 7px;
-
     background: #f8fafc;
-
-    box-shadow:
-
-        inset
-        0 0 0 2px
-        rgba(0,0,0,.08);
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,.08);
 }
 
-
-.cube div:nth-child(2),
-.cube div:nth-child(8) {
-
-    background: #ef4444;
-}
-
-
-.cube div:nth-child(4),
-.cube div:nth-child(6) {
-
-    background: #22c55e;
-}
-
-
-.cube div:nth-child(5) {
-
-    background: #3b82f6;
-}
-
-
-.cube div:nth-child(1),
-.cube div:nth-child(9) {
-
-    background: #facc15;
-}
-
+.cube div:nth-child(2), .cube div:nth-child(8) { background: #ef4444; }
+.cube div:nth-child(4), .cube div:nth-child(6) { background: #22c55e; }
+.cube div:nth-child(5) { background: #3b82f6; }
+.cube div:nth-child(1), .cube div:nth-child(9) { background: #facc15; }
 
 @keyframes cubeFloat {
-
-    0%,
-    100% {
-
-        transform:
-            rotate(-7deg)
-            translateY(0);
-    }
-
-    50% {
-
-        transform:
-            rotate(-4deg)
-            translateY(-15px);
-    }
+    0%, 100% { transform: rotate(-7deg) translateY(0); }
+    50% { transform: rotate(-4deg) translateY(-15px); }
 }
 
-
 /* =========================================
-   BÖLÜMLER
+   BÖLÜMLER (genel)
 ========================================= */
-
 section {
-
-    padding:
-        100px 7%;
-
+    padding: 100px 7%;
     background: transparent;
 }
 
-
 .section-container {
-
     max-width: 1200px;
-
     margin: auto;
 }
 
-
 .section-heading {
-
     text-align: center;
-
     max-width: 700px;
-
-    margin:
-        0 auto 55px;
+    margin: 0 auto 55px;
 }
 
-
 .section-heading span {
-
-    color:
-        var(--primary);
-
+    color: var(--primary);
     font-size: 13px;
-
     font-weight: 800;
-
     letter-spacing: 2px;
-
     text-transform: uppercase;
 }
 
-
 .section-heading h2 {
-
-    font-size:
-        clamp(32px,4vw,48px);
-
+    font-size: clamp(32px,4vw,48px);
     line-height: 1.1;
-
     letter-spacing: -2px;
-
-    color:
-        var(--text);
-
-    margin:
-        12px 0;
+    color: var(--text);
+    margin: 12px 0;
 }
 
-
 .section-heading p {
-
-    color:
-        var(--text-soft);
-
+    color: var(--text-soft);
     line-height: 1.7;
 }
 
-
-/* =========================================
-   AKADEMİ KARTLARI
-========================================= */
-
+/* AKADEMİ KARTLARI */
 .cards {
-
     display: grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
+    grid-template-columns: repeat(3,1fr);
     gap: 22px;
 }
 
-
 .card {
-
     padding: 32px;
-
     border-radius: 22px;
-
-    background:
-        var(--surface);
-
-    border:
-        1px solid
-        var(--border);
-
-    box-shadow:
-        var(--shadow);
-
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
     transition: .3s;
 }
 
-
 .card:hover {
-
-    transform:
-        translateY(-8px);
-
-    border-color:
-        #bfdbfe;
-
-    box-shadow:
-
-        0 20px 45px
-        rgba(37,99,235,.10);
+    transform: translateY(-8px);
+    border-color: #bfdbfe;
+    box-shadow: 0 20px 45px rgba(37,99,235,.10);
 }
 
-
 .card-icon {
-
     width: 55px;
-
     height: 55px;
-
     display: grid;
-
     place-items: center;
-
     border-radius: 15px;
-
-    background:
-        var(--primary-light);
-
+    background: var(--primary-light);
     font-size: 25px;
-
     margin-bottom: 20px;
 }
 
-
 .card h3 {
-
     font-size: 20px;
-
-    color:
-        var(--text);
-
+    color: var(--text);
     margin-bottom: 10px;
 }
 
-
 .card p {
-
-    color:
-        var(--text-soft);
-
+    color: var(--text-soft);
     font-size: 14px;
-
     line-height: 1.7;
 }
 
-
-/* =========================================
-   ZKT TIMER TANITIM BANDI
-========================================= */
-
+/* ZKT TIMER TANITIM BANDI */
 .zkt-promo {
     padding: 0 7% 70px;
     background: transparent;
@@ -878,10 +278,7 @@ section {
     box-shadow: 0 26px 55px rgba(71,85,105,.34);
 }
 
-.zkt-promo-top {
-    position: relative;
-    z-index: 1;
-}
+.zkt-promo-top { position: relative; z-index: 1; }
 
 .zkt-promo-badge {
     display: inline-block;
@@ -969,31 +366,15 @@ section {
     transition: .25s, background-color 0.25s, color 0.25s;
 }
 
-.zkt-promo-cta svg {
-    width: 16px;
-    height: 16px;
-    transition: .25s;
-}
-
-.zkt-promo-card:hover .zkt-promo-cta svg {
-    transform: translateX(3px);
-}
+.zkt-promo-cta svg { width: 16px; height: 16px; transition: .25s; }
+.zkt-promo-card:hover .zkt-promo-cta svg { transform: translateX(3px); }
 
 @media(max-width:700px) {
-    .zkt-promo-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .zkt-promo-cta {
-        align-self: stretch;
-        justify-content: center;
-    }
+    .zkt-promo-row { flex-direction: column; align-items: flex-start; }
+    .zkt-promo-cta { align-self: stretch; justify-content: center; }
 }
 
-/* =========================================
-   RAT YARIŞMA TANITIM BANDI (KIRMIZI)
-========================================= */
-
+/* RAT YARIŞMA TANITIM BANDI */
 .rat-promo {
     padding: 0 7% 70px;
     background: transparent;
@@ -1031,10 +412,7 @@ section {
     box-shadow: 0 26px 55px rgba(230,37,47,.36);
 }
 
-.rat-promo-top {
-    position: relative;
-    z-index: 1;
-}
+.rat-promo-top { position: relative; z-index: 1; }
 
 .rat-promo-badge {
     display: inline-block;
@@ -1124,663 +502,129 @@ section {
     transition: .25s, background-color 0.25s, color 0.25s;
 }
 
-.rat-promo-cta svg {
-    width: 16px;
-    height: 16px;
-    transition: .25s;
-}
-
-.rat-promo-card:hover .rat-promo-cta svg {
-    transform: translateX(3px);
-}
+.rat-promo-cta svg { width: 16px; height: 16px; transition: .25s; }
+.rat-promo-card:hover .rat-promo-cta svg { transform: translateX(3px); }
 
 @media(max-width:700px) {
-    .rat-promo-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .rat-promo-cta {
-        align-self: stretch;
-        justify-content: center;
-    }
+    .rat-promo-row { flex-direction: column; align-items: flex-start; }
+    .rat-promo-cta { align-self: stretch; justify-content: center; }
 }
 
-
-/* =========================================
-   EĞİTİM BÖLÜMÜ
-========================================= */
-
-.learning-section {
-
-    background: transparent;
-
-    transition: background-color 0.3s;
-}
-
+/* EĞİTİM BÖLÜMÜ */
+.learning-section { background: transparent; transition: background-color 0.3s; }
 
 .learning-grid {
-
     display: grid;
-
-    grid-template-columns:
-        repeat(2,1fr);
-
+    grid-template-columns: repeat(2,1fr);
     gap: 22px;
 }
-
 
 .learning-card {
-
     padding: 35px;
-
     border-radius: 22px;
-
-    background:
-        var(--surface);
-
-    border:
-        1px solid
-        var(--border);
-
-    box-shadow:
-        0 10px 30px
-        rgba(15,23,42,.05);
-
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px rgba(15,23,42,.05);
     transition: .3s;
 }
 
-
 .learning-card:hover {
-
-    transform:
-        translateY(-5px);
-
-    box-shadow:
-        0 18px 40px
-        rgba(15,23,42,.09);
+    transform: translateY(-5px);
+    box-shadow: 0 18px 40px rgba(15,23,42,.09);
 }
-
 
 .learning-number {
-
-    color:
-        var(--primary);
-
+    color: var(--primary);
     font-size: 13px;
-
     font-weight: 800;
-
     letter-spacing: 1px;
-
     margin-bottom: 12px;
 }
 
+.learning-card h3 { font-size: 24px; color: var(--text); margin-bottom: 12px; }
+.learning-card p { color: var(--text-soft); font-size: 14px; line-height: 1.7; }
 
-.learning-card h3 {
-
-    font-size: 24px;
-
-    color:
-        var(--text);
-
-    margin-bottom: 12px;
-}
-
-
-.learning-card p {
-
-    color:
-        var(--text-soft);
-
-    font-size: 14px;
-
-    line-height: 1.7;
-}
-
-
-/* =========================================
-   SOSYAL MEDYA
-========================================= */
-
+/* SOSYAL MEDYA */
 .social-grid {
-
     display: grid;
-
-    grid-template-columns:
-        repeat(2,1fr);
-
+    grid-template-columns: repeat(2,1fr);
     gap: 22px;
 }
 
-
 .social-card {
-
     padding: 30px;
-
     display: flex;
-
     align-items: center;
-
     gap: 20px;
-
     border-radius: 20px;
-
-    background:
-        var(--surface);
-
-    border:
-        1px solid
-        var(--border);
-
-    box-shadow:
-        0 10px 30px
-        rgba(15,23,42,.05);
-
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px rgba(15,23,42,.05);
     transition: .3s;
 }
 
-
 .social-card:hover {
-
-    transform:
-        translateY(-5px);
-
-    box-shadow:
-        0 18px 40px
-        rgba(15,23,42,.09);
+    transform: translateY(-5px);
+    box-shadow: 0 18px 40px rgba(15,23,42,.09);
 }
 
-
 .social-icon {
-
     width: 55px;
-
     height: 55px;
-
     display: grid;
-
     place-items: center;
-
     border-radius: 15px;
-
-    background:
-
-        linear-gradient(
-            135deg,
-            #2563eb,
-            #6366f1
-        );
-
+    background: linear-gradient(135deg, #2563eb, #6366f1);
     color: white;
-
     font-size: 23px;
 }
 
+.social-card h3 { font-size: 17px; color: var(--text); }
+.social-card p { color: var(--text-soft); font-size: 13px; margin-top: 3px; }
 
-.social-card h3 {
-
-    font-size: 17px;
-
-    color:
-        var(--text);
-}
-
-
-.social-card p {
-
-    color:
-        var(--text-soft);
-
-    font-size: 13px;
-
-    margin-top: 3px;
-}
-
-
-/* =========================================
-   İLETİŞİM
-========================================= */
-
-.contact {
-
-    text-align: center;
-
-    background:
-        transparent;
-
-    transition: background-color 0.3s;
-}
-
+/* İLETİŞİM */
+.contact { text-align: center; background: transparent; transition: background-color 0.3s; }
 
 .contact-box {
-
     max-width: 800px;
-
     margin: auto;
-
-    padding:
-        55px 30px;
-
+    padding: 55px 30px;
     border-radius: 25px;
-
-    background:
-        var(--surface);
-
-    border:
-        1px solid
-        var(--border);
-
-    box-shadow:
-        var(--shadow);
-
-    transition: background-color 0.3s, border-color 0.3s;
-}
-
-
-.contact-box h2 {
-
-    font-size: 40px;
-
-    color:
-        var(--text);
-
-    margin-bottom: 15px;
-}
-
-
-.contact-box p {
-
-    color:
-        var(--text-soft);
-
-    margin-bottom: 25px;
-}
-
-
-.email {
-
-    display: inline-block;
-
-    padding:
-        14px 20px;
-
-    border-radius: 12px;
-
-    background:
-        var(--primary-light);
-
-    color:
-        var(--primary);
-
-    font-weight: 700;
-
-    border:
-        1px solid
-        #dbeafe;
-}
-
-
-/* =========================================
-   FOOTER
-========================================= */
-
-footer {
-
-    padding: 35px;
-
-    text-align: center;
-
-    background:
-        transparent;
-
-    border-top:
-        1px solid
-        var(--border);
-
-    color:
-        var(--text-soft);
-
-    font-size: 13px;
-
-    transition: background-color 0.3s, border-color 0.3s;
-}
-
-
-/* =========================================
-   ANİMASYON
-========================================= */
-
-.reveal {
-
-    opacity: 0;
-
-    transform:
-        translateY(30px);
-
-    transition:
-        .7s ease;
-}
-
-
-.reveal.active {
-
-    opacity: 1;
-
-    transform:
-        translateY(0);
-}
-
-
-/* =========================================
-   MOBİL
-========================================= */
-
-@media(max-width:900px) {
-
-    .hero {
-
-        padding:
-            80px 6%;
-    }
-
-
-    .hero-container {
-
-        grid-template-columns:
-            1fr;
-
-        text-align: center;
-    }
-
-
-    .hero p {
-
-        margin-left: auto;
-
-        margin-right: auto;
-    }
-
-
-    .cube {
-
-        width: 230px;
-
-        height: 230px;
-    }
-
-
-    .cards {
-
-        grid-template-columns:
-            1fr;
-    }
-
-
-    .learning-grid {
-
-        grid-template-columns:
-            1fr;
-    }
-
-
-    .social-grid {
-
-        grid-template-columns:
-            1fr;
-    }
-}
-
-
-@media(max-width:500px) {
-
-    .hero h1 {
-
-        font-size: 43px;
-
-        letter-spacing: -2px;
-    }
-
-
-    section {
-
-        padding:
-            75px 5%;
-    }
-
-
-    .contact-box h2 {
-
-        font-size: 32px;
-    }
-
-}
-
-/* =========================================
-   KARANLIK MOD
-========================================= */
-
-.dark-mode-btn {
-    border: none;
-    background: var(--surface-soft);
-    color: var(--text);
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: .3s;
-}
-
-.dark-mode-btn:hover {
-    transform: scale(1.08);
-}
-
-/* =========================================
-   DİL SEÇİCİ
-========================================= */
-
-.lang-switcher {
-    position: relative;
-}
-
-.lang-switch-btn {
-    border: none;
-    background: var(--surface-soft);
-    color: var(--text);
-    height: 42px;
-    padding: 0 16px;
-    border-radius: 21px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: .3px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    transition: .3s;
-}
-
-.lang-switch-btn:hover {
-    transform: scale(1.06);
-    background: var(--primary-light);
-    color: var(--primary);
-}
-
-.lang-switch-btn .lang-globe {
-    font-size: 15px;
-    line-height: 1;
-}
-
-.lang-menu {
-    position: absolute;
-    top: calc(100% + 10px);
-    right: 0;
-    min-width: 168px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
     box-shadow: var(--shadow);
-    padding: 7px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition: .2s ease;
-    z-index: 1100;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-.lang-menu.open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
+.contact-box h2 { font-size: 40px; color: var(--text); margin-bottom: 15px; }
+.contact-box p { color: var(--text-soft); margin-bottom: 25px; }
 
-.lang-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    text-align: left;
-    padding: 10px 14px;
-    border-radius: 11px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .2s;
-    width: 100%;
-}
-
-.lang-menu-item:hover {
+.email {
+    display: inline-block;
+    padding: 14px 20px;
+    border-radius: 12px;
     background: var(--primary-light);
     color: var(--primary);
+    font-weight: 700;
+    border: 1px solid #dbeafe;
 }
 
-.lang-menu-item.active {
-    background: var(--primary-light);
-    color: var(--primary);
-    font-weight: 800;
+/* MOBİL */
+@media(max-width:900px) {
+    .hero { padding: 80px 6%; }
+    .hero-container { grid-template-columns: 1fr; text-align: center; }
+    .hero p { margin-left: auto; margin-right: auto; }
+    .cube { width: 230px; height: 230px; }
+    .cards { grid-template-columns: 1fr; }
+    .learning-grid { grid-template-columns: 1fr; }
+    .social-grid { grid-template-columns: 1fr; }
 }
 
-.lang-menu-item .lang-check {
-    margin-left: auto;
-    font-size: 12px;
-    opacity: 0;
+@media(max-width:500px) {
+    .hero h1 { font-size: 43px; letter-spacing: -2px; }
+    section { padding: 75px 5%; }
+    .contact-box h2 { font-size: 32px; }
 }
-
-.lang-menu-item.active .lang-check {
-    opacity: 1;
-}
-
-/* Karanlık mod renkleri */
-
-html.dark-mode,
-body.dark-mode {
-    --background: #0f172a;
-    --surface: #1e293b;
-    --surface-soft: #334155;
-    --text: #f8fafc;
-    --text-soft: #cbd5e1;
-    --border: #334155;
-    --primary-light: #1e3a8a;
-    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
-}
-
-html.dark-mode body,
-body.dark-mode {
-    background: var(--background);
-    color: var(--text);
-}
-
-html.dark-mode .navbar,
-body.dark-mode .navbar {
-    background: rgba(15, 23, 42, 0.90);
-}
-
-html.dark-mode .hero,
-body.dark-mode .hero {
-    background: transparent;
-}
-
-html.dark-mode .learning-section,
-body.dark-mode .learning-section,
-html.dark-mode .contact,
-body.dark-mode .contact {
-    background: transparent;
-}
-
-html.dark-mode .card,
-body.dark-mode .card,
-html.dark-mode .learning-card,
-body.dark-mode .learning-card,
-html.dark-mode .social-card,
-body.dark-mode .social-card,
-html.dark-mode .contact-box,
-body.dark-mode .contact-box,
-html.dark-mode footer,
-body.dark-mode footer {
-    background: var(--surface);
-}
-
-html.dark-mode .card,
-body.dark-mode .card,
-html.dark-mode .learning-card,
-body.dark-mode .learning-card,
-html.dark-mode .social-card,
-body.dark-mode .social-card,
-html.dark-mode .contact-box,
-body.dark-mode .contact-box {
-    border-color: var(--border);
-}
-
-html.dark-mode .bg-glow::before,
-html.dark-mode .bg-glow::after {
-    opacity: 0.25;
-}
-
-html.dark-mode .zkt-promo-card,
-body.dark-mode .zkt-promo-card {
-    background: linear-gradient(120deg, #f5f2fd, #eee9fb 65%);
-    box-shadow: 0 20px 45px rgba(0,0,0,.45);
-}
-
-html.dark-mode .zkt-promo-card::before,
-body.dark-mode .zkt-promo-card::before {
-    background: rgba(124,58,237,.06);
-}
-
-html.dark-mode .zkt-promo-text h3,
-body.dark-mode .zkt-promo-text h3 {
-    color: #172033;
-}
-
-html.dark-mode .zkt-promo-author,
-body.dark-mode .zkt-promo-author {
-    color: rgba(23,32,51,.65);
-}
-
-html.dark-mode .zkt-promo-text p,
-body.dark-mode .zkt-promo-text p {
-    color: rgba(23,32,51,.78);
-}
-
-html.dark-mode .zkt-promo-mark,
-body.dark-mode .zkt-promo-mark {
-    background: rgba(124,58,237,.10);
-}
-
-html.dark-mode .zkt-promo-cta,
-body.dark-mode .zkt-promo-cta {
-    background: #7c3aed;
-    color: #fff;
-}
-
 </style>
 
 <!-- Schema Kodu -->
@@ -1803,7 +647,7 @@ body.dark-mode .zkt-promo-cta {
 }
 </script>
 
-<!-- Google Analytics Kodu -->
+<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -1816,730 +660,251 @@ body.dark-mode .zkt-promo-cta {
 
 <body>
 
-    <!-- Arka Plan Işık Efektleri -->
     <div class="bg-glow"></div>
 
-
-<!-- =========================================
-     ÜST BAR
-========================================= -->
-
+<!-- ÜST BAR -->
 <header class="navbar">
 
     <a href="/" class="nav-logo">
-
-        <div class="nav-logo-mark">
-
-            <div></div>
-            <div></div>
-            <div></div>
-
-            <div></div>
-            <div></div>
-            <div></div>
-
-            <div></div>
-            <div></div>
-            <div></div>
-
-        </div>
-
-
-        <span class="nav-logo-text">
-            Rubik Academy
-        </span>
-
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
     </a>
-
 
     <div class="nav-right">
 
         <nav class="nav-links">
-
-            <a href="http://rubikacademy.fun" class="active" data-i18n="navHome">
-                Ana Sayfa
-            </a>
-
-            <a href="http://rubikacademy.fun/icerikler" data-i18n="navContent">
-                İçerikler
-            </a>
-
+            <a href="http://rubikacademy.fun" class="active" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" data-i18n="navContent">İçerikler</a>
         </nav>
 
         <div class="lang-switcher" id="langSwitcher">
-
             <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
                 <span class="lang-globe">🌐</span>
                 <span id="langLabel">TR</span>
             </button>
 
             <div class="lang-menu" id="langMenu" role="menu">
-
                 <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
-                    <span>Türkçe</span>
-                    <span class="lang-check">✓</span>
+                    <span>Türkçe</span><span class="lang-check">✓</span>
                 </button>
-
                 <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
-                    <span>English</span>
-                    <span class="lang-check">✓</span>
+                    <span>English</span><span class="lang-check">✓</span>
                 </button>
-
                 <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
-                    <span>Русский</span>
-                    <span class="lang-check">✓</span>
+                    <span>Русский</span><span class="lang-check">✓</span>
                 </button>
-
                 <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
-                    <span>Deutsch</span>
-                    <span class="lang-check">✓</span>
+                    <span>Deutsch</span><span class="lang-check">✓</span>
                 </button>
-
                 <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
-                    <span>العربية</span>
-                    <span class="lang-check">✓</span>
+                    <span>العربية</span><span class="lang-check">✓</span>
                 </button>
-
             </div>
-
         </div>
 
-        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-            🌙
-        </button>
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
 
     </div>
 
 </header>
 
 
-
-<!-- =========================================
-     GİRİŞ
-========================================= -->
-
+<!-- GİRİŞ -->
 <section class="hero">
-
     <div class="hero-container">
 
-
         <div class="hero-content reveal">
-
-
-            <div class="badge" data-i18n="badge">
-
-                Speedcubing'e Hoş Geldin
-
-            </div>
-
-
+            <div class="badge" data-i18n="badge">Speedcubing'e Hoş Geldin</div>
             <h1>
-
                 <span data-i18n="heroTitle1">Rubik Küpü</span>
-
-                <span class="gradient-text" data-i18n="heroTitleGradient">
-                    öğren.
-                </span>
-
+                <span class="gradient-text" data-i18n="heroTitleGradient">öğren.</span>
                 <br>
-
                 <span data-i18n="heroTitle2">Hızını geliştir.</span>
-
             </h1>
-
-
             <p data-i18n="heroP">
-
-                Rubik Academy, Rubik küp çözmeyi öğrenmek
-                ve çözüm sürelerini geliştirmek isteyenler
-                için hazırlanmış modern ve sistemli bir
-                eğitim platformudur.
-
+                Rubik Academy, Rubik küp çözmeyi öğrenmek ve çözüm sürelerini geliştirmek isteyenler için hazırlanmış modern ve sistemli bir eğitim platformudur.
             </p>
-
-
-            <a
-                href="#academy"
-                class="btn btn-primary"
-                data-i18n="heroBtn"
-            >
-
-                Öğrenmeye Başla →
-
-            </a>
-
-
+            <a href="#academy" class="btn btn-primary" data-i18n="heroBtn">Öğrenmeye Başla →</a>
         </div>
-
-
-        <!-- KÜP -->
 
         <div class="cube-area reveal">
-
             <div class="cube">
-
-                <div></div>
-                <div></div>
-                <div></div>
-
-                <div></div>
-                <div></div>
-                <div></div>
-
-                <div></div>
-                <div></div>
-                <div></div>
-
+                <div></div><div></div><div></div>
+                <div></div><div></div><div></div>
+                <div></div><div></div><div></div>
             </div>
-
         </div>
 
-
     </div>
-
 </section>
 
 
-
-<!-- =========================================
-     ZKT TIMER TANITIM BANDI
-========================================= -->
-
+<!-- ZKT TIMER TANITIM BANDI -->
 <section class="zkt-promo">
-
     <div class="section-container">
-
         <a href="https://rubikacademy.fun/zkttimer" class="zkt-promo-card reveal">
-
             <div class="zkt-promo-top">
                 <span class="zkt-promo-badge" data-i18n="zktPromoBadge">Yeni · ZKT Timer</span>
             </div>
-
             <div class="zkt-promo-row">
-
                 <div class="zkt-promo-body">
-
-                    <div class="zkt-promo-mark">
-                        <img src="/zkttimer.png" alt="ZKT Timer">
-                    </div>
-
+                    <div class="zkt-promo-mark"><img src="/zkttimer.png" alt="ZKT Timer"></div>
                     <div class="zkt-promo-text">
                         <h3 data-i18n="zktPromoTitle">ZKT Timer</h3>
                         <span class="zkt-promo-author" data-i18n="zktPromoAuthor">İbrahim Yıldız</span>
                         <p data-i18n="zktPromoP">Türkiye'nin en kapsamlı küp zamanlayıcısı. Sürelerini kaydet, istatistiklerini takip et ve arkadaşlarınla online küp çöz.</p>
                     </div>
-
                 </div>
-
                 <div class="zkt-promo-cta" data-i18n="zktPromoCta">
                     Keşfet
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
-
             </div>
-
         </a>
-
     </div>
-
 </section>
 
 
-
-<!-- =========================================
-     RAT YARIŞMA TANITIM BANDI
-========================================= -->
-
+<!-- RAT YARIŞMA TANITIM BANDI -->
 <section class="rat-promo">
-
     <div class="section-container">
-
         <a href="https://rubikacademy.fun/rat" class="rat-promo-card reveal">
-
             <div class="rat-promo-top">
                 <span class="rat-promo-badge" data-i18n="ratPromoBadge">Yarışma · RAT</span>
             </div>
-
             <div class="rat-promo-row">
-
                 <div class="rat-promo-body">
-
-                    <div class="rat-promo-mark">
-                        🏆
-                    </div>
-
+                    <div class="rat-promo-mark">🏆</div>
                     <div class="rat-promo-text">
                         <h3 data-i18n="ratPromoTitle">RAT — Rubik Academy Türkiye Yarışmaları</h3>
                         <span class="rat-promo-author" data-i18n="ratPromoAuthor">Online Yarışmalar</span>
                         <p data-i18n="ratPromoP">FTO Ağustos 2026 yarışmasına katıl, diğer speedcuber'larla yarış ve derecelerini kaydet.</p>
                     </div>
-
                 </div>
-
                 <div class="rat-promo-cta" data-i18n="ratPromoCta">
                     Keşfet
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
-
             </div>
-
         </a>
-
     </div>
-
 </section>
 
 
-
-<!-- =========================================
-     AKADEMİ
-========================================= -->
-
+<!-- AKADEMİ -->
 <section id="academy">
-
     <div class="section-container">
 
-
         <div class="section-heading reveal">
-
-            <span data-i18n="academySpan">
-                Rubik Academy
-            </span>
-
-
-            <h2 data-i18n="academyH2">
-
-                Küp çözmeyi
-                sistemli şekilde öğren.
-
-            </h2>
-
-
-            <p data-i18n="academyP">
-
-                Temelden başlayıp speedcubing seviyesine
-                kadar ilerleyebileceğin içerikler.
-
-            </p>
-
+            <span data-i18n="academySpan">Rubik Academy</span>
+            <h2 data-i18n="academyH2">Küp çözmeyi sistemli şekilde öğren.</h2>
+            <p data-i18n="academyP">Temelden başlayıp speedcubing seviyesine kadar ilerleyebileceğin içerikler.</p>
         </div>
-
-
 
         <div class="cards">
-
-
             <div class="card reveal">
-
-                <div class="card-icon">
-                    🧩
-                </div>
-
-
-                <h3 data-i18n="card1Title">
-                    3x3 Rubik Küp
-                </h3>
-
-
-                <p data-i18n="card1P">
-
-                    3x3 Rubik küpü adım adım öğren.
-                    Temel hareketlerden ileri seviyeye
-                    kadar kendini geliştir.
-
-                </p>
-
+                <div class="card-icon">🧩</div>
+                <h3 data-i18n="card1Title">3x3 Rubik Küp</h3>
+                <p data-i18n="card1P">3x3 Rubik küpü adım adım öğren. Temel hareketlerden ileri seviyeye kadar kendini geliştir.</p>
             </div>
-
-
-
             <div class="card reveal">
-
-                <div class="card-icon">
-                    ⚡
-                </div>
-
-
-                <h3 data-i18n="card2Title">
-                    Algoritmalar
-                </h3>
-
-
-                <p data-i18n="card2P">
-
-                    Daha hızlı çözüm yapabilmek için
-                    gerekli algoritmaları öğren ve
-                    pratik yap.
-
-                </p>
-
+                <div class="card-icon">⚡</div>
+                <h3 data-i18n="card2Title">Algoritmalar</h3>
+                <p data-i18n="card2P">Daha hızlı çözüm yapabilmek için gerekli algoritmaları öğren ve pratik yap.</p>
             </div>
-
-
-
             <div class="card reveal">
-
-                <div class="card-icon">
-                    🚀
-                </div>
-
-
-                <h3 data-i18n="card3Title">
-                    Speedcubing
-                </h3>
-
-
-                <p data-i18n="card3P">
-
-                    Çözüm sürelerini geliştir,
-                    kendi rekorlarını kır ve
-                    speedcubing dünyasında ilerle.
-
-                </p>
-
+                <div class="card-icon">🚀</div>
+                <h3 data-i18n="card3Title">Speedcubing</h3>
+                <p data-i18n="card3P">Çözüm sürelerini geliştir, kendi rekorlarını kır ve speedcubing dünyasında ilerle.</p>
             </div>
-
-
         </div>
 
     </div>
-
 </section>
 
 
-
-<!-- =========================================
-     EĞİTİM
-========================================= -->
-
+<!-- EĞİTİM -->
 <section class="learning-section">
-
     <div class="section-container">
 
-
         <div class="section-heading reveal">
-
-            <span data-i18n="learningSpan">
-                Eğitim
-            </span>
-
-
-            <h2 data-i18n="learningH2">
-                Adım adım ilerle.
-            </h2>
-
-
-            <p data-i18n="learningP">
-
-                Rubik küp öğrenme sürecini
-                kolay ve anlaşılır hale getir.
-
-            </p>
-
+            <span data-i18n="learningSpan">Eğitim</span>
+            <h2 data-i18n="learningH2">Adım adım ilerle.</h2>
+            <p data-i18n="learningP">Rubik küp öğrenme sürecini kolay ve anlaşılır hale getir.</p>
         </div>
-
-
 
         <div class="learning-grid">
-
-
             <div class="learning-card reveal">
-
-                <div class="learning-number" data-i18n="l1num">
-                    01 — BAŞLANGIÇ
-                </div>
-
-
-                <h3 data-i18n="l1title">
-                    Küpü Tanı
-                </h3>
-
-
-                <p data-i18n="l1p">
-
-                    Rubik küpün yapısını,
-                    yüzlerini, merkez parçalarını,
-                    köşe ve kenar parçalarını öğren.
-
-                </p>
-
+                <div class="learning-number" data-i18n="l1num">01 — BAŞLANGIÇ</div>
+                <h3 data-i18n="l1title">Küpü Tanı</h3>
+                <p data-i18n="l1p">Rubik küpün yapısını, yüzlerini, merkez parçalarını, köşe ve kenar parçalarını öğren.</p>
             </div>
-
-
-
             <div class="learning-card reveal">
-
-                <div class="learning-number" data-i18n="l2num">
-                    02 — TEMEL
-                </div>
-
-
-                <h3 data-i18n="l2title">
-                    İlk Çözümünü Yap
-                </h3>
-
-
-                <p data-i18n="l2p">
-
-                    Temel hareketleri öğrenerek
-                    Rubik küpünü baştan sona
-                    çözmeyi öğren.
-
-                </p>
-
+                <div class="learning-number" data-i18n="l2num">02 — TEMEL</div>
+                <h3 data-i18n="l2title">İlk Çözümünü Yap</h3>
+                <p data-i18n="l2p">Temel hareketleri öğrenerek Rubik küpünü baştan sona çözmeyi öğren.</p>
             </div>
-
-
-
             <div class="learning-card reveal">
-
-                <div class="learning-number" data-i18n="l3num">
-                    03 — GELİŞİM
-                </div>
-
-
-                <h3 data-i18n="l3title">
-                    Algoritmaları Öğren
-                </h3>
-
-
-                <p data-i18n="l3p">
-
-                    Çözüm süreni azaltmak için
-                    gerekli algoritmaları
-                    çalışmaya başla.
-
-                </p>
-
+                <div class="learning-number" data-i18n="l3num">03 — GELİŞİM</div>
+                <h3 data-i18n="l3title">Algoritmaları Öğren</h3>
+                <p data-i18n="l3p">Çözüm süreni azaltmak için gerekli algoritmaları çalışmaya başla.</p>
             </div>
-
-
-
             <div class="learning-card reveal">
-
-                <div class="learning-number" data-i18n="l4num">
-                    04 — SPEEDCUBING
-                </div>
-
-
-                <h3 data-i18n="l4title">
-                    Hızını Geliştir
-                </h3>
-
-
-                <p data-i18n="l4p">
-
-                    Farklı teknikleri kullan,
-                    pratik yap ve kendi en iyi
-                    dereceni oluşturmaya çalış.
-
-                </p>
-
+                <div class="learning-number" data-i18n="l4num">04 — SPEEDCUBING</div>
+                <h3 data-i18n="l4title">Hızını Geliştir</h3>
+                <p data-i18n="l4p">Farklı teknikleri kullan, pratik yap ve kendi en iyi dereceni oluşturmaya çalış.</p>
             </div>
-
-
         </div>
 
     </div>
-
 </section>
 
 
-
-<!-- =========================================
-     SOSYAL MEDYA
-========================================= -->
-
+<!-- SOSYAL MEDYA -->
 <section>
-
     <div class="section-container">
-
 
         <div class="section-heading reveal">
-
-            <span data-i18n="socialSpan">
-                Sosyal Medya
-            </span>
-
-
-            <h2 data-i18n="socialH2">
-                Rubik Academy'yi takip et.
-            </h2>
-
-
-            <p data-i18n="socialP">
-
-                Yeni içerikleri ve speedcubing
-                paylaşımlarını kaçırma.
-
-            </p>
-
+            <span data-i18n="socialSpan">Sosyal Medya</span>
+            <h2 data-i18n="socialH2">Rubik Academy'yi takip et.</h2>
+            <p data-i18n="socialP">Yeni içerikleri ve speedcubing paylaşımlarını kaçırma.</p>
         </div>
-
-
 
         <div class="social-grid">
-
-
-            <a
-                href="https://www.instagram.com/erenrubiks"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-card reveal"
-            >
-
-                <div class="social-icon">
-                    ◎
-                </div>
-
-
-                <div>
-
-                    <h3>
-                        Instagram
-                    </h3>
-
-                    <p>
-                        @erenrubiks
-                    </p>
-
-                </div>
-
+            <a href="https://www.instagram.com/erenrubiks" target="_blank" rel="noopener noreferrer" class="social-card reveal">
+                <div class="social-icon">◎</div>
+                <div><h3>Instagram</h3><p>@erenrubiks</p></div>
             </a>
-
-
-
-            <a
-                href="https://www.youtube.com/@rubikacademyy"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-card reveal"
-            >
-
-                <div class="social-icon">
-                    ▶
-                </div>
-
-
-                <div>
-
-                    <h3>
-                        YouTube
-                    </h3>
-
-                    <p>
-                        @rubikacademyy
-                    </p>
-
-                </div>
-
+            <a href="https://www.youtube.com/@rubikacademyy" target="_blank" rel="noopener noreferrer" class="social-card reveal">
+                <div class="social-icon">▶</div>
+                <div><h3>YouTube</h3><p>@rubikacademyy</p></div>
             </a>
-
-
         </div>
 
     </div>
-
 </section>
 
 
-
-<!-- =========================================
-     İLETİŞİM
-========================================= -->
-
+<!-- İLETİŞİM -->
 <section class="contact">
-
     <div class="section-container">
-
-
         <div class="contact-box reveal">
-
-
-            <h2 data-i18n="contactH2">
-                Bir sorunuz mu var?
-            </h2>
-
-
-            <p data-i18n="contactP">
-
-                Sorularınız, önerileriniz veya
-                iş birlikleri için bizimle
-                iletişime geçebilirsiniz.
-
-            </p>
-
-
-            <a
-                href="mailto:muhammederenyalcin@gmail.com"
-                class="email"
-            >
-
-                ✉
-                muhammederenyalcin@gmail.com
-
-            </a>
-
-
+            <h2 data-i18n="contactH2">Bir sorunuz mu var?</h2>
+            <p data-i18n="contactP">Sorularınız, önerileriniz veya iş birlikleri için bizimle iletişime geçebilirsiniz.</p>
+            <a href="mailto:muhammederenyalcin@gmail.com" class="email">✉ muhammederenyalcin@gmail.com</a>
         </div>
-
     </div>
-
 </section>
 
 
-
-<!-- =========================================
-     FOOTER
-========================================= -->
-
+<!-- FOOTER -->
 <footer>
-
     <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
-
 </footer>
 
 
-
+<!-- BU SAYFAYA ÖZEL DİL METİNLERİ (common.js'den ÖNCE tanımlanmalı) -->
 <script>
-
-/* =========================================
-   KARANLIK MOD TIKLAMA FONKSİYONU VE İKON AYARI
-========================================= */
-
-function toggleDarkMode() {
-    var isDark = document.documentElement.classList.toggle("dark-mode");
-    document.body.classList.toggle("dark-mode", isDark);
-    
-    var btn = document.getElementById("darkModeBtn");
-
-    if (isDark) {
-        localStorage.setItem("theme", "dark");
-        if(btn) btn.innerHTML = "☀️";
-    } else {
-        localStorage.setItem("theme", "light");
-        if(btn) btn.innerHTML = "🌙";
-    }
-}
-
-// DOM yüklendiğinde butonun ikonunu duruma göre güncelle
-document.addEventListener("DOMContentLoaded", function() {
-    var savedTheme = localStorage.getItem("theme");
-    var btn = document.getElementById("darkModeBtn");
-    
-    if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark-mode");
-        document.body.classList.add("dark-mode");
-        if(btn) btn.innerHTML = "☀️";
-    } else {
-        if(btn) btn.innerHTML = "🌙";
-    }
-});
-
-/* =========================================
-   DİL SEÇİCİ (TR / EN / RU)
-========================================= */
-
 var translations = {
     tr: {
         navHome: "Ana Sayfa",
@@ -2792,121 +1157,10 @@ var translations = {
         footer: "© 2026 روبيك أكاديمي. جميع الحقوق محفوظة."
     }
 };
-
-var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR" };
-
-function applyLanguage(lang) {
-    if (!translations[lang]) lang = "tr";
-
-    var dict = translations[lang];
-
-    document.querySelectorAll("[data-i18n]").forEach(function(el) {
-        var key = el.getAttribute("data-i18n");
-        if (dict[key]) {
-            el.textContent = dict[key];
-        }
-    });
-
-    document.documentElement.setAttribute("lang", lang);
-
-    document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
-
-    var label = document.getElementById("langLabel");
-    if (label) {
-        label.textContent = langCodes[lang] || "TR";
-    }
-
-    document.querySelectorAll(".lang-menu-item").forEach(function(item) {
-        item.classList.toggle("active", item.getAttribute("data-lang") === lang);
-    });
-
-    localStorage.setItem("site-lang", lang);
-}
-
-function toggleLangMenu(e) {
-    if (e) e.stopPropagation();
-    var menu = document.getElementById("langMenu");
-    var btn = document.getElementById("langSwitchBtn");
-    if (!menu) return;
-    var willOpen = !menu.classList.contains("open");
-    menu.classList.toggle("open", willOpen);
-    if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
-}
-
-function closeLangMenu() {
-    var menu = document.getElementById("langMenu");
-    var btn = document.getElementById("langSwitchBtn");
-    if (menu) menu.classList.remove("open");
-    if (btn) btn.setAttribute("aria-expanded", "false");
-}
-
-function selectLanguage(lang) {
-    applyLanguage(lang);
-    closeLangMenu();
-}
-
-document.addEventListener("click", function(e) {
-    var switcher = document.getElementById("langSwitcher");
-    if (switcher && !switcher.contains(e.target)) {
-        closeLangMenu();
-    }
-});
-
-document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") closeLangMenu();
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-    var savedLang = localStorage.getItem("site-lang") || "tr";
-    applyLanguage(savedLang);
-});
-
-/* =========================================
-   SCROLL ANIMATION
-========================================= */
-
-const observer =
-    new IntersectionObserver(
-
-        (entries) => {
-
-            entries.forEach(
-                (entry) => {
-
-                    if (
-                        entry.isIntersecting
-                    ) {
-
-                        entry.target
-                            .classList
-                            .add("active");
-
-                    }
-
-                }
-            );
-
-        },
-
-        {
-            threshold: 0.15
-        }
-
-    );
-
-
-document
-    .querySelectorAll(".reveal")
-    .forEach(
-        (element) => {
-
-            observer.observe(element);
-
-        }
-    );
-
 </script>
 
+<!-- ORTAK JS (dark mode + dil seçici + reveal) -->
+<script src="/js/common.js"></script>
 
 </body>
 </html>
