@@ -1,0 +1,44 @@
+{
+  "pbl": [
+    {
+      "subset": "Ortega PBL",
+      "cases": [
+        {
+          "name": "Adj/Adj",
+          "alg": "R2 U' B2 U2 R2 U' R2",
+          "alts": [],
+          "pattern_u": "UUUUFRBL",
+          "pattern_d": "UUUURBLF"
+        },
+        {
+          "name": "Adj/Diag",
+          "alg": "R U' R F2 R' U R'",
+          "alts": [],
+          "pattern_u": "UUUURBFL",
+          "pattern_d": "UUUURFRB"
+        },
+        {
+          "name": "Diag/Diag",
+          "alg": "R2 F2 R2",
+          "alts": [],
+          "pattern_u": "UUUURBRF",
+          "pattern_d": "UUUURBRF"
+        },
+        {
+          "name": "Adj U",
+          "alg": "R U R' U' R' F R2 U' R' U' R U R' F'",
+          "alts": [],
+          "pattern_u": "UUUUFRBU",
+          "pattern_d": "UUUURBLF"
+        },
+        {
+          "name": "Diag U",
+          "alg": "F R U' R' U' R U R' F' R U R' U' R' F R F'",
+          "alts": [],
+          "pattern_u": "UUUURBRF",
+          "pattern_d": "UUUUBLFR"
+        }
+      ]
+    }
+  ]
+}
