@@ -689,6 +689,7 @@ Son katman algoritmalarını, her biri kendi diyagramıyla adım adım öğren: 
 
 <script src="/icerikler/algoritmalar/ll.js"></script>
 <script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
+<script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <!-- BU SAYFAYA ÖZEL DİL METİNLERİ (common.js'den ÖNCE tanımlanmalı) -->
 <script>
@@ -930,6 +931,7 @@ var translations = {
    her çalıştığında, tanımlıysa otomatik olarak onLanguageApplied()'i çağırır. */
 var caseCounts = null; // { oll: n, pll: n }
 var ortegaPblCount = null;
+var ortegaOllCount = null;
 
 function updateCountBadges(dict) {
     var ollBadge = document.getElementById("ollCountBadge");
@@ -941,7 +943,7 @@ function updateCountBadges(dict) {
     if (pblBadge && ortegaPblCount !== null) pblBadge.textContent = ortegaPblCount + " " + dict.case_word;
 
     var ortegaOllBadge = document.getElementById("ortegaOllCountBadge");
-    if (ortegaOllBadge) ortegaOllBadge.textContent = dict.soon_tag;
+    if (ortegaOllBadge) ortegaOllBadge.textContent = (ortegaOllCount !== null) ? (ortegaOllCount + " " + dict.case_word) : dict.soon_tag;
 
     var cllBadge = document.getElementById("cllCountBadge");
     if (cllBadge) cllBadge.textContent = dict.soon_tag;
@@ -1035,7 +1037,7 @@ fetch("/icerikler/algoritmalar/oll-pll.json")
     });
 
 /* ---- 2x2 (Ortega PBL / Ortega OLL / CLL) kartları ---- */
-fetch("/icerikler/algoritmalar/ortega-pbl.json")
+var pblFetch = fetch("/icerikler/algoritmalar/ortega-pbl.json")
     .then(function(res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
         return res.json();
@@ -1045,16 +1047,35 @@ fetch("/icerikler/algoritmalar/ortega-pbl.json")
         ortegaPblCount = countCases(groups);
 
         var sampleCase = (groups[0] && groups[0].cases[2]) ? groups[0].cases[2] : (groups[0] ? groups[0].cases[0] : null);
-        var pblDiagramU = sampleCase ? ortegaSvg(sampleCase.pattern_u, "full", 150) : "";
-
-        renderOrtegaCards(pblDiagramU);
+        return sampleCase ? ortegaSvg(sampleCase.pattern_u, "full", 150) : "";
     })
     .catch(function(err) {
         console.error("ortega-pbl.json yüklenemedi (2x2 kartları için):", err);
-        renderOrtegaCards("");
+        return "";
     });
 
-function renderOrtegaCards(pblDiagramHtml) {
+var ollFetch = fetch("/icerikler/algoritmalar/ortega-oll.json")
+    .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .then(function(data) {
+        var groups = data.oll || [];
+        ortegaOllCount = countCases(groups);
+
+        var sampleCase = (groups[0] && groups[0].cases[3]) ? groups[0].cases[3] : (groups[0] ? groups[0].cases[0] : null);
+        return sampleCase ? ortegaOllSvg(sampleCase.pattern, 150) : "";
+    })
+    .catch(function(err) {
+        console.error("ortega-oll.json yüklenemedi (2x2 kartları için):", err);
+        return "";
+    });
+
+Promise.all([pblFetch, ollFetch]).then(function(diagrams) {
+    renderOrtegaCards(diagrams[0], diagrams[1]);
+});
+
+function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml) {
     var lang = localStorage.getItem("site-lang") || "tr";
     var dict = translations[lang] || translations.tr;
 
@@ -1076,7 +1097,8 @@ function renderOrtegaCards(pblDiagramHtml) {
     html += '<a href="/icerikler/algoritmalar/ortega-oll" class="card">';
     html += '  <div class="card-visual ortega-oll-visual">';
     html += '    <div class="level" data-i18n="ortega_oll_level">' + dict.ortega_oll_level + '</div>';
-    html += '    <div class="count-badge" id="ortegaOllCountBadge">' + dict.soon_tag + '</div>';
+    html += '    <div class="count-badge" id="ortegaOllCountBadge">' + (ortegaOllCount !== null ? ortegaOllCount + ' ' + dict.case_word : dict.soon_tag) + '</div>';
+    html += '    <div class="diagram-wrap">' + (ollDiagramHtml || "") + '</div>';
     html += '  </div>';
     html += '  <div class="card-info">';
     html += '    <h3 data-i18n="ortega_oll_title">' + dict.ortega_oll_title + '</h3>';
