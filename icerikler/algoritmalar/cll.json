@@ -1,0 +1,33 @@
+{
+"cll": [
+{
+"subset": "CLL Cases",
+"cases": [
+{
+"name": "Sune",
+"alg": "R U R' U R U2 R'",
+"alts": [],
+"pattern": "UUUUFFBRRLBL"
+},
+{
+"name": "Antisune",
+"alg": "R' U2 R U R' U R",
+"alts": [],
+"pattern": "UUUUBFLRBFLR"
+},
+{
+"name": "H",
+"alg": "R2 U2 R U2 R2",
+"alts": [],
+"pattern": "UUUUFRFBBRLL"
+},
+{
+"name": "Pi",
+"alg": "R U2 R2 U' R2 U' R2 U2 R",
+"alts": [],
+"pattern": "UUUUFBRLFBRL"
+}
+]
+}
+]
+}
