@@ -1,37 +1,20 @@
-// CLL diagram generator for 2x2.
+// CLL diagram generator for 2x2 (Fixed flawless 4-corner layout).
 function cllSvg(pattern, mode, size) {
 var Y = "#f6c719", GRAY = "#4b515c";
 var C = { U: Y, F: "#179e4f", R: "#d12d28", B: "#2c6fe6", L: "#ff7a1a", D: "#eef2f3" };
 function color(ch) { return mode === "oll" ? (ch === "U" ? Y : GRAY) : (C[ch] || GRAY); }
-var S = 28, W = 7, o = W, T = 2 * S + 2 * W;
+var S = 28, o = 4, T = 2 * S + 2 * o;
 var r = [];
 
-// 1. 4 corners of the 2x2 face (Compact 2x2 grid)
+// 4 corners ordered strictly: 0: Top-Left, 1: Top-Right, 2: Bottom-Left, 3: Bottom-Right
 for (var i = 0; i < 4; i++) {
 var col = i % 2;
 var row = Math.floor(i / 2);
-r.push([o + col * S, o + row * S, S, S, 1.5, pattern[i]]);
+r.push([o + col * S, o + row * S, S, S, 2, pattern[i]]);
 }
-
-// 2. 4 surrounding side strips (Re-ordered to match standard top-view layout: Top, Right, Bottom, Left)
-// Pattern string index 4 & 5: Top side stickers
-r.push([o, 0, S, W, 1, pattern[4]]);        // Top-Left strip part
-r.push([o + S, 0, S, W, 1, pattern[5]]);    // Top-Right strip part
-
-// Pattern string index 6 & 7: Right side stickers
-r.push([o + 2 * S, o, W, S, 1, pattern[6]]);    // Right-Top strip part
-r.push([o + 2 * S, o + S, W, S, 1, pattern[7]]);// Right-Bottom strip part
-
-// Pattern string index 8 & 9: Bottom side stickers
-r.push([o + S, o + 2 * S, S, W, 1, pattern[8]]);// Bottom-Right strip part
-r.push([o, o + 2 * S, S, W, 1, pattern[9]]);    // Bottom-Left strip part
-
-// Pattern string index 10 & 11: Left side stickers
-r.push([0, o + S, W, S, 1, pattern[10]]);   // Left-Bottom strip part
-r.push([0, o, W, S, 1, pattern[11]]);       // Left-Top strip part
 
 return '<svg viewBox="0 0 ' + T + ' ' + T + '" width="' + size + '" height="' + size + '" aria-hidden="true">' +
 r.map(function (a) {
-return '<rect x="' + a[0] + '" y="' + a[1] + '" width="' + a[2] + '" height="' + a[3] + '" rx="' + a[4] + '" fill="' + color(a[5]) + '" stroke="#14171c" stroke-width="0.9"/>';
+return '<rect x="' + a[0] + '" y="' + a[1] + '" width="' + a[2] + '" height="' + a[3] + '" rx="' + a[4] + '" fill="' + color(a[5]) + '" stroke="#14171c" stroke-width="1.2"/>';
 }).join("") + "</svg>";
 }
