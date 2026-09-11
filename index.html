@@ -240,276 +240,6 @@ section {
     line-height: 1.7;
 }
 
-/* ZKT TIMER TANITIM BANDI */
-.zkt-promo {
-    padding: 0 7% 70px;
-    background: transparent;
-}
-
-.zkt-promo-card {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px 32px 28px;
-    border-radius: 22px;
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(120deg, #64748b, #475569 65%);
-    box-shadow: 0 20px 45px rgba(71,85,105,.28);
-    transition: .3s, background-color 0.3s;
-}
-
-.zkt-promo-card::before {
-    content: "";
-    position: absolute;
-    top: -60%;
-    right: -10%;
-    width: 320px;
-    height: 320px;
-    border-radius: 50%;
-    background: rgba(255,255,255,.10);
-    pointer-events: none;
-}
-
-.zkt-promo-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 26px 55px rgba(71,85,105,.34);
-}
-
-.zkt-promo-top { position: relative; z-index: 1; }
-
-.zkt-promo-badge {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 20px;
-    background: #7c3aed;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: .8px;
-    text-transform: uppercase;
-}
-
-.zkt-promo-row {
-    display: flex;
-    align-items: center;
-    gap: 26px;
-    position: relative;
-    z-index: 1;
-}
-
-.zkt-promo-body {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex: 1;
-    min-width: 0;
-}
-
-.zkt-promo-mark {
-    width: 56px;
-    height: 56px;
-    flex-shrink: 0;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.zkt-promo-mark img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.zkt-promo-text h3 {
-    color: #fff;
-    font-size: 19px;
-    font-weight: 800;
-    margin-bottom: 2px;
-    letter-spacing: -.3px;
-    transition: color 0.3s;
-}
-
-.zkt-promo-author {
-    display: block;
-    color: rgba(255,255,255,.72);
-    font-size: 12px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    transition: color 0.3s;
-}
-
-.zkt-promo-text p {
-    color: rgba(255,255,255,.88);
-    font-size: 14px;
-    line-height: 1.6;
-    max-width: 560px;
-    transition: color 0.3s;
-}
-
-.zkt-promo-cta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-    padding: 12px 20px;
-    border-radius: 12px;
-    background: #7c3aed;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 800;
-    transition: .25s, background-color 0.25s, color 0.25s;
-}
-
-.zkt-promo-cta svg { width: 16px; height: 16px; transition: .25s; }
-.zkt-promo-card:hover .zkt-promo-cta svg { transform: translateX(3px); }
-
-@media(max-width:700px) {
-    .zkt-promo-row { flex-direction: column; align-items: flex-start; }
-    .zkt-promo-cta { align-self: stretch; justify-content: center; }
-}
-
-/* RAT YARIŞMA TANITIM BANDI */
-.rat-promo {
-    padding: 0 7% 70px;
-    background: transparent;
-}
-
-.rat-promo-card {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px 32px 28px;
-    border-radius: 22px;
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(120deg, #e6252f, #b91c1c 65%);
-    box-shadow: 0 20px 45px rgba(230,37,47,.30);
-    transition: .3s, background-color 0.3s;
-}
-
-.rat-promo-card::before {
-    content: "";
-    position: absolute;
-    top: -60%;
-    right: -10%;
-    width: 320px;
-    height: 320px;
-    border-radius: 50%;
-    background: rgba(255,255,255,.12);
-    pointer-events: none;
-}
-
-.rat-promo-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 26px 55px rgba(230,37,47,.36);
-}
-
-.rat-promo-top { position: relative; z-index: 1; }
-
-.rat-promo-badge {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 20px;
-    background: #172033;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: .8px;
-    text-transform: uppercase;
-}
-
-.rat-promo-row {
-    display: flex;
-    align-items: center;
-    gap: 26px;
-    position: relative;
-    z-index: 1;
-}
-
-.rat-promo-body {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex: 1;
-    min-width: 0;
-}
-
-.rat-promo-mark {
-    width: 56px;
-    height: 56px;
-    flex-shrink: 0;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    background: rgba(255,255,255,.16);
-    font-size: 27px;
-}
-
-.rat-promo-mark img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.rat-promo-text h3 {
-    color: #fff;
-    font-size: 19px;
-    font-weight: 800;
-    margin-bottom: 2px;
-    letter-spacing: -.3px;
-    transition: color 0.3s;
-}
-
-.rat-promo-author {
-    display: block;
-    color: rgba(255,255,255,.75);
-    font-size: 12px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    transition: color 0.3s;
-}
-
-.rat-promo-text p {
-    color: rgba(255,255,255,.90);
-    font-size: 14px;
-    line-height: 1.6;
-    max-width: 560px;
-    transition: color 0.3s;
-}
-
-.rat-promo-cta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-    padding: 12px 20px;
-    border-radius: 12px;
-    background: #fff;
-    color: #b91c1c;
-    font-size: 14px;
-    font-weight: 800;
-    transition: .25s, background-color 0.25s, color 0.25s;
-}
-
-.rat-promo-cta svg { width: 16px; height: 16px; transition: .25s; }
-.rat-promo-card:hover .rat-promo-cta svg { transform: translateX(3px); }
-
-@media(max-width:700px) {
-    .rat-promo-row { flex-direction: column; align-items: flex-start; }
-    .rat-promo-cta { align-self: stretch; justify-content: center; }
-}
-
 /* EĞİTİM BÖLÜMÜ */
 .learning-section { background: transparent; transition: background-color 0.3s; }
 
@@ -739,58 +469,6 @@ section {
 </section>
 
 
-<!-- ZKT TIMER TANITIM BANDI -->
-<section class="zkt-promo">
-    <div class="section-container">
-        <a href="https://rubikacademy.fun/zkttimer" class="zkt-promo-card reveal">
-            <div class="zkt-promo-top">
-                <span class="zkt-promo-badge" data-i18n="zktPromoBadge">Yeni · ZKT Timer</span>
-            </div>
-            <div class="zkt-promo-row">
-                <div class="zkt-promo-body">
-                    <div class="zkt-promo-mark"><img src="/zkttimer.png" alt="ZKT Timer"></div>
-                    <div class="zkt-promo-text">
-                        <h3 data-i18n="zktPromoTitle">ZKT Timer</h3>
-                        <span class="zkt-promo-author" data-i18n="zktPromoAuthor">İbrahim Yıldız</span>
-                        <p data-i18n="zktPromoP">Türkiye'nin en kapsamlı küp zamanlayıcısı. Sürelerini kaydet, istatistiklerini takip et ve arkadaşlarınla online küp çöz.</p>
-                    </div>
-                </div>
-                <div class="zkt-promo-cta" data-i18n="zktPromoCta">
-                    Keşfet
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-            </div>
-        </a>
-    </div>
-</section>
-
-
-<!-- RAT YARIŞMA TANITIM BANDI -->
-<section class="rat-promo">
-    <div class="section-container">
-        <a href="https://rubikacademy.fun/rat" class="rat-promo-card reveal">
-            <div class="rat-promo-top">
-                <span class="rat-promo-badge" data-i18n="ratPromoBadge">Yarışma · RAT</span>
-            </div>
-            <div class="rat-promo-row">
-                <div class="rat-promo-body">
-                    <div class="rat-promo-mark">🏆</div>
-                    <div class="rat-promo-text">
-                        <h3 data-i18n="ratPromoTitle">RAT — Rubik Academy Türkiye Yarışmaları</h3>
-                        <span class="rat-promo-author" data-i18n="ratPromoAuthor">Online Yarışmalar</span>
-                        <p data-i18n="ratPromoP">FTO Ağustos 2026 yarışmasına katıl, diğer speedcuber'larla yarış ve derecelerini kaydet.</p>
-                    </div>
-                </div>
-                <div class="rat-promo-cta" data-i18n="ratPromoCta">
-                    Keşfet
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-            </div>
-        </a>
-    </div>
-</section>
-
-
 <!-- AKADEMİ -->
 <section id="academy">
     <div class="section-container">
@@ -915,16 +593,6 @@ var translations = {
         heroTitle2: "Hızını geliştir.",
         heroP: "Rubik Academy, Rubik küp çözmeyi öğrenmek ve çözüm sürelerini geliştirmek isteyenler için hazırlanmış modern ve sistemli bir eğitim platformudur.",
         heroBtn: "Öğrenmeye Başla →",
-        zktPromoBadge: "Yeni · ZKT Timer",
-        zktPromoTitle: "ZKT Timer",
-        zktPromoAuthor: "İbrahim Yıldız",
-        zktPromoP: "Türkiye'nin en kapsamlı küp zamanlayıcısı. Sürelerini kaydet, istatistiklerini takip et ve arkadaşlarınla online küp çöz.",
-        zktPromoCta: "Keşfet",
-        ratPromoBadge: "Yarışma · RAT",
-        ratPromoTitle: "RAT — Rubik Academy Türkiye Yarışmaları",
-        ratPromoAuthor: "Online Yarışmalar",
-        ratPromoP: "FTO Ağustos 2026 yarışmasına katıl, diğer speedcuber'larla yarış ve derecelerini kaydet.",
-        ratPromoCta: "Keşfet",
         academySpan: "Rubik Academy",
         academyH2: "Küp çözmeyi sistemli şekilde öğren.",
         academyP: "Temelden başlayıp speedcubing seviyesine kadar ilerleyebileceğin içerikler.",
@@ -965,16 +633,6 @@ var translations = {
         heroTitle2: "Boost your speed.",
         heroP: "Rubik Academy is a modern, structured learning platform for anyone who wants to learn how to solve the Rubik's Cube and improve their solve times.",
         heroBtn: "Start Learning →",
-        zktPromoBadge: "New · ZKT Timer",
-        zktPromoTitle: "ZKT Timer",
-        zktPromoAuthor: "İbrahim Yıldız",
-        zktPromoP: "Turkey's most comprehensive cube timer. Log your times, track your stats, and solve cubes online with your friends.",
-        zktPromoCta: "Explore",
-        ratPromoBadge: "Competition · RAT",
-        ratPromoTitle: "RAT — Rubik Academy Turkey Competitions",
-        ratPromoAuthor: "Online Competitions",
-        ratPromoP: "Join the FTO August 2026 competition, race against other speedcubers, and record your results.",
-        ratPromoCta: "Explore",
         academySpan: "Rubik Academy",
         academyH2: "Learn to solve the cube, step by step.",
         academyP: "Content that takes you from the basics all the way to speedcubing level.",
@@ -1015,16 +673,6 @@ var translations = {
         heroTitle2: "Развивай скорость.",
         heroP: "Rubik Academy — современная и структурированная образовательная платформа для тех, кто хочет научиться собирать кубик Рубика и улучшить своё время сборки.",
         heroBtn: "Начать обучение →",
-        zktPromoBadge: "Новое · ZKT Timer",
-        zktPromoTitle: "ZKT Timer",
-        zktPromoAuthor: "İbrahim Yıldız",
-        zktPromoP: "Самый полнофункциональный таймер для кубика в Турции. Сохраняй время, отслеживай статистику и собирай кубик онлайн с друзьями.",
-        zktPromoCta: "Смотреть",
-        ratPromoBadge: "Соревнование · RAT",
-        ratPromoTitle: "RAT — Соревнования Rubik Academy Türkiye",
-        ratPromoAuthor: "Онлайн-соревнования",
-        ratPromoP: "Прими участие в соревновании FTO Август 2026, посоревнуйся с другими спидкуберами и зафиксируй свои результаты.",
-        ratPromoCta: "Смотреть",
         academySpan: "Rubik Academy",
         academyH2: "Изучай сборку кубика системно.",
         academyP: "Контент, который проведёт тебя от основ до профессионального уровня.",
@@ -1065,16 +713,6 @@ var translations = {
         heroTitle2: "Verbessere deine Geschwindigkeit.",
         heroP: "Rubik Academy ist eine moderne und strukturierte Lernplattform für alle, die lernen möchten, den Zauberwürfel zu lösen und ihre Lösungszeiten zu verbessern.",
         heroBtn: "Jetzt lernen →",
-        zktPromoBadge: "Neu · ZKT Timer",
-        zktPromoTitle: "ZKT Timer",
-        zktPromoAuthor: "İbrahim Yıldız",
-        zktPromoP: "Der umfangreichste Würfel-Timer der Türkei. Speichere deine Zeiten, verfolge deine Statistiken und löse Würfel online mit deinen Freunden.",
-        zktPromoCta: "Entdecken",
-        ratPromoBadge: "Wettbewerb · RAT",
-        ratPromoTitle: "RAT — Rubik Academy Türkiye Wettbewerbe",
-        ratPromoAuthor: "Online-Wettbewerbe",
-        ratPromoP: "Nimm am FTO-Wettbewerb im August 2026 teil, tritt gegen andere Speedcuber an und halte deine Ergebnisse fest.",
-        ratPromoCta: "Entdecken",
         academySpan: "Rubik Academy",
         academyH2: "Lerne systematisch, den Würfel zu lösen.",
         academyP: "Inhalte, die dich von den Grundlagen bis zum professionellen Speedcubing-Niveau begleiten.",
@@ -1115,16 +753,6 @@ var translations = {
         heroTitle2: "طوّر سرعتك.",
         heroP: "روبيك أكاديمي هي منصة تعليمية حديثة ومنظمة لكل من يريد تعلّم حل مكعب روبيك وتحسين وقت الحل لديه.",
         heroBtn: "ابدأ التعلم ←",
-        zktPromoBadge: "جديد · ZKT Timer",
-        zktPromoTitle: "ZKT Timer",
-        zktPromoAuthor: "İbrahim Yıldız",
-        zktPromoP: "أشمل ساعة توقيت لمكعب روبيك في تركيا. سجّل أوقاتك، تابع إحصائياتك، وحلّ المكعب أونلاين مع أصدقائك.",
-        zktPromoCta: "اكتشف",
-        ratPromoBadge: "مسابقة · RAT",
-        ratPromoTitle: "RAT — مسابقات روبيك أكاديمي تركيا",
-        ratPromoAuthor: "مسابقات أونلاين",
-        ratPromoP: "شارك في مسابقة FTO أغسطس 2026، نافس محلّي مكعبات آخرين وسجّل نتائجك.",
-        ratPromoCta: "اكتشف",
         academySpan: "روبيك أكاديمي",
         academyH2: "تعلّم حل المكعب بطريقة منظمة.",
         academyP: "محتوى يأخذك من الأساسيات إلى مستوى احترافي في السبيدكيوبنج.",
