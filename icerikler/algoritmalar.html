@@ -244,6 +244,11 @@ body.dark-mode {
     gap: 25px;
 }
 
+.methods.methods-3 {
+    max-width: 1250px;
+    grid-template-columns: repeat(3, 1fr);
+}
+
 .card {
     background: var(--surface);
     border: 1px solid var(--card-border);
@@ -282,6 +287,9 @@ body.dark-mode {
 
 .oll-visual { background: linear-gradient(135deg, #fff6d9, #ffe28a); }
 .pll-visual { background: linear-gradient(135deg, #e2f5ff, #91d8ff); }
+.ortega-pbl-visual { background: linear-gradient(135deg, #fff0e0, #ffcf94); }
+.ortega-oll-visual { background: linear-gradient(135deg, #fff9d6, #ffe97a); }
+.cll-visual { background: linear-gradient(135deg, #eee5ff, #c9adfc); }
 
 .level {
     position: absolute;
@@ -322,6 +330,11 @@ body.dark-mode {
 .card-visual .diagram-wrap svg {
     width: 150px;
     height: 150px;
+}
+
+.card-visual .diagram-wrap.small svg {
+    width: 110px;
+    height: 110px;
 }
 
 .card:hover .diagram-wrap {
@@ -464,6 +477,7 @@ body.dark-mode {
 @media(max-width: 1000px) {
     .hero { padding: 45px; }
     .soon-grid { grid-template-columns: repeat(3, 1fr); }
+    .methods.methods-3 { grid-template-columns: repeat(2, 1fr); max-width: 900px; }
 }
 
 @media(max-width: 700px) {
@@ -472,6 +486,7 @@ body.dark-mode {
     .hero h1 { font-size: 43px; }
     .hero p { font-size: 14px; }
     .methods { grid-template-columns: 1fr; gap: 20px; }
+    .methods.methods-3 { grid-template-columns: 1fr; }
     .card-visual { height: 260px; }
     .section-title h2 { font-size: 27px; }
     .soon-grid { grid-template-columns: repeat(2, 1fr); }
@@ -591,6 +606,16 @@ Son katman algoritmalarını, her biri kendi diyagramıyla adım adım öğren: 
     </section>
 </div>
 
+<!-- 2x2 KATEGORİSİ -->
+<div class="category-block">
+    <div class="category-heading">
+        <h3 data-i18n="cat_2x2_title">2x2</h3>
+        <span data-i18n="cat_2x2_sub">Ortega yöntemi algoritmaları</span>
+    </div>
+    <section class="methods methods-3" id="cards2x2Section">
+    </section>
+</div>
+
 <!-- DİĞERLERİ YAKINDA -->
 <div class="category-block">
     <div class="category-heading">
@@ -598,13 +623,6 @@ Son katman algoritmalarını, her biri kendi diyagramıyla adım adım öğren: 
         <span data-i18n="cat_soon_sub">Yakında eklenecek</span>
     </div>
     <div class="soon-grid" id="soonGrid">
-        <div class="soon-card">
-            <div class="soon-card-icon">2×2</div>
-            <div class="soon-card-text">
-                <h4 data-i18n="soon_2x2">2×2 Algoritmaları</h4>
-                <span class="soon-tag" data-i18n="soon_tag">YAKINDA</span>
-            </div>
-        </div>
         <div class="soon-card">
             <div class="soon-card-icon">4×4</div>
             <div class="soon-card-text">
@@ -670,6 +688,7 @@ Son katman algoritmalarını, her biri kendi diyagramıyla adım adım öğren: 
 </div>
 
 <script src="/icerikler/algoritmalar/ll.js"></script>
+<script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
 
 <!-- BU SAYFAYA ÖZEL DİL METİNLERİ (common.js'den ÖNCE tanımlanmalı) -->
 <script>
@@ -687,10 +706,11 @@ var translations = {
         "section_p": "Kategorini seç ve tüm case'lere diyagramlarıyla göz at.",
         "cat_3x3_title": "3x3",
         "cat_3x3_sub": "Son katman algoritmaları",
+        "cat_2x2_title": "2x2",
+        "cat_2x2_sub": "Ortega yöntemi algoritmaları",
         "cat_soon_title": "Diğerleri",
         "cat_soon_sub": "Yakında eklenecek",
         "soon_tag": "YAKINDA",
-        "soon_2x2": "2×2 Algoritmaları",
         "soon_4x4": "4×4 Algoritmaları",
         "soon_5x5": "5×5 Algoritmaları",
         "soon_pyra": "Pyraminx",
@@ -704,6 +724,15 @@ var translations = {
         "pll_level": "PLL",
         "pll_title": "PLL Algoritmaları",
         "pll_p": "Son katman parçalarını doğru yerine permute etmek için gereken tüm case'ler.",
+        "ortega_pbl_level": "PBL",
+        "ortega_pbl_title": "Ortega PBL Algoritmaları",
+        "ortega_pbl_p": "2x2 çözümünde her iki katmanı da doğru konumuna permute etmek için gereken tüm case'ler.",
+        "ortega_oll_level": "OLL",
+        "ortega_oll_title": "Ortega OLL Algoritmaları",
+        "ortega_oll_p": "2x2 küpte son katmanı tek hamlede oryante etmek için gereken tüm case'ler.",
+        "cll_level": "CLL",
+        "cll_title": "CLL Algoritmaları",
+        "cll_p": "2x2 küpte son katmanı tek adımda hem oryante hem permute eden ileri seviye case'ler.",
         "cta_start": "Case'lere Git",
         "case_word": "case",
         "load_error": "Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.",
@@ -723,10 +752,11 @@ var translations = {
         "section_p": "Pick a category and browse every case with its diagram.",
         "cat_3x3_title": "3x3",
         "cat_3x3_sub": "Last-layer algorithms",
+        "cat_2x2_title": "2x2",
+        "cat_2x2_sub": "Ortega method algorithms",
         "cat_soon_title": "Others",
         "cat_soon_sub": "Coming soon",
         "soon_tag": "SOON",
-        "soon_2x2": "2×2 Algorithms",
         "soon_4x4": "4×4 Algorithms",
         "soon_5x5": "5×5 Algorithms",
         "soon_pyra": "Pyraminx",
@@ -740,6 +770,15 @@ var translations = {
         "pll_level": "PLL",
         "pll_title": "PLL Algorithms",
         "pll_p": "Every case you need to permute the last-layer pieces into place.",
+        "ortega_pbl_level": "PBL",
+        "ortega_pbl_title": "Ortega PBL Algorithms",
+        "ortega_pbl_p": "Every case you need to permute both layers into place when solving a 2x2.",
+        "ortega_oll_level": "OLL",
+        "ortega_oll_title": "Ortega OLL Algorithms",
+        "ortega_oll_p": "Every case you need to orient the last layer of a 2x2 in one go.",
+        "cll_level": "CLL",
+        "cll_title": "CLL Algorithms",
+        "cll_p": "Advanced cases that orient and permute the last layer of a 2x2 at the same time.",
         "cta_start": "View Cases",
         "case_word": "cases",
         "load_error": "Couldn't load the algorithm data. Please try again later.",
@@ -759,10 +798,11 @@ var translations = {
         "section_p": "Выбери категорию и просмотри все кейсы с диаграммами.",
         "cat_3x3_title": "3x3",
         "cat_3x3_sub": "Алгоритмы последнего слоя",
+        "cat_2x2_title": "2x2",
+        "cat_2x2_sub": "Алгоритмы метода Ортега",
         "cat_soon_title": "Другие",
         "cat_soon_sub": "Скоро появится",
         "soon_tag": "СКОРО",
-        "soon_2x2": "Алгоритмы 2×2",
         "soon_4x4": "Алгоритмы 4×4",
         "soon_5x5": "Алгоритмы 5×5",
         "soon_pyra": "Пирамидка",
@@ -776,6 +816,15 @@ var translations = {
         "pll_level": "PLL",
         "pll_title": "Алгоритмы PLL",
         "pll_p": "Все кейсы, необходимые для перестановки элементов последнего слоя.",
+        "ortega_pbl_level": "PBL",
+        "ortega_pbl_title": "Алгоритмы Ortega PBL",
+        "ortega_pbl_p": "Все кейсы для перестановки обоих слоёв на 2x2.",
+        "ortega_oll_level": "OLL",
+        "ortega_oll_title": "Алгоритмы Ortega OLL",
+        "ortega_oll_p": "Все кейсы для ориентации последнего слоя на 2x2 за один подход.",
+        "cll_level": "CLL",
+        "cll_title": "Алгоритмы CLL",
+        "cll_p": "Продвинутые кейсы, которые одновременно ориентируют и переставляют последний слой на 2x2.",
         "cta_start": "Смотреть кейсы",
         "case_word": "кейсов",
         "load_error": "Не удалось загрузить данные алгоритмов. Попробуй позже.",
@@ -795,10 +844,11 @@ var translations = {
         "section_p": "Wähle eine Kategorie und durchsuche alle Fälle mit Diagramm.",
         "cat_3x3_title": "3x3",
         "cat_3x3_sub": "Last-Layer-Algorithmen",
+        "cat_2x2_title": "2x2",
+        "cat_2x2_sub": "Ortega-Methode-Algorithmen",
         "cat_soon_title": "Andere",
         "cat_soon_sub": "Demnächst",
         "soon_tag": "BALD",
-        "soon_2x2": "2×2-Algorithmen",
         "soon_4x4": "4×4-Algorithmen",
         "soon_5x5": "5×5-Algorithmen",
         "soon_pyra": "Pyraminx",
@@ -812,6 +862,15 @@ var translations = {
         "pll_level": "PLL",
         "pll_title": "PLL-Algorithmen",
         "pll_p": "Alle Fälle, die du brauchst, um die Teile der letzten Ebene richtig zu positionieren.",
+        "ortega_pbl_level": "PBL",
+        "ortega_pbl_title": "Ortega-PBL-Algorithmen",
+        "ortega_pbl_p": "Alle Fälle, um beim 2x2 beide Ebenen korrekt zu positionieren.",
+        "ortega_oll_level": "OLL",
+        "ortega_oll_title": "Ortega-OLL-Algorithmen",
+        "ortega_oll_p": "Alle Fälle, um die letzte Ebene beim 2x2 in einem Zug zu orientieren.",
+        "cll_level": "CLL",
+        "cll_title": "CLL-Algorithmen",
+        "cll_p": "Fortgeschrittene Fälle, die die letzte Ebene beim 2x2 gleichzeitig orientieren und positionieren.",
         "cta_start": "Fälle ansehen",
         "case_word": "Fälle",
         "load_error": "Algorithmusdaten konnten nicht geladen werden. Bitte versuche es später erneut.",
@@ -831,10 +890,11 @@ var translations = {
         "section_p": "اختر فئة وتصفّح كل الحالات برسومها التوضيحية.",
         "cat_3x3_title": "3x3",
         "cat_3x3_sub": "خوارزميات الطبقة الأخيرة",
+        "cat_2x2_title": "2x2",
+        "cat_2x2_sub": "خوارزميات طريقة أورتيغا",
         "cat_soon_title": "أخرى",
         "cat_soon_sub": "قريبًا",
         "soon_tag": "قريبًا",
-        "soon_2x2": "خوارزميات 2×2",
         "soon_4x4": "خوارزميات 4×4",
         "soon_5x5": "خوارزميات 5×5",
         "soon_pyra": "Pyraminx",
@@ -848,6 +908,15 @@ var translations = {
         "pll_level": "PLL",
         "pll_title": "خوارزميات PLL",
         "pll_p": "كل الحالات اللازمة لتبديل قطع الطبقة الأخيرة إلى مكانها الصحيح.",
+        "ortega_pbl_level": "PBL",
+        "ortega_pbl_title": "خوارزميات Ortega PBL",
+        "ortega_pbl_p": "كل الحالات اللازمة لتبديل كلتا الطبقتين في مكعب 2x2.",
+        "ortega_oll_level": "OLL",
+        "ortega_oll_title": "خوارزميات Ortega OLL",
+        "ortega_oll_p": "كل الحالات اللازمة لتوجيه الطبقة الأخيرة في مكعب 2x2 بحركة واحدة.",
+        "cll_level": "CLL",
+        "cll_title": "خوارزميات CLL",
+        "cll_p": "حالات متقدمة توجّه وتبدّل الطبقة الأخيرة في مكعب 2x2 في آن واحد.",
         "cta_start": "عرض الحالات",
         "case_word": "حالة",
         "load_error": "تعذّر تحميل بيانات الخوارزميات. حاول مرة أخرى لاحقًا.",
@@ -856,16 +925,26 @@ var translations = {
     }
 };
 
-/* Bu sayfaya özel: OLL/PLL kart sayacı (35 case, 57 case gibi rozetler)
+/* Bu sayfaya özel: OLL/PLL/2x2 kart sayacı (35 case, 57 case gibi rozetler)
    dil değiştiğinde de güncellenmeli. common.js'teki applyLanguage()
    her çalıştığında, tanımlıysa otomatik olarak onLanguageApplied()'i çağırır. */
 var caseCounts = null; // { oll: n, pll: n }
+var ortegaPblCount = null;
 
 function updateCountBadges(dict) {
     var ollBadge = document.getElementById("ollCountBadge");
     var pllBadge = document.getElementById("pllCountBadge");
     if (ollBadge) ollBadge.textContent = caseCounts.oll + " " + dict.case_word;
     if (pllBadge) pllBadge.textContent = caseCounts.pll + " " + dict.case_word;
+
+    var pblBadge = document.getElementById("ortegaPblCountBadge");
+    if (pblBadge && ortegaPblCount !== null) pblBadge.textContent = ortegaPblCount + " " + dict.case_word;
+
+    var ortegaOllBadge = document.getElementById("ortegaOllCountBadge");
+    if (ortegaOllBadge) ortegaOllBadge.textContent = dict.soon_tag;
+
+    var cllBadge = document.getElementById("cllCountBadge");
+    if (cllBadge) cllBadge.textContent = dict.soon_tag;
 }
 
 function onLanguageApplied(lang) {
@@ -954,6 +1033,73 @@ fetch("/icerikler/algoritmalar/oll-pll.json")
         if (errBox) errBox.style.display = "block";
         console.error("oll-pll.json yüklenemedi:", err);
     });
+
+/* ---- 2x2 (Ortega PBL / Ortega OLL / CLL) kartları ---- */
+fetch("/icerikler/algoritmalar/ortega-pbl.json")
+    .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .then(function(data) {
+        var groups = data.pbl || [];
+        ortegaPblCount = countCases(groups);
+
+        var sampleCase = (groups[0] && groups[0].cases[2]) ? groups[0].cases[2] : (groups[0] ? groups[0].cases[0] : null);
+        var pblDiagramU = sampleCase ? ortegaSvg(sampleCase.pattern_u, "full", 150) : "";
+
+        renderOrtegaCards(pblDiagramU);
+    })
+    .catch(function(err) {
+        console.error("ortega-pbl.json yüklenemedi (2x2 kartları için):", err);
+        renderOrtegaCards("");
+    });
+
+function renderOrtegaCards(pblDiagramHtml) {
+    var lang = localStorage.getItem("site-lang") || "tr";
+    var dict = translations[lang] || translations.tr;
+
+    var html = "";
+
+    html += '<a href="/icerikler/algoritmalar/ortega-pbl" class="card">';
+    html += '  <div class="card-visual ortega-pbl-visual">';
+    html += '    <div class="level" data-i18n="ortega_pbl_level">' + dict.ortega_pbl_level + '</div>';
+    html += '    <div class="count-badge" id="ortegaPblCountBadge">' + (ortegaPblCount !== null ? ortegaPblCount + ' ' + dict.case_word : '') + '</div>';
+    html += '    <div class="diagram-wrap">' + pblDiagramHtml + '</div>';
+    html += '  </div>';
+    html += '  <div class="card-info">';
+    html += '    <h3 data-i18n="ortega_pbl_title">' + dict.ortega_pbl_title + '</h3>';
+    html += '    <p data-i18n="ortega_pbl_p">' + dict.ortega_pbl_p + '</p>';
+    html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
+    html += '  </div>';
+    html += '</a>';
+
+    html += '<a href="/icerikler/algoritmalar/ortega-oll" class="card">';
+    html += '  <div class="card-visual ortega-oll-visual">';
+    html += '    <div class="level" data-i18n="ortega_oll_level">' + dict.ortega_oll_level + '</div>';
+    html += '    <div class="count-badge" id="ortegaOllCountBadge">' + dict.soon_tag + '</div>';
+    html += '  </div>';
+    html += '  <div class="card-info">';
+    html += '    <h3 data-i18n="ortega_oll_title">' + dict.ortega_oll_title + '</h3>';
+    html += '    <p data-i18n="ortega_oll_p">' + dict.ortega_oll_p + '</p>';
+    html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
+    html += '  </div>';
+    html += '</a>';
+
+    html += '<a href="/icerikler/algoritmalar/cll" class="card">';
+    html += '  <div class="card-visual cll-visual">';
+    html += '    <div class="level" data-i18n="cll_level">' + dict.cll_level + '</div>';
+    html += '    <div class="count-badge" id="cllCountBadge">' + dict.soon_tag + '</div>';
+    html += '  </div>';
+    html += '  <div class="card-info">';
+    html += '    <h3 data-i18n="cll_title">' + dict.cll_title + '</h3>';
+    html += '    <p data-i18n="cll_p">' + dict.cll_p + '</p>';
+    html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
+    html += '  </div>';
+    html += '</a>';
+
+    document.getElementById("cards2x2Section").innerHTML = html;
+    applyLanguage(lang);
+}
 </script>
 
 </body>
