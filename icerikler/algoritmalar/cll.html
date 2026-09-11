@@ -233,6 +233,7 @@ html.dark-mode .hero {
     color: var(--text-soft);
     text-align: center;
     font-size: 14px;
+    display: none;
 }
 </style>
 
@@ -299,28 +300,43 @@ html.dark-mode .hero {
 
 <div class="subsets-wrap" id="subsetsWrap"></div>
 
-<div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">
+<div id="loadError" class="load-error" data-i18n="load_error">
     Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.
 </div>
 
 </div>
 
-<!-- Harici JS bağlantısı -->
+<!-- Harici JS bağlantıları -->
 <script src="/icerikler/algoritmalar/cllSvg.js"></script>
 
 <script>
 var translations = {
-    "tr": { "navHome": "Ana Sayfa", "navContent": "İçerikler", "back_btn": "← Geri Dön", "badge_text": "2x2 · CLL", "hero_title1": "CLL", "hero_titleAccent": "Algoritmaları", "hero_p": "2x2 Rubik küp çözümlerinde son katman köşe permütasyon ve yönlendirmesini tek adımda çözmek için kullanılan CLL algoritmaları.", "load_error": "Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.", "subset_CLL Cases": "CLL Durumları" },
-    "en": { "navHome": "Home", "navContent": "Content", "back_btn": "← Go Back", "badge_text": "2x2 · CLL", "hero_title1": "CLL", "hero_titleAccent": "Algorithms", "hero_p": "CLL algorithms used to solve 2x2 Rubik's cube last layer corners orientation and permutation in one step.", "load_error": "Couldn't load the algorithm data. Please try again later.", "subset_CLL Cases": "CLL Cases" },
-    "ru": { "navHome": "Главная", "navContent": "Контент", "back_btn": "← Назад", "badge_text": "2x2 · CLL", "hero_title1": "CLL", "hero_titleAccent": "Алгоритмы", "hero_p": "Алгоритмы CLL для одновременной ориентации и пермутации углов последнего слоя в кубике 2x2.", "load_error": "Не удалось загрузить данные алгоритмов. Попробуй позже.", "subset_CLL Cases": "Кейсы CLL" },
-    "de": { "navHome": "Startseite", "navContent": "Inhalte", "back_btn": "← Zurück", "badge_text": "2x2 · CLL", "hero_title1": "CLL", "hero_titleAccent": "Algorithmen", "hero_p": "CLL-Algorithmen zum Lösen der Ecken der letzten Ebene in einem Schritt beim 2x2 Rubik's Cube.", "load_error": "Algorithmusdaten konnten nicht geladen werden. Bitte versuche es später erneut.", "subset_CLL Cases": "CLL Fälle" },
-    "ar": { "navHome": "الرئيسية", "navContent": "المحتوى", "back_btn": "← رجوع", "badge_text": "2x2 · CLL", "hero_title1": "خوارزميات", "hero_titleAccent": "CLL", "hero_p": "خوارزميات CLL المستخدمة لحل زوايا الطبقة الأخيرة في مكعب روبيك 2x2 في خطوة واحدة.", "load_error": "تعذّر تحميل بيانات الخوارزميات. حاول مرة أخرى لاحقًا.", "subset_CLL Cases": "حالات CLL" }
+    "tr": { 
+        "navHome": "Ana Sayfa", "navContent": "İçerikler", "back_btn": "← Geri Dön", "badge_text": "2x2 · CLL", "hero_title1": "CLL", "hero_titleAccent": "Algoritmaları", "hero_p": "2x2 Rubik küp çözümlerinde son katman köşe permütasyon ve yönlendirmesini tek adımda çözmek için kullanılan CLL algoritmaları.", "load_error": "Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.", 
+        "subset_Antisune": "Antisune", "subset_H": "H Grubu", "subset_L": "L Grubu", "subset_PLL": "PLL Grubu", "subset_Pi": "Pi Grubu", "subset_Sune": "Sune", "subset_T": "T Grubu", "subset_U": "U Grubu"
+    },
+    "en": { 
+        "navHome": "Home", "navContent": "Content", "back_btn": "← Go Back", "badge_text": "2x2 · CLL", "hero_title1": "CLL", "hero_titleAccent": "Algorithms", "hero_p": "CLL algorithms used to solve 2x2 Rubik's cube last layer corners orientation and permutation in one step.", "load_error": "Couldn't load the algorithm data. Please try again later.", 
+        "subset_Antisune": "Antisune", "subset_H": "H Group", "subset_L": "L Group", "subset_PLL": "PLL Group", "subset_Pi": "Pi Group", "subset_Sune": "Sune", "subset_T": "T Group", "subset_U": "U Group"
+    },
+    "ru": { 
+        "navHome": "Главная", "navContent": "Контент", "back_btn": "← Назад", "badge_text": "2x2 · CLL", "hero_title1": "CLL", "hero_titleAccent": "Алгоритмы", "hero_p": "Алгоритмы CLL для одновременной ориентации и пермутации углов последнего слоя в кубике 2x2.", "load_error": "Не удалось загрузить данные алгоритмов. Попробуй позже.", 
+        "subset_Antisune": "Антисуне", "subset_H": "Группа H", "subset_L": "Группа L", "subset_PLL": "Группа PLL", "subset_Pi": "Группа Pi", "subset_Sune": "Суне", "subset_T": "Группа T", "subset_U": "Группа U"
+    },
+    "de": { 
+        "navHome": "Startseite", "navContent": "Inhalte", "back_btn": "← Zurück", "badge_text": "2x2 · CLL", "hero_title1": "CLL", "hero_titleAccent": "Algorithmen", "hero_p": "CLL-Algorithmen zum Lösen der Ecken der letzten Ebene in einem Schritt beim 2x2 Rubik's Cube.", "load_error": "Algorithmusdaten konnten nicht geladen werden. Bitte versuche es später erneut.", 
+        "subset_Antisune": "Antisune", "subset_H": "H-Gruppe", "subset_L": "L-Gruppe", "subset_PLL": "PLL-Gruppe", "subset_Pi": "Pi-Gruppe", "subset_Sune": "Sune", "subset_T": "T-Gruppe", "subset_U": "U-Gruppe"
+    },
+    "ar": { 
+        "navHome": "الرئيسية", "navContent": "المحتوى", "back_btn": "← رجوع", "badge_text": "2x2 · CLL", "hero_title1": "خوارزميات", "hero_titleAccent": "CLL", "hero_p": "خوارزميات CLL المستخدمة لحل زوايا الطبقة الأخيرة في مكعب روبيك 2x2 في خطوة واحدة.", "load_error": "تعذّر تحميل بيانات الخوارزميات. حاول مرة أخرى لاحقًا.", 
+        "subset_Antisune": "Antisune", "subset_H": "مجموعة H", "subset_L": "مجموعة L", "subset_PLL": "مجموعة PLL", "subset_Pi": "مجموعة Pi", "subset_Sune": "Sune", "subset_T": "مجموعة T", "subset_U": "مجموعة U"
+    }
 };
 </script>
 
 <script src="/js/common.js"></script>
 
-<!-- Harici JSON dosyasını çekme -->
+<!-- Harici cll.json dosyasını çekme -->
 <script>
 function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
