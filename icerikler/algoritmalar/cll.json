@@ -1,32 +1,85 @@
 {
 "cll": [
 {
-"subset": "CLL Cases",
+"subset": "Antisune",
 "cases": [
-{
-"name": "Sune",
-"alg": "R U R' U R U2 R'",
-"alts": [],
-"pattern": "UUUUFFBRRLBL"
+{ "name": "AS1", "alg": "L' U' L U' L' U2 L", "pattern": "UUUUFFBRRLBL" },
+{ "name": "AS2", "alg": "L' U' L U L F' L' F L' U' L' U' L' U2 L", "pattern": "UUUUFFBRRLBL" },
+{ "name": "AS3", "alg": "F' L F L' U2 L' U2 L", "pattern": "UUUUBFLRBFLR" },
+{ "name": "AS4", "alg": "R U2 R' U2 R' F R F'", "pattern": "UUUUFRFBBRLL" },
+{ "name": "AS5", "alg": "R' F R F' R U R'", "pattern": "UUUUFBRLFBRL" },
+{ "name": "AS6", "alg": "R' U R U' R2 F R F' R U R' U' R", "pattern": "UUUUBFLRBFLR" }
+]
 },
 {
-"name": "Antisune",
-"alg": "R' U2 R U R' U R",
-"alts": [],
-"pattern": "UUUUBFLRBFLR"
+"subset": "H",
+"cases": [
+{ "name": "H1", "alg": "R2 U2 R' U2 R2", "pattern": "UUUUFFBRRLBL" },
+{ "name": "H2", "alg": "F R2 U' R2 U' R2 U R2 F'", "pattern": "UUUUBFLRBFLR" },
+{ "name": "H3", "alg": "R U R' U R U L U' L' U' L", "pattern": "UUUUFRFBBRLL" },
+{ "name": "H4", "alg": "x' U2 R U2 R2 F2 R U2 x", "pattern": "UUUUFBRLFBRL" }
+]
 },
 {
-"name": "H",
-"alg": "R2 U2 R U2 R2",
-"alts": [],
-"pattern": "UUUUFRFBBRLL"
+"subset": "L",
+"cases": [
+{ "name": "L1", "alg": "R' U R' U2 R U' R' U R U' R2", "pattern": "UUUUFFBRRLBL" },
+{ "name": "L2", "alg": "R U2 R2 F2 R U R' F2 R F'", "pattern": "UUUUBFLRBFLR" },
+{ "name": "L3", "alg": "R U2 R' F' R U2 R' U' R' F2 R", "pattern": "UUUUFRFBBRLL" },
+{ "name": "L4", "alg": "F R' F' R U R U' R'", "pattern": "UUUUFBRLFBRL" },
+{ "name": "L5", "alg": "F R U' R' U' R U R' F'", "pattern": "UUUUBFLRBFLR" },
+{ "name": "L6", "alg": "R U2 R2 F R F' R U2 R'", "pattern": "UUUUFRFBBRLL" }
+]
 },
 {
-"name": "Pi",
-"alg": "R U2 R2 U' R2 U' R2 U2 R",
-"alts": [],
-"pattern": "UUUUFBRLFBRL"
-}
+"subset": "PLL",
+"cases": [
+{ "name": "Adjacent", "alg": "R U R' U' R' F R2 U' R' U' R U R' F'", "pattern": "UUUUFFBRRLBL" },
+{ "name": "Diagonal", "alg": "F R U' R' U' R U R' F' R U R' U' R' F R F'", "pattern": "UUUUBFLRBFLR" }
+]
+},
+{
+"subset": "Pi",
+"cases": [
+{ "name": "P1", "alg": "R U' R2 U R2 U R2 U' R", "pattern": "UUUUFFBRRLBL" },
+{ "name": "P2", "alg": "R' F2 R F' U2 R U' R' U' F", "pattern": "UUUUBFLRBFLR" },
+{ "name": "P3", "alg": "F R2 U' R2 U R2 U R2 F'", "pattern": "UUUUFRFBBRLL" },
+{ "name": "P4", "alg": "R U2 R' U' R U R' U2 R' F R F'", "pattern": "UUUUFBRLFBRL" },
+{ "name": "P5", "alg": "R U' R' F R F' R U R' F R", "pattern": "UUUUBFLRBFLR" },
+{ "name": "P6", "alg": "R' U' R' F R F' R U' R' U2 R", "pattern": "UUUUFRFBBRLL" }
+]
+},
+{
+"subset": "Sune",
+"cases": [
+{ "name": "S1", "alg": "R U R' U R U2 R'", "pattern": "UUUUFFBRRLBL" },
+{ "name": "S2", "alg": "L' U2 L U2 L F' L' F", "pattern": "UUUUBFLRBFLR" },
+{ "name": "S3", "alg": "F R' F' R U2 R U2 R'", "pattern": "UUUUFRFBBRLL" },
+{ "name": "S4", "alg": "R U R' U' R F R' F' R U R' U R U2 R'", "pattern": "UUUUFBRLFBRL" },
+{ "name": "S5", "alg": "L F' L' F L' U' L", "pattern": "UUUUBFLRBFLR" },
+{ "name": "S6", "alg": "R U R' U' R' F R F' R U2 R'", "pattern": "UUUUFRFBBRLL" }
+]
+},
+{
+"subset": "T",
+"cases": [
+{ "name": "T1", "alg": "R' U R U2 R2 F' R U' R' F2 R2", "pattern": "UUUUFFBRRLBL" },
+{ "name": "T2", "alg": "R' U R U2 R2 F R F' R", "pattern": "UUUUBFLRBFLR" },
+{ "name": "T3", "alg": "L' U' L U L2 F' L' F L", "pattern": "UUUUFRFBBRLL" },
+{ "name": "T4", "alg": "F R U R' U' R U' R' U' R U R' F'", "pattern": "UUUUFBRLFBRL" },
+{ "name": "T5", "alg": "R U R' U' R' F R F'", "pattern": "UUUUBFLRBFLR" },
+{ "name": "T6", "alg": "F U' R U2 R' U' F2 R U R'", "pattern": "UUUUFRFBBRLL" }
+]
+},
+{
+"subset": "U",
+"cases": [
+{ "name": "U1", "alg": "R2 F2 R U R' F2 R2 U2 R' U' R", "pattern": "UUUUFFBRRLBL" },
+{ "name": "U2", "alg": "R U2 R U' R' F R' F2 U' F", "pattern": "UUUUBFLRBFLR" },
+{ "name": "U3", "alg": "R' U R' F R F' R U2 R' U R", "pattern": "UUUUFRFBBRLL" },
+{ "name": "U4", "alg": "F R' F' R U' R U' R' U2 R U' R'", "pattern": "UUUUFBRLFBRL" },
+{ "name": "U5", "alg": "R U' R2 F R F' R U R' U' R U R'", "pattern": "UUUUBFLRBFLR" },
+{ "name": "U6", "alg": "F R U R' U' F'", "pattern": "UUUUFRFBBRLL" }
 ]
 }
 ]
