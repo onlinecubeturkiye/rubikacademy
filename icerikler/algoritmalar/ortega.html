@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Tema/dil flash önlemek için erken uygulama -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Ortega PBL Algoritmaları</title>
+<link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/ortega-pbl">
+<meta name="description" content="Rubik Academy - 2x2 Ortega yöntemi PBL algoritmalarını diyagramlarıyla öğren.">
+<meta property="og:title" content="Rubik Academy - Ortega PBL Algoritmaları">
+<meta property="og:description" content="2x2 Rubik küpü Ortega metodu PBL durumları ve algoritmaları.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/ortega-pbl">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- ORTAK STİLLER -->
+<link rel="stylesheet" href="/styles/common.css">
+
+<!-- BU SAYFAYA ÖZEL STİLLER -->
+<style>
+html { overflow-x: hidden; }
+
+.page {
+    min-height: calc(100vh - 71px);
+    padding: 45px 5% 80px;
+    background: var(--background);
+    transition: background-color 0.3s;
+}
+
+.nav-bar {
+    max-width: 1250px;
+    margin: 0 auto 25px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: all .25s ease;
+}
+
+.back-btn:hover {
+    transform: translateX(-4px);
+    border-color: #c0e0fc;
+    background: var(--primary-light);
+}
+
+/* HERO */
+.hero {
+    max-width: 1250px;
+    min-height: 220px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 45px 65px;
+    background: linear-gradient(120deg, #eef1ff, #dbe3ff);
+    border: 1px solid #cdd8fb;
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .hero {
+    background: linear-gradient(120deg, #1e2247, #1e293b);
+    border-color: #334155;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    right: -180px;
+    top: -180px;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 3;
+    max-width: 700px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 15px;
+    border-radius: 50px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary-dark);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    margin-bottom: 18px;
+}
+
+.badge i {
+    width: 7px;
+    height: 7px;
+    background: #168ee0;
+    border-radius: 50%;
+}
+
+.hero h1 {
+    font-size: clamp(36px, 4.5vw, 54px);
+    line-height: 1;
+    letter-spacing: -2.5px;
+    font-weight: 950;
+    margin-bottom: 14px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary-dark); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 560px;
+}
+
+/* CASE GRID SECTIONS */
+.subsets-wrap {
+    max-width: 1250px;
+    margin: 0 auto;
+}
+
+.subset-block { margin-bottom: 48px; }
+
+.subset-heading {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding-left: 14px;
+    border-left: 5px solid var(--primary);
+}
+
+.case-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+@media(max-width: 850px) { .case-grid { grid-template-columns: 1fr; } }
+
+.case-card {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.case-card:hover {
+    transform: translateY(-4px);
+    border-color: #dcbb5c;
+    box-shadow: 0 16px 32px rgba(180, 140, 20, .12);
+}
+
+.case-diagrams-group {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.case-diagram {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: var(--diagram-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.case-diagram svg { width: 52px; height: 52px; }
+
+.case-body { flex: 1; min-width: 0; }
+
+.case-name {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+}
+
+.case-alg {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--primary-dark);
+    font-weight: 600;
+    overflow-wrap: break-word;
+}
+
+.load-error {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    text-align: center;
+    font-size: 14px;
+}
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<!-- ÜST BAR -->
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu">
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')"><span>Türkçe</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')"><span>English</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')"><span>Русский</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')"><span>Deutsch</span><span class="lang-check">✓</span></button>
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')"><span>العربية</span><span class="lang-check">✓</span></button>
+            </div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<section class="hero">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+<span data-i18n="badge_text">2x2 &middot; ORTEGA PBL</span>
+</div>
+<h1><span data-i18n="hero_title1">Ortega</span> <span data-i18n="hero_titleAccent">PBL</span></h1>
+<p data-i18n="hero_p">
+2x2 Rubik küp çözümlerinde katmanları doğru konumlarına yerleştirmek için kullanılan Ortega PBL algoritmaları.
+</p>
+</div>
+</section>
+
+<div class="subsets-wrap" id="subsetsWrap"></div>
+
+<div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">
+    Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.
+</div>
+
+</div>
+
+<script src="/icerikler/algoritmalar/ortega-svg.js"></script>
+
+<!-- DİL ÇEVİRİLERİ -->
+<script>
+var translations = {
+    "tr": {
+        "navHome": "Ana Sayfa",
+        "navContent": "İçerikler",
+        "back_btn": "← Geri Dön",
+        "badge_text": "2x2 · ORTEGA PBL",
+        "hero_title1": "Ortega",
+        "hero_titleAccent": "PBL",
+        "hero_p": "2x2 Rubik küp çözümlerinde katmanları doğru konumlarına yerleştirmek için kullanılan Ortega PBL algoritmaları.",
+        "load_error": "Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.",
+        "subset_Ortega PBL": "Ortega PBL Durumları"
+    },
+    "en": {
+        "navHome": "Home",
+        "navContent": "Content",
+        "back_btn": "← Go Back",
+        "badge_text": "2x2 · ORTEGA PBL",
+        "hero_title1": "Ortega",
+        "hero_titleAccent": "PBL",
+        "hero_p": "Ortega PBL algorithms used to position layers correctly in 2x2 Rubik's cube solves.",
+        "load_error": "Couldn't load the algorithm data. Please try again later.",
+        "subset_Ortega PBL": "Ortega PBL Cases"
+    },
+    "ru": {
+        "navHome": "Главная",
+        "navContent": "Контент",
+        "back_btn": "← Назад",
+        "badge_text": "2x2 · ORTEGA PBL",
+        "hero_title1": "Ортега",
+        "hero_titleAccent": "PBL",
+        "hero_p": "Алгоритмы PBL метода Ортега для правильной расстановки слоев в кубике 2x2.",
+        "load_error": "Не удалось загрузить данные алгоритмов. Попробуй позже.",
+        "subset_Ortega PBL": "Кейсы Ortega PBL"
+    },
+    "de": {
+        "navHome": "Startseite",
+        "navContent": "Inhalte",
+        "back_btn": "← Zurück",
+        "badge_text": "2x2 · ORTEGA PBL",
+        "hero_title1": "Ortega",
+        "hero_titleAccent": "PBL",
+        "hero_p": "Ortega PBL-Algorithmen zum korrekten Positionieren der Ebenen beim 2x2 Rubik's Cube.",
+        "load_error": "Algorithmusdaten konnten nicht geladen werden. Bitte versuche es später erneut.",
+        "subset_Ortega PBL": "Ortega PBL Fälle"
+    },
+    "ar": {
+        "navHome": "الرئيسية",
+        "navContent": "المحتوى",
+        "back_btn": "← رجوع",
+        "badge_text": "2x2 · ORTEGA PBL",
+        "hero_title1": "أورتيغا",
+        "hero_titleAccent": "PBL",
+        "hero_p": "خوارزميات Ortega PBL المستخدمة لوضع الطبقات في أماكنها الصحيحة لمكعب روبيك 2x2.",
+        "load_error": "تعذّر تحميل بيانات الخوارزميات. حاول مرة أخرى لاحقًا.",
+        "subset_Ortega PBL": "حالات Ortega PBL"
+    }
+};
+</script>
+
+<script src="/js/common.js"></script>
+
+<!-- SAYFA İÇERİĞİNİ OLUŞTURMA -->
+<script>
+function escapeHtml(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+fetch("ortega-pbl.json")
+    .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .then(function(data) {
+        var groups = data.pbl;
+        var wrap = document.getElementById("subsetsWrap");
+        var html = "";
+
+        for (var i = 0; i < groups.length; i++) {
+            var group = groups[i];
+            var i18nKey = "subset_" + group.subset;
+
+            html += '<div class="subset-block">';
+            html += '  <h2 class="subset-heading" data-i18n="' + i18nKey + '">' + escapeHtml(group.subset) + '</h2>';
+            html += '  <div class="case-grid">';
+
+            for (var j = 0; j < group.cases.length; j++) {
+                var c = group.cases[j];
+                var diagU = ortegaSvg(c.pattern_u, "full", 60);
+                var diagD = ortegaSvg(c.pattern_d, "full", 60);
+
+                html += '<div class="case-card">';
+                html += '  <div class="case-diagrams-group" dir="ltr">';
+                html += '    <div class="case-diagram">' + diagU + '</div>';
+                html += '    <div class="case-diagram">' + diagD + '</div>';
+                html += '  </div>';
+                html += '  <div class="case-body">';
+                html += '    <div class="case-name">' + escapeHtml(c.name) + '</div>';
+                html += '    <div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>';
+                html += '  </div>';
+                html += '</div>';
+            }
+
+            html += '  </div>';
+            html += '</div>';
+        }
+
+        wrap.innerHTML = html;
+
+        var savedLang = localStorage.getItem("site-lang") || "tr";
+        applyLanguage(savedLang);
+    })
+    .catch(function(err) {
+        var errBox = document.getElementById("loadError");
+        if (errBox) errBox.style.display = "block";
+        console.error("ortega-pbl.json yüklenemedi:", err);
+    });
+</script>
+
+</body>
+</html>
