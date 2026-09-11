@@ -75,7 +75,7 @@
       "subset": "U",
       "cases": [
         { "name": "U1", "alg": "R2 F2 R U R' F2 R2 U2 R' U' R", "pattern": "FUFULRBBRLUU" },
-        { "name": "U2", "alg": "R2 F2 R U R' F2 R2 U2 R' U' R", "pattern": "FUFULRBBRLUU" },
+        { "name": "U2", "alg": "R U2 R U' R' F R' F2 U' F", "pattern": "FUFULRBBRLUU" },
         { "name": "U3", "alg": "R' U R' F R F' R U2 R' U R", "pattern": "FRUURBBLUULF" },
         { "name": "U4", "alg": "F R' F' R U' R U' R' U2 R U' R'", "pattern": "FUBURLBFRLUU" },
         { "name": "U5", "alg": "R U' R2 F R F' R U R' U' R U R'", "pattern": "RBUUFRLBUUFL" },
