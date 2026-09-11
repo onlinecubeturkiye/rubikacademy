@@ -690,6 +690,7 @@ Son katman algoritmalarını, her biri kendi diyagramıyla adım adım öğren: 
 <script src="/icerikler/algoritmalar/ll.js"></script>
 <script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
+<script src="/icerikler/algoritmalar/cllSvg.js"></script>
 
 <!-- BU SAYFAYA ÖZEL DİL METİNLERİ (common.js'den ÖNCE tanımlanmalı) -->
 <script>
@@ -948,9 +949,9 @@ function updateCountBadges(dict) {
 
     // DÜZELTME: burada eskiden hep dict.soon_tag ("YAKINDA") yazılıyordu,
     // dil değiştirildiğinde/uygulandığında doğru rozeti eziyordu.
-    // Artık gerçek cllCount değerine göre yazıyor (o da yoksa 42'ye düşer).
+    // Artık ortegaOllBadge ile aynı mantık: veri geldiyse sayıyı, gelmediyse "YAKINDA" gösterir.
     var cllBadge = document.getElementById("cllCountBadge");
-    if (cllBadge) cllBadge.textContent = (cllCount !== null ? cllCount : 42) + " " + dict.case_word;
+    if (cllBadge) cllBadge.textContent = (cllCount !== null) ? (cllCount + " " + dict.case_word) : dict.soon_tag;
 }
 
 function onLanguageApplied(lang) {
@@ -980,25 +981,6 @@ function countCases(groups) {
     var total = 0;
     for (var i = 0; i < groups.length; i++) total += groups[i].cases.length;
     return total;
-}
-
-/* GEÇİCİ CLL GÖRSELİ:
-   Gerçek CLL desenini (ortegaOllSvg.js mantığına uygun, cll.json'daki
-   "pattern" formatını okuyan) çizecek fonksiyon şu an projede yok.
-   Ortega OLL'nin görselini olduğu gibi kullanmak (eski hata) CLL kartının
-   Ortega OLL ile birebir aynı görünmesine yol açıyordu.
-   Bu yer tutucu en azından Ortega OLL'den görsel olarak AYRI ve CLL'ye
-   özgü basit bir ikon gösteriyor. Gerçek diyagramı ekleyebilmem için
-   ortegaOllSvg.js dosyanızı ve cll.json'daki bir "pattern" örneğini
-   paylaşmanız yeterli - o zaman bu fonksiyonu gerçek çizimle değiştiririm. */
-function cllPlaceholderSvg(size) {
-    size = size || 150;
-    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
-           '<rect x="16" y="16" width="68" height="68" rx="16" fill="none" stroke="#7c4fe0" stroke-width="6"/>' +
-           '<line x1="50" y1="16" x2="50" y2="84" stroke="#7c4fe0" stroke-width="4"/>' +
-           '<line x1="16" y1="50" x2="84" y2="50" stroke="#7c4fe0" stroke-width="4"/>' +
-           '<circle cx="50" cy="50" r="7" fill="#7c4fe0"/>' +
-           '</svg>';
 }
 
 fetch("/icerikler/algoritmalar/oll-pll.json")
@@ -1085,9 +1067,10 @@ var ollFetch = fetch("/icerikler/algoritmalar/ortega-oll.json")
         return sampleCase ? ortegaOllSvg(sampleCase.pattern, 150) : "";
     });
 
-/* DÜZELTME: cllSvg() diye bir fonksiyon projede tanımlı değildi,
-   çağrılınca hata fırlatıp promise'i .catch()'e düşürüyordu.
-   Şimdilik cllPlaceholderSvg() kullanılıyor (bkz. yukarıdaki not). */
+/* cll.json yapısı: [{ subset: "Antisune", cases: [{name, alg, pattern}, ...] }, ...]
+   findCaseByName zaten her grubun "cases" dizisine bakıyor, bu yapıyla da çalışır.
+   pattern gerçek cllSvg.js'teki cllSvg(pattern, mode, size) fonksiyonuna veriliyor;
+   mode "oll" DEĞİLSE tam renkli (F/B/R/L/U/D) çizim yapıyor, o yüzden burada "cll" geçildi. */
 var cllFetch = fetch("/icerikler/algoritmalar/cll.json")
     .then(function(res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
@@ -1095,12 +1078,15 @@ var cllFetch = fetch("/icerikler/algoritmalar/cll.json")
     })
     .then(function(data) {
         var groups = data.cll || [];
-        cllCount = countCases(groups) || 42;
-        return cllPlaceholderSvg(150);
+        cllCount = countCases(groups);
+
+        var sampleCase = findCaseByName(groups, "S1") || (groups[0] && groups[0].cases[0]);
+        return sampleCase ? cllSvg(sampleCase.pattern, "cll", 150) : "";
     })
-    .catch(function() {
-        cllCount = 42;
-        return cllPlaceholderSvg(150);
+    .catch(function(err) {
+        cllCount = null;
+        console.error("cll.json yüklenemedi:", err);
+        return "";
     });
 
 Promise.all([pblFetch, ollFetch, cllFetch])
@@ -1148,7 +1134,7 @@ function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml, cllDiagramHtml) {
     html += '<a href="/icerikler/algoritmalar/cll" class="card">';
     html += '  <div class="card-visual cll-visual">';
     html += '    <div class="level" data-i18n="cll_level">' + dict.cll_level + '</div>';
-    html += '    <div class="count-badge" id="cllCountBadge">' + (cllCount !== null ? cllCount : 42) + ' ' + dict.case_word + '</div>';
+    html += '    <div class="count-badge" id="cllCountBadge">' + (cllCount !== null ? cllCount + ' ' + dict.case_word : dict.soon_tag) + '</div>';
     html += '    <div class="diagram-wrap">' + (cllDiagramHtml || "") + '</div>';
     html += '  </div>';
     html += '  <div class="card-info">';
