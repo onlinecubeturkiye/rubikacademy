@@ -1036,7 +1036,6 @@ fetch("/icerikler/algoritmalar/oll-pll.json")
         console.error("oll-pll.json yüklenemedi:", err);
     });
 
-/* ---- 2x2 (Ortega PBL / Ortega OLL / CLL) kartları ---- */
 var pblFetch = fetch("/icerikler/algoritmalar/ortega-pbl.json")
     .then(function(res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
@@ -1063,9 +1062,25 @@ var ollFetch = fetch("/icerikler/algoritmalar/ortega-oll.json")
         return sampleCase ? ortegaOllSvg(sampleCase.pattern, 150) : "";
     });
 
-Promise.all([pblFetch, ollFetch])
+var cllFetch = fetch("/icerikler/algoritmalar/cll.json")
+    .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .then(function(data) {
+        var groups = data.cll || [];
+        cllCount = countCases(groups);
+
+        var sampleCase = (groups[0] && groups[0].cases[0]) ? groups[0].cases[0] : null;
+        return sampleCase ? ortegaOllSvg(sampleCase.pattern, 150) : ""; // Projedeki SVG fonksiyonuna göre uygun olanı seçebilirsin
+    })
+    .catch(function() {
+        return ""; // CLL JSON henüz yoksa veya hata verirse akışın bozulmaması için boş döner
+    });
+
+Promise.all([pblFetch, ollFetch, cllFetch])
     .then(function(diagrams) {
-        renderOrtegaCards(diagrams[0], diagrams[1]);
+        renderOrtegaCards(diagrams[0], diagrams[1], diagrams[2]);
     })
     .catch(function(err) {
         var errBox = document.getElementById("loadError");
@@ -1073,7 +1088,7 @@ Promise.all([pblFetch, ollFetch])
         console.error("Ortega (PBL/OLL/CLL) verisi yüklenemedi:", err);
     });
 
-function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml) {
+function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml, cllDiagramHtml) {
     var lang = localStorage.getItem("site-lang") || "tr";
     var dict = translations[lang] || translations.tr;
 
@@ -1108,7 +1123,8 @@ function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml) {
     html += '<a href="/icerikler/algoritmalar/cll" class="card">';
     html += '  <div class="card-visual cll-visual">';
     html += '    <div class="level" data-i18n="cll_level">' + dict.cll_level + '</div>';
-    html += '    <div class="count-badge" id="cllCountBadge">' + dict.soon_tag + '</div>';
+    html += '    <div class="count-badge" id="cllCountBadge">' + (typeof cllCount !== 'undefined' && cllCount !== null ? cllCount + ' ' + dict.case_word : dict.soon_tag) + '</div>';
+    html += '    <div class="diagram-wrap">' + (cllDiagramHtml || "") + '</div>';
     html += '  </div>';
     html += '  <div class="card-info">';
     html += '    <h3 data-i18n="cll_title">' + dict.cll_title + '</h3>';
