@@ -14,29 +14,29 @@
           "name": "Adj/Diag",
           "alg": "R U' R F2 R' U R'",
           "alts": [],
-          "pattern_u": "UUUUFFRRBBLL",
-          "pattern_d": "UUUURRBBLLFF"
+          "pattern_u": "UUUUFRBLFFFFRRBBLL",
+          "pattern_d": "UUUURBLFFFRRBBLL"
         },
         {
           "name": "Diag/Diag",
           "alg": "R2 F2 R2",
           "alts": [],
-          "pattern_u": "UUUURRBBLLFF",
-          "pattern_d": "UUUURRBBLLFF"
+          "pattern_u": "UUUURBRFFFFRRBBLL",
+          "pattern_d": "UUUURBRFFFFRRBBLL"
         },
         {
           "name": "Adj U",
           "alg": "R U R' U' R' F R2 U' R' U' R U R' F'",
           "alts": [],
-          "pattern_u": "UUUUFFRRBBLL",
-          "pattern_d": "UUUURRBBLLFF"
+          "pattern_u": "UUUUFRBUFFFFRRBBLL",
+          "pattern_d": "UUUURBLFFFFRRBBLL"
         },
         {
           "name": "Diag U",
           "alg": "F R U' R' U' R U R' F' R U R' U' R' F R F'",
           "alts": [],
-          "pattern_u": "UUUURRBBLLFF",
-          "pattern_d": "UUUUFFRRBBLL"
+          "pattern_u": "UUUURBRFFFFRRBBLL",
+          "pattern_d": "UUUUBLFRFFRRBBLL"
         }
       ]
     }
