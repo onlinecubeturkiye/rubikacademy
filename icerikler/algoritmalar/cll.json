@@ -4,7 +4,7 @@
       "subset": "Antisune",
       "cases": [
         { "name": "AS1", "alg": "L' U' L U' L' U2 L", "pattern": "FLRUUBFLRUUB" },
-        { "name": "AS2", "alg": "L' U' L U L F' L' F L' U' L' U' L' U2 L", "pattern": "BLRUUBFRUULF" },
+        { "name": "AS2", "alg": "L' U' L U L F' L' F L' U' L' U' L' U2 L", "pattern": "RBLUFRBLUFRB" },
         { "name": "AS3", "alg": "F' L F L' U2 L' U2 L", "pattern": "BFRUULRFLUUB" },
         { "name": "AS4", "alg": "R U2 R' U2 R' F R F'", "pattern": "FRBUULBFRUUL" },
         { "name": "AS5", "alg": "R' F R F' R U R'", "pattern": "FBRUULLFRUUB" },
