@@ -1,0 +1,51 @@
+{
+  "oll": [
+    {
+      "subset": "Ortega OLL",
+      "cases": [
+        {
+          "name": "H",
+          "alg": "R2 U2 R U2 R2",
+          "alts": [],
+          "pattern": "XXXXUUXXUUXX"
+        },
+        {
+          "name": "Pi",
+          "alg": "R U2 R2 U' R2 U' R2 U2 R",
+          "alts": [],
+          "pattern": "XXXXXUXXXUUU"
+        },
+        {
+          "name": "Antisune",
+          "alg": "R U2 R' U' R U' R'",
+          "alts": [],
+          "pattern": "XUXXUXXUXXUX"
+        },
+        {
+          "name": "Sune",
+          "alg": "R U R' U R U2 R'",
+          "alts": [],
+          "pattern": "XXUXXUUXUXXX"
+        },
+        {
+          "name": "L",
+          "alg": "F R' F' R U R U' R'",
+          "alts": [],
+          "pattern": "UXXUUXUXXXXX"
+        },
+        {
+          "name": "T",
+          "alg": "R U R' U' R' F R F'",
+          "alts": [],
+          "pattern": "XUXUUXXXUXXX"
+        },
+        {
+          "name": "U",
+          "alg": "F R U R' U' F'",
+          "alts": [],
+          "pattern": "XUXUXXXXXXUU"
+        }
+      ]
+    }
+  ]
+}
