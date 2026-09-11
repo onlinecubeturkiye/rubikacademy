@@ -4,7 +4,7 @@
       "subset": "Antisune",
       "cases": [
         { "name": "AS1", "alg": "L' U' L U' L' U2 L", "pattern": "FLRUUBFLRUUB" },
-        { "name": "AS2", "alg": "L' U' L U L F' L' F L' U' L' U' L' U2 L", "pattern": "RBLUFRBLUFRB" },
+        { "name": "AS2", "alg": "L' U' L U L F' L' F L' U' L' U' L' U2 L", "pattern": "LBRUUFLRFUUB" },
         { "name": "AS3", "alg": "F' L F L' U2 L' U2 L", "pattern": "BFRUULRFLUUB" },
         { "name": "AS4", "alg": "R U2 R' U2 R' F R F'", "pattern": "FRBUULBFRUUL" },
         { "name": "AS5", "alg": "R' F R F' R U R'", "pattern": "FBRUULLFRUUB" },
@@ -16,7 +16,7 @@
       "cases": [
         { "name": "H1", "alg": "R2 U2 R' U2 R2", "pattern": "BFBFUURLUURL" },
         { "name": "H2", "alg": "F R2 U' R2 U' R2 U R2 F'", "pattern": "LRBBRLUUFFUU" },
-        { "name": "H3", "alg": "R U R' U R U L U' L' U' L", "pattern": "UURLBFBFUURL" },
+        { "name": "H3", "alg": "R U R' U R U L U' L' U' L", "pattern": "BRFRLBUULFUU" },
         { "name": "H4", "alg": "x' U2 R U2 R2 F2 R U2 x", "pattern": "FFBBUURRUULL" }
       ]
     },
@@ -25,7 +25,7 @@
       "cases": [
         { "name": "L1", "alg": "R' U R' U2 R U' R' U R U' R2", "pattern": "LUUBRUBRFLUF" },
         { "name": "L2", "alg": "R U2 R2 F2 R U R' F2 R F'", "pattern": "FUUFLURLRBUB" },
-        { "name": "L3", "alg": "R U2 R' F' R U2 R' U' R' F2 R", "pattern": "FLUFFUURLRBU" },
+        { "name": "L3", "alg": "R U2 R' F' R U2 R' U' R' F2 R", "pattern": "UFFUURUBBLLR" },
         { "name": "L4", "alg": "F R' F' R U R U' R'", "pattern": "UFBUUFURRLBL" },
         { "name": "L5", "alg": "F R U' R' U' R U R' F'", "pattern": "UFBUURUBFLRL" },
         { "name": "L6", "alg": "R U2 R2 F R F' R U2 R'", "pattern": "URBUURUBLFFL" }
