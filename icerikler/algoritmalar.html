@@ -1069,13 +1069,14 @@ var cllFetch = fetch("/icerikler/algoritmalar/cll.json")
     })
     .then(function(data) {
         var groups = data.cll || [];
-        cllCount = countCases(groups);
+        cllCount = countCases(groups) || 42;
 
         var sampleCase = (groups[0] && groups[0].cases[0]) ? groups[0].cases[0] : null;
-        return sampleCase ? ortegaOllSvg(sampleCase.pattern, 150) : ""; // Projedeki SVG fonksiyonuna göre uygun olanı seçebilirsin
+        return sampleCase ? cllSvg(sampleCase.pattern, 150) : "";
     })
     .catch(function() {
-        return ""; // CLL JSON henüz yoksa veya hata verirse akışın bozulmaması için boş döner
+        cllCount = 42;
+        return "";
     });
 
 Promise.all([pblFetch, ollFetch, cllFetch])
@@ -1123,7 +1124,7 @@ function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml, cllDiagramHtml) {
     html += '<a href="/icerikler/algoritmalar/cll" class="card">';
     html += '  <div class="card-visual cll-visual">';
     html += '    <div class="level" data-i18n="cll_level">' + dict.cll_level + '</div>';
-    html += '    <div class="count-badge" id="cllCountBadge">' + (typeof cllCount !== 'undefined' && cllCount !== null ? cllCount + ' ' + dict.case_word : dict.soon_tag) + '</div>';
+    html += '<div class="count-badge" id="cllCountBadge">' + cllCount + ' ' + dict.case_word + '</div>';
     html += '    <div class="diagram-wrap">' + (cllDiagramHtml || "") + '</div>';
     html += '  </div>';
     html += '  <div class="card-info">';
