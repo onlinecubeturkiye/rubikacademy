@@ -1048,10 +1048,6 @@ var pblFetch = fetch("/icerikler/algoritmalar/ortega-pbl.json")
 
         var sampleCase = (groups[0] && groups[0].cases[2]) ? groups[0].cases[2] : (groups[0] ? groups[0].cases[0] : null);
         return sampleCase ? ortegaSvg(sampleCase.pattern_u, "full", 150) : "";
-    })
-    .catch(function(err) {
-        console.error("ortega-pbl.json yüklenemedi (2x2 kartları için):", err);
-        return "";
     });
 
 var ollFetch = fetch("/icerikler/algoritmalar/ortega-oll.json")
@@ -1065,15 +1061,17 @@ var ollFetch = fetch("/icerikler/algoritmalar/ortega-oll.json")
 
         var sampleCase = (groups[0] && groups[0].cases[3]) ? groups[0].cases[3] : (groups[0] ? groups[0].cases[0] : null);
         return sampleCase ? ortegaOllSvg(sampleCase.pattern, 150) : "";
-    })
-    .catch(function(err) {
-        console.error("ortega-oll.json yüklenemedi (2x2 kartları için):", err);
-        return "";
     });
 
-Promise.all([pblFetch, ollFetch]).then(function(diagrams) {
-    renderOrtegaCards(diagrams[0], diagrams[1]);
-});
+Promise.all([pblFetch, ollFetch])
+    .then(function(diagrams) {
+        renderOrtegaCards(diagrams[0], diagrams[1]);
+    })
+    .catch(function(err) {
+        var errBox = document.getElementById("loadError");
+        if (errBox) errBox.style.display = "block";
+        console.error("Ortega (PBL/OLL/CLL) verisi yüklenemedi:", err);
+    });
 
 function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml) {
     var lang = localStorage.getItem("site-lang") || "tr";
