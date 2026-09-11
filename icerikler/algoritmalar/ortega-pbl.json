@@ -7,36 +7,36 @@
           "name": "Adj/Adj",
           "alg": "R2 U' B2 U2 R2 U' R2",
           "alts": [],
-          "pattern_u": "UUUUFFFFRRBBLL",
-          "pattern_d": "UUUURRBBLLFF"
+          "pattern_u": "UUUUFFBRRLBL",
+          "pattern_d": "DDDDFFBRRLBL"
         },
         {
           "name": "Adj/Diag",
           "alg": "R U' R F2 R' U R'",
           "alts": [],
-          "pattern_u": "UUUUFRBLFFFFRRBBLL",
-          "pattern_d": "UUUURBLFFFRRBBLL"
+          "pattern_u": "UUUUFFBRRLBL",
+          "pattern_d": "DDDDBFLRBFLR"
         },
         {
           "name": "Diag/Diag",
           "alg": "R2 F2 R2",
           "alts": [],
-          "pattern_u": "UUUURBRFFFFRRBBLL",
-          "pattern_d": "UUUURBRFFFFRRBBLL"
+          "pattern_u": "UUUUBFLRBFLR",
+          "pattern_d": "DDDDBFLRBFLR"
         },
         {
           "name": "Adj U",
           "alg": "R U R' U' R' F R2 U' R' U' R U R' F'",
           "alts": [],
-          "pattern_u": "UUUUFRBUFFFFRRBBLL",
-          "pattern_d": "UUUURBLFFFFRRBBLL"
+          "pattern_u": "UUUUFRFBBRLL",
+          "pattern_d": "DDDDFFRRBBLL"
         },
         {
           "name": "Diag U",
           "alg": "F R U' R' U' R U R' F' R U R' U' R' F R F'",
           "alts": [],
-          "pattern_u": "UUUURBRFFFFRRBBLL",
-          "pattern_d": "UUUUBLFRFFRRBBLL"
+          "pattern_u": "UUUUFBRLFBRL",
+          "pattern_d": "DDDDFFRRBBLL"
         }
       ]
     }
