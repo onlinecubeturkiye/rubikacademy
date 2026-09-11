@@ -17,15 +17,6 @@
 <title>Rubik Academy - Ortega PBL Algoritmaları</title>
 <link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
 
-<link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/ortega-pbl">
-<meta name="description" content="Rubik Academy - 2x2 Ortega yöntemi PBL algoritmalarını diyagramlarıyla öğren.">
-<meta property="og:title" content="Rubik Academy - Ortega PBL Algoritmaları">
-<meta property="og:description" content="2x2 Rubik küpü Ortega metodu PBL durumları ve algoritmaları.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/ortega-pbl">
-<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
-<meta name="twitter:card" content="summary_large_image">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -197,8 +188,8 @@ html.dark-mode .hero {
 }
 
 .case-diagram {
-    width: 60px;
-    height: 60px;
+    width: 65px;
+    height: 65px;
     border-radius: 12px;
     background: var(--diagram-bg);
     display: flex;
@@ -207,7 +198,7 @@ html.dark-mode .hero {
     overflow: hidden;
 }
 
-.case-diagram svg { width: 52px; height: 52px; }
+.case-diagram svg { width: 56px; height: 56px; }
 
 .case-body { flex: 1; min-width: 0; }
 
@@ -227,28 +218,7 @@ html.dark-mode .hero {
     font-weight: 600;
     overflow-wrap: break-word;
 }
-
-.load-error {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 22px;
-    border-radius: 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-soft);
-    text-align: center;
-    font-size: 14px;
-}
 </style>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-F7KXWC8B5N');
-</script>
 </head>
 
 <body>
@@ -304,81 +274,108 @@ html.dark-mode .hero {
 
 <div class="subsets-wrap" id="subsetsWrap"></div>
 
-<div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">
-    Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.
 </div>
 
-</div>
+<!-- YENİ 2x2 ORTEGA SVG ÜRETİCİ (Boşluksuz, Tam Dolu Merkez ve Düzgün Köşeler) -->
+<script>
+function ortegaSvg(pattern, mode, size) {
+  var Y = "#f6c719", GRAY = "#4b515c";
+  var C = { U: Y, F: "#179e4f", R: "#ff7a1a", B: "#2c6fe6", L: "#d12d28", D: "#eef2f3" };
+  function color(ch) { return mode === "oll" ? (ch === "U" ? Y : GRAY) : (C[ch] || GRAY); }
+  
+  var S = 28, W = 6, o = W, T = 2 * S + 2 * W;
+  var r = [];
+  
+  // 4 corners of the 2x2 face (Compact 2x2 grid)
+  for (var i = 0; i < 4; i++) {
+    var x = o + (i % 2) * S;
+    var y = o + Math.floor(i / 2) * S;
+    r.push([x, y, S, S, 1.5, pattern[i]]);
+  }
+  
+  // 4 surrounding side strips (Front, Right, Back, Left)
+  r.push([o, o + 2 * S, 2 * S, W, 1, pattern[4]]); // Front
+  r.push([o + 2 * S, o, W, 2 * S, 1, pattern[5]]); // Right
+  r.push([o, 0, 2 * S, W, 1, pattern[6]]);        // Back
+  r.push([0, o, W, 2 * S, 1, pattern[7]]);        // Left
 
-<!-- Harici JS bağlantısı -->
-<script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
+  return '<svg viewBox="0 0 ' + T + ' ' + T + '" width="' + size + '" height="' + size + '" aria-hidden="true">' +
+    r.map(function (a) {
+      return '<rect x="' + a[0] + '" y="' + a[1] + '" width="' + a[2] + '" height="' + a[3] +
+        '" rx="' + a[4] + '" fill="' + color(a[5]) + '" stroke="#14171c" stroke-width="0.9"/>';
+    }).join("") + "</svg>";
+}
+</script>
 
 <script>
 var translations = {
-    "tr": { "navHome": "Ana Sayfa", "navContent": "İçerikler", "back_btn": "← Geri Dön", "badge_text": "2x2 · ORTEGA PBL", "hero_title1": "Ortega", "hero_titleAccent": "PBL", "hero_p": "2x2 Rubik küp çözümlerinde katmanları doğru konumlarına yerleştirmek için kullanılan Ortega PBL algoritmaları.", "load_error": "Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.", "subset_Ortega PBL": "Ortega PBL Durumları" },
-    "en": { "navHome": "Home", "navContent": "Content", "back_btn": "← Go Back", "badge_text": "2x2 · ORTEGA PBL", "hero_title1": "Ortega", "hero_titleAccent": "PBL", "hero_p": "Ortega PBL algorithms used to position layers correctly in 2x2 Rubik's cube solves.", "load_error": "Couldn't load the algorithm data. Please try again later.", "subset_Ortega PBL": "Ortega PBL Cases" },
-    "ru": { "navHome": "Главная", "navContent": "Контент", "back_btn": "← Назад", "badge_text": "2x2 · ORTEGA PBL", "hero_title1": "Ортега", "hero_titleAccent": "PBL", "hero_p": "Алгоритмы PBL метода Ортега для правильной расстановки слоев в кубике 2x2.", "load_error": "Не удалось загрузить данные алгоритмов. Попробуй позже.", "subset_Ortega PBL": "Кейсы Ortega PBL" },
-    "de": { "navHome": "Startseite", "navContent": "Inhalte", "back_btn": "← Zurück", "badge_text": "2x2 · ORTEGA PBL", "hero_title1": "Ortega", "hero_titleAccent": "PBL", "hero_p": "Ortega PBL-Algorithmen zum korrekten Positionieren der Ebenen beim 2x2 Rubik's Cube.", "load_error": "Algorithmusdaten konnten nicht geladen werden. Bitte versuche es später erneut.", "subset_Ortega PBL": "Ortega PBL Fälle" },
-    "ar": { "navHome": "الرئيسية", "navContent": "المحتوى", "back_btn": "← رجوع", "badge_text": "2x2 · ORTEGA PBL", "hero_title1": "أورتيغا", "hero_titleAccent": "PBL", "hero_p": "خوارزميات Ortega PBL المستخدمة لوضع الطبقات في أماكنها الصحيحة لمكعب روبيك 2x2.", "load_error": "تعذّر تحميل بيانات الخوارزميات. حاول مرة أخرى لاحقًا.", "subset_Ortega PBL": "حالات Ortega PBL" }
+    "tr": { "navHome": "Ana Sayfa", "navContent": "İçerikler", "back_btn": "← Geri Dön", "badge_text": "2x2 · ORTEGA PBL", "hero_title1": "Ortega", "hero_titleAccent": "PBL", "hero_p": "2x2 Rubik küp çözümlerinde katmanları doğru konumlarına yerleştirmek için kullanılan Ortega PBL algoritmaları.", "subset_Ortega PBL": "Ortega PBL Durumları" },
+    "en": { "navHome": "Home", "navContent": "Content", "back_btn": "← Go Back", "badge_text": "2x2 · ORTEGA PBL", "hero_title1": "Ortega", "hero_titleAccent": "PBL", "hero_p": "Ortega PBL algorithms used to position layers correctly in 2x2 Rubik's cube solves.", "subset_Ortega PBL": "Ortega PBL Cases" },
+    "ru": { "navHome": "Главная", "navContent": "Контент", "back_btn": "← Назад", "badge_text": "2x2 · ORTEGA PBL", "hero_title1": "Ортега", "hero_titleAccent": "PBL", "hero_p": "Алгоритмы PBL метода Ортега для правильной расстановки слоев в кубике 2x2.", "subset_Ortega PBL": "Кейсы Ortega PBL" },
+    "de": { "navHome": "Startseite", "navContent": "Inhalte", "back_btn": "← Zurück", "badge_text": "2x2 · ORTEGA PBL", "hero_title1": "Ortega", "hero_titleAccent": "PBL", "hero_p": "Ortega PBL-Algorithmen zum korrekten Positionieren der Ebenen beim 2x2 Rubik's Cube.", "subset_Ortega PBL": "Ortega PBL Fälle" },
+    "ar": { "navHome": "الرئيسية", "navContent": "المحتوى", "back_btn": "← رجوع", "badge_text": "2x2 · ORTEGA PBL", "hero_title1": "أورتيغا", "hero_titleAccent": "PBL", "hero_p": "خوارزميات Ortega PBL المستخدمة لوضع الطبقات في أماكنها الصحيحة لمكعب روبيك 2x2.", "subset_Ortega PBL": "حالات Ortega PBL" }
 };
 </script>
 
 <script src="/js/common.js"></script>
 
-<!-- Harici JSON dosyasını çekme -->
+<!-- GÜNCELLENMİŞ ORTEGA PBL VERİLERİ (Orijinal Tabloya Tam Uyumlu) -->
 <script>
 function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-fetch("/icerikler/algoritmalar/ortega-pbl.json")
-    .then(function(res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-    })
-    .then(function(data) {
-        var groups = data.pbl;
-        var wrap = document.getElementById("subsetsWrap");
-        var html = "";
+var data = {
+  "pbl": [
+    {
+      "subset": "Ortega PBL",
+      "cases": [
+        { "name": "Adj/Adj", "alg": "R2 U' B2 U2 R2 U' R2", "pattern_u": "UUUUFRBL", "pattern_d": "UUUURBLF" },
+        { "name": "Adj/Diag", "alg": "R U' R F2 R' U R'", "pattern_u": "UUUURBFL", "pattern_d": "UUUURFRB" },
+        { "name": "Diag/Diag", "alg": "R2 F2 R2", "pattern_u": "UUUURBRF", "pattern_d": "UUUURBRF" },
+        { "name": "Adj U", "alg": "R U R' U' R' F R2 U' R' U' R U R' F'", "pattern_u": "UUUUFRBU", "pattern_d": "UUUURBLF" },
+        { "name": "Diag U", "alg": "F R U' R' U' R U R' F' R U R' U' R' F R F'", "pattern_u": "UUUURBRF", "pattern_d": "UUUUBLFR" }
+      ]
+    }
+  ]
+};
 
-        for (var i = 0; i < groups.length; i++) {
-            var group = groups[i];
-            var i18nKey = "subset_" + group.subset;
+var groups = data.pbit || data.pbl;
+var wrap = document.getElementById("subsetsWrap");
+var html = "";
 
-            html += '<div class="subset-block">';
-            html += '  <h2 class="subset-heading" data-i18n="' + i18nKey + '">' + escapeHtml(group.subset) + '</h2>';
-            html += '  <div class="case-grid">';
+for (var i = 0; i < groups.length; i++) {
+    var group = groups[i];
+    var i18nKey = "subset_" + group.subset;
 
-            for (var j = 0; j < group.cases.length; j++) {
-                var c = group.cases[j];
-                var diagU = ortegaSvg(c.pattern_u, "full", 60);
-                var diagD = ortegaSvg(c.pattern_d, "full", 60);
+    html += '<div class="subset-block">';
+    html += '  <h2 class="subset-heading" data-i18n="' + i18nKey + '">' + escapeHtml(group.subset) + '</h2>';
+    html += '  <div class="case-grid">';
 
-                html += '<div class="case-card">';
-                html += '  <div class="case-diagrams-group" dir="ltr">';
-                html += '    <div class="case-diagram">' + diagU + '</div>';
-                html += '    <div class="case-diagram">' + diagD + '</div>';
-                html += '  </div>';
-                html += '  <div class="case-body">';
-                html += '    <div class="case-name">' + escapeHtml(c.name) + '</div>';
-                html += '    <div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>';
-                html += '  </div>';
-                html += '</div>';
-            }
+    for (var j = 0; j < group.cases.length; j++) {
+        var c = group.cases[j];
+        var diagU = ortegaSvg(c.pattern_u, "full", 64);
+        var diagD = ortegaSvg(c.pattern_d, "full", 64);
 
-            html += '  </div>';
-            html += '</div>';
-        }
+        html += '<div class="case-card">';
+        html += '  <div class="case-diagrams-group" dir="ltr">';
+        html += '    <div class="case-diagram">' + diagU + '</div>';
+        html += '    <div class="case-diagram">' + diagD + '</div>';
+        html += '  </div>';
+        html += '  <div class="case-body">';
+        html += '    <div class="case-name">' + escapeHtml(c.name) + '</div>';
+        html += '    <div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>';
+        html += '  </div>';
+        html += '</div>';
+    }
 
-        wrap.innerHTML = html;
-        var savedLang = localStorage.getItem("site-lang") || "tr";
-        applyLanguage(savedLang);
-    })
-    .catch(function(err) {
-        var errBox = document.getElementById("loadError");
-        if (errBox) errBox.style.display = "block";
-        console.error("ortega-pbl.json yüklenemedi:", err);
-    });
+    html += '  </div>';
+    html += '</div>';
+}
+
+wrap.innerHTML = html;
+var savedLang = localStorage.getItem("site-lang") || "tr";
+applyLanguage(savedLang);
 </script>
 
 </body>
