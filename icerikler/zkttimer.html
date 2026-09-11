@@ -188,9 +188,17 @@ html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
     background: var(--zkt-light);
     color: var(--zkt);
     font-size: 18px;
+    overflow: hidden;
 }
 
 .link-card.primary .link-icon { background: rgba(255,255,255,.18); color: #fff; }
+
+.link-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
 
 .link-text { display: flex; flex-direction: column; align-items: flex-start; }
 
@@ -377,7 +385,7 @@ html.dark-mode .link-card.primary, body.dark-mode .link-card.primary {
             </a>
 
             <a href="https://play.google.com/store/apps/details?id=com.zktimer.app&pcampaignid=web_share" target="_blank" rel="noopener noreferrer" class="link-card">
-                <div class="link-icon">▶</div>
+                <div class="link-icon"><img src="/playstore.png" alt="Google Play"></div>
                 <div class="link-text">
                     <small data-i18n="linkPlaySmall">Google Play</small>
                     <span data-i18n="linkPlayText">Android'de İndir</span>
@@ -385,7 +393,7 @@ html.dark-mode .link-card.primary, body.dark-mode .link-card.primary {
             </a>
 
             <a href="https://apps.apple.com/tr/app/zkt-timer/id6760920873?l=tr" target="_blank" rel="noopener noreferrer" class="link-card">
-                <div class="link-icon"></div>
+                <div class="link-icon"><img src="/appstorelogo.png" alt="App Store"></div>
                 <div class="link-text">
                     <small data-i18n="linkAppSmall">App Store</small>
                     <span data-i18n="linkAppText">iOS'ta İndir</span>
