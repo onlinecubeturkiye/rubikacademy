@@ -1,86 +1,254 @@
 {
-"cll": [
-{
-"subset": "Antisune",
-"cases": [
-{ "name": "AS1", "alg": "L' U' L U' L' U2 L", "pattern": "UUUUFFBRRLBL" },
-{ "name": "AS2", "alg": "L' U' L U L F' L' F L' U' L' U' L' U2 L", "pattern": "UUUUFFBRRLBL" },
-{ "name": "AS3", "alg": "F' L F L' U2 L' U2 L", "pattern": "UUUUBFLRBFLR" },
-{ "name": "AS4", "alg": "R U2 R' U2 R' F R F'", "pattern": "UUUUFRFBBRLL" },
-{ "name": "AS5", "alg": "R' F R F' R U R'", "pattern": "UUUUFBRLFBRL" },
-{ "name": "AS6", "alg": "R' U R U' R2 F R F' R U R' U' R", "pattern": "UUUUBFLRBFLR" }
-]
-},
-{
-"subset": "H",
-"cases": [
-{ "name": "H1", "alg": "R2 U2 R' U2 R2", "pattern": "UUUUFFBRRLBL" },
-{ "name": "H2", "alg": "F R2 U' R2 U' R2 U R2 F'", "pattern": "UUUUBFLRBFLR" },
-{ "name": "H3", "alg": "R U R' U R U L U' L' U' L", "pattern": "UUUUFRFBBRLL" },
-{ "name": "H4", "alg": "x' U2 R U2 R2 F2 R U2 x", "pattern": "UUUUFBRLFBRL" }
-]
-},
-{
-"subset": "L",
-"cases": [
-{ "name": "L1", "alg": "R' U R' U2 R U' R' U R U' R2", "pattern": "UUUUFFBRRLBL" },
-{ "name": "L2", "alg": "R U2 R2 F2 R U R' F2 R F'", "pattern": "UUUUBFLRBFLR" },
-{ "name": "L3", "alg": "R U2 R' F' R U2 R' U' R' F2 R", "pattern": "UUUUFRFBBRLL" },
-{ "name": "L4", "alg": "F R' F' R U R U' R'", "pattern": "UUUUFBRLFBRL" },
-{ "name": "L5", "alg": "F R U' R' U' R U R' F'", "pattern": "UUUUBFLRBFLR" },
-{ "name": "L6", "alg": "R U2 R2 F R F' R U2 R'", "pattern": "UUUUFRFBBRLL" }
-]
-},
-{
-"subset": "PLL",
-"cases": [
-{ "name": "Adjacent", "alg": "R U R' U' R' F R2 U' R' U' R U R' F'", "pattern": "UUUUFFBRRLBL" },
-{ "name": "Diagonal", "alg": "F R U' R' U' R U R' F' R U R' U' R' F R F'", "pattern": "UUUUBFLRBFLR" }
-]
-},
-{
-"subset": "Pi",
-"cases": [
-{ "name": "P1", "alg": "R U' R2 U R2 U R2 U' R", "pattern": "UUUUFFBRRLBL" },
-{ "name": "P2", "alg": "R' F2 R F' U2 R U' R' U' F", "pattern": "UUUUBFLRBFLR" },
-{ "name": "P3", "alg": "F R2 U' R2 U R2 U R2 F'", "pattern": "UUUUFRFBBRLL" },
-{ "name": "P4", "alg": "R U2 R' U' R U R' U2 R' F R F'", "pattern": "UUUUFBRLFBRL" },
-{ "name": "P5", "alg": "R U' R' F R F' R U R' F R", "pattern": "UUUUBFLRBFLR" },
-{ "name": "P6", "alg": "R' U' R' F R F' R U' R' U2 R", "pattern": "UUUUFRFBBRLL" }
-]
-},
-{
-"subset": "Sune",
-"cases": [
-{ "name": "S1", "alg": "R U R' U R U2 R'", "pattern": "UUUUFFBRRLBL" },
-{ "name": "S2", "alg": "L' U2 L U2 L F' L' F", "pattern": "UUUUBFLRBFLR" },
-{ "name": "S3", "alg": "F R' F' R U2 R U2 R'", "pattern": "UUUUFRFBBRLL" },
-{ "name": "S4", "alg": "R U R' U' R F R' F' R U R' U R U2 R'", "pattern": "UUUUFBRLFBRL" },
-{ "name": "S5", "alg": "L F' L' F L' U' L", "pattern": "UUUUBFLRBFLR" },
-{ "name": "S6", "alg": "R U R' U' R' F R F' R U2 R'", "pattern": "UUUUFRFBBRLL" }
-]
-},
-{
-"subset": "T",
-"cases": [
-{ "name": "T1", "alg": "R' U R U2 R2 F' R U' R' F2 R2", "pattern": "UUUUFFBRRLBL" },
-{ "name": "T2", "alg": "R' U R U2 R2 F R F' R", "pattern": "UUUUBFLRBFLR" },
-{ "name": "T3", "alg": "L' U' L U L2 F' L' F L", "pattern": "UUUUFRFBBRLL" },
-{ "name": "T4", "alg": "F R U R' U' R U' R' U' R U R' F'", "pattern": "UUUUFBRLFBRL" },
-{ "name": "T5", "alg": "R U R' U' R' F R F'", "pattern": "UUUUBFLRBFLR" },
-{ "name": "T6", "alg": "F U' R U2 R' U' F2 R U R'", "pattern": "UUUUFRFBBRLL" }
-]
-},
-{
-"subset": "U",
-"cases": [
-{ "name": "U1", "alg": "R2 F2 R U R' F2 R2 U2 R' U' R", "pattern": "UUUUFFBRRLBL" },
-{ "name": "U2", "alg": "R U2 R U' R' F R' F2 U' F", "pattern": "UUUUBFLRBFLR" },
-{ "name": "U3", "alg": "R' U R' F R F' R U2 R' U R", "pattern": "UUUUFRFBBRLL" },
-{ "name": "U4", "alg": "F R' F' R U' R U' R' U2 R U' R'", "pattern": "UUUUFBRLFBRL" },
-{ "name": "U5", "alg": "R U' R2 F R F' R U R' U' R U R'", "pattern": "UUUUBFLRBFLR" },
-{ "name": "U6", "alg": "F R U R' U' F'", "pattern": "UUUUFRFBBRLL" }
-]
-}
-]
+  "cll": [
+    {
+      "subset": "Antisune",
+      "cases": [
+        {
+          "name": "AS1",
+          "alg": "L' U' L U' L' U2 L",
+          "pattern": "FLRUUBFLRUUB"
+        },
+        {
+          "name": "AS2",
+          "alg": "L' U' L U L F' L' F L' U' L' U' L' U2 L",
+          "pattern": "BBURRBLUDULF"
+        },
+        {
+          "name": "AS3",
+          "alg": "F' L F L' U2 L' U2 L",
+          "pattern": "BFRUULRFLUUB"
+        },
+        {
+          "name": "AS4",
+          "alg": "R U2 R' U2 R' F R F'",
+          "pattern": "FRBUULBFRUUL"
+        },
+        {
+          "name": "AS5",
+          "alg": "R' F R F' R U R'",
+          "pattern": "FBRUULLFRUUB"
+        },
+        {
+          "name": "AS6",
+          "alg": "R' U R U' R2 F R F' R U R' U' R",
+          "pattern": "LFBUURRBFUUL"
+        }
+      ]
+    },
+    {
+      "subset": "H",
+      "cases": [
+        {
+          "name": "H1",
+          "alg": "R2 U2 R' U2 R2",
+          "pattern": "BFBFUURLUURL"
+        },
+        {
+          "name": "H2",
+          "alg": "F R2 U' R2 U' R2 U R2 F'",
+          "pattern": "LRBBRLUUFFUU"
+        },
+        {
+          "name": "H3",
+          "alg": "R U R' U R U L U' L' U' L",
+          "pattern": "ULBRDUFFRUBR"
+        },
+        {
+          "name": "H4",
+          "alg": "x' U2 R U2 R2 F2 R U2 x",
+          "pattern": "FFBBUURRUULL"
+        }
+      ]
+    },
+    {
+      "subset": "L",
+      "cases": [
+        {
+          "name": "L1",
+          "alg": "R' U R' U2 R U' R' U R U' R2",
+          "pattern": "LUUBRUBRFLUF"
+        },
+        {
+          "name": "L2",
+          "alg": "R U2 R2 F2 R U R' F2 R F'",
+          "pattern": "FUUFLURLRBUB"
+        },
+        {
+          "name": "L3",
+          "alg": "R U2 R' F' R U2 R' U' R' F2 R",
+          "pattern": "FUFUDRBBULLL"
+        },
+        {
+          "name": "L4",
+          "alg": "F R' F' R U R U' R'",
+          "pattern": "UFBUUFURRLBL"
+        },
+        {
+          "name": "L5",
+          "alg": "F R U' R' U' R U R' F'",
+          "pattern": "UFBUURUBFLRL"
+        },
+        {
+          "name": "L6",
+          "alg": "R U2 R2 F R F' R U2 R'",
+          "pattern": "URBUURUBLFFL"
+        }
+      ]
+    },
+    {
+      "subset": "PLL",
+      "cases": [
+        {
+          "name": "Adjacent",
+          "alg": "R U R' U' R' F R2 U' R' U' R U R' F'",
+          "pattern": "UUUUFRFBBRLL"
+        },
+        {
+          "name": "Diagonal",
+          "alg": "F R U' R' U' R U R' F' R U R' U' R' F R F'",
+          "pattern": "UUUUFBRLFBRL"
+        }
+      ]
+    },
+    {
+      "subset": "Pi",
+      "cases": [
+        {
+          "name": "P1",
+          "alg": "R U' R2 U R2 U R2 U' R",
+          "pattern": "FLBLRUFBRUUU"
+        },
+        {
+          "name": "P2",
+          "alg": "R' F2 R F' U2 R U' R' U' F",
+          "pattern": "FRLFBUBLRUUU"
+        },
+        {
+          "name": "P3",
+          "alg": "F R2 U' R2 U R2 U R2 F'",
+          "pattern": "RLLRBBFUUUFU"
+        },
+        {
+          "name": "P4",
+          "alg": "R U2 R' U' R U R' U2 R' F R F'",
+          "pattern": "LBBRRULFFUUU"
+        },
+        {
+          "name": "P5",
+          "alg": "R U' R' F R F' R U R' F R",
+          "pattern": "RDRRUURFDFBB"
+        },
+        {
+          "name": "P6",
+          "alg": "R' U' R' F R F' R U' R' U2 R",
+          "pattern": "LRBBUUURFFUL"
+        }
+      ]
+    },
+    {
+      "subset": "Sune",
+      "cases": [
+        {
+          "name": "S1",
+          "alg": "R U R' U R U2 R'",
+          "pattern": "RFULBUUBULFR"
+        },
+        {
+          "name": "S2",
+          "alg": "L' U2 L U2 L F' L' F",
+          "pattern": "LFUBRUURULBF"
+        },
+        {
+          "name": "S3",
+          "alg": "F R' F' R U2 R U2 R'",
+          "pattern": "FBULRUUBURLF"
+        },
+        {
+          "name": "S4",
+          "alg": "R U R' U' R F R' F' R U R' U R U2 R'",
+          "pattern": "URLBBRUDLFFU"
+        },
+        {
+          "name": "S5",
+          "alg": "L F' L' F L' U' L",
+          "pattern": "BFULRUUBULRF"
+        },
+        {
+          "name": "S6",
+          "alg": "R U R' U' R' F R F' R U2 R'",
+          "pattern": "UFRFUUDLFRRB"
+        }
+      ]
+    },
+    {
+      "subset": "T",
+      "cases": [
+        {
+          "name": "T1",
+          "alg": "R' U R U2 R2 F' R U' R' F2 R2",
+          "pattern": "LLUURRUBFBUF"
+        },
+        {
+          "name": "T2",
+          "alg": "R' U R U2 R2 F R F' R",
+          "pattern": "LRUUBBULFFUR"
+        },
+        {
+          "name": "T3",
+          "alg": "L' U' L U L2 F' L' F L",
+          "pattern": "ULLLBFBURDBU"
+        },
+        {
+          "name": "T4",
+          "alg": "F R U R' U' R U' R' U' R U R' F'",
+          "pattern": "UUBBRLFULRFU"
+        },
+        {
+          "name": "T5",
+          "alg": "R U R' U' R' F R F'",
+          "pattern": "FURUUFBRULLB"
+        },
+        {
+          "name": "T6",
+          "alg": "F U' R U2 R' U' F2 R U R'",
+          "pattern": "RLUURLUFBBUF"
+        }
+      ]
+    },
+    {
+      "subset": "U",
+      "cases": [
+        {
+          "name": "U1",
+          "alg": "R2 F2 R U R' F2 R2 U2 R' U' R",
+          "pattern": "FUUUBLFFLRDR"
+        },
+        {
+          "name": "U2",
+          "alg": "R U2 R U' R' F R' F2 U' F",
+          "pattern": "FUFULRBBRLUU"
+        },
+        {
+          "name": "U3",
+          "alg": "R' U R' F R F' R U2 R' U R",
+          "pattern": "FRUURBBLUULF"
+        },
+        {
+          "name": "U4",
+          "alg": "F R' F' R U' R U' R' U2 R U' R'",
+          "pattern": "FUBURLBFRLUU"
+        },
+        {
+          "name": "U5",
+          "alg": "R U' R2 F R F' R U R' U' R U R'",
+          "pattern": "RBUUFRLBUUFL"
+        },
+        {
+          "name": "U6",
+          "alg": "F R U R' U' F'",
+          "pattern": "RURUFLBFBLUU"
+        }
+      ]
+    }
+  ]
 }
