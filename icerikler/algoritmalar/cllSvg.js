@@ -1,12 +1,12 @@
-// CLL diagram generator for 2x2 (Fixed flawless 4-corner layout).
+// CLL diagram generator for 2x2 (Clean 4-corner top face layout matching standard CLL charts).
 function cllSvg(pattern, mode, size) {
 var Y = "#f6c719", GRAY = "#4b515c";
 var C = { U: Y, F: "#179e4f", R: "#d12d28", B: "#2c6fe6", L: "#ff7a1a", D: "#eef2f3" };
 function color(ch) { return mode === "oll" ? (ch === "U" ? Y : GRAY) : (C[ch] || GRAY); }
-var S = 28, o = 4, T = 2 * S + 2 * o;
+var S = 32, o = 4, T = 2 * S + 2 * o;
 var r = [];
 
-// 4 corners ordered strictly: 0: Top-Left, 1: Top-Right, 2: Bottom-Left, 3: Bottom-Right
+// 4 corners of the 2x2 top face
 for (var i = 0; i < 4; i++) {
 var col = i % 2;
 var row = Math.floor(i / 2);
