@@ -6,12 +6,16 @@ function cllSvg(pattern, mode, size) {
   var S = 28, W = 7, o = W, T = 2 * S + 2 * W;
   var r = [];
 
-  // 1. 4 corners of the 2x2 face (Compact 2x2 grid)
-  for (var i = 0; i < 4; i++) {
-    var col = i % 2;
-    var row = Math.floor(i / 2);
-    r.push([o + col * S, o + row * S, S, S, 1.5, pattern[i]]);
-  }
+// 1. 4 corners of the 2x2 face — reversed row order to match reference (bottom row first visually swapped)
+for (var i = 0; i < 4; i++) {
+  var col = i % 2;
+  var row = Math.floor(i / 2);
+  // swap index 2 and 3 (bottom-left/bottom-right) to fix vertical mirroring
+  var idx = i;
+  if (i === 2) idx = 3;
+  else if (i === 3) idx = 2;
+  r.push([o + col * S, o + row * S, S, S, 1.5, pattern[idx]]);
+}
 
   // 2. 4 surrounding side strips, each pushed in the same index order (left/top -> right/bottom)
 
