@@ -6,12 +6,29 @@
    <script src="/js/i18n.js"></script>
    <script src="/js/common.js"></script>
 
-   YENİ DİL EKLEMEK İÇİN: sadece bu dosyayı düzenle.
+   YENİ DİL EKLEMEK İÇİN (sadece bu dosya):
+     1) aşağıdaki "languages" listesine bir satır ekle
+        (örn. zh: { name: "中文", code: "ZH" })
+     2) "common" ve her sayfa bloğuna aynı dil koduyla çeviriyi ekle
+   Dil menüsü, common.js tarafından "languages" listesinden
+   otomatik oluşturulur; HTML dosyalarına dokunmak gerekmez.
    YENİ SAYFA EKLEMEK İÇİN: SITE_I18N.pages altına yeni bir
    anahtar (örn. "cll") ekle, sayfada PAGE_ID = "cll" yaz.
 ========================================================= */
 
 var SITE_I18N = {
+
+    /* Desteklenen diller — dil menüsü bu listeden otomatik oluşturulur.
+       name: menüde görünen ad | code: menü butonundaki kısa etiket
+       dir: sadece sağdan sola yazılan diller için "rtl" (Arapça, Farsça...) */
+    languages: {
+        tr: { name: "Türkçe",   code: "TR" },
+        en: { name: "English",  code: "EN" },
+        fr: { name: "Français", code: "FR" },
+        ru: { name: "Русский",  code: "RU" },
+        de: { name: "Deutsch",  code: "DE" },
+        ar: { name: "العربية",  code: "AR", dir: "rtl" }
+    },
 
     /* Tüm sayfalarda ORTAK olan metinler (navbar, footer vb.) */
     common: {
