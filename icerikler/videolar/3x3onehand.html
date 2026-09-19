@@ -14,15 +14,17 @@
 </script>
 <title>Rubik Academy - One Hand (Tek El) Eğitimi</title>
 <link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
-<!-- DİKKAT: aşağıdaki 4 satır bozuk/placeholder durumda, gerçek değerlerle değiştirilmeli -->
-<link rel="canonical" href= + canonical + >
-<meta name="description" content= + description + >
-<meta property="og:title" content= + og_title + >
-<meta property="og:description" content= + og_description + >
+
+<!-- NOT: URL'yi sayfanın gerçek adresine göre düzelt (ör. /one-hand, /3x3-oh) -->
+<link rel="canonical" href="https://rubikacademy.fun/onehand">
+<meta name="description" content="Rubik Academy - Rubik küpü tek elle (One Hand) çözmeyi öğren. Parmak teknikleri, OH algoritmaları ve hız geliştirme eğitimleri.">
+<meta property="og:title" content="Rubik Academy - One Hand (Tek El) Eğitimi">
+<meta property="og:description" content="Tek elle küp çözmeyi başlangıçtan ileri seviyeye kadar adım adım öğren!">
 <meta property="og:type" content="website">
-<meta property="og:url" content= + canonical + >
+<meta property="og:url" content="https://rubikacademy.fun/onehand">
 <meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
 <meta name="twitter:card" content="summary_large_image">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -48,6 +50,7 @@
             <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
         </nav>
 
+        <!-- Dil menüsü common.js tarafından SITE_I18N.languages listesinden üretilir -->
         <div class="lang-switcher" id="langSwitcher">
             <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Sprache wechseln / Сменить язык / تغيير اللغة">
                 <span class="lang-globe">🌐</span>
@@ -60,6 +63,9 @@
                 </button>
                 <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
                     <span>English</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="fr" role="menuitem" onclick="selectLanguage('fr')">
+                    <span>Français</span><span class="lang-check">✓</span>
                 </button>
                 <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
                     <span>Русский</span><span class="lang-check">✓</span>
@@ -85,7 +91,7 @@
 
 <section class="hero">
 <div class="hero-text">
-<div class="badge"><i></i>3×3 ONE HAND</div>
+<div class="badge"><i></i><span data-i18n="badge_text">3×3 ONE HAND</span></div>
 <h1><span data-i18n="hero_title1">One Hand</span> <span data-i18n="hero_titleAccent">Eğitimleri</span></h1>
 <p data-i18n="hero_p">Rubik Küpü tek elle çözmeyi öğren; parmak tekniklerinden algoritma seçimine kadar tek el (OH) becerini adım adım geliştir.</p>
 </div>
@@ -189,125 +195,8 @@
 
 </div>
 
-<script>
-var translations = {
-    "tr": {
-        "navHome": "Ana Sayfa",
-        "navContent": "İçerikler",
-        "back_btn": "← Geri Dön",
-        "hero_title1": "One Hand",
-        "hero_titleAccent": "Eğitimleri",
-        "hero_p": "Rubik Küpü tek elle çözmeyi öğren; parmak tekniklerinden algoritma seçimine kadar tek el (OH) becerini adım adım geliştir.",
-        "section_small": "ÖĞRENME YOLCULUĞU",
-        "section_h2": "One Hand Methodları",
-        "section_p": "Seviyeni seç ve tek elle küp çözme yolculuğuna başla.",
-        "level_beginner": "BAŞLANGIÇ SEVİYESİ",
-        "beginner_title": "Başlangıç Methodu",
-        "beginner_p": "Tek elle çözmeye ilk kez başlayacaklar için hazırlanmış adım adım başlangıç eğitimi.",
-        "level_middle": "ORTA SEVİYESİ",
-        "middle_title": "Orta Seviye Methodu",
-        "middle_p": "Temel tek el tekniğini bilenler için daha akıcı parmak hareketleri ve gelişmiş algoritmalar.",
-        "level_advanced": "İLERİ SEVİYE",
-        "advanced_title": "İleri Seviye Methodu",
-        "advanced_p": "Rekabetçi süreler hedefleyenler için ileri düzey tek el (OH) algoritmaları ve teknikleri.",
-        "cta_start": "Eğitime Başla",
-        "bottom_title": "🧩 Seviyeni seç, tek elini hızlandır!",
-        "bottom_p": "Rubik Academy ile One Hand çözüm becerilerini adım adım geliştir."
-    },
-    "en": {
-        "navHome": "Home",
-        "navContent": "Content",
-        "back_btn": "← Go Back",
-        "hero_title1": "One Hand",
-        "hero_titleAccent": "Tutorials",
-        "hero_p": "Learn to solve the Rubik's Cube with one hand; develop your one-handed (OH) skills step by step, from finger tricks to algorithm choice.",
-        "section_small": "LEARNING JOURNEY",
-        "section_h2": "One Hand Methods",
-        "section_p": "Pick your level and start your one-handed solving journey.",
-        "level_beginner": "BEGINNER LEVEL",
-        "beginner_title": "Beginner Method",
-        "beginner_p": "A step-by-step beginner tutorial for those starting to solve one-handed for the first time.",
-        "level_middle": "INTERMEDIATE LEVEL",
-        "middle_title": "Intermediate Method",
-        "middle_p": "Smoother finger tricks and advanced algorithms for those who already know the basic one-handed technique.",
-        "level_advanced": "ADVANCED LEVEL",
-        "advanced_title": "Advanced Method",
-        "advanced_p": "Advanced one-handed (OH) algorithms and techniques for those aiming for competitive times.",
-        "cta_start": "Start Learning",
-        "bottom_title": "🧩 Pick your level, speed up your one hand!",
-        "bottom_p": "Develop your One Hand solving skills step by step with Rubik Academy."
-    },
-    "ru": {
-        "navHome": "Главная",
-        "navContent": "Контент",
-        "back_btn": "← Назад",
-        "hero_title1": "Одной рукой",
-        "hero_titleAccent": "Обучение",
-        "hero_p": "Научись собирать кубик Рубика одной рукой; развивай свои навыки OH шаг за шагом — от техник пальцев до выбора алгоритмов.",
-        "section_small": "ОБУЧАЮЩИЙ ПУТЬ",
-        "section_h2": "Методы One Hand",
-        "section_p": "Выбери свой уровень и начни путь сборки одной рукой.",
-        "level_beginner": "НАЧАЛЬНЫЙ УРОВЕНЬ",
-        "beginner_title": "Метод для начинающих",
-        "beginner_p": "Пошаговое обучение для тех, кто впервые начинает собирать одной рукой.",
-        "level_middle": "СРЕДНИЙ УРОВЕНЬ",
-        "middle_title": "Метод среднего уровня",
-        "middle_p": "Более плавные техники пальцев и продвинутые алгоритмы для тех, кто уже знает базовую технику одной руки.",
-        "level_advanced": "ПРОДВИНУТЫЙ УРОВЕНЬ",
-        "advanced_title": "Продвинутый метод",
-        "advanced_p": "Продвинутые алгоритмы и техники одной руки (OH) для тех, кто стремится к соревновательному времени.",
-        "cta_start": "Начать обучение",
-        "bottom_title": "🧩 Выбери уровень, ускорь свою одну руку!",
-        "bottom_p": "Развивай свои навыки сборки One Hand шаг за шагом с Rubik Academy."
-    },
-    "de": {
-        "navHome": "Startseite",
-        "navContent": "Inhalte",
-        "back_btn": "← Zurück",
-        "hero_title1": "One Hand",
-        "hero_titleAccent": "Anleitungen",
-        "hero_p": "Lerne, den Zauberwürfel mit einer Hand zu lösen; entwickle deine einhändigen (OH) Fähigkeiten Schritt für Schritt, von Fingertricks bis zur Algorithmuswahl.",
-        "section_small": "LERNREISE",
-        "section_h2": "One-Hand-Methoden",
-        "section_p": "Wähle dein Niveau und starte deine einhändige Lösungsreise.",
-        "level_beginner": "EINSTEIGERSTUFE",
-        "beginner_title": "Einsteigermethode",
-        "beginner_p": "Eine Schritt-für-Schritt-Anleitung für alle, die zum ersten Mal einhändig lösen.",
-        "level_middle": "MITTELSTUFE",
-        "middle_title": "Methode für Fortgeschrittene",
-        "middle_p": "Flüssigere Fingertricks und fortgeschrittene Algorithmen für alle, die die einhändige Grundtechnik bereits beherrschen.",
-        "level_advanced": "FORTGESCHRITTENENSTUFE",
-        "advanced_title": "Fortgeschrittene Methode",
-        "advanced_p": "Fortgeschrittene einhändige (OH) Algorithmen und Techniken für alle, die wettbewerbsfähige Zeiten anstreben.",
-        "cta_start": "Jetzt lernen",
-        "bottom_title": "🧩 Wähle dein Niveau, beschleunige deine eine Hand!",
-        "bottom_p": "Entwickle deine One-Hand-Lösungsfähigkeiten Schritt für Schritt mit Rubik Academy."
-    },
-    "ar": {
-        "navHome": "الرئيسية",
-        "navContent": "المحتوى",
-        "back_btn": "← رجوع",
-        "hero_title1": "اليد الواحدة",
-        "hero_titleAccent": "دروس",
-        "hero_p": "تعلّم حل مكعب روبيك بيد واحدة؛ طوّر مهاراتك في الحل بيد واحدة (OH) خطوة بخطوة، من تقنيات الأصابع إلى اختيار الخوارزميات.",
-        "section_small": "رحلة التعلم",
-        "section_h2": "طرق الحل بيد واحدة",
-        "section_p": "اختر مستواك وابدأ رحلة الحل بيد واحدة.",
-        "level_beginner": "مستوى مبتدئ",
-        "beginner_title": "طريقة المبتدئين",
-        "beginner_p": "درس تدريجي لمن يبدأون الحل بيد واحدة لأول مرة.",
-        "level_middle": "مستوى متوسط",
-        "middle_title": "طريقة المستوى المتوسط",
-        "middle_p": "تقنيات أصابع أكثر سلاسة وخوارزميات متقدمة لمن يعرفون تقنية اليد الواحدة الأساسية بالفعل.",
-        "level_advanced": "مستوى متقدم",
-        "advanced_title": "الطريقة المتقدمة",
-        "advanced_p": "خوارزميات وتقنيات متقدمة للحل بيد واحدة (OH) لمن يسعون لأوقات تنافسية.",
-        "cta_start": "ابدأ التعلم",
-        "bottom_title": "🧩 اختر مستواك، سرّع يدك الواحدة!",
-        "bottom_p": "طوّر مهاراتك في الحل بيد واحدة خطوة بخطوة مع Rubik Academy."
-    }
-};
-</script>
+<script>var PAGE_ID = "onehand";</script>
+<script src="/js/i18n.js"></script>
 <script src="/js/common.js"></script>
 </body>
 </html>
