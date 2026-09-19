@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
 /* =========================================
    DİL SEÇİCİ
 ========================================= */
-var langCodes = { tr: "TR", en: "EN", ru: "RU", de: "DE", ar: "AR", fr: "FR" };
+var langCodes = { tr: "TR", en: "EN", fr: "FR", ru: "RU", de: "DE", ar: "AR" };
 
 function applyLanguage(lang) {
     if (typeof translations === "undefined" || !translations[lang]) {
