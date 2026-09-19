@@ -1,54 +1,5 @@
-/* =========================================================
-   RUBIK ACADEMY — ORTAK ÇEVİRİ DOSYASI (i18n.js)
-   Tüm sayfalarda şu şekilde eklenir (common.js'den ÖNCE):
-
-   <script>var PAGE_ID = "index";</script>   <!-- sayfa kimliği -->
-   <script src="/js/i18n.js"></script>
-   <script src="/js/common.js"></script>
-
-   YENİ DİL EKLEMEK İÇİN: sadece bu dosyayı düzenle.
-   YENİ SAYFA EKLEMEK İÇİN: SITE_I18N.pages altına yeni bir
-   anahtar (örn. "cll") ekle, sayfada PAGE_ID = "cll" yaz.
-========================================================= */
-
-var SITE_I18N = {
-
-    /* Tüm sayfalarda ORTAK olan metinler (navbar, footer vb.) */
-    common: {
-        tr: {
-            navHome: "Ana Sayfa",
-            navContent: "İçerikler",
-            footer: "© 2026 Rubik Academy. Tüm hakları saklıdır."
-        },
-        en: {
-            navHome: "Home",
-            navContent: "Content",
-            footer: "© 2026 Rubik Academy. All rights reserved."
-        },
-        fr: {
-            navHome: "Accueil",
-            navContent: "Contenus",
-            footer: "© 2026 Rubik Academy. Tous droits réservés."
-        },
-        ru: {
-            navHome: "Главная",
-            navContent: "Контент",
-            footer: "© 2026 Rubik Academy. Все права защищены."
-        },
-        de: {
-            navHome: "Startseite",
-            navContent: "Inhalte",
-            footer: "© 2026 Rubik Academy. Alle Rechte vorbehalten."
-        },
-        ar: {
-            navHome: "الرئيسية",
-            navContent: "المحتوى",
-            footer: "© 2026 روبيك أكاديمي. جميع الحقوق محفوظة."
-        }
-    },
-
-    /* Sayfaya özel metinler, PAGE_ID'ye göre */
-    pages: {
+/* i18n.js içinde SITE_I18N.pages altına eklenecek blok.
+   NOT: "index" bloğu i18n.js dosyanda zaten var — bu blokla birebir aynı. */
 
         index: {
             tr: {
@@ -254,7 +205,7 @@ var SITE_I18N = {
                 card3P: "حسّن وقت حلك، اكسر أرقامك القياسية، وتقدّم في عالم السبيدكيوبنج.",
                 learningSpan: "التعلّم",
                 learningH2: "تقدّم خطوة بخطوة.",
-                learningP: "لا تفوّت المحتوى الجديد وأخبار السبيدكيوبنج.",
+                learningP: "اجعل عملية تعلّم مكعب روبيك بسيطة وواضحة.",
                 l1num: "01 — البداية",
                 l1title: "تعرّف على المكعب",
                 l1p: "تعرّف على بنية مكعب روبيك: أوجهه، القطع المركزية، قطع الزوايا وقطع الحواف.",
@@ -274,15 +225,3 @@ var SITE_I18N = {
                 contactP: "لا تتردد في التواصل معنا للأسئلة أو الاقتراحات أو التعاون."
             }
         }
-
-        /* Diğer sayfalar (örn. "cll", "3x3" vb.) buraya aynı şekilde eklenir:
-        cll: {
-            tr: { ... },
-            en: { ... },
-            fr: { ... },
-            ...
-        },
-        */
-
-    }
-};
