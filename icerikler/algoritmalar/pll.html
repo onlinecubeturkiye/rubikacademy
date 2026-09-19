@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- TEMA VE SEO AYARLARI -->
 <script>
   (function() {
     var savedTheme = localStorage.getItem("theme");
@@ -16,10 +15,8 @@
 </script>
 
 <title>Rubik Academy - PLL Algoritmaları (21 Case)</title>
-<!-- TARAYICI SEKMESİ İÇİN LOGO -->
 <link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
 
-<link rel="stylesheet" href="/styles/common.css">
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/pll">
 <meta name="description" content="Rubik Academy - 21 PLL algoritmasını, her biri kendi diyagramı ve alternatifleriyle öğren.">
 <meta property="og:title" content="Rubik Academy - PLL Algoritmaları">
@@ -34,16 +31,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<style>
-html {
-    overflow-x: hidden;
-}
+<link rel="stylesheet" href="/styles/common.css">
 
-/* =========================================
-   BU SAYFAYA ÖZEL RENK DEĞİŞKENLERİ
-   (temel değişkenler artık common.css'te;
-   burada sadece PLL sayfasına özel olanlar var)
-========================================= */
+<style>
+/* Bu sayfaya özel açık mavi hero/bottom paleti (common.css'in varsayılanından farklı) */
 :root {
     --hero-bg: linear-gradient(120deg, #e2f5ff, #91d8ff);
     --hero-border: #b7ddf6;
@@ -54,8 +45,7 @@ html {
     --bottom-text: #18578c;
 }
 
-html.dark-mode,
-body.dark-mode {
+html.dark-mode, body.dark-mode {
     --hero-bg: linear-gradient(120deg, #16324a, #1e293b);
     --hero-border: #334155;
     --btn-bg: #334155;
@@ -65,44 +55,6 @@ body.dark-mode {
     --bottom-text: #60a5fa;
 }
 
-/* =========================================
-   SAYFA İÇERİK DÜZENİ
-========================================= */
-.page {
-    min-height: calc(100vh - 71px);
-    padding: 45px 5% 80px;
-    background: var(--background);
-    transition: background-color 0.3s;
-}
-
-/* NAV / GERİ DÖN */
-.nav-bar {
-    max-width: 1250px;
-    margin: 0 auto 25px;
-}
-
-.back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--primary);
-    font-size: 13px;
-    font-weight: 800;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-    transition: all .25s ease;
-}
-
-.back-btn:hover {
-    transform: translateX(-4px);
-    border-color: #c0e0fc;
-    background: var(--primary-light);
-}
-
-/* HERO */
 .hero {
     max-width: 1250px;
     min-height: 220px;
@@ -130,33 +82,9 @@ body.dark-mode {
     top: -180px;
 }
 
-.hero-text {
-    position: relative;
-    z-index: 3;
-    max-width: 700px;
-}
+.hero-text { position: relative; z-index: 3; max-width: 700px; }
 
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    padding: 9px 15px;
-    border-radius: 50px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--primary-dark);
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: 1.5px;
-    margin-bottom: 18px;
-}
-
-.badge i {
-    width: 7px;
-    height: 7px;
-    background: #168ee0;
-    border-radius: 50%;
-}
+.hero .badge { color: var(--primary-dark); }
 
 .hero h1 {
     font-size: clamp(36px, 4.5vw, 54px);
@@ -176,15 +104,9 @@ body.dark-mode {
     max-width: 560px;
 }
 
-/* CASE GRID SECTIONS */
-.subsets-wrap {
-    max-width: 1250px;
-    margin: 0 auto;
-}
-
-.subset-block {
-    margin-bottom: 48px;
-}
+/* CASE GRID */
+.subsets-wrap { max-width: 1250px; margin: 0 auto; }
+.subset-block { margin-bottom: 48px; }
 
 .subset-heading {
     font-size: 22px;
@@ -196,19 +118,9 @@ body.dark-mode {
     border-left: 5px solid var(--primary);
 }
 
-.case-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-}
-
-@media(max-width: 1000px) {
-    .case-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media(max-width: 700px) {
-    .case-grid { grid-template-columns: 1fr; }
-}
+.case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media(max-width: 1000px) { .case-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(max-width: 700px) { .case-grid { grid-template-columns: 1fr; } }
 
 .case-card {
     display: flex;
@@ -241,15 +153,9 @@ body.dark-mode {
     transition: background-color 0.3s;
 }
 
-.case-diagram svg {
-    width: 62px;
-    height: 62px;
-}
+.case-diagram svg { width: 62px; height: 62px; }
 
-.case-body {
-    flex: 1;
-    min-width: 0;
-}
+.case-body { flex: 1; min-width: 0; }
 
 .case-name {
     font-size: 14px;
@@ -308,34 +214,29 @@ body.dark-mode {
 .bottom h3 { color: var(--bottom-text); font-size: 21px; margin-bottom: 7px; }
 .bottom p { color: var(--text-soft); font-size: 13px; }
 
-@media(max-width: 1000px) {
-    .hero { padding: 40px; }
-}
-
+@media(max-width: 1000px) { .hero { padding: 40px; } }
 @media(max-width: 700px) {
-    .page { padding: 25px 4% 55px; }
     .hero { min-height: auto; padding: 34px 24px; border-radius: 27px; }
     .hero h1 { font-size: 38px; }
     .hero p { font-size: 13px; }
     .subset-heading { font-size: 19px; }
 }
 </style>
+
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-F7KXWC8B5N');
 </script>
 </head>
 
 <body>
 
-<!-- =========================================
-     ÜST BAR (NAVBAR)
-========================================= -->
+<div class="bg-glow"></div>
+
 <header class="navbar">
     <a href="http://rubikacademy.fun" class="nav-logo">
         <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
@@ -350,41 +251,11 @@ body.dark-mode {
         </nav>
 
         <div class="lang-switcher" id="langSwitcher">
-
-            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Sprache wechseln / Сменить язык / تغيير اللغة">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
                 <span class="lang-globe">🌐</span>
                 <span id="langLabel">TR</span>
             </button>
-
-            <div class="lang-menu" id="langMenu" role="menu">
-
-                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
-                    <span>Türkçe</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
-                    <span>English</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
-                    <span>Русский</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
-                    <span>Deutsch</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
-                    <span>العربية</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-            </div>
-
+            <div class="lang-menu" id="langMenu" role="menu"></div>
         </div>
 
         <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
@@ -394,13 +265,11 @@ body.dark-mode {
 
 <div class="page">
 
-<!-- NAVIGATION -->
 <nav class="nav-bar">
     <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
+<section class="hero reveal">
 <div class="hero-text">
 <div class="badge">
 <i></i>
@@ -413,110 +282,28 @@ Son katman parçalarını doğru yerine permute etmek için gereken 21 case, her
 </div>
 </section>
 
-<!-- CASE'LER -->
 <div class="subsets-wrap" id="subsetsWrap"></div>
 
 <div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">
     Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.
 </div>
 
-<!-- ALT -->
-<section class="bottom">
+<section class="bottom reveal">
 <h3 data-i18n="bottom_title">🧩 PLL'leri de tamamladın mı?</h3>
 <p data-i18n="bottom_p">Artık son katmanı tek bakışta çözebilirsin. Pratik yapmaya devam et!</p>
 </section>
 
 </div>
 
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
 <script src="/icerikler/algoritmalar/ll.js"></script>
 
-<!-- BU SAYFAYA ÖZEL DİL METİNLERİ (common.js'den ÖNCE tanımlanmalı) -->
-<script>
-var translations = {
-    "tr": {
-        "navHome": "Ana Sayfa",
-        "navContent": "İçerikler",
-        "back_btn": "← Geri Dön",
-        "badge_text": "PLL · 21 CASE",
-        "hero_title1": "PLL",
-        "hero_titleAccent": "Algoritmaları",
-        "hero_p": "Son katman parçalarını doğru yerine permute etmek için gereken 21 case, her biri kendi diyagramı ve alternatifleriyle.",
-        "load_error": "Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.",
-        "bottom_title": "🧩 PLL'leri de tamamladın mı?",
-        "bottom_p": "Artık son katmanı tek bakışta çözebilirsin. Pratik yapmaya devam et!",
-        "subset_Adj corners": "Komşu Köşeler (Adj)",
-        "subset_Diag corners": "Çapraz Köşeler (Diag)",
-        "subset_G perm": "G Permütasyonu",
-        "subset_Edge perm": "Kenar Permütasyonu"
-    },
-    "en": {
-        "navHome": "Home",
-        "navContent": "Content",
-        "back_btn": "← Go Back",
-        "badge_text": "PLL · 21 CASES",
-        "hero_title1": "PLL",
-        "hero_titleAccent": "Algorithms",
-        "hero_p": "21 cases for permuting the last-layer pieces into place, each with its own diagram and alternatives.",
-        "load_error": "Couldn't load the algorithm data. Please try again later.",
-        "bottom_title": "🧩 Finished PLL too?",
-        "bottom_p": "You can now solve the last layer in one look. Keep practicing!",
-        "subset_Adj corners": "Adjacent Corners",
-        "subset_Diag corners": "Diagonal Corners",
-        "subset_G perm": "G Perm",
-        "subset_Edge perm": "Edge Perm"
-    },
-    "ru": {
-        "navHome": "Главная",
-        "navContent": "Контент",
-        "back_btn": "← Назад",
-        "badge_text": "PLL · 21 КЕЙС",
-        "hero_title1": "PLL",
-        "hero_titleAccent": "Алгоритмы",
-        "hero_p": "21 кейс для расстановки элементов последнего слоя по местам, каждый со своей диаграммой и альтернативами.",
-        "load_error": "Не удалось загрузить данные алгоритмов. Попробуй позже.",
-        "bottom_title": "🧩 Освоил и PLL?",
-        "bottom_p": "Теперь ты можешь собирать последний слой с одного взгляда. Продолжай практиковаться!",
-        "subset_Adj corners": "Соседние углы (Adj)",
-        "subset_Diag corners": "Диагональные углы (Diag)",
-        "subset_G perm": "G перестановка",
-        "subset_Edge perm": "Перестановка рёбер"
-    },
-    "de": {
-        "navHome": "Startseite",
-        "navContent": "Inhalte",
-        "back_btn": "← Zurück",
-        "badge_text": "PLL · 21 FÄLLE",
-        "hero_title1": "PLL",
-        "hero_titleAccent": "Algorithmen",
-        "hero_p": "21 Fälle, um die Teile der letzten Ebene an ihren richtigen Platz zu bringen, jeweils mit eigenem Diagramm und Alternativen.",
-        "load_error": "Algorithmusdaten konnten nicht geladen werden. Bitte versuche es später erneut.",
-        "bottom_title": "🧩 Auch PLL geschafft?",
-        "bottom_p": "Jetzt kannst du die letzte Ebene auf einen Blick lösen. Bleib dran!",
-        "subset_Adj corners": "Benachbarte Ecken (Adj)",
-        "subset_Diag corners": "Diagonale Ecken (Diag)",
-        "subset_G perm": "G-Permutation",
-        "subset_Edge perm": "Kanten-Permutation"
-    },
-    "ar": {
-        "navHome": "الرئيسية",
-        "navContent": "المحتوى",
-        "back_btn": "← رجوع",
-        "badge_text": "PLL · 21 حالة",
-        "hero_title1": "PLL",
-        "hero_titleAccent": "خوارزميات",
-        "hero_p": "21 حالة لتبديل قطع الطبقة الأخيرة إلى مكانها الصحيح، كل حالة برسمها التوضيحي وبدائلها.",
-        "load_error": "تعذّر تحميل بيانات الخوارزميات. حاول مرة أخرى لاحقًا.",
-        "bottom_title": "🧩 هل أنهيت PLL أيضًا؟",
-        "bottom_p": "أصبح بإمكانك الآن حل الطبقة الأخيرة بنظرة واحدة. واصل التدرّب!",
-        "subset_Adj corners": "زوايا متجاورة (Adj)",
-        "subset_Diag corners": "زوايا قطرية (Diag)",
-        "subset_G perm": "تبديل G",
-        "subset_Edge perm": "تبديل الأطراف"
-    }
-};
-</script>
-
-<!-- ORTAK JS (dark mode + dil seçici motoru + reveal) -->
+<!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
+<script>var PAGE_ID = "pll";</script>
+<script src="/js/i18n.js"></script>
 <script src="/js/common.js"></script>
 
 <!-- BU SAYFAYA ÖZEL: PLL VERİSİNİ YÜKLE VE SAYFAYI OLUŞTUR -->
@@ -574,7 +361,6 @@ fetch("/icerikler/algoritmalar/oll-pll.json")
 
         wrap.innerHTML = html;
 
-        // Kartlar DOM'a eklendikten sonra dili tekrar uygula (başlıklar çevrilsin)
         var savedLang = localStorage.getItem("site-lang") || "tr";
         applyLanguage(savedLang);
     })
