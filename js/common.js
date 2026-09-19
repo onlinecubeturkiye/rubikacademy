@@ -9,10 +9,12 @@
    Bu dosya şunları yönetir:
    - Karanlık mod (localStorage: "theme")
    - Dil seçici motoru (localStorage: "site-lang")
+   - Dil menüsünün otomatik oluşturulması (SITE_I18N.languages)
    - Scroll reveal (IntersectionObserver)
 
-   NOT: Çeviri metinleri artık SITE_I18N (i18n.js) içinde,
+   NOT: Çeviri metinleri SITE_I18N (i18n.js) içinde,
    PAGE_ID ile sayfaya özel + common (nav/footer) birleştirilir.
+   Yeni dil eklemek için sadece i18n.js düzenlenir.
 ========================================================= */
 
 /* Sayfa render olmadan önce (flash önlemek için) tema class'ını uygula */
@@ -57,7 +59,43 @@ document.addEventListener("DOMContentLoaded", function () {
 /* =========================================
    DİL SEÇİCİ
 ========================================= */
-var langCodes = { tr: "TR", en: "EN", fr: "FR", ru: "RU", de: "DE", ar: "AR" };
+
+/* i18n.js içindeki dil listesi (yoksa boş obje) */
+function getLanguages() {
+    return (typeof SITE_I18N !== "undefined" && SITE_I18N.languages) || {};
+}
+
+/* Dil menüsünü SITE_I18N.languages listesinden oluşturur.
+   Liste yoksa sayfadaki elle yazılmış butonlara dokunmaz. */
+function buildLangMenu() {
+    var menu = document.getElementById("langMenu");
+    var langs = getLanguages();
+    var codes = Object.keys(langs);
+    if (!menu || codes.length === 0) return;
+
+    menu.innerHTML = "";
+
+    codes.forEach(function (code) {
+        var btn = document.createElement("button");
+        btn.className = "lang-menu-item";
+        btn.setAttribute("data-lang", code);
+        btn.setAttribute("role", "menuitem");
+        btn.addEventListener("click", function () {
+            selectLanguage(code);
+        });
+
+        var name = document.createElement("span");
+        name.textContent = langs[code].name || code;
+
+        var check = document.createElement("span");
+        check.className = "lang-check";
+        check.textContent = "✓";
+
+        btn.appendChild(name);
+        btn.appendChild(check);
+        menu.appendChild(btn);
+    });
+}
 
 function applyLanguage(lang) {
     if (typeof SITE_I18N === "undefined") {
@@ -82,12 +120,14 @@ function applyLanguage(lang) {
         }
     });
 
+    var info = getLanguages()[lang];
+
     document.documentElement.setAttribute("lang", lang);
-    document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+    document.documentElement.setAttribute("dir", (info && info.dir) || "ltr");
 
     var label = document.getElementById("langLabel");
     if (label) {
-        label.textContent = langCodes[lang] || "TR";
+        label.textContent = (info && info.code) || lang.toUpperCase();
     }
 
     document.querySelectorAll(".lang-menu-item").forEach(function (item) {
@@ -138,6 +178,7 @@ document.addEventListener("keydown", function (e) {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+    buildLangMenu(); /* önce menüyü oluştur, sonra dili uygula (active işareti için) */
     var savedLang = localStorage.getItem("site-lang") || "tr";
     applyLanguage(savedLang);
 });
