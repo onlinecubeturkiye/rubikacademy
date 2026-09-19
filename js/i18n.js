@@ -273,6 +273,87 @@ var SITE_I18N = {
                 contactH2: "هل لديك سؤال؟",
                 contactP: "لا تتردد في التواصل معنا للأسئلة أو الاقتراحات أو التعاون."
             }
+        },
+
+        icerikler: {
+            tr: {
+                ic_title: "Eğitim İçerikleri",
+                ic_intro: "Küp çözmeyi öğrenmek için ihtiyacın olan her şey burada: adım adım video anlatımlar, ezberlemen gereken algoritmalar ve gelişimini takip edeceğin zamanlayıcı aracı.",
+                tag_video: "VİDEO ANLATIM",
+                item_videos: "Videolar",
+                item_videos_p: "2×2'den 7×7'ye, Pyraminx'ten Megaminx'e kadar tüm küpler için adım adım video eğitimleri.",
+                tag_algo: "REFERANS",
+                item_algos: "Algoritmalar",
+                item_algos_p: "OLL, PLL, F2L ve daha fazlası — hız geliştirmen için gereken tüm algoritma listeleri tek yerde.",
+                tag_tool: "ARAÇ",
+                item_zkt_p: "Çözüm sürelerini kaydet, ortalamanı takip et ve gelişimini zaman içinde karşılaştır.",
+                cta_go: "İncele →"
+            },
+            en: {
+                ic_title: "Learning Content",
+                ic_intro: "Everything you need to learn to solve cubes: step-by-step video tutorials, the algorithms you'll need to memorize, and a timer to track your progress.",
+                tag_video: "VIDEO TUTORIALS",
+                item_videos: "Videos",
+                item_videos_p: "From 2×2 to 7×7, Pyraminx to Megaminx — step-by-step video tutorials for every cube.",
+                tag_algo: "REFERENCE",
+                item_algos: "Algorithms",
+                item_algos_p: "OLL, PLL, F2L and more — every algorithm list you need to build speed, in one place.",
+                tag_tool: "TOOL",
+                item_zkt_p: "Log your solve times, track your average, and compare your progress over time.",
+                cta_go: "Explore →"
+            },
+            fr: {
+                ic_title: "Contenus d'apprentissage",
+                ic_intro: "Tout ce dont tu as besoin pour apprendre à résoudre les cubes : des vidéos explicatives étape par étape, les algorithmes à mémoriser et un chronomètre pour suivre ta progression.",
+                tag_video: "TUTORIELS VIDÉO",
+                item_videos: "Vidéos",
+                item_videos_p: "Du 2×2 au 7×7, du Pyraminx au Megaminx — des tutoriels vidéo étape par étape pour chaque cube.",
+                tag_algo: "RÉFÉRENCE",
+                item_algos: "Algorithmes",
+                item_algos_p: "OLL, PLL, F2L et bien plus — toutes les listes d'algorithmes dont tu as besoin pour gagner en vitesse, au même endroit.",
+                tag_tool: "OUTIL",
+                item_zkt_p: "Enregistre tes temps de résolution, suis ta moyenne et compare ta progression au fil du temps.",
+                cta_go: "Découvrir →"
+            },
+            ru: {
+                ic_title: "Учебные материалы",
+                ic_intro: "Всё, что нужно для обучения сборке кубиков: пошаговые видеоуроки, алгоритмы для запоминания и таймер для отслеживания прогресса.",
+                tag_video: "ВИДЕОУРОКИ",
+                item_videos: "Видео",
+                item_videos_p: "От 2×2 до 7×7, от Пирамидки до Мегаминкса — пошаговые видеоуроки для каждого кубика.",
+                tag_algo: "СПРАВОЧНИК",
+                item_algos: "Алгоритмы",
+                item_algos_p: "OLL, PLL, F2L и многое другое — все списки алгоритмов для набора скорости в одном месте.",
+                tag_tool: "ИНСТРУМЕНТ",
+                item_zkt_p: "Записывай время сборки, отслеживай среднее значение и сравнивай прогресс со временем.",
+                cta_go: "Открыть →"
+            },
+            de: {
+                ic_title: "Lerninhalte",
+                ic_intro: "Alles, was du zum Würfellösen brauchst: Schritt-für-Schritt-Videoanleitungen, die Algorithmen, die du auswendig lernen musst, und ein Timer, um deinen Fortschritt zu verfolgen.",
+                tag_video: "VIDEOANLEITUNGEN",
+                item_videos: "Videos",
+                item_videos_p: "Von 2×2 bis 7×7, von Pyraminx bis Megaminx — Schritt-für-Schritt-Videoanleitungen für jeden Würfel.",
+                tag_algo: "REFERENZ",
+                item_algos: "Algorithmen",
+                item_algos_p: "OLL, PLL, F2L und mehr — alle Algorithmuslisten, die du für mehr Geschwindigkeit brauchst, an einem Ort.",
+                tag_tool: "TOOL",
+                item_zkt_p: "Erfasse deine Lösungszeiten, verfolge deinen Durchschnitt und vergleiche deinen Fortschritt über die Zeit.",
+                cta_go: "Entdecken →"
+            },
+            ar: {
+                ic_title: "المحتوى التعليمي",
+                ic_intro: "كل ما تحتاجه لتعلّم حل المكعبات: دروس فيديو خطوة بخطوة، الخوارزميات التي يجب حفظها، وأداة توقيت لتتبع تقدّمك.",
+                tag_video: "دروس فيديو",
+                item_videos: "الفيديوهات",
+                item_videos_p: "من 2×2 إلى 7×7، ومن Pyraminx إلى Megaminx — دروس فيديو خطوة بخطوة لكل مكعب.",
+                tag_algo: "مرجع",
+                item_algos: "الخوارزميات",
+                item_algos_p: "OLL وPLL وF2L والمزيد — جميع قوائم الخوارزميات التي تحتاجها لزيادة السرعة في مكان واحد.",
+                tag_tool: "أداة",
+                item_zkt_p: "سجّل أوقات حلك، وتتبّع متوسطك، وقارن تقدّمك عبر الزمن.",
+                cta_go: "استكشف ←"
+            }
         }
 
         /* Diğer sayfalar (örn. "cll", "3x3" vb.) buraya aynı şekilde eklenir.
