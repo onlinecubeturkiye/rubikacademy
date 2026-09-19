@@ -1,10 +1,9 @@
 /* =========================================================
    RUBIK ACADEMY — ORTAK JS (common.js)
-   Tüm sayfalarda şu şekilde eklenir (translations objesinden SONRA):
+   Tüm sayfalarda şu sırayla eklenir:
 
-   <script>
-     var translations = { tr: {...}, en: {...}, ... };
-   </script>
+   <script>var PAGE_ID = "index";</script>
+   <script src="/js/i18n.js"></script>
    <script src="/js/common.js"></script>
 
    Bu dosya şunları yönetir:
@@ -12,11 +11,8 @@
    - Dil seçici motoru (localStorage: "site-lang")
    - Scroll reveal (IntersectionObserver)
 
-   NOT: "translations" objesi her sayfada FARKLIDIR (sayfaya
-   özel metinler içerir) ve bu dosyadan ÖNCE tanımlanmalıdır.
-   Sayfada dinamik içerik varsa (örn. fetch ile yüklenen kartlar),
-   içerik DOM'a eklendikten sonra applyLanguage(lang) tekrar
-   çağrılabilir — bu dosyadaki fonksiyon global'dir.
+   NOT: Çeviri metinleri artık SITE_I18N (i18n.js) içinde,
+   PAGE_ID ile sayfaya özel + common (nav/footer) birleştirilir.
 ========================================================= */
 
 /* Sayfa render olmadan önce (flash önlemek için) tema class'ını uygula */
@@ -64,11 +60,20 @@ document.addEventListener("DOMContentLoaded", function () {
 var langCodes = { tr: "TR", en: "EN", fr: "FR", ru: "RU", de: "DE", ar: "AR" };
 
 function applyLanguage(lang) {
-    if (typeof translations === "undefined" || !translations[lang]) {
+    if (typeof SITE_I18N === "undefined") {
+        console.error("i18n.js yüklenmemiş — common.js'den ÖNCE eklenmeli.");
+        return;
+    }
+    if (!SITE_I18N.common[lang]) {
         lang = "tr";
     }
 
-    var dict = translations[lang];
+    var commonDict = SITE_I18N.common[lang] || {};
+    var pageId = typeof PAGE_ID !== "undefined" ? PAGE_ID : null;
+    var pageDict = (pageId && SITE_I18N.pages[pageId] && SITE_I18N.pages[pageId][lang]) || {};
+
+    /* Sayfaya özel anahtar varsa o kazanır, yoksa ortak (common) kullanılır */
+    var dict = Object.assign({}, commonDict, pageDict);
 
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
         var key = el.getAttribute("data-i18n");
