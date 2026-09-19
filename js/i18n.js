@@ -1055,6 +1055,88 @@ var SITE_I18N = {
                 bottom_title: "🧩 من أي فئة تبدأ؟",
                 bottom_p: "تعلّم خوارزميات الطبقة الأخيرة خطوة بخطوة مع Rubik Academy."
             }
+        },
+
+        /* FTO — Bencisco Methodu sayfası (PAGE_ID = "bencisco") */
+        bencisco: {
+            tr: {
+                back_btn: "← Geri Dön",
+                badge_text: "BENCISCO METHODU",
+                page_h1_1: "Bencisco",
+                page_h1_2: "Methodu",
+                page_p: "FTO'yu Bencisco Methodu ile adım adım çözmeyi öğren. Aşağıdaki videoyu izleyerek temel yüzey ve köşe parçalarını tamamla.",
+                video_title: "Bencisco Methodu Anlatımı",
+                video_sub: "Adım adım FTO çözüm videosu",
+                watch_yt: "YouTube'da İzle",
+                go_channel: "Kanala Git",
+                bottom_title: "🧩 Adım adım öğren, hızını artır!",
+                bottom_p: "Rubik Academy ile Bencisco Methodunu izleyerek FTO çözüm becerini geliştir."
+            },
+            en: {
+                back_btn: "← Go Back",
+                badge_text: "BENCISCO METHOD",
+                page_h1_1: "Bencisco",
+                page_h1_2: "Method",
+                page_p: "Learn to solve the FTO step by step with the Bencisco Method. Watch the video below to complete the basic faces and corner pieces.",
+                video_title: "Bencisco Method Tutorial",
+                video_sub: "Step-by-step FTO solving video",
+                watch_yt: "Watch on YouTube",
+                go_channel: "Go to Channel",
+                bottom_title: "🧩 Learn step by step, speed up!",
+                bottom_p: "Develop your FTO solving skills by watching the Bencisco Method with Rubik Academy."
+            },
+            fr: {
+                back_btn: "← Retour",
+                badge_text: "MÉTHODE BENCISCO",
+                page_h1_1: "Méthode",
+                page_h1_2: "Bencisco",
+                page_p: "Apprends à résoudre le FTO étape par étape avec la méthode Bencisco. Regarde la vidéo ci-dessous pour compléter les faces de base et les pièces de coin.",
+                video_title: "Tutoriel de la méthode Bencisco",
+                video_sub: "Vidéo de résolution du FTO pas à pas",
+                watch_yt: "Regarder sur YouTube",
+                go_channel: "Aller à la chaîne",
+                bottom_title: "🧩 Apprends pas à pas, gagne en vitesse !",
+                bottom_p: "Développe tes compétences en résolution du FTO en suivant la méthode Bencisco avec Rubik Academy."
+            },
+            ru: {
+                back_btn: "← Назад",
+                badge_text: "МЕТОД BENCISCO",
+                page_h1_1: "Метод",
+                page_h1_2: "Bencisco",
+                page_p: "Изучи метод Bencisco и собери FTO шаг за шагом. Посмотри видео ниже, чтобы завершить базовые грани и угловые элементы.",
+                video_title: "Обучение методу Bencisco",
+                video_sub: "Пошаговое видео сборки FTO",
+                watch_yt: "Смотреть на YouTube",
+                go_channel: "Перейти на канал",
+                bottom_title: "🧩 Учись шаг за шагом, ускоряйся!",
+                bottom_p: "Развивай навыки сборки FTO, изучая метод Bencisco вместе с Rubik Academy."
+            },
+            de: {
+                back_btn: "← Zurück",
+                badge_text: "BENCISCO METHODE",
+                page_h1_1: "Bencisco",
+                page_h1_2: "Methode",
+                page_p: "Lerne mit der Bencisco Methode, das FTO Schritt für Schritt zu lösen. Schau dir das Video unten an, um die Grundflächen und Eckstücke zu vervollständigen.",
+                video_title: "Bencisco Methode Anleitung",
+                video_sub: "Schritt-für-Schritt FTO Lösungsvideo",
+                watch_yt: "Auf YouTube ansehen",
+                go_channel: "Zum Kanal",
+                bottom_title: "🧩 Schritt für Schritt lernen, schneller werden!",
+                bottom_p: "Entwickle deine FTO-Fähigkeiten mit der Bencisco Methode bei Rubik Academy."
+            },
+            ar: {
+                back_btn: "← رجوع",
+                badge_text: "طريقة بينسيسكو",
+                page_h1_1: "طريقة",
+                page_h1_2: "بينسيسكو",
+                page_p: "تعلّم حل FTO خطوة بخطوة باستخدام طريقة بينسيسكو. شاهد الفيديو أدناه لإكمال الأوجه الأساسية وقطع الزوايا.",
+                video_title: "شرح طريقة بينسيسكو",
+                video_sub: "فيديو حل FTO خطوة بخطوة",
+                watch_yt: "شاهد على يوتيوب",
+                go_channel: "الذهاب إلى القناة",
+                bottom_title: "🧩 تعلّم خطوة بخطوة، سرّع نفسك!",
+                bottom_p: "طوّر مهاراتك في حل FTO بمشاهدة طريقة بينسيسكو مع Rubik Academy."
+            }
         }
 
         /* Diğer sayfalar (örn. "cll", "3x3" vb.) buraya aynı şekilde eklenir.
