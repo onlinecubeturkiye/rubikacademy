@@ -692,248 +692,24 @@ Son katman algoritmalarını, her biri kendi diyagramıyla adım adım öğren: 
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 <script src="/icerikler/algoritmalar/cllSvg.js"></script>
 
-<!-- BU SAYFAYA ÖZEL DİL METİNLERİ (common.js'den ÖNCE tanımlanmalı) -->
+<!-- BU SAYFAYA ÖZEL: rozet sayaçları + çeviri yardımcısı
+     (metinler artık i18n.js içindeki SITE_I18N.pages.algoritmalar bloğunda) -->
 <script>
-var translations = {
-    "tr": {
-        "navHome": "Ana Sayfa",
-        "navContent": "İçerikler",
-        "back_btn": "← Geri Dön",
-        "badge_text": "ALGORİTMALAR",
-        "hero_title1": "Algoritmaları",
-        "hero_titleAccent": "Öğren",
-        "hero_p": "Son katman algoritmalarını, her biri kendi diyagramıyla adım adım öğren: 57 OLL ve 21 PLL case.",
-        "section_small": "ALGORİTMA KÜTÜPHANESİ",
-        "section_h2": "OLL & PLL Algoritmaları",
-        "section_p": "Kategorini seç ve tüm case'lere diyagramlarıyla göz at.",
-        "cat_3x3_title": "3x3",
-        "cat_3x3_sub": "Son katman algoritmaları",
-        "cat_2x2_title": "2x2",
-        "cat_2x2_sub": "Ortega yöntemi algoritmaları",
-        "cat_soon_title": "Diğerleri",
-        "cat_soon_sub": "Yakında eklenecek",
-        "soon_tag": "YAKINDA",
-        "soon_4x4": "4×4 Algoritmaları",
-        "soon_5x5": "5×5 Algoritmaları",
-        "soon_pyra": "Pyraminx",
-        "soon_skewb": "Skewb",
-        "soon_sq1": "Square-1",
-        "soon_mega": "Megaminx",
-        "soon_clock": "Rubik's Clock",
-        "oll_level": "OLL",
-        "oll_title": "OLL Algoritmaları",
-        "oll_p": "Son katman yüzeyini tek hamlede oryante etmek için gereken tüm case'ler.",
-        "pll_level": "PLL",
-        "pll_title": "PLL Algoritmaları",
-        "pll_p": "Son katman parçalarını doğru yerine permute etmek için gereken tüm case'ler.",
-        "ortega_pbl_level": "PBL",
-        "ortega_pbl_title": "Ortega PBL Algoritmaları",
-        "ortega_pbl_p": "2x2 çözümünde her iki katmanı da doğru konumuna permute etmek için gereken tüm case'ler.",
-        "ortega_oll_level": "OLL",
-        "ortega_oll_title": "Ortega OLL Algoritmaları",
-        "ortega_oll_p": "2x2 küpte son katmanı tek hamlede oryante etmek için gereken tüm case'ler.",
-        "cll_level": "CLL",
-        "cll_title": "CLL Algoritmaları",
-        "cll_p": "2x2 küpte son katmanı tek adımda hem oryante hem permute eden ileri seviye case'ler.",
-        "cta_start": "Case'lere Git",
-        "case_word": "case",
-        "load_error": "Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.",
-        "bottom_title": "🧩 Hangi kategoriden başlıyorsun?",
-        "bottom_p": "Rubik Academy ile son katman algoritmalarını adım adım öğren."
-    },
-    "en": {
-        "navHome": "Home",
-        "navContent": "Content",
-        "back_btn": "← Go Back",
-        "badge_text": "ALGORITHMS",
-        "hero_title1": "Learn the",
-        "hero_titleAccent": "Algorithms",
-        "hero_p": "Learn the last-layer algorithms step by step, each with its own diagram: 57 OLL and 21 PLL cases.",
-        "section_small": "ALGORITHM LIBRARY",
-        "section_h2": "OLL & PLL Algorithms",
-        "section_p": "Pick a category and browse every case with its diagram.",
-        "cat_3x3_title": "3x3",
-        "cat_3x3_sub": "Last-layer algorithms",
-        "cat_2x2_title": "2x2",
-        "cat_2x2_sub": "Ortega method algorithms",
-        "cat_soon_title": "Others",
-        "cat_soon_sub": "Coming soon",
-        "soon_tag": "SOON",
-        "soon_4x4": "4×4 Algorithms",
-        "soon_5x5": "5×5 Algorithms",
-        "soon_pyra": "Pyraminx",
-        "soon_skewb": "Skewb",
-        "soon_sq1": "Square-1",
-        "soon_mega": "Megaminx",
-        "soon_clock": "Rubik's Clock",
-        "oll_level": "OLL",
-        "oll_title": "OLL Algorithms",
-        "oll_p": "Every case you need to orient the last layer in a single set of moves.",
-        "pll_level": "PLL",
-        "pll_title": "PLL Algorithms",
-        "pll_p": "Every case you need to permute the last-layer pieces into place.",
-        "ortega_pbl_level": "PBL",
-        "ortega_pbl_title": "Ortega PBL Algorithms",
-        "ortega_pbl_p": "Every case you need to permute both layers into place when solving a 2x2.",
-        "ortega_oll_level": "OLL",
-        "ortega_oll_title": "Ortega OLL Algorithms",
-        "ortega_oll_p": "Every case you need to orient the last layer of a 2x2 in one go.",
-        "cll_level": "CLL",
-        "cll_title": "CLL Algorithms",
-        "cll_p": "Advanced cases that orient and permute the last layer of a 2x2 at the same time.",
-        "cta_start": "View Cases",
-        "case_word": "cases",
-        "load_error": "Couldn't load the algorithm data. Please try again later.",
-        "bottom_title": "🧩 Which category are you starting with?",
-        "bottom_p": "Learn the last-layer algorithms step by step with Rubik Academy."
-    },
-    "ru": {
-        "navHome": "Главная",
-        "navContent": "Контент",
-        "back_btn": "← Назад",
-        "badge_text": "АЛГОРИТМЫ",
-        "hero_title1": "Изучи",
-        "hero_titleAccent": "алгоритмы",
-        "hero_p": "Изучи алгоритмы последнего слоя шаг за шагом, каждый со своей диаграммой: 57 OLL и 21 PLL кейс.",
-        "section_small": "БИБЛИОТЕКА АЛГОРИТМОВ",
-        "section_h2": "Алгоритмы OLL и PLL",
-        "section_p": "Выбери категорию и просмотри все кейсы с диаграммами.",
-        "cat_3x3_title": "3x3",
-        "cat_3x3_sub": "Алгоритмы последнего слоя",
-        "cat_2x2_title": "2x2",
-        "cat_2x2_sub": "Алгоритмы метода Ортега",
-        "cat_soon_title": "Другие",
-        "cat_soon_sub": "Скоро появится",
-        "soon_tag": "СКОРО",
-        "soon_4x4": "Алгоритмы 4×4",
-        "soon_5x5": "Алгоритмы 5×5",
-        "soon_pyra": "Пирамидка",
-        "soon_skewb": "Skewb",
-        "soon_sq1": "Square-1",
-        "soon_mega": "Мегаминкс",
-        "soon_clock": "Rubik's Clock",
-        "oll_level": "OLL",
-        "oll_title": "Алгоритмы OLL",
-        "oll_p": "Все кейсы, необходимые для ориентации последнего слоя за один подход.",
-        "pll_level": "PLL",
-        "pll_title": "Алгоритмы PLL",
-        "pll_p": "Все кейсы, необходимые для перестановки элементов последнего слоя.",
-        "ortega_pbl_level": "PBL",
-        "ortega_pbl_title": "Алгоритмы Ortega PBL",
-        "ortega_pbl_p": "Все кейсы для перестановки обоих слоёв на 2x2.",
-        "ortega_oll_level": "OLL",
-        "ortega_oll_title": "Алгоритмы Ortega OLL",
-        "ortega_oll_p": "Все кейсы для ориентации последнего слоя на 2x2 за один подход.",
-        "cll_level": "CLL",
-        "cll_title": "Алгоритмы CLL",
-        "cll_p": "Продвинутые кейсы, которые одновременно ориентируют и переставляют последний слой на 2x2.",
-        "cta_start": "Смотреть кейсы",
-        "case_word": "кейсов",
-        "load_error": "Не удалось загрузить данные алгоритмов. Попробуй позже.",
-        "bottom_title": "🧩 С какой категории начнёшь?",
-        "bottom_p": "Изучай алгоритмы последнего слоя шаг за шагом вместе с Rubik Academy."
-    },
-    "de": {
-        "navHome": "Startseite",
-        "navContent": "Inhalte",
-        "back_btn": "← Zurück",
-        "badge_text": "ALGORITHMEN",
-        "hero_title1": "Lerne die",
-        "hero_titleAccent": "Algorithmen",
-        "hero_p": "Lerne die Last-Layer-Algorithmen Schritt für Schritt, jeder mit eigenem Diagramm: 57 OLL- und 21 PLL-Fälle.",
-        "section_small": "ALGORITHMEN-BIBLIOTHEK",
-        "section_h2": "OLL- & PLL-Algorithmen",
-        "section_p": "Wähle eine Kategorie und durchsuche alle Fälle mit Diagramm.",
-        "cat_3x3_title": "3x3",
-        "cat_3x3_sub": "Last-Layer-Algorithmen",
-        "cat_2x2_title": "2x2",
-        "cat_2x2_sub": "Ortega-Methode-Algorithmen",
-        "cat_soon_title": "Andere",
-        "cat_soon_sub": "Demnächst",
-        "soon_tag": "BALD",
-        "soon_4x4": "4×4-Algorithmen",
-        "soon_5x5": "5×5-Algorithmen",
-        "soon_pyra": "Pyraminx",
-        "soon_skewb": "Skewb",
-        "soon_sq1": "Square-1",
-        "soon_mega": "Megaminx",
-        "soon_clock": "Rubik's Clock",
-        "oll_level": "OLL",
-        "oll_title": "OLL-Algorithmen",
-        "oll_p": "Alle Fälle, die du brauchst, um die letzte Ebene in einem Zug zu orientieren.",
-        "pll_level": "PLL",
-        "pll_title": "PLL-Algorithmen",
-        "pll_p": "Alle Fälle, die du brauchst, um die Teile der letzten Ebene richtig zu positionieren.",
-        "ortega_pbl_level": "PBL",
-        "ortega_pbl_title": "Ortega-PBL-Algorithmen",
-        "ortega_pbl_p": "Alle Fälle, um beim 2x2 beide Ebenen korrekt zu positionieren.",
-        "ortega_oll_level": "OLL",
-        "ortega_oll_title": "Ortega-OLL-Algorithmen",
-        "ortega_oll_p": "Alle Fälle, um die letzte Ebene beim 2x2 in einem Zug zu orientieren.",
-        "cll_level": "CLL",
-        "cll_title": "CLL-Algorithmen",
-        "cll_p": "Fortgeschrittene Fälle, die die letzte Ebene beim 2x2 gleichzeitig orientieren und positionieren.",
-        "cta_start": "Fälle ansehen",
-        "case_word": "Fälle",
-        "load_error": "Algorithmusdaten konnten nicht geladen werden. Bitte versuche es später erneut.",
-        "bottom_title": "🧩 Mit welcher Kategorie fängst du an?",
-        "bottom_p": "Lerne die Last-Layer-Algorithmen Schritt für Schritt mit Rubik Academy."
-    },
-    "ar": {
-        "navHome": "الرئيسية",
-        "navContent": "المحتوى",
-        "back_btn": "← رجوع",
-        "badge_text": "الخوارزميات",
-        "hero_title1": "تعلّم",
-        "hero_titleAccent": "الخوارزميات",
-        "hero_p": "تعلّم خوارزميات الطبقة الأخيرة خطوة بخطوة، كل حالة برسمها التوضيحي: 57 حالة OLL و21 حالة PLL.",
-        "section_small": "مكتبة الخوارزميات",
-        "section_h2": "خوارزميات OLL و PLL",
-        "section_p": "اختر فئة وتصفّح كل الحالات برسومها التوضيحية.",
-        "cat_3x3_title": "3x3",
-        "cat_3x3_sub": "خوارزميات الطبقة الأخيرة",
-        "cat_2x2_title": "2x2",
-        "cat_2x2_sub": "خوارزميات طريقة أورتيغا",
-        "cat_soon_title": "أخرى",
-        "cat_soon_sub": "قريبًا",
-        "soon_tag": "قريبًا",
-        "soon_4x4": "خوارزميات 4×4",
-        "soon_5x5": "خوارزميات 5×5",
-        "soon_pyra": "Pyraminx",
-        "soon_skewb": "Skewb",
-        "soon_sq1": "Square-1",
-        "soon_mega": "Megaminx",
-        "soon_clock": "Rubik's Clock",
-        "oll_level": "OLL",
-        "oll_title": "خوارزميات OLL",
-        "oll_p": "كل الحالات اللازمة لتوجيه الطبقة الأخيرة بحركة واحدة.",
-        "pll_level": "PLL",
-        "pll_title": "خوارزميات PLL",
-        "pll_p": "كل الحالات اللازمة لتبديل قطع الطبقة الأخيرة إلى مكانها الصحيح.",
-        "ortega_pbl_level": "PBL",
-        "ortega_pbl_title": "خوارزميات Ortega PBL",
-        "ortega_pbl_p": "كل الحالات اللازمة لتبديل كلتا الطبقتين في مكعب 2x2.",
-        "ortega_oll_level": "OLL",
-        "ortega_oll_title": "خوارزميات Ortega OLL",
-        "ortega_oll_p": "كل الحالات اللازمة لتوجيه الطبقة الأخيرة في مكعب 2x2 بحركة واحدة.",
-        "cll_level": "CLL",
-        "cll_title": "خوارزميات CLL",
-        "cll_p": "حالات متقدمة توجّه وتبدّل الطبقة الأخيرة في مكعب 2x2 في آن واحد.",
-        "cta_start": "عرض الحالات",
-        "case_word": "حالة",
-        "load_error": "تعذّر تحميل بيانات الخوارزميات. حاول مرة أخرى لاحقًا.",
-        "bottom_title": "🧩 من أي فئة تبدأ؟",
-        "bottom_p": "تعلّم خوارزميات الطبقة الأخيرة خطوة بخطوة مع Rubik Academy."
-    }
-};
+/* Sayfaya özel çeviri sözlüğünü i18n.js'ten okur.
+   Seçili dilde yoksa Türkçe'ye düşer. */
+function getDict(lang) {
+    var pages = (window.SITE_I18N && SITE_I18N.pages) || {};
+    var page = pages[window.PAGE_ID] || {};
+    return page[lang] || page.tr || {};
+}
 
-/* Bu sayfaya özel: OLL/PLL/2x2 kart sayacı (35 case, 57 case gibi rozetler)
+/* OLL/PLL/2x2 kart sayacı (57 case, 21 case gibi rozetler)
    dil değiştiğinde de güncellenmeli. common.js'teki applyLanguage()
    her çalıştığında, tanımlıysa otomatik olarak onLanguageApplied()'i çağırır. */
 var caseCounts = null; // { oll: n, pll: n }
 var ortegaPblCount = null;
 var ortegaOllCount = null;
-var cllCount = null; // DÜZELTME: diğer sayaçlar gibi burada da tanımlandı
+var cllCount = null;
 
 function updateCountBadges(dict) {
     var ollBadge = document.getElementById("ollCountBadge");
@@ -947,22 +723,20 @@ function updateCountBadges(dict) {
     var ortegaOllBadge = document.getElementById("ortegaOllCountBadge");
     if (ortegaOllBadge) ortegaOllBadge.textContent = (ortegaOllCount !== null) ? (ortegaOllCount + " " + dict.case_word) : dict.soon_tag;
 
-    // DÜZELTME: burada eskiden hep dict.soon_tag ("YAKINDA") yazılıyordu,
-    // dil değiştirildiğinde/uygulandığında doğru rozeti eziyordu.
-    // Artık ortegaOllBadge ile aynı mantık: veri geldiyse sayıyı, gelmediyse "YAKINDA" gösterir.
+    // Veri geldiyse sayıyı, gelmediyse "YAKINDA" rozetini gösterir.
     var cllBadge = document.getElementById("cllCountBadge");
     if (cllBadge) cllBadge.textContent = (cllCount !== null) ? (cllCount + " " + dict.case_word) : dict.soon_tag;
 }
 
 function onLanguageApplied(lang) {
     if (caseCounts) {
-        var dict = translations[lang] || translations.tr;
-        updateCountBadges(dict);
+        updateCountBadges(getDict(lang));
     }
 }
 </script>
 
-<!-- ORTAK JS (dark mode + dil seçici motoru + reveal) -->
+<script>var PAGE_ID = "algoritmalar";</script>
+<script src="/js/i18n.js"></script>
 <script src="/js/common.js"></script>
 
 <!-- BU SAYFAYA ÖZEL: OLL / PLL VERİSİNİ YÜKLE VE KARTLARI OLUŞTUR -->
@@ -1000,7 +774,7 @@ fetch("/icerikler/algoritmalar/oll-pll.json")
         var pllDiagram = pllCase ? llSvg(pllCase.pattern, "pll", 150) : "";
 
         var lang = localStorage.getItem("site-lang") || "tr";
-        var dict = translations[lang] || translations.tr;
+        var dict = getDict(lang);
 
         var html = "";
 
@@ -1101,7 +875,7 @@ Promise.all([pblFetch, ollFetch, cllFetch])
 
 function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml, cllDiagramHtml) {
     var lang = localStorage.getItem("site-lang") || "tr";
-    var dict = translations[lang] || translations.tr;
+    var dict = getDict(lang);
 
     var html = "";
 
