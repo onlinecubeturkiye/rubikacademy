@@ -1,260 +1,264 @@
 <!DOCTYPE html>
 <html lang="tr">
-	<head>
-		<meta charset="UTF-8">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-				<!-- TEMA VE SEO AYARLARI -->
-				<script>
-					(function() {
-					var savedTheme = localStorage.getItem("theme");
-					if (savedTheme === "dark") {
-					document.documentElement.classList.add("dark-mode");
-					}
-					var savedLang = localStorage.getItem("site-lang") || "tr";
-					document.documentElement.setAttribute("lang", savedLang);
-					document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
-					})();
-				</script>
+    <!-- TEMA VE DİL AYARLARI -->
+    <script>
+        (function () {
+            var savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.documentElement.classList.add("dark-mode");
+            }
+            var savedLang = localStorage.getItem("site-lang") || "tr";
+            document.documentElement.setAttribute("lang", savedLang);
+            document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+        })();
+    </script>
 
-				<title>Rubik Academy - 3x3 Eğitimi ve CFOP Metodu</title>
-				<!-- TARAYICI SEKMESİ İÇİN LOGO -->
-				<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
+    <title>Rubik Academy - 3x3 Eğitimi ve CFOP Metodu</title>
 
-					<link rel="canonical" href="https://rubikacademy.fun/3x3">
-						<meta name="description" content="Rubik Academy - 3x3 Rubik küp çözme tekniklerini, F2L, OLL ve PLL algoritmalarını adım adım öğren.">
-							<meta property="og:title" content="Rubik Academy - 3x3 Eğitimi">
-								<meta property="og:description" content="Klasik 3x3 Rubik küpü en anlaşılır yöntemler ve CFOP algoritma rehberiyle çözmeyi öğren!">
-									<meta property="og:type" content="website">
-										<meta property="og:url" content="https://rubikacademy.fun/3x3">
-											<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
-												<meta name="twitter:card" content="summary_large_image">
+    <!-- TARAYICI SEKMESİ İÇİN LOGO -->
+    <link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
 
-													<link rel="preconnect" href="https://fonts.googleapis.com">
-														<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-															<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="canonical" href="https://rubikacademy.fun/3x3">
+    <meta name="description" content="Rubik Academy - 3x3 Rubik küp çözme tekniklerini, F2L, OLL ve PLL algoritmalarını adım adım öğren.">
+    <meta property="og:title" content="Rubik Academy - 3x3 Eğitimi">
+    <meta property="og:description" content="Klasik 3x3 Rubik küpü en anlaşılır yöntemler ve CFOP algoritma rehberiyle çözmeyi öğren!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rubikacademy.fun/3x3">
+    <meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
+    <meta name="twitter:card" content="summary_large_image">
 
-																<link rel="stylesheet" href="/styles/common.css">
-																																<!-- Google tag (gtag.js) -->
-																<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
-																<script>
-																	window.dataLayer = window.dataLayer || [];
-																	function gtag(){dataLayer.push(arguments);}
-																	gtag('js', new Date());
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-																	gtag('config', 'G-F7KXWC8B5N');
-																</script>
-															</head>
+    <link rel="stylesheet" href="/styles/common.css">
 
-	<body>
+    <!-- Google tag (gtag.js) -->
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-F7KXWC8B5N');
+    </script>
+</head>
 
-		<!-- =========================================
-     ÜST BAR (NAVBAR)
-========================================= -->
-		<header class="navbar">
-			<a href="/" class="nav-logo">
-				<img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
-				<span class="nav-logo-text">Rubik Academy</span>
-			</a>
+<body>
 
-			<div class="nav-right">
+    <!-- =========================================
+         ÜST BAR (NAVBAR)
+    ========================================= -->
+    <header class="navbar">
+        <a href="/" class="nav-logo">
+            <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+            <span class="nav-logo-text">Rubik Academy</span>
+        </a>
 
-				<nav class="nav-links">
-					<a href="http://rubikacademy.fun" data-i18n="navHome">
-						Ana Sayfa
-					</a>
-					<a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">
-						İçerikler
-					</a>
-				</nav>
+        <div class="nav-right">
 
-				<div class="lang-switcher" id="langSwitcher">
+            <nav class="nav-links">
+                <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+                <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+            </nav>
 
-					<button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
-						<span class="lang-globe">🌐</span>
-						<span id="langLabel">TR</span>
-					</button>
+            <!-- Dil menüsü common.js tarafından SITE_I18N.languages listesinden
+                 otomatik oluşturulur. Aşağıdakiler yalnızca fallback içeriktir. -->
+            <div class="lang-switcher" id="langSwitcher">
 
-					<div class="lang-menu" id="langMenu" role="menu">
+                <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
+                    <span class="lang-globe">🌐</span>
+                    <span id="langLabel">TR</span>
+                </button>
 
-						<button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
-							<span>Türkçe</span>
-							<span class="lang-check">✓</span>
-						</button>
+                <div class="lang-menu" id="langMenu" role="menu">
 
-						<button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
-							<span>English</span>
-							<span class="lang-check">✓</span>
-						</button>
+                    <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                        <span>Türkçe</span>
+                        <span class="lang-check">✓</span>
+                    </button>
 
-						<button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
-							<span>Русский</span>
-							<span class="lang-check">✓</span>
-						</button>
+                    <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                        <span>English</span>
+                        <span class="lang-check">✓</span>
+                    </button>
 
-						<button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
-							<span>Deutsch</span>
-							<span class="lang-check">✓</span>
-						</button>
+                    <button class="lang-menu-item" data-lang="fr" role="menuitem" onclick="selectLanguage('fr')">
+                        <span>Français</span>
+                        <span class="lang-check">✓</span>
+                    </button>
 
-						<button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
-							<span>العربية</span>
-							<span class="lang-check">✓</span>
-						</button>
+                    <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                        <span>Русский</span>
+                        <span class="lang-check">✓</span>
+                    </button>
 
-					</div>
+                    <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+                        <span>Deutsch</span>
+                        <span class="lang-check">✓</span>
+                    </button>
 
-				</div>
+                    <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+                        <span>العربية</span>
+                        <span class="lang-check">✓</span>
+                    </button>
 
-				<button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-					🌙
-				</button>
+                </div>
 
-			</div>
-		</header>
+            </div>
 
-		<div class="page">
+            <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+                🌙
+            </button>
 
-			<!-- NAVIGATION -->
-			<nav class="nav-bar">
-				<a href="http://rubikacademy.fun/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
-			</nav>
+        </div>
+    </header>
 
-			<!-- HERO -->
-			<section class="hero">
-				<div class="hero-text">
-					<div class="badge">
-						<i></i>
-						3×3 RUBİK KÜP
-					</div>
-					<h1>
-						<span data-i18n="hero_title1">3×3</span>
-						<span data-i18n="hero_titleAccent">Eğitimleri</span>
-					</h1>
-					<p data-i18n="hero_p">
-						3×3 Rubik Küp'ü çözmeyi sıfırdan öğren, temel yöntemlerden orta seviyeye ve ileri seviye speedcubing tekniklerine kadar kendini geliştir.
-					</p>
-				</div>
+    <div class="page">
 
-				<!-- HERO KÜP (2D) -->
-				<svg class="hero-cube" viewBox="0 0 300 300">
-					<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
-					<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
-					<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-					<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-					<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-					<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-					<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
-					<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-					<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
-					<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-				</svg>
-			</section>
+        <!-- NAVIGATION -->
+        <nav class="nav-bar">
+            <a href="http://rubikacademy.fun/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+        </nav>
 
-			<!-- BAŞLIK -->
-			<section class="section-title">
-				<small data-i18n="section_small">ÖĞRENME YOLCULUĞU</small>
-				<h2 data-i18n="section_h2">3×3 Methodları</h2>
-				<p data-i18n="section_p">Seviyeni seç ve küp çözme yolculuğuna başla.</p>
-			</section>
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-text">
+                <div class="badge">
+                    <i></i>
+                    <span data-i18n="badge_text">3×3 RUBİK KÜP</span>
+                </div>
+                <h1>
+                    <span data-i18n="hero_title1">3×3</span>
+                    <span data-i18n="hero_titleAccent">Eğitimleri</span>
+                </h1>
+                <p data-i18n="hero_p">
+                    3×3 Rubik Küp'ü çözmeyi sıfırdan öğren, temel yöntemlerden orta seviyeye ve ileri seviye speedcubing tekniklerine kadar kendini geliştir.
+                </p>
+            </div>
 
-			<!-- KARTLAR -->
-			<section class="methods">
+            <!-- HERO KÜP (2D) -->
+            <svg class="hero-cube" viewBox="0 0 300 300">
+                <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+                <rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
+                <rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+                <rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+                <rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+                <rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+                <rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+                <rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+                <rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+                <rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+            </svg>
+        </section>
 
-				<!-- BAŞLANGIÇ -->
-				<a href="http://rubikacademy.fun/yakinda.html" class="card">
-					<div class="card-visual beginner">
-						<div class="level" data-i18n="level_beginner">BAŞLANGIÇ SEVİYESİ</div>
-						<svg class="cube" viewBox="0 0 300 300">
-							<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
-							<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-						</svg>
-					</div>
-					<div class="card-info">
-						<h3 data-i18n="beginner_title">Başlangıç Methodu</h3>
-						<p data-i18n="beginner_p">3×3 Rubik Küp'ü ilk kez çözecekler için hazırlanmış adım adım başlangıç eğitimi.</p>
-						<div class="button">
-							<span data-i18n="cta_start">Eğitime Başla</span>
-							<span class="arrow">→</span>
-						</div>
-					</div>
-				</a>
+        <!-- BAŞLIK -->
+        <section class="section-title">
+            <small data-i18n="section_small">ÖĞRENME YOLCULUĞU</small>
+            <h2 data-i18n="section_h2">3×3 Methodları</h2>
+            <p data-i18n="section_p">Seviyeni seç ve küp çözme yolculuğuna başla.</p>
+        </section>
 
-				<!-- ORTA -->
-				<a href="http://rubikacademy.fun/yakinda.html" class="card">
-					<div class="card-visual middle">
-						<div class="level" data-i18n="level_middle">ORTA SEVİYESİ</div>
-						<svg class="cube" viewBox="0 0 300 300">
-							<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
-							<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-						</svg>
-					</div>
-					<div class="card-info">
-						<h3 data-i18n="middle_title">Orta Seviye Methodu</h3>
-						<p data-i18n="middle_p">Temel yöntemi bilenler için daha hızlı çözüm ve gelişmiş algoritmalar üzerine hazırlanan eğitim.</p>
-						<div class="button">
-							<span data-i18n="cta_start">Eğitime Başla</span>
-							<span class="arrow">→</span>
-						</div>
-					</div>
-				</a>
+        <!-- KARTLAR -->
+        <section class="methods">
 
-				<!-- İLERİ -->
-				<a href="http://rubikacademy.fun/yakinda.html" class="card">
-					<div class="card-visual advanced">
-						<div class="level" data-i18n="level_advanced">İLERİ SEVİYE</div>
-						<svg class="cube" viewBox="0 0 300 300">
-							<rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
-							<rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffffff" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
-							<rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
-							<rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffffff" stroke="#111827" stroke-width="2.5"/>
-							<rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
-						</svg>
-					</div>
-					<div class="card-info">
-						<h3 data-i18n="advanced_title">İleri Seviye Methodu</h3>
-						<p data-i18n="advanced_p">Daha hızlı süreler hedefleyenler için speedcubing, gelişmiş algoritmalar ve ileri çözüm teknikleri.</p>
-						<div class="button">
-							<span data-i18n="cta_start">Eğitime Başla</span>
-							<span class="arrow">→</span>
-						</div>
-					</div>
-				</a>
+            <!-- BAŞLANGIÇ -->
+            <a href="http://rubikacademy.fun/yakinda.html" class="card">
+                <div class="card-visual beginner">
+                    <div class="level" data-i18n="level_beginner">BAŞLANGIÇ SEVİYESİ</div>
+                    <svg class="cube" viewBox="0 0 300 300">
+                        <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+                        <rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <h3 data-i18n="beginner_title">Başlangıç Methodu</h3>
+                    <p data-i18n="beginner_p">3×3 Rubik Küp'ü ilk kez çözecekler için hazırlanmış adım adım başlangıç eğitimi.</p>
+                    <div class="button">
+                        <span data-i18n="cta_start">Eğitime Başla</span>
+                        <span class="arrow">→</span>
+                    </div>
+                </div>
+            </a>
 
-			</section>
+            <!-- ORTA -->
+            <a href="http://rubikacademy.fun/yakinda.html" class="card">
+                <div class="card-visual middle">
+                    <div class="level" data-i18n="level_middle">ORTA SEVİYESİ</div>
+                    <svg class="cube" viewBox="0 0 300 300">
+                        <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+                        <rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <h3 data-i18n="middle_title">Orta Seviye Methodu</h3>
+                    <p data-i18n="middle_p">Temel yöntemi bilenler için daha hızlı çözüm ve gelişmiş algoritmalar üzerine hazırlanan eğitim.</p>
+                    <div class="button">
+                        <span data-i18n="cta_start">Eğitime Başla</span>
+                        <span class="arrow">→</span>
+                    </div>
+                </div>
+            </a>
 
-			<!-- ALT -->
-			<section class="bottom">
-				<h3 data-i18n="bottom_title">🧩 Seviyeni seç, küpünü hızlandır!</h3>
-				<p data-i18n="bottom_p">Rubik Academy ile 3×3 çözüm becerilerini adım adım geliştir.</p>
-			</section>
+            <!-- İLERİ -->
+            <a href="http://rubikacademy.fun/yakinda.html" class="card">
+                <div class="card-visual advanced">
+                    <div class="level" data-i18n="level_advanced">İLERİ SEVİYE</div>
+                    <svg class="cube" viewBox="0 0 300 300">
+                        <rect x="40.0" y="40.0" width="220.0" height="220.0" rx="30.0" fill="#111827" stroke="#111827" stroke-width="3"/>
+                        <rect x="59.1" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="121.8" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="184.5" y="59.1" width="56.4" height="56.4" rx="12.4" fill="#ffffff" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="59.1" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#ffd21f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="121.8" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#e6252f" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="184.5" y="121.8" width="56.4" height="56.4" rx="12.4" fill="#12a04a" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="59.1" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#1e6fe6" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="121.8" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#ffffff" stroke="#111827" stroke-width="2.5"/>
+                        <rect x="184.5" y="184.5" width="56.4" height="56.4" rx="12.4" fill="#f97316" stroke="#111827" stroke-width="2.5"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <h3 data-i18n="advanced_title">İleri Seviye Methodu</h3>
+                    <p data-i18n="advanced_p">Daha hızlı süreler hedefleyenler için speedcubing, gelişmiş algoritmalar ve ileri çözüm teknikleri.</p>
+                    <div class="button">
+                        <span data-i18n="cta_start">Eğitime Başla</span>
+                        <span class="arrow">→</span>
+                    </div>
+                </div>
+            </a>
 
-		</div>
+        </section>
 
-		<script>var PAGE_ID = "3x3";</script>
-		<script src="/js/i18n.js"></script>
-		<script src="/js/common.js"></script>
+        <!-- ALT -->
+        <section class="bottom">
+            <h3 data-i18n="bottom_title">🧩 Seviyeni seç, küpünü hızlandır!</h3>
+            <p data-i18n="bottom_p">Rubik Academy ile 3×3 çözüm becerilerini adım adım geliştir.</p>
+        </section>
 
-	</body>
+    </div>
+
+    <script>var PAGE_ID = "3x3";</script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/common.js"></script>
+
+</body>
 </html>
