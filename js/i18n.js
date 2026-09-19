@@ -1137,6 +1137,58 @@ var SITE_I18N = {
                 bottom_title: "🧩 تعلّم خطوة بخطوة، سرّع نفسك!",
                 bottom_p: "طوّر مهاراتك في حل FTO بمشاهدة طريقة بينسيسكو مع Rubik Academy."
             }
+        },
+
+        /* FTO — Notasyon ve Rotasyonlar sayfası (PAGE_ID = "notasyon") — yakında yayında */
+        notasyon: {
+            tr: {
+                back_btn: "← Geri Dön",
+                badge_text: "NOTASYON",
+                page_h1: "Notasyon ve Rotasyonlar",
+                page_p: "Bu eğitim şu anda hazırlanıyor. FTO'nun temel hareket notasyonunu ve küp rotasyonlarını içeren içerik çok yakında burada yayında olacak.",
+                status_text: "Henüz Yayınlanmadı",
+                back_link: "← FTO Sayfasına Dön"
+            },
+            en: {
+                back_btn: "← Go Back",
+                badge_text: "NOTATION",
+                page_h1: "Notation and Rotations",
+                page_p: "This lesson is currently being prepared. Content covering the basic move notation and cube rotations of the FTO will be published here very soon.",
+                status_text: "Not Published Yet",
+                back_link: "← Back to FTO Page"
+            },
+            fr: {
+                back_btn: "← Retour",
+                badge_text: "NOTATION",
+                page_h1: "Notation et rotations",
+                page_p: "Cette leçon est en cours de préparation. Le contenu sur la notation des mouvements de base et les rotations du FTO sera publié ici très bientôt.",
+                status_text: "Pas encore publié",
+                back_link: "← Retour à la page FTO"
+            },
+            ru: {
+                back_btn: "← Назад",
+                badge_text: "НОТАЦИЯ",
+                page_h1: "Нотация и повороты",
+                page_p: "Этот урок сейчас готовится. Материал об основной нотации ходов и поворотах кубика FTO будет опубликован здесь очень скоро.",
+                status_text: "Ещё не опубликовано",
+                back_link: "← Назад к странице FTO"
+            },
+            de: {
+                back_btn: "← Zurück",
+                badge_text: "NOTATION",
+                page_h1: "Notation und Rotationen",
+                page_p: "Diese Lektion wird derzeit vorbereitet. Inhalte zur grundlegenden Zugnotation und den Würfelrotationen des FTO werden bald hier veröffentlicht.",
+                status_text: "Noch nicht veröffentlicht",
+                back_link: "← Zurück zur FTO-Seite"
+            },
+            ar: {
+                back_btn: "← رجوع",
+                badge_text: "الترميز",
+                page_h1: "الترميز والدورانات",
+                page_p: "يتم حاليًا إعداد هذا الدرس. سيتم نشر المحتوى الخاص بترميز الحركات الأساسي ودورانات مكعب FTO هنا قريبًا جدًا.",
+                status_text: "لم يُنشر بعد",
+                back_link: "← العودة إلى صفحة FTO"
+            }
         }
 
         /* Diğer sayfalar (örn. "cll", "3x3" vb.) buraya aynı şekilde eklenir.
