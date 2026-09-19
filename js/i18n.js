@@ -354,6 +354,51 @@ var SITE_I18N = {
                 item_zkt_p: "سجّل أوقات حلك، وتتبّع متوسطك، وقارن تقدّمك عبر الزمن.",
                 cta_go: "استكشف ←"
             }
+        },
+
+        notfound: {
+            tr: {
+                nf_pageTitle: "Rubik Academy - Sayfa Bulunamadı (404)",
+                nf_badge: "HATA 404",
+                nf_title: "Sayfa Bulunamadı",
+                nf_desc: "Aradığın sayfa taşınmış, silinmiş veya hiç var olmamış olabilir. Küp çözmeye devam etmek için ana sayfaya dön.",
+                nf_btn: "Ana Sayfaya Dön"
+            },
+            en: {
+                nf_pageTitle: "Rubik Academy - Page Not Found (404)",
+                nf_badge: "ERROR 404",
+                nf_title: "Page Not Found",
+                nf_desc: "The page you are looking for might have been moved, deleted, or never existed. Return to the homepage to keep solving cubes.",
+                nf_btn: "Back to Home"
+            },
+            fr: {
+                nf_pageTitle: "Rubik Academy - Page introuvable (404)",
+                nf_badge: "ERREUR 404",
+                nf_title: "Page introuvable",
+                nf_desc: "La page que tu cherches a peut-être été déplacée, supprimée ou n'a jamais existé. Retourne à l'accueil pour continuer à résoudre des cubes.",
+                nf_btn: "Retour à l'accueil"
+            },
+            ru: {
+                nf_pageTitle: "Rubik Academy - Страница не найдена (404)",
+                nf_badge: "ОШИБКА 404",
+                nf_title: "Страница не найдена",
+                nf_desc: "Страница, которую ты ищешь, возможно, была перемещена, удалена или никогда не существовала. Вернись на главную, чтобы продолжить собирать кубики.",
+                nf_btn: "На главную"
+            },
+            de: {
+                nf_pageTitle: "Rubik Academy - Seite nicht gefunden (404)",
+                nf_badge: "FEHLER 404",
+                nf_title: "Seite nicht gefunden",
+                nf_desc: "Die Seite, die du suchst, wurde möglicherweise verschoben, gelöscht oder hat nie existiert. Kehre zur Startseite zurück, um weiter Würfel zu lösen.",
+                nf_btn: "Zurück zur Startseite"
+            },
+            ar: {
+                nf_pageTitle: "روبيك أكاديمي - الصفحة غير موجودة (404)",
+                nf_badge: "خطأ 404",
+                nf_title: "الصفحة غير موجودة",
+                nf_desc: "ربما تم نقل الصفحة التي تبحث عنها أو حذفها أو لم تكن موجودة أصلًا. عد إلى الصفحة الرئيسية لمتابعة حل المكعبات.",
+                nf_btn: "العودة إلى الرئيسية"
+            }
         }
 
         /* Diğer sayfalar (örn. "cll", "3x3" vb.) buraya aynı şekilde eklenir.
