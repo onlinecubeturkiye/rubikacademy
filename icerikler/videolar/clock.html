@@ -11,7 +11,7 @@
     if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
     var savedLang = localStorage.getItem("site-lang") || "tr";
     document.documentElement.setAttribute("lang", savedLang);
-    document.documentElement.setAttribute("dir", "ltr");
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
   })();
 </script>
 
@@ -398,34 +398,8 @@ html {
                 <span id="langLabel">TR</span>
             </button>
 
-            <div class="lang-menu" id="langMenu" role="menu">
-
-                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
-                    <span>Türkçe</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
-                    <span>English</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
-                    <span>Русский</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
-                    <span>Deutsch</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
-                    <span>العربية</span>
-                    <span class="lang-check">✓</span>
-                </button>
-
-            </div>
+            <!-- Menü içeriği common.js tarafından SITE_I18N.languages listesinden üretilir -->
+            <div class="lang-menu" id="langMenu" role="menu"></div>
 
         </div>
 
@@ -446,7 +420,7 @@ html {
 <div class="hero-text">
 <div class="badge">
 <i></i>
-RUBİK'S CLOCK
+<span data-i18n="badge_text">RUBİK'S CLOCK</span>
 </div>
 <h1><span data-i18n="hero_title1">Clock</span> <span data-i18n="hero_titleAccent">Eğitimleri</span></h1>
 <p data-i18n="hero_p">
@@ -622,129 +596,8 @@ Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızl
 
 </div>
 
-<script>
-/* =========================================================
-   DİL SEÇİCİ (TR / EN / RU / DE / AR)
-========================================================= */
-
-var translations = {
-    "tr": {
-        "navHome": "Ana Sayfa",
-        "navContent": "İçerikler",
-        "back_btn": "← Geri Dön",
-        "hero_title1": "Clock",
-        "hero_titleAccent": "Eğitimleri",
-        "hero_p": "Rubik's Clock'u çözmeyi sıfırdan öğren; saat ayarlama mantığından hızlı çözüm tekniklerine kadar kendini geliştir.",
-        "section_small": "ÖĞRENME YOLCULUĞU",
-        "section_h2": "Clock Methodları",
-        "section_p": "Seviyeni seç ve Rubik's Clock çözme yolculuğuna başla.",
-        "level_beginner": "BAŞLANGIÇ SEVİYESİ",
-        "beginner_title": "Başlangıç Methodu",
-        "beginner_p": "Rubik's Clock'u ilk kez çözecekler için hazırlanmış adım adım başlangıç eğitimi.",
-        "level_middle": "ORTA SEVİYESİ",
-        "middle_title": "Orta Seviye Methodu",
-        "middle_p": "Temel yöntemi bilenler için daha hızlı çözüm ve gelişmiş algoritmalar üzerine hazırlanan eğitim.",
-        "level_advanced": "İLERİ SEVİYE",
-        "advanced_title": "İleri Seviye Methodu",
-        "advanced_p": "Daha hızlı süreler hedefleyenler için speedcubing, gelişmiş algoritmalar ve ileri çözüm teknikleri.",
-        "cta_start": "Eğitime Başla",
-        "bottom_title": "🕐 Seviyeni seç, saatini hızlandır!",
-        "bottom_p": "Rubik Academy ile Clock çözüm becerilerini adım adım geliştir."
-    },
-    "en": {
-        "navHome": "Home",
-        "navContent": "Content",
-        "back_btn": "← Go Back",
-        "hero_title1": "Clock",
-        "hero_titleAccent": "Tutorials",
-        "hero_p": "Learn to solve the Rubik's Clock from scratch; develop yourself from the logic of setting the clocks through to fast solving techniques.",
-        "section_small": "LEARNING JOURNEY",
-        "section_h2": "Clock Methods",
-        "section_p": "Pick your level and start your Rubik's Clock solving journey.",
-        "level_beginner": "BEGINNER LEVEL",
-        "beginner_title": "Beginner Method",
-        "beginner_p": "A step-by-step beginner tutorial for those solving the Rubik's Clock for the first time.",
-        "level_middle": "INTERMEDIATE LEVEL",
-        "middle_title": "Intermediate Method",
-        "middle_p": "A tutorial built on faster solving and advanced algorithms for those who already know the basic method.",
-        "level_advanced": "ADVANCED LEVEL",
-        "advanced_title": "Advanced Method",
-        "advanced_p": "Speedcubing, advanced algorithms, and advanced solving techniques for those aiming for faster solve times.",
-        "cta_start": "Start Learning",
-        "bottom_title": "🕐 Pick your level, speed up your clock!",
-        "bottom_p": "Develop your Clock solving skills step by step with Rubik Academy."
-    },
-    "ru": {
-        "navHome": "Главная",
-        "navContent": "Контент",
-        "back_btn": "← Назад",
-        "hero_title1": "Clock",
-        "hero_titleAccent": "Обучение",
-        "hero_p": "Изучи сборку Rubik's Clock с нуля; развивайся от логики настройки часов до техник быстрой сборки.",
-        "section_small": "ОБУЧАЮЩИЙ ПУТЬ",
-        "section_h2": "Методы Clock",
-        "section_p": "Выбери свой уровень и начни путь сборки Rubik's Clock.",
-        "level_beginner": "НАЧАЛЬНЫЙ УРОВЕНЬ",
-        "beginner_title": "Метод для начинающих",
-        "beginner_p": "Пошаговое обучение для новичков, впервые собирающих Rubik's Clock.",
-        "level_middle": "СРЕДНИЙ УРОВЕНЬ",
-        "middle_title": "Метод среднего уровня",
-        "middle_p": "Обучение более быстрой сборке и продвинутым алгоритмам для тех, кто уже знает базовый метод.",
-        "level_advanced": "ПРОДВИНУТЫЙ УРОВЕНЬ",
-        "advanced_title": "Продвинутый метод",
-        "advanced_p": "Спидкубинг, продвинутые алгоритмы и техники сборки для тех, кто нацелен на более быстрое время.",
-        "cta_start": "Начать обучение",
-        "bottom_title": "🕐 Выбери уровень, ускорь свои часы!",
-        "bottom_p": "Развивай навыки сборки Clock шаг за шагом вместе с Rubik Academy."
-    },
-    "de": {
-        "navHome": "Startseite",
-        "navContent": "Inhalte",
-        "back_btn": "← Zurück",
-        "hero_title1": "Clock",
-        "hero_titleAccent": "Anleitungen",
-        "hero_p": "Lerne den Rubik's Clock von Grund auf zu lösen; entwickle dich von der Logik des Uhreneinstellens bis hin zu schnellen Lösetechniken.",
-        "section_small": "LERNREISE",
-        "section_h2": "Clock-Methoden",
-        "section_p": "Wähle dein Niveau und starte deine Rubik's Clock-Lösungsreise.",
-        "level_beginner": "EINSTEIGERSTUFE",
-        "beginner_title": "Einsteigermethode",
-        "beginner_p": "Eine Schritt-für-Schritt-Anleitung für alle, die den Rubik's Clock zum ersten Mal lösen.",
-        "level_middle": "MITTELSTUFE",
-        "middle_title": "Methode für Fortgeschrittene",
-        "middle_p": "Eine Anleitung mit schnellerem Lösen und fortgeschrittenen Algorithmen für alle, die die Grundmethode bereits kennen.",
-        "level_advanced": "FORTGESCHRITTENENSTUFE",
-        "advanced_title": "Fortgeschrittene Methode",
-        "advanced_p": "Speedcubing, fortgeschrittene Algorithmen und fortgeschrittene Lösetechniken für alle, die schnellere Zeiten anstreben.",
-        "cta_start": "Jetzt lernen",
-        "bottom_title": "🕐 Wähle dein Niveau, beschleunige deine Uhr!",
-        "bottom_p": "Entwickle deine Clock-Lösungsfähigkeiten Schritt für Schritt mit Rubik Academy."
-    },
-    "ar": {
-        "navHome": "الرئيسية",
-        "navContent": "المحتوى",
-        "back_btn": "← رجوع",
-        "hero_title1": "Clock",
-        "hero_titleAccent": "دروس",
-        "hero_p": "تعلّم حل Rubik's Clock من الصفر؛ طوّر نفسك من منطق ضبط الساعات إلى تقنيات الحل السريع.",
-        "section_small": "رحلة التعلم",
-        "section_h2": "طرق حل Clock",
-        "section_p": "اختر مستواك وابدأ رحلة حل Rubik's Clock.",
-        "level_beginner": "مستوى مبتدئ",
-        "beginner_title": "طريقة المبتدئين",
-        "beginner_p": "درس تدريجي للمبتدئين لمن يحلّون Rubik's Clock لأول مرة.",
-        "level_middle": "مستوى متوسط",
-        "middle_title": "طريقة المستوى المتوسط",
-        "middle_p": "درس يعتمد على حل أسرع وخوارزميات متقدمة لمن يعرفون الطريقة الأساسية بالفعل.",
-        "level_advanced": "مستوى متقدم",
-        "advanced_title": "الطريقة المتقدمة",
-        "advanced_p": "سبيدكيوبنج وخوارزميات متقدمة وتقنيات حل متقدمة لمن يسعون لأوقات أسرع.",
-        "cta_start": "ابدأ التعلم",
-        "bottom_title": "🕐 اختر مستواك، سرّع ساعتك!",
-        "bottom_p": "طوّر مهاراتك في حل Clock خطوة بخطوة مع Rubik Academy."
-    }
-};
-</script>
+<script>var PAGE_ID = "clock";</script>
+<script src="/js/i18n.js"></script>
 <script src="/js/common.js"></script>
 
 </body>
