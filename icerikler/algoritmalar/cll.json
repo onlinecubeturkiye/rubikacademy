@@ -55,7 +55,7 @@
         { "name": "S1", "alg": "R U R' U R U2 R'", "pattern": "RFULBUUBULFR" },
         { "name": "S2", "alg": "L' U2 L U2 L F' L' F", "pattern": "LFUBRUURULBF" },
         { "name": "S3", "alg": "F R' F' R U2 R U2 R'", "pattern": "FBULRUUBURLF" },
-        { "name": "S4", "alg": "R U R' U' R F R' F' R U R' U R U2 R'", "pattern": "URLBBRUDLFFU" },
+        { "name": "S4", "alg": "R U R' U' R F R' F' R U R' U R U2 R'", "pattern": "BRULFUUBUFRL" },
         { "name": "S5", "alg": "L F' L' F L' U' L", "pattern": "BFULRUUBULRF" },
         { "name": "S6", "alg": "RU R' U R' FR F' R U2 R'", "pattern": "BURFFUBLULRU" }
       ]
