@@ -121,11 +121,37 @@ body {
 <body>
 
 <div class="error-card">
-    <div class="error-badge">ERROR 404</div>
-    <h1 class="error-title">Page Not Found</h1>
-    <p class="error-desc">The page you are looking for might have been moved, deleted, or never existed. Return to the homepage to keep solving cubes.</p>
-    <a href="/" class="home-btn">Back to Home</a>
+    <div class="error-badge" data-i18n="nf_badge">ERROR 404</div>
+    <h1 class="error-title" data-i18n="nf_title">Page Not Found</h1>
+    <p class="error-desc" data-i18n="nf_desc">The page you are looking for might have been moved, deleted, or never existed. Return to the homepage to keep solving cubes.</p>
+    <a href="/" class="home-btn" data-i18n="nf_btn">Back to Home</a>
 </div>
+
+<!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir).
+     Bu sayfa common.js kullanmaz; dil, diğer sayfalarda seçilip localStorage'a
+     kaydedilen "site-lang" değerinden okunur. i18n.js yüklenemezse
+     sayfadaki İngilizce metinler olduğu gibi kalır. -->
+<script>var PAGE_ID = "notfound";</script>
+<script src="/js/i18n.js"></script>
+<script>
+(function () {
+    var lang = "tr"; /* sitenin varsayılan dili; kayıtlı dil yoksa bu kullanılır */
+    try { lang = localStorage.getItem("site-lang") || lang; } catch (e) {}
+
+    var pages = window.SITE_I18N && SITE_I18N.pages;
+    var t = pages && pages[PAGE_ID] && pages[PAGE_ID][lang];
+    if (!t) return; /* çeviri yoksa İngilizce kalır */
+
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+        var key = el.getAttribute("data-i18n");
+        if (t[key] !== undefined) el.textContent = t[key];
+    });
+
+    if (t.nf_pageTitle) document.title = t.nf_pageTitle;
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+})();
+</script>
 
 </body>
 </html>
