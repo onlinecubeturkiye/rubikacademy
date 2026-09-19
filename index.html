@@ -587,6 +587,16 @@ section {
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "index";</script>
 <script src="/js/i18n.js"></script>
+<script>
+var translations = {};
+Object.keys(SITE_I18N.common).forEach(function (lang) {
+    translations[lang] = Object.assign(
+        {},
+        SITE_I18N.common[lang],
+        (SITE_I18N.pages[PAGE_ID] || {})[lang]
+    );
+});
+</script>
 <script src="/js/common.js"></script>
 
 </body>
