@@ -115,13 +115,71 @@ html.dark-mode .hero {
     border-radius: 20px;
     padding: 16px;
     box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
-    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .case-card:hover {
     transform: translateY(-4px);
     border-color: #dcbb5c;
     box-shadow: 0 16px 32px rgba(180, 140, 20, .12);
+}
+
+.case-card:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ÖĞRENME DURUMLARI */
+.case-card.state-learning {
+    background: #fff8d6;
+    border-color: #f2c94c;
+}
+.case-card.state-known {
+    background: #dcfce7;
+    border-color: #22c55e;
+}
+.case-card.state-learning:hover { border-color: #e0b12a; box-shadow: 0 16px 32px rgba(242, 201, 76, .25); }
+.case-card.state-known:hover { border-color: #16a34a; box-shadow: 0 16px 32px rgba(34, 197, 94, .22); }
+
+html.dark-mode .case-card.state-learning {
+    background: #3a3212;
+    border-color: #b8901f;
+}
+html.dark-mode .case-card.state-known {
+    background: #123524;
+    border-color: #22a35a;
+}
+
+.case-status {
+    font-size: 11px;
+    font-weight: 800;
+    margin-top: 6px;
+    display: none;
+}
+.case-card.state-learning .case-status { display: block; color: #a16207; }
+.case-card.state-known .case-status { display: block; color: #15803d; }
+html.dark-mode .case-card.state-learning .case-status { color: #facc15; }
+html.dark-mode .case-card.state-known .case-status { color: #4ade80; }
+
+/* İLERLEME ÖZETİ */
+.progress-summary {
+    max-width: 1250px;
+    margin: 0 auto 28px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    font-weight: 800;
+}
+.progress-summary span {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    color: var(--text);
 }
 
 .case-diagram {
@@ -236,6 +294,9 @@ html.dark-mode .hero {
 </div>
 </section>
 
+<!-- İlerleme özeti -->
+<div class="progress-summary" id="progressSummary"></div>
+
 <div class="subsets-wrap" id="subsetsWrap"></div>
 
 <div id="loadError" class="load-error" data-i18n="load_error">
@@ -256,10 +317,103 @@ html.dark-mode .hero {
 <script src="/js/i18n.js"></script>
 <script src="/js/common.js"></script>
 
-<!-- Harici cll.json dosyasını çekme -->
 <script>
+/* ============================================================
+   ÖĞRENME İLERLEMESİ (localStorage)
+   Beyaz (boş) -> sarı (learning) -> yeşil (known) -> beyaz
+   Her algoritma sayfası için PROGRESS_KEY farklı olmalı.
+   ============================================================ */
+var PROGRESS_KEY = "algo-progress-cll";
+var STATES = ["", "learning", "known"];
+
+// Bu sayfaya özel metinler (i18n.js'e bağımlı değil)
+var PROGRESS_TEXT = {
+    tr: { learning: "Öğreniyorum", known: "Biliyorum" },
+    en: { learning: "Learning",    known: "Known" },
+    de: { learning: "Ich lerne",   known: "Kann ich" },
+    fr: { learning: "J'apprends",  known: "Je sais" },
+    ru: { learning: "Учу",         known: "Знаю" },
+    ar: { learning: "أتعلم",       known: "أعرف" }
+};
+
+function currentLang() {
+    return localStorage.getItem("site-lang") || "tr";
+}
+
+function progressText() {
+    return PROGRESS_TEXT[currentLang()] || PROGRESS_TEXT.tr;
+}
+
+function loadProgress() {
+    try {
+        var p = JSON.parse(localStorage.getItem(PROGRESS_KEY));
+        return (p && typeof p === "object") ? p : {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function saveProgress(p) {
+    try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+
+function stateOfCard(card) {
+    if (card.classList.contains("state-known")) return "known";
+    if (card.classList.contains("state-learning")) return "learning";
+    return "";
+}
+
+function applyState(card, state) {
+    card.classList.remove("state-learning", "state-known");
+    if (state) card.classList.add("state-" + state);
+    var s = card.querySelector(".case-status");
+    if (s) s.textContent = state ? progressText()[state] : "";
+}
+
+function updateSummary() {
+    var cards = document.querySelectorAll(".case-card");
+    var learning = 0, known = 0;
+    for (var i = 0; i < cards.length; i++) {
+        var st = stateOfCard(cards[i]);
+        if (st === "learning") learning++;
+        if (st === "known") known++;
+    }
+    var t = progressText();
+    var el = document.getElementById("progressSummary");
+    if (el) {
+        el.innerHTML =
+            '<span>🟡 ' + t.learning + ': ' + learning + '</span>' +
+            '<span>🟢 ' + t.known + ': ' + known + ' / ' + cards.length + '</span>';
+    }
+}
+
+// Dil değişince rozet ve özet metinlerini yenile
+function refreshProgressLabels() {
+    var cards = document.querySelectorAll(".case-card");
+    for (var i = 0; i < cards.length; i++) {
+        applyState(cards[i], stateOfCard(cards[i]));
+    }
+    updateSummary();
+}
+
+function cycleCard(card) {
+    var name = card.getAttribute("data-case");
+    var p = loadProgress();
+    var current = p[name] || "";
+    var next = STATES[(STATES.indexOf(current) + 1) % STATES.length];
+
+    if (next) { p[name] = next; } else { delete p[name]; }
+    saveProgress(p);
+
+    applyState(card, next);
+    updateSummary();
+}
+
+/* ============================================================
+   cll.json'dan kartları oluştur
+   ============================================================ */
 function escapeHtml(str) {
-    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 fetch("/icerikler/algoritmalar/cll.json")
@@ -270,6 +424,8 @@ fetch("/icerikler/algoritmalar/cll.json")
     .then(function(data) {
         var groups = data.cll;
         var wrap = document.getElementById("subsetsWrap");
+        var progress = loadProgress();
+        var t = progressText();
         var html = "";
 
         for (var i = 0; i < groups.length; i++) {
@@ -283,12 +439,16 @@ fetch("/icerikler/algoritmalar/cll.json")
             for (var j = 0; j < group.cases.length; j++) {
                 var c = group.cases[j];
                 var diag = cllSvg(c.pattern, "full", 60);
+                var st = progress[c.name] || "";
+                var cls = "case-card" + (st ? " state-" + st : "");
+                var label = st ? t[st] : "";
 
-                html += '<div class="case-card">';
+                html += '<div class="' + cls + '" data-case="' + escapeHtml(c.name) + '" role="button" tabindex="0">';
                 html += '  <div class="case-diagram" dir="ltr">' + diag + '</div>';
                 html += '  <div class="case-body">';
                 html += '    <div class="case-name">' + escapeHtml(c.name) + '</div>';
                 html += '    <div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>';
+                html += '    <div class="case-status">' + escapeHtml(label) + '</div>';
                 html += '  </div>';
                 html += '</div>';
             }
@@ -298,14 +458,38 @@ fetch("/icerikler/algoritmalar/cll.json")
         }
 
         wrap.innerHTML = html;
-        var savedLang = localStorage.getItem("site-lang") || "tr";
+
+        // Tek dinleyici (event delegation): tıklama
+        wrap.addEventListener("click", function(e) {
+            var card = e.target.closest(".case-card");
+            if (card) cycleCard(card);
+        });
+
+        // Klavye desteği: Enter / Boşluk
+        wrap.addEventListener("keydown", function(e) {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            var card = e.target.closest(".case-card");
+            if (!card) return;
+            e.preventDefault();
+            cycleCard(card);
+        });
+
+        var savedLang = currentLang();
         applyLanguage(savedLang);
+        refreshProgressLabels();
     })
     .catch(function(err) {
         var errBox = document.getElementById("loadError");
         if (errBox) errBox.style.display = "block";
         console.error("cll.json yüklenemedi:", err);
     });
+
+// Kullanıcı dili sonradan değiştirirse etiketleri güncelle
+document.addEventListener("click", function(e) {
+    if (e.target.closest("#langMenu")) {
+        setTimeout(refreshProgressLabels, 50);
+    }
+});
 </script>
 
 </body>
