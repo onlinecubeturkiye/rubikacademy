@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- TEMA VE DİL BAŞLANGIÇ AYARLARI -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Koçluklar</title>
+<link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/kocluklar">
+<meta name="description" content="Rubik Academy - Birebir küp koçluğu. 2x2 için Ömer Eymen Akar ile birebir ders al.">
+<meta property="og:title" content="Rubik Academy - Koçluklar">
+<meta property="og:description" content="Kendi seviyene özel birebir küp koçluğu seansları.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/kocluklar">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogoBlack-Photoroom.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- ORTAK STİLLER (tüm sitede aynı) -->
+<link rel="stylesheet" href="/styles/common.css">
+
+<!-- BU SAYFAYA ÖZEL STİLLER -->
+<style>
+
+html {
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+.page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 30px 5% 90px;
+    background: transparent;
+}
+
+/* =========================================================
+   BAŞLIK
+========================================================= */
+
+.intro {
+    max-width: 700px;
+    margin: 0 auto 50px;
+    text-align: center;
+}
+
+.intro-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 17px;
+    border-radius: 50px;
+    background: var(--badge-bg);
+    border: 1px solid var(--badge-border);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.7px;
+    margin-bottom: 18px;
+}
+
+.intro-badge i {
+    width: 7px;
+    height: 7px;
+    display: block;
+    border-radius: 50%;
+    background: #20a4f3;
+    box-shadow: 0 0 0 5px rgba(32,164,243,.12);
+}
+
+.intro h1 {
+    font-size: clamp(36px, 4.6vw, 54px);
+    line-height: 1.05;
+    letter-spacing: -2.5px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 16px;
+}
+
+.intro p {
+    max-width: 560px;
+    margin: auto;
+    color: var(--text-soft);
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+/* RESPONSIVE */
+@media(max-width:680px) {
+    .page { padding: 22px 4% 60px; }
+    .intro { margin-bottom: 35px; }
+    .intro h1 { font-size: 36px; }
+    .intro p { font-size: 14px; }
+}
+
+/* =========================================================
+   KOÇ KARTLARI
+========================================================= */
+
+.coaches {
+    width: 100%;
+    max-width: 820px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+.coach {
+    position: relative;
+    overflow: hidden;
+    border-radius: 28px;
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow);
+    transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+    text-decoration: none;
+}
+
+.coach:hover {
+    transform: translateY(-8px);
+    border-color: #bfdbfe;
+    box-shadow: 0 24px 55px rgba(34,111,168,.14);
+}
+
+.coach-photo {
+    height: 260px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #e1f3ff, #8bd4ff);
+}
+
+.coach-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.coach-cube-tag {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 7px 13px;
+    border-radius: 8px;
+    background: rgba(17,24,39,.78);
+    backdrop-filter: blur(4px);
+    color: #f8fafc;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .5px;
+}
+
+.coach-info {
+    padding: 22px 24px 25px;
+}
+
+.coach-tag {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 7px;
+    background: var(--badge-bg);
+    color: var(--primary);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    margin-bottom: 11px;
+}
+
+.coach-info h2 {
+    font-size: 20px;
+    font-weight: 850;
+    letter-spacing: -.4px;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.coach-info p {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-soft);
+    margin-bottom: 17px;
+}
+
+.coach-start {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    transition: gap .25s ease;
+}
+
+.coach:hover .coach-start {
+    gap: 12px;
+}
+
+/* Tek koç varken kartı ortala ve makul bir genişlikte tut */
+.coaches.single {
+    grid-template-columns: minmax(0, 380px);
+    justify-content: center;
+}
+
+/* RESPONSIVE KOÇ KARTLARI */
+@media(max-width:680px) {
+    .coaches { grid-template-columns: 1fr; gap: 20px; }
+    .coaches.single { grid-template-columns: 1fr; }
+    .coach { border-radius: 22px; }
+    .coach-photo { height: 220px; }
+}
+
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<!-- Arka Plan Işık Efektleri -->
+<div class="bg-glow"></div>
+
+<!-- =========================================
+     ÜST BAR
+========================================= -->
+<header class="navbar">
+
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir / Switch language / Сменить язык">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu" role="menu">
+                <button class="lang-menu-item" data-lang="tr" role="menuitem" onclick="selectLanguage('tr')">
+                    <span>Türkçe</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="en" role="menuitem" onclick="selectLanguage('en')">
+                    <span>English</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="fr" role="menuitem" onclick="selectLanguage('fr')">
+                    <span>Français</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="ru" role="menuitem" onclick="selectLanguage('ru')">
+                    <span>Русский</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="de" role="menuitem" onclick="selectLanguage('de')">
+                    <span>Deutsch</span><span class="lang-check">✓</span>
+                </button>
+                <button class="lang-menu-item" data-lang="ar" role="menuitem" onclick="selectLanguage('ar')">
+                    <span>العربية</span><span class="lang-check">✓</span>
+                </button>
+            </div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
+    </div>
+
+</header>
+
+<div class="page">
+
+    <!-- ======================================================
+         BAŞLIK
+    ====================================================== -->
+    <section class="intro">
+
+        <div class="intro-badge">
+            <i></i>
+            RUBIK ACADEMY
+        </div>
+
+        <h1 data-i18n="kc_title">Koçluklar</h1>
+
+        <p data-i18n="kc_intro">
+            Kendi hızına ve seviyene özel, birebir küp koçluğu seansları.
+            Uzman koçlarımızla birebir çalışarak gelişimini hızlandır.
+        </p>
+
+    </section>
+
+    <!-- ======================================================
+         KOÇLAR
+    ====================================================== -->
+    <section class="coaches single">
+
+        <!-- ÖMER EYMEN AKAR - 2x2 -->
+        <a href="https://instagram.com/rubikacademyy" target="_blank" rel="noopener" class="coach" aria-label="Ömer Eymen Akar - 2x2 Koçluğu">
+            <div class="coach-photo">
+                <span class="coach-cube-tag">2×2</span>
+                <img src="/oea22.png" alt="Ömer Eymen Akar">
+            </div>
+            <div class="coach-info">
+                <span class="coach-tag" data-i18n="tag_koc_oea">2×2 KOÇU</span>
+                <h2>Ömer Eymen Akar</h2>
+                <p data-i18n="koc_oea_p">2×2 küpte hız ve algoritma tekniklerini birebir seanslarla öğrenmek isteyenler için özel koçluk.</p>
+                <span class="coach-start" data-i18n="cta_contact">İletişime Geç →</span>
+            </div>
+        </a>
+
+    </section>
+
+</div>
+
+<!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
+<script>var PAGE_ID = "kocluklar";</script>
+<script src="/js/i18n.js"></script>
+
+<!-- KART HAREKETİ (3D Efekt) — sayfaya özel -->
+<script>
+document.querySelectorAll(".coach").forEach(function(card) {
+    card.addEventListener("mousemove", function(e) {
+        if (window.innerWidth < 800) return;
+
+        var rect = card.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+
+        var rotateY = ((x / rect.width) - .5) * 2.2;
+        var rotateX = ((y / rect.height) - .5) * -2.2;
+
+        card.style.transform =
+            "translateY(-8px) perspective(1200px) rotateX(" + rotateX + "deg) rotateY(" + rotateY + "deg)";
+    });
+
+    card.addEventListener("mouseleave", function() {
+        card.style.transform = "";
+    });
+});
+
+window.addEventListener("resize", function() {
+    if (window.innerWidth < 800) {
+        document.querySelectorAll(".coach").forEach(function(card) {
+            card.style.transform = "";
+        });
+    }
+});
+</script>
+
+<script src="/js/common.js"></script>
+
+</body>
+</html>
