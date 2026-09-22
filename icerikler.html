@@ -175,6 +175,7 @@ html {
 .item-visual.blue   { background: linear-gradient(135deg, #e1f3ff, #8bd4ff); }
 .item-visual.purple { background: linear-gradient(135deg, #eee8ff, #b39cff); }
 .item-visual.orange { background: linear-gradient(135deg, #fff0df, #ffac5b); }
+.item-visual.green  { background: linear-gradient(135deg, #e3fbea, #7de8a6); }
 
 .item-logo {
     width: 84px;
@@ -253,12 +254,10 @@ html {
 /* RESPONSIVE KARTLAR */
 @media(max-width:900px) {
     .items { grid-template-columns: repeat(2, 1fr); }
-    .item:last-child { grid-column: span 2; }
 }
 
 @media(max-width:680px) {
     .items { grid-template-columns: 1fr; gap: 20px; }
-    .item:last-child { grid-column: span 1; }
     .item { border-radius: 22px; }
     .item-visual { height: 165px; }
 }
@@ -407,6 +406,24 @@ html {
                 <span class="item-tag" data-i18n="tag_tool">ARAÇ</span>
                 <h2>ZKT Timer</h2>
                 <p data-i18n="item_zkt_p">Çözüm sürelerini kaydet, ortalamanı takip et ve gelişimini zaman içinde karşılaştır.</p>
+                <span class="item-start" data-i18n="cta_go">İncele →</span>
+            </div>
+        </a>
+
+        <!-- KOÇLUKLAR -->
+        <a href="/icerikler/kocluklar" class="item" aria-label="Koçluklar">
+            <div class="item-visual green">
+                <div class="item-logo">
+                    <svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="34" r="16" fill="#f8fafc"/>
+                        <path d="M22 84 C22 60 36 49 50 49 C64 49 78 60 78 84 Z" fill="#f8fafc"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="item-info">
+                <span class="item-tag" data-i18n="tag_coaching">BİREBİR DERS</span>
+                <h2 data-i18n="item_coaching">Koçluklar</h2>
+                <p data-i18n="item_coaching_p">Kendi hızına ve seviyene özel birebir koçluk seanslarıyla gelişimini hızlandır.</p>
                 <span class="item-start" data-i18n="cta_go">İncele →</span>
             </div>
         </a>
