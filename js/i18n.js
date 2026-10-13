@@ -3422,6 +3422,94 @@ square1: {
         bottom_title: "🧩 اختر مستواك، سرّع مكعبك!",
         bottom_p: "طوّر مهاراتك في حل Square-1 خطوة بخطوة مع Rubik Academy."
     }
+},
+
+       /* İçerikler/Koçluklar — Koçluklar sayfası (PAGE_ID = "kocluklar") */
+kocluklar: {
+    tr: {
+        kc_title: "Koçluklar",
+        kc_intro: "Kendi hızına ve seviyene özel, birebir küp koçluğu seansları. Uzman koçlarımızla birebir çalışarak gelişimini hızlandır.",
+        tag_koc_oea: "2×2 · 3×3 · SKEWB KOÇU",
+        koc_oea_p: "2×2, 3×3, 3×3 tek el ve Skewb'de hız ve algoritma tekniklerini birebir seanslarla öğrenmek isteyenler için özel koçluk.",
+        tag_koc_mak: "MEGAMINX KOÇU",
+        koc_mak_p: "Megaminx'te çözüm adımlarını ve hız tekniklerini birebir seanslarla geliştirmek isteyenler için özel koçluk.",
+        tag_koc_oc: "SKEWB KOÇU",
+        koc_oc_p: "Skewb'de algoritma ve hız tekniklerini birebir seanslarla öğrenmek isteyenler için özel koçluk.",
+        pkg_oh: "3×3 Tek El",
+        cta_buy: "Satın Al",
+        cta_contact: "Sorular için iletişime geç →",
+        kc_pay_note: "Ödemeler Shopier üzerinden güvenle alınır. Ödemeden sonra seans saatini birlikte belirliyoruz."
+    },
+    en: {
+        kc_title: "Coaching",
+        kc_intro: "One-on-one cubing coaching sessions tailored to your pace and level. Work directly with our expert coaches and speed up your progress.",
+        tag_koc_oea: "2×2 · 3×3 · SKEWB COACH",
+        koc_oea_p: "Personal coaching for anyone who wants to learn speed and algorithm techniques for 2×2, 3×3, 3×3 one-handed and Skewb in one-on-one sessions.",
+        tag_koc_mak: "MEGAMINX COACH",
+        koc_mak_p: "Personal coaching for anyone who wants to improve their Megaminx solving steps and speed techniques in one-on-one sessions.",
+        tag_koc_oc: "SKEWB COACH",
+        koc_oc_p: "Personal coaching for anyone who wants to learn Skewb algorithms and speed techniques in one-on-one sessions.",
+        pkg_oh: "3×3 One-Handed",
+        cta_buy: "Buy",
+        cta_contact: "Questions? Get in touch →",
+        kc_pay_note: "Payments are processed securely via Shopier. After payment, we'll schedule your session time together."
+    },
+    fr: {
+        kc_title: "Coaching",
+        kc_intro: "Des séances de coaching individuel adaptées à ton rythme et à ton niveau. Travaille directement avec nos coachs experts et progresse plus vite.",
+        tag_koc_oea: "COACH 2×2 · 3×3 · SKEWB",
+        koc_oea_p: "Coaching personnalisé pour apprendre les techniques de vitesse et d'algorithmes en 2×2, 3×3, 3×3 à une main et Skewb lors de séances individuelles.",
+        tag_koc_mak: "COACH MEGAMINX",
+        koc_mak_p: "Coaching personnalisé pour améliorer tes étapes de résolution et ta vitesse au Megaminx lors de séances individuelles.",
+        tag_koc_oc: "COACH SKEWB",
+        koc_oc_p: "Coaching personnalisé pour apprendre les algorithmes et les techniques de vitesse au Skewb lors de séances individuelles.",
+        pkg_oh: "3×3 à une main",
+        cta_buy: "Acheter",
+        cta_contact: "Des questions ? Contacte-nous →",
+        kc_pay_note: "Les paiements sont traités en toute sécurité via Shopier. Après le paiement, nous fixons ensemble l'heure de ta séance."
+    },
+    ru: {
+        kc_title: "Коучинг",
+        kc_intro: "Индивидуальные занятия по спидкубингу с учётом твоего темпа и уровня. Занимайся напрямую с нашими опытными тренерами и прогрессируй быстрее.",
+        tag_koc_oea: "ТРЕНЕР 2×2 · 3×3 · SKEWB",
+        koc_oea_p: "Индивидуальный коучинг для тех, кто хочет освоить скоростные техники и алгоритмы для 2×2, 3×3, 3×3 одной рукой и Skewb на личных занятиях.",
+        tag_koc_mak: "ТРЕНЕР MEGAMINX",
+        koc_mak_p: "Индивидуальный коучинг для тех, кто хочет улучшить этапы сборки и скоростные техники Megaminx на личных занятиях.",
+        tag_koc_oc: "ТРЕНЕР SKEWB",
+        koc_oc_p: "Индивидуальный коучинг для тех, кто хочет освоить алгоритмы и скоростные техники Skewb на личных занятиях.",
+        pkg_oh: "3×3 одной рукой",
+        cta_buy: "Купить",
+        cta_contact: "Есть вопросы? Свяжись с нами →",
+        kc_pay_note: "Оплата безопасно проходит через Shopier. После оплаты мы вместе согласуем время занятия."
+    },
+    de: {
+        kc_title: "Coachings",
+        kc_intro: "Einzel-Coachings für Speedcubing, abgestimmt auf dein Tempo und dein Niveau. Arbeite direkt mit unseren erfahrenen Coaches und verbessere dich schneller.",
+        tag_koc_oea: "2×2 · 3×3 · SKEWB COACH",
+        koc_oea_p: "Persönliches Coaching für alle, die Speed- und Algorithmustechniken für 2×2, 3×3, 3×3 einhändig und Skewb in Einzelstunden lernen möchten.",
+        tag_koc_mak: "MEGAMINX COACH",
+        koc_mak_p: "Persönliches Coaching für alle, die ihre Megaminx-Lösungsschritte und Speedtechniken in Einzelstunden verbessern möchten.",
+        tag_koc_oc: "SKEWB COACH",
+        koc_oc_p: "Persönliches Coaching für alle, die Skewb-Algorithmen und Speedtechniken in Einzelstunden lernen möchten.",
+        pkg_oh: "3×3 Einhändig",
+        cta_buy: "Kaufen",
+        cta_contact: "Fragen? Kontaktiere uns →",
+        kc_pay_note: "Zahlungen werden sicher über Shopier abgewickelt. Nach der Zahlung legen wir gemeinsam den Termin fest."
+    },
+    ar: {
+        kc_title: "التدريب",
+        kc_intro: "جلسات تدريب فردية على حل المكعب تناسب سرعتك ومستواك. تدرّب مباشرة مع مدربينا الخبراء وسرّع تقدّمك.",
+        tag_koc_oea: "مدرب 2×2 · 3×3 · SKEWB",
+        koc_oea_p: "تدريب خاص لمن يريد تعلّم تقنيات السرعة والخوارزميات في 2×2 و3×3 و3×3 بيد واحدة وSkewb من خلال جلسات فردية.",
+        tag_koc_mak: "مدرب MEGAMINX",
+        koc_mak_p: "تدريب خاص لمن يريد تطوير خطوات حل Megaminx وتقنيات السرعة من خلال جلسات فردية.",
+        tag_koc_oc: "مدرب SKEWB",
+        koc_oc_p: "تدريب خاص لمن يريد تعلّم خوارزميات Skewb وتقنيات السرعة من خلال جلسات فردية.",
+        pkg_oh: "3×3 بيد واحدة",
+        cta_buy: "اشترِ الآن",
+        cta_contact: "لديك أسئلة؟ تواصل معنا ←",
+        kc_pay_note: "تتم المدفوعات بأمان عبر Shopier. بعد الدفع نحدد موعد الجلسة معًا."
+    }
 }
 
         /* Diğer sayfalar buraya aynı şekilde eklenir.
