@@ -19,7 +19,7 @@
 <link rel="icon" href="/RubikAcademyLogoBlack-Photoroom.png" type="image/png">
 
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/kocluklar">
-<meta name="description" content="Rubik Academy - Birebir küp koçluğu. 2x2 için Ömer Eymen Akar ile birebir ders al.">
+<meta name="description" content="Rubik Academy - Birebir küp koçluğu. 2x2, 3x3, 3x3 Tek El, Skewb ve Megaminx için uzman koçlarla birebir ders al.">
 <meta property="og:title" content="Rubik Academy - Koçluklar">
 <meta property="og:description" content="Kendi seviyene özel birebir küp koçluğu seansları.">
 <meta property="og:type" content="website">
@@ -114,10 +114,11 @@ html {
 
 .coaches {
     width: 100%;
-    max-width: 820px;
+    max-width: 1140px;
     margin: auto;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    align-items: start;
     gap: 30px;
 }
 
@@ -129,34 +130,54 @@ html {
     border: 1px solid var(--card-border);
     box-shadow: var(--shadow);
     transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
-    text-decoration: none;
 }
 
 .coach:hover {
-    transform: translateY(-8px);
+    transform: translateY(-6px);
     border-color: #bfdbfe;
     box-shadow: 0 24px 55px rgba(34,111,168,.14);
 }
 
 .coach-photo {
-    height: 260px;
+    height: 190px;
     position: relative;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: linear-gradient(135deg, #e1f3ff, #8bd4ff);
 }
 
+/* Fotoğraf yoksa baş harfler görünür; fotoğraf varsa üstünü kaplar */
+.coach-initials {
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    color: rgba(23,32,51,.5);
+}
+
 .coach-photo img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
 
-.coach-cube-tag {
+.coach-cube-tags {
     position: absolute;
     top: 16px;
     left: 16px;
-    padding: 7px 13px;
+    right: 16px;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.coach-cube-tag {
+    padding: 7px 11px;
     border-radius: 8px;
     background: rgba(17,24,39,.78);
     backdrop-filter: blur(4px);
@@ -197,6 +218,76 @@ html {
     margin-bottom: 17px;
 }
 
+/* =========================================================
+   PAKETLER (SHOPIER ÖDEME LİNKLERİ)
+========================================================= */
+
+.packages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.pkg {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px 12px 15px;
+    border-radius: 16px;
+    background: var(--surface-soft);
+    border: 1px solid var(--card-border);
+    text-decoration: none;
+    transition: border-color .25s ease;
+}
+
+.pkg:hover {
+    border-color: var(--primary);
+}
+
+.pkg-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.pkg-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.15;
+    white-space: nowrap;
+}
+
+.pkg-price s {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-soft);
+}
+
+.pkg-price b {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.pkg-buy {
+    padding: 9px 13px;
+    border-radius: 11px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    transition: background .25s ease;
+}
+
+.pkg:hover .pkg-buy {
+    background: var(--primary-dark);
+}
+
 .coach-start {
     display: inline-flex;
     align-items: center;
@@ -204,25 +295,30 @@ html {
     color: var(--primary);
     font-size: 13px;
     font-weight: 800;
+    text-decoration: none;
     transition: gap .25s ease;
 }
 
-.coach:hover .coach-start {
+.coach-start:hover {
     gap: 12px;
 }
 
-/* Tek koç varken kartı ortala ve makul bir genişlikte tut */
-.coaches.single {
-    grid-template-columns: minmax(0, 380px);
-    justify-content: center;
+.pay-note {
+    max-width: 640px;
+    margin: 40px auto 0;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-soft);
 }
 
 /* RESPONSIVE KOÇ KARTLARI */
 @media(max-width:680px) {
     .coaches { grid-template-columns: 1fr; gap: 20px; }
-    .coaches.single { grid-template-columns: 1fr; }
     .coach { border-radius: 22px; }
-    .coach-photo { height: 220px; }
+    .coach-photo { height: 170px; }
+    .coach-info { padding: 20px 18px 22px; }
+    .pkg { padding: 11px 10px 11px 13px; gap: 10px; }
 }
 
 </style>
@@ -317,23 +413,92 @@ html {
     <!-- ======================================================
          KOÇLAR
     ====================================================== -->
-    <section class="coaches single">
+    <section class="coaches">
 
-        <!-- ÖMER EYMEN AKAR - 2x2 -->
-        <a href="https://instagram.com/rubikacademyy" target="_blank" rel="noopener" class="coach" aria-label="Ömer Eymen Akar - 2x2 Koçluğu">
+        <!-- ÖMER EYMEN AKAR - 2X2, 3X3, 3X3 TEK EL VE SKEWB KOÇLUĞU -->
+        <article class="coach" aria-label="Ömer Eymen Akar - 2x2, 3x3, 3x3 Tek El ve Skewb Koçluğu">
             <div class="coach-photo">
-                <span class="coach-cube-tag">2×2</span>
-                <img src="/oea22.png" alt="Ömer Eymen Akar">
+                <div class="coach-cube-tags"><span class="coach-cube-tag">2×2</span><span class="coach-cube-tag">3×3</span><span class="coach-cube-tag">OH</span><span class="coach-cube-tag">Skewb</span></div>
+                <span class="coach-initials" aria-hidden="true">ÖEA</span>
+                <img src="/oea22.png" alt="Ömer Eymen Akar" onerror="this.remove()">
             </div>
             <div class="coach-info">
-                <span class="coach-tag" data-i18n="tag_koc_oea">2×2 KOÇU</span>
+                <span class="coach-tag" data-i18n="tag_koc_oea">2×2 · 3×3 · SKEWB KOÇU</span>
                 <h2>Ömer Eymen Akar</h2>
-                <p data-i18n="koc_oea_p">2×2 küpte hız ve algoritma tekniklerini birebir seanslarla öğrenmek isteyenler için özel koçluk.</p>
-                <span class="coach-start" data-i18n="cta_contact">İletişime Geç →</span>
+                <p data-i18n="koc_oea_p">2×2, 3×3, 3×3 tek el ve Skewb'de hız ve algoritma tekniklerini birebir seanslarla öğrenmek isteyenler için özel koçluk.</p>
+                <div class="packages">
+                    <a class="pkg" href="https://www.shopier.com/rubikacademy/51184316" target="_blank" rel="noopener">
+                        <span class="pkg-name">2×2</span>
+                        <span class="pkg-price"><s>100 TL</s><b>50 TL</b></span>
+                        <span class="pkg-buy" data-i18n="cta_buy">Satın Al</span>
+                    </a>
+                    <a class="pkg" href="https://www.shopier.com/rubikacademy/51192178" target="_blank" rel="noopener">
+                        <span class="pkg-name">3×3</span>
+                        <span class="pkg-price"><s>125 TL</s><b>75 TL</b></span>
+                        <span class="pkg-buy" data-i18n="cta_buy">Satın Al</span>
+                    </a>
+                    <a class="pkg" href="https://www.shopier.com/rubikacademy/51192240" target="_blank" rel="noopener">
+                        <span class="pkg-name" data-i18n="pkg_oh">3×3 Tek El</span>
+                        <span class="pkg-price"><s>125 TL</s><b>75 TL</b></span>
+                        <span class="pkg-buy" data-i18n="cta_buy">Satın Al</span>
+                    </a>
+                    <!-- DİKKAT: Skewb (Ömer Eymen Akar) için verilen link 2×2 ile aynı — doğru Shopier linki gelince güncelle -->
+                    <a class="pkg" href="https://www.shopier.com/rubikacademy/51184316" target="_blank" rel="noopener">
+                        <span class="pkg-name">Skewb</span>
+                        <span class="pkg-price"><s>100 TL</s><b>50 TL</b></span>
+                        <span class="pkg-buy" data-i18n="cta_buy">Satın Al</span>
+                    </a>
+                </div>
+                <a href="https://instagram.com/rubikacademyy" target="_blank" rel="noopener" class="coach-start" data-i18n="cta_contact">Sorular için iletişime geç →</a>
             </div>
-        </a>
+        </article>
+
+        <!-- MERT ALİ KÖROĞLU - MEGAMINX KOÇLUĞU -->
+        <article class="coach" aria-label="Mert Ali Köroğlu - Megaminx Koçluğu">
+            <div class="coach-photo">
+                <div class="coach-cube-tags"><span class="coach-cube-tag">Megaminx</span></div>
+                <span class="coach-initials" aria-hidden="true">MAK</span>
+            </div>
+            <div class="coach-info">
+                <span class="coach-tag" data-i18n="tag_koc_mak">MEGAMINX KOÇU</span>
+                <h2>Mert Ali Köroğlu</h2>
+                <p data-i18n="koc_mak_p">Megaminx'te çözüm adımlarını ve hız tekniklerini birebir seanslarla geliştirmek isteyenler için özel koçluk.</p>
+                <div class="packages">
+                    <a class="pkg" href="https://www.shopier.com/rubikacademy/51267779" target="_blank" rel="noopener">
+                        <span class="pkg-name">Megaminx</span>
+                        <span class="pkg-price"><s>100 TL</s><b>50 TL</b></span>
+                        <span class="pkg-buy" data-i18n="cta_buy">Satın Al</span>
+                    </a>
+                </div>
+                <a href="https://instagram.com/rubikacademyy" target="_blank" rel="noopener" class="coach-start" data-i18n="cta_contact">Sorular için iletişime geç →</a>
+            </div>
+        </article>
+
+        <!-- ÖMER ÇAVUŞ - SKEWB KOÇLUĞU -->
+        <article class="coach" aria-label="Ömer Çavuş - Skewb Koçluğu">
+            <div class="coach-photo">
+                <div class="coach-cube-tags"><span class="coach-cube-tag">Skewb</span></div>
+                <span class="coach-initials" aria-hidden="true">ÖÇ</span>
+            </div>
+            <div class="coach-info">
+                <span class="coach-tag" data-i18n="tag_koc_oc">SKEWB KOÇU</span>
+                <h2>Ömer Çavuş</h2>
+                <p data-i18n="koc_oc_p">Skewb'de algoritma ve hız tekniklerini birebir seanslarla öğrenmek isteyenler için özel koçluk.</p>
+                <div class="packages">
+                    <a class="pkg" href="https://www.shopier.com/rubikacademy/51260789" target="_blank" rel="noopener">
+                        <span class="pkg-name">Skewb</span>
+                        <span class="pkg-price"><s>100 TL</s><b>50 TL</b></span>
+                        <span class="pkg-buy" data-i18n="cta_buy">Satın Al</span>
+                    </a>
+                </div>
+                <a href="https://instagram.com/rubikacademyy" target="_blank" rel="noopener" class="coach-start" data-i18n="cta_contact">Sorular için iletişime geç →</a>
+            </div>
+        </article>
 
     </section>
+
+    <p class="pay-note" data-i18n="kc_pay_note">Ödemeler Shopier üzerinden güvenle alınır. Ödemeden sonra seans saatini birlikte belirliyoruz.</p>
+
 
 </div>
 
@@ -351,11 +516,11 @@ document.querySelectorAll(".coach").forEach(function(card) {
         var x = e.clientX - rect.left;
         var y = e.clientY - rect.top;
 
-        var rotateY = ((x / rect.width) - .5) * 2.2;
-        var rotateX = ((y / rect.height) - .5) * -2.2;
+        var rotateY = ((x / rect.width) - .5) * 1.4;
+        var rotateX = ((y / rect.height) - .5) * -1.4;
 
         card.style.transform =
-            "translateY(-8px) perspective(1200px) rotateX(" + rotateX + "deg) rotateY(" + rotateY + "deg)";
+            "translateY(-6px) perspective(1200px) rotateX(" + rotateX + "deg) rotateY(" + rotateY + "deg)";
     });
 
     card.addEventListener("mouseleave", function() {
