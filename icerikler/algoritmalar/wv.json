@@ -5,12 +5,12 @@
       "cases": [
         {
           "name": "WV 1",
-          "alg": "L R U' R' U L' U2 R U' R'",
+          "alg": "L' U2 R U R' U2 L",
           "alts": [
-            "R U R D R' U2 R D' R' U2 R'",
-            "R U2 R' U R U2 R2 U' R U' R' U2 R"
+            "R' D R2 U' R' U R2 D' R2",
+            "R2 U' R F2 R' U R' U' R2 F2 R"
           ],
-          "pattern": "UFUUUUUURXXFXXDXRXXXX"
+          "pattern": "UUUUUUFFURRXXXXXXXXXD"
         }
       ]
     },
@@ -19,54 +19,51 @@
       "cases": [
         {
           "name": "WV 2",
-          "alg": "R U R'",
+          "alg": "R U' R'",
           "alts": [],
-          "pattern": "XFUUUUUURXXFXXDXRXUXX"
+          "pattern": "UUUUUUFFXRRUXXXXXXXXD"
         },
         {
           "name": "WV 3",
-          "alg": "R U R' U R' U2 R U R' U R",
-          "alts": [
-            "R U R' U2 R U R' U R U2 R'",
-            "R U L R' U' R' U L' U' R"
-          ],
-          "pattern": "UFUUUUXURXXFXXDXRXXXU"
+          "alg": "R U R' U' R U' R'",
+          "alts": [],
+          "pattern": "XUUUUUFFURRXXXXXXXUXD"
         },
         {
           "name": "WV 4",
-          "alg": "R U R' U2 R' U2 R U R' U R",
+          "alg": "R2 D R' U' R D' R2",
           "alts": [
-            "D U R' U2 R' U2 R' U2 R2 D'",
-            "R U R' F U F' U F U2 F'"
+            "R2 U' R F R' U R' U' R2 F' R",
+            "R U R' U' R U' R2 U2 R U R' U R"
           ],
-          "pattern": "UFXUUUUURXXFUXDXRXXXX"
+          "pattern": "UUXUUUFFURRXUXXXXXXXD"
         },
         {
           "name": "WV 5",
-          "alg": "R U2 L' R' U2 R U R' U2 L",
+          "alg": "R2 U' L' U R' U' L R'",
           "alts": [
-            "R U R D R' U R D' R' U' R'",
-            "R U' R' U' R2 D R' U' R D' R2"
+            "R F' U2 R' U' R U' F U' R'",
+            "F' U' F U2 F' U' F R U2 R'"
           ],
-          "pattern": "UFUUUUXURUXFXXDXRXXXX"
+          "pattern": "UUUUUUFFXRRXXXUXXXXXD"
         },
         {
           "name": "WV 6",
-          "alg": "R U' R F2 R' U2 R' U2 R2 F2 R2",
+          "alg": "R U' R' U R' U' R U' R' U2 R",
           "alts": [
-            "R U' R' F' R U2 R' U2 R' F R",
-            "R U' R' F2 R U2 R' U2 R' F2 R"
+            "R U' R' U2 R U2 R' U' R U' R'",
+            "R' U F2 U' R2 U' R2 U F2 U' R"
           ],
-          "pattern": "UFXUUUUURXXFXXDXRUXXX"
+          "pattern": "UUXUUUFFURRXXXXXXUXXD"
         },
         {
           "name": "WV 7",
-          "alg": "L R U L' R' U2 L U L'",
+          "alg": "R F' R U R U' R' F U' R2 U2 R",
           "alts": [
-            "R U R2 U' R' D' R U R' D R2",
-            "R U F R' U R F' R' F U' F'"
+            "D' R2 U R U' R2 D R U' R2 U2 R",
+            "R' U' R' U' R' D R' U R D' U R"
           ],
-          "pattern": "XFUUUUUURXXFXXDURXXXX"
+          "pattern": "XUUUUUFFURRXXXXUXXXXD"
         }
       ]
     },
@@ -75,101 +72,105 @@
       "cases": [
         {
           "name": "WV 8",
-          "alg": "R U' R' U' R U' R'",
+          "alg": "R U R2 U' R2 U' R2 U2 R",
           "alts": [],
-          "pattern": "XFUUUUXURUXFXXDURXXXX"
+          "pattern": "XUXUUUFFURRXXXXUXUXXD"
         },
         {
           "name": "WV 9",
-          "alg": "R U2 R' U R U2 R'",
-          "alts": [
-            "L' R U R' U' L"
-          ],
-          "pattern": "UFXUUUXURXXFUXDXRXXXU"
+          "alg": "R' U' R2 U' R2 U2 R2 U2 R'",
+          "alts": [],
+          "pattern": "UUXUUUFFXRRXUXUXXXXXD"
         },
         {
           "name": "WV 10",
-          "alg": "R U' R2 U' R2 U' R2 U2 R",
-          "alts": [],
-          "pattern": "UFXUUUXURUXFXXDXRUXXX"
+          "alg": "R' D' R U R' D R2 U2 R'",
+          "alts": [
+            "R' U' R' F R U R2 U' R' F'",
+            "L' U2 R U L R' U L' U L"
+          ],
+          "pattern": "UUXUUUFFXRRUUXXXXXXXD"
         },
         {
           "name": "WV 11",
-          "alg": "R U R2 U' R U' R' U2 R",
-          "alts": [],
-          "pattern": "XFXUUUUURXXFXXDURUXXX"
+          "alg": "R U' R' U' R U2 R' U' R U' R'",
+          "alts": [
+            "R U' R' U2 R' U' R U' R' U2 R",
+            "R' U' R' U' R U R' U' R2 U2 R"
+          ],
+          "pattern": "XUXUUUFFURRXXXXXXUUXD"
         },
         {
           "name": "WV 12",
-          "alg": "R U' R D R' U2 R D' R2",
+          "alg": "R U' R' U R' U2 R U R' U R",
           "alts": [
-            "R U' L' R' U R U' L U2 R'",
-            "R U2 F' U R' U R U2 F U' R'"
+            "R U' R' U2 R U R' U R U2 R'",
+            "R U' L R' U' R' U L' U' R"
           ],
-          "pattern": "XFXUUUUURXXFUXDXRXUXX"
+          "pattern": "XUUUUUFFXRRXXXUUXXXXD"
         },
         {
           "name": "WV 13",
-          "alg": "R U' R' U' R U R' U' R U' R'",
+          "alg": "R' U' R2 U' R2 U2 R U' R U' R'",
           "alts": [
-            "L' R U R2 U' L R U2 R' U' R",
-            "L' R' U L2 U' R2 U L2 R' U' L"
+            "F2 U' F2 U' F2 R' F2 R U2 F2",
+            "L U' R U' R' U' R U2 L' U' R'"
           ],
-          "pattern": "UFXUUUXURXXFXXDXRUXXU"
+          "pattern": "XUUUUUFFXRRXXXUXXXUXD"
         },
         {
           "name": "WV 14",
-          "alg": "L R U' R' U L' U' R U2 R'",
+          "alg": "F2 R U2 R' U2 R' F2 R2 U' R'",
           "alts": [
-            "L R U' R2 U L' U' R2 U2 R'",
-            "R U' L' U R' U' L R U2 R'"
+            "R U' R D R' U2 R D' R' U2 R'",
+            "R U R' U L' U2 R U' R' U2 L"
           ],
-          "pattern": "XFUUUUXURXXFXXDURXXXU"
+          "pattern": "XUUUUUFFXRRUXXXXXXUXD"
         },
         {
           "name": "WV 15",
-          "alg": "R U2 R' U' L' U R U' L R'",
+          "alg": "F' U' F R' F R F2 U F",
           "alts": [
-            "R2 F R' U R F' R2 F U' F'",
-            "R U2 R2 U' R2 U' R2 U2 R U' R U' R'"
+            "R U2 R' U2 L R U' R' U L'",
+            "R U' R2 U' R' D' R U R' D R2"
           ],
-          "pattern": "XFUUUUXURXXFXXDXRXUXU"
+          "pattern": "XUUUUUFFXRRUXXXUXXXXD"
         },
         {
           "name": "WV 16",
-          "alg": "R U R D' R U' R' D R U R",
+          "alg": "L' U2 R U' R' U' R U' L R'",
           "alts": [
-            "R' U R U2 R2 U R U2 R U2 R U' R2",
-            "R2 U' R2 U R2 U R2 U R' U' R U R"
+            "R U' R D' R U2 R' D R U2 R",
+            "F' R' U2 R F U' R' U' F R F'"
           ],
-          "pattern": "XFXUUUUURXXFXXDXRUUXX"
+          "pattern": "UUXUUUFFXRRXXXUXXUXXD"
         },
         {
           "name": "WV 17",
-          "alg": "R U2 R2 D' R U R' D R2 U2 R'",
+          "alg": "R' F R F' R U' R' F' U F",
           "alts": [
-            "R' U R2 U2 R U2 R U2 R U R2 U R'",
-            "R2 U R U' R' U' R U2 R' U2 R' U R'"
+            "L' U2 R U' R' U2 L U R U' R'",
+            "R' U L' U R2 U' L U2 R2 U R"
           ],
-          "pattern": "XFXUUUUURXXFUXDURXXXX"
+          "pattern": "UUXUUUFFXRRUXXXXXUXXD"
         },
         {
           "name": "WV 18",
-          "alg": "R U R' U R U2 R2 U' R2 U' R2 U2 R",
+          "alg": "R2 U' L' U R2 U R U2 R' U2 L",
           "alts": [
-            "R2 U R' U R' U' R2 U R' U' R U' R2",
-            "R U2 R' U F' R U2 R' U2 R' F R"
+            "D R' U R' U2 R2 U R' U R2 D'",
+            "R' D' R U2 R' D R U' R U2 R'"
           ],
-          "pattern": "UFXUUUXURUXFUXDXRXXXX"
+          "pattern": "XUXUUUFFURRXUXXUXXXXD"
         },
         {
           "name": "WV 19",
-          "alg": "R2 F R' U' R F' R' U2 R' F U' F'",
+          "alg": "L' U2 R U2 R' U2 L U' R U2 R'",
           "alts": [
-            "R U' R U' R U' R2 U2 R2 U R U' R2 U' R",
-            "R U' R U2 R' U R' U2 R U2 R U R' U' R'"
+            "R U' R' U R U2 R2 U' R2 U' R2 U2 R",
+            "R2 U R2 U R2 U2 R' U2 R' U2 R U' R'"
           ],
-          "pattern": "XFUUUUXURUXFXXDXRXUXX"
+          "pattern": "XUXUUUFFURRXUXXXXXUXD"
         }
       ]
     },
@@ -178,69 +179,69 @@
       "cases": [
         {
           "name": "WV 20",
-          "alg": "R U R2 U2 R U R' U R",
+          "alg": "R U' R2 U' R U' R' U2 R",
           "alts": [],
-          "pattern": "XFXUUUXURXXFUXDXRXUXU"
+          "pattern": "XUXUUUFFXRRUXXXXXUUXD"
         },
         {
           "name": "WV 21",
-          "alg": "R' U L U' R2 U L' R'",
-          "alts": [
-            "R U R' U2 R' U' R U' R' U2 R",
-            "R U2 R' U R' U' R2 U' R2 U2 R"
-          ],
-          "pattern": "XFXUUUXURUXFXXDXRUUXX"
+          "alg": "R U' R2 U2 R U R' U R",
+          "alts": [],
+          "pattern": "XUXUUUFFXRRXUXUUXXXXD"
         },
         {
           "name": "WV 22",
-          "alg": "R U2 R D R' U' R D' R2",
+          "alg": "R U R D R' U2 R D' R2",
           "alts": [
-            "R U' R' U' R U' R2 U2 R U R' U R",
-            "R' U' R' U2 R' U2 R' U2 R2 U' R2 U R'"
+            "R2 D R' U R D' R' U2 R'",
+            "R F' U R' U R U2 F U' R'"
           ],
-          "pattern": "XFXUUUXURUXFUXDXRXUXX"
+          "pattern": "XUXUUUFFXRRUUXXXXXUXD"
         },
         {
           "name": "WV 23",
-          "alg": "R U R' U R' U' R U' R' U2 R",
+          "alg": "R U R' U' R U R' U' R U' R'",
           "alts": [
-            "R U R' U2 R U2 R' U' R U' R'",
-            "R' D' U' R U' R' D U2 R2 U R'"
+            "L' U R U' L U R' U R U R'",
+            "F' U' F U' F' U2 F U R U R'"
           ],
-          "pattern": "XFXUUUXURUXFXXDURUXXX"
+          "pattern": "XUXUUUFFXRRXXXUXXUUXD"
         },
         {
           "name": "WV 24",
-          "alg": "R U2 R' U R U' R' U R U2 R'",
-          "alts": [],
-          "pattern": "XFXUUUXURUXFUXDURXXXX"
+          "alg": "R U' R' U2 R' U2 R U R' U R",
+          "alts": [
+            "R U' R' U' R U R' U R U2 R'",
+            "R U' R' F U F' U F U2 F'"
+          ],
+          "pattern": "XUXUUUFFXRRUUXXUXXXXD"
         },
         {
           "name": "WV 25",
-          "alg": "F R2 U F' R F U' R F' R",
+          "alg": "R2 F2 U2 R' U' R U' F2 R' U' R'",
           "alts": [
-            "R U R D' R U2 R' D R U2 R",
-            "L' U R U' L U R' U' R U R'"
+            "R U' R D' R U' R' D R U R",
+            "R' U' R' U2 R U2 R' U2 R' U R' U2 R"
           ],
-          "pattern": "XFXUUUXURXXFXXDXRUUXU"
+          "pattern": "XUXUUUFFXRRUXXXUXUXXD"
         },
         {
           "name": "WV 26",
-          "alg": "R U R' U2 R U2 R2 U' R2 U' R2 U2 R",
+          "alg": "R U' R' U2 R U2 R2 U' R2 U' R2 U2 R",
           "alts": [
-            "U R' U R' U R' U' R2 U2 R' U R",
-            "U R2 U2 R' U' R U' R2 U R U' R'"
+            "R U2 R' U2 L R U' R2 U L' U' R",
+            "F' U2 R U R' U' R' F2 R F2 U F"
           ],
-          "pattern": "XFXUUUXURXXFUXDURXXXU"
+          "pattern": "XUXUUUFFXRRXUXUXXXUXD"
         },
         {
           "name": "WV 27",
-          "alg": "R U R' U' R U2 R2 U' R2 U' R2 U2 R",
+          "alg": "R U R' U' R U' R2 U' R U' R' U2 R",
           "alts": [
-            "R U' R' U' R U' R2 U' R U' R' U2 R",
-            "R U2 R' U R U2 R2 U2 R U R' U R"
+            "R U' R' U' R U2 R2 U' R2 U' R2 U2 R",
+            "R2 U2 R' U R' U2 R' U R' U2 R U R"
           ],
-          "pattern": "XFXUUUXURXXFXXDURUXXU"
+          "pattern": "XUXUUUFFXRRXXXUUXUXXD"
         }
       ]
     }
