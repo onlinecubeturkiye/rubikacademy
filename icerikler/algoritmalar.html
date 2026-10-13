@@ -21,7 +21,7 @@
 
 <link rel="stylesheet" href="/styles/common.css">
 <link rel="canonical" href="https://rubikacademy.fun/algoritmalar">
-<meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, Ortega ve CLL algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
+<meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, WV, Ortega ve CLL algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
 <meta property="og:title" content="Rubik Academy - Algoritmalar">
 <meta property="og:description" content="Tüm küpler için algoritmaları diyagramlarıyla öğren: 3x3, 2x2 ve yakında daha fazlası.">
 <meta property="og:type" content="website">
@@ -145,6 +145,7 @@ html {
 .ortega-oll-visual { background: var(--tint-yellow); }
 .cll-visual { background: var(--tint-purple); }
 .coll-visual { background: var(--tint-green); }
+.wv-visual { background: var(--tint-orange); }
 
 .count-badge {
     position: absolute;
@@ -369,7 +370,7 @@ html {
 </div>
 <h1><span data-i18n="hero_title1">Algoritmaları</span> <span data-i18n="hero_titleAccent">Öğren</span></h1>
 <p data-i18n="hero_p">
-Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, Ortega ve CLL case'lerini diyagramlarıyla adım adım öğren. Diğer küpler yakında.
+Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, WV, Ortega ve CLL case'lerini diyagramlarıyla adım adım öğren. Diğer küpler yakında.
 </p>
 </div>
 </section>
@@ -387,7 +388,7 @@ Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, Ortega v
         <h3 data-i18n="cat_3x3_title">3x3</h3>
         <span data-i18n="cat_3x3_sub">Son katman algoritmaları</span>
     </div>
-    <section class="methods methods-3" id="cardsSection">
+    <section class="methods" id="cardsSection">
     </section>
 </div>
 
@@ -496,6 +497,7 @@ var ortegaPblCount = null;
 var ortegaOllCount = null;
 var cllCount = null;
 var collCount = null;
+var wvCount = null;
 
 function updateCountBadges(dict) {
     var ollBadge = document.getElementById("ollCountBadge");
@@ -512,6 +514,9 @@ function updateCountBadges(dict) {
     // Veri geldiyse sayıyı, gelmediyse "YAKINDA" rozetini gösterir.
     var collBadge = document.getElementById("collCountBadge");
     if (collBadge && collCount !== null) collBadge.textContent = collCount + " " + dict.case_word;
+
+    var wvBadge = document.getElementById("wvCountBadge");
+    if (wvBadge && wvCount !== null) wvBadge.textContent = wvCount + " " + dict.case_word;
 
     var cllBadge = document.getElementById("cllCountBadge");
     if (cllBadge) cllBadge.textContent = (cllCount !== null) ? (cllCount + " " + dict.case_word) : dict.soon_tag;
@@ -557,6 +562,16 @@ var collDataFetch = fetch("/icerikler/algoritmalar/coll.json")
         return null;
     });
 
+var wvDataFetch = fetch("/icerikler/algoritmalar/wv.json")
+    .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .catch(function(err) {
+        console.error("wv.json yüklenemedi:", err);
+        return null;
+    });
+
 fetch("/icerikler/algoritmalar/oll-pll.json")
     .then(function(res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
@@ -565,7 +580,10 @@ fetch("/icerikler/algoritmalar/oll-pll.json")
     .then(function(data) {
         return collDataFetch.then(function(collData) {
             data.coll = collData ? collData.coll : null;
-            return data;
+            return wvDataFetch.then(function(wvData) {
+                data.wv = wvData ? wvData.wv : null;
+                return data;
+            });
         });
     })
     .then(function(data) {
@@ -624,6 +642,25 @@ fetch("/icerikler/algoritmalar/oll-pll.json")
             html += '  <div class="card-info">';
             html += '    <h3 data-i18n="coll_title">' + dict.coll_title + '</h3>';
             html += '    <p data-i18n="coll_p">' + dict.coll_p + '</p>';
+            html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
+            html += '  </div>';
+            html += '</a>';
+        }
+
+        if (data.wv) {
+            wvCount = countCases(data.wv);
+            var wvCase = findCaseByName(data.wv, "WV 9");
+            var wvDiagram = wvCase ? llSvg(wvCase.pattern, "pll", 150) : "";
+
+            html += '<a href="/icerikler/algoritmalar/wv" class="card">';
+            html += '  <div class="card-visual wv-visual">';
+            html += '    <div class="level" data-i18n="wv_level">' + dict.wv_level + '</div>';
+            html += '    <div class="count-badge" id="wvCountBadge">' + wvCount + ' ' + dict.case_word + '</div>';
+            html += '    <div class="diagram-wrap">' + wvDiagram + '</div>';
+            html += '  </div>';
+            html += '  <div class="card-info">';
+            html += '    <h3 data-i18n="wv_title">' + dict.wv_title + '</h3>';
+            html += '    <p data-i18n="wv_p">' + dict.wv_p + '</p>';
             html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
             html += '  </div>';
             html += '</a>';
