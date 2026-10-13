@@ -21,7 +21,7 @@
 
 <link rel="stylesheet" href="/styles/common.css">
 <link rel="canonical" href="https://rubikacademy.fun/algoritmalar">
-<meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, Ortega ve CLL algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
+<meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, Ortega ve CLL algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
 <meta property="og:title" content="Rubik Academy - Algoritmalar">
 <meta property="og:description" content="Tüm küpler için algoritmaları diyagramlarıyla öğren: 3x3, 2x2 ve yakında daha fazlası.">
 <meta property="og:type" content="website">
@@ -144,6 +144,7 @@ html {
 .ortega-pbl-visual { background: var(--tint-orange); }
 .ortega-oll-visual { background: var(--tint-yellow); }
 .cll-visual { background: var(--tint-purple); }
+.coll-visual { background: var(--tint-green); }
 
 .count-badge {
     position: absolute;
@@ -368,7 +369,7 @@ html {
 </div>
 <h1><span data-i18n="hero_title1">Algoritmaları</span> <span data-i18n="hero_titleAccent">Öğren</span></h1>
 <p data-i18n="hero_p">
-Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, Ortega ve CLL case'lerini diyagramlarıyla adım adım öğren. Diğer küpler yakında.
+Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, Ortega ve CLL case'lerini diyagramlarıyla adım adım öğren. Diğer küpler yakında.
 </p>
 </div>
 </section>
@@ -386,7 +387,7 @@ Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, Ortega ve CLL 
         <h3 data-i18n="cat_3x3_title">3x3</h3>
         <span data-i18n="cat_3x3_sub">Son katman algoritmaları</span>
     </div>
-    <section class="methods" id="cardsSection">
+    <section class="methods methods-3" id="cardsSection">
     </section>
 </div>
 
@@ -494,6 +495,7 @@ var caseCounts = null; // { oll: n, pll: n }
 var ortegaPblCount = null;
 var ortegaOllCount = null;
 var cllCount = null;
+var collCount = null;
 
 function updateCountBadges(dict) {
     var ollBadge = document.getElementById("ollCountBadge");
@@ -508,6 +510,9 @@ function updateCountBadges(dict) {
     if (ortegaOllBadge) ortegaOllBadge.textContent = (ortegaOllCount !== null) ? (ortegaOllCount + " " + dict.case_word) : dict.soon_tag;
 
     // Veri geldiyse sayıyı, gelmediyse "YAKINDA" rozetini gösterir.
+    var collBadge = document.getElementById("collCountBadge");
+    if (collBadge && collCount !== null) collBadge.textContent = collCount + " " + dict.case_word;
+
     var cllBadge = document.getElementById("cllCountBadge");
     if (cllBadge) cllBadge.textContent = (cllCount !== null) ? (cllCount + " " + dict.case_word) : dict.soon_tag;
 }
@@ -541,10 +546,27 @@ function countCases(groups) {
     return total;
 }
 
+/* COLL verisi ayrı dosyada; yüklenemezse 3x3 bölümünde sadece OLL/PLL gösterilir */
+var collDataFetch = fetch("/icerikler/algoritmalar/coll.json")
+    .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .catch(function(err) {
+        console.error("coll.json yüklenemedi:", err);
+        return null;
+    });
+
 fetch("/icerikler/algoritmalar/oll-pll.json")
     .then(function(res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
         return res.json();
+    })
+    .then(function(data) {
+        return collDataFetch.then(function(collData) {
+            data.coll = collData ? collData.coll : null;
+            return data;
+        });
     })
     .then(function(data) {
         var ollCount = countCases(data.oll);
@@ -587,6 +609,25 @@ fetch("/icerikler/algoritmalar/oll-pll.json")
         html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
         html += '  </div>';
         html += '</a>';
+
+        if (data.coll) {
+            collCount = countCases(data.coll);
+            var collCase = findCaseByName(data.coll, "S2");
+            var collDiagram = collCase ? llSvg(collCase.pattern, "pll", 150) : "";
+
+            html += '<a href="/icerikler/algoritmalar/coll" class="card">';
+            html += '  <div class="card-visual coll-visual">';
+            html += '    <div class="level" data-i18n="coll_level">' + dict.coll_level + '</div>';
+            html += '    <div class="count-badge" id="collCountBadge">' + collCount + ' ' + dict.case_word + '</div>';
+            html += '    <div class="diagram-wrap">' + collDiagram + '</div>';
+            html += '  </div>';
+            html += '  <div class="card-info">';
+            html += '    <h3 data-i18n="coll_title">' + dict.coll_title + '</h3>';
+            html += '    <p data-i18n="coll_p">' + dict.coll_p + '</p>';
+            html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
+            html += '  </div>';
+            html += '</a>';
+        }
 
         document.getElementById("cardsSection").innerHTML = html;
 
