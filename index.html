@@ -28,16 +28,25 @@
 
 /* =========================================
    ANA GİRİŞ (HERO)
+   Ortak .hero kutu stilini (common.css) burada sıfırlıyoruz:
+   ana sayfada hero tam genişlik, çerçevesiz.
 ========================================= */
 .hero {
-    min-height: 100vh;
+    min-height: calc(100vh - 75px);
+    max-width: none;
+    margin: 0;
     display: flex;
     align-items: center;
-    padding: 90px 7%;
+    padding: 70px 7%;
     background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
     overflow-x: hidden;
-    transition: background-color 0.3s;
 }
+
+.hero::before { display: none; }
 
 .hero-container {
     width: 100%;
@@ -52,43 +61,62 @@
 .badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 9px 16px;
+    gap: 9px;
+    padding: 8px 15px;
     border-radius: 50px;
-    background: var(--primary-light);
-    border: 1px solid #dbeafe;
-    color: var(--primary);
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    box-shadow: var(--shadow-sm);
+    color: var(--text);
     font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 25px;
+    font-weight: 800;
+    letter-spacing: 0;
+    margin-bottom: 26px;
 }
 
 .badge::before {
     content: "";
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #22c55e;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    background: var(--cube-green);
 }
 
 .hero h1 {
-    font-size: clamp(45px, 6vw, 76px);
-    line-height: 1.04;
-    letter-spacing: -4px;
+    font-size: clamp(46px, 6vw, 80px);
+    line-height: 1.02;
+    letter-spacing: -2.5px;
     font-weight: 900;
     color: var(--text);
     margin-bottom: 25px;
 }
 
+.hero h1 span { color: var(--text); }
+.hero h1 span:last-child { color: var(--primary); }
+
+/* "öğren." — sarı vurgu kalemi */
 .gradient-text {
-    background: linear-gradient(90deg, #2563eb, #0891b2, #6366f1);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    position: relative;
+    display: inline-block;
+    color: var(--text);
+    z-index: 0;
+}
+
+.gradient-text::after {
+    content: "";
+    position: absolute;
+    left: -4px;
+    right: -6px;
+    bottom: .08em;
+    height: .38em;
+    background: var(--cube-yellow);
+    border-radius: 6px;
+    transform: rotate(-1.5deg);
+    z-index: -1;
 }
 
 .hero p {
-    max-width: 620px;
+    max-width: 600px;
     color: var(--text-soft);
     font-size: 18px;
     line-height: 1.75;
@@ -99,22 +127,29 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 15px 25px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    transition: .3s;
+    padding: 16px 26px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 800;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
 
 .btn-primary {
-    color: white;
-    background: linear-gradient(135deg, #2563eb, #4f46e5);
-    box-shadow: 0 12px 30px rgba(37,99,235,.22);
+    color: #17171f;
+    background: var(--cube-yellow);
+    border: var(--card-bw) solid var(--ink);
+    box-shadow: var(--shadow);
 }
 
 .btn-primary:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 18px 40px rgba(37,99,235,.30);
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--ink);
+    background: var(--btn-hover-bg);
+}
+
+.btn-primary:active {
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 var(--ink);
 }
 
 /* KÜP */
@@ -122,44 +157,81 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+}
+
+/* Küpün arkasındaki renkli "çıkartma" kareleri */
+.cube-area::before,
+.cube-area::after {
+    content: "";
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 18px;
+    border: var(--card-bw) solid var(--ink);
+    z-index: -1;
+}
+
+.cube-area::before {
+    background: var(--cube-red);
+    top: -10px;
+    right: 8%;
+    transform: rotate(14deg);
+}
+
+.cube-area::after {
+    background: var(--cube-blue);
+    bottom: -14px;
+    left: 8%;
+    width: 70px;
+    height: 70px;
+    transform: rotate(-10deg);
 }
 
 .cube {
-    width: 280px;
-    height: 280px;
-    padding: 12px;
+    width: 290px;
+    height: 290px;
+    padding: 13px;
     display: grid;
     grid-template-columns: repeat(3,1fr);
     grid-template-rows: repeat(3,1fr);
-    gap: 7px;
-    border-radius: 28px;
-    background: #1e293b;
+    gap: 8px;
+    border-radius: 30px;
+    background: #17171f;
+    border: var(--card-bw) solid #17171f;
     transform: rotate(-7deg);
-    box-shadow: 0 35px 60px rgba(15,23,42,.20), 0 0 60px rgba(37,99,235,.10);
+    box-shadow: 12px 12px 0 rgba(23,23,31,.18);
     animation: cubeFloat 5s ease-in-out infinite;
 }
 
+html.dark-mode .cube { box-shadow: 12px 12px 0 rgba(0,0,0,.45); }
+
 .cube div {
-    border-radius: 7px;
-    background: #f8fafc;
-    box-shadow: inset 0 0 0 2px rgba(0,0,0,.08);
+    border-radius: 9px;
+    background: var(--cube-white);
+    box-shadow: inset 0 -5px 0 rgba(0,0,0,.12);
 }
 
-.cube div:nth-child(2), .cube div:nth-child(8) { background: #ef4444; }
-.cube div:nth-child(4), .cube div:nth-child(6) { background: #22c55e; }
-.cube div:nth-child(5) { background: #3b82f6; }
-.cube div:nth-child(1), .cube div:nth-child(9) { background: #facc15; }
+.cube div:nth-child(2), .cube div:nth-child(8) { background: var(--cube-red); }
+.cube div:nth-child(4), .cube div:nth-child(6) { background: var(--cube-green); }
+.cube div:nth-child(5) { background: #1d5bff; }
+.cube div:nth-child(1), .cube div:nth-child(9) { background: var(--cube-yellow); }
+.cube div:nth-child(3) { background: var(--cube-orange); }
 
 @keyframes cubeFloat {
     0%, 100% { transform: rotate(-7deg) translateY(0); }
     50% { transform: rotate(-4deg) translateY(-15px); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .cube { animation: none; }
+}
+
 /* =========================================
    BÖLÜMLER (genel)
 ========================================= */
 section {
-    padding: 100px 7%;
+    padding: 95px 7%;
     background: transparent;
 }
 
@@ -175,19 +247,25 @@ section {
 }
 
 .section-heading span {
-    color: var(--primary);
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 2px;
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 9px;
+    background: var(--cube-yellow);
+    border: var(--card-bw) solid var(--ink);
+    color: #17171f;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
 }
 
 .section-heading h2 {
-    font-size: clamp(32px,4vw,48px);
-    line-height: 1.1;
-    letter-spacing: -2px;
+    font-size: clamp(32px,4vw,50px);
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    font-weight: 800;
     color: var(--text);
-    margin: 12px 0;
+    margin: 16px 0 12px;
 }
 
 .section-heading p {
@@ -195,41 +273,54 @@ section {
     line-height: 1.7;
 }
 
+/* Küp renkleri sırası: kartlar sırayla bu renkleri alır */
+.cards > :nth-child(1),
+.learning-grid > :nth-child(1),
+.social-grid > :nth-child(1) { --accent: var(--cube-red); --accent-tint: var(--tint-red); }
+.cards > :nth-child(2),
+.learning-grid > :nth-child(2),
+.social-grid > :nth-child(2) { --accent: var(--cube-blue); --accent-tint: var(--tint-blue); }
+.cards > :nth-child(3),
+.learning-grid > :nth-child(3),
+.social-grid > :nth-child(3) { --accent: var(--cube-green); --accent-tint: var(--tint-green); }
+.learning-grid > :nth-child(4) { --accent: var(--cube-orange); --accent-tint: var(--tint-orange); }
+
 /* AKADEMİ KARTLARI */
 .cards {
     display: grid;
     grid-template-columns: repeat(3,1fr);
-    gap: 22px;
+    gap: 26px;
 }
 
 .card {
-    padding: 32px;
+    padding: 30px;
     border-radius: 22px;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: var(--card-bw) solid var(--card-border);
     box-shadow: var(--shadow);
-    transition: .3s;
+    transition: transform .2s ease, box-shadow .2s ease, opacity .7s ease;
 }
 
 .card:hover {
-    transform: translateY(-8px);
-    border-color: #bfdbfe;
-    box-shadow: 0 20px 45px rgba(37,99,235,.10);
+    transform: translate(-3px, -3px);
+    box-shadow: var(--shadow-hover);
 }
 
 .card-icon {
-    width: 55px;
-    height: 55px;
+    width: 58px;
+    height: 58px;
     display: grid;
     place-items: center;
-    border-radius: 15px;
-    background: var(--primary-light);
-    font-size: 25px;
+    border-radius: 16px;
+    background: var(--accent-tint, var(--primary-light));
+    border: var(--card-bw) solid var(--card-border);
+    font-size: 26px;
     margin-bottom: 20px;
 }
 
 .card h3 {
-    font-size: 20px;
+    font-size: 22px;
+    font-weight: 800;
     color: var(--text);
     margin-bottom: 10px;
 }
@@ -241,108 +332,141 @@ section {
 }
 
 /* EĞİTİM BÖLÜMÜ */
-.learning-section { background: transparent; transition: background-color 0.3s; }
+.learning-section { background: transparent; }
 
 .learning-grid {
     display: grid;
     grid-template-columns: repeat(2,1fr);
-    gap: 22px;
+    gap: 26px;
 }
 
 .learning-card {
-    padding: 35px;
+    position: relative;
+    padding: 32px 34px 32px 40px;
     border-radius: 22px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: 0 10px 30px rgba(15,23,42,.05);
-    transition: .3s;
+    border: var(--card-bw) solid var(--card-border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease, opacity .7s ease;
+}
+
+/* Sol kenarda renk şeridi */
+.learning-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background: var(--accent, var(--primary));
+    border-right: var(--card-bw) solid var(--card-border);
 }
 
 .learning-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 18px 40px rgba(15,23,42,.09);
+    transform: translate(-3px, -3px);
+    box-shadow: var(--shadow-hover);
 }
 
 .learning-number {
-    color: var(--primary);
-    font-size: 13px;
-    font-weight: 800;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: var(--accent-tint, var(--primary-light));
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 900;
     letter-spacing: 1px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
-.learning-card h3 { font-size: 24px; color: var(--text); margin-bottom: 12px; }
+.learning-card h3 { font-size: 25px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
 .learning-card p { color: var(--text-soft); font-size: 14px; line-height: 1.7; }
 
 /* SOSYAL MEDYA */
 .social-grid {
     display: grid;
     grid-template-columns: repeat(3,1fr);
-    gap: 22px;
+    gap: 26px;
 }
 
 .social-card {
-    padding: 30px;
+    padding: 26px;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 18px;
     border-radius: 20px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: 0 10px 30px rgba(15,23,42,.05);
-    transition: .3s;
+    border: var(--card-bw) solid var(--card-border);
+    box-shadow: var(--shadow);
+    transition: transform .2s ease, box-shadow .2s ease, opacity .7s ease;
 }
 
 .social-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 18px 40px rgba(15,23,42,.09);
+    transform: translate(-3px, -3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.social-card:active {
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 var(--ink);
 }
 
 .social-icon {
-    width: 55px;
-    height: 55px;
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
     display: grid;
     place-items: center;
     border-radius: 15px;
-    background: linear-gradient(135deg, #2563eb, #6366f1);
+    background: var(--accent, var(--primary));
+    border: var(--card-bw) solid var(--ink);
     color: white;
     font-size: 23px;
 }
 
-.social-card h3 { font-size: 17px; color: var(--text); }
+.social-card h3 { font-size: 18px; font-weight: 800; color: var(--text); }
 .social-card p { color: var(--text-soft); font-size: 13px; margin-top: 3px; }
 
 /* İLETİŞİM */
-.contact { text-align: center; background: transparent; transition: background-color 0.3s; }
+.contact { text-align: center; background: transparent; }
 
 .contact-box {
     max-width: 800px;
     margin: auto;
     padding: 55px 30px;
-    border-radius: 25px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    border-radius: 26px;
+    background: var(--cube-blue);
+    border: var(--card-bw) solid var(--ink);
     box-shadow: var(--shadow);
-    transition: background-color 0.3s, border-color 0.3s;
+    color: #fff;
 }
 
-.contact-box h2 { font-size: 40px; color: var(--text); margin-bottom: 15px; }
-.contact-box p { color: var(--text-soft); margin-bottom: 25px; }
+.contact-box h2 { font-size: 42px; font-weight: 800; letter-spacing: -1px; color: #fff; margin-bottom: 15px; }
+.contact-box p { color: rgba(255,255,255,.85); margin-bottom: 26px; }
 
 .email {
     display: inline-block;
     padding: 14px 20px;
-    border-radius: 12px;
-    background: var(--primary-light);
-    color: var(--primary);
-    font-weight: 700;
-    border: 1px solid #dbeafe;
+    border-radius: 13px;
+    background: var(--cube-yellow);
+    color: #17171f;
+    font-weight: 800;
+    border: var(--card-bw) solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    word-break: break-all;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.email:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--ink);
 }
 
 /* MOBİL */
 @media(max-width:900px) {
-    .hero { padding: 80px 6%; }
-    .hero-container { grid-template-columns: 1fr; text-align: center; }
+    .hero { padding: 55px 6% 70px; min-height: auto; }
+    .hero-container { grid-template-columns: 1fr; text-align: center; gap: 55px; }
     .hero p { margin-left: auto; margin-right: auto; }
     .cube { width: 230px; height: 230px; }
     .cards { grid-template-columns: 1fr; }
@@ -351,9 +475,11 @@ section {
 }
 
 @media(max-width:500px) {
-    .hero h1 { font-size: 43px; letter-spacing: -2px; }
-    section { padding: 75px 5%; }
+    .hero h1 { font-size: 44px; letter-spacing: -1.5px; }
+    section { padding: 70px 5%; }
+    .contact-box { padding: 42px 20px; }
     .contact-box h2 { font-size: 32px; }
+    .email { font-size: 13px; }
 }
 </style>
 

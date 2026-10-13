@@ -50,7 +50,7 @@
 .soon-card {
     width: 100%;
     background: var(--hero-bg);
-    border: 1px solid var(--hero-border);
+    border: var(--card-bw) solid var(--hero-border);
     border-radius: 34px;
     box-shadow: var(--shadow);
     padding: 70px 45px;
@@ -86,7 +86,7 @@
     align-items: center;
     justify-content: center;
     font-size: 42px;
-    box-shadow: 0 12px 28px rgba(15, 23, 42, .08);
+    box-shadow: var(--shadow-sm);
     position: relative;
     z-index: 2;
     animation: soonFloat 4s ease-in-out infinite;
@@ -166,7 +166,7 @@
 .soon-back a:hover { background: var(--btn-hover-bg); transform: translateY(-2px); }
 
 @media(max-width: 700px) {
-    .page { padding: 25px 4% 55px; }
+    
     .soon-card { padding: 50px 24px; border-radius: 27px; }
     .soon-icon { width: 80px; height: 80px; font-size: 34px; }
 }

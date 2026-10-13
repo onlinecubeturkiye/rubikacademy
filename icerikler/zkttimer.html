@@ -35,7 +35,16 @@
 <!-- BU SAYFAYA ÖZEL STİLLER -->
 <style>
 
-html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
+/* ZKT Timer marka rengi (mor) */
+:root {
+    --zkt: #7c3aed;
+    --zkt-light: var(--tint-purple);
+}
+
+html.dark-mode,
+body.dark-mode {
+    --zkt: #b79bff;
+}
 
 /* NAV-BACK (sayfaya özel geri dön butonu) */
 
@@ -53,17 +62,25 @@ html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
 
 .nav-back:hover {
     background: var(--zkt-light);
-    color: var(--zkt);
+    color: var(--text);
 }
 
-/* HERO */
+/* HERO — ortak .hero kutusunu sıfırlayıp mor bir kart olarak çiziyoruz */
 
 .hero {
-    padding: 90px 7% 60px;
+    display: block;
+    min-height: 0;
+    max-width: 1100px;
+    margin: 45px auto 0;
+    padding: 70px 7% 60px;
     text-align: center;
+    background: var(--zkt-light);
+    border-radius: 30px;
 }
 
 .hero-inner {
+    position: relative;
+    z-index: 3;
     max-width: 720px;
     margin: 0 auto;
 }
@@ -73,11 +90,12 @@ html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
     height: 110px;
     margin: 0 auto 28px;
     border-radius: 28px;
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    background: #17171f;
+    border: var(--card-bw) solid var(--ink);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 25px 50px rgba(124,58,237,.28);
+    box-shadow: var(--shadow);
     overflow: hidden;
     animation: logoFloat 5s ease-in-out infinite;
 }
@@ -93,49 +111,51 @@ html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
     50% { transform: translateY(-12px); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .logo-mark { animation: none; }
+}
+
 .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 16px;
-    border-radius: 50px;
-    background: var(--zkt-light);
-    border: 1px solid #e9d8fd;
-    color: var(--zkt);
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .5px;
     margin-bottom: 22px;
 }
 
 .badge::before {
     content: "";
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #22c55e;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--cube-green);
 }
 
 .hero h1 {
-    font-size: clamp(38px, 5.5vw, 58px);
-    line-height: 1.06;
-    letter-spacing: -2.5px;
+    font-size: clamp(40px, 5.5vw, 62px);
+    line-height: 1.04;
+    letter-spacing: -2px;
     font-weight: 900;
     color: var(--text);
-    margin-bottom: 18px;
+    margin-bottom: 14px;
 }
 
 .hero-author {
     display: inline-block;
-    color: var(--text-soft);
-    font-size: 14px;
-    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 800;
     margin-bottom: 22px;
 }
 
 .hero p {
     color: var(--text-soft);
+    opacity: 1;
     font-size: 17px;
     line-height: 1.75;
+    max-width: none;
     margin-bottom: 36px;
 }
 
@@ -145,7 +165,7 @@ html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 14px;
+    gap: 16px;
     margin-bottom: 10px;
 }
 
@@ -153,32 +173,33 @@ html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 15px 24px;
+    padding: 14px 22px;
     border-radius: 16px;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: var(--card-bw) solid var(--card-border);
     box-shadow: var(--shadow);
-    font-weight: 700;
+    font-weight: 800;
     font-size: 15px;
     color: var(--text);
-    transition: .25s;
+    transition: transform .15s ease, box-shadow .15s ease;
     min-width: 210px;
 }
 
 .link-card:hover {
-    transform: translateY(-5px);
-    border-color: #ddd6fe;
-    box-shadow: 0 18px 40px rgba(124,58,237,.14);
+    transform: translate(-3px, -3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.link-card:active {
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 var(--ink);
 }
 
 .link-card.primary {
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    background: var(--zkt);
+    border-color: var(--ink);
     color: #fff;
-    border: none;
-    box-shadow: 0 15px 35px rgba(124,58,237,.30);
 }
-
-.link-card.primary:hover { box-shadow: 0 20px 45px rgba(124,58,237,.38); }
 
 .link-icon {
     width: 38px;
@@ -193,7 +214,7 @@ html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
     overflow: hidden;
 }
 
-.link-card.primary .link-icon { background: rgba(255,255,255,.18); color: #fff; }
+.link-card.primary .link-icon { background: rgba(255,255,255,.2); color: #fff; }
 
 .link-icon img {
     width: 100%;
@@ -205,18 +226,18 @@ html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
 .link-text { display: flex; flex-direction: column; align-items: flex-start; }
 
 .link-text small {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 11px;
     color: var(--text-soft);
     text-transform: uppercase;
     letter-spacing: .5px;
 }
 
-.link-card.primary .link-text small { color: rgba(255,255,255,.75); }
+.link-card.primary .link-text small { color: rgba(255,255,255,.8); }
 
 /* SECTIONS */
 
-section.info { padding: 70px 7%; }
+section.info { padding: 80px 7%; }
 
 .section-container { max-width: 1000px; margin: auto; }
 
@@ -227,19 +248,25 @@ section.info { padding: 70px 7%; }
 }
 
 .section-heading span {
-    color: var(--zkt);
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 2px;
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 9px;
+    background: var(--cube-yellow);
+    border: var(--card-bw) solid var(--ink);
+    color: #17171f;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
 }
 
 .section-heading h2 {
-    font-size: clamp(28px, 3.5vw, 40px);
-    line-height: 1.15;
-    letter-spacing: -1.5px;
+    font-size: clamp(28px, 3.5vw, 42px);
+    line-height: 1.12;
+    letter-spacing: -1px;
+    font-weight: 800;
     color: var(--text);
-    margin: 12px 0;
+    margin: 16px 0 12px;
 }
 
 .section-heading p { color: var(--text-soft); line-height: 1.7; }
@@ -247,33 +274,45 @@ section.info { padding: 70px 7%; }
 .feature-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 24px;
 }
+
+.feature-grid > :nth-child(1) { --accent-tint: var(--tint-red); }
+.feature-grid > :nth-child(2) { --accent-tint: var(--tint-blue); }
+.feature-grid > :nth-child(3) { --accent-tint: var(--tint-green); }
 
 .feature-card {
-    padding: 30px;
+    padding: 28px;
     border-radius: 20px;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: var(--card-bw) solid var(--card-border);
     box-shadow: var(--shadow);
-    transition: .3s;
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.feature-card:hover { transform: translateY(-6px); border-color: #ddd6fe; }
+.feature-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: var(--shadow-hover);
+}
 
 .feature-icon {
-    width: 50px;
-    height: 50px;
+    width: 54px;
+    height: 54px;
     display: grid;
     place-items: center;
-    border-radius: 14px;
-    background: var(--zkt-light);
-    font-size: 22px;
+    border-radius: 15px;
+    background: var(--accent-tint, var(--zkt-light));
+    border: var(--card-bw) solid var(--card-border);
+    font-size: 24px;
     margin-bottom: 18px;
 }
 
-.feature-card h3 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
+.feature-card h3 { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
 .feature-card p { color: var(--text-soft); font-size: 14px; line-height: 1.65; }
+
+@media(max-width:1180px) {
+    .hero { margin: 35px 4% 0; }
+}
 
 @media(max-width:700px) {
     .feature-grid { grid-template-columns: 1fr; }
@@ -281,20 +320,8 @@ section.info { padding: 70px 7%; }
 }
 
 @media(max-width:500px) {
-    .hero { padding: 70px 5% 50px; }
+    .hero { padding: 50px 5% 40px; margin: 25px 4% 0; }
     .nav-back { padding: 8px 12px; font-size: 12px; }
-}
-
-/* DARK MODE (sayfaya özel bileşenler) */
-
-html.dark-mode .feature-card, body.dark-mode .feature-card,
-html.dark-mode .link-card, body.dark-mode .link-card {
-    background: var(--surface);
-    border-color: var(--border);
-}
-html.dark-mode .link-card.primary, body.dark-mode .link-card.primary {
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
-    border: none;
 }
 
 </style>

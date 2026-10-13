@@ -3,20 +3,26 @@
    Tüm sayfalarda <head> içine şu şekilde eklenir:
    <link rel="stylesheet" href="/styles/common.css">
 
+   TEMA: "Küp renkleri" — krem zemin, kalın koyu kenarlıklı
+   ve ofset gölgeli kartlar, Rubik küpünün 6 rengi vurgu olarak.
+
    Bu dosya şunları içerir:
+   - Yazı tipleri (Rubik başlıklar, Inter metin)
    - Renk değişkenleri (açık / karanlık mod)
    - Genel sıfırlama
    - Navbar (logo, menü, dil seçici, karanlık mod butonu)
-   - Karanlık mod override'ları
-   - Scroll reveal animasyonu
+   - Arka plan efekti (bg-glow)
    - Footer
-   - Arka plan glow efekti (bg-glow)
+   - Scroll reveal animasyonu
    - Eğitim/İçerik sayfaları ortak bloğu (hero + seviye kartları)
 
    Sayfaya özel şeyler (case-grid, tablo, vb. gerçekten
    sayfaya özgü bileşenler) HER SAYFANIN KENDİ <style>
-   bloğunda kalmaya devam eder.
+   bloğunda kalmaya devam eder; renk/kenarlık/gölge için
+   buradaki değişkenleri (var(--...)) kullanmalıdır.
 ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@500;600;700;800;900&display=swap");
 
 html {
     scroll-behavior: smooth;
@@ -28,27 +34,57 @@ html {
    RENK DEĞİŞKENLERİ — AÇIK MOD (varsayılan)
 ========================================= */
 :root {
-    --background: #f8fafc;
+    /* Küpün 6 rengi */
+    --cube-red: #f0383a;
+    --cube-orange: #ff8a1f;
+    --cube-yellow: #ffd21f;
+    --cube-green: #16b364;
+    --cube-blue: #1d5bff;
+    --cube-white: #ffffff;
+
+    /* Küp renklerinin açık tonları (kart görselleri, rozetler) */
+    --tint-red: #ffe1df;
+    --tint-orange: #ffe9d3;
+    --tint-yellow: #fff3c4;
+    --tint-green: #d6f6e5;
+    --tint-blue: #dfe8ff;
+    --tint-purple: #ece4ff;
+
+    /* Kenarlık ve ofset gölge rengi */
+    --ink: #17171f;
+    --card-bw: 2px;
+
+    --font-display: "Rubik", "Inter", sans-serif;
+
+    --background: #fff8ec;
     --surface: #ffffff;
-    --surface-soft: #f1f5f9;
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-    --primary-light: #eff6ff;
-    --text: #172033;
-    --text-soft: #64748b;
-    --border: #e2e8f0;
-    --card-border: #dfebf5;
-    --shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
-    --diagram-bg: #f1f5f9;
+    --surface-soft: #f6efe2;
+    --primary: #1d5bff;
+    --primary-dark: #1446d1;
+    --primary-light: #e3ebff;
+    --text: #17171f;
+    --text-soft: #5b5b6e;
+    --border: #eadfcb;
+    --card-border: var(--ink);
+    --shadow: 5px 5px 0 var(--ink);
+    --shadow-sm: 3px 3px 0 var(--ink);
+    --shadow-hover: 8px 8px 0 var(--ink);
+    --diagram-bg: #f6efe2;
+    --dot: rgba(23, 23, 31, .07);
+
+    --badge-bg: var(--tint-blue);
+    --badge-border: var(--ink);
+    --badge-text: var(--primary);
 
     /* Eğitim sayfaları (hero / seviye kartları) için */
-    --hero-bg: linear-gradient(120deg, #e8f7ff, #c8eaff);
-    --hero-border: #cce8fa;
-    --btn-bg: #eef8ff;
-    --btn-hover-bg: #dff2ff;
-    --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
-    --bottom-border: #d5eafa;
-    --bottom-text: #18578c;
+    --hero-bg: var(--cube-yellow);
+    --hero-border: var(--ink);
+    --btn-bg: var(--cube-yellow);
+    --btn-hover-bg: #ffc400;
+    --btn-text: var(--ink);
+    --bottom-bg: var(--tint-blue);
+    --bottom-border: var(--ink);
+    --bottom-text: var(--text);
 }
 
 /* =========================================
@@ -56,25 +92,42 @@ html {
 ========================================= */
 html.dark-mode,
 body.dark-mode {
-    --background: #0f172a;
-    --surface: #1e293b;
-    --surface-soft: #334155;
-    --text: #f8fafc;
-    --text-soft: #cbd5e1;
-    --border: #334155;
-    --card-border: #334155;
-    --primary-light: #1e3a8a;
-    --shadow: 0 15px 40px rgba(0, 0, 0, 0.30);
-    --diagram-bg: #0f172a;
+    --cube-blue: #4f7dff;
+
+    --tint-red: #3a1d22;
+    --tint-orange: #3a2717;
+    --tint-yellow: #3a3214;
+    --tint-green: #15352a;
+    --tint-blue: #1b2650;
+    --tint-purple: #2a2150;
+
+    --ink: #050509;
+
+    --background: #111219;
+    --surface: #1c1d27;
+    --surface-soft: #272938;
+    --primary: #6b93ff;
+    --primary-dark: #8aa9ff;
+    --primary-light: #1f2a52;
+    --text: #f6f6fa;
+    --text-soft: #b9bbcc;
+    --border: #2d3042;
+    --card-border: #3a3d54;
+    --shadow: 5px 5px 0 #050509;
+    --shadow-sm: 3px 3px 0 #050509;
+    --shadow-hover: 8px 8px 0 #050509;
+    --diagram-bg: #151620;
+    --dot: rgba(255, 255, 255, .05);
 
     /* Eğitim sayfaları (hero / seviye kartları) için */
-    --hero-bg: linear-gradient(120deg, #1e293b, #0f172a);
-    --hero-border: #334155;
-    --btn-bg: #334155;
-    --btn-hover-bg: #1e3a8a;
-    --bottom-bg: #1e293b;
-    --bottom-border: #334155;
-    --bottom-text: #60a5fa;
+    --hero-bg: #24252f;
+    --hero-border: #3a3d54;
+    --btn-bg: var(--cube-yellow);
+    --btn-hover-bg: #ffdf5c;
+    --btn-text: #17171f;
+    --bottom-bg: #1b2650;
+    --bottom-border: #3a3d54;
+    --bottom-text: var(--text);
 }
 
 /* =========================================
@@ -88,11 +141,17 @@ body.dark-mode {
 
 body {
     font-family: "Inter", sans-serif;
-    background: var(--background);
+    background-color: var(--background);
+    background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
     color: var(--text);
     overflow-x: hidden;
     width: 100%;
     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3 {
+    font-family: var(--font-display);
 }
 
 a {
@@ -100,10 +159,16 @@ a {
     color: inherit;
 }
 
+::selection {
+    background: var(--cube-yellow);
+    color: #17171f;
+}
+
 /* =========================================
-   ARKA PLAN IŞIK EFEKTİ (bg-glow)
+   ARKA PLAN EFEKTİ (bg-glow)
    Kullanmak isteyen sayfa <div class="bg-glow"></div>
    ekler; eklemeyen sayfada zaten etkisi olmaz.
+   Küp renklerinde iki yumuşak ışık.
 ========================================= */
 .bg-glow {
     position: fixed;
@@ -120,30 +185,31 @@ a {
 .bg-glow::after {
     content: "";
     position: absolute;
-    width: 500px;
-    height: 500px;
+    width: 460px;
+    height: 460px;
     border-radius: 50%;
     filter: blur(120px);
-    opacity: 0.18;
+    opacity: 0.22;
     animation: floatGlow 15s infinite alternate ease-in-out;
 }
 
 .bg-glow::before {
-    background: #2563eb;
-    top: -100px;
+    background: var(--cube-yellow);
+    top: -120px;
     left: -100px;
 }
 
 .bg-glow::after {
-    background: #6366f1;
-    bottom: -100px;
+    background: var(--cube-blue);
+    bottom: -120px;
     right: -100px;
+    opacity: 0.14;
     animation-delay: -7s;
 }
 
 html.dark-mode .bg-glow::before,
 html.dark-mode .bg-glow::after {
-    opacity: 0.25;
+    opacity: 0.10;
 }
 
 @keyframes floatGlow {
@@ -151,8 +217,14 @@ html.dark-mode .bg-glow::after {
     100% { transform: translate(150px, 200px) scale(1.25); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .bg-glow::before,
+    .bg-glow::after { animation: none; }
+}
+
 /* =========================================
    NAVBAR
+   Altında küpün renklerinden oluşan şerit var.
 ========================================= */
 .navbar {
     position: sticky;
@@ -161,17 +233,33 @@ html.dark-mode .bg-glow::after {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 7%;
-    background: rgba(248, 250, 252, 0.85);
+    padding: 14px 7%;
+    background: rgba(255, 252, 245, 0.92);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: var(--card-bw) solid var(--card-border);
     transition: background-color 0.3s, border-color 0.3s;
+}
+
+.navbar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(-4px - var(--card-bw));
+    height: 4px;
+    background: linear-gradient(90deg,
+        var(--cube-red) 0 20%,
+        var(--cube-orange) 20% 40%,
+        var(--cube-yellow) 40% 60%,
+        var(--cube-green) 60% 80%,
+        var(--cube-blue) 80% 100%);
+    pointer-events: none;
 }
 
 html.dark-mode .navbar,
 body.dark-mode .navbar {
-    background: rgba(15, 23, 42, 0.90);
+    background: rgba(17, 18, 25, 0.92);
 }
 
 .nav-logo {
@@ -181,17 +269,25 @@ body.dark-mode .navbar {
 }
 
 .nav-logo-mark {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
     object-fit: cover;
-    box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+    border: var(--card-bw) solid var(--card-border);
+    box-shadow: var(--shadow-sm);
+    background: var(--surface);
+    transition: transform .25s ease;
+}
+
+.nav-logo:hover .nav-logo-mark {
+    transform: rotate(-8deg);
 }
 
 .nav-logo-text {
-    font-size: 17px;
+    font-family: var(--font-display);
+    font-size: 19px;
     font-weight: 800;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.4px;
     color: var(--text);
 }
 
@@ -204,44 +300,58 @@ body.dark-mode .navbar {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .nav-links a {
-    padding: 9px 16px;
-    border-radius: 10px;
+    padding: 8px 15px;
+    border-radius: 11px;
+    border: var(--card-bw) solid transparent;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-soft);
-    transition: .25s;
+    transition: .2s;
 }
 
-.nav-links a:hover,
+.nav-links a:hover {
+    color: var(--text);
+    background: var(--surface-soft);
+}
+
 .nav-links a.active {
-    background: var(--primary-light);
-    color: var(--primary);
+    background: var(--cube-yellow);
+    border-color: var(--ink);
+    color: #17171f;
+    box-shadow: var(--shadow-sm);
 }
 
 /* =========================================
    KARANLIK MOD BUTONU
 ========================================= */
 .dark-mode-btn {
-    border: none;
-    background: var(--surface-soft);
+    border: var(--card-bw) solid var(--card-border);
+    background: var(--surface);
     color: var(--text);
     width: 42px;
     height: 42px;
-    border-radius: 50%;
-    font-size: 20px;
+    border-radius: 12px;
+    font-size: 19px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: .3s;
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s, box-shadow .15s;
 }
 
 .dark-mode-btn:hover {
-    transform: scale(1.08);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+
+.dark-mode-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--ink);
 }
 
 /* =========================================
@@ -252,26 +362,31 @@ body.dark-mode .navbar {
 }
 
 .lang-switch-btn {
-    border: none;
-    background: var(--surface-soft);
+    border: var(--card-bw) solid var(--card-border);
+    background: var(--surface);
     color: var(--text);
     height: 42px;
-    padding: 0 16px;
-    border-radius: 21px;
+    padding: 0 14px;
+    border-radius: 12px;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: .3px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 7px;
-    transition: .3s;
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s, box-shadow .15s;
 }
 
 .lang-switch-btn:hover {
-    transform: scale(1.06);
-    background: var(--primary-light);
-    color: var(--primary);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+
+.lang-switch-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--ink);
 }
 
 .lang-switch-btn .lang-globe {
@@ -281,11 +396,11 @@ body.dark-mode .navbar {
 
 .lang-menu {
     position: absolute;
-    top: calc(100% + 10px);
+    top: calc(100% + 12px);
     right: 0;
-    min-width: 168px;
+    min-width: 172px;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: var(--card-bw) solid var(--card-border);
     border-radius: 16px;
     box-shadow: var(--shadow);
     padding: 7px;
@@ -314,7 +429,7 @@ body.dark-mode .navbar {
     color: var(--text);
     text-align: left;
     padding: 10px 14px;
-    border-radius: 11px;
+    border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -323,13 +438,12 @@ body.dark-mode .navbar {
 }
 
 .lang-menu-item:hover {
-    background: var(--primary-light);
-    color: var(--primary);
+    background: var(--surface-soft);
 }
 
 .lang-menu-item.active {
-    background: var(--primary-light);
-    color: var(--primary);
+    background: var(--cube-yellow);
+    color: #17171f;
     font-weight: 800;
 }
 
@@ -345,21 +459,45 @@ body.dark-mode .navbar {
 
 @media(max-width: 500px) {
     .navbar {
-        padding: 14px 5%;
+        padding: 12px 4%;
+    }
+    .nav-logo {
+        gap: 8px;
+    }
+    .nav-logo-mark {
+        width: 34px;
+        height: 34px;
     }
     .nav-logo-text {
         font-size: 15px;
     }
     .nav-links a {
-        padding: 8px 12px;
-        font-size: 13px;
+        padding: 7px 9px;
+        font-size: 12px;
+        white-space: nowrap;
     }
     .nav-right {
         gap: 6px;
     }
     .lang-switch-btn {
-        padding: 0 10px;
+        height: 38px;
+        padding: 0 9px;
         font-size: 12px;
+    }
+    .lang-switch-btn .lang-globe {
+        display: none;
+    }
+    .dark-mode-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 17px;
+    }
+}
+
+/* Çok dar ekranlarda logo yazısını gizle ki menü tek satıra sığsın */
+@media(max-width: 420px) {
+    .nav-logo-text {
+        display: none;
     }
 }
 
@@ -370,9 +508,10 @@ footer {
     padding: 35px;
     text-align: center;
     background: transparent;
-    border-top: 1px solid var(--border);
+    border-top: var(--card-bw) solid var(--card-border);
     color: var(--text-soft);
     font-size: 13px;
+    font-weight: 500;
     transition: background-color 0.3s, border-color 0.3s;
 }
 
@@ -398,7 +537,7 @@ footer {
 .page {
     min-height: calc(100vh - 71px);
     padding: 45px 5% 80px;
-    background: var(--background);
+    background: transparent;
     transition: background-color 0.3s;
 }
 
@@ -411,28 +550,32 @@ footer {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 18px;
+    padding: 9px 16px;
     border-radius: 12px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--primary);
+    border: var(--card-bw) solid var(--card-border);
+    color: var(--text);
     font-size: 13px;
     font-weight: 800;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-    transition: all .25s ease;
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s ease, box-shadow .15s ease;
 }
 
 .back-btn:hover {
-    transform: translateX(-4px);
-    border-color: #c0e0fc;
-    background: var(--primary-light);
+    transform: translate(-2px, -1px);
+    box-shadow: 5px 4px 0 var(--ink);
+}
+
+.back-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--ink);
 }
 
 .hero {
     max-width: 1250px;
     min-height: 390px;
     margin: 0 auto 45px;
-    border-radius: 34px;
+    border-radius: 30px;
     overflow: hidden;
     position: relative;
     display: flex;
@@ -440,20 +583,41 @@ footer {
     justify-content: space-between;
     padding: 55px 65px;
     background: var(--hero-bg);
-    border: 1px solid var(--hero-border);
+    border: var(--card-bw) solid var(--hero-border);
     box-shadow: var(--shadow);
     transition: background 0.3s, border-color 0.3s;
 }
 
+/* Hero köşesinde küp çıkartması deseni */
 .hero::before {
     content: "";
     position: absolute;
-    width: 430px;
-    height: 430px;
-    border-radius: 50%;
-    border: 70px solid rgba(255, 255, 255, .15);
-    left: -180px;
-    top: -180px;
+    width: 260px;
+    height: 260px;
+    right: -40px;
+    bottom: -60px;
+    border-radius: 0;
+    border: none;
+    left: auto;
+    top: auto;
+    opacity: .18;
+    transform: rotate(-12deg);
+    background:
+        repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 86px),
+        repeating-linear-gradient(0deg, var(--ink) 0 6px, transparent 6px 86px);
+    pointer-events: none;
+}
+
+.hero > * {
+    position: relative;
+    z-index: 1;
+}
+
+html.dark-mode .hero::before {
+    background:
+        repeating-linear-gradient(90deg, #ffffff 0 6px, transparent 6px 86px),
+        repeating-linear-gradient(0deg, #ffffff 0 6px, transparent 6px 86px);
+    opacity: .05;
 }
 
 .hero-text {
@@ -466,29 +630,30 @@ footer {
     display: inline-flex;
     align-items: center;
     gap: 9px;
-    padding: 9px 15px;
+    padding: 8px 14px;
     border-radius: 50px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--primary);
+    border: var(--card-bw) solid var(--card-border);
+    color: var(--text);
     font-size: 10px;
     font-weight: 900;
     letter-spacing: 1.5px;
     margin-bottom: 18px;
+    box-shadow: var(--shadow-sm);
 }
 
 .badge i {
-    width: 7px;
-    height: 7px;
-    background: #168ee0;
-    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    background: var(--cube-red);
+    border-radius: 2px;
 }
 
 .hero h1 {
     font-size: clamp(42px, 5vw, 68px);
-    line-height: .98;
-    letter-spacing: -3px;
-    font-weight: 950;
+    line-height: 1;
+    letter-spacing: -2px;
+    font-weight: 900;
     margin-bottom: 18px;
     color: var(--text);
 }
@@ -496,7 +661,8 @@ footer {
 .hero h1 span { color: var(--primary); }
 
 .hero p {
-    color: var(--text-soft);
+    color: var(--text);
+    opacity: .8;
     font-size: 15px;
     line-height: 1.75;
     max-width: 560px;
@@ -508,7 +674,7 @@ footer {
     position: relative;
     z-index: 3;
     flex-shrink: 0;
-    filter: drop-shadow(0 25px 22px rgba(0, 0, 0, .23));
+    filter: drop-shadow(8px 10px 0 rgba(23, 23, 31, .9));
     animation: floating 5s ease-in-out infinite;
 }
 
@@ -517,30 +683,37 @@ footer {
     50% { transform: translateY(-12px) rotate(2deg); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .hero-cube { animation: none; }
+}
+
 .section-title {
     max-width: 1250px;
     margin: 0 auto 25px;
 }
 
 .section-title small {
-    display: block;
-    color: var(--primary);
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: var(--cube-yellow);
+    color: #17171f;
     font-size: 10px;
     font-weight: 900;
-    letter-spacing: 1.7px;
-    margin-bottom: 8px;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
 }
 
 .section-title h2 {
-    font-size: 30px;
-    letter-spacing: -1px;
-    font-weight: 900;
+    font-size: 32px;
+    letter-spacing: -.8px;
+    font-weight: 800;
     color: var(--text);
 }
 
 .section-title p {
     color: var(--text-soft);
-    font-size: 13px;
+    font-size: 14px;
     margin-top: 7px;
 }
 
@@ -549,23 +722,22 @@ footer {
     margin: auto;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
+    gap: 28px;
 }
 
 .card {
     background: var(--surface);
-    border: 1px solid var(--card-border);
-    border-radius: 27px;
+    border: var(--card-bw) solid var(--card-border);
+    border-radius: 24px;
     overflow: hidden;
     box-shadow: var(--shadow);
-    transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease, background-color 0.3s;
+    transition: transform .2s ease, box-shadow .2s ease, background-color 0.3s;
     display: block;
 }
 
 .card:hover {
-    transform: translateY(-8px);
-    border-color: #c7e5fa;
-    box-shadow: 0 25px 50px rgba(35, 108, 162, .14);
+    transform: translate(-3px, -3px);
+    box-shadow: var(--shadow-hover);
 }
 
 .card-visual {
@@ -575,6 +747,7 @@ footer {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-bottom: var(--card-bw) solid var(--card-border);
 }
 
 .card-visual::before {
@@ -583,54 +756,67 @@ footer {
     width: 250px;
     height: 250px;
     border-radius: 50%;
-    border: 40px solid rgba(255, 255, 255, .25);
+    border: 40px solid rgba(255, 255, 255, .35);
     top: -140px;
     right: -90px;
+    z-index: 0;
 }
 
-.beginner { background: linear-gradient(135deg, #e2f5ff, #91d8ff); }
-.middle { background: linear-gradient(135deg, #e9e4ff, #b7a5ff); }
-.advanced { background: linear-gradient(135deg, #dffaf1, #73d8c3); }
+/* Görsel, dekoratif halkanın üstünde kalsın */
+.card-visual > svg,
+.card-visual > img,
+.card-visual > .cube {
+    position: relative;
+    z-index: 1;
+}
+
+html.dark-mode .card-visual::before {
+    border-color: rgba(255, 255, 255, .04);
+}
+
+.beginner { background: var(--tint-green); }
+.middle { background: var(--tint-blue); }
+.advanced { background: var(--tint-red); }
 
 .level {
     position: absolute;
-    left: 18px;
-    top: 18px;
+    left: 16px;
+    top: 16px;
     z-index: 5;
-    padding: 8px 11px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, .85);
-    backdrop-filter: blur(10px);
+    padding: 7px 11px;
+    border-radius: 9px;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
     font-size: 9px;
     font-weight: 900;
     letter-spacing: 1px;
-    color: #26374b;
+    color: var(--text);
 }
 
 .cube {
     width: 225px;
     height: 225px;
     transition: transform .45s cubic-bezier(.2, .8, .2, 1);
-    filter: drop-shadow(0 20px 18px rgba(16, 35, 53, .22));
+    filter: drop-shadow(6px 8px 0 rgba(23, 23, 31, .85));
 }
 
 .card:hover .cube {
-    transform: scale(1.08) translateY(-7px) rotate(-2deg);
+    transform: scale(1.06) translateY(-6px) rotate(-3deg);
 }
 
-.card-info { padding: 25px 25px 27px; }
+.card-info { padding: 24px 24px 26px; }
 
 .card-info h3 {
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: -.5px;
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -.4px;
     margin-bottom: 9px;
     color: var(--text);
 }
 
 .card-info p {
     color: var(--text-soft);
-    font-size: 13px;
+    font-size: 13.5px;
     line-height: 1.65;
     min-height: 64px;
     margin-bottom: 20px;
@@ -641,13 +827,14 @@ footer {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 13px 15px;
-    border-radius: 13px;
+    padding: 12px 15px;
+    border-radius: 12px;
     background: var(--btn-bg);
-    color: var(--primary);
-    font-size: 12px;
+    color: var(--btn-text);
+    border: var(--card-bw) solid var(--ink);
+    font-size: 13px;
     font-weight: 900;
-    transition: background .25s ease, padding .25s ease, color .25s ease;
+    transition: background .2s ease, padding .2s ease;
 }
 
 .card:hover .button {
@@ -659,17 +846,18 @@ footer {
 
 .bottom {
     max-width: 1250px;
-    margin: 38px auto 0;
+    margin: 42px auto 0;
     padding: 32px;
     text-align: center;
-    border-radius: 25px;
+    border-radius: 24px;
     background: var(--bottom-bg);
-    border: 1px solid var(--bottom-border);
+    border: var(--card-bw) solid var(--bottom-border);
+    box-shadow: var(--shadow);
     transition: background-color 0.3s, border-color 0.3s;
 }
 
-.bottom h3 { color: var(--bottom-text); font-size: 21px; margin-bottom: 7px; }
-.bottom p { color: var(--text-soft); font-size: 13px; }
+.bottom h3 { color: var(--bottom-text); font-size: 22px; font-weight: 800; margin-bottom: 7px; }
+.bottom p { color: var(--text-soft); font-size: 14px; }
 
 @media(max-width: 1000px) {
     .hero { padding: 45px; }
@@ -679,12 +867,13 @@ footer {
 
 @media(max-width: 700px) {
     .page { padding: 25px 4% 55px; }
-    .hero { min-height: auto; padding: 38px 25px 25px; flex-direction: column; text-align: center; border-radius: 27px; }
+    .hero { min-height: auto; padding: 38px 25px 25px; flex-direction: column; text-align: center; border-radius: 24px; }
     .hero-text { max-width: 100%; }
-    .hero h1 { font-size: 43px; }
+    .hero h1 { font-size: 42px; }
     .hero p { font-size: 14px; }
     .hero-cube { width: 235px; height: 235px; margin-top: 15px; }
-    .methods { grid-template-columns: 1fr; gap: 20px; }
-    .card-visual { height: 320px; }
+    .hero::before { display: none; }
+    .methods { grid-template-columns: 1fr; gap: 22px; }
+    .card-visual { height: 300px; }
     .section-title h2 { font-size: 27px; }
 }
