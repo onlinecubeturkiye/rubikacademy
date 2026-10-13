@@ -66,21 +66,22 @@ html {
     padding: 9px 17px;
     border-radius: 50px;
     background: var(--badge-bg);
-    border: 1px solid var(--badge-border);
-    color: var(--primary);
+    border: var(--card-bw) solid var(--badge-border);
+    color: var(--text);
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 1.7px;
     margin-bottom: 18px;
+    box-shadow: var(--shadow-sm);
 }
 
 .intro-badge i {
     width: 7px;
     height: 7px;
     display: block;
-    border-radius: 50%;
-    background: #20a4f3;
-    box-shadow: 0 0 0 5px rgba(32,164,243,.12);
+    border-radius: 2px;
+    background: var(--cube-red);
+    
 }
 
 .intro h1 {
@@ -127,15 +128,14 @@ html {
     overflow: hidden;
     border-radius: 28px;
     background: var(--surface);
-    border: 1px solid var(--card-border);
+    border: var(--card-bw) solid var(--card-border);
     box-shadow: var(--shadow);
     transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
 }
 
 .coach:hover {
-    transform: translateY(-6px);
-    border-color: #bfdbfe;
-    box-shadow: 0 24px 55px rgba(34,111,168,.14);
+    transform: translate(-3px, -3px);
+    box-shadow: var(--shadow-hover);
 }
 
 .coach-photo {
@@ -145,7 +145,8 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #e1f3ff, #8bd4ff);
+    background: var(--tint-blue);
+    border-bottom: var(--card-bw) solid var(--card-border);
 }
 
 /* Fotoğraf yoksa baş harfler görünür; fotoğraf varsa üstünü kaplar */
@@ -153,7 +154,8 @@ html {
     font-size: 64px;
     font-weight: 900;
     letter-spacing: -2px;
-    color: rgba(23,32,51,.5);
+    color: var(--text);
+    opacity: .35;
 }
 
 .coach-photo img {
@@ -196,7 +198,7 @@ html {
     padding: 6px 10px;
     border-radius: 7px;
     background: var(--badge-bg);
-    color: var(--primary);
+    color: var(--text);
     font-size: 9px;
     font-weight: 900;
     letter-spacing: 1px;
@@ -236,7 +238,7 @@ html {
     padding: 12px 12px 12px 15px;
     border-radius: 16px;
     background: var(--surface-soft);
-    border: 1px solid var(--card-border);
+    border: var(--card-bw) solid var(--card-border);
     text-decoration: none;
     transition: border-color .25s ease;
 }
@@ -316,7 +318,9 @@ html {
 @media(max-width:680px) {
     .coaches { grid-template-columns: 1fr; gap: 20px; }
     .coach { border-radius: 22px; }
-    .coach-photo { height: 170px; }
+    .coach-photo { height: 170px;
+    border-bottom: var(--card-bw) solid var(--card-border);
+}
     .coach-info { padding: 20px 18px 22px; }
     .pkg { padding: 11px 10px 11px 13px; gap: 10px; }
 }

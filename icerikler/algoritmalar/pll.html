@@ -34,26 +34,6 @@
 <link rel="stylesheet" href="/styles/common.css">
 
 <style>
-/* Bu sayfaya özel açık mavi hero/bottom paleti (common.css'in varsayılanından farklı) */
-:root {
-    --hero-bg: linear-gradient(120deg, #e2f5ff, #91d8ff);
-    --hero-border: #b7ddf6;
-    --btn-bg: #eef8ff;
-    --btn-hover-bg: #dff2ff;
-    --bottom-bg: linear-gradient(135deg, #edf8ff, #e6f4ff);
-    --bottom-border: #d5eafa;
-    --bottom-text: #18578c;
-}
-
-html.dark-mode, body.dark-mode {
-    --hero-bg: linear-gradient(120deg, #16324a, #1e293b);
-    --hero-border: #334155;
-    --btn-bg: #334155;
-    --btn-hover-bg: #1e3a8a;
-    --bottom-bg: #1e293b;
-    --bottom-border: #334155;
-    --bottom-text: #60a5fa;
-}
 
 .hero {
     max-width: 1250px;
@@ -65,12 +45,11 @@ html.dark-mode, body.dark-mode {
     display: flex;
     align-items: center;
     padding: 45px 65px;
-    background: var(--hero-bg);
-    border: 1px solid var(--hero-border);
+    background: var(--tint-blue);
+    border: var(--card-bw) solid var(--hero-border);
     box-shadow: var(--shadow);
     transition: background 0.3s, border-color 0.3s;
 }
-
 
 .hero::before {
     content: "";
@@ -128,16 +107,16 @@ html.dark-mode, body.dark-mode {
     gap: 16px;
     align-items: flex-start;
     background: var(--surface);
-    border: 1px solid var(--card-border);
+    border: var(--card-bw) solid var(--card-border);
     border-radius: 20px;
     padding: 16px;
-    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .case-card:hover {
     transform: translateY(-4px);
     border-color: #7fbdec;
-    box-shadow: 0 16px 32px rgba(20, 110, 180, .12);
+    box-shadow: var(--shadow-hover);
 }
 
 .case-diagram {
@@ -200,23 +179,9 @@ html.dark-mode, body.dark-mode {
     font-size: 14px;
 }
 
-.bottom {
-    max-width: 1250px;
-    margin: 38px auto 0;
-    padding: 32px;
-    text-align: center;
-    border-radius: 25px;
-    background: var(--bottom-bg);
-    border: 1px solid var(--bottom-border);
-    transition: background-color 0.3s, border-color 0.3s;
-}
-
-.bottom h3 { color: var(--bottom-text); font-size: 21px; margin-bottom: 7px; }
-.bottom p { color: var(--text-soft); font-size: 13px; }
-
-@media(max-width: 1000px) { .hero { padding: 40px; } }
+@media(max-width: 1000px) { .hero { padding: 40px; background: var(--tint-blue); } }
 @media(max-width: 700px) {
-    .hero { min-height: auto; padding: 34px 24px; border-radius: 27px; }
+    .hero { min-height: auto; padding: 34px 24px; border-radius: 27px; background: var(--tint-blue); }
     .hero h1 { font-size: 38px; }
     .hero p { font-size: 13px; }
     .subset-heading { font-size: 19px; }
@@ -232,8 +197,8 @@ html.dark-mode, body.dark-mode {
 
 .case-card.state-learning { background: #fff8d6; border-color: #f2c94c; }
 .case-card.state-known { background: #dcfce7; border-color: #22c55e; }
-.case-card.state-learning:hover { border-color: #e0b12a; box-shadow: 0 16px 32px rgba(242, 201, 76, .25); }
-.case-card.state-known:hover { border-color: #16a34a; box-shadow: 0 16px 32px rgba(34, 197, 94, .22); }
+.case-card.state-learning:hover { border-color: #e0b12a; box-shadow: var(--shadow-hover); }
+.case-card.state-known:hover { border-color: #16a34a; box-shadow: var(--shadow-hover); }
 
 html.dark-mode .case-card.state-learning { background: #3a3212; border-color: #b8901f; }
 html.dark-mode .case-card.state-known { background: #123524; border-color: #22a35a; }
@@ -258,7 +223,7 @@ html.dark-mode .case-card.state-known .case-status { color: #4ade80; }
     padding: 8px 14px;
     border-radius: 999px;
     background: var(--surface);
-    border: 1px solid var(--card-border);
+    border: var(--card-bw) solid var(--card-border);
     color: var(--text);
 }
 </style>
