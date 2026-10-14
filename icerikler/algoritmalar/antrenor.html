@@ -218,6 +218,14 @@
 .mode-card .reveal-diagram { display: none; }
 .mode-card .reveal-box { justify-content: center; text-align: center; }
 .mode-card #holdTip, .mode-card #scramble { display: none; }
+.bt-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; margin: -4px auto 12px; font-size: 12.5px; font-weight: 700; color: var(--text-soft); }
+.bt-bar.on #btStatus { color: var(--text); }
+.mode-card .timer-area.running .timer { display: none; }
+.scramble .bt-done { opacity: .3; }
+.scramble .bt-cur { color: var(--cube-blue); text-decoration: underline; text-underline-offset: 5px; }
+.scramble .bt-half { color: var(--cube-orange); }
+.scramble .bt-fix { color: #fff; background: var(--cube-red); border-radius: 8px; padding: 0 8px; }
+.scramble .bt-warn { font-size: 15px; color: var(--text-soft); }
 .trainer-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
 
 .reveal-box {
@@ -400,6 +408,12 @@ html[dir="rtl"] .stat-table th { text-align: right; }
         <button class="mode-btn" data-mode="cube" data-i18n="mode_cube">🧊 Küple çalış</button>
         <button class="mode-btn" data-mode="card" data-i18n="mode_card">🃏 Küpsüz (kart)</button>
     </div>
+    <div class="bt-bar" id="btBar">
+        <span id="btStatus"></span>
+        <button class="btn-sm" id="btConnect" data-i18n="bt_connect">🔵 Bluetooth küp bağla</button>
+        <button class="btn-sm" id="btReset" style="display:none" data-i18n="bt_reset">Küpüm çözülmüş</button>
+        <button class="btn-sm" id="btDisconnect" style="display:none" data-i18n="bt_disconnect">Bağlantıyı kes</button>
+    </div>
     <div class="hold-tip" id="holdTip" data-i18n="hold_tip_3x3">Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.</div>
     <div class="scramble" id="scramble" dir="ltr"></div>
     <div class="empty-note" id="emptyNote" style="display:none" data-i18n="empty_note">Çalışmak için en az bir case seç.</div>
@@ -458,6 +472,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script>var PAGE_ID = "antrenor";</script>
 <script src="/js/i18n.js?v=20261019"></script>
 <script src="/js/common.js?v=20261019"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261019"></script>
 
 <script>
 /* ============================================================
@@ -711,10 +726,12 @@ function nextCase() {
         document.getElementById("cardDiagram").innerHTML = "";
         document.getElementById("timerHint").textContent = T("hint_ready");
     }
+    if (typeof btOnNewCase === "function") btOnNewCase();
 }
 
 /* ---------------- ZAMANLAYICI ---------------- */
 function tick() {
+    if (mode === "card") return; // kart modunda süre arka planda ölçülür, ekranda akmaz
     document.getElementById("timer").textContent = fmt(performance.now() - startTime);
     rafId = requestAnimationFrame(tick);
 }
@@ -900,6 +917,7 @@ function onLanguageApplied() {
     document.getElementById("holdTip").textContent = T(current.cube === "2x2" ? "hold_tip_2x2" : "hold_tip_3x3");
     var hint = state === "idle" ? "hint_ready" : state === "running" ? (mode === "card" ? "hint_card" : "hint_running") : (mode === "card" ? "hint_card_done" : "hint_done");
     document.getElementById("timerHint").textContent = T(hint);
+    if (typeof btRenderBar === "function") btRenderBar();
 }
 
 loadAll().then(function () {
