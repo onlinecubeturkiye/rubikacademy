@@ -260,17 +260,6 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
     .subset-heading { font-size: 19px; }
 }
 
-/* SET SEKMELERİ (3x3 / 2x2 setleri arasında geçiş) */
-.set-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 4px auto 22px; }
-.set-tabs .set-tabs-label { width: 100%; text-align: center; font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--text-soft); margin-bottom: 2px; }
-.set-tab {
-    border: var(--card-bw) solid var(--ink); border-radius: 14px; padding: 9px 16px; text-decoration: none;
-    font: 800 14.5px "Inter", sans-serif; background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm);
-    transition: transform .12s, box-shadow .12s;
-}
-.set-tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
-.set-tab.active { background: var(--cube-yellow); color: #17171f; }
-@media (max-width: 520px) { .set-tab { padding: 7px 11px; font-size: 13.5px; } }
 
 /* SET SEKMELERİ + NOTASYON */
 .set-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0 auto 14px; }
@@ -342,14 +331,6 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 <nav class="nav-bar">
     <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
 </nav>
-
-<div class="set-tabs">
-    <span class="set-tabs-label">3x3</span>
-    <a href="/icerikler/algoritmalar/oll" class="set-tab active" aria-current="page">OLL</a>
-    <a href="/icerikler/algoritmalar/pll" class="set-tab">PLL</a>
-    <a href="/icerikler/algoritmalar/coll" class="set-tab">COLL</a>
-    <a href="/icerikler/algoritmalar/wv" class="set-tab">WV</a>
-</div>
 
 <section class="hero reveal">
 <div class="hero-text">
