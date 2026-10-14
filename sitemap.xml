@@ -6,25 +6,31 @@
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-
   <url>
     <loc>https://rubikacademy.fun/icerikler</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://rubikacademy.fun/icerikler/videolar</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://rubikacademy.fun/icerikler/algoritmalar</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/antrenor</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/kocluklar</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
   <url>
     <loc>https://rubikacademy.fun/icerikler/zkttimer</loc>
     <changefreq>weekly</changefreq>
@@ -65,55 +71,94 @@
   <url>
     <loc>https://rubikacademy.fun/icerikler/videolar/3x3onehand</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://rubikacademy.fun/icerikler/videolar/pyraminx</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://rubikacademy.fun/icerikler/videolar/skewb</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://rubikacademy.fun/icerikler/videolar/square1</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://rubikacademy.fun/icerikler/videolar/megaminx</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://rubikacademy.fun/icerikler/videolar/clock</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://rubikacademy.fun/icerikler/videolar/fto</loc>
     <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/fto/bencisco_method</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
-
-  <!-- Ana sayfadan linklenen ama sunucu-taraflı (SSR) doğrulanamayan sayfalar; JS ile açılıyor olabilir, kontrol edilmeli -->
   <url>
-    <loc>https://rubikacademy.fun/zkttimer</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://rubikacademy.fun/rat</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://rubikacademy.fun/yakinda.html</loc>
+    <loc>https://rubikacademy.fun/fto/notasyon</loc>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
+  </url>
+
+  <!-- Algoritma sayfaları -->
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/oll</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/pll</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/coll</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/wv</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/cll</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/ortega-oll</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/ortega-pbl</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/eg1</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/eg2</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
 </urlset>

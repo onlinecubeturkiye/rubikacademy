@@ -301,10 +301,13 @@ var SITE_I18N = {
                 item_videos_p: "2×2'den 7×7'ye, Pyraminx'ten Megaminx'e kadar tüm küpler için adım adım video eğitimleri.",
                 tag_algo: "REFERANS",
                 item_algos: "Algoritmalar",
-                item_algos_p: "OLL, PLL, F2L ve daha fazlası — hız geliştirmen için gereken tüm algoritma listeleri tek yerde.",
+                item_algos_p: "OLL, PLL, COLL, WV, CLL, EG ve daha fazlası — hız geliştirmen için gereken tüm algoritma listeleri tek yerde.",
                 tag_trainer: "PRATİK",
                 item_trainer: "Algoritma Antrenörü",
                 item_trainer_p: "OLL, PLL, COLL, WV ve 2x2 case'lerini karıştırma ve süreyle çalış; zorlandıkların daha sık gelsin.",
+                tag_coaching: "BİREBİR DERS",
+                item_coaching: "Koçluklar",
+                item_coaching_p: "Kendi hızına ve seviyene özel birebir koçluk seanslarıyla gelişimini hızlandır.",
                 tag_tool: "ARAÇ",
                 item_zkt_p: "Çözüm sürelerini kaydet, ortalamanı takip et ve gelişimini zaman içinde karşılaştır.",
                 cta_go: "İncele →"
@@ -317,10 +320,13 @@ var SITE_I18N = {
                 item_videos_p: "From 2×2 to 7×7, Pyraminx to Megaminx — step-by-step video tutorials for every cube.",
                 tag_algo: "REFERENCE",
                 item_algos: "Algorithms",
-                item_algos_p: "OLL, PLL, F2L and more — every algorithm list you need to build speed, in one place.",
+                item_algos_p: "OLL, PLL, COLL, WV, CLL, EG and more — every algorithm list you need to build speed, in one place.",
                 tag_trainer: "PRACTICE",
                 item_trainer: "Algorithm Trainer",
                 item_trainer_p: "Practice OLL, PLL, COLL, WV and 2x2 cases with scrambles and a timer; the ones you struggle with come up more often.",
+                tag_coaching: "1-ON-1 LESSONS",
+                item_coaching: "Coaching",
+                item_coaching_p: "Speed up your progress with one-on-one coaching sessions tailored to your pace and level.",
                 tag_tool: "TOOL",
                 item_zkt_p: "Log your solve times, track your average, and compare your progress over time.",
                 cta_go: "Explore →"
@@ -333,10 +339,13 @@ var SITE_I18N = {
                 item_videos_p: "Du 2×2 au 7×7, du Pyraminx au Megaminx — des tutoriels vidéo étape par étape pour chaque cube.",
                 tag_algo: "RÉFÉRENCE",
                 item_algos: "Algorithmes",
-                item_algos_p: "OLL, PLL, F2L et bien plus — toutes les listes d'algorithmes dont tu as besoin pour gagner en vitesse, au même endroit.",
+                item_algos_p: "OLL, PLL, COLL, WV, CLL, EG et bien plus — toutes les listes d'algorithmes dont tu as besoin pour gagner en vitesse, au même endroit.",
                 tag_trainer: "PRATIQUE",
                 item_trainer: "Entraîneur d'algorithmes",
                 item_trainer_p: "Travaille les cas OLL, PLL, COLL, WV et 2x2 avec des mélanges et un chrono ; ceux qui te posent problème reviennent plus souvent.",
+                tag_coaching: "COURS PARTICULIERS",
+                item_coaching: "Coaching",
+                item_coaching_p: "Accélère tes progrès avec des séances de coaching individuel adaptées à ton rythme et à ton niveau.",
                 tag_tool: "OUTIL",
                 item_zkt_p: "Enregistre tes temps de résolution, suis ta moyenne et compare ta progression au fil du temps.",
                 cta_go: "Découvrir →"
@@ -349,10 +358,13 @@ var SITE_I18N = {
                 item_videos_p: "От 2×2 до 7×7, от Пирамидки до Мегаминкса — пошаговые видеоуроки для каждого кубика.",
                 tag_algo: "СПРАВОЧНИК",
                 item_algos: "Алгоритмы",
-                item_algos_p: "OLL, PLL, F2L и многое другое — все списки алгоритмов для набора скорости в одном месте.",
+                item_algos_p: "OLL, PLL, COLL, WV, CLL, EG и многое другое — все списки алгоритмов для набора скорости в одном месте.",
                 tag_trainer: "ПРАКТИКА",
                 item_trainer: "Тренажёр алгоритмов",
                 item_trainer_p: "Тренируй кейсы OLL, PLL, COLL, WV и 2x2 со скрамблами и таймером; сложные для тебя выпадают чаще.",
+                tag_coaching: "ИНДИВИДУАЛЬНО",
+                item_coaching: "Коучинг",
+                item_coaching_p: "Ускорь прогресс с индивидуальными занятиями, подобранными под твой темп и уровень.",
                 tag_tool: "ИНСТРУМЕНТ",
                 item_zkt_p: "Записывай время сборки, отслеживай среднее значение и сравнивай прогресс со временем.",
                 cta_go: "Открыть →"
@@ -365,10 +377,13 @@ var SITE_I18N = {
                 item_videos_p: "Von 2×2 bis 7×7, von Pyraminx bis Megaminx — Schritt-für-Schritt-Videoanleitungen für jeden Würfel.",
                 tag_algo: "REFERENZ",
                 item_algos: "Algorithmen",
-                item_algos_p: "OLL, PLL, F2L und mehr — alle Algorithmuslisten, die du für mehr Geschwindigkeit brauchst, an einem Ort.",
+                item_algos_p: "OLL, PLL, COLL, WV, CLL, EG und mehr — alle Algorithmuslisten, die du für mehr Geschwindigkeit brauchst, an einem Ort.",
                 tag_trainer: "ÜBEN",
                 item_trainer: "Algorithmen-Trainer",
                 item_trainer_p: "Übe OLL-, PLL-, COLL-, WV- und 2x2-Fälle mit Scrambles und Timer; schwierige Fälle kommen öfter.",
+                tag_coaching: "EINZELUNTERRICHT",
+                item_coaching: "Coachings",
+                item_coaching_p: "Verbessere dich schneller mit Einzel-Coachings, abgestimmt auf dein Tempo und Niveau.",
                 tag_tool: "TOOL",
                 item_zkt_p: "Erfasse deine Lösungszeiten, verfolge deinen Durchschnitt und vergleiche deinen Fortschritt über die Zeit.",
                 cta_go: "Entdecken →"
@@ -381,10 +396,13 @@ var SITE_I18N = {
                 item_videos_p: "من 2×2 إلى 7×7، ومن Pyraminx إلى Megaminx — دروس فيديو خطوة بخطوة لكل مكعب.",
                 tag_algo: "مرجع",
                 item_algos: "الخوارزميات",
-                item_algos_p: "OLL وPLL وF2L والمزيد — جميع قوائم الخوارزميات التي تحتاجها لزيادة السرعة في مكان واحد.",
+                item_algos_p: "OLL وPLL وCOLL وWV وCLL وEG والمزيد — جميع قوائم الخوارزميات التي تحتاجها لزيادة السرعة في مكان واحد.",
                 tag_trainer: "تدريب",
                 item_trainer: "مدرّب الخوارزميات",
                 item_trainer_p: "تدرّب على حالات OLL وPLL وCOLL وWV و2x2 مع الخلط والمؤقت؛ والحالات الصعبة عليك تظهر أكثر.",
+                tag_coaching: "دروس فردية",
+                item_coaching: "التدريب",
+                item_coaching_p: "سرّع تقدّمك بجلسات تدريب فردية تناسب سرعتك ومستواك.",
                 tag_tool: "أداة",
                 item_zkt_p: "سجّل أوقات حلك، وتتبّع متوسطك، وقارن تقدّمك عبر الزمن.",
                 cta_go: "استكشف ←"
@@ -4262,6 +4280,58 @@ eg2: {
         subset_Sune: "Sune",
         subset_T: "مجموعة T",
         subset_U: "مجموعة U"
+    }
+},
+
+       /* Yakında — hazırlanan eğitim sayfası (PAGE_ID = "yakinda") */
+yakinda: {
+    tr: {
+        back_btn: "← Eğitimlere Geri Dön",
+        badge: "İÇERİK HAZIRLANIYOR",
+        h1_part1: "Bu Eğitim",
+        h1_part2: "Çok Yakında!",
+        desc_p: "Rubik Academy ekibi olarak bu bölümün rehber ve algoritma videolarını titizlikle hazırlıyoruz. Takipte kal, çok yakında yayınlanacak!",
+        action_btn: "Diğer Eğitimlere Göz At →"
+    },
+    en: {
+        back_btn: "← Back to Tutorials",
+        badge: "CONTENT IN PROGRESS",
+        h1_part1: "This Tutorial",
+        h1_part2: "Coming Soon!",
+        desc_p: "The Rubik Academy team is carefully preparing the guide and algorithm videos for this section. Stay tuned, it'll be published very soon!",
+        action_btn: "Browse Other Tutorials →"
+    },
+    fr: {
+        back_btn: "← Retour aux tutoriels",
+        badge: "CONTENU EN PRÉPARATION",
+        h1_part1: "Ce tutoriel",
+        h1_part2: "arrive bientôt !",
+        desc_p: "L'équipe Rubik Academy prépare avec soin les guides et les vidéos d'algorithmes de cette section. Reste connecté, la publication arrive très bientôt !",
+        action_btn: "Voir les autres tutoriels →"
+    },
+    ru: {
+        back_btn: "← Назад к урокам",
+        badge: "КОНТЕНТ ГОТОВИТСЯ",
+        h1_part1: "Этот урок",
+        h1_part2: "Совсем скоро!",
+        desc_p: "Команда Rubik Academy тщательно готовит гайды и видео с алгоритмами для этого раздела. Оставайся на связи — публикация уже совсем скоро!",
+        action_btn: "Посмотреть другие уроки →"
+    },
+    de: {
+        back_btn: "← Zurück zu den Anleitungen",
+        badge: "INHALT WIRD VORBEREITET",
+        h1_part1: "Diese Anleitung",
+        h1_part2: "kommt bald!",
+        desc_p: "Das Rubik Academy Team bereitet die Anleitungs- und Algorithmusvideos für diesen Bereich sorgfältig vor. Bleib dran, die Veröffentlichung folgt sehr bald!",
+        action_btn: "Andere Anleitungen ansehen →"
+    },
+    ar: {
+        back_btn: "← العودة إلى الدروس",
+        badge: "المحتوى قيد التحضير",
+        h1_part1: "هذا الدرس",
+        h1_part2: "قريباً جداً!",
+        desc_p: "يقوم فريق Rubik Academy بإعداد فيديوهات الدليل والخوارزميات لهذا القسم بعناية. ترقّب، سيتم النشر قريباً جداً!",
+        action_btn: "تصفّح الدروس الأخرى ←"
     }
 }
 
