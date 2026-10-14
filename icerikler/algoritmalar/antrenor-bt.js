@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261021";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261022";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -109,7 +109,10 @@
         bt_way_b2: "\"Start scan\" butonuna bas; listede küpünün adını (ör. GAN12i_5962) bul.",
         bt_way_b3: "Yanındaki adresi (AB:12:34:56:78:9A gibi) aşağıya yaz.",
         bt_copy: "Kopyala", bt_copied: "Kopyalandı ✓", bt_mac_ok: "Bağlan", bt_mac_cancel: "İptal",
-        bt_mac_bad: "MAC adresi geçersiz. Biçim: AB:12:34:56:78:9A"
+        bt_mac_bad: "MAC adresi geçersiz. Biçim: AB:12:34:56:78:9A",
+        bt_pick_title: "Küpünü seç", bt_pick_intro: "Küpünün açık olduğundan emin ol (bir yüzü çevir, uyanır).",
+        bt_pick_known: "Daha önce bağlandı", bt_pick_none: "Henüz kayıtlı küp yok. Yeni küp ara'ya bas ve listeden küpünü seç; sonraki seferlerde burada görünür.",
+        bt_pick_scan: "🔍 Yeni küp ara", bt_pick_go: "Bağlan →"
     };
     function txt(k) {
         var v = (typeof T === "function") ? T(k) : k;
@@ -289,8 +292,41 @@
         });
     }
 
-    function connect() {
+    /* Site içi küp seçme penceresi. Chrome'un kendi cihaz listesi sadece ilk eşleşmede açılır;
+       daha önce izin verilen küpler (getDevices) burada listelenir ve doğrudan bağlanır. */
+    function openPicker() {
         if (!supported()) return;
+        loadLib().catch(function () {}); // Chrome'un cihaz penceresi dokunuştan hemen sonra açılabilsin diye önceden yükle
+        var modal = el("btPick"), list = el("btPickList");
+        el("btPickTitle").textContent = txt("bt_pick_title");
+        el("btPickIntro").textContent = txt("bt_pick_intro");
+        el("btPickScan").textContent = txt("bt_pick_scan");
+        el("btPickCancel").textContent = txt("bt_mac_cancel");
+        list.innerHTML = "";
+        function close() { modal.classList.remove("show"); modal.onclick = null; }
+        el("btPickCancel").onclick = close;
+        modal.onclick = function (e) { if (e.target === modal) close(); };
+        el("btPickScan").onclick = function () { close(); connect(null); };
+        var getter = navigator.bluetooth.getDevices ? navigator.bluetooth.getDevices() : Promise.resolve([]);
+        getter.catch(function () { return []; }).then(function (devs) {
+            if (!devs.length) { list.innerHTML = '<p class="bt-pick-empty">' + esc(txt("bt_pick_none")) + '</p>'; return; }
+            devs.forEach(function (d) {
+                var b = document.createElement("button");
+                b.type = "button"; b.className = "bt-cube";
+                b.innerHTML = '<span class="bt-icon" aria-hidden="true">🧊</span><span>' + esc(d.name || "Smart cube") +
+                    '<small>' + esc(txt("bt_pick_known")) + '</small></span><span class="go">' + esc(txt("bt_pick_go")) + '</span>';
+                b.onclick = function () { close(); connect(d); };
+                list.appendChild(b);
+            });
+        });
+        modal.classList.add("show");
+    }
+
+    function connect(knownDevice) {
+        if (!supported()) return;
+        // Kayıtlı küp seçildiyse kütüphanenin cihaz seçme çağrısını bir kereliğine o küpe yönlendir
+        var bt = navigator.bluetooth, origRequest = bt.requestDevice;
+        if (knownDevice) bt.requestDevice = function () { bt.requestDevice = origRequest; return Promise.resolve(knownDevice); };
         el("btConnect").disabled = true;
         connecting = true; renderBar();
         loadLib().then(function () {
@@ -326,6 +362,7 @@
             renderBar();
             window.btOnNewCase();
         }).catch(function (err) {
+            if (bt.requestDevice !== origRequest) bt.requestDevice = origRequest;
             el("btConnect").disabled = false;
             conn = null; connecting = false;
             renderBar();
@@ -358,7 +395,7 @@
     function init() {
         if (inited || !el("btBar")) return;
         inited = true;
-        el("btConnect").addEventListener("click", connect);
+        el("btConnect").addEventListener("click", openPicker);
         el("btDisconnect").addEventListener("click", disconnect);
         el("btReset").addEventListener("click", markSolved);
         renderBar();
