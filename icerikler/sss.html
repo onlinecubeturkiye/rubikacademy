@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Sıkça Sorulan Sorular (SSS)</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/sss">
+<meta name="description" content="Rubik Academy hakkında sıkça sorulan sorular: algoritma antrenörü, akıllı küp bağlama, uygulama olarak yükleme ve koçluk.">
+<meta property="og:title" content="Rubik Academy - Sıkça Sorulan Sorular">
+<meta property="og:description" content="Antrenör, akıllı küp, çevrimdışı kullanım ve koçluk hakkında sorular ve cevaplar.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/sss">
+<meta property="og:image" content="https://rubikacademy.fun/og/site.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/site.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261033">
+
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "Rubik Academy nedir?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Rubik küp çözmeyi öğrenmek ve hızlanmak isteyenler için bir eğitim sitesi: başlangıç rehberi, video eğitimler, algoritma listeleri, algoritma antrenörü ve birebir koçluk tek yerde."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "İçerikler ücretli mi?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Hayır. Başlangıç rehberi, videolar, tüm algoritma sayfaları, antrenör ve yazdırılabilir kağıtlar ücretsiz. Sadece birebir koçluk seansları ücretli."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Küpü hiç çözemiyorum, nereden başlamalıyım?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "3x3 başlangıç rehberinden başla. Önce notasyonu öğrenip sonra 7 adımı sırayla uygula; toplamda sadece 6 algoritma ezberlemen yeterli."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Başlangıç yönteminden sonra hangi algoritmaları öğrenmeliyim?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "3x3 için genelde sıra şöyle: önce PLL, sonra OLL. Bunlar oturunca COLL ve Winter Variation gibi ileri setlere geçebilirsin. 2x2'de Ortega OLL ve PBL ile başlayıp CLL ve EG'ye ilerle."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "R, U', M2 gibi harfler ne anlama geliyor?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Bunlar küp notasyonu: her harf bir yüzü çevirmeyi anlatır. Tek harf saat yönünde çeyrek tur, kesme işareti (') ters yön, 2 ise yarım tur demek. Başlangıç rehberindeki notasyon bölümünde hepsi resimli anlatılıyor."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Algoritma antrenörü nasıl çalışır?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Bir set ve çalışmak istediğin case'leri seçersin. Antrenör bir karıştırma verir, sen onu çözülmüş küpe uygulayıp algoritmayı süreyle yaparsın. \"Zorlandım\" dediğin case'ler daha sık gelir. Küpün yanında değilse küpsüz (kart) modunda sadece algoritmayı hatırlamaya çalışırsın."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Akıllı (Bluetooth) küp bağlayabilir miyim?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Evet. GAN akıllı küpleri (ör. GAN 12 ui, GAN 356 i serisi) antrenöre bağlanabilir; süre hamlelerle otomatik başlar ve case çözülünce durur. Bunun için Android'de veya bilgisayarda Chrome ya da Edge gerekir. iPhone ve iPad tarayıcıları Bluetooth bağlantısını desteklemiyor."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "İlerlemem ve istatistiklerim nereye kaydediliyor?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "\"Öğreniyorum / Biliyorum\" işaretleri, antrenör istatistikleri ve ilerleme grafiği kullandığın tarayıcıya kaydedilir. Hesap gerekmez, ama başka bir cihazda görünmez. Tarayıcı verilerini silersen bunlar da silinir."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Siteyi telefona uygulama gibi yükleyebilir miyim?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Evet. Android'de Chrome menüsünden \"Uygulamayı yükle\" ya da \"Ana ekrana ekle\"yi seç. iPhone'da Safari'de Paylaş düğmesine basıp \"Ana Ekrana Ekle\"yi seç. Site ana ekranda uygulama gibi açılır."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "İnternet olmadan çalışır mı?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Siteyi bir kez internetle açtıktan sonra algoritma sayfaları, antrenör ve başlangıç rehberi internetsiz de açılır. Videolar için internet gerekir."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Algoritmaları kağıda nasıl yazdırırım?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "OLL, PLL ve CLL için tek sayfalık A4 kağıtlar hazır. Yazdır sayfasında seti seçip \"Yazdır / PDF\"ye bas; yazdır penceresinde \"PDF olarak kaydet\"i seçersen PDF dosyası alırsın."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Hangi küpler için koçluk var?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "2x2, 3x3, 3x3 tek el, Skewb ve Megaminx için birebir koçluk seansları var. Koçları ve güncel fiyatları Koçluklar sayfasında görebilirsin."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Koçluk seansını nasıl satın alırım?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Koçluklar sayfasında istediğin küpün yanındaki \"Satın Al\" düğmesine bas. Ödeme Shopier üzerinden güvenle alınır."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Seans saati nasıl belirleniyor?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Ödemeden sonra seans saatini seninle birlikte belirliyoruz."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Sorularım için size nasıl ulaşırım?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Instagram'da @rubikacademyy hesabına mesaj atabilirsin."
+   }
+  }
+ ]
+}
+</script>
+
+<style>
+.faq-head { margin: 6px 0 22px; }
+.faq-head .badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--surface); font-weight: 900; font-size: 13px; letter-spacing: .6px; color: var(--text); }
+.faq-head h1 { font-size: 46px; font-weight: 900; line-height: 1.05; margin: 14px 0 10px; color: var(--text); }
+.faq-head h1 span + span { color: var(--primary); }
+.faq-head p { color: var(--text-soft); font-size: 16px; max-width: 680px; }
+.faq-sec { margin-bottom: 26px; max-width: 860px; }
+.faq-sec h2 { font-size: 21px; font-weight: 900; color: var(--text); margin: 0 0 12px; padding-inline-start: 12px; border-inline-start: 5px solid var(--cube-yellow); }
+.faq { background: var(--surface); border: var(--card-bw) solid var(--ink); border-radius: 16px; margin-bottom: 10px; box-shadow: var(--shadow-sm); overflow: hidden; }
+.faq summary { list-style: none; cursor: pointer; padding: 15px 18px; font-weight: 800; font-size: 16px; color: var(--text); display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; flex: none; width: 28px; height: 28px; border-radius: 50%; border: var(--card-bw) solid var(--ink); background: var(--cube-yellow); color: #17171f; display: grid; place-items: center; font-weight: 900; font-size: 18px; line-height: 1; transition: transform .2s; }
+.faq[open] summary::after { transform: rotate(45deg); }
+.faq[open] summary { border-bottom: 1px solid var(--border); }
+.faq-a { padding: 14px 18px 16px; color: var(--text-soft); font-size: 15px; line-height: 1.6; }
+.faq-link { display: inline-block; margin-top: 8px; font-weight: 800; color: var(--primary); text-decoration: none; }
+.faq-link:hover { text-decoration: underline; }
+@media (max-width: 600px) { .faq-head h1 { font-size: 34px; } .faq summary { font-size: 15px; padding: 13px 14px; } .faq-a { padding: 12px 14px 14px; } }
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<header class="faq-head">
+    <span class="badge" data-i18n="badge">SSS</span>
+    <h1><span data-i18n="title">Sıkça Sorulan</span> <span data-i18n="title_accent">Sorular</span></h1>
+    <p data-i18n="intro">Site, algoritma antrenörü, uygulama olarak yükleme ve koçluk hakkında en çok sorulanlar.</p>
+</header>
+
+<section class="faq-sec reveal">
+    <h2 data-i18n="sec_general">Genel</h2>
+    <details class="faq" id="s1">
+        <summary data-i18n="q1">Rubik Academy nedir?</summary>
+        <div class="faq-a">
+            <p data-i18n="a1">Rubik küp çözmeyi öğrenmek ve hızlanmak isteyenler için bir eğitim sitesi: başlangıç rehberi, video eğitimler, algoritma listeleri, algoritma antrenörü ve birebir koçluk tek yerde.</p>
+        </div>
+    </details>
+    <details class="faq" id="s2">
+        <summary data-i18n="q2">İçerikler ücretli mi?</summary>
+        <div class="faq-a">
+            <p data-i18n="a2">Hayır. Başlangıç rehberi, videolar, tüm algoritma sayfaları, antrenör ve yazdırılabilir kağıtlar ücretsiz. Sadece birebir koçluk seansları ücretli.</p>
+        </div>
+    </details>
+    <details class="faq" id="s3">
+        <summary data-i18n="q3">Küpü hiç çözemiyorum, nereden başlamalıyım?</summary>
+        <div class="faq-a">
+            <p data-i18n="a3">3x3 başlangıç rehberinden başla. Önce notasyonu öğrenip sonra 7 adımı sırayla uygula; toplamda sadece 6 algoritma ezberlemen yeterli.</p>
+            <a class="faq-link" href="/icerikler/baslangic" data-i18n="l_beginner">Başlangıç rehberine git →</a>
+        </div>
+    </details>
+    <details class="faq" id="s4">
+        <summary data-i18n="q4">Başlangıç yönteminden sonra hangi algoritmaları öğrenmeliyim?</summary>
+        <div class="faq-a">
+            <p data-i18n="a4">3x3 için genelde sıra şöyle: önce PLL, sonra OLL. Bunlar oturunca COLL ve Winter Variation gibi ileri setlere geçebilirsin. 2x2&#x27;de Ortega OLL ve PBL ile başlayıp CLL ve EG&#x27;ye ilerle.</p>
+            <a class="faq-link" href="/icerikler/algoritmalar" data-i18n="l_algos">Algoritmalara git →</a>
+        </div>
+    </details>
+    <details class="faq" id="s5">
+        <summary data-i18n="q5">R, U&#x27;, M2 gibi harfler ne anlama geliyor?</summary>
+        <div class="faq-a">
+            <p data-i18n="a5">Bunlar küp notasyonu: her harf bir yüzü çevirmeyi anlatır. Tek harf saat yönünde çeyrek tur, kesme işareti (&#x27;) ters yön, 2 ise yarım tur demek. Başlangıç rehberindeki notasyon bölümünde hepsi resimli anlatılıyor.</p>
+            <a class="faq-link" href="/icerikler/baslangic#notasyon" data-i18n="l_notation">Notasyon bölümüne git →</a>
+        </div>
+    </details>
+</section>
+
+<section class="faq-sec reveal">
+    <h2 data-i18n="sec_tools">Antrenör ve uygulama</h2>
+    <details class="faq" id="s6">
+        <summary data-i18n="q6">Algoritma antrenörü nasıl çalışır?</summary>
+        <div class="faq-a">
+            <p data-i18n="a6">Bir set ve çalışmak istediğin case&#x27;leri seçersin. Antrenör bir karıştırma verir, sen onu çözülmüş küpe uygulayıp algoritmayı süreyle yaparsın. &quot;Zorlandım&quot; dediğin case&#x27;ler daha sık gelir. Küpün yanında değilse küpsüz (kart) modunda sadece algoritmayı hatırlamaya çalışırsın.</p>
+            <a class="faq-link" href="/icerikler/algoritmalar/antrenor" data-i18n="l_trainer">Antrenörü aç →</a>
+        </div>
+    </details>
+    <details class="faq" id="s7">
+        <summary data-i18n="q7">Akıllı (Bluetooth) küp bağlayabilir miyim?</summary>
+        <div class="faq-a">
+            <p data-i18n="a7">Evet. GAN akıllı küpleri (ör. GAN 12 ui, GAN 356 i serisi) antrenöre bağlanabilir; süre hamlelerle otomatik başlar ve case çözülünce durur. Bunun için Android&#x27;de veya bilgisayarda Chrome ya da Edge gerekir. iPhone ve iPad tarayıcıları Bluetooth bağlantısını desteklemiyor.</p>
+        </div>
+    </details>
+    <details class="faq" id="s8">
+        <summary data-i18n="q8">İlerlemem ve istatistiklerim nereye kaydediliyor?</summary>
+        <div class="faq-a">
+            <p data-i18n="a8">&quot;Öğreniyorum / Biliyorum&quot; işaretleri, antrenör istatistikleri ve ilerleme grafiği kullandığın tarayıcıya kaydedilir. Hesap gerekmez, ama başka bir cihazda görünmez. Tarayıcı verilerini silersen bunlar da silinir.</p>
+        </div>
+    </details>
+    <details class="faq" id="s9">
+        <summary data-i18n="q9">Siteyi telefona uygulama gibi yükleyebilir miyim?</summary>
+        <div class="faq-a">
+            <p data-i18n="a9">Evet. Android&#x27;de Chrome menüsünden &quot;Uygulamayı yükle&quot; ya da &quot;Ana ekrana ekle&quot;yi seç. iPhone&#x27;da Safari&#x27;de Paylaş düğmesine basıp &quot;Ana Ekrana Ekle&quot;yi seç. Site ana ekranda uygulama gibi açılır.</p>
+        </div>
+    </details>
+    <details class="faq" id="s10">
+        <summary data-i18n="q10">İnternet olmadan çalışır mı?</summary>
+        <div class="faq-a">
+            <p data-i18n="a10">Siteyi bir kez internetle açtıktan sonra algoritma sayfaları, antrenör ve başlangıç rehberi internetsiz de açılır. Videolar için internet gerekir.</p>
+        </div>
+    </details>
+    <details class="faq" id="s11">
+        <summary data-i18n="q11">Algoritmaları kağıda nasıl yazdırırım?</summary>
+        <div class="faq-a">
+            <p data-i18n="a11">OLL, PLL ve CLL için tek sayfalık A4 kağıtlar hazır. Yazdır sayfasında seti seçip &quot;Yazdır / PDF&quot;ye bas; yazdır penceresinde &quot;PDF olarak kaydet&quot;i seçersen PDF dosyası alırsın.</p>
+            <a class="faq-link" href="/icerikler/algoritmalar/yazdir" data-i18n="l_print">Yazdır sayfasına git →</a>
+        </div>
+    </details>
+</section>
+
+<section class="faq-sec reveal">
+    <h2 data-i18n="sec_coach">Koçluk</h2>
+    <details class="faq" id="s12">
+        <summary data-i18n="q12">Hangi küpler için koçluk var?</summary>
+        <div class="faq-a">
+            <p data-i18n="a12">2x2, 3x3, 3x3 tek el, Skewb ve Megaminx için birebir koçluk seansları var. Koçları ve güncel fiyatları Koçluklar sayfasında görebilirsin.</p>
+        </div>
+    </details>
+    <details class="faq" id="s13">
+        <summary data-i18n="q13">Koçluk seansını nasıl satın alırım?</summary>
+        <div class="faq-a">
+            <p data-i18n="a13">Koçluklar sayfasında istediğin küpün yanındaki &quot;Satın Al&quot; düğmesine bas. Ödeme Shopier üzerinden güvenle alınır.</p>
+            <a class="faq-link" href="/icerikler/kocluklar" data-i18n="l_coach">Koçluklar sayfasına git →</a>
+        </div>
+    </details>
+    <details class="faq" id="s14">
+        <summary data-i18n="q14">Seans saati nasıl belirleniyor?</summary>
+        <div class="faq-a">
+            <p data-i18n="a14">Ödemeden sonra seans saatini seninle birlikte belirliyoruz.</p>
+        </div>
+    </details>
+    <details class="faq" id="s15">
+        <summary data-i18n="q15">Sorularım için size nasıl ulaşırım?</summary>
+        <div class="faq-a">
+            <p data-i18n="a15">Instagram&#x27;da @rubikacademyy hesabına mesaj atabilirsin.</p>
+            <a class="faq-link" href="https://instagram.com/rubikacademyy" target="_blank" rel="noopener" data-i18n="l_insta">Instagram&#x27;da yaz →</a>
+        </div>
+    </details>
+</section>
+
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script>var PAGE_ID = "sss";</script>
+<script src="/js/i18n.js?v=20261033"></script>
+<script src="/js/common.js?v=20261033"></script>
+<script>
+// Adresle gelen soruyu aç (ör. /icerikler/sss#s7)
+(function () {
+    var d = location.hash && document.getElementById(location.hash.slice(1));
+    if (d && d.tagName === "DETAILS") d.open = true;
+})();
+</script>
+
+</body>
+</html>
