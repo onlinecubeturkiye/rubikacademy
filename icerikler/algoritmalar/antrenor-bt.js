@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/gan-web-bluetooth.min.js?v=20261020";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261022";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -54,24 +54,46 @@
         for (var i = 0; i < model.length; i++) if (model[i] !== STK[i].c) return false;
         return true;
     }
+    function matches(model, test) {
+        for (var i = 0; i < model.length; i++) if (test(STK[i]) && model[i] !== STK[i].c) return false;
+        return true;
+    }
+    function isF2L(s) { return s.p[1] < 1; }
+    function isTopFace(s) { return s.n[1] === 1; }
+    function isTopCorner(s) { return s.p[1] === 1 && s.p[0] !== 0 && s.p[2] !== 0; }
+    function upToAUF(model, test) {
+        for (var k = 0; k < 4; k++) { if (matches(model, test)) return true; model = turn(model, "U", 1); }
+        return false;
+    }
+    /* Case'in çözüldüğü an: sete göre (tüm küpün çözülmesi beklenmez)
+       OLL / WV: ilk iki katman + üst yüz tek renk
+       COLL: + köşeler yerinde (AUF hariç)
+       PLL: küp AUF hariç çözülü */
+    function caseDone(model) {
+        var id = current ? current.id : "";
+        if (id === "oll" || id === "wv") return matches(model, isF2L) && matches(model, isTopFace);
+        if (id === "coll") return matches(model, isF2L) && matches(model, isTopFace) && upToAUF(model, isTopCorner);
+        if (id === "pll") return upToAUF(model, function () { return true; });
+        return isSolved(model);
+    }
 
     /* ---------- durum ---------- */
     var conn = null, sub = null, model = solvedModel(), modelKnown = false;
     var phase = "off";      // off | needSolve | scrambling | ready | solving | done
     var todo = [];          // [{f, q, fix}] yapılacak çeyrek tur sayısı (1 = X, 2 = X2, 3 = X')
     var total = 0;          // karıştırmadaki hamle sayısı
-    var gotEvent = false, connecting = false;
+    var gotEvent = false, connecting = false, afterCase = false;
 
     function el(id) { return document.getElementById(id); }
     /* i18n.js eski bir sürümden gelirse ham anahtar görünmesin diye Türkçe yedekler */
     var FB = {
         bt_title: "Bluetooth akıllı küp", bt_connect: "Bağlan", bt_reset: "Küpüm çözülmüş", bt_disconnect: "Bağlantıyı kes",
-        bt_hint: "GAN akıllı küpünü bağla: karıştırma takip edilir, süre kendiliğinden başlar ve durur.",
+        bt_hint: "GAN (i, i2, i3, i Carry, ui…), MoYu, QiYi, GoCube veya Giiker akıllı küpünü bağla: karıştırma takip edilir, süre kendiliğinden başlar ve case çözülünce durur.",
         bt_unsupported: "Bluetooth küp için Chrome veya Edge gerekir (iPhone/iPad desteklenmez).",
         bt_only3x3: "Bluetooth sadece 3x3 setlerinde çalışır", bt_cube_mode: "Bluetooth için \"Küple çalış\" modunu seç",
         bt_need_solve: "Önce küpü çöz (ya da yaptığın hamleleri geri al). Çözülünce karıştırma başlar.",
         bt_unknown: "Küp çözülmüş değil görünüyor. Çöz ve \"Küpüm çözülmüş\" butonuna bas.",
-        bt_fix: "Düzelt:", bt_hint_scramble: "Karıştırmayı sarı üstte, yeşil önde tutarak uygula",
+        bt_fix: "Düzelt:", bt_finish_cube: "Case tamam! Yeni karıştırma için küpü bitir (tamamen çöz) ya da algoritmanın tersini yap.", bt_hint_scramble: "Karıştırmayı sarı üstte, yeşil önde tutarak uygula",
         bt_hint_solve: "Küp çözülünce karıştırma başlayacak", bt_hint_ready: "Hazır! İlk hamlende süre başlar, küp çözülünce durur",
         bt_connected: "Bağlı", bt_connecting: "Bağlanıyor…",
         bt_no_data: "Küpten veri gelmiyor. MAC adresi yanlış olabilir; bağlantıyı kesip tekrar dene.",
@@ -87,7 +109,10 @@
         bt_way_b2: "\"Start scan\" butonuna bas; listede küpünün adını (ör. GAN12i_5962) bul.",
         bt_way_b3: "Yanındaki adresi (AB:12:34:56:78:9A gibi) aşağıya yaz.",
         bt_copy: "Kopyala", bt_copied: "Kopyalandı ✓", bt_mac_ok: "Bağlan", bt_mac_cancel: "İptal",
-        bt_mac_bad: "MAC adresi geçersiz. Biçim: AB:12:34:56:78:9A"
+        bt_mac_bad: "MAC adresi geçersiz. Biçim: AB:12:34:56:78:9A",
+        bt_pick_title: "Küpünü seç", bt_pick_intro: "Küpünün açık olduğundan emin ol (bir yüzü çevir, uyanır).",
+        bt_pick_known: "Daha önce bağlandı", bt_pick_none: "Henüz kayıtlı küp yok. Yeni küp ara'ya bas ve listeden küpünü seç; sonraki seferlerde burada görünür.",
+        bt_pick_scan: "🔍 Yeni küp ara", bt_pick_go: "Bağlan →"
     };
     function txt(k) {
         var v = (typeof T === "function") ? T(k) : k;
@@ -130,7 +155,7 @@
         if (!applies() || !curScramble) return;
         var box = el("scramble");
         if (phase === "needSolve") {
-            box.innerHTML = '<span class="bt-warn">' + esc(txt(modelKnown ? "bt_need_solve" : "bt_unknown")) + '</span>';
+            box.innerHTML = '<span class="bt-warn">' + esc(txt(!modelKnown ? "bt_unknown" : (afterCase ? "bt_finish_cube" : "bt_need_solve"))) + '</span>';
             return;
         }
         var orig = parseScramble(curScramble);
@@ -163,6 +188,7 @@
     window.btOnNewCase = function () {
         renderBar();
         if (!applies()) { phase = "off"; return; }
+        afterCase = phase === "done";
         if (!modelKnown || !isSolved(model)) { phase = "needSolve"; renderScramble(); setHint("bt_hint_solve"); return; }
         startScrambleTracking();
     };
@@ -198,11 +224,11 @@
         if (phase === "ready" && state === "idle") {
             phase = "solving";
             startTimer();
-            if (isSolved(model)) { stopTimer(); phase = "done"; }
+            if (caseDone(model)) { stopTimer(); phase = "done"; }
             return;
         }
         if ((phase === "solving" || state === "running") && state === "running") {
-            if (isSolved(model)) { stopTimer(); phase = "done"; }
+            if (caseDone(model)) { stopTimer(); phase = "done"; }
         }
     }
 
@@ -266,12 +292,45 @@
         });
     }
 
-    function connect() {
+    /* Site içi küp seçme penceresi. Chrome'un kendi cihaz listesi sadece ilk eşleşmede açılır;
+       daha önce izin verilen küpler (getDevices) burada listelenir ve doğrudan bağlanır. */
+    function openPicker() {
         if (!supported()) return;
+        loadLib().catch(function () {}); // Chrome'un cihaz penceresi dokunuştan hemen sonra açılabilsin diye önceden yükle
+        var modal = el("btPick"), list = el("btPickList");
+        el("btPickTitle").textContent = txt("bt_pick_title");
+        el("btPickIntro").textContent = txt("bt_pick_intro");
+        el("btPickScan").textContent = txt("bt_pick_scan");
+        el("btPickCancel").textContent = txt("bt_mac_cancel");
+        list.innerHTML = "";
+        function close() { modal.classList.remove("show"); modal.onclick = null; }
+        el("btPickCancel").onclick = close;
+        modal.onclick = function (e) { if (e.target === modal) close(); };
+        el("btPickScan").onclick = function () { close(); connect(null); };
+        var getter = navigator.bluetooth.getDevices ? navigator.bluetooth.getDevices() : Promise.resolve([]);
+        getter.catch(function () { return []; }).then(function (devs) {
+            if (!devs.length) { list.innerHTML = '<p class="bt-pick-empty">' + esc(txt("bt_pick_none")) + '</p>'; return; }
+            devs.forEach(function (d) {
+                var b = document.createElement("button");
+                b.type = "button"; b.className = "bt-cube";
+                b.innerHTML = '<span class="bt-icon" aria-hidden="true">🧊</span><span>' + esc(d.name || "Smart cube") +
+                    '<small>' + esc(txt("bt_pick_known")) + '</small></span><span class="go">' + esc(txt("bt_pick_go")) + '</span>';
+                b.onclick = function () { close(); connect(d); };
+                list.appendChild(b);
+            });
+        });
+        modal.classList.add("show");
+    }
+
+    function connect(knownDevice) {
+        if (!supported()) return;
+        // Kayıtlı küp seçildiyse kütüphanenin cihaz seçme çağrısını bir kereliğine o küpe yönlendir
+        var bt = navigator.bluetooth, origRequest = bt.requestDevice;
+        if (knownDevice) bt.requestDevice = function () { bt.requestDevice = origRequest; return Promise.resolve(knownDevice); };
         el("btConnect").disabled = true;
         connecting = true; renderBar();
         loadLib().then(function () {
-            return window.GanBT.connectGanCube(macProvider);
+            return window.GanBT.connectSmartCube(macProvider);
         }).then(function (c) {
             conn = c; connecting = false;
             gotEvent = false;
@@ -290,7 +349,8 @@
                     }
                 } else if (ev.type === "DISCONNECT") { dropConnection(); }
             });
-            c.sendCubeCommand({ type: "REQUEST_FACELETS" });
+            if (!c.capabilities || c.capabilities.facelets) c.sendCommand({ type: "REQUEST_FACELETS" }).catch(function () {});
+            else { model = solvedModel(); modelKnown = false; }
             setTimeout(function () {
                 if (conn === c && !gotEvent) {
                     el("btStatus").textContent = txt("bt_no_data");
@@ -302,6 +362,7 @@
             renderBar();
             window.btOnNewCase();
         }).catch(function (err) {
+            if (bt.requestDevice !== origRequest) bt.requestDevice = origRequest;
             el("btConnect").disabled = false;
             conn = null; connecting = false;
             renderBar();
@@ -334,7 +395,7 @@
     function init() {
         if (inited || !el("btBar")) return;
         inited = true;
-        el("btConnect").addEventListener("click", connect);
+        el("btConnect").addEventListener("click", openPicker);
         el("btDisconnect").addEventListener("click", disconnect);
         el("btReset").addEventListener("click", markSolved);
         renderBar();

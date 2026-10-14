@@ -31,7 +31,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261020">
+<link rel="stylesheet" href="/styles/common.css?v=20261022">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -265,6 +265,19 @@ html[dir="rtl"] .bt-way ol { padding-left: 0; padding-right: 20px; }
     font: 800 18px "JetBrains Mono", monospace; letter-spacing: 1px; text-transform: uppercase;
     border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text);
 }
+.bt-pick-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 12px; }
+.bt-cube {
+    display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px; cursor: pointer; text-align: left;
+    border-radius: 14px; border: var(--card-bw) solid var(--ink); background: var(--surface-soft); color: var(--text);
+    font: 800 15px "Inter", sans-serif; box-shadow: var(--shadow-sm); transition: transform .12s, box-shadow .12s;
+}
+.bt-cube:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.bt-cube .bt-icon { width: 34px; height: 34px; font-size: 17px; }
+.bt-cube small { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-soft); }
+.bt-cube .go { margin-left: auto; color: var(--cube-blue); font-size: 13px; }
+html[dir="rtl"] .bt-cube { text-align: right; } html[dir="rtl"] .bt-cube .go { margin-left: 0; margin-right: auto; }
+.bt-scan { width: 100%; padding: 12px; font-size: 14px !important; }
+.bt-pick-empty { font-size: 13px; color: var(--text-soft); margin: 0 0 12px; }
 .bt-err { min-height: 18px; font-size: 12.5px; font-weight: 700; color: var(--cube-red); }
 .bt-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
 .mode-card .timer-area.running .timer { display: none; }
@@ -510,6 +523,16 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 </div>
 </div>
 
+<div class="bt-modal" id="btPick" role="dialog" aria-modal="true" aria-labelledby="btPickTitle">
+    <div class="bt-dialog">
+        <h3 id="btPickTitle"></h3>
+        <p id="btPickIntro"></p>
+        <div class="bt-pick-list" id="btPickList"></div>
+        <button class="btn-sm btn-bt bt-scan" id="btPickScan" type="button"></button>
+        <div class="bt-dialog-actions"><button class="btn-sm" id="btPickCancel" type="button"></button></div>
+    </div>
+</div>
+
 <div class="bt-modal" id="btModal" role="dialog" aria-modal="true" aria-labelledby="btMacTitle">
     <div class="bt-dialog">
         <h3 id="btMacTitle"></h3>
@@ -543,9 +566,9 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261020"></script>
-<script src="/js/common.js?v=20261020"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261020"></script>
+<script src="/js/i18n.js?v=20261022"></script>
+<script src="/js/common.js?v=20261022"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261022"></script>
 
 <script>
 /* ============================================================
@@ -655,7 +678,7 @@ function loadAll() {
     SETS.forEach(function (s) { files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261020").then(function (r) {
+        return fetch(BASE + f + "?v=20261022").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
