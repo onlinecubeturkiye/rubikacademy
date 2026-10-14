@@ -6001,12 +6001,12 @@ alg5: {
 
         /* İçerikler/Algoritmalar/Yazdır — tek sayfalık A4 algoritma kağıtları (PAGE_ID = "yazdir") */
         yazdir: {
-            tr: { back_btn: "← Geri Dön", page_title: "Yazdırılabilir Algoritma Kağıtları", intro: "OLL, PLL ve CLL için tek sayfalık A4 çıktı. Yazdır penceresinde \"PDF olarak kaydet\"i seçersen PDF dosyası alırsın.", cases: "{n} case", sheet_sub: "Sarı üstte, yeşil önde tut." },
-            en: { back_btn: "← Go Back", page_title: "Printable Algorithm Sheets", intro: "One-page A4 sheets for OLL, PLL and CLL. Choose \"Save as PDF\" in the print dialog to get a PDF file.", cases: "{n} cases", sheet_sub: "Hold yellow on top, green in front." },
-            fr: { back_btn: "← Retour", page_title: "Fiches d'algorithmes à imprimer", intro: "Fiches A4 d'une page pour OLL, PLL et CLL. Choisis « Enregistrer au format PDF » dans la fenêtre d'impression pour obtenir un PDF.", cases: "{n} cas", sheet_sub: "Jaune en haut, vert devant." },
-            ru: { back_btn: "← Назад", page_title: "Листы алгоритмов для печати", intro: "Одностраничные листы A4 для OLL, PLL и CLL. Выбери «Сохранить как PDF» в окне печати, чтобы получить PDF.", cases: "{n} случаев", sheet_sub: "Жёлтый сверху, зелёный спереди." },
-            de: { back_btn: "← Zurück", page_title: "Druckbare Algorithmus-Blätter", intro: "Einseitige A4-Blätter für OLL, PLL und CLL. Wähle im Druckdialog „Als PDF speichern“, um eine PDF-Datei zu erhalten.", cases: "{n} Fälle", sheet_sub: "Gelb oben, Grün vorne halten." },
-            ar: { back_btn: "← رجوع", page_title: "أوراق خوارزميات للطباعة", intro: "أوراق A4 من صفحة واحدة لـ OLL وPLL وCLL. اختر \"حفظ بتنسيق PDF\" في نافذة الطباعة للحصول على ملف PDF.", cases: "{n} حالة", sheet_sub: "الأصفر للأعلى والأخضر للأمام." }
+            tr: { back_btn: "← Geri Dön", page_title: "Yazdırılabilir Algoritma Kağıtları", intro: "3x3, 2x2, Pyraminx ve Skewb algoritmalarının A4 çıktısı. Yazdır penceresinde \"PDF olarak kaydet\"i seçersen PDF dosyası alırsın.", cases: "{n} case", sheet_sub: "Sarı üstte, yeşil önde tut." },
+            en: { back_btn: "← Go Back", page_title: "Printable Algorithm Sheets", intro: "A4 sheets for all 3x3, 2x2, Pyraminx and Skewb algorithms. Choose \"Save as PDF\" in the print dialog to get a PDF file.", cases: "{n} cases", sheet_sub: "Hold yellow on top, green in front." },
+            fr: { back_btn: "← Retour", page_title: "Fiches d'algorithmes à imprimer", intro: "Fiches A4 pour tous les algorithmes 3x3, 2x2, Pyraminx et Skewb. Choisis « Enregistrer au format PDF » dans la fenêtre d'impression pour obtenir un PDF.", cases: "{n} cas", sheet_sub: "Jaune en haut, vert devant." },
+            ru: { back_btn: "← Назад", page_title: "Листы алгоритмов для печати", intro: "Листы A4 со всеми алгоритмами 3x3, 2x2, Pyraminx и Skewb. Выбери «Сохранить как PDF» в окне печати, чтобы получить PDF.", cases: "{n} случаев", sheet_sub: "Жёлтый сверху, зелёный спереди." },
+            de: { back_btn: "← Zurück", page_title: "Druckbare Algorithmus-Blätter", intro: "A4-Blätter für alle 3x3-, 2x2-, Pyraminx- und Skewb-Algorithmen. Wähle im Druckdialog „Als PDF speichern“, um eine PDF-Datei zu erhalten.", cases: "{n} Fälle", sheet_sub: "Gelb oben, Grün vorne halten." },
+            ar: { back_btn: "← رجوع", page_title: "أوراق خوارزميات للطباعة", intro: "أوراق A4 لكل خوارزميات 3x3 و2x2 والبيرامينكس والسكيوب. اختر \"حفظ بتنسيق PDF\" في نافذة الطباعة للحصول على ملف PDF.", cases: "{n} حالة", sheet_sub: "الأصفر للأعلى والأخضر للأمام." }
         },
         /* İçerikler/SSS — sıkça sorulan sorular (PAGE_ID = "sss") */
         sss: {
