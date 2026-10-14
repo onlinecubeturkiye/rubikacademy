@@ -14,13 +14,13 @@
   })();
 </script>
 
-<title>Rubik Academy - Skewb Nasıl Çözülür? (Başlangıç Yöntemi)</title>
+<title>Rubik Academy - Skewb Algoritmaları (Sarah Beginner, Intermediate, Advanced)</title>
 <link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
 
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/skewb">
-<meta name="description" content="Skewb'i 4 adımda çöz: ilk katman, merkezler ve üst köşeler. Tek algoritma (Sledgehammer), diyagramlı ve simülasyonla doğrulanmış.">
-<meta property="og:title" content="Skewb Nasıl Çözülür? — Rubik Academy">
-<meta property="og:description" content="Skewb başlangıç yöntemi: 4 adım, tek algoritma.">
+<meta name="description" content="Skewb Sarah's Beginner, Intermediate ve Advanced algoritmaları: diyagramlı, simülasyonla doğrulanmış.">
+<meta property="og:title" content="Rubik Academy - Skewb Algoritmaları (Sarah Beginner, Intermediate, Advanced)">
+<meta property="og:description" content="Skewb Sarah's Beginner, Intermediate ve Advanced algoritmaları: diyagramlı, simülasyonla doğrulanmış.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/skewb">
 <meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
@@ -31,68 +31,258 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261025">
+<link rel="stylesheet" href="/styles/common.css?v=20261026">
 
 <style>
-.wrap { max-width: 980px; margin: 0 auto; }
-.intro { text-align: center; margin: 0 auto 28px; max-width: 760px; }
-.intro .badge { margin-bottom: 14px; }
-.intro h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -1.5px; font-weight: 900; color: var(--text); margin-bottom: 14px; }
-.intro p { color: var(--text-soft); font-size: 16px; line-height: 1.7; }
-.box { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 24px 26px; margin-bottom: 26px; }
-.toc strong { display: block; font-family: var(--font-display); font-size: 17px; margin-bottom: 12px; color: var(--text); }
-.toc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.toc-chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px 7px 7px; border-radius: 12px; border: var(--card-bw) solid var(--card-border); background: var(--surface-soft); font-size: 13px; font-weight: 800; color: var(--text); transition: transform .12s, box-shadow .12s; }
-.toc-chip:hover { transform: translate(-1px,-1px); box-shadow: var(--shadow-sm); }
-.toc-n { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; background: var(--cube-yellow); color: #17171f; font-size: 12px; font-weight: 900; border: var(--card-bw) solid var(--ink); }
-.step { scroll-margin-top: 90px; }
-.step h2 { font-size: 24px; font-weight: 800; letter-spacing: -.4px; color: var(--text); margin-bottom: 12px; }
-.step p { color: var(--text-soft); font-size: 15px; line-height: 1.75; margin-bottom: 12px; }
-.step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.step-head h2 { margin: 0; }
-.step-num { flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-family: var(--font-display); font-size: 21px; font-weight: 900; border: var(--card-bw) solid var(--ink); color: #fff; }
-.step-num.red { background: var(--cube-red); } .step-num.orange { background: var(--cube-orange); }
-.step-num.yellow { background: var(--cube-yellow); color: #17171f; } .step-num.green { background: var(--cube-green); } .step-num.blue { background: var(--cube-blue); }
-.alg { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 15px; font-weight: 800; color: #17171f; background: var(--cube-yellow); border: var(--card-bw) solid var(--ink); border-radius: 10px; padding: 4px 10px; margin: 2px 0; box-shadow: 2px 2px 0 var(--ink); white-space: nowrap; }
-.alg-rows p { margin-bottom: 8px; }
-.figs { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin: 16px 0 14px; }
-.fig { margin: 0; flex: 0 1 190px; text-align: center; }
-.fig-img { min-height: 120px; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 16px; background: var(--surface-soft); border: var(--card-bw) solid var(--border); }
-.fig-img svg { max-width: 100%; height: auto; }
-.fig-img.ll svg { width: 120px; height: 120px; }
-.fig figcaption { margin-top: 8px; font-size: 12.5px; font-weight: 700; color: var(--text-soft); line-height: 1.45; }
-.moves { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 16px 0 12px; }
-.move { text-align: center; padding: 8px 4px; border-radius: 14px; background: var(--surface-soft); border: var(--card-bw) solid var(--border); }
-.move-img svg { width: 100%; max-width: 104px; height: auto; }
-.move b { display: block; font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--text); }
-.move small { font-size: 11px; font-weight: 700; color: var(--text-soft); }
-.muted { font-size: 13.5px !important; }
-.warn { background: var(--tint-red); border: var(--card-bw) solid var(--card-border); border-radius: 12px; padding: 10px 14px; color: var(--text) !important; font-weight: 700; }
-.done { text-align: center; background: var(--tint-green); }
-.done h2 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
-.done p { color: var(--text-soft); margin-bottom: 16px; }
-.next-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-.next-link { padding: 11px 16px; border-radius: 13px; background: var(--surface); border: var(--card-bw) solid var(--ink); box-shadow: var(--shadow-sm); font-weight: 800; font-size: 14px; color: var(--text); transition: transform .12s, box-shadow .12s; }
-.next-link:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
-html.dark-mode .fig-img, html.dark-mode .move { background: #e9e4da; border-color: #3a3d54; }
-html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
-@media (max-width: 760px) { .moves { grid-template-columns: repeat(4, 1fr); } }
-@media (max-width: 520px) {
-  .box { padding: 18px 16px; }
-  .moves { grid-template-columns: repeat(3, 1fr); }
-  .fig { flex-basis: 44%; }
-  .step h2 { font-size: 20px; }
-  .alg { font-size: 14px; white-space: normal; }
+.hero {
+    max-width: 1250px;
+    min-height: 220px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 45px 65px;
+    background: var(--tint-purple);
+    border: var(--card-bw) solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
 }
 
-.moves.m3 { grid-template-columns: repeat(3, 1fr); max-width: 520px; margin-left: auto; margin-right: auto; }
-.moves.m3 .move-img svg { max-width: 130px; }
-.done h2 { font-size: 22px; }
-.fig { flex-basis: 215px; }
-.fig-img svg { max-width: 190px; }
-@media (max-width: 520px) { .alg { white-space: normal; } }
-.sledge { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0 6px; padding: 12px 14px; border-radius: 14px; background: var(--tint-yellow); border: var(--card-bw) solid var(--border); }
-.sledge b { font-family: var(--font-display); font-size: 17px; color: var(--text); }
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    right: -180px;
+    top: -180px;
+}
+
+.hero-text { position: relative; z-index: 3; max-width: 700px; }
+
+.hero .badge { color: var(--primary-dark); }
+
+.hero h1 {
+    font-size: clamp(36px, 4.5vw, 54px);
+    line-height: 1;
+    letter-spacing: -2.5px;
+    font-weight: 950;
+    margin-bottom: 14px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary-dark); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 560px;
+}
+
+/* CASE GRID */
+.subsets-wrap { max-width: 1250px; margin: 0 auto; }
+.subset-block { margin-bottom: 48px; }
+
+.subset-heading {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding-left: 14px;
+    border-left: 5px solid var(--primary);
+}
+
+.case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media(max-width: 1000px) { .case-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(max-width: 700px) { .case-grid { grid-template-columns: 1fr; } }
+
+.case-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.case-card:hover {
+    transform: translateY(-4px);
+    border-color: #dcbb5c;
+    box-shadow: var(--shadow-hover);
+}
+
+.case-card:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ÖĞRENME DURUMLARI */
+.case-card.state-learning {
+    background: #fff8d6;
+    border-color: #f2c94c;
+}
+.case-card.state-known {
+    background: #dcfce7;
+    border-color: #22c55e;
+}
+.case-card.state-learning:hover { border-color: #e0b12a; box-shadow: var(--shadow-hover); }
+.case-card.state-known:hover { border-color: #16a34a; box-shadow: var(--shadow-hover); }
+
+html.dark-mode .case-card.state-learning {
+    background: #3a3212;
+    border-color: #b8901f;
+}
+html.dark-mode .case-card.state-known {
+    background: #123524;
+    border-color: #22a35a;
+}
+
+.case-status {
+    font-size: 11px;
+    font-weight: 800;
+    margin-top: 8px;
+    display: none;
+}
+.case-card.state-learning .case-status { display: block; color: #a16207; }
+.case-card.state-known .case-status { display: block; color: #15803d; }
+html.dark-mode .case-card.state-learning .case-status { color: #facc15; }
+html.dark-mode .case-card.state-known .case-status { color: #4ade80; }
+
+/* İLERLEME ÖZETİ */
+.progress-summary {
+    max-width: 1250px;
+    margin: 0 auto 28px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    font-weight: 800;
+}
+.progress-summary span {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    color: var(--text);
+}
+
+.case-diagram {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    background: var(--diagram-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+.case-diagram svg { width: 62px; height: 62px; }
+
+.case-body { flex: 1; min-width: 0; }
+
+.case-name {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+}
+
+.case-alg {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--primary-dark);
+    font-weight: 600;
+    overflow-wrap: break-word;
+}
+
+.case-alts {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.case-alt-line {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-soft);
+    overflow-wrap: break-word;
+}
+
+.load-error {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    text-align: center;
+    font-size: 14px;
+}
+
+.bottom {
+    max-width: 1250px;
+    margin: 38px auto 0;
+    padding: 32px;
+    text-align: center;
+    border-radius: 25px;
+    background: var(--bottom-bg);
+    border: 1px solid #d5eafa;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .bottom { background: var(--surface); border-color: var(--border); }
+
+.bottom h3 { color: #18578c; font-size: 21px; margin-bottom: 7px; }
+html.dark-mode .bottom h3 { color: #60a5fa; }
+
+@media(max-width: 1000px) { .hero { padding: 40px; background: var(--tint-purple); border: var(--card-bw) solid var(--hero-border); } }
+@media(max-width: 700px) {
+    .hero { min-height: auto; padding: 34px 24px; border-radius: 27px; background: var(--tint-purple); border: var(--card-bw) solid var(--hero-border); }
+    .hero h1 { font-size: 38px; }
+    .hero p { font-size: 13px; }
+    .subset-heading { font-size: 19px; }
+}
+
+/* SET SEKMELERİ + NOTASYON */
+.set-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0 auto 14px; }
+.set-tab {
+    border: var(--card-bw) solid var(--ink); border-radius: 14px; padding: 10px 18px; cursor: pointer;
+    font: 800 15px "Inter", sans-serif; background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm);
+    transition: transform .12s, box-shadow .12s;
+}
+.set-tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.set-tab.active { background: var(--cube-yellow); color: #17171f; }
+.set-desc { max-width: 760px; margin: 0 auto 22px; text-align: center; font-size: 14.5px; color: var(--text-soft); line-height: 1.6; }
+.nota-box {
+    max-width: 900px; margin: 0 auto 26px; padding: 18px 20px; border-radius: 20px;
+    border: var(--card-bw) solid var(--card-border); background: var(--surface); box-shadow: var(--shadow);
+}
+.nota-box h2 { font-family: var(--font-display); font-size: 20px; margin: 0 0 10px; color: var(--text); }
+.nota-moves { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 10px; }
+.nota-move { text-align: center; padding: 6px 8px 8px; border-radius: 14px; background: var(--surface-soft); border: var(--card-bw) solid var(--border); width: 120px; }
+.nota-move svg { width: 100%; height: auto; max-width: 104px; }
+.nota-move b { display: block; font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--text); }
+.nota-move small { font-size: 11px; font-weight: 700; color: var(--text-soft); }
+.nota-box p { font-size: 13.5px; color: var(--text-soft); line-height: 1.6; margin: 6px 0 0; }
+.case-diagram svg { width: 96px; height: 96px; }
+@media (max-width: 520px) { .nota-move { width: 74px; padding: 4px; } .nota-move small { font-size: 10px; } .set-tab { padding: 8px 12px; font-size: 14px; } }
 </style>
 
 <!-- Google tag (gtag.js) -->
@@ -116,6 +306,7 @@ html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
     </a>
 
     <div class="nav-right">
+
         <nav class="nav-links">
             <a href="/" data-i18n="navHome">Ana Sayfa</a>
             <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
@@ -130,83 +321,212 @@ html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
         </div>
 
         <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
     </div>
 </header>
 
 <div class="page">
-<div class="wrap">
 
 <nav class="nav-bar">
     <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
 </nav>
 
-<section class="intro">
-    <div class="badge"><i></i><span data-i18n="badge">SKEWB · BAŞLANGIÇ</span></div>
-    <h1 data-i18n="title">Skewb Nasıl Çözülür?</h1>
-    <p data-i18n="hero_p">Skewb'i 4 adımda çözmeyi öğren. Tek bir algoritma, Sledgehammer, neredeyse her şeyi yapıyor; her adım skewb simülasyonunda binlerce karıştırmayla test edildi.</p>
-</section>
-<section class="box step">
-    <h2 data-i18n="know_title">Skewb'i tanı</h2>
-    <p data-i18n="know_p1">Skewb'in 8 köşesi ve 6 merkezi (kare parçalar) vardır. Her hamle, küpün yarısını bir köşenin etrafında 120° çevirir; bu yüzden her hamlede 4 köşe ve 3 merkez hareket eder.</p>
-    <p data-i18n="know_p2">Şemalarda küp açılmış hâlde gösterilir: ortada üst yüz, altında ön yüz, en altta alt yüz; sol ve sağ kollar sol ve sağ yüzler, en üstteki de arka yüzdür. Beyazı alta, sarıyı üste koyacağız. Gri parçalar o adımda önemsizdir.</p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-2.3 -2.3 4.6 4.6" width="170" height="170" xmlns="http://www.w3.org/2000/svg"><polygon points="0.779,-1.450 0.779,-0.550 -0.779,-0.550 -0.779,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.674,-1.000 -0.895,-0.550 -0.895,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.000,-0.033 -0.779,-0.483 0.779,-0.483" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.703,-0.950 -0.924,-0.500 -1.703,-0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.029,0.017 -0.808,-0.433 -0.029,0.917" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.029,0.017 0.029,0.917 0.808,-0.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div></figure></div>
-</section>
-<section class="box step">
-    <h2 data-i18n="not_title">Notasyon</h2>
-    <div class="moves m3"><div class="move"><div class="move-img" dir="ltr"><svg viewBox="-2.3 -2.3 4.6 4.6" width="150" height="150" xmlns="http://www.w3.org/2000/svg"><polygon points="0.779,-1.450 0.779,-0.550 -0.779,-0.550 -0.779,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#ffffff" stroke-width="0.035" stroke-linejoin="round" fill-opacity="0.62" stroke="none"/><polygon points="-1.674,-1.000 -0.895,-0.550 -0.895,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.000,-0.033 -0.779,-0.483 0.779,-0.483" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#ffffff" stroke-width="0.035" stroke-linejoin="round" fill-opacity="0.62" stroke="none"/><polygon points="-1.703,-0.950 -0.924,-0.500 -1.703,-0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.029,0.017 -0.808,-0.433 -0.029,0.917" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#ffffff" stroke-width="0.035" stroke-linejoin="round" fill-opacity="0.62" stroke="none"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.029,0.017 0.029,0.917 0.808,-0.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><path d="M0.275,-0.476 A0.55,0.55 0 1 1 -0.542,0.096" fill="none" stroke="#17171f" stroke-width="0.09" stroke-linecap="round"/><polygon points="-0.576,-0.101 -0.660,0.116 -0.423,0.075" fill="#17171f"/></svg></div><b dir="ltr">R</b><small data-i18n="not_R">Sağ-ön-üst köşe</small></div><div class="move"><div class="move-img" dir="ltr"><svg viewBox="-2.3 -2.3 4.6 4.6" width="150" height="150" xmlns="http://www.w3.org/2000/svg"><polygon points="0.779,-1.450 0.779,-0.550 -0.779,-0.550 -0.779,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.674,-1.000 -0.895,-0.550 -0.895,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#ffffff" stroke-width="0.035" stroke-linejoin="round" fill-opacity="0.62" stroke="none"/><polygon points="0.000,-0.033 -0.779,-0.483 0.779,-0.483" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.703,-0.950 -0.924,-0.500 -1.703,-0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#ffffff" stroke-width="0.035" stroke-linejoin="round" fill-opacity="0.62" stroke="none"/><polygon points="-0.029,0.017 -0.808,-0.433 -0.029,0.917" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#ffffff" stroke-width="0.035" stroke-linejoin="round" fill-opacity="0.62" stroke="none"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#ffffff" stroke-width="0.035" stroke-linejoin="round" fill-opacity="0.62" stroke="none"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#ffffff" stroke-width="0.035" stroke-linejoin="round" fill-opacity="0.62" stroke="none"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#ffffff" stroke-width="0.035" stroke-linejoin="round" fill-opacity="0.62" stroke="none"/><polygon points="0.029,0.017 0.029,0.917 0.808,-0.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><path d="M-2.208,-0.725 A0.55,0.55 0 1 1 -1.182,-1.000" fill="none" stroke="#17171f" stroke-width="0.09" stroke-linecap="round"/><polygon points="-1.182,-0.800 -1.062,-1.000 -1.302,-1.000" fill="#17171f"/></svg></div><b dir="ltr">L</b><small data-i18n="not_L">Sol-ön-üst köşe</small></div><div class="move"><div class="move-img" dir="ltr"><svg viewBox="-2.3 -2.3 4.6 4.6" width="150" height="150" xmlns="http://www.w3.org/2000/svg"><polygon points="0.779,-1.450 0.779,-0.550 -0.779,-0.550 -0.779,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.674,-1.000 -0.895,-0.550 -0.895,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.000,-0.033 -0.779,-0.483 0.779,-0.483" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.703,-0.950 -0.924,-0.500 -1.703,-0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.029,0.017 -0.808,-0.433 -0.029,0.917" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.029,0.017 0.029,0.917 0.808,-0.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><path d="M-0.940,-1.592 A1.0,1.0 0 0 1 0.940,-1.592" fill="none" stroke="#17171f" stroke-width="0.09" stroke-linecap="round"/><polygon points="1.008,-1.404 1.052,-1.633 0.827,-1.551" fill="#17171f"/></svg></div><b dir="ltr">y</b><small data-i18n="not_y">Tüm küpü çevir</small></div></div>
-    <p class="muted" data-i18n="not_p">R ve L, önündeki iki üst köşeden birini ve onunla birlikte küpün yarısını, o köşeye bakarken saat yönünde çevirir. Kesme işareti (') ters yön demektir. y, tüm küpü üstten bakınca saat yönünde 90° döndürmektir; y2 ise 180°. Bu rehber başlangıç rehberlerinde yaygın olan köşe notasyonunu kullanır; yarışma karıştırmalarının notasyonu farklıdır.</p>
-    <div class="sledge"><b data-i18n="sl_title">Sledgehammer (S)</b> <code class="alg" dir="ltr">R' L R L'</code></div>
-    <p data-i18n="sl_p">Bu rehberin tek algoritması. Alt katmanı hiç bozmaz; üst köşeleri yerlerinde döndürür ve merkezlerin yerini değiştirir. Aşağıda S yazdığımızda bunu kastediyoruz.</p>
-</section>
-<section class="box step">
-    <div class="step-head"><span class="step-num red">1</span><h2 data-i18n="s1_title">İlk katman (beyaz)</h2></div>
-    <p data-i18n="s1_p1">Beyaz merkezi alta al. Şimdi 4 beyaz köşeyi tek tek yerleştir. Köşenin gideceği yeri sağ-ön-alt konuma getir (gerekirse küpü y ile çevir). İlk köşe için herhangi bir beyaz köşe olur; sonrakilerin yan renkleri komşu köşelerle eşleşmeli.</p>
-    <p data-i18n="s1_p2">Aradığın köşe üst katmanda ya sol-önde ya da sağ-arkada durur:</p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.1 -0.1 6.2 8.2" width="150" height="198" xmlns="http://www.w3.org/2000/svg"><polygon points="3.000,2.140 3.860,3.000 3.000,3.860 2.140,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,2.047 2.907,2.047 2.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,3.953 2.907,3.953 2.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,2.047 3.093,2.047 3.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,3.953 3.093,3.953 3.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,7.860 3.860,7.000 3.000,6.140 2.140,7.000" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,7.953 2.907,7.953 2.047,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,6.047 2.907,6.047 2.047,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,7.953 3.093,7.953 3.953,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,6.047 3.093,6.047 3.953,6.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,5.860 3.860,5.000 3.000,4.140 2.140,5.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,5.953 2.907,5.953 2.047,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,4.047 2.907,4.047 2.047,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,5.953 3.093,5.953 3.953,5.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,4.047 3.093,4.047 3.953,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,0.140 3.860,1.000 3.000,1.860 2.140,1.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,0.047 2.907,0.047 2.047,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,1.953 2.907,1.953 2.047,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,0.047 3.093,0.047 3.953,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,1.953 3.093,1.953 3.953,1.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.000,2.140 4.140,3.000 5.000,3.860 5.860,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,2.047 5.093,2.047 5.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,3.953 5.093,3.953 5.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,2.047 4.907,2.047 4.047,2.907" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,3.953 4.907,3.953 4.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.000,2.140 1.860,3.000 1.000,3.860 0.140,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,2.047 0.907,2.047 0.047,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,3.953 0.907,3.953 0.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,2.047 1.093,2.047 1.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,3.953 1.093,3.953 1.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s1_c1">Sağ-arkada, beyaz arkaya bakıyor: R</figcaption></figure><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.1 -0.1 6.2 8.2" width="150" height="198" xmlns="http://www.w3.org/2000/svg"><polygon points="3.000,2.140 3.860,3.000 3.000,3.860 2.140,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,2.047 2.907,2.047 2.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,3.953 2.907,3.953 2.047,3.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,2.047 3.093,2.047 3.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,3.953 3.093,3.953 3.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,7.860 3.860,7.000 3.000,6.140 2.140,7.000" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,7.953 2.907,7.953 2.047,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,6.047 2.907,6.047 2.047,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,7.953 3.093,7.953 3.953,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,6.047 3.093,6.047 3.953,6.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,5.860 3.860,5.000 3.000,4.140 2.140,5.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,5.953 2.907,5.953 2.047,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,4.047 2.907,4.047 2.047,4.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,5.953 3.093,5.953 3.953,5.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,4.047 3.093,4.047 3.953,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,0.140 3.860,1.000 3.000,1.860 2.140,1.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,0.047 2.907,0.047 2.047,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,1.953 2.907,1.953 2.047,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,0.047 3.093,0.047 3.953,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,1.953 3.093,1.953 3.953,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.000,2.140 4.140,3.000 5.000,3.860 5.860,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,2.047 5.093,2.047 5.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,3.953 5.093,3.953 5.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,2.047 4.907,2.047 4.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,3.953 4.907,3.953 4.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.000,2.140 1.860,3.000 1.000,3.860 0.140,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,2.047 0.907,2.047 0.047,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,3.953 0.907,3.953 0.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,2.047 1.093,2.047 1.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,3.953 1.093,3.953 1.953,3.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s1_c2">Sol-önde, beyaz sola bakıyor: R'</figcaption></figure><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.1 -0.1 6.2 8.2" width="150" height="198" xmlns="http://www.w3.org/2000/svg"><polygon points="3.000,2.140 3.860,3.000 3.000,3.860 2.140,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,2.047 2.907,2.047 2.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,3.953 2.907,3.953 2.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,2.047 3.093,2.047 3.953,2.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,3.953 3.093,3.953 3.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,7.860 3.860,7.000 3.000,6.140 2.140,7.000" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,7.953 2.907,7.953 2.047,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,6.047 2.907,6.047 2.047,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,7.953 3.093,7.953 3.953,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,6.047 3.093,6.047 3.953,6.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,5.860 3.860,5.000 3.000,4.140 2.140,5.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,5.953 2.907,5.953 2.047,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,4.047 2.907,4.047 2.047,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,5.953 3.093,5.953 3.953,5.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,4.047 3.093,4.047 3.953,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,0.140 3.860,1.000 3.000,1.860 2.140,1.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,0.047 2.907,0.047 2.047,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,1.953 2.907,1.953 2.047,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,0.047 3.093,0.047 3.953,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,1.953 3.093,1.953 3.953,1.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.000,2.140 4.140,3.000 5.000,3.860 5.860,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,2.047 5.093,2.047 5.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,3.953 5.093,3.953 5.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,2.047 4.907,2.047 4.047,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,3.953 4.907,3.953 4.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.000,2.140 1.860,3.000 1.000,3.860 0.140,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,2.047 0.907,2.047 0.047,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,3.953 0.907,3.953 0.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,2.047 1.093,2.047 1.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,3.953 1.093,3.953 1.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s1_c3">Beyaz başka yöne bakıyor: S</figcaption></figure></div>
-    <p data-i18n="s1_p3">Beyaz başka bir yöne bakıyorsa S yap: alt katman bozulmaz, sadece köşe yerinde döner. Yukarıdaki iki durumdan biri gelene kadar tekrarla (en fazla 2 kez).</p>
-    <p class="muted" data-i18n="s1_p4">Köşe altta ama yanlış yerdeyse onu sağ-ön-alta getir ve R ile üste çıkar.</p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.1 -0.1 6.2 8.2" width="150" height="198" xmlns="http://www.w3.org/2000/svg"><polygon points="3.000,2.140 3.860,3.000 3.000,3.860 2.140,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,2.047 2.907,2.047 2.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,3.953 2.907,3.953 2.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,2.047 3.093,2.047 3.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,3.953 3.093,3.953 3.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,7.860 3.860,7.000 3.000,6.140 2.140,7.000" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,7.953 2.907,7.953 2.047,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,6.047 2.907,6.047 2.047,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,7.953 3.093,7.953 3.953,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,6.047 3.093,6.047 3.953,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,5.860 3.860,5.000 3.000,4.140 2.140,5.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,5.953 2.907,5.953 2.047,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,4.047 2.907,4.047 2.047,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,5.953 3.093,5.953 3.953,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,4.047 3.093,4.047 3.953,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,0.140 3.860,1.000 3.000,1.860 2.140,1.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,0.047 2.907,0.047 2.047,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,1.953 2.907,1.953 2.047,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,0.047 3.093,0.047 3.953,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,1.953 3.093,1.953 3.953,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.000,2.140 4.140,3.000 5.000,3.860 5.860,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,2.047 5.093,2.047 5.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,3.953 5.093,3.953 5.953,3.093" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,2.047 4.907,2.047 4.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,3.953 4.907,3.953 4.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.000,2.140 1.860,3.000 1.000,3.860 0.140,3.000" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,2.047 0.907,2.047 0.047,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,3.953 0.907,3.953 0.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,2.047 1.093,2.047 1.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,3.953 1.093,3.953 1.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s1_cap">İlk katman tamam</figcaption></figure></div>
-</section>
-<section class="box step">
-    <div class="step-head"><span class="step-num orange">2</span><h2 data-i18n="s2_title">Sarı merkezi üste getir</h2></div>
-    <p data-i18n="s2_p">Sarı merkez yanlardaysa küpü y ile çevirerek onu öne al ve S yap. S, öndeki ve üstteki merkezlerin (ve sol ile sağdakilerin) yerini değiştirir.</p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.1 -0.1 6.2 8.2" width="150" height="198" xmlns="http://www.w3.org/2000/svg"><polygon points="3.000,2.140 3.860,3.000 3.000,3.860 2.140,3.000" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,2.047 2.907,2.047 2.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,3.953 2.907,3.953 2.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,2.047 3.093,2.047 3.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,3.953 3.093,3.953 3.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,7.860 3.860,7.000 3.000,6.140 2.140,7.000" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,7.953 2.907,7.953 2.047,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,6.047 2.907,6.047 2.047,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,7.953 3.093,7.953 3.953,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,6.047 3.093,6.047 3.953,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,5.860 3.860,5.000 3.000,4.140 2.140,5.000" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,5.953 2.907,5.953 2.047,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,4.047 2.907,4.047 2.047,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,5.953 3.093,5.953 3.953,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,4.047 3.093,4.047 3.953,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,0.140 3.860,1.000 3.000,1.860 2.140,1.000" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,0.047 2.907,0.047 2.047,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,1.953 2.907,1.953 2.047,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,0.047 3.093,0.047 3.953,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,1.953 3.093,1.953 3.953,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.000,2.140 4.140,3.000 5.000,3.860 5.860,3.000" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,2.047 5.093,2.047 5.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,3.953 5.093,3.953 5.953,3.093" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,2.047 4.907,2.047 4.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,3.953 4.907,3.953 4.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.000,2.140 1.860,3.000 1.000,3.860 0.140,3.000" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,2.047 0.907,2.047 0.047,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,3.953 0.907,3.953 0.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,2.047 1.093,2.047 1.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,3.953 1.093,3.953 1.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s2_cap">Sarı merkez önde: S</figcaption></figure></div>
-</section>
-<section class="box step">
-    <div class="step-head"><span class="step-num green">3</span><h2 data-i18n="s3_title">Yan merkezler</h2></div>
-    <p data-i18n="s3_p1">Bir yan yüzün doğru rengi, o yüzün alt köşelerindeki renktir. Kaç yan merkezin doğru olduğunu say:</p>
-    <p><span data-i18n="s3_a">Biri doğru: doğru merkezi sağa al. Ön merkez sol yüzün rengindeyse:</span><br><code class="alg" dir="ltr">S y S y S</code></p>
-    <p><span data-i18n="s3_b">Ön merkez arka yüzün rengindeyse küpü 180° çevir; doğru merkez solda, ön merkez sağ yüzün renginde olur. Uygula:</span><br><code class="alg" dir="ltr">S y' S y' S</code></p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.1 -0.1 6.2 8.2" width="150" height="198" xmlns="http://www.w3.org/2000/svg"><polygon points="3.000,2.140 3.860,3.000 3.000,3.860 2.140,3.000" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,2.047 2.907,2.047 2.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,3.953 2.907,3.953 2.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,2.047 3.093,2.047 3.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,3.953 3.093,3.953 3.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,7.860 3.860,7.000 3.000,6.140 2.140,7.000" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,7.953 2.907,7.953 2.047,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,6.047 2.907,6.047 2.047,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,7.953 3.093,7.953 3.953,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,6.047 3.093,6.047 3.953,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,5.860 3.860,5.000 3.000,4.140 2.140,5.000" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,5.953 2.907,5.953 2.047,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,4.047 2.907,4.047 2.047,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,5.953 3.093,5.953 3.953,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,4.047 3.093,4.047 3.953,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,0.140 3.860,1.000 3.000,1.860 2.140,1.000" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,0.047 2.907,0.047 2.047,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,1.953 2.907,1.953 2.047,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,0.047 3.093,0.047 3.953,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,1.953 3.093,1.953 3.953,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.000,2.140 4.140,3.000 5.000,3.860 5.860,3.000" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,2.047 5.093,2.047 5.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,3.953 5.093,3.953 5.953,3.093" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,2.047 4.907,2.047 4.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,3.953 4.907,3.953 4.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.000,2.140 1.860,3.000 1.000,3.860 0.140,3.000" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,2.047 0.907,2.047 0.047,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,3.953 0.907,3.953 0.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,2.047 1.093,2.047 1.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,3.953 1.093,3.953 1.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s3_ca">Sağ doğru, ön = sol yüzün rengi</figcaption></figure><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.1 -0.1 6.2 8.2" width="150" height="198" xmlns="http://www.w3.org/2000/svg"><polygon points="3.000,2.140 3.860,3.000 3.000,3.860 2.140,3.000" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,2.047 2.907,2.047 2.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,3.953 2.907,3.953 2.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,2.047 3.093,2.047 3.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,3.953 3.093,3.953 3.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,7.860 3.860,7.000 3.000,6.140 2.140,7.000" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,7.953 2.907,7.953 2.047,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,6.047 2.907,6.047 2.047,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,7.953 3.093,7.953 3.953,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,6.047 3.093,6.047 3.953,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,5.860 3.860,5.000 3.000,4.140 2.140,5.000" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,5.953 2.907,5.953 2.047,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,4.047 2.907,4.047 2.047,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,5.953 3.093,5.953 3.953,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,4.047 3.093,4.047 3.953,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,0.140 3.860,1.000 3.000,1.860 2.140,1.000" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,0.047 2.907,0.047 2.047,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,1.953 2.907,1.953 2.047,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,0.047 3.093,0.047 3.953,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,1.953 3.093,1.953 3.953,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.000,2.140 4.140,3.000 5.000,3.860 5.860,3.000" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,2.047 5.093,2.047 5.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,3.953 5.093,3.953 5.953,3.093" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,2.047 4.907,2.047 4.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,3.953 4.907,3.953 4.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.000,2.140 1.860,3.000 1.000,3.860 0.140,3.000" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,2.047 0.907,2.047 0.047,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,3.953 0.907,3.953 0.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,2.047 1.093,2.047 1.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,3.953 1.093,3.953 1.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s3_cb">Sol doğru, ön = sağ yüzün rengi</figcaption></figure><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.1 -0.1 6.2 8.2" width="150" height="198" xmlns="http://www.w3.org/2000/svg"><polygon points="3.000,2.140 3.860,3.000 3.000,3.860 2.140,3.000" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,2.047 2.907,2.047 2.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,3.953 2.907,3.953 2.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,2.047 3.093,2.047 3.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,3.953 3.093,3.953 3.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,7.860 3.860,7.000 3.000,6.140 2.140,7.000" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,7.953 2.907,7.953 2.047,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,6.047 2.907,6.047 2.047,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,7.953 3.093,7.953 3.953,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,6.047 3.093,6.047 3.953,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,5.860 3.860,5.000 3.000,4.140 2.140,5.000" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,5.953 2.907,5.953 2.047,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,4.047 2.907,4.047 2.047,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,5.953 3.093,5.953 3.953,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,4.047 3.093,4.047 3.953,4.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,0.140 3.860,1.000 3.000,1.860 2.140,1.000" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,0.047 2.907,0.047 2.047,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,1.953 2.907,1.953 2.047,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,0.047 3.093,0.047 3.953,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,1.953 3.093,1.953 3.953,1.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.000,2.140 4.140,3.000 5.000,3.860 5.860,3.000" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,2.047 5.093,2.047 5.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,3.953 5.093,3.953 5.953,3.093" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,2.047 4.907,2.047 4.047,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,3.953 4.907,3.953 4.047,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.000,2.140 1.860,3.000 1.000,3.860 0.140,3.000" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,2.047 0.907,2.047 0.047,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,3.953 0.907,3.953 0.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,2.047 1.093,2.047 1.953,2.907" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,3.953 1.093,3.953 1.953,3.093" fill="#5a5d66" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s3_cop">Karşılıklılar yer değiştirmiş</figcaption></figure></div>
-    <p><span data-i18n="s3_op">Hiçbiri doğru değil ve karşılıklı merkezler yer değiştirmişse (ön ile arka, sol ile sağ):</span><br><code class="alg" dir="ltr">S y2 S y2 S</code></p>
-    <p data-i18n="s3_adj">Hiçbiri doğru değil ama karşılıklılar yer değiştirmemişse: herhangi bir tutuşla S y S y S yap. Bir merkez doğru olur; sonra yukarıdaki gibi devam et.</p>
-</section>
-<section class="box step">
-    <div class="step-head"><span class="step-num blue">4</span><h2 data-i18n="s4_title">Üst köşeleri döndür</h2></div>
-    <p data-i18n="s4_p1">Artık sadece üst köşeler ters dönmüş olabilir. Bu adımda S'yi iki kez arka arkaya yap (S S): merkezler ve alt katman bozulmaz.</p>
-    <p data-i18n="s4_pair">Hiçbir köşenin sarısı üstte değilse bir yan yüzde iki sarı yan yana durur. O yüzü sola al ve S S yap.</p>
-    <p data-i18n="s4_diag">İki köşenin sarısı üstteyse (çapraz): onları sağ-ön ve sol-arkaya al. Sol-ön köşenin sarısı öne bakmalı; bakmıyorsa küpü 180° çevir. S S yap; ardından ilk durum gelir.</p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.1 -0.1 6.2 8.2" width="150" height="198" xmlns="http://www.w3.org/2000/svg"><polygon points="3.000,2.140 3.860,3.000 3.000,3.860 2.140,3.000" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,2.047 2.907,2.047 2.047,2.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,3.953 2.907,3.953 2.047,3.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,2.047 3.093,2.047 3.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,3.953 3.093,3.953 3.953,3.093" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,7.860 3.860,7.000 3.000,6.140 2.140,7.000" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,7.953 2.907,7.953 2.047,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,6.047 2.907,6.047 2.047,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,7.953 3.093,7.953 3.953,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,6.047 3.093,6.047 3.953,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,5.860 3.860,5.000 3.000,4.140 2.140,5.000" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,5.953 2.907,5.953 2.047,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,4.047 2.907,4.047 2.047,4.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,5.953 3.093,5.953 3.953,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,4.047 3.093,4.047 3.953,4.907" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,0.140 3.860,1.000 3.000,1.860 2.140,1.000" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,0.047 2.907,0.047 2.047,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,1.953 2.907,1.953 2.047,1.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,0.047 3.093,0.047 3.953,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,1.953 3.093,1.953 3.953,1.093" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.000,2.140 4.140,3.000 5.000,3.860 5.860,3.000" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,2.047 5.093,2.047 5.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,3.953 5.093,3.953 5.953,3.093" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,2.047 4.907,2.047 4.047,2.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,3.953 4.907,3.953 4.047,3.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.000,2.140 1.860,3.000 1.000,3.860 0.140,3.000" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,2.047 0.907,2.047 0.047,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,3.953 0.907,3.953 0.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,2.047 1.093,2.047 1.953,2.907" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,3.953 1.093,3.953 1.953,3.093" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s4_cpair">Sarı çift solda: S S</figcaption></figure><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.1 -0.1 6.2 8.2" width="150" height="198" xmlns="http://www.w3.org/2000/svg"><polygon points="3.000,2.140 3.860,3.000 3.000,3.860 2.140,3.000" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,2.047 2.907,2.047 2.047,2.907" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,3.953 2.907,3.953 2.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,2.047 3.093,2.047 3.953,2.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,3.953 3.093,3.953 3.953,3.093" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,7.860 3.860,7.000 3.000,6.140 2.140,7.000" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,7.953 2.907,7.953 2.047,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,6.047 2.907,6.047 2.047,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,7.953 3.093,7.953 3.953,7.093" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,6.047 3.093,6.047 3.953,6.907" fill="#ffffff" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,5.860 3.860,5.000 3.000,4.140 2.140,5.000" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,5.953 2.907,5.953 2.047,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,4.047 2.907,4.047 2.047,4.907" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,5.953 3.093,5.953 3.953,5.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,4.047 3.093,4.047 3.953,4.907" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.000,0.140 3.860,1.000 3.000,1.860 2.140,1.000" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,0.047 2.907,0.047 2.047,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="2.047,1.953 2.907,1.953 2.047,1.093" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,0.047 3.093,0.047 3.953,0.907" fill="#1e6fe0" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="3.953,1.953 3.093,1.953 3.953,1.093" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.000,2.140 4.140,3.000 5.000,3.860 5.860,3.000" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,2.047 5.093,2.047 5.953,2.907" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="5.953,3.953 5.093,3.953 5.953,3.093" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,2.047 4.907,2.047 4.047,2.907" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="4.047,3.953 4.907,3.953 4.047,3.093" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.000,2.140 1.860,3.000 1.000,3.860 0.140,3.000" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,2.047 0.907,2.047 0.047,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.047,3.953 0.907,3.953 0.047,3.093" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,2.047 1.093,2.047 1.953,2.907" fill="#e53935" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.953,3.953 1.093,3.953 1.953,3.093" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s4_cdiag">Çapraz: S S</figcaption></figure></div>
-</section>
-<section class="box done">
-    <h2 data-i18n="done_title">Tebrikler! 🎉</h2>
-    <p data-i18n="done_p">Skewb'i çözdün. Hızlanmak için videolara göz atabilir ya da diğer algoritmalara geçebilirsin.</p>
-    <div class="next-links">
-        <a href="/icerikler/videolar/skewb" class="next-link">▶ <span data-i18n="next_video">Skewb video eğitimi</span></a>
-        <a href="/icerikler/algoritmalar" class="next-link">📘 <span data-i18n="next_algos">Tüm algoritmalar</span></a>
-    </div>
+<section class="hero reveal">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+<span data-i18n="badge_text">SKEWB · SARAH</span>
+</div>
+<h1><span data-i18n="hero_title1">Skewb</span> <span data-i18n="hero_titleAccent">Algoritmaları</span></h1>
+<p data-i18n="hero_p">Sarah's Beginner, Intermediate ve Advanced setleri. Her case'in diyagramı ve skewb simülasyonunda doğrulanmış algoritması var; kartlara dokunarak öğrendiklerini işaretle.</p>
+</div>
 </section>
 
-</div>
+<section class="nota-box">
+    <h2 data-i18n="not_title">Notasyon (Sarah)</h2>
+    <div class="nota-moves"><div class="nota-move"><div dir="ltr"><svg viewBox="-2.4 -2.5 4.8 4.8" width="130" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="0.779,-1.450 0.779,-0.550 -0.779,-0.550 -0.779,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-1.674,-1.000 -0.895,-0.550 -0.895,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.000,-0.033 -0.779,-0.483 0.779,-0.483" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-1.703,-0.950 -0.924,-0.500 -1.703,-0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.029,0.017 -0.808,-0.433 -0.029,0.917" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.029,0.017 0.029,0.917 0.808,-0.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><path d="M0.104,-0.591 A0.6,0.6 0 1 1 -0.591,-0.104" fill="none" stroke="#fff" stroke-width="0.17" stroke-linecap="round"/><path d="M0.104,-0.591 A0.6,0.6 0 1 1 -0.591,-0.104" fill="none" stroke="#17171f" stroke-width="0.09" stroke-linecap="round"/><polygon points="-0.553,-0.321 -0.721,-0.127 -0.461,-0.081" fill="#17171f"/></svg></div><b dir="ltr">F</b><small data-i18n="not_F">Öndeki köşe</small></div><div class="nota-move"><div dir="ltr"><svg viewBox="-2.4 -2.5 4.8 4.8" width="130" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="0.779,-1.450 0.779,-0.550 -0.779,-0.550 -0.779,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.674,-1.000 -0.895,-0.550 -0.895,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.674,-1.000 -0.895,-0.550 -0.895,-1.450" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.000,-0.033 -0.779,-0.483 0.779,-0.483" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-1.703,-0.950 -0.924,-0.500 -1.703,-0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.703,-0.950 -0.924,-0.500 -1.703,-0.050" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-0.029,0.017 -0.808,-0.433 -0.029,0.917" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.029,0.017 0.029,0.917 0.808,-0.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><path d="M1.190,-0.946 A0.55,0.55 0 1 1 2.007,-0.374" fill="none" stroke="#fff" stroke-width="0.17" stroke-linecap="round"/><path d="M1.190,-0.946 A0.55,0.55 0 1 1 2.007,-0.374" fill="none" stroke="#17171f" stroke-width="0.09" stroke-linecap="round"/><polygon points="1.817,-0.264 2.073,-0.259 1.941,-0.488" fill="#17171f"/></svg></div><b dir="ltr">R</b><small data-i18n="not_R">Sağdaki köşe</small></div><div class="nota-move"><div dir="ltr"><svg viewBox="-2.4 -2.5 4.8 4.8" width="130" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="0.779,-1.450 0.779,-0.550 -0.779,-0.550 -0.779,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.674,-1.000 -0.895,-0.550 -0.895,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="0.000,-0.033 -0.779,-0.483 0.779,-0.483" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.703,-0.950 -0.924,-0.500 -1.703,-0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-0.029,0.017 -0.808,-0.433 -0.029,0.917" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="0.029,0.017 0.029,0.917 0.808,-0.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><path d="M-2.007,-0.374 A0.55,0.55 0 1 1 -1.190,-0.946" fill="none" stroke="#fff" stroke-width="0.17" stroke-linecap="round"/><path d="M-2.007,-0.374 A0.55,0.55 0 1 1 -1.190,-0.946" fill="none" stroke="#17171f" stroke-width="0.09" stroke-linecap="round"/><polygon points="-1.152,-0.729 -1.060,-0.968 -1.320,-0.923" fill="#17171f"/></svg></div><b dir="ltr">L</b><small data-i18n="not_L">Soldaki köşe</small></div><div class="nota-move"><div dir="ltr"><svg viewBox="-2.4 -2.5 4.8 4.8" width="130" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="0.779,-1.450 0.779,-0.550 -0.779,-0.550 -0.779,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.674,-1.000 -0.895,-0.550 -0.895,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.000,-0.033 -0.779,-0.483 0.779,-0.483" fill="#fdd835" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.000,-0.033 -0.779,-0.483 0.779,-0.483" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-1.703,-0.950 -0.924,-0.500 -1.703,-0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="-0.029,0.017 -0.808,-0.433 -0.029,0.917" fill="#16a34a" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="-0.029,0.017 -0.808,-0.433 -0.029,0.917" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.029,0.017 0.029,0.917 0.808,-0.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.04" stroke-linejoin="round"/><polygon points="0.029,0.017 0.029,0.917 0.808,-0.433" fill="#ffffff" stroke-width="0.04" stroke-linejoin="round" fill-opacity="0.65" stroke="none"/><path d="M0.542,-1.996 A0.55,0.55 0 0 0 -0.542,-1.996" fill="none" stroke="#fff" stroke-width="0.17" stroke-linecap="round"/><path d="M0.542,-1.996 A0.55,0.55 0 0 0 -0.542,-1.996" fill="none" stroke="#17171f" stroke-width="0.09" stroke-linecap="round"/><polygon points="-0.580,-1.779 -0.672,-2.018 -0.412,-1.973" fill="#17171f"/></svg></div><b dir="ltr">B</b><small data-i18n="not_B">Arkadaki köşe</small></div></div>
+    <p data-i18n="not_p">Beyaz altta, sarı üstte; bir üst köşe sana bakacak şekilde (çapraz) tut. F, R, L, B sırasıyla öndeki, sağdaki, soldaki ve arkadaki üst köşeyi, köşeye bakarken saat yönünde 120° çevirir; ' ters yön demektir. y, tüm küpü üstten bakınca saat yönünde 90° döndürmektir. S = R' F R F' (Sledgehammer), H = F R' F' R (Hedgeslammer).</p>
+    <p data-i18n="view_note">Diyagramlar üstten bakıştır: sana bakan köşe (F) en altta; kenardaki şeritler yan yüzlerin üst kısmıdır.</p>
+</section>
+
+<div class="set-tabs" id="setTabs"></div>
+<p class="set-desc" id="setDesc"></p>
+
+<!-- İlerleme özeti -->
+<div class="progress-summary" id="progressSummary"></div>
+
+<div class="subsets-wrap" id="subsetsWrap"></div>
+
+<div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.</div>
+
+<section class="bottom reveal">
+<h3 data-i18n="bottom_title">🔷 Pratik zamanı</h3>
+<p data-i18n="bottom_p">Algoritmaları videolarla birleştir ve süreni ölç.</p>
+</section>
+
 </div>
 
 <footer>
     <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
 </footer>
 
-<script>var PAGE_ID = "skewb_rehber";</script>
-<script src="/js/i18n.js?v=20261025"></script>
-<script src="/js/common.js?v=20261025"></script>
+
+<!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
+<script>var PAGE_ID = "skewb_algos";</script>
+<script src="/js/i18n.js?v=20261026"></script>
+<script src="/js/common.js?v=20261026"></script>
+
+<script>
+/* ============================================================
+   SKEWB ALGORİTMA SETLERİ
+   Veri: skewb.json (simülasyonla bulunup doğrulanmış algoritmalar)
+   Diyagramlar sayfada çizilir: geom = etiket çokgenleri, c = renk harfleri
+   Her setin ilerlemesi ayrı localStorage anahtarında tutulur.
+   ============================================================ */
+var PAGE_KEY = "skewb";
+var STATES = ["", "learning", "known"];
+var PROGRESS_TEXT = {
+    tr: { learning: "Öğreniyorum", known: "Biliyorum" },
+    en: { learning: "Learning",    known: "Known" },
+    de: { learning: "Ich lerne",   known: "Kann ich" },
+    fr: { learning: "J'apprends",  known: "Je sais" },
+    ru: { learning: "Учу",         known: "Знаю" },
+    ar: { learning: "أتعلم",       known: "أعرف" }
+};
+var DATA = null, currentSet = null;
+
+function currentLang() { return localStorage.getItem("site-lang") || "tr"; }
+function progressText() { return PROGRESS_TEXT[currentLang()] || PROGRESS_TEXT.tr; }
+function T(key, fallback) {
+    var pages = (window.SITE_I18N && SITE_I18N.pages) || {};
+    var p = pages[PAGE_ID] || {};
+    var d = p[currentLang()] || {};
+    return d[key] || (p.tr && p.tr[key]) || fallback || key;
+}
+function progressKey() { return "algo-progress-" + PAGE_KEY + "-" + currentSet; }
+function loadProgress() {
+    try { var p = JSON.parse(localStorage.getItem(progressKey())); return (p && typeof p === "object") ? p : {}; } catch (e) { return {}; }
+}
+function saveProgress(p) { try { localStorage.setItem(progressKey(), JSON.stringify(p)); } catch (e) {} }
+function stateOfCard(card) {
+    if (card.classList.contains("state-known")) return "known";
+    if (card.classList.contains("state-learning")) return "learning";
+    return "";
+}
+function applyState(card, state) {
+    card.classList.remove("state-learning", "state-known");
+    if (state) card.classList.add("state-" + state);
+    var s = card.querySelector(".case-status");
+    if (s) s.textContent = state ? progressText()[state] : "";
+}
+function updateSummary() {
+    var cards = document.querySelectorAll(".case-card"), learning = 0, known = 0;
+    for (var i = 0; i < cards.length; i++) {
+        var st = stateOfCard(cards[i]);
+        if (st === "learning") learning++;
+        if (st === "known") known++;
+    }
+    var t = progressText();
+    document.getElementById("progressSummary").innerHTML =
+        '<span>🟡 ' + t.learning + ': ' + learning + '</span>' + '<span>🟢 ' + t.known + ': ' + known + ' / ' + cards.length + '</span>';
+}
+function refreshProgressLabels() {
+    var cards = document.querySelectorAll(".case-card");
+    for (var i = 0; i < cards.length; i++) applyState(cards[i], stateOfCard(cards[i]));
+    updateSummary();
+}
+function cycleCard(card) {
+    var name = card.getAttribute("data-case"), p = loadProgress();
+    var next = STATES[(STATES.indexOf(p[name] || "") + 1) % STATES.length];
+    if (next) p[name] = next; else delete p[name];
+    saveProgress(p);
+    applyState(card, next);
+    updateSummary();
+}
+function escapeHtml(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+/* Diyagram: geom.polys[i] çokgenine c[i] rengini ver */
+function caseSvg(c, size) {
+    var g = DATA.geom, v = g.view, out = '<svg viewBox="' + v.join(" ") + '" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg">';
+    var sw = (v[2] / 160).toFixed(3);
+    for (var i = 0; i < g.polys.length; i++) {
+        var pts = g.polys[i].map(function (p) { return p[0] + "," + p[1]; }).join(" ");
+        out += '<polygon points="' + pts + '" fill="' + (DATA.colors[c.charAt(i)] || "#5a5d66") + '" stroke="#17171f" stroke-width="' + sw + '" stroke-linejoin="round"/>';
+    }
+    return out + '</svg>';
+}
+function renderTabs() {
+    var html = "";
+    DATA.sets.forEach(function (s) {
+        html += '<button class="set-tab' + (s.id === currentSet ? " active" : "") + '" data-set="' + s.id + '" data-i18n="set_' + s.id + '">' + escapeHtml(T("set_" + s.id, s.id)) + '</button>';
+    });
+    document.getElementById("setTabs").innerHTML = html;
+    var d = document.getElementById("setDesc");
+    d.setAttribute("data-i18n", "desc_" + currentSet);
+    d.textContent = T("desc_" + currentSet, "");
+}
+function renderSet() {
+    var set = DATA.sets.filter(function (s) { return s.id === currentSet; })[0] || DATA.sets[0];
+    currentSet = set.id;
+    try { localStorage.setItem("algo-set-" + PAGE_KEY, currentSet); } catch (e) {}
+    renderTabs();
+    var progress = loadProgress(), t = progressText(), html = "";
+    set.groups.forEach(function (group) {
+        var key = "subset_" + group.subset;
+        html += '<div class="subset-block"><h2 class="subset-heading" data-i18n="' + key + '">' + escapeHtml(T(key, group.subset)) + '</h2><div class="case-grid">';
+        group.cases.forEach(function (c) {
+            var st = progress[c.name] || "";
+            html += '<div class="case-card' + (st ? " state-" + st : "") + '" data-case="' + escapeHtml(c.name) + '" role="button" tabindex="0">' +
+                '<div class="case-diagram" dir="ltr">' + caseSvg(c.c, 96) + '</div>' +
+                '<div class="case-body"><div class="case-name">' + escapeHtml(c.name) + '</div>' +
+                '<div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>' +
+                '<div class="case-status">' + escapeHtml(st ? t[st] : "") + '</div></div></div>';
+        });
+        html += '</div></div>';
+    });
+    document.getElementById("subsetsWrap").innerHTML = html;
+    updateSummary();
+}
+
+fetch("/icerikler/algoritmalar/skewb.json?v=20261026")
+    .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    .then(function (data) {
+        DATA = data;
+        var saved = null;
+        try { saved = localStorage.getItem("algo-set-" + PAGE_KEY); } catch (e) {}
+        var fromHash = (location.hash || "").replace("#", "");
+        currentSet = [fromHash, saved].filter(function (id) { return id && data.sets.some(function (s) { return s.id === id; }); })[0] || data.sets[0].id;
+        renderSet();
+        var wrap = document.getElementById("subsetsWrap");
+        wrap.addEventListener("click", function (e) {
+            var sel = window.getSelection ? String(window.getSelection()) : "";
+            if (sel.length > 0) return;
+            var card = e.target.closest(".case-card");
+            if (card) cycleCard(card);
+        });
+        wrap.addEventListener("keydown", function (e) {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            var card = e.target.closest(".case-card");
+            if (!card) return;
+            e.preventDefault(); cycleCard(card);
+        });
+        document.getElementById("setTabs").addEventListener("click", function (e) {
+            var b = e.target.closest(".set-tab");
+            if (!b) return;
+            currentSet = b.getAttribute("data-set");
+            history.replaceState(null, "", "#" + currentSet);
+            renderSet();
+        });
+    })
+    .catch(function (err) {
+        document.getElementById("loadError").style.display = "block";
+        console.error("skewb.json yüklenemedi:", err);
+    });
+
+// Dil değişince (common.js applyLanguage sonrası çağırır)
+function onLanguageApplied() { if (DATA) { renderTabs(); refreshProgressLabels(); } }
+</script>
 
 </body>
 </html>

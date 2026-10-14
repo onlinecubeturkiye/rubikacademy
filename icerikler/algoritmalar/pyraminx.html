@@ -14,13 +14,13 @@
   })();
 </script>
 
-<title>Rubik Academy - Pyraminx Nasıl Çözülür? (Başlangıç Yöntemi)</title>
+<title>Rubik Academy - Pyraminx Algoritmaları (L3E, L4E)</title>
 <link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
 
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/pyraminx">
-<meta name="description" content="Pyraminx'i 5 adımda çöz: uçlar, merkezler, alt kenarlar ve son 3 kenar. Sadece 4 kısa algoritma, diyagramlı ve simülasyonla doğrulanmış.">
-<meta property="og:title" content="Pyraminx Nasıl Çözülür? — Rubik Academy">
-<meta property="og:description" content="Pyraminx başlangıç yöntemi: 5 adım, 4 algoritma.">
+<meta name="description" content="Pyraminx Beginner (L3E) ve L4E algoritmaları: diyagramlı, simülasyonla doğrulanmış.">
+<meta property="og:title" content="Rubik Academy - Pyraminx Algoritmaları (L3E, L4E)">
+<meta property="og:description" content="Pyraminx Beginner (L3E) ve L4E algoritmaları: diyagramlı, simülasyonla doğrulanmış.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/pyraminx">
 <meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
@@ -31,66 +31,258 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261025">
+<link rel="stylesheet" href="/styles/common.css?v=20261026">
 
 <style>
-.wrap { max-width: 980px; margin: 0 auto; }
-.intro { text-align: center; margin: 0 auto 28px; max-width: 760px; }
-.intro .badge { margin-bottom: 14px; }
-.intro h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -1.5px; font-weight: 900; color: var(--text); margin-bottom: 14px; }
-.intro p { color: var(--text-soft); font-size: 16px; line-height: 1.7; }
-.box { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 24px 26px; margin-bottom: 26px; }
-.toc strong { display: block; font-family: var(--font-display); font-size: 17px; margin-bottom: 12px; color: var(--text); }
-.toc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.toc-chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px 7px 7px; border-radius: 12px; border: var(--card-bw) solid var(--card-border); background: var(--surface-soft); font-size: 13px; font-weight: 800; color: var(--text); transition: transform .12s, box-shadow .12s; }
-.toc-chip:hover { transform: translate(-1px,-1px); box-shadow: var(--shadow-sm); }
-.toc-n { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; background: var(--cube-yellow); color: #17171f; font-size: 12px; font-weight: 900; border: var(--card-bw) solid var(--ink); }
-.step { scroll-margin-top: 90px; }
-.step h2 { font-size: 24px; font-weight: 800; letter-spacing: -.4px; color: var(--text); margin-bottom: 12px; }
-.step p { color: var(--text-soft); font-size: 15px; line-height: 1.75; margin-bottom: 12px; }
-.step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.step-head h2 { margin: 0; }
-.step-num { flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-family: var(--font-display); font-size: 21px; font-weight: 900; border: var(--card-bw) solid var(--ink); color: #fff; }
-.step-num.red { background: var(--cube-red); } .step-num.orange { background: var(--cube-orange); }
-.step-num.yellow { background: var(--cube-yellow); color: #17171f; } .step-num.green { background: var(--cube-green); } .step-num.blue { background: var(--cube-blue); }
-.alg { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 15px; font-weight: 800; color: #17171f; background: var(--cube-yellow); border: var(--card-bw) solid var(--ink); border-radius: 10px; padding: 4px 10px; margin: 2px 0; box-shadow: 2px 2px 0 var(--ink); white-space: nowrap; }
-.alg-rows p { margin-bottom: 8px; }
-.figs { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin: 16px 0 14px; }
-.fig { margin: 0; flex: 0 1 190px; text-align: center; }
-.fig-img { min-height: 120px; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 16px; background: var(--surface-soft); border: var(--card-bw) solid var(--border); }
-.fig-img svg { max-width: 100%; height: auto; }
-.fig-img.ll svg { width: 120px; height: 120px; }
-.fig figcaption { margin-top: 8px; font-size: 12.5px; font-weight: 700; color: var(--text-soft); line-height: 1.45; }
-.moves { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 16px 0 12px; }
-.move { text-align: center; padding: 8px 4px; border-radius: 14px; background: var(--surface-soft); border: var(--card-bw) solid var(--border); }
-.move-img svg { width: 100%; max-width: 104px; height: auto; }
-.move b { display: block; font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--text); }
-.move small { font-size: 11px; font-weight: 700; color: var(--text-soft); }
-.muted { font-size: 13.5px !important; }
-.warn { background: var(--tint-red); border: var(--card-bw) solid var(--card-border); border-radius: 12px; padding: 10px 14px; color: var(--text) !important; font-weight: 700; }
-.done { text-align: center; background: var(--tint-green); }
-.done h2 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
-.done p { color: var(--text-soft); margin-bottom: 16px; }
-.next-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-.next-link { padding: 11px 16px; border-radius: 13px; background: var(--surface); border: var(--card-bw) solid var(--ink); box-shadow: var(--shadow-sm); font-weight: 800; font-size: 14px; color: var(--text); transition: transform .12s, box-shadow .12s; }
-.next-link:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
-html.dark-mode .fig-img, html.dark-mode .move { background: #e9e4da; border-color: #3a3d54; }
-html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
-@media (max-width: 760px) { .moves { grid-template-columns: repeat(4, 1fr); } }
-@media (max-width: 520px) {
-  .box { padding: 18px 16px; }
-  .moves { grid-template-columns: repeat(3, 1fr); }
-  .fig { flex-basis: 44%; }
-  .step h2 { font-size: 20px; }
-  .alg { font-size: 14px; white-space: normal; }
+.hero {
+    max-width: 1250px;
+    min-height: 220px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 45px 65px;
+    background: var(--tint-purple);
+    border: var(--card-bw) solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
 }
 
-.moves.m3 { grid-template-columns: repeat(3, 1fr); max-width: 520px; margin-left: auto; margin-right: auto; }
-.moves.m3 .move-img svg { max-width: 130px; }
-.done h2 { font-size: 22px; }
-.fig { flex-basis: 215px; }
-.fig-img svg { max-width: 190px; }
-@media (max-width: 520px) { .alg { white-space: normal; } }
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    right: -180px;
+    top: -180px;
+}
+
+.hero-text { position: relative; z-index: 3; max-width: 700px; }
+
+.hero .badge { color: var(--primary-dark); }
+
+.hero h1 {
+    font-size: clamp(36px, 4.5vw, 54px);
+    line-height: 1;
+    letter-spacing: -2.5px;
+    font-weight: 950;
+    margin-bottom: 14px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary-dark); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 560px;
+}
+
+/* CASE GRID */
+.subsets-wrap { max-width: 1250px; margin: 0 auto; }
+.subset-block { margin-bottom: 48px; }
+
+.subset-heading {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding-left: 14px;
+    border-left: 5px solid var(--primary);
+}
+
+.case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media(max-width: 1000px) { .case-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(max-width: 700px) { .case-grid { grid-template-columns: 1fr; } }
+
+.case-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.case-card:hover {
+    transform: translateY(-4px);
+    border-color: #dcbb5c;
+    box-shadow: var(--shadow-hover);
+}
+
+.case-card:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ÖĞRENME DURUMLARI */
+.case-card.state-learning {
+    background: #fff8d6;
+    border-color: #f2c94c;
+}
+.case-card.state-known {
+    background: #dcfce7;
+    border-color: #22c55e;
+}
+.case-card.state-learning:hover { border-color: #e0b12a; box-shadow: var(--shadow-hover); }
+.case-card.state-known:hover { border-color: #16a34a; box-shadow: var(--shadow-hover); }
+
+html.dark-mode .case-card.state-learning {
+    background: #3a3212;
+    border-color: #b8901f;
+}
+html.dark-mode .case-card.state-known {
+    background: #123524;
+    border-color: #22a35a;
+}
+
+.case-status {
+    font-size: 11px;
+    font-weight: 800;
+    margin-top: 8px;
+    display: none;
+}
+.case-card.state-learning .case-status { display: block; color: #a16207; }
+.case-card.state-known .case-status { display: block; color: #15803d; }
+html.dark-mode .case-card.state-learning .case-status { color: #facc15; }
+html.dark-mode .case-card.state-known .case-status { color: #4ade80; }
+
+/* İLERLEME ÖZETİ */
+.progress-summary {
+    max-width: 1250px;
+    margin: 0 auto 28px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    font-weight: 800;
+}
+.progress-summary span {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    color: var(--text);
+}
+
+.case-diagram {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    background: var(--diagram-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+.case-diagram svg { width: 62px; height: 62px; }
+
+.case-body { flex: 1; min-width: 0; }
+
+.case-name {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+}
+
+.case-alg {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--primary-dark);
+    font-weight: 600;
+    overflow-wrap: break-word;
+}
+
+.case-alts {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.case-alt-line {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-soft);
+    overflow-wrap: break-word;
+}
+
+.load-error {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    text-align: center;
+    font-size: 14px;
+}
+
+.bottom {
+    max-width: 1250px;
+    margin: 38px auto 0;
+    padding: 32px;
+    text-align: center;
+    border-radius: 25px;
+    background: var(--bottom-bg);
+    border: 1px solid #d5eafa;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .bottom { background: var(--surface); border-color: var(--border); }
+
+.bottom h3 { color: #18578c; font-size: 21px; margin-bottom: 7px; }
+html.dark-mode .bottom h3 { color: #60a5fa; }
+
+@media(max-width: 1000px) { .hero { padding: 40px; background: var(--tint-purple); border: var(--card-bw) solid var(--hero-border); } }
+@media(max-width: 700px) {
+    .hero { min-height: auto; padding: 34px 24px; border-radius: 27px; background: var(--tint-purple); border: var(--card-bw) solid var(--hero-border); }
+    .hero h1 { font-size: 38px; }
+    .hero p { font-size: 13px; }
+    .subset-heading { font-size: 19px; }
+}
+
+/* SET SEKMELERİ + NOTASYON */
+.set-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0 auto 14px; }
+.set-tab {
+    border: var(--card-bw) solid var(--ink); border-radius: 14px; padding: 10px 18px; cursor: pointer;
+    font: 800 15px "Inter", sans-serif; background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm);
+    transition: transform .12s, box-shadow .12s;
+}
+.set-tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.set-tab.active { background: var(--cube-yellow); color: #17171f; }
+.set-desc { max-width: 760px; margin: 0 auto 22px; text-align: center; font-size: 14.5px; color: var(--text-soft); line-height: 1.6; }
+.nota-box {
+    max-width: 900px; margin: 0 auto 26px; padding: 18px 20px; border-radius: 20px;
+    border: var(--card-bw) solid var(--card-border); background: var(--surface); box-shadow: var(--shadow);
+}
+.nota-box h2 { font-family: var(--font-display); font-size: 20px; margin: 0 0 10px; color: var(--text); }
+.nota-moves { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 10px; }
+.nota-move { text-align: center; padding: 6px 8px 8px; border-radius: 14px; background: var(--surface-soft); border: var(--card-bw) solid var(--border); width: 120px; }
+.nota-move svg { width: 100%; height: auto; max-width: 104px; }
+.nota-move b { display: block; font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--text); }
+.nota-move small { font-size: 11px; font-weight: 700; color: var(--text-soft); }
+.nota-box p { font-size: 13.5px; color: var(--text-soft); line-height: 1.6; margin: 6px 0 0; }
+.case-diagram svg { width: 96px; height: 96px; }
+@media (max-width: 520px) { .nota-move { width: 74px; padding: 4px; } .nota-move small { font-size: 10px; } .set-tab { padding: 8px 12px; font-size: 14px; } }
 </style>
 
 <!-- Google tag (gtag.js) -->
@@ -114,6 +306,7 @@ html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
     </a>
 
     <div class="nav-right">
+
         <nav class="nav-links">
             <a href="/" data-i18n="navHome">Ana Sayfa</a>
             <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
@@ -128,81 +321,212 @@ html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
         </div>
 
         <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
     </div>
 </header>
 
 <div class="page">
-<div class="wrap">
 
 <nav class="nav-bar">
     <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
 </nav>
 
-<section class="intro">
-    <div class="badge"><i></i><span data-i18n="badge">PYRAMINX · BAŞLANGIÇ</span></div>
-    <h1 data-i18n="title">Pyraminx Nasıl Çözülür?</h1>
-    <p data-i18n="hero_p">Pyraminx'i 5 adımda çözmeyi öğren. Sadece 4 kısa algoritma yeter; her adım pyraminx simülasyonunda binlerce karıştırmayla test edildi.</p>
-</section>
-<section class="box step">
-    <h2 data-i18n="know_title">Pyraminx'i tanı</h2>
-    <p data-i18n="know_p1">Pyraminx'in 4 ucu, 4 merkez parçası ve 6 kenarı vardır. Uçlar tek başına döner ve başka hiçbir parçayı bozmaz. Merkezler, uçların hemen altındaki üç renkli parçalardır; yerinden ayrılmaz, sadece kendi etrafında döner.</p>
-    <p data-i18n="know_p2">Şemalarda pyraminx açılmış hâlde gösterilir: üst sırada ortadaki üçgen ön yüz, solundaki sol yüz, sağındaki sağ yüzdür; alttaki üçgen alt yüzdür. Alt yüzü sarı yapacağız.</p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.05 -0.05 3.100 1.892" width="200" height="122" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.591 0.857,0.591 1.000,0.839" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.564 0.857,0.564 1.000,0.316" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.302 0.690,0.302 0.833,0.550" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.275 0.690,0.275 0.833,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.810,0.013 0.523,0.013 0.667,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.302 1.023,0.302 1.167,0.550" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.275 1.023,0.275 1.167,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.013 0.857,0.013 1.000,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.013 1.190,0.013 1.333,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.190,0.013 2.333,0.262 2.477,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.167,0.027 2.310,0.275 2.023,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.023,0.302 2.167,0.550 2.310,0.302" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.000,0.316 2.143,0.564 1.857,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.591 2.000,0.839 2.143,0.591" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.013 2.000,0.262 2.143,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.027 1.977,0.275 1.690,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.302 1.833,0.550 1.977,0.302" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,0.013 1.667,0.262 1.810,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.939 1.833,1.188 1.977,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.953 1.810,1.201 1.523,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,1.228 1.667,1.476 1.810,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,1.242 1.643,1.490 1.357,1.490" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,1.517 1.500,1.765 1.643,1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,0.939 1.500,1.188 1.643,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.953 1.477,1.201 1.190,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.190,1.228 1.333,1.476 1.477,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.023,0.939 1.167,1.188 1.310,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/></svg></div></figure></div>
-</section>
-<section class="box step">
-    <h2 data-i18n="not_title">Notasyon</h2>
-    <div class="moves m3"><div class="move"><div class="move-img" dir="ltr"><svg viewBox="0.5 -0.5 2 1.75" width="150" height="131" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><path d="M1.181,-0.035 A0.33,0.33 0 0 1 1.819,-0.035" fill="none" stroke="#17171f" stroke-width="0.05" stroke-linecap="round"/><polygon points="1.847,0.071 1.883,-0.052 1.755,-0.018" fill="#17171f"/></svg></div><b dir="ltr">U</b><small data-i18n="not_U">Üst köşe</small></div><div class="move"><div class="move-img" dir="ltr"><svg viewBox="0.5 -0.5 2 1.75" width="150" height="131" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><path d="M1.029,1.195 A0.33,0.33 0 0 1 0.971,0.537" fill="none" stroke="#17171f" stroke-width="0.05" stroke-linecap="round"/><polygon points="1.081,0.528 0.965,0.472 0.977,0.603" fill="#17171f"/></svg></div><b dir="ltr">L</b><small data-i18n="not_L">Sol köşe</small></div><div class="move"><div class="move-img" dir="ltr"><svg viewBox="0.5 -0.5 2 1.75" width="150" height="131" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><path d="M2.029,0.537 A0.33,0.33 0 0 1 1.971,1.195" fill="none" stroke="#17171f" stroke-width="0.05" stroke-linecap="round"/><polygon points="1.862,1.185 1.965,1.261 1.977,1.129" fill="#17171f"/></svg></div><b dir="ltr">R</b><small data-i18n="not_R">Sağ köşe</small></div></div>
-    <p class="muted" data-i18n="not_p">Her harf o köşeyi iki katmanıyla (uç, merkez ve 3 kenar) birlikte, köşeye dışarıdan bakarken saat yönünde 120° çevirir. Kesme işareti (') ters yön demektir: R' saat yönünün tersidir. B arkadaki köşedir; küçük harfler (u, l, r, b) sadece ucu çevirir.</p>
-</section>
-<section class="box step">
-    <div class="step-head"><span class="step-num red">1</span><h2 data-i18n="s1_title">Uçları çöz</h2></div>
-    <p data-i18n="s1_p">Her ucu, hemen altındaki merkez parçanın renkleriyle aynı olacak şekilde çevir. Dört uç için de yap. Uçlar diğer parçaları etkilemediği için bu adım hiçbir şeyi bozmaz.</p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.05 -0.05 3.100 1.892" width="200" height="122" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.591 0.857,0.591 1.000,0.839" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.564 0.857,0.564 1.000,0.316" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.302 0.690,0.302 0.833,0.550" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.275 0.690,0.275 0.833,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.810,0.013 0.523,0.013 0.667,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.302 1.023,0.302 1.167,0.550" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.275 1.023,0.275 1.167,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.013 0.857,0.013 1.000,0.262" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.013 1.190,0.013 1.333,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.190,0.013 2.333,0.262 2.477,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.167,0.027 2.310,0.275 2.023,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.023,0.302 2.167,0.550 2.310,0.302" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.000,0.316 2.143,0.564 1.857,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.591 2.000,0.839 2.143,0.591" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.013 2.000,0.262 2.143,0.013" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.027 1.977,0.275 1.690,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.302 1.833,0.550 1.977,0.302" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,0.013 1.667,0.262 1.810,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.939 1.833,1.188 1.977,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.953 1.810,1.201 1.523,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,1.228 1.667,1.476 1.810,1.228" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,1.242 1.643,1.490 1.357,1.490" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,1.517 1.500,1.765 1.643,1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,0.939 1.500,1.188 1.643,0.939" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.953 1.477,1.201 1.190,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.190,1.228 1.333,1.476 1.477,1.228" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.023,0.939 1.167,1.188 1.310,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s1_cap">Her uç kendi merkeziyle aynı renkte</figcaption></figure></div>
-</section>
-<section class="box step">
-    <div class="step-head"><span class="step-num orange">2</span><h2 data-i18n="s2_title">Merkezleri hizala</h2></div>
-    <p data-i18n="s2_p">Merkezinde sarı olmayan köşeyi bul ve onu üste al. Diğer üç köşeyi (L, R, B) tek tek çevirerek her birinin merkezindeki sarıyı alt yüze getir. Artık her yüzün rengi belli: o yüzdeki merkezlerin rengi.</p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.05 -0.05 3.100 1.892" width="200" height="122" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.591 0.857,0.591 1.000,0.839" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.564 0.857,0.564 1.000,0.316" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.302 0.690,0.302 0.833,0.550" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.275 0.690,0.275 0.833,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.810,0.013 0.523,0.013 0.667,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.302 1.023,0.302 1.167,0.550" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.275 1.023,0.275 1.167,0.027" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.013 0.857,0.013 1.000,0.262" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.013 1.190,0.013 1.333,0.262" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.190,0.013 2.333,0.262 2.477,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.167,0.027 2.310,0.275 2.023,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.023,0.302 2.167,0.550 2.310,0.302" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.000,0.316 2.143,0.564 1.857,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.591 2.000,0.839 2.143,0.591" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.013 2.000,0.262 2.143,0.013" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.027 1.977,0.275 1.690,0.275" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.302 1.833,0.550 1.977,0.302" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,0.013 1.667,0.262 1.810,0.013" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.939 1.833,1.188 1.977,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.953 1.810,1.201 1.523,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,1.228 1.667,1.476 1.810,1.228" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,1.242 1.643,1.490 1.357,1.490" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,1.517 1.500,1.765 1.643,1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,0.939 1.500,1.188 1.643,0.939" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.953 1.477,1.201 1.190,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.190,1.228 1.333,1.476 1.477,1.228" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.023,0.939 1.167,1.188 1.310,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s2_cap">Alttaki üç merkezin sarısı alt yüzde</figcaption></figure></div>
-</section>
-<section class="box step">
-    <div class="step-head"><span class="step-num yellow">3</span><h2 data-i18n="s3_title">Alt kenarları yerleştir</h2></div>
-    <p data-i18n="s3_p1">Alt yüzün 3 kenarını tek tek yerleştir. Yerleştireceğin kenarın sarı olmayan rengi hangi yüzün rengiyse, sarı altta kalacak şekilde o yüzü öne al.</p>
-    <p><span data-i18n="s3_p2">Kenarı üst katmanda bul ve U'yu çevirerek kenarın sarı olmayan rengini ön yüze getir. Kenar sol üstteyse:</span> <code class="alg" dir="ltr">R U' R'</code></p>
-    <p><span data-i18n="s3_p3">Kenar sağ üstteyse:</span> <code class="alg" dir="ltr">L' U L</code></p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.05 -0.05 3.100 1.892" width="200" height="122" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.591 0.857,0.591 1.000,0.839" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.564 0.857,0.564 1.000,0.316" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.302 0.690,0.302 0.833,0.550" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.275 0.690,0.275 0.833,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.810,0.013 0.523,0.013 0.667,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.302 1.023,0.302 1.167,0.550" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.275 1.023,0.275 1.167,0.027" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.013 0.857,0.013 1.000,0.262" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.013 1.190,0.013 1.333,0.262" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.190,0.013 2.333,0.262 2.477,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.167,0.027 2.310,0.275 2.023,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.023,0.302 2.167,0.550 2.310,0.302" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.000,0.316 2.143,0.564 1.857,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.591 2.000,0.839 2.143,0.591" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.013 2.000,0.262 2.143,0.013" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.027 1.977,0.275 1.690,0.275" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.302 1.833,0.550 1.977,0.302" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,0.013 1.667,0.262 1.810,0.013" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.939 1.833,1.188 1.977,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.953 1.810,1.201 1.523,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,1.228 1.667,1.476 1.810,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,1.242 1.643,1.490 1.357,1.490" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,1.517 1.500,1.765 1.643,1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,0.939 1.500,1.188 1.643,0.939" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.953 1.477,1.201 1.190,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.190,1.228 1.333,1.476 1.477,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.023,0.939 1.167,1.188 1.310,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s3_c1">Kenar solda, rengi önde</figcaption></figure><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.05 -0.05 3.100 1.892" width="200" height="122" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.591 0.857,0.591 1.000,0.839" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.564 0.857,0.564 1.000,0.316" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.302 0.690,0.302 0.833,0.550" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.275 0.690,0.275 0.833,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.810,0.013 0.523,0.013 0.667,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.302 1.023,0.302 1.167,0.550" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.275 1.023,0.275 1.167,0.027" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.013 0.857,0.013 1.000,0.262" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.013 1.190,0.013 1.333,0.262" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.190,0.013 2.333,0.262 2.477,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.167,0.027 2.310,0.275 2.023,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.023,0.302 2.167,0.550 2.310,0.302" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.000,0.316 2.143,0.564 1.857,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.591 2.000,0.839 2.143,0.591" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.013 2.000,0.262 2.143,0.013" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.027 1.977,0.275 1.690,0.275" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.302 1.833,0.550 1.977,0.302" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,0.013 1.667,0.262 1.810,0.013" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.939 1.833,1.188 1.977,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.953 1.810,1.201 1.523,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,1.228 1.667,1.476 1.810,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,1.242 1.643,1.490 1.357,1.490" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,1.517 1.500,1.765 1.643,1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,0.939 1.500,1.188 1.643,0.939" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.953 1.477,1.201 1.190,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.190,1.228 1.333,1.476 1.477,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.023,0.939 1.167,1.188 1.310,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s3_c2">Kenar sağda, rengi önde</figcaption></figure><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.05 -0.05 3.100 1.892" width="200" height="122" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.591 0.857,0.591 1.000,0.839" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.564 0.857,0.564 1.000,0.316" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.302 0.690,0.302 0.833,0.550" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.275 0.690,0.275 0.833,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.810,0.013 0.523,0.013 0.667,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.302 1.023,0.302 1.167,0.550" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.275 1.023,0.275 1.167,0.027" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.013 0.857,0.013 1.000,0.262" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.013 1.190,0.013 1.333,0.262" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.190,0.013 2.333,0.262 2.477,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.167,0.027 2.310,0.275 2.023,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.023,0.302 2.167,0.550 2.310,0.302" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.000,0.316 2.143,0.564 1.857,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.591 2.000,0.839 2.143,0.591" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.013 2.000,0.262 2.143,0.013" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.027 1.977,0.275 1.690,0.275" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.302 1.833,0.550 1.977,0.302" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,0.013 1.667,0.262 1.810,0.013" fill="#5a5d66" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.939 1.833,1.188 1.977,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.953 1.810,1.201 1.523,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,1.228 1.667,1.476 1.810,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,1.242 1.643,1.490 1.357,1.490" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,1.517 1.500,1.765 1.643,1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,0.939 1.500,1.188 1.643,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.953 1.477,1.201 1.190,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.190,1.228 1.333,1.476 1.477,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.023,0.939 1.167,1.188 1.310,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s3_c3">Alt katman tamam</figcaption></figure></div>
-    <p class="muted" data-i18n="s3_p4">Kenar alt katmanda ama yanlış yerde ya da ters duruyorsa: küpü çevirip onu ön-alt kenara getir, R U' R' ile üste çıkar, sonra yukarıdaki gibi yerleştir.</p>
-</section>
-<section class="box step">
-    <div class="step-head"><span class="step-num green">4</span><h2 data-i18n="s4_title">Üst merkezi hizala</h2></div>
-    <p data-i18n="s4_p">U'yu çevirerek üst merkezin renklerini yan yüzlerin renkleriyle eşleştir. Uç da onunla birlikte döner.</p>
-</section>
-<section class="box step">
-    <div class="step-head"><span class="step-num blue">5</span><h2 data-i18n="s5_title">Son 3 kenar</h2></div>
-    <p data-i18n="s5_p1">Üst katmandaki 3 kenardan kaçının doğru (hem yeri hem yönü doğru) olduğuna bak.</p>
-    <p><span data-i18n="s5_one">Tek kenar doğruysa diğer ikisi ters dönmüştür. Doğru kenarı arkaya al; iki ters kenar önde, solda ve sağda kalsın. Uygula:</span><br><code class="alg" dir="ltr">R' L R L' U L' U' L</code></p>
-    <p><span data-i18n="s5_zero">Hiçbir kenar doğru değilse üç kenar yer değiştirmiştir. Uygula:</span><br><code class="alg" dir="ltr">R U R' U R U R'</code></p>
-    <div class="figs"><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.05 -0.05 3.100 1.892" width="200" height="122" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.591 0.857,0.591 1.000,0.839" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.564 0.857,0.564 1.000,0.316" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.302 0.690,0.302 0.833,0.550" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.275 0.690,0.275 0.833,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.810,0.013 0.523,0.013 0.667,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.302 1.023,0.302 1.167,0.550" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.275 1.023,0.275 1.167,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.013 0.857,0.013 1.000,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.013 1.190,0.013 1.333,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.190,0.013 2.333,0.262 2.477,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.167,0.027 2.310,0.275 2.023,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.023,0.302 2.167,0.550 2.310,0.302" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.000,0.316 2.143,0.564 1.857,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.591 2.000,0.839 2.143,0.591" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.013 2.000,0.262 2.143,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.027 1.977,0.275 1.690,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.302 1.833,0.550 1.977,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,0.013 1.667,0.262 1.810,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.939 1.833,1.188 1.977,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.953 1.810,1.201 1.523,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,1.228 1.667,1.476 1.810,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,1.242 1.643,1.490 1.357,1.490" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,1.517 1.500,1.765 1.643,1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,0.939 1.500,1.188 1.643,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.953 1.477,1.201 1.190,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.190,1.228 1.333,1.476 1.477,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.023,0.939 1.167,1.188 1.310,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s5_cap1">Öndeki iki kenar ters</figcaption></figure><figure class="fig"><div class="fig-img" dir="ltr"><svg viewBox="-0.05 -0.05 3.100 1.892" width="200" height="122" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.591 0.857,0.591 1.000,0.839" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.564 0.857,0.564 1.000,0.316" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.302 0.690,0.302 0.833,0.550" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.275 0.690,0.275 0.833,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.810,0.013 0.523,0.013 0.667,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.302 1.023,0.302 1.167,0.550" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.275 1.023,0.275 1.167,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.013 0.857,0.013 1.000,0.262" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.013 1.190,0.013 1.333,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.190,0.013 2.333,0.262 2.477,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.167,0.027 2.310,0.275 2.023,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.023,0.302 2.167,0.550 2.310,0.302" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.000,0.316 2.143,0.564 1.857,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.591 2.000,0.839 2.143,0.591" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.013 2.000,0.262 2.143,0.013" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.027 1.977,0.275 1.690,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.302 1.833,0.550 1.977,0.302" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,0.013 1.667,0.262 1.810,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.939 1.833,1.188 1.977,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.953 1.810,1.201 1.523,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,1.228 1.667,1.476 1.810,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,1.242 1.643,1.490 1.357,1.490" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,1.517 1.500,1.765 1.643,1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,0.939 1.500,1.188 1.643,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.953 1.477,1.201 1.190,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.190,1.228 1.333,1.476 1.477,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.023,0.939 1.167,1.188 1.310,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/></svg></div><figcaption data-i18n="s5_cap2">Üç kenar yer değiştirmiş</figcaption></figure></div>
-    <p><span data-i18n="s5_zero2">Hâlâ hiçbir kenar doğru değilse bir kez daha uygula. Tek kenar doğru olduysa yukarıdaki algoritmaya geç. Kenarlar öbür yöne dönüyorsa bunun aynası işini kısaltır:</span> <code class="alg" dir="ltr">R U' R' U' R U' R'</code></p>
-</section>
-<section class="box done">
-    <h2 data-i18n="done_title">Tebrikler! 🎉</h2>
-    <p data-i18n="done_p">Pyraminx'i çözdün. Hızlanmak için videolara göz atabilir ya da diğer algoritmalara geçebilirsin.</p>
-    <div class="next-links">
-        <a href="/icerikler/videolar/pyraminx" class="next-link">▶ <span data-i18n="next_video">Pyraminx video eğitimi</span></a>
-        <a href="/icerikler/algoritmalar" class="next-link">📘 <span data-i18n="next_algos">Tüm algoritmalar</span></a>
-    </div>
+<section class="hero reveal">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+<span data-i18n="badge_text">PYRAMINX · L3E · L4E</span>
+</div>
+<h1><span data-i18n="hero_title1">Pyraminx</span> <span data-i18n="hero_titleAccent">Algoritmaları</span></h1>
+<p data-i18n="hero_p">Beginner (L3E) ve L4E setleri. Her case'in diyagramı ve pyraminx simülasyonunda doğrulanmış algoritması var; kartlara dokunarak öğrendiklerini işaretle.</p>
+</div>
 </section>
 
-</div>
+<section class="nota-box">
+    <h2 data-i18n="not_title">Notasyon</h2>
+    <div class="nota-moves"><div class="nota-move"><div dir="ltr"><svg viewBox="0.5 -0.5 2 1.75" width="150" height="131" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><path d="M1.181,-0.035 A0.33,0.33 0 0 1 1.819,-0.035" fill="none" stroke="#17171f" stroke-width="0.05" stroke-linecap="round"/><polygon points="1.847,0.071 1.883,-0.052 1.755,-0.018" fill="#17171f"/></svg></div><b dir="ltr">U</b><small data-i18n="not_U">Üst köşe</small></div><div class="nota-move"><div dir="ltr"><svg viewBox="0.5 -0.5 2 1.75" width="150" height="131" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><path d="M1.029,1.195 A0.33,0.33 0 0 1 0.971,0.537" fill="none" stroke="#17171f" stroke-width="0.05" stroke-linecap="round"/><polygon points="1.081,0.528 0.965,0.472 0.977,0.603" fill="#17171f"/></svg></div><b dir="ltr">L</b><small data-i18n="not_L">Sol köşe</small></div><div class="nota-move"><div dir="ltr"><svg viewBox="0.5 -0.5 2 1.75" width="150" height="131" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#ffffff" fill-opacity="0.62" stroke="none" stroke-width="0.015" stroke-linejoin="round"/><path d="M2.029,0.537 A0.33,0.33 0 0 1 1.971,1.195" fill="none" stroke="#17171f" stroke-width="0.05" stroke-linecap="round"/><polygon points="1.862,1.185 1.965,1.261 1.977,1.129" fill="#17171f"/></svg></div><b dir="ltr">R</b><small data-i18n="not_R">Sağ köşe</small></div></div>
+    <p data-i18n="not_p">Sarı yüz altta, bir yüz sana bakacak şekilde tut. Harf o köşeyi iki katmanıyla birlikte, köşeye dışarıdan bakarken saat yönünde 120° çevirir; ' ters yön demektir. B arkadaki köşedir. Uçları (küçük harfler) en başta çöz.</p>
+    <p data-i18n="view_note">Diyagramlar pyraminx'e üstten bakıştır: ortadaki uç üst köşe, alt kenar en altta (önde).</p>
+</section>
+
+<div class="set-tabs" id="setTabs"></div>
+<p class="set-desc" id="setDesc"></p>
+
+<!-- İlerleme özeti -->
+<div class="progress-summary" id="progressSummary"></div>
+
+<div class="subsets-wrap" id="subsetsWrap"></div>
+
+<div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.</div>
+
+<section class="bottom reveal">
+<h3 data-i18n="bottom_title">🔺 Pratik zamanı</h3>
+<p data-i18n="bottom_p">Algoritmaları videolarla birleştir ve süreni ölç.</p>
+</section>
+
 </div>
 
 <footer>
     <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
 </footer>
 
-<script>var PAGE_ID = "pyra_rehber";</script>
-<script src="/js/i18n.js?v=20261025"></script>
-<script src="/js/common.js?v=20261025"></script>
+
+<!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
+<script>var PAGE_ID = "pyra_algos";</script>
+<script src="/js/i18n.js?v=20261026"></script>
+<script src="/js/common.js?v=20261026"></script>
+
+<script>
+/* ============================================================
+   PYRAMINX ALGORİTMA SETLERİ
+   Veri: pyraminx.json (simülasyonla bulunup doğrulanmış algoritmalar)
+   Diyagramlar sayfada çizilir: geom = etiket çokgenleri, c = renk harfleri
+   Her setin ilerlemesi ayrı localStorage anahtarında tutulur.
+   ============================================================ */
+var PAGE_KEY = "pyraminx";
+var STATES = ["", "learning", "known"];
+var PROGRESS_TEXT = {
+    tr: { learning: "Öğreniyorum", known: "Biliyorum" },
+    en: { learning: "Learning",    known: "Known" },
+    de: { learning: "Ich lerne",   known: "Kann ich" },
+    fr: { learning: "J'apprends",  known: "Je sais" },
+    ru: { learning: "Учу",         known: "Знаю" },
+    ar: { learning: "أتعلم",       known: "أعرف" }
+};
+var DATA = null, currentSet = null;
+
+function currentLang() { return localStorage.getItem("site-lang") || "tr"; }
+function progressText() { return PROGRESS_TEXT[currentLang()] || PROGRESS_TEXT.tr; }
+function T(key, fallback) {
+    var pages = (window.SITE_I18N && SITE_I18N.pages) || {};
+    var p = pages[PAGE_ID] || {};
+    var d = p[currentLang()] || {};
+    return d[key] || (p.tr && p.tr[key]) || fallback || key;
+}
+function progressKey() { return "algo-progress-" + PAGE_KEY + "-" + currentSet; }
+function loadProgress() {
+    try { var p = JSON.parse(localStorage.getItem(progressKey())); return (p && typeof p === "object") ? p : {}; } catch (e) { return {}; }
+}
+function saveProgress(p) { try { localStorage.setItem(progressKey(), JSON.stringify(p)); } catch (e) {} }
+function stateOfCard(card) {
+    if (card.classList.contains("state-known")) return "known";
+    if (card.classList.contains("state-learning")) return "learning";
+    return "";
+}
+function applyState(card, state) {
+    card.classList.remove("state-learning", "state-known");
+    if (state) card.classList.add("state-" + state);
+    var s = card.querySelector(".case-status");
+    if (s) s.textContent = state ? progressText()[state] : "";
+}
+function updateSummary() {
+    var cards = document.querySelectorAll(".case-card"), learning = 0, known = 0;
+    for (var i = 0; i < cards.length; i++) {
+        var st = stateOfCard(cards[i]);
+        if (st === "learning") learning++;
+        if (st === "known") known++;
+    }
+    var t = progressText();
+    document.getElementById("progressSummary").innerHTML =
+        '<span>🟡 ' + t.learning + ': ' + learning + '</span>' + '<span>🟢 ' + t.known + ': ' + known + ' / ' + cards.length + '</span>';
+}
+function refreshProgressLabels() {
+    var cards = document.querySelectorAll(".case-card");
+    for (var i = 0; i < cards.length; i++) applyState(cards[i], stateOfCard(cards[i]));
+    updateSummary();
+}
+function cycleCard(card) {
+    var name = card.getAttribute("data-case"), p = loadProgress();
+    var next = STATES[(STATES.indexOf(p[name] || "") + 1) % STATES.length];
+    if (next) p[name] = next; else delete p[name];
+    saveProgress(p);
+    applyState(card, next);
+    updateSummary();
+}
+function escapeHtml(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+/* Diyagram: geom.polys[i] çokgenine c[i] rengini ver */
+function caseSvg(c, size) {
+    var g = DATA.geom, v = g.view, out = '<svg viewBox="' + v.join(" ") + '" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg">';
+    var sw = (v[2] / 160).toFixed(3);
+    for (var i = 0; i < g.polys.length; i++) {
+        var pts = g.polys[i].map(function (p) { return p[0] + "," + p[1]; }).join(" ");
+        out += '<polygon points="' + pts + '" fill="' + (DATA.colors[c.charAt(i)] || "#5a5d66") + '" stroke="#17171f" stroke-width="' + sw + '" stroke-linejoin="round"/>';
+    }
+    return out + '</svg>';
+}
+function renderTabs() {
+    var html = "";
+    DATA.sets.forEach(function (s) {
+        html += '<button class="set-tab' + (s.id === currentSet ? " active" : "") + '" data-set="' + s.id + '" data-i18n="set_' + s.id + '">' + escapeHtml(T("set_" + s.id, s.id)) + '</button>';
+    });
+    document.getElementById("setTabs").innerHTML = html;
+    var d = document.getElementById("setDesc");
+    d.setAttribute("data-i18n", "desc_" + currentSet);
+    d.textContent = T("desc_" + currentSet, "");
+}
+function renderSet() {
+    var set = DATA.sets.filter(function (s) { return s.id === currentSet; })[0] || DATA.sets[0];
+    currentSet = set.id;
+    try { localStorage.setItem("algo-set-" + PAGE_KEY, currentSet); } catch (e) {}
+    renderTabs();
+    var progress = loadProgress(), t = progressText(), html = "";
+    set.groups.forEach(function (group) {
+        var key = "subset_" + group.subset;
+        html += '<div class="subset-block"><h2 class="subset-heading" data-i18n="' + key + '">' + escapeHtml(T(key, group.subset)) + '</h2><div class="case-grid">';
+        group.cases.forEach(function (c) {
+            var st = progress[c.name] || "";
+            html += '<div class="case-card' + (st ? " state-" + st : "") + '" data-case="' + escapeHtml(c.name) + '" role="button" tabindex="0">' +
+                '<div class="case-diagram" dir="ltr">' + caseSvg(c.c, 96) + '</div>' +
+                '<div class="case-body"><div class="case-name">' + escapeHtml(c.name) + '</div>' +
+                '<div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>' +
+                '<div class="case-status">' + escapeHtml(st ? t[st] : "") + '</div></div></div>';
+        });
+        html += '</div></div>';
+    });
+    document.getElementById("subsetsWrap").innerHTML = html;
+    updateSummary();
+}
+
+fetch("/icerikler/algoritmalar/pyraminx.json?v=20261026")
+    .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    .then(function (data) {
+        DATA = data;
+        var saved = null;
+        try { saved = localStorage.getItem("algo-set-" + PAGE_KEY); } catch (e) {}
+        var fromHash = (location.hash || "").replace("#", "");
+        currentSet = [fromHash, saved].filter(function (id) { return id && data.sets.some(function (s) { return s.id === id; }); })[0] || data.sets[0].id;
+        renderSet();
+        var wrap = document.getElementById("subsetsWrap");
+        wrap.addEventListener("click", function (e) {
+            var sel = window.getSelection ? String(window.getSelection()) : "";
+            if (sel.length > 0) return;
+            var card = e.target.closest(".case-card");
+            if (card) cycleCard(card);
+        });
+        wrap.addEventListener("keydown", function (e) {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            var card = e.target.closest(".case-card");
+            if (!card) return;
+            e.preventDefault(); cycleCard(card);
+        });
+        document.getElementById("setTabs").addEventListener("click", function (e) {
+            var b = e.target.closest(".set-tab");
+            if (!b) return;
+            currentSet = b.getAttribute("data-set");
+            history.replaceState(null, "", "#" + currentSet);
+            renderSet();
+        });
+    })
+    .catch(function (err) {
+        document.getElementById("loadError").style.display = "block";
+        console.error("pyraminx.json yüklenemedi:", err);
+    });
+
+// Dil değişince (common.js applyLanguage sonrası çağırır)
+function onLanguageApplied() { if (DATA) { renderTabs(); refreshProgressLabels(); } }
+</script>
 
 </body>
 </html>
