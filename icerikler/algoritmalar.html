@@ -19,7 +19,7 @@
 <!-- TARAYICI SEKMESİ İÇİN LOGO -->
 <link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261026">
+<link rel="stylesheet" href="/styles/common.css?v=20261027">
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar">
 <meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, WV, Ortega, CLL ve EG algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
 <meta property="og:title" content="Rubik Academy - Algoritmalar">
@@ -147,6 +147,9 @@ html {
 .eg1-visual { background: var(--tint-blue); }
 .eg2-visual { background: var(--tint-green); }
 .p4-visual { background: var(--tint-orange); }
+.hub-slot { display: contents; }
+.cube3-visual { background: var(--tint-yellow); }
+.cube2-visual { background: var(--tint-purple); }
 .pyra-visual { background: var(--tint-green); }
 .skewb-visual { background: var(--tint-blue); }
 .methods.methods-1 { max-width: 440px; grid-template-columns: 1fr; }
@@ -446,23 +449,15 @@ Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, WV, Orte
     <span class="trainer-banner-btn" data-i18n="trainer_btn">Antrenörü Aç →</span>
 </a>
 
-<!-- 3x3 KATEGORİSİ -->
+<!-- 3x3 & 2x2 KATEGORİSİ: her küp tek kart; set seçimi açılan sayfadaki sekmelerden -->
 <div class="category-block">
     <div class="category-heading">
-        <h3 data-i18n="cat_3x3_title">3x3</h3>
-        <span data-i18n="cat_3x3_sub">Son katman algoritmaları</span>
+        <h3 data-i18n="cat_cubes_title">3x3 &amp; 2x2</h3>
+        <span data-i18n="cat_cubes_sub">Algoritma setleri</span>
     </div>
-    <section class="methods" id="cardsSection">
-    </section>
-</div>
-
-<!-- 2x2 KATEGORİSİ -->
-<div class="category-block">
-    <div class="category-heading">
-        <h3 data-i18n="cat_2x2_title">2x2</h3>
-        <span data-i18n="cat_2x2_sub">Ortega yöntemi algoritmaları</span>
-    </div>
-    <section class="methods methods-3" id="cards2x2Section">
+    <section class="methods">
+        <div class="hub-slot" id="cardsSection"></div>
+        <div class="hub-slot" id="cards2x2Section"></div>
     </section>
 </div>
 
@@ -616,8 +611,12 @@ var ortegaOllCount = null;
 var cllCount = null;
 var collCount = null;
 var wvCount = null;
+var hubTotals = { c3: null, c2: null }; // 3x3 ve 2x2 kartlarındaki toplam case sayısı
 
 function updateCountBadges(dict) {
+    var h3 = document.getElementById("hub3Badge"), h2 = document.getElementById("hub2Badge");
+    if (h3 && hubTotals.c3 !== null) h3.textContent = hubTotals.c3 + " " + dict.case_word;
+    if (h2 && hubTotals.c2 !== null) h2.textContent = hubTotals.c2 + " " + dict.case_word;
     var ollBadge = document.getElementById("ollCountBadge");
     var pllBadge = document.getElementById("pllCountBadge");
     if (ollBadge) ollBadge.textContent = caseCounts.oll + " " + dict.case_word;
@@ -648,8 +647,8 @@ function onLanguageApplied(lang) {
 </script>
 
 <script>var PAGE_ID = "algoritmalar";</script>
-<script src="/js/i18n.js?v=20261026"></script>
-<script src="/js/common.js?v=20261026"></script>
+<script src="/js/i18n.js?v=20261027"></script>
+<script src="/js/common.js?v=20261027"></script>
 
 <!-- BU SAYFAYA ÖZEL: OLL / PLL VERİSİNİ YÜKLE VE KARTLARI OLUŞTUR -->
 <script>
@@ -784,6 +783,16 @@ fetch("/icerikler/algoritmalar/oll-pll.json")
             html += '</a>';
         }
 
+        // Tek kart: setler (OLL, PLL, COLL, WV) açılan sayfadaki sekmelerden seçilir
+        hubTotals.c3 = ollCount + pllCount + (data.coll ? collCount : 0) + (data.wv ? wvCount : 0);
+        html = '<a href="/icerikler/algoritmalar/oll" class="card">' +
+            '<div class="card-visual cube3-visual">' +
+            '<div class="level" data-i18n="cube3_level">' + (dict.cube3_level || "OLL · PLL · COLL · WV") + '</div>' +
+            '<div class="count-badge" id="hub3Badge">' + hubTotals.c3 + ' ' + dict.case_word + '</div>' +
+            '<div class="diagram-wrap">' + ollDiagram + '</div></div>' +
+            '<div class="card-info"><h3 data-i18n="cube3_title">' + (dict.cube3_title || "3x3 Algoritmaları") + '</h3>' +
+            '<p data-i18n="cube3_p">' + (dict.cube3_p || "") + '</p>' +
+            '<div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div></div></a>';
         document.getElementById("cardsSection").innerHTML = html;
 
         // Kartlar DOM'a eklendikten sonra dili tekrar uygula
@@ -931,6 +940,17 @@ function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml, cllDiagramHtml, egDat
         });
     }
 
+    // Tek kart: setler (Ortega OLL/PBL, CLL, EG-1, EG-2) açılan sayfadaki sekmelerden seçilir
+    hubTotals.c2 = (ortegaPblCount || 0) + (ortegaOllCount || 0) + (cllCount || 0);
+    if (egData) hubTotals.c2 += countCases(egData.eg1 || []) + countCases(egData.eg2 || []);
+    html = '<a href="/icerikler/algoritmalar/ortega-oll" class="card">' +
+        '<div class="card-visual cube2-visual">' +
+        '<div class="level" data-i18n="cube2_level">' + (dict.cube2_level || "ORTEGA · CLL · EG") + '</div>' +
+        '<div class="count-badge" id="hub2Badge">' + hubTotals.c2 + ' ' + dict.case_word + '</div>' +
+        '<div class="diagram-wrap">' + (cllDiagramHtml || pblDiagramHtml || "") + '</div></div>' +
+        '<div class="card-info"><h3 data-i18n="cube2_title">' + (dict.cube2_title || "2x2 Algoritmaları") + '</h3>' +
+        '<p data-i18n="cube2_p">' + (dict.cube2_p || "") + '</p>' +
+        '<div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div></div></a>';
     document.getElementById("cards2x2Section").innerHTML = html;
     applyLanguage(lang);
 }
