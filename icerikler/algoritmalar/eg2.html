@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - EG-2 Algoritmaları (42 Case)</title>
+<link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/eg2">
+<meta name="description" content="Rubik Academy - 2x2 EG-2 yönteminin 42 case'ini üst ve alt katman diyagramları ve alternatif algoritmalarıyla öğren.">
+<meta property="og:title" content="Rubik Academy - EG-2 Algoritmaları">
+<meta property="og:description" content="2x2 EG-2: alt katmanın çapraz iki köşesi yer değiştirmişken küpü tek algoritmayla çözen 42 case.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/eg2">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261016">
+
+<style>
+.hero {
+    max-width: 1250px;
+    min-height: 220px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 45px 65px;
+    background: var(--tint-green);
+    border: var(--card-bw) solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    right: -180px;
+    top: -180px;
+}
+
+.hero-text { position: relative; z-index: 3; max-width: 700px; }
+
+.hero .badge { color: var(--primary-dark); }
+
+.hero h1 {
+    font-size: clamp(36px, 4.5vw, 54px);
+    line-height: 1;
+    letter-spacing: -2.5px;
+    font-weight: 950;
+    margin-bottom: 14px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary-dark); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 560px;
+}
+
+/* CASE GRID */
+.subsets-wrap { max-width: 1250px; margin: 0 auto; }
+.subset-block { margin-bottom: 48px; }
+
+.subset-heading {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding-left: 14px;
+    border-left: 5px solid var(--primary);
+}
+
+.case-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+@media(max-width: 850px) { .case-grid { grid-template-columns: 1fr; } }
+
+.case-card {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+.case-card:hover {
+    transform: translateY(-4px);
+    border-color: #dcbb5c;
+    box-shadow: var(--shadow-hover);
+}
+
+.case-diagrams-group { display: flex; gap: 8px; flex-shrink: 0; }
+
+.case-diagram {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: var(--diagram-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.case-diagram svg { width: 52px; height: 52px; }
+
+.case-body { flex: 1; min-width: 0; }
+
+.case-name {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+}
+
+.case-alg {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--primary-dark);
+    font-weight: 600;
+    overflow-wrap: break-word;
+}
+
+.case-alts {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.case-alt-line {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-soft);
+    overflow-wrap: break-word;
+}
+
+.eg-note {
+    max-width: 1250px;
+    margin: -20px auto 24px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-soft);
+}
+
+.load-error {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    text-align: center;
+    font-size: 14px;
+}
+
+@media(max-width: 1000px) { .hero { padding: 40px; background: var(--tint-green); border: var(--card-bw) solid var(--hero-border); } }
+@media(max-width: 700px) {
+    .hero { min-height: auto; padding: 34px 24px; border-radius: 27px; background: var(--tint-green); border: var(--card-bw) solid var(--hero-border); }
+    .hero h1 { font-size: 38px; }
+    .hero p { font-size: 13px; }
+    .subset-heading { font-size: 19px; }
+}
+
+/* ÖĞRENME DURUMLARI */
+.case-card {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+}
+.case-card:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+.case-card.state-learning { background: #fff8d6; border-color: #f2c94c; }
+.case-card.state-known { background: #dcfce7; border-color: #22c55e; }
+.case-card.state-learning:hover { border-color: #e0b12a; box-shadow: var(--shadow-hover); }
+.case-card.state-known:hover { border-color: #16a34a; box-shadow: var(--shadow-hover); }
+
+html.dark-mode .case-card.state-learning { background: #3a3212; border-color: #b8901f; }
+html.dark-mode .case-card.state-known { background: #123524; border-color: #22a35a; }
+
+.case-status { font-size: 11px; font-weight: 800; margin-top: 8px; display: none; }
+.case-card.state-learning .case-status { display: block; color: #a16207; }
+.case-card.state-known .case-status { display: block; color: #15803d; }
+html.dark-mode .case-card.state-learning .case-status { color: #facc15; }
+html.dark-mode .case-card.state-known .case-status { color: #4ade80; }
+
+/* İLERLEME ÖZETİ */
+.progress-summary {
+    max-width: 1250px;
+    margin: 0 auto 28px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    font-weight: 800;
+}
+.progress-summary span {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    color: var(--text);
+}
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<section class="hero reveal">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+<span data-i18n="badge_text">2x2 &middot; EG-2 &middot; 42 CASE</span>
+</div>
+<h1><span data-i18n="hero_title1">EG-2</span> <span data-i18n="hero_titleAccent">Algoritmaları</span></h1>
+<p data-i18n="hero_p">
+Alt katman yönlüyken ve çapraz iki köşesi yer değiştirmişken, 2x2'yi tek algoritmayla bitiren 42 case. EG yönteminin bir parçası: CLL (EG-0) ile birlikte EG-1 ve EG-2 tam EG'yi oluşturur.
+</p>
+</div>
+</section>
+
+<p class="eg-note" data-i18n="eg_note">Her case'te solda üst katman (yukarıdan), sağda alt katman görünür. Alt katman, üstten içinden bakıyormuş gibi aynı yönde çizilir (ön kenar aşağıda).</p>
+
+<!-- İlerleme özeti -->
+<div class="progress-summary" id="progressSummary"></div>
+
+<div class="subsets-wrap" id="subsetsWrap"></div>
+
+<div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">
+    Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.
+</div>
+
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
+
+<!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
+<script>var PAGE_ID = "eg2";</script>
+<script src="/js/i18n.js?v=20261016"></script>
+<script src="/js/common.js?v=20261016"></script>
+
+<script>
+/* ============================================================
+   ÖĞRENME İLERLEMESİ (localStorage)
+   Beyaz (boş) -> sarı (learning) -> yeşil (known) -> beyaz
+   Her algoritma sayfası için PROGRESS_KEY farklı olmalı.
+   ============================================================ */
+var PROGRESS_KEY = "algo-progress-eg2";
+var STATES = ["", "learning", "known"];
+
+var PROGRESS_TEXT = {
+    tr: { learning: "Öğreniyorum", known: "Biliyorum" },
+    en: { learning: "Learning",    known: "Known" },
+    de: { learning: "Ich lerne",   known: "Kann ich" },
+    fr: { learning: "J'apprends",  known: "Je sais" },
+    ru: { learning: "Учу",         known: "Знаю" },
+    ar: { learning: "أتعلم",       known: "أعرف" }
+};
+
+function currentLang() { return localStorage.getItem("site-lang") || "tr"; }
+function progressText() { return PROGRESS_TEXT[currentLang()] || PROGRESS_TEXT.tr; }
+
+function loadProgress() {
+    try {
+        var p = JSON.parse(localStorage.getItem(PROGRESS_KEY));
+        return (p && typeof p === "object") ? p : {};
+    } catch (e) { return {}; }
+}
+function saveProgress(p) {
+    try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+
+function stateOfCard(card) {
+    if (card.classList.contains("state-known")) return "known";
+    if (card.classList.contains("state-learning")) return "learning";
+    return "";
+}
+
+function applyState(card, state) {
+    card.classList.remove("state-learning", "state-known");
+    if (state) card.classList.add("state-" + state);
+    var s = card.querySelector(".case-status");
+    if (s) s.textContent = state ? progressText()[state] : "";
+}
+
+function updateSummary() {
+    var cards = document.querySelectorAll(".case-card");
+    var learning = 0, known = 0;
+    for (var i = 0; i < cards.length; i++) {
+        var st = stateOfCard(cards[i]);
+        if (st === "learning") learning++;
+        if (st === "known") known++;
+    }
+    var t = progressText();
+    var el = document.getElementById("progressSummary");
+    if (el) {
+        el.innerHTML =
+            '<span>🟡 ' + t.learning + ': ' + learning + '</span>' +
+            '<span>🟢 ' + t.known + ': ' + known + ' / ' + cards.length + '</span>';
+    }
+}
+
+function refreshProgressLabels() {
+    var cards = document.querySelectorAll(".case-card");
+    for (var i = 0; i < cards.length; i++) applyState(cards[i], stateOfCard(cards[i]));
+    updateSummary();
+}
+
+function cycleCard(card) {
+    var key = card.getAttribute("data-case");
+    var p = loadProgress();
+    var current = p[key] || "";
+    var next = STATES[(STATES.indexOf(current) + 1) % STATES.length];
+    if (next) { p[key] = next; } else { delete p[key]; }
+    saveProgress(p);
+    applyState(card, next);
+    updateSummary();
+}
+
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+fetch("/icerikler/algoritmalar/eg.json")
+    .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .then(function(data) {
+        var groups = data.eg2;
+        var wrap = document.getElementById("subsetsWrap");
+        var progress = loadProgress();
+        var t = progressText();
+        var html = "";
+
+        for (var i = 0; i < groups.length; i++) {
+            var group = groups[i];
+            var i18nKey = "subset_" + group.subset;
+
+            html += '<div class="subset-block">';
+            html += '  <h2 class="subset-heading" data-i18n="' + i18nKey + '">' + escapeHtml(group.subset) + '</h2>';
+            html += '  <div class="case-grid">';
+
+            for (var j = 0; j < group.cases.length; j++) {
+                var c = group.cases[j];
+                // Kayıt anahtarı: alt grup + case adı (farklı gruplarda aynı isim çakışmasın)
+                var key = group.subset + "::" + c.name;
+                var st = progress[key] || "";
+                var cls = "case-card" + (st ? " state-" + st : "");
+                var label = st ? t[st] : "";
+
+                html += '<div class="' + cls + '" data-case="' + escapeHtml(key) + '" role="button" tabindex="0">';
+                var diagU = ortegaSvg(c.pattern_u, "full", 60);
+                var diagD = ortegaSvg(c.pattern_d, "full", 60);
+                html += '  <div class="case-diagrams-group" dir="ltr">';
+                html += '    <div class="case-diagram">' + diagU + '</div>';
+                html += '    <div class="case-diagram">' + diagD + '</div>';
+                html += '  </div>';
+                html += '  <div class="case-body">';
+                html += '    <div class="case-name">' + escapeHtml(c.name) + '</div>';
+                html += '    <div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>';
+                if (c.alts && c.alts.length > 0) {
+                    html += '    <div class="case-alts" dir="ltr">';
+                    for (var k = 0; k < c.alts.length; k++) {
+                        html += '      <div class="case-alt-line">' + escapeHtml(c.alts[k]) + '</div>';
+                    }
+                    html += '    </div>';
+                }
+
+                html += '    <div class="case-status">' + escapeHtml(label) + '</div>';
+                html += '  </div>';
+                html += '</div>';
+            }
+
+            html += '  </div>';
+            html += '</div>';
+        }
+
+        wrap.innerHTML = html;
+
+        // Tıklama (event delegation)
+        wrap.addEventListener("click", function(e) {
+            // Metin seçiliyorsa (algoritma kopyalama) durumu değiştirme
+            var sel = window.getSelection ? String(window.getSelection()) : "";
+            if (sel.length > 0) return;
+            var card = e.target.closest(".case-card");
+            if (card) cycleCard(card);
+        });
+
+        // Klavye: Enter / Boşluk
+        wrap.addEventListener("keydown", function(e) {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            var card = e.target.closest(".case-card");
+            if (!card) return;
+            e.preventDefault();
+            cycleCard(card);
+        });
+
+        applyLanguage(currentLang());
+        refreshProgressLabels();
+    })
+    .catch(function(err) {
+        var errBox = document.getElementById("loadError");
+        if (errBox) errBox.style.display = "block";
+        console.error("/icerikler/algoritmalar/eg.json yüklenemedi:", err);
+    });
+
+// Dil menüsünden dil değişince etiketleri güncelle
+document.addEventListener("click", function(e) {
+    if (e.target.closest("#langMenu")) setTimeout(refreshProgressLabels, 50);
+});
+</script>
+
+</body>
+</html>
