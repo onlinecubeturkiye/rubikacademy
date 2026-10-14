@@ -37,7 +37,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261040">
+<link rel="stylesheet" href="/styles/common.css?v=20261041">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -687,9 +687,9 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261040"></script>
-<script src="/js/common.js?v=20261040"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261040"></script>
+<script src="/js/i18n.js?v=20261041"></script>
+<script src="/js/common.js?v=20261041"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261041"></script>
 
 <script>
 /* ============================================================
@@ -715,7 +715,6 @@ var SETS = [
     { id: "eg2",        label: "EG-2",       file: "eg.json",         dataKey: "eg2",  progress: "algo-progress-eg2",        keyFmt: "subset", page: "eg2",        puzzle: "2x2", cube: "2x2", draw: drawPair },
     { id: "roux-cmll",  label: "CMLL", file: "roux.json", multi: "cmll", progress: "algo-progress-roux-cmll", keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", noBT: true, draw: polyDraw },
     { id: "roux-eo",    label: "EO",   file: "roux.json", multi: "eo",   progress: "algo-progress-roux-eo",   keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", noBT: true, draw: polyDraw },
-    { id: "roux-l4c",   label: "4c",   file: "roux.json", multi: "l4c",  progress: "algo-progress-roux-l4c",  keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", noBT: true, draw: polyDraw },
     { id: "pyra-l3e",   label: "L3E",  file: "pyraminx.json", multi: "l3e", progress: "algo-progress-pyraminx-l3e", keyFmt: "name", page: "pyra_algos", puzzle: "pyra", cube: "pyra", draw: polyDraw },
     { id: "pyra-l4e",   label: "L4E",  file: "pyraminx.json", multi: "l4e", progress: "algo-progress-pyraminx-l4e", keyFmt: "name", page: "pyra_algos", puzzle: "pyra", cube: "pyra", draw: polyDraw },
     { id: "sk-beginner",     label: "Sarah Beginner",     file: "skewb.json", multi: "beginner",     progress: "algo-progress-skewb-beginner",     keyFmt: "name", page: "skewb_algos", puzzle: "skewb", cube: "skewb", draw: polyDraw },
@@ -845,7 +844,7 @@ function loadAll() {
     SETS.forEach(function (s) { files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261040").then(function (r) {
+        return fetch(BASE + f + "?v=20261041").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
