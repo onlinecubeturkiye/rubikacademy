@@ -22,7 +22,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#ffd21f">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261042">
+<link rel="stylesheet" href="/styles/common.css?v=20261043">
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar">
 <meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, WV, Ortega, CLL ve EG algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
 <meta property="og:title" content="Rubik Academy - Algoritmalar">
@@ -345,6 +345,34 @@ html {
     .trainer-banner { flex-wrap: wrap; }
     .trainer-banner-btn { width: 100%; text-align: center; }
 }
+
+/* ===== Algoritma kütüphanesi: küp bölümleri + doğrudan set kartları ===== */
+.tool-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: -6px 0 22px; }
+.tool-link { padding: 9px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 800; font-size: 14px; text-decoration: none; box-shadow: var(--shadow-sm); }
+.tool-link:hover { background: var(--cube-yellow); color: #17171f; }
+.jump { position: sticky; top: 8px; z-index: 20; display: flex; gap: 8px; overflow-x: auto; padding: 8px; margin: 0 auto 26px; max-width: max-content;
+    border: var(--card-bw) solid var(--ink); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-sm); scrollbar-width: none; }
+.jump::-webkit-scrollbar { display: none; }
+.jump a { flex: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 14px; color: var(--text); text-decoration: none; white-space: nowrap; }
+.jump a:hover, .jump a.on { background: var(--cube-yellow); color: #17171f; }
+.puz { margin-bottom: 34px; scroll-margin-top: 90px; }
+.puz-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 14px; padding-inline-start: 14px; border-inline-start: 6px solid var(--cube-yellow); }
+.puz-head h3 { font-family: var(--font-display); font-size: 26px; font-weight: 900; color: var(--text); }
+.puz-sub { font-size: 14px; font-weight: 600; color: var(--text-soft); }
+.set-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+.set-card { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 18px; text-decoration: none; color: var(--text);
+    border: var(--card-bw) solid var(--ink); background: var(--surface); box-shadow: var(--shadow-sm); transition: transform .12s, box-shadow .12s; }
+.set-card:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); }
+.sc-diag { flex: none; width: 76px; height: 76px; border-radius: 12px; background: var(--diagram-bg); display: grid; place-items: center; overflow: hidden; }
+.sc-diag svg { width: 66px; height: 66px; }
+.sc-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.sc-text b { font-size: 17px; font-weight: 900; }
+.sc-count { font-size: 12px; font-weight: 800; color: var(--primary); }
+.sc-text small { font-size: 12.5px; color: var(--text-soft); line-height: 1.35; }
+.sc-arrow { font-weight: 900; font-size: 18px; color: var(--text-soft); }
+[dir="rtl"] .sc-arrow { transform: scaleX(-1); }
+.set-card:hover .sc-arrow { color: var(--text); }
+@media (max-width: 520px) { .set-grid { grid-template-columns: 1fr; } .puz-head h3 { font-size: 22px; } .jump { max-width: 100%; } }
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
@@ -434,7 +462,7 @@ html {
 </div>
 <h1><span data-i18n="hero_title1">Algoritmaları</span> <span data-i18n="hero_titleAccent">Öğren</span></h1>
 <p data-i18n="hero_p">
-Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, WV, Ortega, CLL ve EG case'lerini diyagramlarıyla adım adım öğren. Diğer küpler yakında.
+3x3 (CFOP ve Roux), 2x2, Pyraminx, Skewb, 4x4 ve 5x5 için tüm algoritma setleri diyagramlarıyla. Bir sete dokun, doğrudan case'lere git.
 </p>
 </div>
 </section>
@@ -456,64 +484,143 @@ Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, WV, Orte
     <span class="trainer-banner-btn" data-i18n="trainer_btn">Antrenörü Aç →</span>
 </a>
 
-<!-- ALGORİTMA SETLERİ: tüm küpler tek bölümde; set seçimi açılan sayfadaki sekmelerden -->
-<div class="category-block">
-    <div class="category-heading">
-        <h3 data-i18n="cat_sets_title">Algoritma Setleri</h3>
-    </div>
-    <section class="methods methods-3">
-        <div class="hub-slot" id="cardsSection"></div>
-        <div class="hub-slot" id="cards2x2Section"></div>
-        <a href="/icerikler/algoritmalar/4x4" class="card">
-            <div class="card-visual p4-visual">
-                <div class="level" data-i18n="p4_level">PARITY</div>
-                <div class="count-badge" data-i18n="p4_count">2 set</div>
-                <div class="diagram-wrap" dir="ltr"><svg viewBox="0 0 122 122" width="150" height="150" aria-hidden="true"><rect x="10" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="36" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="62" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="88" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="10" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="36" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="62" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="88" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="10" y="62" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="36" y="62" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="62" y="62" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="88" y="62" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="10" y="88" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="36" y="88" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="62" y="88" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="88" y="88" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="10" y="114" width="24" height="8" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"/><rect x="114" y="10" width="8" height="24" rx="2" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"/><rect x="10" y="0" width="24" height="8" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"/><rect x="0" y="10" width="8" height="24" rx="2" fill="#d12d28" stroke="#14171c" stroke-width="0.9"/><rect x="36" y="114" width="24" height="8" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"/><rect x="114" y="36" width="8" height="24" rx="2" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"/><rect x="36" y="0" width="24" height="8" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"/><rect x="0" y="36" width="8" height="24" rx="2" fill="#d12d28" stroke="#14171c" stroke-width="0.9"/><rect x="62" y="114" width="24" height="8" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"/><rect x="114" y="62" width="8" height="24" rx="2" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"/><rect x="62" y="0" width="24" height="8" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"/><rect x="0" y="62" width="8" height="24" rx="2" fill="#d12d28" stroke="#14171c" stroke-width="0.9"/><rect x="88" y="114" width="24" height="8" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"/><rect x="114" y="88" width="8" height="24" rx="2" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"/><rect x="88" y="0" width="24" height="8" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"/><rect x="0" y="88" width="8" height="24" rx="2" fill="#d12d28" stroke="#14171c" stroke-width="0.9"/></svg></div>
-            </div>
-            <div class="card-info">
-                <h3 data-i18n="p4_title">4x4 Algoritmaları</h3>
-                <p data-i18n="p4_p">OLL ve PLL parity ile PLL parity case'leri.</p>
-                <div class="button"><span data-i18n="cta_start">Case'lere Git</span><span class="arrow">→</span></div>
-            </div>
-        </a>
-<a href="/icerikler/algoritmalar/5x5" class="card">
-            <div class="card-visual p5-visual">
-                <div class="level" data-i18n="p5_level">PARITY</div>
-                <div class="count-badge" data-i18n="p5_count">1 set</div>
-                <div class="diagram-wrap" dir="ltr"><svg viewBox="0 0 122 122" width="150" height="150" aria-hidden="true"><rect x="14.0" y="14.0" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="33.2" y="14.0" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="52.4" y="14.0" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="71.6" y="14.0" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="90.8" y="14.0" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="14.0" y="33.2" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="33.2" y="33.2" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="52.4" y="33.2" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="71.6" y="33.2" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="90.8" y="33.2" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="14.0" y="52.4" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="33.2" y="52.4" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="52.4" y="52.4" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="71.6" y="52.4" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="90.8" y="52.4" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="14.0" y="71.6" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="33.2" y="71.6" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="52.4" y="71.6" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="71.6" y="71.6" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="90.8" y="71.6" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="14.0" y="90.8" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="33.2" y="90.8" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="52.4" y="90.8" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="71.6" y="90.8" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="90.8" y="90.8" width="17.2" height="17.2" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"/><rect x="14.0" y="113.0" width="17.2" height="8" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"/><rect x="14.0" y="1" width="17.2" height="8" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"/><rect x="1" y="14.0" width="8" height="17.2" rx="2" fill="#d12d28" stroke="#14171c" stroke-width="0.9"/><rect x="113.0" y="14.0" width="8" height="17.2" rx="2" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"/><rect x="33.2" y="113.0" width="17.2" height="8" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"/><rect x="33.2" y="1" width="17.2" height="8" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"/><rect x="1" y="33.2" width="8" height="17.2" rx="2" fill="#d12d28" stroke="#14171c" stroke-width="0.9"/><rect x="113.0" y="33.2" width="8" height="17.2" rx="2" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"/><rect x="52.4" y="113.0" width="17.2" height="8" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"/><rect x="52.4" y="1" width="17.2" height="8" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"/><rect x="1" y="52.4" width="8" height="17.2" rx="2" fill="#d12d28" stroke="#14171c" stroke-width="0.9"/><rect x="113.0" y="52.4" width="8" height="17.2" rx="2" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"/><rect x="71.6" y="113.0" width="17.2" height="8" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"/><rect x="71.6" y="1" width="17.2" height="8" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"/><rect x="1" y="71.6" width="8" height="17.2" rx="2" fill="#d12d28" stroke="#14171c" stroke-width="0.9"/><rect x="113.0" y="71.6" width="8" height="17.2" rx="2" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"/><rect x="90.8" y="113.0" width="17.2" height="8" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"/><rect x="90.8" y="1" width="17.2" height="8" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"/><rect x="1" y="90.8" width="8" height="17.2" rx="2" fill="#d12d28" stroke="#14171c" stroke-width="0.9"/><rect x="113.0" y="90.8" width="8" height="17.2" rx="2" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"/></svg></div>
-            </div>
-            <div class="card-info">
-                <h3 data-i18n="p5_title">5x5 Algoritmaları</h3>
-                <p data-i18n="p5_p">Kenar parity: son kenarda iki kanat ters kaldığında.</p>
-                <div class="button"><span data-i18n="cta_start">Case'lere Git</span><span class="arrow">→</span></div>
-            </div>
-        </a>
-        <a href="/icerikler/algoritmalar/pyraminx" class="card">
-            <div class="card-visual pyra-visual">
-                <div class="level" data-i18n="pyra_level">L3E · L4E</div>
-                <div class="count-badge" data-i18n="pyra_count">2 set</div>
-                <div class="diagram-wrap" dir="ltr"><svg viewBox="-0.05 -0.05 3.100 1.892" width="230" height="170" xmlns="http://www.w3.org/2000/svg"><polygon points="1.833,0.604 1.690,0.853 1.977,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.810,0.591 1.667,0.839 1.523,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.604 1.357,0.853 1.643,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.591 1.333,0.839 1.190,0.591" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.167,0.604 1.023,0.853 1.310,0.853" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.316 1.523,0.564 1.810,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.643,0.302 1.500,0.550 1.357,0.302" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.316 1.190,0.564 1.477,0.564" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,0.027 1.357,0.275 1.643,0.275" fill="#16a34a" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.591 0.857,0.591 1.000,0.839" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.564 0.857,0.564 1.000,0.316" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.302 0.690,0.302 0.833,0.550" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.977,0.275 0.690,0.275 0.833,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="0.810,0.013 0.523,0.013 0.667,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.302 1.023,0.302 1.167,0.550" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.310,0.275 1.023,0.275 1.167,0.027" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.143,0.013 0.857,0.013 1.000,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.477,0.013 1.190,0.013 1.333,0.262" fill="#e53935" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.190,0.013 2.333,0.262 2.477,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.167,0.027 2.310,0.275 2.023,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.023,0.302 2.167,0.550 2.310,0.302" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="2.000,0.316 2.143,0.564 1.857,0.564" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.591 2.000,0.839 2.143,0.591" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.857,0.013 2.000,0.262 2.143,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.833,0.027 1.977,0.275 1.690,0.275" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.302 1.833,0.550 1.977,0.302" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,0.013 1.667,0.262 1.810,0.013" fill="#1e6fe0" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.690,0.939 1.833,1.188 1.977,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.667,0.953 1.810,1.201 1.523,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.523,1.228 1.667,1.476 1.810,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.500,1.242 1.643,1.490 1.357,1.490" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,1.517 1.500,1.765 1.643,1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.357,0.939 1.500,1.188 1.643,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.333,0.953 1.477,1.201 1.190,1.201" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.190,1.228 1.333,1.476 1.477,1.228" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/><polygon points="1.023,0.939 1.167,1.188 1.310,0.939" fill="#fdd835" stroke="#17171f" stroke-width="0.015" stroke-linejoin="round"/></svg></div>
-            </div>
-            <div class="card-info">
-                <h3 data-i18n="pyra_title">Pyraminx Algoritmaları</h3>
-                <p data-i18n="pyra_p">Beginner (L3E) ve L4E: son 3 ve son 4 kenar için 95 case.</p>
-                <div class="button"><span data-i18n="cta_start">Case'lere Git</span><span class="arrow">→</span></div>
-            </div>
-        </a>
-        <a href="/icerikler/algoritmalar/skewb" class="card">
-            <div class="card-visual skewb-visual">
-                <div class="level" data-i18n="skewb_level">SARAH</div>
-                <div class="count-badge" data-i18n="skewb_count">3 set</div>
-                <div class="diagram-wrap" dir="ltr"><svg viewBox="-2.3 -2.3 4.6 4.6" width="170" height="170" xmlns="http://www.w3.org/2000/svg"><polygon points="0.779,-1.450 0.779,-0.550 -0.779,-0.550 -0.779,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.000,-1.967 0.779,-1.517 -0.779,-1.517" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.674,-1.000 -0.895,-0.550 -0.895,-1.450" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.674,-1.000 0.895,-1.450 0.895,-0.550" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.000,-0.033 -0.779,-0.483 0.779,-0.483" fill="#fdd835" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.866,1.400 -0.087,0.950 -0.866,-0.400 -1.645,0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.703,0.983 -0.924,1.433 -1.703,0.083" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-1.703,-0.950 -0.924,-0.500 -1.703,-0.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.029,1.950 -0.808,1.500 -0.029,1.050" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="-0.029,0.017 -0.808,-0.433 -0.029,0.917" fill="#16a34a" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.645,0.050 0.866,-0.400 0.087,0.950 0.866,1.400" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,0.983 1.703,0.083 0.924,1.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.029,1.950 0.029,1.050 0.808,1.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="1.703,-0.950 1.703,-0.050 0.924,-0.500" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/><polygon points="0.029,0.017 0.029,0.917 0.808,-0.433" fill="#fb8c00" stroke="#17171f" stroke-width="0.035" stroke-linejoin="round"/></svg></div>
-            </div>
-            <div class="card-info">
-                <h3 data-i18n="skewb_title">Skewb Algoritmaları</h3>
-                <p data-i18n="skewb_p">Sarah's Beginner, Intermediate ve Advanced setleri.</p>
-                <div class="button"><span data-i18n="cta_start">Case'lere Git</span><span class="arrow">→</span></div>
-            </div>
-        </a>
-    </section>
+<div class="tool-links">
+    <a href="/icerikler/algoritmalar/yazdir" class="tool-link" data-i18n="link_print">🖨️ Yazdırılabilir kağıtlar (PDF)</a>
+    <a href="/icerikler/sss" class="tool-link" data-i18n="link_faq">❓ Sıkça sorulan sorular</a>
 </div>
+
+<nav class="jump" aria-label="Küpler"><a href="#p3">3x3 · CFOP</a><a href="#proux">3x3 · Roux</a><a href="#p2">2x2</a><a href="#ppyra">Pyraminx</a><a href="#pskewb">Skewb</a><a href="#p4">4x4</a><a href="#p5">5x5</a></nav>
+
+<section class="puz" id="p3">
+    <div class="puz-head"><h3>3x3 · CFOP</h3><span class="puz-sub" data-i18n="pz_cfop">Son katman setleri</span></div>
+    <div class="set-grid">
+        <a class="set-card" href="/icerikler/algoritmalar/oll">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="0 0 96 96" aria-hidden="true"><rect x="10" y="10" width="24" height="24" rx="2" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="62" width="24" height="24" rx="2" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="62" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="62" width="24" height="24" rx="2" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="88" width="24" height="8" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="10" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="0" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="10" width="8" height="24" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="88" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="36" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="0" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="36" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="88" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="62" width="8" height="24" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="0" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="62" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect></svg></span>
+            <span class="sc-text"><b>OLL</b><span class="sc-count">57 <span data-i18n="case_word">case</span></span><small data-i18n="sd_oll">Üst yüzü tek adımda sarı yap</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/pll">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="0 0 96 96" aria-hidden="true"><rect x="10" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="62" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="62" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="62" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="88" width="24" height="8" rx="1" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="10" width="8" height="24" rx="1" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="0" width="24" height="8" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="10" width="8" height="24" rx="1" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="88" width="24" height="8" rx="1" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="36" width="8" height="24" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="0" width="24" height="8" rx="1" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="36" width="8" height="24" rx="1" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="88" width="24" height="8" rx="1" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="62" width="8" height="24" rx="1" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="0" width="24" height="8" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="62" width="8" height="24" rx="1" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect></svg></span>
+            <span class="sc-text"><b>PLL</b><span class="sc-count">21 <span data-i18n="case_word">case</span></span><small data-i18n="sd_pll">Son katmanı yerleştir, küpü bitir</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/coll">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="0 0 96 96" aria-hidden="true"><rect x="10" y="10" width="24" height="24" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="10" width="24" height="24" rx="2" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="62" width="24" height="24" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="62" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="62" width="24" height="24" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="88" width="24" height="8" rx="1" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="10" width="8" height="24" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="0" width="24" height="8" rx="1" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="10" width="8" height="24" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="88" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="36" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="0" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="36" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="88" width="24" height="8" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="62" width="8" height="24" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="0" width="24" height="8" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="62" width="8" height="24" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect></svg></span>
+            <span class="sc-text"><b>COLL</b><span class="sc-count">42 <span data-i18n="case_word">case</span></span><small data-i18n="sd_coll">Kenarlar yönlüyken köşeleri birlikte çöz</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/wv">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="0 0 96 96" aria-hidden="true"><rect x="10" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="10" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="36" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="62" width="24" height="24" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="62" width="24" height="24" rx="2" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="62" width="24" height="24" rx="2" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="88" width="24" height="8" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="10" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="10" y="0" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="10" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="88" width="24" height="8" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="36" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="36" y="0" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="36" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="88" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="88" y="62" width="8" height="24" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="62" y="0" width="24" height="8" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="62" width="8" height="24" rx="1" fill="#eef2f3" stroke="#14171c" stroke-width="0.9"></rect></svg></span>
+            <span class="sc-text"><b>WV</b><span class="sc-count">27 <span data-i18n="case_word">case</span></span><small data-i18n="sd_wv">Son F2L çiftiyle köşeleri yönlendir</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+    </div>
+</section>
+<section class="puz" id="proux">
+    <div class="puz-head"><h3>3x3 · Roux</h3><span class="puz-sub" data-i18n="pz_roux">Blok yöntemi</span></div>
+    <div class="set-grid">
+        <a class="set-card" href="/icerikler/algoritmalar/roux#cmll">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="0 0 4 4" xmlns="http://www.w3.org/2000/svg"><polygon points="0.5,0.06 1.42,0.06 1.42,0.42 0.5,0.42" fill="#f6c719" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="1.5,0.06 2.42,0.06 2.42,0.42 1.5,0.42" fill="#4b515c" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="2.5,0.06 3.42,0.06 3.42,0.42 2.5,0.42" fill="#f6c719" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="0.06,0.5 0.42,0.5 0.42,1.42 0.06,1.42" fill="#2c6fe6" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="0.06,1.5 0.42,1.5 0.42,2.42 0.06,2.42" fill="#4b515c" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="0.06,2.5 0.42,2.5 0.42,3.42 0.06,3.42" fill="#179e4f" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="3.58,0.5 3.94,0.5 3.94,1.42 3.58,1.42" fill="#2c6fe6" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="3.58,1.5 3.94,1.5 3.94,2.42 3.58,2.42" fill="#4b515c" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="3.58,2.5 3.94,2.5 3.94,3.42 3.58,3.42" fill="#179e4f" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="0.5,0.5 1.42,0.5 1.42,1.42 0.5,1.42" fill="#d12d28" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="1.5,0.5 2.42,0.5 2.42,1.42 1.5,1.42" fill="#4b515c" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="2.5,0.5 3.42,0.5 3.42,1.42 2.5,1.42" fill="#ff7a1a" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="0.5,1.5 1.42,1.5 1.42,2.42 0.5,2.42" fill="#4b515c" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="1.5,1.5 2.42,1.5 2.42,2.42 1.5,2.42" fill="#f6c719" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="2.5,1.5 3.42,1.5 3.42,2.42 2.5,2.42" fill="#4b515c" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="0.5,2.5 1.42,2.5 1.42,3.42 0.5,3.42" fill="#d12d28" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="1.5,2.5 2.42,2.5 2.42,3.42 1.5,3.42" fill="#4b515c" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="2.5,2.5 3.42,2.5 3.42,3.42 2.5,3.42" fill="#ff7a1a" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="0.5,3.58 1.42,3.58 1.42,3.94 0.5,3.94" fill="#f6c719" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="1.5,3.58 2.42,3.58 2.42,3.94 1.5,3.94" fill="#4b515c" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon><polygon points="2.5,3.58 3.42,3.58 3.42,3.94 2.5,3.94" fill="#f6c719" stroke="#17171f" stroke-width="0.025" stroke-linejoin="round"></polygon></svg></span>
+            <span class="sc-text"><b>CMLL</b><span class="sc-count">42 <span data-i18n="case_word">case</span></span><small data-i18n="sd_cmll">İki bloktan sonra son katman köşeleri</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/roux#eo">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="-2.626 -3.02 5.252 6.01" class="iso" xmlns="http://www.w3.org/2000/svg"><polygon points="0,-2.94 0.762,-2.5 0,-2.06 -0.762,-2.5" fill="#f6c719" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="0.866,-2.44 1.628,-2 0.866,-1.56 0.104,-2" fill="#f6c719" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="1.732,-1.94 2.494,-1.5 1.732,-1.06 0.97,-1.5" fill="#f6c719" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-0.866,-2.44 -0.104,-2 -0.866,-1.56 -1.628,-2" fill="#4b515c" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="0,-1.94 0.762,-1.5 0,-1.06 -0.762,-1.5" fill="#f6c719" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="0.866,-1.44 1.628,-1 0.866,-0.56 0.104,-1" fill="#4b515c" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-1.732,-1.94 -0.97,-1.5 -1.732,-1.06 -2.494,-1.5" fill="#f6c719" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-0.866,-1.44 -0.104,-1 -0.866,-0.56 -1.628,-1" fill="#4b515c" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="0,-0.94 0.762,-0.5 0,-0.06 -0.762,-0.5" fill="#f6c719" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-2.546,-0.53 -1.784,-0.09 -1.784,-0.97 -2.546,-1.41" fill="#d12d28" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-1.68,-0.03 -0.918,0.41 -0.918,-0.47 -1.68,-0.91" fill="#f6c719" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-0.814,0.47 -0.052,0.91 -0.052,0.03 -0.814,-0.41" fill="#d12d28" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-2.546,0.47 -1.784,0.91 -1.784,0.03 -2.546,-0.41" fill="#179e4f" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-1.68,0.97 -0.918,1.41 -0.918,0.53 -1.68,0.09" fill="#179e4f" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-0.814,1.47 -0.052,1.91 -0.052,1.03 -0.814,0.59" fill="#179e4f" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-2.546,1.47 -1.784,1.91 -1.784,1.03 -2.546,0.59" fill="#179e4f" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-1.68,1.97 -0.918,2.41 -0.918,1.53 -1.68,1.09" fill="#f6c719" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="-0.814,2.47 -0.052,2.91 -0.052,2.03 -0.814,1.59" fill="#179e4f" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="0.814,0.47 0.052,0.91 0.052,0.03 0.814,-0.41" fill="#179e4f" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="1.68,-0.03 0.918,0.41 0.918,-0.47 1.68,-0.91" fill="#eef2f3" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="2.546,-0.53 1.784,-0.09 1.784,-0.97 2.546,-1.41" fill="#179e4f" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="0.814,1.47 0.052,1.91 0.052,1.03 0.814,0.59" fill="#ff7a1a" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="1.68,0.97 0.918,1.41 0.918,0.53 1.68,0.09" fill="#ff7a1a" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="2.546,0.47 1.784,0.91 1.784,0.03 2.546,-0.41" fill="#ff7a1a" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="0.814,2.47 0.052,2.91 0.052,2.03 0.814,1.59" fill="#ff7a1a" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="1.68,1.97 0.918,2.41 0.918,1.53 1.68,1.09" fill="#ff7a1a" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon><polygon points="2.546,1.47 1.784,1.91 1.784,1.03 2.546,0.59" fill="#ff7a1a" stroke="#17171f" stroke-width="0.033" stroke-linejoin="round"></polygon></svg></span>
+            <span class="sc-text"><b>EO</b><span class="sc-count">11 <span data-i18n="case_word">case</span></span><small data-i18n="sd_eo">Son 6 kenarın yönü (M ve U)</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+    </div>
+</section>
+<section class="puz" id="p2">
+    <div class="puz-head"><h3>2x2</h3><span class="puz-sub" data-i18n="pz_2x2">Ortega, CLL ve EG</span></div>
+    <div class="set-grid">
+        <a class="set-card" href="/icerikler/algoritmalar/ortega-oll">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="0 0 70 70" aria-hidden="true"><rect x="7" y="7" width="28" height="28" rx="1.5" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="7" width="28" height="28" rx="1.5" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="35" width="28" height="28" rx="1.5" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="35" width="28" height="28" rx="1.5" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="63" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="63" width="28" height="7" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="63" y="7" width="7" height="28" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="63" y="35" width="7" height="28" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="0" width="28" height="7" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="0" width="28" height="7" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="7" width="7" height="28" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="35" width="7" height="28" rx="1" fill="#4b515c" stroke="#14171c" stroke-width="0.9"></rect></svg></span>
+            <span class="sc-text"><b>Ortega OLL</b><span class="sc-count">7 <span data-i18n="case_word">case</span></span><small data-i18n="sd_ortega_oll">2x2 üst yüzü yönlendir</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/ortega-pbl">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="0 0 70 70" aria-hidden="true"><rect x="7" y="7" width="28" height="28" rx="1.5" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="7" width="28" height="28" rx="1.5" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="35" width="28" height="28" rx="1.5" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="35" width="28" height="28" rx="1.5" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="63" width="28" height="7" rx="1" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="63" width="28" height="7" rx="1" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="63" y="7" width="7" height="28" rx="1" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="63" y="35" width="7" height="28" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="0" width="28" height="7" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="0" width="28" height="7" rx="1" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="7" width="7" height="28" rx="1" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="35" width="7" height="28" rx="1" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect></svg></span>
+            <span class="sc-text"><b>Ortega PBL</b><span class="sc-count">5 <span data-i18n="case_word">case</span></span><small data-i18n="sd_ortega_pbl">İki katmanı birlikte yerleştir</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/cll">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="0 0 70 70" aria-hidden="true"><rect x="7" y="7" width="28" height="28" rx="1.5" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="7" width="28" height="28" rx="1.5" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="35" width="28" height="28" rx="1.5" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="35" width="28" height="28" rx="1.5" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="0" width="28" height="7" rx="1" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="0" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="63" y="7" width="7" height="28" rx="1" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="63" y="35" width="7" height="28" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="63" width="28" height="7" rx="1" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="63" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="7" width="7" height="28" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="35" width="7" height="28" rx="1" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect></svg></span>
+            <span class="sc-text"><b>CLL</b><span class="sc-count">42 <span data-i18n="case_word">case</span></span><small data-i18n="sd_cll">İlk katmandan sonra tek adımda bitir</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/eg1">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="0 0 70 70" aria-hidden="true"><rect x="7" y="7" width="28" height="28" rx="1.5" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="7" width="28" height="28" rx="1.5" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="35" width="28" height="28" rx="1.5" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="35" width="28" height="28" rx="1.5" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="63" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="63" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="63" y="7" width="7" height="28" rx="1" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="63" y="35" width="7" height="28" rx="1" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="0" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="0" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="7" width="7" height="28" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="35" width="7" height="28" rx="1" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect></svg></span>
+            <span class="sc-text"><b>EG-1</b><span class="sc-count">42 <span data-i18n="case_word">case</span></span><small data-i18n="sd_eg1">Altta komşu köşe değişimi</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/eg2">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="0 0 70 70" aria-hidden="true"><rect x="7" y="7" width="28" height="28" rx="1.5" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="7" width="28" height="28" rx="1.5" fill="#ff7a1a" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="35" width="28" height="28" rx="1.5" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="35" width="28" height="28" rx="1.5" fill="#d12d28" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="63" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="63" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="63" y="7" width="7" height="28" rx="1" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="63" y="35" width="7" height="28" rx="1" fill="#2c6fe6" stroke="#14171c" stroke-width="0.9"></rect><rect x="7" y="0" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="35" y="0" width="28" height="7" rx="1" fill="#f6c719" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="7" width="7" height="28" rx="1" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect><rect x="0" y="35" width="7" height="28" rx="1" fill="#179e4f" stroke="#14171c" stroke-width="0.9"></rect></svg></span>
+            <span class="sc-text"><b>EG-2</b><span class="sc-count">42 <span data-i18n="case_word">case</span></span><small data-i18n="sd_eg2">Altta çapraz köşe değişimi</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+    </div>
+</section>
+<section class="puz" id="ppyra">
+    <div class="puz-head"><h3>Pyraminx</h3><span class="puz-sub" data-i18n="pz_pyra">Kenar setleri</span></div>
+    <div class="set-grid">
+        <a class="set-card" href="/icerikler/algoritmalar/pyraminx#l3e">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="-0.841 -0.956 1.682 1.47" xmlns="http://www.w3.org/2000/svg"><polygon points="0.544,0.329 0.31,0.464 0.778,0.464" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.506,0.322 0.272,0.457 0.038,0.322" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0,0.329 -0.234,0.464 0.234,0.464" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.038,0.322 -0.272,0.457 -0.506,0.322" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.544,0.329 -0.778,0.464 -0.31,0.464" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.272,0.172 0.038,0.307 0.506,0.307" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.234,0.164 0,0.3 -0.234,0.164" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.272,0.172 -0.506,0.307 -0.038,0.307" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0,0.015 -0.234,0.15 0.234,0.15" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.557,0.307 -0.557,0.037 -0.791,0.442" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.532,0.278 -0.532,0.007 -0.298,-0.128" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.285,-0.164 -0.285,-0.435 -0.519,-0.029" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.259,-0.194 -0.259,-0.464 -0.025,-0.599" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.013,-0.636 -0.013,-0.906 -0.247,-0.501" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.285,0.15 -0.285,-0.12 -0.519,0.285" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.259,0.12 -0.259,-0.15 -0.025,-0.285" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.013,-0.322 -0.013,-0.592 -0.247,-0.186" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.013,-0.007 -0.013,-0.278 -0.247,0.128" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.013,-0.636 0.247,-0.501 0.013,-0.906" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.025,-0.599 0.259,-0.464 0.259,-0.194" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.285,-0.164 0.519,-0.029 0.285,-0.435" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.298,-0.128 0.532,0.007 0.532,0.278" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.557,0.307 0.791,0.442 0.557,0.037" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.013,-0.322 0.247,-0.186 0.013,-0.592" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.025,-0.285 0.259,-0.15 0.259,0.12" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.285,0.15 0.519,0.285 0.285,-0.12" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.013,-0.007 0.247,0.128 0.013,-0.278" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon></svg></span>
+            <span class="sc-text"><b>L3E</b><span class="sc-count">11 <span data-i18n="case_word">case</span></span><small data-i18n="sd_l3e">Başlangıç: son 3 kenar</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/pyraminx#l4e">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="-0.841 -0.956 1.682 1.47" xmlns="http://www.w3.org/2000/svg"><polygon points="0.544,0.329 0.31,0.464 0.778,0.464" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.506,0.322 0.272,0.457 0.038,0.322" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0,0.329 -0.234,0.464 0.234,0.464" fill="#fdd835" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.038,0.322 -0.272,0.457 -0.506,0.322" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.544,0.329 -0.778,0.464 -0.31,0.464" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.272,0.172 0.038,0.307 0.506,0.307" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.234,0.164 0,0.3 -0.234,0.164" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.272,0.172 -0.506,0.307 -0.038,0.307" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0,0.015 -0.234,0.15 0.234,0.15" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.557,0.307 -0.557,0.037 -0.791,0.442" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.532,0.278 -0.532,0.007 -0.298,-0.128" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.285,-0.164 -0.285,-0.435 -0.519,-0.029" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.259,-0.194 -0.259,-0.464 -0.025,-0.599" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.013,-0.636 -0.013,-0.906 -0.247,-0.501" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.285,0.15 -0.285,-0.12 -0.519,0.285" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.259,0.12 -0.259,-0.15 -0.025,-0.285" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.013,-0.322 -0.013,-0.592 -0.247,-0.186" fill="#16a34a" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="-0.013,-0.007 -0.013,-0.278 -0.247,0.128" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.013,-0.636 0.247,-0.501 0.013,-0.906" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.025,-0.599 0.259,-0.464 0.259,-0.194" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.285,-0.164 0.519,-0.029 0.285,-0.435" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.298,-0.128 0.532,0.007 0.532,0.278" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.557,0.307 0.791,0.442 0.557,0.037" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.013,-0.322 0.247,-0.186 0.013,-0.592" fill="#e53935" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.025,-0.285 0.259,-0.15 0.259,0.12" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.285,0.15 0.519,0.285 0.285,-0.12" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon><polygon points="0.013,-0.007 0.247,0.128 0.013,-0.278" fill="#1e6fe0" stroke="#17171f" stroke-width="0.011" stroke-linejoin="round"></polygon></svg></span>
+            <span class="sc-text"><b>L4E</b><span class="sc-count">84 <span data-i18n="case_word">case</span></span><small data-i18n="sd_l4e">İleri: son 4 kenar</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+    </div>
+</section>
+<section class="puz" id="pskewb">
+    <div class="puz-head"><h3>Skewb</h3><span class="puz-sub" data-i18n="pz_skewb">Sarah yöntemi</span></div>
+    <div class="set-grid">
+        <a class="set-card" href="/icerikler/algoritmalar/skewb#beginner">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="-1.774 -1.774 3.548 3.548" xmlns="http://www.w3.org/2000/svg"><polygon points="0.608,-0.608 0.608,0.608 -0.608,0.608 -0.608,-0.608" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0,-1.348 0.608,-0.74 -0.608,-0.74" fill="#e53935" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-1.348,0 -0.74,0.608 -0.74,-0.608" fill="#16a34a" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.348,0 0.74,-0.608 0.74,0.608" fill="#fb8c00" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0,1.348 -0.608,0.74 0.608,0.74" fill="#16a34a" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.493,1.653 -0.754,0.754 -1.653,0.493" fill="#1e6fe0" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-1.395,0.066 -0.815,0.646 -1.714,0.385" fill="#e53935" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.066,1.395 -0.646,0.815 -0.385,1.714" fill="#fb8c00" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.653,-0.493 0.754,-0.754 0.493,-1.653" fill="#16a34a" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0.066,-1.395 0.646,-0.815 0.385,-1.714" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.395,-0.066 0.815,-0.646 1.714,-0.385" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.653,0.493 0.754,0.754 0.493,1.653" fill="#e53935" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.395,0.066 1.714,0.385 0.815,0.646" fill="#1e6fe0" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0.066,1.395 0.385,1.714 0.646,0.815" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.493,-1.653 -0.754,-0.754 -1.653,-0.493" fill="#fb8c00" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.066,-1.395 -0.385,-1.714 -0.646,-0.815" fill="#1e6fe0" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-1.395,-0.066 -1.714,-0.385 -0.815,-0.646" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon></svg></span>
+            <span class="sc-text"><b>Sarah Beginner</b><span class="sc-count">14 <span data-i18n="case_word">case</span></span><small data-i18n="sd_sk_beginner">Tetikleyiciler ve yan merkezler</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/skewb#intermediate">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="-1.774 -1.774 3.548 3.548" xmlns="http://www.w3.org/2000/svg"><polygon points="0.608,-0.608 0.608,0.608 -0.608,0.608 -0.608,-0.608" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0,-1.348 0.608,-0.74 -0.608,-0.74" fill="#e53935" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-1.348,0 -0.74,0.608 -0.74,-0.608" fill="#16a34a" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.348,0 0.74,-0.608 0.74,0.608" fill="#fb8c00" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0,1.348 -0.608,0.74 0.608,0.74" fill="#16a34a" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.493,1.653 -0.754,0.754 -1.653,0.493" fill="#1e6fe0" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-1.395,0.066 -0.815,0.646 -1.714,0.385" fill="#e53935" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.066,1.395 -0.646,0.815 -0.385,1.714" fill="#fb8c00" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.653,-0.493 0.754,-0.754 0.493,-1.653" fill="#16a34a" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0.066,-1.395 0.646,-0.815 0.385,-1.714" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.395,-0.066 0.815,-0.646 1.714,-0.385" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.653,0.493 0.754,0.754 0.493,1.653" fill="#e53935" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.395,0.066 1.714,0.385 0.815,0.646" fill="#1e6fe0" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0.066,1.395 0.385,1.714 0.646,0.815" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.493,-1.653 -0.754,-0.754 -1.653,-0.493" fill="#fb8c00" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.066,-1.395 -0.385,-1.714 -0.646,-0.815" fill="#1e6fe0" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-1.395,-0.066 -1.714,-0.385 -0.815,-0.646" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon></svg></span>
+            <span class="sc-text"><b>Sarah Intermediate</b><span class="sc-count">15 <span data-i18n="case_word">case</span></span><small data-i18n="sd_sk_intermediate">Üst yüz tek adımda</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/skewb#advanced">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="-1.774 -1.774 3.548 3.548" xmlns="http://www.w3.org/2000/svg"><polygon points="0.608,-0.608 0.608,0.608 -0.608,0.608 -0.608,-0.608" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0,-1.348 0.608,-0.74 -0.608,-0.74" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-1.348,0 -0.74,0.608 -0.74,-0.608" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.348,0 0.74,-0.608 0.74,0.608" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0,1.348 -0.608,0.74 0.608,0.74" fill="#fdd835" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.493,1.653 -0.754,0.754 -1.653,0.493" fill="#e53935" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-1.395,0.066 -0.815,0.646 -1.714,0.385" fill="#16a34a" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.066,1.395 -0.646,0.815 -0.385,1.714" fill="#16a34a" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.653,-0.493 0.754,-0.754 0.493,-1.653" fill="#fb8c00" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0.066,-1.395 0.646,-0.815 0.385,-1.714" fill="#1e6fe0" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.395,-0.066 0.815,-0.646 1.714,-0.385" fill="#1e6fe0" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.653,0.493 0.754,0.754 0.493,1.653" fill="#1e6fe0" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="1.395,0.066 1.714,0.385 0.815,0.646" fill="#fb8c00" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="0.066,1.395 0.385,1.714 0.646,0.815" fill="#fb8c00" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.493,-1.653 -0.754,-0.754 -1.653,-0.493" fill="#16a34a" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-0.066,-1.395 -0.385,-1.714 -0.646,-0.815" fill="#e53935" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon><polygon points="-1.395,-0.066 -1.714,-0.385 -0.815,-0.646" fill="#e53935" stroke="#17171f" stroke-width="0.022" stroke-linejoin="round"></polygon></svg></span>
+            <span class="sc-text"><b>Sarah Advanced</b><span class="sc-count">136 <span data-i18n="case_word">case</span></span><small data-i18n="sd_sk_advanced">İlk katmandan sonra tek algoritma</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+    </div>
+</section>
+<section class="puz" id="p4">
+    <div class="puz-head"><h3>4x4</h3><span class="puz-sub" data-i18n="pz_4x4">Parity algoritmaları</span></div>
+    <div class="set-grid">
+        <a class="set-card" href="/icerikler/algoritmalar/4x4#parity">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="-0.05 -0.05 5.02 5.02" xmlns="http://www.w3.org/2000/svg"><polygon points="0.52,0.52 1.4,0.52 1.4,1.4 0.52,1.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.52,1.52 1.4,1.52 1.4,2.4 0.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.52,2.52 1.4,2.52 1.4,3.4 0.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.52,3.52 1.4,3.52 1.4,4.4 0.52,4.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,0.52 2.4,0.52 2.4,1.4 1.52,1.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,1.52 2.4,1.52 2.4,2.4 1.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,2.52 2.4,2.52 2.4,3.4 1.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,3.52 2.4,3.52 2.4,4.4 1.52,4.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,0.52 3.4,0.52 3.4,1.4 2.52,1.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,1.52 3.4,1.52 3.4,2.4 2.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,2.52 3.4,2.52 3.4,3.4 2.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,3.52 3.4,3.52 3.4,4.4 2.52,4.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,0.52 4.4,0.52 4.4,1.4 3.52,1.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,1.52 4.4,1.52 4.4,2.4 3.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,2.52 4.4,2.52 4.4,3.4 3.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,3.52 4.4,3.52 4.4,4.4 3.52,4.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="4.6,0.52 4.86,0.52 4.86,1.4 4.6,1.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="4.6,1.52 4.86,1.52 4.86,2.4 4.6,2.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="4.6,2.52 4.86,2.52 4.86,3.4 4.6,3.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="4.6,3.52 4.86,3.52 4.86,4.4 4.6,4.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.06,0.52 0.32,0.52 0.32,1.4 0.06,1.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.06,1.52 0.32,1.52 0.32,2.4 0.06,2.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.06,2.52 0.32,2.52 0.32,3.4 0.06,3.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.06,3.52 0.32,3.52 0.32,4.4 0.06,4.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.52,4.6 1.4,4.6 1.4,4.86 0.52,4.86" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,4.6 2.4,4.6 2.4,4.86 1.52,4.86" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,4.6 3.4,4.6 3.4,4.86 2.52,4.86" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,4.6 4.4,4.6 4.4,4.86 3.52,4.86" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.52,0.06 1.4,0.06 1.4,0.32 0.52,0.32" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,0.06 2.4,0.06 2.4,0.32 1.52,0.32" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,0.06 3.4,0.06 3.4,0.32 2.52,0.32" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,0.06 4.4,0.06 4.4,0.32 3.52,0.32" fill="#5a5d66" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon></svg></span>
+            <span class="sc-text"><b>OLL / PLL Parity</b><span class="sc-count">2 <span data-i18n="case_word">case</span></span><small data-i18n="sd_4x4_parity">OLL ve PLL parity</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="set-card" href="/icerikler/algoritmalar/4x4#pllp">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="-0.05 -0.05 5.02 5.02" xmlns="http://www.w3.org/2000/svg"><polygon points="0.52,0.52 1.4,0.52 1.4,1.4 0.52,1.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.52,1.52 1.4,1.52 1.4,2.4 0.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.52,2.52 1.4,2.52 1.4,3.4 0.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.52,3.52 1.4,3.52 1.4,4.4 0.52,4.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,0.52 2.4,0.52 2.4,1.4 1.52,1.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,1.52 2.4,1.52 2.4,2.4 1.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,2.52 2.4,2.52 2.4,3.4 1.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,3.52 2.4,3.52 2.4,4.4 1.52,4.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,0.52 3.4,0.52 3.4,1.4 2.52,1.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,1.52 3.4,1.52 3.4,2.4 2.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,2.52 3.4,2.52 3.4,3.4 2.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,3.52 3.4,3.52 3.4,4.4 2.52,4.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,0.52 4.4,0.52 4.4,1.4 3.52,1.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,1.52 4.4,1.52 4.4,2.4 3.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,2.52 4.4,2.52 4.4,3.4 3.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,3.52 4.4,3.52 4.4,4.4 3.52,4.4" fill="#fdd835" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="4.6,0.52 4.86,0.52 4.86,1.4 4.6,1.4" fill="#16a34a" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="4.6,1.52 4.86,1.52 4.86,2.4 4.6,2.4" fill="#fb8c00" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="4.6,2.52 4.86,2.52 4.86,3.4 4.6,3.4" fill="#fb8c00" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="4.6,3.52 4.86,3.52 4.86,4.4 4.6,4.4" fill="#1e6fe0" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.06,0.52 0.32,0.52 0.32,1.4 0.06,1.4" fill="#16a34a" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.06,1.52 0.32,1.52 0.32,2.4 0.06,2.4" fill="#e53935" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.06,2.52 0.32,2.52 0.32,3.4 0.06,3.4" fill="#e53935" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.06,3.52 0.32,3.52 0.32,4.4 0.06,4.4" fill="#1e6fe0" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.52,4.6 1.4,4.6 1.4,4.86 0.52,4.86" fill="#e53935" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,4.6 2.4,4.6 2.4,4.86 1.52,4.86" fill="#1e6fe0" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,4.6 3.4,4.6 3.4,4.86 2.52,4.86" fill="#1e6fe0" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,4.6 4.4,4.6 4.4,4.86 3.52,4.86" fill="#fb8c00" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="0.52,0.06 1.4,0.06 1.4,0.32 0.52,0.32" fill="#e53935" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="1.52,0.06 2.4,0.06 2.4,0.32 1.52,0.32" fill="#16a34a" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="2.52,0.06 3.4,0.06 3.4,0.32 2.52,0.32" fill="#16a34a" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon><polygon points="3.52,0.06 4.4,0.06 4.4,0.32 3.52,0.32" fill="#fb8c00" stroke="#17171f" stroke-width="0.031" stroke-linejoin="round"></polygon></svg></span>
+            <span class="sc-text"><b>PLL Parity</b><span class="sc-count">22 <span data-i18n="case_word">case</span></span><small data-i18n="sd_4x4_pllp">PLL parity birleşik case'leri</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+    </div>
+</section>
+<section class="puz" id="p5">
+    <div class="puz-head"><h3>5x5</h3><span class="puz-sub" data-i18n="pz_5x5">Parity algoritması</span></div>
+    <div class="set-grid">
+        <a class="set-card" href="/icerikler/algoritmalar/5x5#parity">
+            <span class="sc-diag" dir="ltr"><svg aria-hidden="true" viewBox="-0.05 -0.05 6.02 6.02" xmlns="http://www.w3.org/2000/svg"><polygon points="0.52,0.52 1.4,0.52 1.4,1.4 0.52,1.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.52,1.52 1.4,1.52 1.4,2.4 0.52,2.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.52,2.52 1.4,2.52 1.4,3.4 0.52,3.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.52,3.52 1.4,3.52 1.4,4.4 0.52,4.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.52,4.52 1.4,4.52 1.4,5.4 0.52,5.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="1.52,0.52 2.4,0.52 2.4,1.4 1.52,1.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="1.52,1.52 2.4,1.52 2.4,2.4 1.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="1.52,2.52 2.4,2.52 2.4,3.4 1.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="1.52,3.52 2.4,3.52 2.4,4.4 1.52,4.4" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="1.52,4.52 2.4,4.52 2.4,5.4 1.52,5.4" fill="#16a34a" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="2.52,0.52 3.4,0.52 3.4,1.4 2.52,1.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="2.52,1.52 3.4,1.52 3.4,2.4 2.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="2.52,2.52 3.4,2.52 3.4,3.4 2.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="2.52,3.52 3.4,3.52 3.4,4.4 2.52,4.4" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="2.52,4.52 3.4,4.52 3.4,5.4 2.52,5.4" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="3.52,0.52 4.4,0.52 4.4,1.4 3.52,1.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="3.52,1.52 4.4,1.52 4.4,2.4 3.52,2.4" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="3.52,2.52 4.4,2.52 4.4,3.4 3.52,3.4" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="3.52,3.52 4.4,3.52 4.4,4.4 3.52,4.4" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="3.52,4.52 4.4,4.52 4.4,5.4 3.52,5.4" fill="#16a34a" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="4.52,0.52 5.4,0.52 5.4,1.4 4.52,1.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="4.52,1.52 5.4,1.52 5.4,2.4 4.52,2.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="4.52,2.52 5.4,2.52 5.4,3.4 4.52,3.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="4.52,3.52 5.4,3.52 5.4,4.4 4.52,4.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="4.52,4.52 5.4,4.52 5.4,5.4 4.52,5.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="5.6,0.52 5.86,0.52 5.86,1.4 5.6,1.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="5.6,1.52 5.86,1.52 5.86,2.4 5.6,2.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="5.6,2.52 5.86,2.52 5.86,3.4 5.6,3.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="5.6,3.52 5.86,3.52 5.86,4.4 5.6,4.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="5.6,4.52 5.86,4.52 5.86,5.4 5.6,5.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.06,0.52 0.32,0.52 0.32,1.4 0.06,1.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.06,1.52 0.32,1.52 0.32,2.4 0.06,2.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.06,2.52 0.32,2.52 0.32,3.4 0.06,3.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.06,3.52 0.32,3.52 0.32,4.4 0.06,4.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.06,4.52 0.32,4.52 0.32,5.4 0.06,5.4" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.52,5.6 1.4,5.6 1.4,5.86 0.52,5.86" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="1.52,5.6 2.4,5.6 2.4,5.86 1.52,5.86" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="2.52,5.6 3.4,5.6 3.4,5.86 2.52,5.86" fill="#16a34a" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="3.52,5.6 4.4,5.6 4.4,5.86 3.52,5.86" fill="#fdd835" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="4.52,5.6 5.4,5.6 5.4,5.86 4.52,5.86" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="0.52,0.06 1.4,0.06 1.4,0.32 0.52,0.32" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="1.52,0.06 2.4,0.06 2.4,0.32 1.52,0.32" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="2.52,0.06 3.4,0.06 3.4,0.32 2.52,0.32" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="3.52,0.06 4.4,0.06 4.4,0.32 3.52,0.32" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon><polygon points="4.52,0.06 5.4,0.06 5.4,0.32 4.52,0.32" fill="#5a5d66" stroke="#17171f" stroke-width="0.038" stroke-linejoin="round"></polygon></svg></span>
+            <span class="sc-text"><b>Edge Parity</b><span class="sc-count">1 <span data-i18n="case_word">case</span></span><small data-i18n="sd_5x5_parity">Son kenarda iki kanat ters</small></span>
+            <span class="sc-arrow" aria-hidden="true">→</span>
+        </a>
+    </div>
+</section>
 
 <!-- DİĞERLERİ YAKINDA -->
 <div class="category-block">
@@ -558,394 +665,31 @@ Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, WV, Orte
 
 </div>
 
-<script src="/icerikler/algoritmalar/ll.js"></script>
-<script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
-<script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
-<script src="/icerikler/algoritmalar/cllSvg.js"></script>
 
 <!-- BU SAYFAYA ÖZEL: rozet sayaçları + çeviri yardımcısı
      (metinler artık i18n.js içindeki SITE_I18N.pages.algoritmalar bloğunda) -->
+
+
 <script>
-/* Sayfaya özel çeviri sözlüğünü i18n.js'ten okur.
-   Seçili dilde yoksa Türkçe'ye düşer. */
-/* Tarayıcı i18n.js'in eski (önbellekteki) bir sürümünü kullanırsa yeni
-   kartların metinleri eksik kalıp "undefined" görünmesin diye yedek metinler. */
-var CARD_FALLBACK = {
-    case_word: "case",
-    cta_start: "Case'lere Git",
-    coll_level: "COLL",
-    coll_title: "COLL Algoritmaları",
-    coll_p: "Kenarlar yönlüyken son katman köşelerini tek adımda hem yönlendirip hem yerine oturtan 42 case.",
-    wv_level: "WV",
-    wv_title: "Winter Variation (WV)",
-    wv_p: "Son F2L çiftini R U' R' ile yerleştirirken son katman köşelerini de yönlendiren 27 case — OLL atlanır.",
-    eg1_level: "EG-1",
-    eg1_title: "EG-1 Algoritmaları",
-    eg1_p: "Alt katmanda komşu iki köşe yer değiştirmişken 2x2'yi tek algoritmayla bitiren 42 case.",
-    eg2_level: "EG-2",
-    eg2_title: "EG-2 Algoritmaları",
-    eg2_p: "Alt katmanda çapraz iki köşe yer değiştirmişken 2x2'yi tek algoritmayla bitiren 42 case."
-};
-
-function getDict(lang) {
-    var pages = (window.SITE_I18N && SITE_I18N.pages) || {};
-    var page = pages[window.PAGE_ID] || {};
-    return Object.assign({}, CARD_FALLBACK, page.tr || {}, page[lang] || {});
-}
-
-/* OLL/PLL/2x2 kart sayacı (57 case, 21 case gibi rozetler)
-   dil değiştiğinde de güncellenmeli. common.js'teki applyLanguage()
-   her çalıştığında, tanımlıysa otomatik olarak onLanguageApplied()'i çağırır. */
-var caseCounts = null; // { oll: n, pll: n }
-var ortegaPblCount = null;
-var ortegaOllCount = null;
-var cllCount = null;
-var collCount = null;
-var wvCount = null;
-var hubTotals = { c3: null, c2: null }; // 3x3 ve 2x2 kartlarındaki toplam case sayısı
-
-function updateCountBadges(dict) {
-    var h3 = document.getElementById("hub3Badge"), h2 = document.getElementById("hub2Badge");
-    if (h3 && hubTotals.c3 !== null) h3.textContent = hubTotals.c3 + " " + dict.case_word;
-    if (h2 && hubTotals.c2 !== null) h2.textContent = hubTotals.c2 + " " + dict.case_word;
-    var ollBadge = document.getElementById("ollCountBadge");
-    var pllBadge = document.getElementById("pllCountBadge");
-    if (ollBadge) ollBadge.textContent = caseCounts.oll + " " + dict.case_word;
-    if (pllBadge) pllBadge.textContent = caseCounts.pll + " " + dict.case_word;
-
-    var pblBadge = document.getElementById("ortegaPblCountBadge");
-    if (pblBadge && ortegaPblCount !== null) pblBadge.textContent = ortegaPblCount + " " + dict.case_word;
-
-    var ortegaOllBadge = document.getElementById("ortegaOllCountBadge");
-    if (ortegaOllBadge) ortegaOllBadge.textContent = (ortegaOllCount !== null) ? (ortegaOllCount + " " + dict.case_word) : dict.soon_tag;
-
-    // Veri geldiyse sayıyı, gelmediyse "YAKINDA" rozetini gösterir.
-    var collBadge = document.getElementById("collCountBadge");
-    if (collBadge && collCount !== null) collBadge.textContent = collCount + " " + dict.case_word;
-
-    var wvBadge = document.getElementById("wvCountBadge");
-    if (wvBadge && wvCount !== null) wvBadge.textContent = wvCount + " " + dict.case_word;
-
-    var cllBadge = document.getElementById("cllCountBadge");
-    if (cllBadge) cllBadge.textContent = (cllCount !== null) ? (cllCount + " " + dict.case_word) : dict.soon_tag;
-}
-
-function onLanguageApplied(lang) {
-    if (caseCounts) {
-        updateCountBadges(getDict(lang));
-    }
-}
+/* Üstteki küp şeridi: görünen bölümü vurgula */
+(function () {
+    var links = document.querySelectorAll(".jump a");
+    if (!("IntersectionObserver" in window) || !links.length) return;
+    var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+            if (!e.isIntersecting) return;
+            links.forEach(function (a) { a.classList.toggle("on", a.getAttribute("href") === "#" + e.target.id); });
+        });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    document.querySelectorAll(".puz").forEach(function (sec) { io.observe(sec); });
+})();
 </script>
-
 <script>var PAGE_ID = "algoritmalar";</script>
-<script src="/js/i18n.js?v=20261042"></script>
-<script src="/js/common.js?v=20261042"></script>
+<script src="/js/i18n.js?v=20261043"></script>
+<script src="/js/common.js?v=20261043"></script>
 
 <!-- BU SAYFAYA ÖZEL: OLL / PLL VERİSİNİ YÜKLE VE KARTLARI OLUŞTUR -->
-<script>
-function findCaseByName(groups, name) {
-    for (var i = 0; i < groups.length; i++) {
-        var cases = groups[i].cases;
-        for (var j = 0; j < cases.length; j++) {
-            if (cases[j].name === name) return cases[j];
-        }
-    }
-    return null;
-}
 
-function countCases(groups) {
-    var total = 0;
-    for (var i = 0; i < groups.length; i++) total += groups[i].cases.length;
-    return total;
-}
-
-/* COLL verisi ayrı dosyada; yüklenemezse 3x3 bölümünde sadece OLL/PLL gösterilir */
-var collDataFetch = fetch("/icerikler/algoritmalar/coll.json")
-    .then(function(res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-    })
-    .catch(function(err) {
-        console.error("coll.json yüklenemedi:", err);
-        return null;
-    });
-
-var wvDataFetch = fetch("/icerikler/algoritmalar/wv.json")
-    .then(function(res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-    })
-    .catch(function(err) {
-        console.error("wv.json yüklenemedi:", err);
-        return null;
-    });
-
-fetch("/icerikler/algoritmalar/oll-pll.json")
-    .then(function(res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-    })
-    .then(function(data) {
-        return collDataFetch.then(function(collData) {
-            data.coll = collData ? collData.coll : null;
-            return wvDataFetch.then(function(wvData) {
-                data.wv = wvData ? wvData.wv : null;
-                return data;
-            });
-        });
-    })
-    .then(function(data) {
-        var ollCount = countCases(data.oll);
-        var pllCount = countCases(data.pll);
-        caseCounts = { oll: ollCount, pll: pllCount };
-
-        var ollCase = findCaseByName(data.oll, "OLL 27");
-        var pllCase = findCaseByName(data.pll, "T perm");
-
-        var ollDiagram = ollCase ? llSvg(ollCase.pattern, "oll", 150) : "";
-        var pllDiagram = pllCase ? llSvg(pllCase.pattern, "pll", 150) : "";
-
-        var lang = localStorage.getItem("site-lang") || "tr";
-        var dict = getDict(lang);
-
-        var html = "";
-
-        html += '<a href="/icerikler/algoritmalar/oll" class="card">';
-        html += '  <div class="card-visual oll-visual">';
-        html += '    <div class="level" data-i18n="oll_level">' + dict.oll_level + '</div>';
-        html += '    <div class="count-badge" id="ollCountBadge">' + ollCount + ' ' + dict.case_word + '</div>';
-        html += '    <div class="diagram-wrap">' + ollDiagram + '</div>';
-        html += '  </div>';
-        html += '  <div class="card-info">';
-        html += '    <h3 data-i18n="oll_title">' + dict.oll_title + '</h3>';
-        html += '    <p data-i18n="oll_p">' + dict.oll_p + '</p>';
-        html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
-        html += '  </div>';
-        html += '</a>';
-
-        html += '<a href="/icerikler/algoritmalar/pll" class="card">';
-        html += '  <div class="card-visual pll-visual">';
-        html += '    <div class="level" data-i18n="pll_level">' + dict.pll_level + '</div>';
-        html += '    <div class="count-badge" id="pllCountBadge">' + pllCount + ' ' + dict.case_word + '</div>';
-        html += '    <div class="diagram-wrap">' + pllDiagram + '</div>';
-        html += '  </div>';
-        html += '  <div class="card-info">';
-        html += '    <h3 data-i18n="pll_title">' + dict.pll_title + '</h3>';
-        html += '    <p data-i18n="pll_p">' + dict.pll_p + '</p>';
-        html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
-        html += '  </div>';
-        html += '</a>';
-
-        if (data.coll) {
-            collCount = countCases(data.coll);
-            var collCase = findCaseByName(data.coll, "S2");
-            var collDiagram = collCase ? llSvg(collCase.pattern, "pll", 150) : "";
-
-            html += '<a href="/icerikler/algoritmalar/coll" class="card">';
-            html += '  <div class="card-visual coll-visual">';
-            html += '    <div class="level" data-i18n="coll_level">' + dict.coll_level + '</div>';
-            html += '    <div class="count-badge" id="collCountBadge">' + collCount + ' ' + dict.case_word + '</div>';
-            html += '    <div class="diagram-wrap">' + collDiagram + '</div>';
-            html += '  </div>';
-            html += '  <div class="card-info">';
-            html += '    <h3 data-i18n="coll_title">' + dict.coll_title + '</h3>';
-            html += '    <p data-i18n="coll_p">' + dict.coll_p + '</p>';
-            html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
-            html += '  </div>';
-            html += '</a>';
-        }
-
-        if (data.wv) {
-            wvCount = countCases(data.wv);
-            var wvCase = findCaseByName(data.wv, "WV 9");
-            var wvDiagram = wvCase ? llSvg(wvCase.pattern, "pll", 150) : "";
-
-            html += '<a href="/icerikler/algoritmalar/wv" class="card">';
-            html += '  <div class="card-visual wv-visual">';
-            html += '    <div class="level" data-i18n="wv_level">' + dict.wv_level + '</div>';
-            html += '    <div class="count-badge" id="wvCountBadge">' + wvCount + ' ' + dict.case_word + '</div>';
-            html += '    <div class="diagram-wrap">' + wvDiagram + '</div>';
-            html += '  </div>';
-            html += '  <div class="card-info">';
-            html += '    <h3 data-i18n="wv_title">' + dict.wv_title + '</h3>';
-            html += '    <p data-i18n="wv_p">' + dict.wv_p + '</p>';
-            html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
-            html += '  </div>';
-            html += '</a>';
-        }
-
-        // Tek kart: setler (OLL, PLL, COLL, WV) açılan sayfadaki sekmelerden seçilir
-        hubTotals.c3 = ollCount + pllCount + (data.coll ? collCount : 0) + (data.wv ? wvCount : 0);
-        html = '<a href="/icerikler/algoritmalar/oll" class="card">' +
-            '<div class="card-visual cube3-visual">' +
-            '<div class="level" data-i18n="cube3_level">' + (dict.cube3_level || "OLL · PLL · COLL · WV · ROUX") + '</div>' +
-            '<div class="count-badge" data-i18n="cube3_count">' + (dict.cube3_count || "5 set") + '</div>' +
-            '<div class="diagram-wrap">' + ollDiagram + '</div></div>' +
-            '<div class="card-info"><h3 data-i18n="cube3_title">' + (dict.cube3_title || "3x3 Algoritmaları") + '</h3>' +
-            '<p data-i18n="cube3_p">' + (dict.cube3_p || "") + '</p>' +
-            '<div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div></div></a>';
-        document.getElementById("cardsSection").innerHTML = html;
-
-        // Kartlar DOM'a eklendikten sonra dili tekrar uygula
-        applyLanguage(lang);
-    })
-    .catch(function(err) {
-        var errBox = document.getElementById("loadError");
-        if (errBox) errBox.style.display = "block";
-        console.error("oll-pll.json yüklenemedi:", err);
-    });
-
-var pblFetch = fetch("/icerikler/algoritmalar/ortega-pbl.json")
-    .then(function(res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-    })
-    .then(function(data) {
-        var groups = data.pbl || [];
-        ortegaPblCount = countCases(groups);
-
-        var sampleCase = (groups[0] && groups[0].cases[2]) ? groups[0].cases[2] : (groups[0] ? groups[0].cases[0] : null);
-        return sampleCase ? ortegaSvg(sampleCase.pattern_u, "full", 150) : "";
-    });
-
-var ollFetch = fetch("/icerikler/algoritmalar/ortega-oll.json")
-    .then(function(res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-    })
-    .then(function(data) {
-        var groups = data.oll || [];
-        ortegaOllCount = countCases(groups);
-
-        var sampleCase = (groups[0] && groups[0].cases[3]) ? groups[0].cases[3] : (groups[0] ? groups[0].cases[0] : null);
-        return sampleCase ? ortegaOllSvg(sampleCase.pattern, 150) : "";
-    });
-
-/* cll.json yapısı: [{ subset: "Antisune", cases: [{name, alg, pattern}, ...] }, ...]
-   findCaseByName zaten her grubun "cases" dizisine bakıyor, bu yapıyla da çalışır.
-   pattern gerçek cllSvg.js'teki cllSvg(pattern, mode, size) fonksiyonuna veriliyor;
-   mode "oll" DEĞİLSE tam renkli (F/B/R/L/U/D) çizim yapıyor, o yüzden burada "cll" geçildi. */
-var cllFetch = fetch("/icerikler/algoritmalar/cll.json")
-    .then(function(res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-    })
-    .then(function(data) {
-        var groups = data.cll || [];
-        cllCount = countCases(groups);
-
-        var sampleCase = findCaseByName(groups, "S1") || (groups[0] && groups[0].cases[0]);
-        return sampleCase ? cllSvg(sampleCase.pattern, "cll", 150) : "";
-    })
-    .catch(function(err) {
-        cllCount = null;
-        console.error("cll.json yüklenemedi:", err);
-        return "";
-    });
-
-/* EG-1 / EG-2 verisi (yüklenemezse 2x2 bölümünde sadece Ortega ve CLL gösterilir) */
-var egFetch = fetch("/icerikler/algoritmalar/eg.json")
-    .then(function(res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-    })
-    .catch(function(err) {
-        console.error("eg.json yüklenemedi:", err);
-        return null;
-    });
-
-Promise.all([pblFetch, ollFetch, cllFetch, egFetch])
-    .then(function(diagrams) {
-        renderOrtegaCards(diagrams[0], diagrams[1], diagrams[2], diagrams[3]);
-    })
-    .catch(function(err) {
-        var errBox = document.getElementById("loadError");
-        if (errBox) errBox.style.display = "block";
-        console.error("Ortega (PBL/OLL/CLL) verisi yüklenemedi:", err);
-    });
-
-function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml, cllDiagramHtml, egData) {
-    var lang = localStorage.getItem("site-lang") || "tr";
-    var dict = getDict(lang);
-
-    var html = "";
-
-    html += '<a href="/icerikler/algoritmalar/ortega-pbl" class="card">';
-    html += '  <div class="card-visual ortega-pbl-visual">';
-    html += '    <div class="level" data-i18n="ortega_pbl_level">' + dict.ortega_pbl_level + '</div>';
-    html += '    <div class="count-badge" id="ortegaPblCountBadge">' + (ortegaPblCount !== null ? ortegaPblCount + ' ' + dict.case_word : '') + '</div>';
-    html += '    <div class="diagram-wrap">' + pblDiagramHtml + '</div>';
-    html += '  </div>';
-    html += '  <div class="card-info">';
-    html += '    <h3 data-i18n="ortega_pbl_title">' + dict.ortega_pbl_title + '</h3>';
-    html += '    <p data-i18n="ortega_pbl_p">' + dict.ortega_pbl_p + '</p>';
-    html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
-    html += '  </div>';
-    html += '</a>';
-
-    html += '<a href="/icerikler/algoritmalar/ortega-oll" class="card">';
-    html += '  <div class="card-visual ortega-oll-visual">';
-    html += '    <div class="level" data-i18n="ortega_oll_level">' + dict.ortega_oll_level + '</div>';
-    html += '    <div class="count-badge" id="ortegaOllCountBadge">' + (ortegaOllCount !== null ? ortegaOllCount + ' ' + dict.case_word : dict.soon_tag) + '</div>';
-    html += '    <div class="diagram-wrap">' + (ollDiagramHtml || "") + '</div>';
-    html += '  </div>';
-    html += '  <div class="card-info">';
-    html += '    <h3 data-i18n="ortega_oll_title">' + dict.ortega_oll_title + '</h3>';
-    html += '    <p data-i18n="ortega_oll_p">' + dict.ortega_oll_p + '</p>';
-    html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
-    html += '  </div>';
-    html += '</a>';
-
-    html += '<a href="/icerikler/algoritmalar/cll" class="card">';
-    html += '  <div class="card-visual cll-visual">';
-    html += '    <div class="level" data-i18n="cll_level">' + dict.cll_level + '</div>';
-    html += '    <div class="count-badge" id="cllCountBadge">' + (cllCount !== null ? cllCount + ' ' + dict.case_word : dict.soon_tag) + '</div>';
-    html += '    <div class="diagram-wrap">' + (cllDiagramHtml || "") + '</div>';
-    html += '  </div>';
-    html += '  <div class="card-info">';
-    html += '    <h3 data-i18n="cll_title">' + dict.cll_title + '</h3>';
-    html += '    <p data-i18n="cll_p">' + dict.cll_p + '</p>';
-    html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
-    html += '  </div>';
-    html += '</a>';
-
-    if (egData) {
-        [["eg1", "U3"], ["eg2", "P2"]].forEach(function (pair) {
-            var id = pair[0];
-            var groups = egData[id] || [];
-            var count = countCases(groups);
-            var sample = findCaseByName(groups, pair[1]) || (groups[0] && groups[0].cases[0]);
-            var diag = sample ? ortegaSvg(sample.pattern_u, "full", 110) + ortegaSvg(sample.pattern_d, "full", 110) : "";
-            html += '<a href="/icerikler/algoritmalar/' + id + '" class="card">';
-            html += '  <div class="card-visual ' + id + '-visual">';
-            html += '    <div class="level" data-i18n="' + id + '_level">' + dict[id + "_level"] + '</div>';
-            html += '    <div class="count-badge">' + count + ' ' + dict.case_word + '</div>';
-            html += '    <div class="diagram-wrap pair">' + diag + '</div>';
-            html += '  </div>';
-            html += '  <div class="card-info">';
-            html += '    <h3 data-i18n="' + id + '_title">' + dict[id + "_title"] + '</h3>';
-            html += '    <p data-i18n="' + id + '_p">' + dict[id + "_p"] + '</p>';
-            html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
-            html += '  </div>';
-            html += '</a>';
-        });
-    }
-
-    // Tek kart: setler (Ortega OLL/PBL, CLL, EG-1, EG-2) açılan sayfadaki sekmelerden seçilir
-    hubTotals.c2 = (ortegaPblCount || 0) + (ortegaOllCount || 0) + (cllCount || 0);
-    if (egData) hubTotals.c2 += countCases(egData.eg1 || []) + countCases(egData.eg2 || []);
-    html = '<a href="/icerikler/algoritmalar/ortega-oll" class="card">' +
-        '<div class="card-visual cube2-visual">' +
-        '<div class="level" data-i18n="cube2_level">' + (dict.cube2_level || "ORTEGA · CLL · EG") + '</div>' +
-        '<div class="count-badge" data-i18n="cube2_count">' + (dict.cube2_count || "5 set") + '</div>' +
-        '<div class="diagram-wrap">' + (cllDiagramHtml || pblDiagramHtml || "") + '</div></div>' +
-        '<div class="card-info"><h3 data-i18n="cube2_title">' + (dict.cube2_title || "2x2 Algoritmaları") + '</h3>' +
-        '<p data-i18n="cube2_p">' + (dict.cube2_p || "") + '</p>' +
-        '<div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div></div></a>';
-    document.getElementById("cards2x2Section").innerHTML = html;
-    applyLanguage(lang);
-}
-</script>
 
 </body>
 </html>
