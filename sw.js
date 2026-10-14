@@ -3,7 +3,7 @@
    - CSS/JS/JSON/görseller: önbellekten hemen ver, arka planda güncelle
    - Algoritma sayfaları ve antrenör kurulumda önceden indirilir (çevrimdışı açılsın diye)
    Sürüm (VERSION) değişince eski önbellek silinir. */
-var VERSION = "ra-20261036";
+var VERSION = "ra-20261037";
 var PRECACHE = [
     "/",
     "/icerikler.html",
@@ -27,37 +27,37 @@ var PRECACHE = [
     "/icerikler/algoritmalar/skewb.html",
     "/icerikler/algoritmalar/antrenor.html",
     "/icerikler/algoritmalar/yazdir.html",
-    "/styles/common.css?v=20261036",
-    "/js/i18n.js?v=20261036",
-    "/js/common.js?v=20261036",
+    "/styles/common.css?v=20261037",
+    "/js/i18n.js?v=20261037",
+    "/js/common.js?v=20261037",
     "/darkmode.js",
     "/icerikler/algoritmalar/ll.js",
     "/icerikler/algoritmalar/cllSvg.js",
     "/icerikler/algoritmalar/ortegaSvg.js",
     "/icerikler/algoritmalar/ortegaOllSvg.js",
-    "/icerikler/algoritmalar/antrenor-bt.js?v=20261036",
+    "/icerikler/algoritmalar/antrenor-bt.js?v=20261037",
     "/icons/icon-192.png",
     "/icons/favicon-48.png",
     "/manifest.webmanifest",
     "/icerikler/algoritmalar/oll-pll.json",
-    "/icerikler/algoritmalar/oll-pll.json?v=20261036",
+    "/icerikler/algoritmalar/oll-pll.json?v=20261037",
     "/icerikler/algoritmalar/coll.json",
-    "/icerikler/algoritmalar/coll.json?v=20261036",
+    "/icerikler/algoritmalar/coll.json?v=20261037",
     "/icerikler/algoritmalar/wv.json",
-    "/icerikler/algoritmalar/wv.json?v=20261036",
+    "/icerikler/algoritmalar/wv.json?v=20261037",
     "/icerikler/algoritmalar/cll.json",
-    "/icerikler/algoritmalar/cll.json?v=20261036",
+    "/icerikler/algoritmalar/cll.json?v=20261037",
     "/icerikler/algoritmalar/ortega-oll.json",
-    "/icerikler/algoritmalar/ortega-oll.json?v=20261036",
+    "/icerikler/algoritmalar/ortega-oll.json?v=20261037",
     "/icerikler/algoritmalar/ortega-pbl.json",
-    "/icerikler/algoritmalar/ortega-pbl.json?v=20261036",
+    "/icerikler/algoritmalar/ortega-pbl.json?v=20261037",
     "/icerikler/algoritmalar/eg.json",
-    "/icerikler/algoritmalar/eg.json?v=20261036",
-    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20261036",
-    "/icerikler/algoritmalar/4x4.json?v=20261036",
-    "/icerikler/algoritmalar/5x5.json?v=20261036",
-    "/icerikler/algoritmalar/pyraminx.json?v=20261036",
-    "/icerikler/algoritmalar/skewb.json?v=20261036"
+    "/icerikler/algoritmalar/eg.json?v=20261037",
+    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20261037",
+    "/icerikler/algoritmalar/4x4.json?v=20261037",
+    "/icerikler/algoritmalar/5x5.json?v=20261037",
+    "/icerikler/algoritmalar/pyraminx.json?v=20261037",
+    "/icerikler/algoritmalar/skewb.json?v=20261037"
 ];
 
 self.addEventListener("install", function (event) {
