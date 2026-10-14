@@ -34,7 +34,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261030">
+<link rel="stylesheet" href="/styles/common.css?v=20261031">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -389,6 +389,33 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 .stat-scroll { max-height: 360px; overflow-y: auto; border-radius: 12px; }
 .stat-scroll .stat-table thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); }
 
+/* İLERLEME GRAFİKLERİ */
+#progressBox { position: relative; }
+.range-tabs { display: flex; gap: 6px; }
+.range-tabs .btn-sm.active { background: var(--cube-yellow); color: #17171f; }
+.prog-sub { color: var(--text-soft); font-size: 13px; margin: -4px 0 12px; }
+.prog-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.prog-chart { margin: 0; border: var(--card-bw) solid var(--border); border-radius: 14px; padding: 10px 10px 4px; background: var(--surface-soft); min-width: 0; }
+.prog-chart figcaption { font-size: 12px; font-weight: 800; color: var(--text-soft); margin-bottom: 4px; }
+.chart-area { position: relative; height: 170px; }
+.chart-area svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.chart-area .grid { stroke: var(--border); stroke-width: 1; }
+.chart-area .axis-t { fill: var(--text-soft); font-size: 10px; font-family: "JetBrains Mono", monospace; }
+.chart-area .bar { fill: var(--primary); }
+.chart-area .line { fill: none; stroke: var(--primary); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart-area .dot { fill: var(--primary); stroke: var(--surface-soft); stroke-width: 2; }
+.chart-area .hit { fill: transparent; cursor: default; }
+.chart-area .hit:hover, .chart-area .hit.on { fill: var(--dot); }
+.chart-area .empty-t { fill: var(--text-soft); font-size: 12px; }
+.prog-total { font-size: 12px; font-weight: 700; color: var(--text-soft); margin-top: 10px; }
+.chart-tip {
+    position: absolute; z-index: 5; pointer-events: none; display: none;
+    background: var(--surface); color: var(--text); border: var(--card-bw) solid var(--ink);
+    border-radius: 10px; padding: 6px 9px; font-size: 12px; box-shadow: var(--shadow-sm); white-space: nowrap;
+}
+.chart-tip b { display: block; font-size: 11px; color: var(--text-soft); }
+@media (max-width: 700px) { .prog-charts { grid-template-columns: 1fr; } .chart-area { height: 150px; } }
+
 /* Tablet: biraz daha geniş tablo alanı */
 @media (min-width: 701px) and (max-width: 1099px) {
     .stat-scroll { max-height: 420px; }
@@ -540,6 +567,23 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     </div>
 </section>
 
+<!-- İLERLEME (günlük geçmiş) -->
+<section class="box" id="progressBox">
+    <div class="box-head">
+        <h2 data-i18n="prog_title">İlerleme</h2>
+        <div class="range-tabs" id="progRange" role="group">
+            <button class="btn-sm" type="button" data-days="14"></button>
+            <button class="btn-sm" type="button" data-days="30"></button>
+        </div>
+    </div>
+    <p class="prog-sub" data-i18n="prog_sub">Bu set için günlük çözüm sayısı ve ortalama süre. Ortalama düştükçe hızlanıyorsun.</p>
+    <div class="prog-charts" id="progCharts">
+        <figure class="prog-chart"><figcaption data-i18n="prog_count">Günlük çözüm</figcaption><div class="chart-area" id="chartCount"></div></figure>
+        <figure class="prog-chart"><figcaption data-i18n="prog_avg">Günlük ortalama (sn)</figcaption><div class="chart-area" id="chartAvg"></div></figure>
+    </div>
+    <p class="prog-total" id="progTotal"></p>
+    <div class="chart-tip" id="chartTip" role="tooltip"></div>
+</section>
 </div>
 
 <!-- İSTATİSTİK -->
@@ -604,9 +648,9 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261030"></script>
-<script src="/js/common.js?v=20261030"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261030"></script>
+<script src="/js/i18n.js?v=20261031"></script>
+<script src="/js/common.js?v=20261031"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261031"></script>
 
 <script>
 /* ============================================================
@@ -661,7 +705,12 @@ var FALLBACK = {
     hint_card: "Algoritmayı aklından geçir, hazır olunca dokun ya da bir tuşa bas",
     hint_card_done: "Doğru hatırladın mı? Bildim (1) / Zorlandım (2)",
     mode_cube: "🧊 Küple çalış",
-    mode_card: "🃏 Küpsüz (kart)"
+    mode_card: "🃏 Küpsüz (kart)",
+    prog_days: "{n} gün",
+    prog_empty: "Henüz geçmiş yok. Çözdükçe grafik burada oluşacak.",
+    prog_total: "Toplam: {n} çözüm, {d} gün",
+    tip_solves: "{n} çözüm",
+    tip_avg: "ort. {t}"
 };
 
 function lang() { return localStorage.getItem("site-lang") || "tr"; }
@@ -716,7 +765,7 @@ function loadAll() {
     SETS.forEach(function (s) { files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261030").then(function (r) {
+        return fetch(BASE + f + "?v=20261031").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -906,6 +955,7 @@ function grade(hard) {
     else { s.score = Math.max(0, (s.score || 0) - 1); }
     save(STATS_KEY, stats);
     session.push(lastTime);
+    recordHistory(lastTime);
     lastKey = curCase.key;
     renderStats();
     nextCase();
@@ -925,6 +975,7 @@ function renderStats() {
     document.getElementById("stAo12").textContent = fmt(avgOf(session, 12));
     document.getElementById("stBest").textContent = session.length ? fmt(Math.min.apply(null, session)) : "-";
 
+    renderProgress();
     var st = stats[statId()] || {};
     var rows = DATA[current.id].filter(function (c) { return st[c.key]; });
     var wrap = document.getElementById("statTableWrap");
@@ -940,6 +991,146 @@ function renderStats() {
     html += '</tbody></table>';
     wrap.innerHTML = html;
 }
+
+/* ---------------- GÜNLÜK GEÇMİŞ VE GRAFİK ---------------- */
+var HIST_KEY = "trainer-history-v1";   // statId -> {"YYYY-MM-DD": {n, sum, best}}
+var RANGE_KEY = "trainer-range-v1";
+var hist = load(HIST_KEY, {});
+var progDays = (load(RANGE_KEY, {}).days === 30) ? 30 : 14;
+
+function dayKey(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function recordHistory(ms) {
+    var h = hist[statId()] || (hist[statId()] = {});
+    var k = dayKey(new Date());
+    var d = h[k] || (h[k] = { n: 0, sum: 0, best: null });
+    d.n++;
+    d.sum += ms;
+    d.best = d.best == null ? ms : Math.min(d.best, ms);
+    save(HIST_KEY, hist);
+}
+function T2(key, vars) {
+    return T(key).replace(/\{(\w+)\}/g, function (m, v) { return vars[v] != null ? vars[v] : m; });
+}
+function niceMax(v) {
+    if (v <= 0) return 1;
+    var p = Math.pow(10, Math.floor(Math.log10(v))), f = v / p;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p;
+}
+function dayLabel(d) {
+    var t = "";
+    try { t = d.toLocaleDateString(lang(), { day: "numeric", month: "short" }); } catch (e) {}
+    // Uzun ay adları eksende çakışmasın
+    return (t && t.length <= 7) ? t : d.getDate() + "/" + (d.getMonth() + 1);
+}
+
+function renderProgress() {
+    if (!current) return;
+    var h = hist[statId()] || {};
+    var days = [], today = new Date();
+    today.setHours(12, 0, 0, 0);
+    for (var i = progDays - 1; i >= 0; i--) {
+        var d = new Date(today); d.setDate(today.getDate() - i);
+        var r = h[dayKey(d)];
+        days.push({ date: d, n: r ? r.n : 0, avg: r && r.n ? r.sum / r.n : null });
+    }
+    document.querySelectorAll("#progRange .btn-sm").forEach(function (b) {
+        var n = +b.getAttribute("data-days");
+        b.textContent = T2("prog_days", { n: n });
+        b.classList.toggle("active", n === progDays);
+    });
+    var tot = 0, active = 0;
+    Object.keys(h).forEach(function (k) { tot += h[k].n; active++; });
+    document.getElementById("progTotal").textContent = tot ? T2("prog_total", { n: tot, d: active }) : "";
+    drawChart("chartCount", days, "bar");
+    drawChart("chartAvg", days, "line");
+}
+
+/* Tek seriler: legend yok, başlık seriyi adlandırır. Üzerine gelince/dokununca ipucu. */
+function drawChart(id, days, kind) {
+    var box = document.getElementById(id);
+    var W = Math.max(200, box.clientWidth), H = box.clientHeight || 160;
+    var padL = 34, padR = 6, padT = 8, padB = 20;
+    var iw = W - padL - padR, ih = H - padT - padB;
+    var vals = days.map(function (d) { return kind === "bar" ? d.n : (d.avg == null ? null : d.avg / 1000); });
+    var has = vals.some(function (v) { return v; });
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(T(kind === "bar" ? "prog_count" : "prog_avg")) + '">';
+    if (!has) {
+        box.innerHTML = svg + '<text class="empty-t" x="' + (W / 2) + '" y="' + (H / 2) + '" text-anchor="middle">' + esc(T("prog_empty")) + '</text></svg>';
+        return;
+    }
+    var max = niceMax(Math.max.apply(null, vals.filter(function (v) { return v != null; })));
+    var y = function (v) { return padT + ih - (v / max) * ih; };
+    var step = iw / days.length;
+    for (var g = 0; g <= 2; g++) {
+        var gv = max * g / 2, gy = y(gv);
+        svg += '<line class="grid" x1="' + padL + '" x2="' + (W - padR) + '" y1="' + gy + '" y2="' + gy + '"/>' +
+            '<text class="axis-t" x="' + (padL - 5) + '" y="' + (gy + 3) + '" text-anchor="end">' + (kind === "bar" ? Math.round(gv) : (gv < 10 ? gv.toFixed(1) : Math.round(gv))) + '</text>';
+    }
+    var every = days.length > 14 ? 7 : 3;
+    days.forEach(function (d, i) {
+        if ((days.length - 1 - i) % every === 0) {
+            svg += '<text class="axis-t" x="' + (padL + step * (i + .5)) + '" y="' + (H - 4) + '" text-anchor="middle">' + esc(dayLabel(d.date)) + '</text>';
+        }
+    });
+    if (kind === "bar") {
+        var bw = Math.max(3, Math.min(18, step - 2));
+        days.forEach(function (d, i) {
+            if (!d.n) return;
+            var x = padL + step * (i + .5) - bw / 2, top = y(d.n), bh = padT + ih - top, r = Math.min(4, bw / 2, bh);
+            svg += '<path class="bar" d="M' + x + ' ' + (padT + ih) + 'V' + (top + r) + 'Q' + x + ' ' + top + ' ' + (x + r) + ' ' + top +
+                'H' + (x + bw - r) + 'Q' + (x + bw) + ' ' + top + ' ' + (x + bw) + ' ' + (top + r) + 'V' + (padT + ih) + 'Z"/>';
+        });
+    } else {
+        // Çözüm olmayan günlerde çizgi kesilir
+        var path = "", pen = false, dots = "";
+        days.forEach(function (d, i) {
+            var v = vals[i];
+            if (v == null) { pen = false; return; }
+            var x = padL + step * (i + .5), yy = y(v);
+            path += (pen ? "L" : "M") + x + " " + yy;
+            pen = true;
+            dots += '<circle class="dot" cx="' + x + '" cy="' + yy + '" r="4"/>';
+        });
+        svg += '<path class="line" d="' + path + '"/>' + dots;
+    }
+    days.forEach(function (d, i) {
+        svg += '<rect class="hit" data-i="' + i + '" x="' + (padL + step * i) + '" y="' + padT + '" width="' + step + '" height="' + ih + '"/>';
+    });
+    box.innerHTML = svg + '</svg>';
+    box._days = days;
+}
+
+function showTip(e) {
+    var r = e.target.closest && e.target.closest(".hit");
+    var tip = document.getElementById("chartTip");
+    document.querySelectorAll("#progCharts .hit.on").forEach(function (x) { if (x !== r) x.classList.remove("on"); });
+    if (!r) { tip.style.display = "none"; return; }
+    r.classList.add("on");
+    var d = r.closest(".chart-area")._days[+r.getAttribute("data-i")];
+    tip.innerHTML = '<b>' + esc(dayLabel(d.date)) + '</b>' + esc(T2("tip_solves", { n: d.n })) +
+        (d.avg != null ? ' · ' + esc(T2("tip_avg", { t: fmt(d.avg) })) : "");
+    tip.style.display = "block";
+    var host = document.getElementById("progressBox").getBoundingClientRect(), rb = r.getBoundingClientRect();
+    var left = rb.left + rb.width / 2 - host.left - tip.offsetWidth / 2;
+    tip.style.left = Math.max(6, Math.min(host.width - tip.offsetWidth - 6, left)) + "px";
+    tip.style.top = (rb.top - host.top - tip.offsetHeight + 4) + "px";
+}
+var progCharts = document.getElementById("progCharts");
+progCharts.addEventListener("mousemove", showTip);
+progCharts.addEventListener("click", showTip);
+progCharts.addEventListener("mouseleave", function () { showTip({ target: document.body }); });
+document.getElementById("progRange").addEventListener("click", function (e) {
+    var b = e.target.closest(".btn-sm");
+    if (!b) return;
+    progDays = +b.getAttribute("data-days");
+    save(RANGE_KEY, { days: progDays });
+    renderProgress();
+    b.blur();
+});
+var progResizeT;
+window.addEventListener("resize", function () { clearTimeout(progResizeT); progResizeT = setTimeout(renderProgress, 150); });
 
 /* ---------------- OLAYLAR ---------------- */
 function isTyping(e) {
@@ -981,6 +1172,8 @@ document.getElementById("btnReset").addEventListener("click", function () {
     if (!confirm(T("reset_confirm"))) return;
     delete stats[statId()];
     save(STATS_KEY, stats);
+    delete hist[statId()];
+    save(HIST_KEY, hist);
     session = [];
     renderStats();
 });
@@ -1062,6 +1255,7 @@ loadAll().then(function () {
     document.getElementById("setupBox").style.display = "none";
     document.getElementById("trainerBox").style.display = "none";
     document.getElementById("statsBox").style.display = "none";
+    document.getElementById("progressBox").style.display = "none";
     console.error("Antrenör verisi yüklenemedi:", err);
 });
 </script>
