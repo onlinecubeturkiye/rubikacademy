@@ -31,7 +31,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261026">
+<link rel="stylesheet" href="/styles/common.css?v=20261027">
 
 <style>
 .hero {
@@ -373,8 +373,8 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "pyra_algos";</script>
-<script src="/js/i18n.js?v=20261026"></script>
-<script src="/js/common.js?v=20261026"></script>
+<script src="/js/i18n.js?v=20261027"></script>
+<script src="/js/common.js?v=20261027"></script>
 
 <script>
 /* ============================================================
@@ -489,7 +489,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/pyraminx.json?v=20261026")
+fetch("/icerikler/algoritmalar/pyraminx.json?v=20261027")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
