@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Yazdırılabilir Algoritma Kağıtları (OLL, PLL, CLL)</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/yazdir">
+<meta name="description" content="OLL, PLL ve CLL algoritmalarının tek sayfalık A4 çıktısı. Yazdır ya da PDF olarak kaydet.">
+<meta property="og:title" content="Rubik Academy - Yazdırılabilir Algoritma Kağıtları">
+<meta property="og:description" content="OLL, PLL ve CLL için tek sayfalık A4 algoritma kağıtları.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/yazdir">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261032">
+
+<style>
+.print-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin: 6px 0 14px; }
+.print-head h1 { font-size: 30px; font-weight: 900; color: var(--text); }
+.print-intro { color: var(--text-soft); font-size: 14px; max-width: 720px; margin-bottom: 16px; }
+.sheet-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.sheet-tab {
+    padding: 8px 16px; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--surface);
+    color: var(--text); font-weight: 800; font-size: 14px; cursor: pointer; font-family: inherit;
+}
+.sheet-tab.active { background: var(--cube-yellow); color: #17171f; box-shadow: var(--shadow-sm); }
+.print-btn {
+    padding: 11px 20px; border-radius: 14px; border: var(--card-bw) solid var(--ink); background: var(--cube-yellow);
+    color: #17171f; font-weight: 900; font-size: 15px; cursor: pointer; box-shadow: var(--shadow-sm); font-family: inherit;
+}
+.print-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.sheet-scroll { overflow-x: auto; padding-bottom: 8px; margin-bottom: 30px; }
+.load-error { display: none; padding: 18px; border-radius: 14px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 700; margin-bottom: 30px; }
+
+/* A4 kağıt: ekranda önizleme, çıktıda tek sayfa. Tema ne olursa olsun beyaz kağıt. */
+.sheet {
+    width: 210mm; height: 297mm; padding: 8mm 9mm; margin: 0 auto; box-sizing: border-box;
+    background: #fff; color: #17171f; border: 1px solid #d9d2c3; border-radius: 6px; box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    display: flex; flex-direction: column; overflow: hidden;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    font-family: Inter, system-ui, sans-serif;
+}
+.sheet-top { display: flex; align-items: center; gap: 3mm; border-bottom: .5mm solid #17171f; padding-bottom: 2mm; margin-bottom: 2.5mm; }
+.sheet-top img { width: 9mm; height: 9mm; object-fit: contain; }
+.sheet-top .t { font-size: 15pt; font-weight: 900; line-height: 1; }
+.sheet-top .s { font-size: 7.5pt; color: #5b5b6e; margin-top: .8mm; }
+.sheet-top .site { margin-left: auto; font-size: 8pt; font-weight: 800; text-align: right; }
+.sheet-grid { flex: 1; display: grid; gap: 1.6mm; }
+.cell { display: flex; align-items: center; gap: 2mm; border: .3mm solid #e2dccf; border-radius: 1.6mm; padding: 1.2mm 1.6mm; min-width: 0; min-height: 0; overflow: hidden; break-inside: avoid; }
+.cell .d { flex: none; line-height: 0; }
+.cell .d svg { width: 100%; height: 100%; }
+.cell .tx { min-width: 0; }
+.cell .n { font-weight: 900; line-height: 1.1; }
+.cell .g { color: #6b6b7c; font-weight: 600; line-height: 1.1; }
+.cell .a { font-family: "JetBrains Mono", monospace; line-height: 1.25; margin-top: .6mm; word-spacing: -.08em; }
+
+@media (max-width: 860px) {
+    .sheet-scroll .sheet { transform-origin: top left; }
+}
+@page { size: A4; margin: 0; }
+@media print {
+    html, body { background: #fff !important; }
+    body > *:not(.page), .page > *:not(.sheet-scroll), .bg-glow, footer { display: none !important; }
+    .page { padding: 0 !important; margin: 0 !important; max-width: none !important; }
+    .sheet-scroll { overflow: visible; margin: 0; padding: 0; height: auto !important; }
+    .sheet { border: 0; border-radius: 0; box-shadow: none; transform: none !important; margin: 0; }
+}
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<div class="print-head">
+    <h1 data-i18n="page_title">Yazdırılabilir Algoritma Kağıtları</h1>
+    <button class="print-btn" type="button" id="printBtn" onclick="window.print()" data-i18n="print_btn">🖨️ Yazdır / PDF</button>
+</div>
+<p class="print-intro" data-i18n="intro">OLL, PLL ve CLL için tek sayfalık A4 çıktı. Yazdır penceresinde "PDF olarak kaydet"i seçersen PDF dosyası alırsın.</p>
+
+<div class="sheet-tabs" id="sheetTabs" role="tablist">
+    <button class="sheet-tab" type="button" data-set="oll">OLL</button>
+    <button class="sheet-tab" type="button" data-set="pll">PLL</button>
+    <button class="sheet-tab" type="button" data-set="cll">CLL</button>
+</div>
+
+<div class="sheet-scroll" id="sheetScroll">
+    <div class="sheet" id="sheet" dir="ltr">
+        <div class="sheet-top">
+            <img src="/icons/icon-192.png" alt="">
+            <div><div class="t" id="sheetTitle"></div><div class="s" id="sheetSub"></div></div>
+            <div class="site">Rubik Academy<br>rubikacademy.fun</div>
+        </div>
+        <div class="sheet-grid" id="sheetGrid"></div>
+    </div>
+</div>
+
+<div id="loadError" class="load-error" data-i18n="load_error">Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.</div>
+
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script src="/icerikler/algoritmalar/ll.js"></script>
+<script src="/icerikler/algoritmalar/cllSvg.js"></script>
+
+<script>var PAGE_ID = "yazdir";</script>
+<script src="/js/i18n.js?v=20261032"></script>
+<script src="/js/common.js?v=20261032"></script>
+
+<script>
+/* Tek sayfalık A4 algoritma kağıtları. Veriler algoritma sayfalarıyla aynı JSON'lardan gelir.
+   cols/rows: ızgara, diag: diyagram boyu (mm), name/alg: yazı boyu (pt) */
+var SHEETS = {
+    oll: { file: "oll-pll.json", key: "oll", page: "oll", title: "OLL", cols: 5, rows: 12, diag: 15, name: 7, alg: 6.3, sub: true,
+           draw: function (c) { return llSvg(c.pattern, "oll", 60); } },
+    pll: { file: "oll-pll.json", key: "pll", page: "pll", title: "PLL", cols: 3, rows: 7, diag: 27, name: 10, alg: 8.4,
+           draw: function (c) { return llSvg(c.pattern, "pll", 60); } },
+    cll: { file: "cll.json", key: "cll", page: "cll", title: "CLL (2x2)", cols: 4, rows: 11, diag: 17, name: 8, alg: 7,
+           draw: function (c) { return cllSvg(c.pattern, "full", 60); } }
+};
+var cache = {}, curSet = null;
+
+function lang() { return localStorage.getItem("site-lang") || "tr"; }
+function pageText(page, key) {
+    var p = (window.SITE_I18N && SITE_I18N.pages[page]) || {};
+    return (p[lang()] && p[lang()][key]) || (p.tr && p.tr[key]) || null;
+}
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+function getData(file) {
+    if (!cache[file]) cache[file] = fetch("/icerikler/algoritmalar/" + file).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+    });
+    return cache[file];
+}
+
+function render() {
+    var cfg = SHEETS[curSet];
+    getData(cfg.file).then(function (data) {
+        var cases = [];
+        data[cfg.key].forEach(function (g) {
+            g.cases.forEach(function (c) { cases.push({ c: c, subset: g.subset }); });
+        });
+        document.getElementById("sheetTitle").textContent = cfg.title + " · " + (pageText("yazdir", "cases") || "{n} case").replace("{n}", cases.length);
+        document.getElementById("sheetSub").textContent = pageText("yazdir", "sheet_sub") || "";
+        var grid = document.getElementById("sheetGrid");
+        grid.style.gridTemplateColumns = "repeat(" + cfg.cols + ", minmax(0, 1fr))";
+        grid.style.gridTemplateRows = "repeat(" + cfg.rows + ", minmax(0, 1fr))";
+        grid.innerHTML = cases.map(function (x) {
+            var sub = cfg.sub ? '<div class="g" style="font-size:' + (cfg.name - 1.6) + 'pt">' + esc(pageText(cfg.page, "subset_" + x.subset) || x.subset) + '</div>' : "";
+            return '<div class="cell"><div class="d" style="width:' + cfg.diag + 'mm;height:' + cfg.diag + 'mm">' + cfg.draw(x.c) + '</div>' +
+                '<div class="tx"><div class="n" style="font-size:' + cfg.name + 'pt">' + esc(x.c.name) + '</div>' + sub +
+                '<div class="a" style="font-size:' + cfg.alg + 'pt">' + esc(x.c.alg) + '</div></div></div>';
+        }).join("");
+        document.getElementById("loadError").style.display = "none";
+        fitSheet();
+    }).catch(function (err) {
+        document.getElementById("loadError").style.display = "block";
+        console.error(err);
+    });
+}
+
+function selectSet(id) {
+    if (!SHEETS[id]) id = "oll";
+    curSet = id;
+    document.querySelectorAll(".sheet-tab").forEach(function (b) {
+        var on = b.getAttribute("data-set") === id;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    document.title = "Rubik Academy - " + SHEETS[id].title + " " + (pageText("yazdir", "page_title") || "");
+    history.replaceState(null, "", "?set=" + id);
+    render();
+}
+
+/* Dar ekranda kağıdı sığacak kadar küçült (çıktıyı etkilemez) */
+function fitSheet() {
+    var wrap = document.getElementById("sheetScroll"), sheet = document.getElementById("sheet");
+    sheet.style.transform = "";
+    wrap.style.height = "";
+    wrap.style.overflow = "";
+    var avail = wrap.clientWidth, w = sheet.offsetWidth;
+    if (avail < w) {
+        var k = avail / w;
+        sheet.style.transform = "scale(" + k + ")";
+        sheet.style.transformOrigin = "top left";
+        wrap.style.height = (sheet.offsetHeight * k + 8) + "px";
+        wrap.style.overflow = "hidden";
+    }
+}
+window.addEventListener("resize", fitSheet);
+
+document.getElementById("sheetTabs").addEventListener("click", function (e) {
+    var b = e.target.closest(".sheet-tab");
+    if (b) selectSet(b.getAttribute("data-set"));
+});
+function onLanguageApplied() { if (curSet) render(); }
+
+selectSet(new URLSearchParams(location.search).get("set") || "oll");
+</script>
+
+</body>
+</html>

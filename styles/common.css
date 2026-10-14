@@ -877,3 +877,12 @@ html.dark-mode .card-visual::before {
     .card-visual { height: 300px; }
     .section-title h2 { font-size: 27px; }
 }
+
+/* Algoritma sayfalarındaki "Yazdır / PDF" bağlantısı */
+.print-row { display: flex; justify-content: flex-end; max-width: 1100px; margin: -6px auto 14px; }
+.print-link {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 12px;
+    border: var(--card-bw, 2px) solid var(--ink); background: var(--surface); color: var(--text);
+    font-weight: 800; font-size: 14px; text-decoration: none; box-shadow: var(--shadow-sm);
+}
+.print-link:hover { background: var(--cube-yellow); color: #17171f; }
