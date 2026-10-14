@@ -37,7 +37,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261038">
+<link rel="stylesheet" href="/styles/common.css?v=20261039">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -76,6 +76,31 @@
 
 /* SET SEÇİMİ */
 .set-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.puzzle-pick { position: relative; margin-bottom: 14px; }
+.puzzle-btn {
+    display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 14px; cursor: pointer;
+    border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm);
+    font: 800 16px Inter, sans-serif; transition: transform .12s, box-shadow .12s;
+}
+.puzzle-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.pz-label { font-size: 11px; font-weight: 900; letter-spacing: .6px; text-transform: uppercase; color: var(--text-soft); }
+.pz-arrow { font-size: 13px; transition: transform .15s; }
+.puzzle-btn[aria-expanded="true"] .pz-arrow { transform: rotate(180deg); }
+.puzzle-menu {
+    position: absolute; z-index: 30; top: calc(100% + 8px); left: 0; min-width: 280px; max-width: min(420px, calc(100vw - 48px));
+    display: none; padding: 8px; border-radius: 16px; border: var(--card-bw) solid var(--ink); background: var(--surface); box-shadow: var(--shadow);
+}
+[dir="rtl"] .puzzle-menu { left: auto; right: 0; }
+.puzzle-menu.show { display: grid; gap: 4px; }
+.pz-item {
+    display: grid; gap: 2px; text-align: start; padding: 10px 12px; border-radius: 12px; border: 0; cursor: pointer;
+    background: transparent; color: var(--text); font-family: inherit;
+}
+.pz-item b { font-size: 15px; font-weight: 900; }
+.pz-item span { font-size: 12px; font-weight: 600; color: var(--text-soft); }
+.pz-item:hover { background: var(--surface-soft); }
+.pz-item.active { background: var(--cube-yellow); color: #17171f; }
+.pz-item.active span { color: #17171f; opacity: .75; }
 .set-tab {
     border: var(--card-bw) solid var(--card-border);
     background: var(--surface);
@@ -516,6 +541,12 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <div class="trainer-main">
 <!-- SET VE CASE SEÇİMİ -->
 <section class="box" id="setupBox">
+    <div class="puzzle-pick">
+        <button class="puzzle-btn" id="puzzleBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+            <span class="pz-label" data-i18n="pz_label">Küp</span><b id="puzzleName">3x3 · CFOP</b><span class="pz-arrow" aria-hidden="true">▾</span>
+        </button>
+        <div class="puzzle-menu" id="puzzleMenu" role="listbox"></div>
+    </div>
     <div class="set-tabs" id="setTabs" role="tablist"></div>
 
     <div class="box-head">
@@ -547,7 +578,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
             <button class="btn-sm" id="btDisconnect" style="display:none" data-i18n="bt_disconnect">Bağlantıyı kes</button>
         </div>
     </div>
-    <div class="hold-tip" id="holdTip" data-i18n="hold_tip_3x3">Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.</div>
+    <div class="hold-tip" id="holdTip">Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.</div>
     <div class="scramble" id="scramble" dir="ltr"></div>
     <div class="empty-note" id="emptyNote" style="display:none" data-i18n="empty_note">Çalışmak için en az bir case seç.</div>
 
@@ -656,9 +687,9 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261038"></script>
-<script src="/js/common.js?v=20261038"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261038"></script>
+<script src="/js/i18n.js?v=20261039"></script>
+<script src="/js/common.js?v=20261039"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261039"></script>
 
 <script>
 /* ============================================================
@@ -673,16 +704,49 @@ var BASE = "/icerikler/algoritmalar/";
 /* keyFmt: algoritma sayfasının "Öğreniyorum" kaydında kullandığı anahtar biçimi
    ("name" = sadece case adı, "subset" = "altgrup::ad") */
 var SETS = [
-    { id: "oll",        label: "OLL",        file: "oll-pll.json",    dataKey: "oll",  progress: "algo-progress-oll",        keyFmt: "name",   page: "oll",        cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
-    { id: "pll",        label: "PLL",        file: "oll-pll.json",    dataKey: "pll",  progress: "algo-progress-pll",        keyFmt: "subset", page: "pll",        cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
-    { id: "coll",       label: "COLL",       file: "coll.json",       dataKey: "coll", progress: "algo-progress-coll",       keyFmt: "subset", page: "coll",       cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
-    { id: "wv",         label: "WV",         file: "wv.json",         dataKey: "wv",   progress: "algo-progress-wv",         keyFmt: "subset", page: "wv",         cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
-    { id: "cll",        label: "CLL",        file: "cll.json",        dataKey: "cll",  progress: "algo-progress-cll",        keyFmt: "name",   page: "cll",        cube: "2x2", draw: function (c, s) { return cllSvg(c.pattern, "full", s); } },
-    { id: "ortega-oll", label: "Ortega OLL", file: "ortega-oll.json", dataKey: "oll",  progress: "algo-progress-ortega-oll", keyFmt: "subset", page: "ortega-oll", cube: "2x2", draw: function (c, s) { return ortegaOllSvg(c.pattern, s); } },
-    { id: "ortega-pbl", label: "Ortega PBL", file: "ortega-pbl.json", dataKey: "pbl",  progress: "algo-progress-ortega-pbl", keyFmt: "subset", page: "ortega-pbl", cube: "2x2", draw: function (c, s) { return ortegaSvg(c.pattern_u, "full", s); } },
-    { id: "eg1",        label: "EG-1",       file: "eg.json",         dataKey: "eg1",  progress: "algo-progress-eg1",        keyFmt: "subset", page: "eg1",        cube: "2x2", draw: drawPair },
-    { id: "eg2",        label: "EG-2",       file: "eg.json",         dataKey: "eg2",  progress: "algo-progress-eg2",        keyFmt: "subset", page: "eg2",        cube: "2x2", draw: drawPair }
+    { id: "oll",        label: "OLL",        file: "oll-pll.json",    dataKey: "oll",  progress: "algo-progress-oll",        keyFmt: "name",   page: "oll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
+    { id: "pll",        label: "PLL",        file: "oll-pll.json",    dataKey: "pll",  progress: "algo-progress-pll",        keyFmt: "subset", page: "pll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
+    { id: "coll",       label: "COLL",       file: "coll.json",       dataKey: "coll", progress: "algo-progress-coll",       keyFmt: "subset", page: "coll",       puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
+    { id: "wv",         label: "WV",         file: "wv.json",         dataKey: "wv",   progress: "algo-progress-wv",         keyFmt: "subset", page: "wv",         puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
+    { id: "cll",        label: "CLL",        file: "cll.json",        dataKey: "cll",  progress: "algo-progress-cll",        keyFmt: "name",   page: "cll",        puzzle: "2x2", cube: "2x2", draw: function (c, s) { return cllSvg(c.pattern, "full", s); } },
+    { id: "ortega-oll", label: "Ortega OLL", file: "ortega-oll.json", dataKey: "oll",  progress: "algo-progress-ortega-oll", keyFmt: "subset", page: "ortega-oll", puzzle: "2x2", cube: "2x2", draw: function (c, s) { return ortegaOllSvg(c.pattern, s); } },
+    { id: "ortega-pbl", label: "Ortega PBL", file: "ortega-pbl.json", dataKey: "pbl",  progress: "algo-progress-ortega-pbl", keyFmt: "subset", page: "ortega-pbl", puzzle: "2x2", cube: "2x2", draw: function (c, s) { return ortegaSvg(c.pattern_u, "full", s); } },
+    { id: "eg1",        label: "EG-1",       file: "eg.json",         dataKey: "eg1",  progress: "algo-progress-eg1",        keyFmt: "subset", page: "eg1",        puzzle: "2x2", cube: "2x2", draw: drawPair },
+    { id: "eg2",        label: "EG-2",       file: "eg.json",         dataKey: "eg2",  progress: "algo-progress-eg2",        keyFmt: "subset", page: "eg2",        puzzle: "2x2", cube: "2x2", draw: drawPair },
+    { id: "roux-cmll",  label: "CMLL", file: "roux.json", multi: "cmll", progress: "algo-progress-roux-cmll", keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", noBT: true, draw: polyDraw },
+    { id: "roux-eo",    label: "EO",   file: "roux.json", multi: "eo",   progress: "algo-progress-roux-eo",   keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", noBT: true, draw: polyDraw },
+    { id: "roux-l4c",   label: "4c",   file: "roux.json", multi: "l4c",  progress: "algo-progress-roux-l4c",  keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", noBT: true, draw: polyDraw },
+    { id: "pyra-l3e",   label: "L3E",  file: "pyraminx.json", multi: "l3e", progress: "algo-progress-pyraminx-l3e", keyFmt: "name", page: "pyra_algos", puzzle: "pyra", cube: "pyra", draw: polyDraw },
+    { id: "pyra-l4e",   label: "L4E",  file: "pyraminx.json", multi: "l4e", progress: "algo-progress-pyraminx-l4e", keyFmt: "name", page: "pyra_algos", puzzle: "pyra", cube: "pyra", draw: polyDraw },
+    { id: "sk-beginner",     label: "Sarah Beginner",     file: "skewb.json", multi: "beginner",     progress: "algo-progress-skewb-beginner",     keyFmt: "name", page: "skewb_algos", puzzle: "skewb", cube: "skewb", draw: polyDraw },
+    { id: "sk-intermediate", label: "Sarah Intermediate", file: "skewb.json", multi: "intermediate", progress: "algo-progress-skewb-intermediate", keyFmt: "name", page: "skewb_algos", puzzle: "skewb", cube: "skewb", draw: polyDraw },
+    { id: "sk-advanced",     label: "Sarah Advanced",     file: "skewb.json", multi: "advanced",     progress: "algo-progress-skewb-advanced",     keyFmt: "name", page: "skewb_algos", puzzle: "skewb", cube: "skewb", draw: polyDraw },
+    { id: "4x4-parity", label: "OLL/PLL Parity", file: "4x4.json", multi: "parity", progress: "algo-progress-4x4-parity", keyFmt: "name", page: "alg4", puzzle: "4x4", cube: "4x4", draw: polyDraw },
+    { id: "4x4-pllp",   label: "PLL Parity",     file: "4x4.json", multi: "pllp",   progress: "algo-progress-4x4-pllp",   keyFmt: "name", page: "alg4", puzzle: "4x4", cube: "4x4", draw: polyDraw },
+    { id: "5x5-parity", label: "Edge Parity",    file: "5x5.json", multi: "parity", progress: "algo-progress-5x5-parity", keyFmt: "name", page: "alg5", puzzle: "5x5", cube: "5x5", draw: polyDraw }
 ];
+var PUZZLES = [
+    { id: "cfop",  label: "3x3 · CFOP" },
+    { id: "roux",  label: "3x3 · Roux" },
+    { id: "2x2",   label: "2x2" },
+    { id: "pyra",  label: "Pyraminx" },
+    { id: "skewb", label: "Skewb" },
+    { id: "4x4",   label: "4x4" },
+    { id: "5x5",   label: "5x5" }
+];
+var PUZ_KEY = "trainer-puzzle-sets-v1"; // bulmaca -> son seçilen set
+/* Pyraminx, Skewb, 4x4, 5x5 ve Roux: veri dosyasındaki çokgen geometrisiyle çiz (algoritma sayfalarıyla aynı) */
+function polyDraw(c, size) {
+    var json = this.json, g = (json.geoms && this.geomName) ? json.geoms[this.geomName] : json.geom;
+    var v = g.view, w = size, h = size;
+    if (v[2] / v[3] < 0.7) { h = Math.round(size * 1.5); w = Math.round(h * v[2] / v[3]); }
+    var sw = (v[2] / 160).toFixed(3), out = '<svg viewBox="' + v.join(" ") + '" width="' + w + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">';
+    for (var i = 0; i < g.polys.length; i++) {
+        out += '<polygon points="' + g.polys[i].map(function (p) { return p[0] + "," + p[1]; }).join(" ") + '" fill="' + (json.colors[c.c.charAt(i)] || "#5a5d66") +
+            '" stroke="#17171f" stroke-width="' + sw + '" stroke-linejoin="round"/>';
+    }
+    return out + '</svg>';
+}
 
 /* EG: üst ve alt katman yan yana */
 function drawPair(c, s) {
@@ -710,6 +774,11 @@ var FALLBACK = {
     learning_none: "Bu sette \"Öğreniyorum\" olarak işaretlediğin case yok. Algoritma sayfasında case kartlarına tıklayarak işaretleyebilirsin.",
     hold_tip_3x3: "Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.",
     hold_tip_2x2: "Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş 2x2'ye uygula.",
+    hold_tip_roux: "Karıştırmayı sarı üstte, yeşil önde tutarak uygula. Sonda x veya x2 varsa küpü öyle çevir (M katmanı kaymış case).",
+    hold_tip_pyra: "Karıştırmayı çözülmüş Pyraminx'e, algoritma sayfasındaki diyagramla aynı yönde tutarak uygula (küçük harfler uçlardır).",
+    hold_tip_skewb: "Karıştırma Sarah notasyonundadır: bir üst köşe sana bakacak şekilde tut; F, R, L, B öndeki, sağdaki, soldaki ve arkadaki üst köşedir.",
+    hold_tip_big: "Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.",
+    pz_label: "Küp",
     hint_card: "Algoritmayı aklından geçir, hazır olunca dokun ya da bir tuşa bas",
     hint_card_done: "Doğru hatırladın mı? Bildim (1) / Zorlandım (2)",
     mode_cube: "🧊 Küple çalış",
@@ -760,6 +829,9 @@ var session = [];     // bu oturumdaki süreler (ms)
 var mode = (load(MODE_KEY, {}).mode === "card") ? "card" : "cube";
 function statId() { return mode === "card" ? current.id + ":card" : current.id; }
 // Küple modda süre işlerken set/case değiştirilmez; kart modunda her an değiştirilebilir
+function holdTipKey() {
+    return { "2x2": "hold_tip_2x2", roux: "hold_tip_roux", pyra: "hold_tip_pyra", skewb: "hold_tip_skewb", "4x4": "hold_tip_big", "5x5": "hold_tip_big" }[current.puzzle] || "hold_tip_3x3";
+}
 function busy() { return state === "running" && mode === "cube"; }
 var state = "idle";   // idle | running | done
 var curCase = null, curScramble = "", lastKey = null;
@@ -773,7 +845,7 @@ function loadAll() {
     SETS.forEach(function (s) { files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261038").then(function (r) {
+        return fetch(BASE + f + "?v=20261039").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -782,7 +854,11 @@ function loadAll() {
         names.forEach(function (n, i) { byFile[n] = jsons[i]; });
         var scr = byFile["antrenor-karistirmalar.json"];
         SETS.forEach(function (s) {
-            var groups = byFile[s.file][s.dataKey] || [];
+            var groups;
+            if (s.multi) {
+                var entry = (byFile[s.file].sets || []).filter(function (x) { return x.id === s.multi; })[0] || { groups: [] };
+                groups = entry.groups; s.json = byFile[s.file]; s.geomName = entry.geom || null;
+            } else groups = byFile[s.file][s.dataKey] || [];
             var list = [];
             groups.forEach(function (g) {
                 g.cases.forEach(function (c) {
@@ -799,18 +875,44 @@ function loadAll() {
 
 /* ---------------- SET SEKMELERİ ---------------- */
 function renderTabs() {
-    var html = "";
+    var html = "", pz = current ? current.puzzle : "cfop";
     SETS.forEach(function (s) {
-        var n = (DATA[s.id] || []).length;
+        if (s.puzzle !== pz || !(DATA[s.id] || []).length) return;
         html += '<button class="set-tab' + (current && current.id === s.id ? " active" : "") + '" data-set="' + s.id + '" role="tab">' +
-            esc(s.label) + '<small>' + s.cube + '</small></button>';
+            esc(s.label) + '<small>' + DATA[s.id].length + '</small></button>';
     });
     document.getElementById("setTabs").innerHTML = html;
+    renderPuzzleMenu();
+}
+function puzzleSets(pz) { return SETS.filter(function (s) { return s.puzzle === pz && (DATA[s.id] || []).length; }); }
+function renderPuzzleMenu() {
+    var pz = current ? current.puzzle : "cfop";
+    var info = PUZZLES.filter(function (p) { return p.id === pz; })[0] || PUZZLES[0];
+    document.getElementById("puzzleName").textContent = info.label;
+    document.getElementById("puzzleMenu").innerHTML = PUZZLES.map(function (p) {
+        var sets = puzzleSets(p.id);
+        if (!sets.length) return "";
+        return '<button type="button" class="pz-item' + (p.id === pz ? " active" : "") + '" role="option" aria-selected="' + (p.id === pz) + '" data-pz="' + p.id + '">' +
+            '<b>' + esc(p.label) + '</b><span>' + esc(sets.map(function (s) { return s.label; }).join(" · ")) + '</span></button>';
+    }).join("");
+}
+function togglePuzzleMenu(open) {
+    var m = document.getElementById("puzzleMenu"), b = document.getElementById("puzzleBtn");
+    if (open === undefined) open = !m.classList.contains("show");
+    m.classList.toggle("show", open);
+    b.setAttribute("aria-expanded", open ? "true" : "false");
+}
+function selectPuzzle(pz) {
+    var last = load(PUZ_KEY, {})[pz];
+    var sets = puzzleSets(pz);
+    if (!sets.length) return;
+    selectSet(sets.some(function (s) { return s.id === last; }) ? last : sets[0].id);
 }
 
 function selectSet(id) {
     current = SETS.filter(function (s) { return s.id === id; })[0] || SETS[0];
     save(SET_KEY, { id: current.id });
+    var pm = load(PUZ_KEY, {}); pm[current.puzzle] = current.id; save(PUZ_KEY, pm);
     if (!selection[current.id]) {
         selection[current.id] = {};
         DATA[current.id].forEach(function (c) { selection[current.id][c.key] = true; });
@@ -818,7 +920,7 @@ function selectSet(id) {
     }
     renderTabs();
     renderCases();
-    document.getElementById("holdTip").textContent = T(current.cube === "2x2" ? "hold_tip_2x2" : "hold_tip_3x3");
+    document.getElementById("holdTip").textContent = T(holdTipKey());
     session = [];
     lastKey = null;
     nextCase();
@@ -1186,6 +1288,20 @@ document.getElementById("btnReset").addEventListener("click", function () {
     renderStats();
 });
 
+document.getElementById("puzzleBtn").addEventListener("click", function (e) {
+    e.stopPropagation();
+    if (!busy()) togglePuzzleMenu();
+});
+document.getElementById("puzzleMenu").addEventListener("click", function (e) {
+    var b = e.target.closest(".pz-item");
+    if (!b) return;
+    togglePuzzleMenu(false);
+    selectPuzzle(b.getAttribute("data-pz"));
+});
+document.addEventListener("click", function (e) {
+    if (!e.target.closest(".puzzle-pick")) togglePuzzleMenu(false);
+});
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") togglePuzzleMenu(false); });
 document.getElementById("setTabs").addEventListener("click", function (e) {
     var b = e.target.closest(".set-tab");
     if (b && !busy()) selectSet(b.getAttribute("data-set"));
@@ -1249,7 +1365,7 @@ function onLanguageApplied() {
     if (!current) return;
     renderCases();
     renderStats();
-    document.getElementById("holdTip").textContent = T(current.cube === "2x2" ? "hold_tip_2x2" : "hold_tip_3x3");
+    document.getElementById("holdTip").textContent = T(holdTipKey());
     var hint = state === "idle" ? "hint_ready" : state === "running" ? (mode === "card" ? "hint_card" : "hint_running") : (mode === "card" ? "hint_card_done" : "hint_done");
     document.getElementById("timerHint").textContent = T(hint);
     if (typeof btRenderBar === "function") btRenderBar();
@@ -1257,7 +1373,10 @@ function onLanguageApplied() {
 
 loadAll().then(function () {
     var saved = load(SET_KEY, {});
-    selectSet(saved.id || "oll");
+    // ?set=cmll / ?set=roux-cmll gibi bağlantılarla doğrudan o sete gel
+    var q = new URLSearchParams(location.search).get("set");
+    var want = q && SETS.filter(function (s) { return (s.id === q || s.id === "roux-" + q || s.multi === q) && (DATA[s.id] || []).length; })[0];
+    selectSet(want ? want.id : (saved.id || "oll"));
 }).catch(function (err) {
     document.getElementById("loadError").style.display = "block";
     document.getElementById("setupBox").style.display = "none";
