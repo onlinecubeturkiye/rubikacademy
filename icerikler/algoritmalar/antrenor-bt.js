@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261036";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261037";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -83,6 +83,7 @@
     var todo = [];          // [{f, q, fix}] yapılacak çeyrek tur sayısı (1 = X, 2 = X2, 3 = X')
     var total = 0;          // karıştırmadaki hamle sayısı
     var gotEvent = false, connecting = false, afterCase = false, tooMany = false;
+    var noData = false, forceMac = false, recent = [], lastMac = "";
     var lastDevice = null, userDisconnect = false; // bu sayfada seçilen küp: tekrar bağlanırken Chrome listesi açılmasın
     var MAX_FIX = 10; // bundan fazla düzeltme hamlesi birikirse "küpü çöz" denir
 
@@ -99,6 +100,10 @@
         bt_hint_solve: "Küp çözülünce karıştırma başlayacak", bt_hint_ready: "Hazır! İlk hamlende süre başlar, küp çözülünce durur",
         bt_connected: "Bağlı", bt_connecting: "Bağlanıyor…",
         bt_no_data: "Küpten veri gelmiyor. MAC adresi yanlış olabilir; bağlantıyı kesip tekrar dene.",
+        bt_no_data_t: "veri gelmiyor",
+        bt_no_data2: "Küp bağlandı ama hamle gelmiyor. Genelde küpün MAC adresi yanlıştır: \"MAC'i değiştir\"e bas ve doğru adresi gir. Küp telefonda GAN uygulamasına bağlıysa önce oradan çıkar.",
+        bt_mac_used: "Kullanılan MAC:", bt_mac_change: "MAC'i değiştir",
+        bt_turn_test: "Test: bir yüzü çevir, hamlen burada görünmeli.", bt_moves: "Gelen hamleler:",
         bt_failed: "Bağlantı kurulamadı. Küpün açık olduğundan emin ol ve tekrar dene.",
         bt_mac_title: "Küpün MAC adresi gerekli",
         bt_mac_intro: "GAN küpler şifreli iletişim kurar; bunun için küpün MAC adresi lazım. Tarayıcın bunu otomatik okuyamadı. İki yoldan birini kullan (sadece bir kez gerekir):",
@@ -143,15 +148,20 @@
         bar.classList.toggle("on", on);
         el("btConnect").style.display = on ? "none" : "";
         el("btDisconnect").style.display = on ? "" : "none";
-        el("btReset").style.display = on ? "" : "none";
+        el("btReset").style.display = on && !noData ? "" : "none";
+        el("btMac").style.display = on && (noData || /^GAN|^MG|^AiCube/.test(conn.deviceName || "")) ? "" : "none";
+        el("btMac").textContent = txt("bt_mac_change");
+        bar.classList.toggle("warn", on && noData);
+        renderMoves();
         var st = el("btStatus");
-        el("btTitle").textContent = on ? (conn.deviceName || "GAN") + " · " + txt("bt_connected") : txt("bt_title");
+        el("btTitle").textContent = on ? (conn.deviceName || "GAN") + " · " + (noData ? "⚠ " + txt("bt_no_data_t") : txt("bt_connected")) : txt("bt_title");
         el("btConnect").textContent = txt("bt_connect");
         el("btReset").textContent = txt("bt_reset");
         el("btDisconnect").textContent = txt("bt_disconnect");
         if (!supported()) { st.textContent = txt("bt_unsupported"); el("btConnect").disabled = true; return; }
         if (connecting) { st.textContent = txt("bt_connecting"); return; }
         if (!on) { st.textContent = txt("bt_hint"); return; }
+        if (noData) { st.textContent = txt("bt_no_data2") + (lastMac ? " " + txt("bt_mac_used") + " " + lastMac : ""); return; }
         if (current && current.cube !== "3x3") st.textContent = txt("bt_only3x3");
         else if (mode !== "cube") st.textContent = txt("bt_cube_mode");
         else st.textContent = txt(state === "running" ? "bt_hint_ready" : "bt_hint_scramble");
@@ -180,6 +190,21 @@
         box.innerHTML = html;
     }
 
+    /* Küpten gelen son hamleler: bağlantının gerçekten çalıştığını görmek için */
+    function renderMoves() {
+        var m = el("btMoves");
+        if (!m) return;
+        if (!conn || noData) { m.textContent = ""; return; }
+        m.textContent = recent.length ? txt("bt_moves") + " " + recent.join(" ") : txt("bt_turn_test");
+    }
+    function changeMac() {
+        var dev = lastDevice;
+        var macs = savedMacs(); if (conn) delete macs[conn.deviceName || "?"];
+        try { localStorage.setItem(MAC_KEY, JSON.stringify(macs)); } catch (e) {}
+        if (conn) disconnect();
+        forceMac = true;
+        if (dev) connect(dev); else openPicker();
+    }
     function setHint(k) { var h = el("timerHint"); if (h) h.textContent = txt(k); }
 
     /* ---------- karıştırma takibi ---------- */
@@ -261,6 +286,7 @@
     function savedMacs() { try { return JSON.parse(localStorage.getItem(MAC_KEY)) || {}; } catch (e) { return {}; } }
     function macProvider(device, isFallback) {
         var saved = savedMacs()[device.name || "?"];
+        if (forceMac) { forceMac = false; return askMac(saved || lastMac || ""); }
         if (!isFallback) return Promise.resolve(saved || null);
         return askMac(saved || "");
     }
@@ -359,7 +385,7 @@
         // Kayıtlı küp varsa doğrudan onu ver; yoksa Chrome'un listesini aç ve seçilen küpü bu sayfa için hafızada tut
         bt.requestDevice = function (opts) {
             bt.requestDevice = origRequest;
-            if (knownDevice) return Promise.resolve(knownDevice);
+            if (knownDevice) { lastDevice = knownDevice; return Promise.resolve(knownDevice); }
             return origRequest.call(bt, opts).then(function (d) { lastDevice = d; return d; });
         };
         el("btConnect").disabled = true;
@@ -368,7 +394,7 @@
             return window.GanBT.connectSmartCube(macProvider);
         }).then(function (c) {
             conn = c; connecting = false;
-            gotEvent = false;
+            gotEvent = false; noData = false; recent = []; lastMac = c.deviceMAC || lastMac;
             try {
                 var macs = savedMacs();
                 if (c.deviceMAC) { macs[c.deviceName || "?"] = c.deviceMAC; localStorage.setItem(MAC_KEY, JSON.stringify(macs)); }
@@ -376,7 +402,13 @@
             modelKnown = false;
             sub = c.events$.subscribe(function (ev) {
                 gotEvent = true;
-                if (ev.type === "MOVE") onMove(ev.face, ev.direction);
+                if (noData) { noData = false; renderBar(); }
+                if (ev.type === "MOVE") {
+                    recent.push(fmtMove(MAP[FACES[ev.face]], ev.direction === 0 ? 1 : 3));
+                    if (recent.length > 8) recent.shift();
+                    renderMoves();
+                    onMove(ev.face, ev.direction);
+                }
                 else if (ev.type === "FACELETS") {
                     if (!modelKnown) {
                         if (ev.facelets === "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB") { model = solvedModel(); modelKnown = true; }
@@ -393,7 +425,7 @@
             else { model = solvedModel(); modelKnown = false; }
             setTimeout(function () {
                 if (conn === c && !gotEvent) {
-                    el("btStatus").textContent = txt("bt_no_data");
+                    noData = true; renderBar();
                     var macs = savedMacs(); delete macs[c.deviceName || "?"];
                     try { localStorage.setItem(MAC_KEY, JSON.stringify(macs)); } catch (e) {}
                 }
@@ -413,7 +445,7 @@
     }
     function dropConnection() {
         if (sub) { try { sub.unsubscribe(); } catch (e) {} }
-        sub = null; conn = null; phase = "off";
+        sub = null; conn = null; phase = "off"; noData = false;
         renderBar();
         if (curScramble) el("scramble").textContent = curScramble;
         if (state === "idle") setHint("hint_ready");
@@ -439,6 +471,7 @@
         el("btConnect").addEventListener("click", openPicker);
         el("btDisconnect").addEventListener("click", disconnect);
         el("btReset").addEventListener("click", markSolved);
+        el("btMac").addEventListener("click", changeMac);
         renderBar();
     }
     window.btRenderBar = renderBar;
