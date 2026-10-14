@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261023";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261024";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -82,7 +82,8 @@
     var phase = "off";      // off | needSolve | scrambling | ready | solving | done
     var todo = [];          // [{f, q, fix}] yapılacak çeyrek tur sayısı (1 = X, 2 = X2, 3 = X')
     var total = 0;          // karıştırmadaki hamle sayısı
-    var gotEvent = false, connecting = false, afterCase = false;
+    var gotEvent = false, connecting = false, afterCase = false, tooMany = false;
+    var MAX_FIX = 10; // bundan fazla düzeltme hamlesi birikirse "küpü çöz" denir
 
     function el(id) { return document.getElementById(id); }
     /* i18n.js eski bir sürümden gelirse ham anahtar görünmesin diye Türkçe yedekler */
@@ -93,7 +94,7 @@
         bt_only3x3: "Bluetooth sadece 3x3 setlerinde çalışır", bt_cube_mode: "Bluetooth için \"Küple çalış\" modunu seç",
         bt_need_solve: "Önce küpü çöz (ya da yaptığın hamleleri geri al). Çözülünce karıştırma başlar.",
         bt_unknown: "Küp çözülmüş değil görünüyor. Çöz ve \"Küpüm çözülmüş\" butonuna bas.",
-        bt_fix: "Düzelt:", bt_finish_cube: "Case tamam! Yeni karıştırma için küpü bitir (tamamen çöz) ya da algoritmanın tersini yap.", bt_hint_scramble: "Karıştırmayı sarı üstte, yeşil önde tutarak uygula",
+        bt_fix: "Düzelt:", bt_too_many: "Çok fazla farklı hamle yapıldı. Küpü çöz; çözülünce karıştırma baştan başlar.", bt_finish_cube: "Case tamam! Yeni karıştırma için küpü bitir (tamamen çöz) ya da algoritmanın tersini yap.", bt_hint_scramble: "Karıştırmayı sarı üstte, yeşil önde tutarak uygula",
         bt_hint_solve: "Küp çözülünce karıştırma başlayacak", bt_hint_ready: "Hazır! İlk hamlende süre başlar, küp çözülünce durur",
         bt_connected: "Bağlı", bt_connecting: "Bağlanıyor…",
         bt_no_data: "Küpten veri gelmiyor. MAC adresi yanlış olabilir; bağlantıyı kesip tekrar dene.",
@@ -159,7 +160,7 @@
         if (!applies() || !curScramble) return;
         var box = el("scramble");
         if (phase === "needSolve") {
-            box.innerHTML = '<span class="bt-warn">' + esc(txt(!modelKnown ? "bt_unknown" : (afterCase ? "bt_finish_cube" : "bt_need_solve"))) + '</span>';
+            box.innerHTML = '<span class="bt-warn">' + esc(txt(!modelKnown ? "bt_unknown" : tooMany ? "bt_too_many" : (afterCase ? "bt_finish_cube" : "bt_need_solve"))) + '</span>';
             return;
         }
         var orig = parseScramble(curScramble);
@@ -182,6 +183,7 @@
 
     /* ---------- karıştırma takibi ---------- */
     function startScrambleTracking() {
+        tooMany = false;
         todo = parseScramble(curScramble);
         total = todo.length;
         phase = "scrambling";
@@ -220,6 +222,14 @@
                 var keepFix = todo[1].fix;
                 todo.splice(0, 2);
                 if (merged) todo.unshift({ f: f, q: merged, fix: keepFix });
+            }
+            // Çok fazla yanlış hamle: uzun düzeltme listesi yerine küpü çözmesini iste
+            var fixCount = 0;
+            for (var k = 0; k < todo.length && todo[k].fix; k++) fixCount += todo[k].q === 2 ? 2 : 1;
+            if (fixCount > MAX_FIX) {
+                phase = "needSolve"; tooMany = true; afterCase = false;
+                renderScramble(); setHint("bt_hint_solve");
+                return;
             }
             if (!todo.length) { phase = "ready"; setHint("bt_hint_ready"); }
             renderScramble();

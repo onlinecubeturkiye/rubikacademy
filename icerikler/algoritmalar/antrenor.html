@@ -31,7 +31,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261023">
+<link rel="stylesheet" href="/styles/common.css?v=20261024">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -382,6 +382,36 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     margin-bottom: 20px;
 }
 
+/* İstatistik tablosu kendi içinde kayar; sayfa aşağı doğru uzamaz */
+.stat-scroll { max-height: 360px; overflow-y: auto; border-radius: 12px; }
+.stat-scroll .stat-table thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); }
+
+/* Tablet: biraz daha geniş tablo alanı */
+@media (min-width: 701px) and (max-width: 1099px) {
+    .stat-scroll { max-height: 420px; }
+    .timer { font-size: 88px; }
+}
+
+/* Bilgisayar: antrenör solda, istatistikler sağda yapışkan sütun */
+@media (min-width: 1100px) {
+    .wrap { max-width: 1320px; }
+    .intro { margin-bottom: 18px; }
+    .trainer-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 24px; align-items: start; }
+    .trainer-main .box { margin-bottom: 20px; }
+    .trainer-main .box:last-child, #statsBox { margin-bottom: 0; }
+    .intro h1 { font-size: 44px; }
+    .intro p { font-size: 14px; }
+    .scramble { font-size: 22px; }
+    #statsBox { position: sticky; top: 16px; }
+    #statsBox .box-head { flex-wrap: wrap; gap: 8px; }
+    #statsBox .stat-tiles { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    #statsBox .stat-tile { padding: 10px; }
+    #statsBox .stat-tile b { font-size: 19px; }
+    #statsBox .stat-table .hide-sm { display: none; }
+    .stat-scroll { max-height: calc(100vh - 330px); min-height: 220px; }
+    .timer { font-size: 96px; }
+}
+
 @media (max-width: 700px) {
     .box { padding: 16px; border-radius: 18px; }
     .stat-tiles { grid-template-columns: repeat(2, 1fr); }
@@ -445,6 +475,8 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 
 <div id="loadError" class="load-error" data-i18n="load_error">Antrenör verisi yüklenemedi. Lütfen daha sonra tekrar dene.</div>
 
+<div class="trainer-grid">
+<div class="trainer-main">
 <!-- SET VE CASE SEÇİMİ -->
 <section class="box" id="setupBox">
     <div class="set-tabs" id="setTabs" role="tablist"></div>
@@ -505,6 +537,8 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     </div>
 </section>
 
+</div>
+
 <!-- İSTATİSTİK -->
 <section class="box" id="statsBox">
     <div class="box-head">
@@ -517,8 +551,9 @@ html[dir="rtl"] .stat-table th { text-align: right; }
         <div class="stat-tile"><b id="stAo12">-</b><span data-i18n="st_ao12">Son 12 ortalaması</span></div>
         <div class="stat-tile"><b id="stBest">-</b><span data-i18n="st_best">Oturumun en iyisi</span></div>
     </div>
-    <div id="statTableWrap"></div>
+    <div id="statTableWrap" class="stat-scroll"></div>
 </section>
+</div>
 
 </div>
 </div>
@@ -566,9 +601,9 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261023"></script>
-<script src="/js/common.js?v=20261023"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261023"></script>
+<script src="/js/i18n.js?v=20261024"></script>
+<script src="/js/common.js?v=20261024"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261024"></script>
 
 <script>
 /* ============================================================
@@ -678,7 +713,7 @@ function loadAll() {
     SETS.forEach(function (s) { files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261023").then(function (r) {
+        return fetch(BASE + f + "?v=20261024").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
