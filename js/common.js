@@ -202,3 +202,10 @@ document.addEventListener("DOMContentLoaded", function () {
         observer.observe(element);
     });
 });
+
+/* Çevrimdışı kullanım ve "ana ekrana ekle" için service worker */
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/sw.js").catch(function () {});
+    });
+}
