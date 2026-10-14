@@ -31,7 +31,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261028">
+<link rel="stylesheet" href="/styles/common.css?v=20261029">
 
 <style>
 .hero {
@@ -260,6 +260,18 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
     .subset-heading { font-size: 19px; }
 }
 
+/* SET SEKMELERİ (3x3 / 2x2 setleri arasında geçiş) */
+.set-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 4px auto 22px; }
+.set-tabs .set-tabs-label { width: 100%; text-align: center; font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--text-soft); margin-bottom: 2px; }
+.set-tab {
+    border: var(--card-bw) solid var(--ink); border-radius: 14px; padding: 9px 16px; text-decoration: none;
+    font: 800 14.5px "Inter", sans-serif; background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm);
+    transition: transform .12s, box-shadow .12s;
+}
+.set-tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.set-tab.active { background: var(--cube-yellow); color: #17171f; }
+@media (max-width: 520px) { .set-tab { padding: 7px 11px; font-size: 13.5px; } }
+
 /* SET SEKMELERİ + NOTASYON */
 .set-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0 auto 14px; }
 .set-tab {
@@ -331,6 +343,14 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
     <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
 </nav>
 
+<div class="set-tabs">
+    <span class="set-tabs-label">3x3</span>
+    <a href="/icerikler/algoritmalar/oll" class="set-tab active" aria-current="page">OLL</a>
+    <a href="/icerikler/algoritmalar/pll" class="set-tab">PLL</a>
+    <a href="/icerikler/algoritmalar/coll" class="set-tab">COLL</a>
+    <a href="/icerikler/algoritmalar/wv" class="set-tab">WV</a>
+</div>
+
 <section class="hero reveal">
 <div class="hero-text">
 <div class="badge">
@@ -373,8 +393,8 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "pyra_algos";</script>
-<script src="/js/i18n.js?v=20261028"></script>
-<script src="/js/common.js?v=20261028"></script>
+<script src="/js/i18n.js?v=20261029"></script>
+<script src="/js/common.js?v=20261029"></script>
 
 <script>
 /* ============================================================
@@ -447,8 +467,8 @@ function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 /* Diyagram: geom.polys[i] çokgenine c[i] rengini ver */
-function caseSvg(c, size) {
-    var g = DATA.geom, v = g.view, out = '<svg viewBox="' + v.join(" ") + '" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg">';
+function caseSvg(c, size, g) {
+    g = g || DATA.geom; var v = g.view, out = '<svg viewBox="' + v.join(" ") + '" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg">';
     var sw = (v[2] / 160).toFixed(3);
     for (var i = 0; i < g.polys.length; i++) {
         var pts = g.polys[i].map(function (p) { return p[0] + "," + p[1]; }).join(" ");
@@ -472,15 +492,17 @@ function renderSet() {
     try { localStorage.setItem("algo-set-" + PAGE_KEY, currentSet); } catch (e) {}
     renderTabs();
     var progress = loadProgress(), t = progressText(), html = "";
+    var geom = (DATA.geoms && set.geom) ? DATA.geoms[set.geom] : DATA.geom;
     set.groups.forEach(function (group) {
         var key = "subset_" + group.subset;
         html += '<div class="subset-block"><h2 class="subset-heading" data-i18n="' + key + '">' + escapeHtml(T(key, group.subset)) + '</h2><div class="case-grid">';
         group.cases.forEach(function (c) {
             var st = progress[c.name] || "";
             html += '<div class="case-card' + (st ? " state-" + st : "") + '" data-case="' + escapeHtml(c.name) + '" role="button" tabindex="0">' +
-                '<div class="case-diagram" dir="ltr">' + caseSvg(c.c, 96) + '</div>' +
+                '<div class="case-diagram" dir="ltr">' + caseSvg(c.c, 96, geom) + '</div>' +
                 '<div class="case-body"><div class="case-name">' + escapeHtml(c.name) + '</div>' +
                 '<div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>' +
+                (c.alts && c.alts.length ? '<div class="case-alts" dir="ltr">' + c.alts.map(function (a) { return '<div class="case-alt-line">' + escapeHtml(a) + '</div>'; }).join("") + '</div>' : '') +
                 '<div class="case-status">' + escapeHtml(st ? t[st] : "") + '</div></div></div>';
         });
         html += '</div></div>';
@@ -489,7 +511,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/pyraminx.json?v=20261028")
+fetch("/icerikler/algoritmalar/pyraminx.json?v=20261029")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
