@@ -31,7 +31,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261018">
+<link rel="stylesheet" href="/styles/common.css?v=20261019">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -189,6 +189,35 @@
 }
 .timer-area.running .timer { color: var(--cube-green); }
 .timer-hint { margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--text-soft); }
+.mode-switch {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 14px;
+    border-radius: 14px;
+    border: var(--card-bw) solid var(--card-border);
+    background: var(--surface-soft);
+}
+.mode-btn {
+    border: 0;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font: 800 13px "Inter", sans-serif;
+    color: var(--text-soft);
+    background: transparent;
+    cursor: pointer;
+}
+.mode-btn.active { background: var(--cube-yellow); color: #17171f; box-shadow: var(--shadow-sm); }
+.card-diagram { display: none; justify-content: center; margin-bottom: 14px; }
+.mode-card .card-diagram { display: flex; }
+.card-diagram svg { width: 150px; height: 150px; }
+.card-diagram .diag-pair { gap: 10px; }
+.card-diagram .diag-pair svg { width: 120px; height: 120px; }
+.mode-card .timer { font-size: clamp(30px, 6vw, 44px); }
+.mode-card .timer-area { padding: 18px 10px; }
+.mode-card .reveal-diagram { display: none; }
+.mode-card .reveal-box { justify-content: center; text-align: center; }
+.mode-card #holdTip, .mode-card #scramble { display: none; }
 .trainer-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
 
 .reveal-box {
@@ -367,11 +396,16 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 
 <!-- ANTRENÖR -->
 <section class="box trainer" id="trainerBox">
+    <div class="mode-switch" id="modeSwitch" role="tablist">
+        <button class="mode-btn" data-mode="cube" data-i18n="mode_cube">🧊 Küple çalış</button>
+        <button class="mode-btn" data-mode="card" data-i18n="mode_card">🃏 Küpsüz (kart)</button>
+    </div>
     <div class="hold-tip" id="holdTip" data-i18n="hold_tip_3x3">Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.</div>
     <div class="scramble" id="scramble" dir="ltr"></div>
     <div class="empty-note" id="emptyNote" style="display:none" data-i18n="empty_note">Çalışmak için en az bir case seç.</div>
 
     <div class="timer-area" id="timerArea" role="button" tabindex="0" aria-live="polite">
+        <div class="card-diagram" id="cardDiagram" dir="ltr"></div>
         <div class="timer" id="timer" dir="ltr">0.00</div>
         <div class="timer-hint" id="timerHint"></div>
     </div>
@@ -422,8 +456,8 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261018"></script>
-<script src="/js/common.js?v=20261018"></script>
+<script src="/js/i18n.js?v=20261019"></script>
+<script src="/js/common.js?v=20261019"></script>
 
 <script>
 /* ============================================================
@@ -457,6 +491,7 @@ function drawPair(c, s) {
 var STATS_KEY = "trainer-stats-v1";
 var SEL_KEY = "trainer-selection-v1";
 var SET_KEY = "trainer-set-v1";
+var MODE_KEY = "trainer-mode-v1";
 
 /* Yedek metinler (i18n.js eski bir sürümden gelirse "undefined" görünmesin) */
 var FALLBACK = {
@@ -473,7 +508,11 @@ var FALLBACK = {
     reset_confirm: "Bu setin tüm istatistikleri silinsin mi?",
     learning_none: "Bu sette \"Öğreniyorum\" olarak işaretlediğin case yok. Algoritma sayfasında case kartlarına tıklayarak işaretleyebilirsin.",
     hold_tip_3x3: "Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.",
-    hold_tip_2x2: "Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş 2x2'ye uygula."
+    hold_tip_2x2: "Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş 2x2'ye uygula.",
+    hint_card: "Algoritmayı aklından geçir, hazır olunca dokun ya da bir tuşa bas",
+    hint_card_done: "Doğru hatırladın mı? Bildim (1) / Zorlandım (2)",
+    mode_cube: "🧊 Küple çalış",
+    mode_card: "🃏 Küpsüz (kart)"
 };
 
 function lang() { return localStorage.getItem("site-lang") || "tr"; }
@@ -508,8 +547,14 @@ function fmt(ms) {
 var DATA = {};        // setId -> [{key, name, subset, alg, raw, scrambles}]
 var current = null;   // seçili set
 var selection = load(SEL_KEY, {});   // setId -> {caseKey: true}
-var stats = load(STATS_KEY, {});     // setId -> {caseKey: {n, sum, best, score}}
+var stats = load(STATS_KEY, {});     // setId (kart modunda setId + ":card") -> {caseKey: {n, sum, best, score}}
 var session = [];     // bu oturumdaki süreler (ms)
+/* Mod: "cube" = karıştırmayı küpe uygula + süre, "card" = küpsüz hızlı kart (diyagramı gör, algoritmayı hatırla).
+   Kart modunda süre "hatırlama süresi"dir; bu yüzden istatistikleri ayrı tutulur. */
+var mode = (load(MODE_KEY, {}).mode === "card") ? "card" : "cube";
+function statId() { return mode === "card" ? current.id + ":card" : current.id; }
+// Küple modda süre işlerken set/case değiştirilmez; kart modunda her an değiştirilebilir
+function busy() { return state === "running" && mode === "cube"; }
 var state = "idle";   // idle | running | done
 var curCase = null, curScramble = "", lastKey = null;
 var startTime = 0, rafId = 0, lastTime = 0;
@@ -522,7 +567,7 @@ function loadAll() {
     SETS.forEach(function (s) { files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261018").then(function (r) {
+        return fetch(BASE + f + "?v=20261019").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -618,7 +663,7 @@ function setSelection(map) {
     selection[current.id] = map;
     save(SEL_KEY, selection);
     renderCases();
-    if (state !== "running") nextCase();
+    if (!busy()) nextCase();
 }
 
 /* ---------------- CASE SEÇİM ALGORİTMASI ----------------
@@ -629,7 +674,7 @@ function pickCase() {
     var pool = DATA[current.id].filter(function (c) { return sel[c.key]; });
     if (!pool.length) return null;
     if (pool.length > 1) pool = pool.filter(function (c) { return c.key !== lastKey; });
-    var st = stats[current.id] || {};
+    var st = stats[statId()] || {};
     var weights = pool.map(function (c) {
         var s = st[c.key];
         return s ? 1 + (s.score || 0) : 3;
@@ -659,7 +704,13 @@ function nextCase() {
     curScramble = list[Math.floor(Math.random() * list.length)];
     document.getElementById("scramble").textContent = curScramble;
     document.getElementById("timer").textContent = "0.00";
-    document.getElementById("timerHint").textContent = T("hint_ready");
+    if (mode === "card") {
+        document.getElementById("cardDiagram").innerHTML = current.draw(curCase.raw, 150);
+        startTimer();
+    } else {
+        document.getElementById("cardDiagram").innerHTML = "";
+        document.getElementById("timerHint").textContent = T("hint_ready");
+    }
 }
 
 /* ---------------- ZAMANLAYICI ---------------- */
@@ -674,7 +725,7 @@ function startTimer() {
     state = "running";
     startTime = performance.now();
     document.getElementById("timerArea").classList.add("running");
-    document.getElementById("timerHint").textContent = T("hint_running");
+    document.getElementById("timerHint").textContent = T(mode === "card" ? "hint_card" : "hint_running");
     tick();
 }
 
@@ -685,7 +736,7 @@ function stopTimer() {
     state = "done";
     document.getElementById("timer").textContent = fmt(lastTime);
     document.getElementById("timerArea").classList.remove("running");
-    document.getElementById("timerHint").textContent = T("hint_done");
+    document.getElementById("timerHint").textContent = T(mode === "card" ? "hint_card_done" : "hint_done");
     document.getElementById("revealDiagram").innerHTML = current.draw(curCase.raw, 74);
     document.getElementById("revealName").textContent = curCase.name;
     document.getElementById("revealAlg").textContent = curCase.alg;
@@ -695,7 +746,7 @@ function stopTimer() {
 
 function grade(hard) {
     if (state !== "done") return;
-    var setStats = stats[current.id] || (stats[current.id] = {});
+    var setStats = stats[statId()] || (stats[statId()] = {});
     var s = setStats[curCase.key] || (setStats[curCase.key] = { n: 0, sum: 0, best: null, score: 0, hard: 0 });
     s.n++;
     s.sum += lastTime;
@@ -723,7 +774,7 @@ function renderStats() {
     document.getElementById("stAo12").textContent = fmt(avgOf(session, 12));
     document.getElementById("stBest").textContent = session.length ? fmt(Math.min.apply(null, session)) : "-";
 
-    var st = stats[current.id] || {};
+    var st = stats[statId()] || {};
     var rows = DATA[current.id].filter(function (c) { return st[c.key]; });
     var wrap = document.getElementById("statTableWrap");
     if (!rows.length) { wrap.innerHTML = '<p class="empty-note">' + esc(T("no_stats")) + '</p>'; return; }
@@ -777,7 +828,7 @@ document.getElementById("btnHard").addEventListener("click", function () { grade
 document.getElementById("btnSkip").addEventListener("click", function () { lastKey = curCase ? curCase.key : null; nextCase(); this.blur(); });
 document.getElementById("btnReset").addEventListener("click", function () {
     if (!confirm(T("reset_confirm"))) return;
-    delete stats[current.id];
+    delete stats[statId()];
     save(STATS_KEY, stats);
     session = [];
     renderStats();
@@ -785,7 +836,7 @@ document.getElementById("btnReset").addEventListener("click", function () {
 
 document.getElementById("setTabs").addEventListener("click", function (e) {
     var b = e.target.closest(".set-tab");
-    if (b && state !== "running") selectSet(b.getAttribute("data-set"));
+    if (b && !busy()) selectSet(b.getAttribute("data-set"));
 });
 document.getElementById("caseGroups").addEventListener("click", function (e) {
     var b = e.target.closest(".chip");
@@ -797,7 +848,7 @@ document.getElementById("caseGroups").addEventListener("click", function (e) {
     b.classList.toggle("on", !!sel[k]);
     b.setAttribute("aria-pressed", sel[k] ? "true" : "false");
     updateSelCount();
-    if (state === "idle" && (!curCase || !sel[curCase.key])) nextCase();
+    if ((state === "idle" || (mode === "card" && state === "running")) && (!curCase || !sel[curCase.key])) nextCase();
 });
 document.getElementById("selAll").addEventListener("click", function () {
     var m = {};
@@ -817,13 +868,37 @@ document.getElementById("caseToggle").addEventListener("click", function () {
     document.getElementById("caseToggleArrow").textContent = open ? "▴" : "▾";
 });
 
+/* ---------------- MOD ---------------- */
+function applyMode() {
+    document.getElementById("trainerBox").classList.toggle("mode-card", mode === "card");
+    Array.prototype.forEach.call(document.querySelectorAll(".mode-btn"), function (b) {
+        var on = b.getAttribute("data-mode") === mode;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+}
+document.getElementById("modeSwitch").addEventListener("click", function (e) {
+    var b = e.target.closest(".mode-btn");
+    if (!b || busy()) return;
+    var m = b.getAttribute("data-mode");
+    if (m === mode) return;
+    mode = m;
+    save(MODE_KEY, { mode: mode });
+    applyMode();
+    session = [];
+    lastKey = null;
+    b.blur();
+    if (current) { nextCase(); renderStats(); }
+});
+applyMode();
+
 // Dil değişince dinamik metinleri yenile (common.js applyLanguage sonrası çağırır)
 function onLanguageApplied() {
     if (!current) return;
     renderCases();
     renderStats();
     document.getElementById("holdTip").textContent = T(current.cube === "2x2" ? "hold_tip_2x2" : "hold_tip_3x3");
-    var hint = state === "idle" ? "hint_ready" : state === "running" ? "hint_running" : "hint_done";
+    var hint = state === "idle" ? "hint_ready" : state === "running" ? (mode === "card" ? "hint_card" : "hint_running") : (mode === "card" ? "hint_card_done" : "hint_done");
     document.getElementById("timerHint").textContent = T(hint);
 }
 
