@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261039";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261040";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -84,6 +84,8 @@
     var total = 0;          // karıştırmadaki hamle sayısı
     var gotEvent = false, connecting = false, afterCase = false, tooMany = false;
     var noData = false, forceMac = false, recent = [], lastMac = "";
+    var attempt = 0, stage = "", stageName = "", connTimer = 0, lastError = ""; // bağlantı aşaması: takılırsa nerede kaldığı görünsün
+    var CONNECT_TIMEOUT = 25000;
     var lastDevice = null, userDisconnect = false; // bu sayfada seçilen küp: tekrar bağlanırken Chrome listesi açılmasın
     var MAX_FIX = 10; // bundan fazla düzeltme hamlesi birikirse "küpü çöz" denir
 
@@ -104,6 +106,9 @@
         bt_no_data2: "Küp bağlandı ama hamle gelmiyor. Genelde küpün MAC adresi yanlıştır: \"MAC'i değiştir\"e bas ve doğru adresi gir. Küp telefonda GAN uygulamasına bağlıysa önce oradan çıkar.",
         bt_mac_used: "Kullanılan MAC:", bt_mac_change: "MAC'i değiştir",
         bt_turn_test: "Test: bir yüzü çevir, hamlen burada görünmeli.", bt_moves: "Gelen hamleler:",
+        bt_st_pick: "küp seçiliyor", bt_st_found: "küp bulundu", bt_st_mac: "MAC adresi alınıyor", bt_st_link: "küple bağlantı kuruluyor",
+        bt_timeout: "Bağlantı tamamlanamadı. Küp telefondaki GAN uygulamasına bağlıysa uygulamayı kapat, küpü bir yüzünü çevirerek uyandır ve tekrar dene. Olmazsa Bluetooth'u kapatıp aç.",
+        bt_stage: "Kaldığı aşama:", bt_error: "Hata:",
         bt_failed: "Bağlantı kurulamadı. Küpün açık olduğundan emin ol ve tekrar dene.",
         bt_mac_title: "Küpün MAC adresi gerekli",
         bt_mac_intro: "GAN küpler şifreli iletişim kurar; bunun için küpün MAC adresi lazım. Tarayıcın bunu otomatik okuyamadı. İki yoldan birini kullan (sadece bir kez gerekir):",
@@ -159,7 +164,8 @@
         el("btReset").textContent = txt("bt_reset");
         el("btDisconnect").textContent = txt("bt_disconnect");
         if (!supported()) { st.textContent = txt("bt_unsupported"); el("btConnect").disabled = true; return; }
-        if (connecting) { st.textContent = txt("bt_connecting"); return; }
+        if (connecting) { st.textContent = txt("bt_connecting") + (stage ? " (" + txt("bt_st_" + stage) + (stageName ? ": " + stageName : "") + ")" : ""); return; }
+        if (!on && lastError) { st.textContent = lastError; return; }
         if (!on) { st.textContent = txt("bt_hint"); return; }
         if (noData) { st.textContent = txt("bt_no_data2") + (lastMac ? " " + txt("bt_mac_used") + " " + lastMac : ""); return; }
         if (current && (current.cube !== "3x3" || current.noBT)) st.textContent = txt("bt_only3x3");
@@ -284,7 +290,28 @@
         });
     }
     function savedMacs() { try { return JSON.parse(localStorage.getItem(MAC_KEY)) || {}; } catch (e) { return {}; } }
+    function setStage(k, name) { stage = k; if (name) stageName = name; renderBar(); }
+    function armTimeout(id) {
+        clearTimeout(connTimer);
+        connTimer = setTimeout(function () {
+            if (id !== attempt || !connecting) return;
+            attempt++; // geç gelen sonuçları yok say
+            var where = stage ? txt("bt_st_" + stage) : "";
+            connecting = false;
+            try { if (lastDevice && lastDevice.gatt && lastDevice.gatt.connected) lastDevice.gatt.disconnect(); } catch (e) {}
+            lastError = txt("bt_timeout") + (where ? " " + txt("bt_stage") + " " + where + "." : "");
+            el("btConnect").disabled = false;
+            renderBar();
+        }, CONNECT_TIMEOUT);
+    }
     function macProvider(device, isFallback) {
+        var id = attempt;
+        setStage("mac", device && device.name);
+        if (isFallback || forceMac) clearTimeout(connTimer); // kullanıcı MAC yazarken süre işlemesin
+        var p = macProvider0(device, isFallback);
+        return Promise.resolve(p).then(function (m) { if (id === attempt) { setStage("link"); armTimeout(id); } return m; });
+    }
+    function macProvider0(device, isFallback) {
         var saved = savedMacs()[device.name || "?"];
         if (forceMac) { forceMac = false; return askMac(saved || lastMac || ""); }
         if (!isFallback) return Promise.resolve(saved || null);
@@ -383,16 +410,22 @@
         // Kayıtlı küp seçildiyse kütüphanenin cihaz seçme çağrısını bir kereliğine o küpe yönlendir
         var bt = navigator.bluetooth, origRequest = bt.requestDevice;
         // Kayıtlı küp varsa doğrudan onu ver; yoksa Chrome'un listesini aç ve seçilen küpü bu sayfa için hafızada tut
+        var id = ++attempt;
+        lastError = ""; stage = ""; stageName = "";
         bt.requestDevice = function (opts) {
             bt.requestDevice = origRequest;
-            if (knownDevice) { lastDevice = knownDevice; return Promise.resolve(knownDevice); }
-            return origRequest.call(bt, opts).then(function (d) { lastDevice = d; return d; });
+            var found = function (d) { lastDevice = d; if (id === attempt) { setStage("found", d && d.name); armTimeout(id); } return d; };
+            if (knownDevice) return Promise.resolve(found(knownDevice));
+            setStage("pick");
+            return origRequest.call(bt, opts).then(found);
         };
         el("btConnect").disabled = true;
         connecting = true; renderBar();
         loadLib().then(function () {
             return window.GanBT.connectSmartCube(macProvider);
         }).then(function (c) {
+            if (id !== attempt) { try { c.disconnect(); } catch (e) {} return; } // zaman aşımından sonra geldi
+            clearTimeout(connTimer); stage = "";
             conn = c; connecting = false;
             gotEvent = false; noData = false; recent = []; lastMac = c.deviceMAC || lastMac;
             try {
@@ -435,11 +468,15 @@
             window.btOnNewCase();
         }).catch(function (err) {
             if (bt.requestDevice !== origRequest) bt.requestDevice = origRequest;
+            if (id !== attempt) return;
+            clearTimeout(connTimer);
+            var where = stage ? txt("bt_st_" + stage) : ""; stage = "";
             el("btConnect").disabled = false;
             conn = null; connecting = false;
             renderBar();
             if (err && err.name === "NotFoundError") return; // kullanıcı seçim penceresini kapattı
-            el("btStatus").textContent = txt("bt_failed");
+            lastError = txt("bt_failed") + (where ? " " + txt("bt_stage") + " " + where + "." : "") + (err && err.message ? " " + txt("bt_error") + " " + err.message : "");
+            renderBar();
             console.error("Bluetooth bağlantısı kurulamadı:", err);
         });
     }
