@@ -115,7 +115,6 @@
           "alg": "F R' F' R U S' R U' R' S",
           "alts": [
             "F R' F' R2 r' U R U' R' U' M'",
-            "(R U R' U) (R' F R F') U2 (R' F R F')",
             "F' r U r' U' S r' F r S'"
           ],
           "pattern": "UFFRULBBUUUFUURRULBUL"
