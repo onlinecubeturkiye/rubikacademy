@@ -926,11 +926,11 @@ var SITE_I18N = {
                 eg2_title: "EG-2 Algoritmaları",
                 eg2_p: "Alt katmanda çapraz iki köşe yer değiştirmişken 2x2'yi tek algoritmayla bitiren 42 case.",
                 cat_4x4_title: "4x4",
-                cat_4x4_sub: "Parite algoritmaları",
-                p4_level: "PARİTE",
+                cat_4x4_sub: "Parity algoritmaları",
+                p4_level: "PARITY",
                 p4_count: "2 algoritma",
-                p4_title: "4x4 Parite",
-                p4_p: "4x4'ü 3x3 gibi çözerken çıkan OLL ve PLL paritesini tanı ve tek algoritmayla düzelt.",
+                p4_title: "4x4 Parity",
+                p4_p: "4x4'ü 3x3 gibi çözerken çıkan OLL ve PLL parity'sini tanı ve tek algoritmayla düzelt.",
                 cat_ps_title: "Pyraminx & Skewb",
                 cat_ps_sub: "Başlangıç yöntemleri",
                 ps_level: "BAŞLANGIÇ",
@@ -4927,15 +4927,15 @@ baslangic: {
     }
 },
 
-       /* İçerikler/Algoritmalar/4x4 Parite (PAGE_ID = "parite4") */
+       /* İçerikler/Algoritmalar/4x4 Parity (PAGE_ID = "parite4") */
 parite4: {
     tr: {
         back_btn: "← Geri Dön",
-        badge: "4x4 · PARİTE",
-        title: "4x4 Parite Algoritmaları",
+        badge: "4x4 · PARITY",
+        title: "4x4 Parity Algoritmaları",
         hero_p: "4x4'ü 3x3 gibi çözerken karşına çıkan, 3x3'te hiç olmayan iki durum ve onları düzelten algoritmalar. Her algoritma 4x4 küp simülasyonunda doğrulandı.",
-        what_title: "Parite nedir?",
-        what_p1: "4x4 genellikle indirgeme yöntemiyle çözülür: önce merkezler, sonra kenar çiftleri tamamlanır ve küp artık bir 3x3 gibi çözülür. Ama 4x4'te sabit merkez olmadığı için, son katmanda 3x3'te imkânsız olan iki durumla karşılaşabilirsin: OLL paritesi ve PLL paritesi.",
+        what_title: "Parity nedir?",
+        what_p1: "4x4 genellikle indirgeme yöntemiyle çözülür: önce merkezler, sonra kenar çiftleri tamamlanır ve küp artık bir 3x3 gibi çözülür. Ama 4x4'te sabit merkez olmadığı için, son katmanda 3x3'te imkânsız olan iki durumla karşılaşabilirsin: OLL parity'si ve PLL parity'si.",
         what_p2: "Bunlar senin hatan değil; yaklaşık her iki çözümden birinde görülür. Tanıyıp tek bir algoritmayla düzeltirsin.",
         not_title: "4x4 notasyonu",
         not_R: "Sadece en dıştaki sağ katman",
@@ -4943,7 +4943,7 @@ parite4: {
         not_2R: "Sadece içteki sağ katman",
         not_Uw: "Üstteki iki katman birlikte",
         not_x: "x: küpün tamamını R yönünde çevir. Diğer yüzler için de aynı mantık geçerlidir (Lw, Uw, 2U…).",
-        oll_title: "OLL paritesi",
+        oll_title: "OLL parity'si",
         oll_rec: "Nasıl tanınır: son katmanı yönlendirirken tek bir kenar çifti (ya da üç tanesi) ters duruyor. 3x3'te kenarlar hep çift sayıda ters olur.",
         oll_alg: "Ters kenar çiftini öne al ve uygula:",
         oll_alt: "Alternatif:",
@@ -4951,7 +4951,7 @@ parite4: {
         oll_c1: "Önce: öndeki kenar çifti ters",
         oll_c2: "Sonra: bütün kenarlar doğru yönde",
         corner_note: "Köşeler bu adımda önemsizdir (gri).",
-        pll_title: "PLL paritesi",
+        pll_title: "PLL parity'si",
         pll_rec: "Nasıl tanınır: son katmanda iki kenar çifti yer değiştirmiş ve durum 3x3'teki hiçbir PLL'e benzemiyor (ör. sadece karşılıklı iki kenarın yer değiştirmesi).",
         pll_alg: "Yer değiştirmiş kenarları öne ve arkaya al, uygula; sonunda U2:",
         pll_alt: "Alternatif:",
@@ -4959,7 +4959,7 @@ parite4: {
         pll_c1: "Önce: öndeki ve arkadaki kenar çiftleri yer değiştirmiş",
         pll_c2: "Sonra: çözüldü",
         tip_title: "İpucu",
-        tip_p: "Pariteyi ne kadar erken fark edersen o kadar iyi: OLL paritesini yönlendirme sırasında, PLL paritesini PLL'e bakınca görürsün. Algoritmaları antrenörde ve 4x4 videosunda pratik edebilirsin.",
+        tip_p: "Parity'yi ne kadar erken fark edersen o kadar iyi: OLL parity'sini yönlendirme sırasında, PLL parity'sini PLL'e bakınca görürsün. Algoritmaları antrenörde ve 4x4 videosunda pratik edebilirsin.",
         next_video: "4x4 video eğitimi",
         next_algos: "Tüm algoritmalar"
     },

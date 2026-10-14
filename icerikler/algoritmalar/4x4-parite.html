@@ -14,13 +14,13 @@
   })();
 </script>
 
-<title>Rubik Academy - 4x4 Parite Algoritmaları (OLL ve PLL Paritesi)</title>
+<title>Rubik Academy - 4x4 Parity Algoritmaları (OLL ve PLL Parity'si)</title>
 <link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
 
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/4x4-parite">
-<meta name="description" content="4x4 OLL paritesi ve PLL paritesi: nasıl tanınır, hangi algoritma uygulanır. Diyagramlı ve simülasyonla doğrulanmış.">
-<meta property="og:title" content="4x4 Parite Algoritmaları — Rubik Academy">
-<meta property="og:description" content="4x4 OLL ve PLL paritesi: tanıma ve algoritmalar.">
+<meta name="description" content="4x4 OLL parity'si ve PLL parity'si: nasıl tanınır, hangi algoritma uygulanır. Diyagramlı ve simülasyonla doğrulanmış.">
+<meta property="og:title" content="4x4 Parity Algoritmaları — Rubik Academy">
+<meta property="og:description" content="4x4 OLL ve PLL parity'si: tanıma ve algoritmalar.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/4x4-parite">
 <meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
@@ -136,13 +136,13 @@ html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
 </nav>
 
 <section class="intro">
-    <div class="badge"><i></i><span data-i18n="badge">4x4 · PARİTE</span></div>
-    <h1 data-i18n="title">4x4 Parite Algoritmaları</h1>
+    <div class="badge"><i></i><span data-i18n="badge">4x4 · PARITY</span></div>
+    <h1 data-i18n="title">4x4 Parity Algoritmaları</h1>
     <p data-i18n="hero_p">4x4'ü 3x3 gibi çözerken karşına çıkan, 3x3'te hiç olmayan iki durum ve onları düzelten algoritmalar. Her algoritma 4x4 küp simülasyonunda doğrulandı.</p>
 </section>
 <section class="box step">
-    <h2 data-i18n="what_title">Parite nedir?</h2>
-    <p data-i18n="what_p1">4x4 genellikle indirgeme yöntemiyle çözülür: önce merkezler, sonra kenar çiftleri tamamlanır ve küp artık bir 3x3 gibi çözülür. Ama 4x4'te sabit merkez olmadığı için, son katmanda 3x3'te imkânsız olan iki durumla karşılaşabilirsin: OLL paritesi ve PLL paritesi.</p>
+    <h2 data-i18n="what_title">Parity nedir?</h2>
+    <p data-i18n="what_p1">4x4 genellikle indirgeme yöntemiyle çözülür: önce merkezler, sonra kenar çiftleri tamamlanır ve küp artık bir 3x3 gibi çözülür. Ama 4x4'te sabit merkez olmadığı için, son katmanda 3x3'te imkânsız olan iki durumla karşılaşabilirsin: OLL parity'si ve PLL parity'si.</p>
     <p data-i18n="what_p2">Bunlar senin hatan değil; yaklaşık her iki çözümden birinde görülür. Tanıyıp tek bir algoritmayla düzeltirsin.</p>
 </section>
 <section class="box step">
@@ -151,7 +151,7 @@ html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
     <p class="muted" data-i18n="not_x">x: küpün tamamını R yönünde çevir. Diğer yüzler için de aynı mantık geçerlidir (Lw, Uw, 2U…).</p>
 </section>
 <section class="box step" id="oll">
-    <div class="step-head"><span class="step-num orange">1</span><h2 data-i18n="oll_title">OLL paritesi</h2></div>
+    <div class="step-head"><span class="step-num orange">1</span><h2 data-i18n="oll_title">OLL parity'si</h2></div>
     <p data-i18n="oll_rec">Nasıl tanınır: son katmanı yönlendirirken tek bir kenar çifti (ya da üç tanesi) ters duruyor. 3x3'te kenarlar hep çift sayıda ters olur.</p>
     <p><span data-i18n="oll_alg">Ters kenar çiftini öne al ve uygula:</span><br><code class="alg" dir="ltr">Rw U2 x Rw U2 Rw U2 Rw' U2 Lw U2 Rw' U2 Rw U2 Rw' U2 Rw'</code></p>
     <p><span data-i18n="oll_alt">Alternatif:</span> <code class="alg" dir="ltr">r2 B2 U2 l U2 r' U2 r U2 F2 r F2 l' B2 r2</code></p>
@@ -160,7 +160,7 @@ html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
     <p data-i18n="oll_note">Algoritma ters kenarı düzeltir; son katmandaki diğer parçaların yeri veya yönü değişebilir. Ardından normal OLL ve PLL ile devam et.</p>
 </section>
 <section class="box step" id="pll">
-    <div class="step-head"><span class="step-num blue">2</span><h2 data-i18n="pll_title">PLL paritesi</h2></div>
+    <div class="step-head"><span class="step-num blue">2</span><h2 data-i18n="pll_title">PLL parity'si</h2></div>
     <p data-i18n="pll_rec">Nasıl tanınır: son katmanda iki kenar çifti yer değiştirmiş ve durum 3x3'teki hiçbir PLL'e benzemiyor (ör. sadece karşılıklı iki kenarın yer değiştirmesi).</p>
     <p><span data-i18n="pll_alg">Yer değiştirmiş kenarları öne ve arkaya al, uygula; sonunda U2:</span><br><code class="alg" dir="ltr">2R2 U2 2R2 Uw2 2R2 Uw2 U2</code></p>
     <p><span data-i18n="pll_alt">Alternatif:</span> <code class="alg" dir="ltr">Rw2 R2 U2 Rw2 R2 Uw2 Rw2 R2 Uw2 U2</code></p>
@@ -169,7 +169,7 @@ html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
 </section>
 <section class="box done">
     <h2 data-i18n="tip_title">İpucu</h2>
-    <p data-i18n="tip_p">Pariteyi ne kadar erken fark edersen o kadar iyi: OLL paritesini yönlendirme sırasında, PLL paritesini PLL'e bakınca görürsün. Algoritmaları antrenörde ve 4x4 videosunda pratik edebilirsin.</p>
+    <p data-i18n="tip_p">Parity'yi ne kadar erken fark edersen o kadar iyi: OLL parity'sini yönlendirme sırasında, PLL parity'sini PLL'e bakınca görürsün. Algoritmaları antrenörde ve 4x4 videosunda pratik edebilirsin.</p>
     <div class="next-links">
         <a href="/icerikler/videolar/4x4" class="next-link">▶ <span data-i18n="next_video">4x4 video eğitimi</span></a>
         <a href="/icerikler/algoritmalar" class="next-link">📘 <span data-i18n="next_algos">Tüm algoritmalar</span></a>
