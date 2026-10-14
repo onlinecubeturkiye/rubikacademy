@@ -37,7 +37,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261034">
+<link rel="stylesheet" href="/styles/common.css?v=20261036">
 
 <style>
 .hero {
@@ -359,6 +359,8 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 <div class="set-tabs" id="setTabs"></div>
 <p class="set-desc" id="setDesc"></p>
 
+<div class="print-row"><a class="print-link" id="printLink" href="/icerikler/algoritmalar/yazdir?set=sk-beginner" data-i18n="print_btn">🖨️ Yazdır / PDF</a></div>
+
 <!-- İlerleme özeti -->
 <div class="progress-summary" id="progressSummary"></div>
 
@@ -380,8 +382,8 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "skewb_algos";</script>
-<script src="/js/i18n.js?v=20261034"></script>
-<script src="/js/common.js?v=20261034"></script>
+<script src="/js/i18n.js?v=20261036"></script>
+<script src="/js/common.js?v=20261036"></script>
 
 <script>
 /* ============================================================
@@ -478,6 +480,7 @@ function renderSet() {
     currentSet = set.id;
     try { localStorage.setItem("algo-set-" + PAGE_KEY, currentSet); } catch (e) {}
     renderTabs();
+    document.getElementById("printLink").href = "/icerikler/algoritmalar/yazdir?set=sk-" + currentSet;
     var progress = loadProgress(), t = progressText(), html = "";
     var geom = (DATA.geoms && set.geom) ? DATA.geoms[set.geom] : DATA.geom;
     set.groups.forEach(function (group) {
@@ -498,7 +501,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/skewb.json?v=20261034")
+fetch("/icerikler/algoritmalar/skewb.json?v=20261036")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
