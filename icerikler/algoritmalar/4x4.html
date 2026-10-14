@@ -15,7 +15,10 @@
 </script>
 
 <title>Rubik Academy - 4x4 Algoritmaları (Parity, PLL Parity)</title>
-<link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
 
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/4x4">
 <meta name="description" content="4x4 OLL ve PLL parity algoritmaları ve PLL parity case'leri: diyagramlı, simülasyonla doğrulanmış.">
@@ -31,7 +34,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261029">
+<link rel="stylesheet" href="/styles/common.css?v=20261030">
 
 <style>
 .hero {
@@ -374,8 +377,8 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "alg4";</script>
-<script src="/js/i18n.js?v=20261029"></script>
-<script src="/js/common.js?v=20261029"></script>
+<script src="/js/i18n.js?v=20261030"></script>
+<script src="/js/common.js?v=20261030"></script>
 
 <script>
 /* ============================================================
@@ -492,7 +495,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/4x4.json?v=20261029")
+fetch("/icerikler/algoritmalar/4x4.json?v=20261030")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;

@@ -1,0 +1,123 @@
+/* Rubik Academy service worker
+   - Sayfalar: önce ağ (güncel içerik), bağlantı yoksa önbellek
+   - CSS/JS/JSON/görseller: önbellekten hemen ver, arka planda güncelle
+   - Algoritma sayfaları ve antrenör kurulumda önceden indirilir (çevrimdışı açılsın diye)
+   Sürüm (VERSION) değişince eski önbellek silinir. */
+var VERSION = "ra-20261030";
+var PRECACHE = [
+    "/",
+    "/icerikler.html",
+    "/icerikler/algoritmalar.html",
+    "/icerikler/baslangic.html",
+    "/icerikler/kocluklar.html",
+    "/icerikler/videolar.html",
+    "/icerikler/algoritmalar/oll.html",
+    "/icerikler/algoritmalar/pll.html",
+    "/icerikler/algoritmalar/coll.html",
+    "/icerikler/algoritmalar/wv.html",
+    "/icerikler/algoritmalar/cll.html",
+    "/icerikler/algoritmalar/ortega-oll.html",
+    "/icerikler/algoritmalar/ortega-pbl.html",
+    "/icerikler/algoritmalar/eg1.html",
+    "/icerikler/algoritmalar/eg2.html",
+    "/icerikler/algoritmalar/4x4.html",
+    "/icerikler/algoritmalar/5x5.html",
+    "/icerikler/algoritmalar/pyraminx.html",
+    "/icerikler/algoritmalar/skewb.html",
+    "/icerikler/algoritmalar/antrenor.html",
+    "/styles/common.css?v=20261030",
+    "/js/i18n.js?v=20261030",
+    "/js/common.js?v=20261030",
+    "/darkmode.js",
+    "/icerikler/algoritmalar/ll.js",
+    "/icerikler/algoritmalar/cllSvg.js",
+    "/icerikler/algoritmalar/ortegaSvg.js",
+    "/icerikler/algoritmalar/ortegaOllSvg.js",
+    "/icerikler/algoritmalar/antrenor-bt.js?v=20261030",
+    "/icons/icon-192.png",
+    "/icons/favicon-48.png",
+    "/manifest.webmanifest",
+    "/icerikler/algoritmalar/oll-pll.json",
+    "/icerikler/algoritmalar/oll-pll.json?v=20261030",
+    "/icerikler/algoritmalar/coll.json",
+    "/icerikler/algoritmalar/coll.json?v=20261030",
+    "/icerikler/algoritmalar/wv.json",
+    "/icerikler/algoritmalar/wv.json?v=20261030",
+    "/icerikler/algoritmalar/cll.json",
+    "/icerikler/algoritmalar/cll.json?v=20261030",
+    "/icerikler/algoritmalar/ortega-oll.json",
+    "/icerikler/algoritmalar/ortega-oll.json?v=20261030",
+    "/icerikler/algoritmalar/ortega-pbl.json",
+    "/icerikler/algoritmalar/ortega-pbl.json?v=20261030",
+    "/icerikler/algoritmalar/eg.json",
+    "/icerikler/algoritmalar/eg.json?v=20261030",
+    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20261030",
+    "/icerikler/algoritmalar/4x4.json?v=20261030",
+    "/icerikler/algoritmalar/5x5.json?v=20261030",
+    "/icerikler/algoritmalar/pyraminx.json?v=20261030",
+    "/icerikler/algoritmalar/skewb.json?v=20261030"
+];
+
+self.addEventListener("install", function (event) {
+    event.waitUntil(caches.open(VERSION).then(function (cache) {
+        // Biri başarısız olsa da diğerleri önbelleğe girsin
+        return Promise.all(PRECACHE.map(function (url) {
+            return cache.add(new Request(url, { cache: "reload" })).catch(function () {});
+        }));
+    }).then(function () { return self.skipWaiting(); }));
+});
+
+self.addEventListener("activate", function (event) {
+    event.waitUntil(caches.keys().then(function (keys) {
+        return Promise.all(keys.filter(function (k) { return k !== VERSION; }).map(function (k) { return caches.delete(k); }));
+    }).then(function () { return self.clients.claim(); }));
+});
+
+function fromCache(request) {
+    return caches.open(VERSION).then(function (cache) {
+        return cache.match(request).then(function (hit) {
+            if (hit) return hit;
+            // ?v= sürümü farklıysa veya .html'li/.html'siz adres
+            return cache.match(request, { ignoreSearch: true }).then(function (hit2) {
+                if (hit2 || request.mode !== "navigate") return hit2;
+                var url = new URL(request.url), p = url.pathname;
+                var alt = p.endsWith(".html") ? p.slice(0, -5) : p + ".html";
+                if (p.endsWith("/index.html")) alt = p.slice(0, -10);
+                return cache.match(alt, { ignoreSearch: true });
+            });
+        });
+    });
+}
+
+self.addEventListener("fetch", function (event) {
+    var req = event.request;
+    if (req.method !== "GET") return;
+    var url = new URL(req.url);
+    if (url.origin !== self.location.origin) return; // Google Analytics, fontlar vb. tarayıcıya kalsın
+
+    if (req.mode === "navigate") {
+        event.respondWith(fetch(req).then(function (res) {
+            if (res && res.ok) {
+                var copy = res.clone();
+                caches.open(VERSION).then(function (c) { c.put(req, copy); });
+            }
+            if (res && res.ok) return res;
+            // Sunucu hata verdiyse (ör. .html'siz adres) önbellekteki sürümü dene
+            return fromCache(req).then(function (hit) { return hit || res; });
+        }).catch(function () {
+            return fromCache(req).then(function (hit) { return hit || caches.match("/", { ignoreSearch: true }); });
+        }));
+        return;
+    }
+
+    event.respondWith(fromCache(req).then(function (hit) {
+        var net = fetch(req).then(function (res) {
+            if (res && res.ok) {
+                var copy = res.clone();
+                caches.open(VERSION).then(function (c) { c.put(req, copy); });
+            }
+            return res;
+        }).catch(function () { return hit; });
+        return hit || net;
+    }));
+});
