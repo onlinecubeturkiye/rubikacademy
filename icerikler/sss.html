@@ -37,7 +37,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261033">
+<link rel="stylesheet" href="/styles/common.css?v=20261034">
 
 <script type="application/ld+json">
 {
@@ -185,6 +185,27 @@
 .faq-a { padding: 14px 18px 16px; color: var(--text-soft); font-size: 15px; line-height: 1.6; }
 .faq-link { display: inline-block; margin-top: 8px; font-weight: 800; color: var(--primary); text-decoration: none; }
 .faq-link:hover { text-decoration: underline; }
+.faq-layout { display: block; }
+.faq-aside { display: grid; gap: 16px; max-width: 860px; margin-top: 10px; }
+.aside-card { background: var(--surface); border: var(--card-bw) solid var(--ink); border-radius: 18px; padding: 18px; box-shadow: var(--shadow-sm); }
+.aside-card h3 { font-size: 16px; font-weight: 900; color: var(--text); margin-bottom: 10px; }
+.aside-nav a, .aside-quick a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 12px; color: var(--text); text-decoration: none; font-weight: 700; font-size: 14px; }
+.aside-nav a:hover, .aside-quick a:hover { background: var(--surface-soft); }
+.aside-nav a b { margin-inline-start: auto; min-width: 26px; text-align: center; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--cube-yellow); color: #17171f; border: 1.5px solid var(--ink); }
+.aside-help { background: var(--tint-blue, var(--primary-light)); }
+.help-icon { font-size: 28px; margin-bottom: 6px; }
+.aside-help p { color: var(--text-soft); font-size: 14px; margin-bottom: 14px; line-height: 1.5; }
+.help-btn { display: inline-block; padding: 10px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--cube-yellow); color: #17171f; font-weight: 900; text-decoration: none; box-shadow: var(--shadow-sm); }
+.help-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.q-ic { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border-radius: 9px; background: var(--surface-soft); border: 1.5px solid var(--border); font-size: 15px; }
+.faq-sec { scroll-margin-top: 20px; }
+.aside-nav { display: none; }
+@media (min-width: 1000px) {
+    .faq-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; align-items: start; }
+    .faq-main .faq-sec { max-width: none; }
+    .faq-aside { margin-top: 0; max-width: none; }
+    .aside-nav { display: block; }
+}
 @media (max-width: 600px) { .faq-head h1 { font-size: 34px; } .faq summary { font-size: 15px; padding: 13px 14px; } .faq-a { padding: 12px 14px 14px; } }
 </style>
 
@@ -238,7 +259,9 @@
     <p data-i18n="intro">Site, algoritma antrenörü, uygulama olarak yükleme ve koçluk hakkında en çok sorulanlar.</p>
 </header>
 
-<section class="faq-sec reveal">
+<div class="faq-layout">
+<div class="faq-main">
+<section class="faq-sec reveal" id="sec-general">
     <h2 data-i18n="sec_general">Genel</h2>
     <details class="faq" id="s1">
         <summary data-i18n="q1">Rubik Academy nedir?</summary>
@@ -275,7 +298,7 @@
     </details>
 </section>
 
-<section class="faq-sec reveal">
+<section class="faq-sec reveal" id="sec-tools">
     <h2 data-i18n="sec_tools">Antrenör ve uygulama</h2>
     <details class="faq" id="s6">
         <summary data-i18n="q6">Algoritma antrenörü nasıl çalışır?</summary>
@@ -317,7 +340,7 @@
     </details>
 </section>
 
-<section class="faq-sec reveal">
+<section class="faq-sec reveal" id="sec-coach">
     <h2 data-i18n="sec_coach">Koçluk</h2>
     <details class="faq" id="s12">
         <summary data-i18n="q12">Hangi küpler için koçluk var?</summary>
@@ -346,6 +369,30 @@
         </div>
     </details>
 </section>
+</div>
+
+<aside class="faq-aside">
+    <div class="aside-card aside-nav">
+        <h3 data-i18n="aside_sections">Bölümler</h3>
+        <a href="#sec-general"><span data-i18n="sec_general">Genel</span><b>5</b></a>
+        <a href="#sec-tools"><span data-i18n="sec_tools">Antrenör ve uygulama</span><b>6</b></a>
+        <a href="#sec-coach"><span data-i18n="sec_coach">Koçluk</span><b>4</b></a>
+    </div>
+    <div class="aside-card aside-help">
+        <div class="help-icon" aria-hidden="true">💬</div>
+        <h3 data-i18n="help_title">Cevabını bulamadın mı?</h3>
+        <p data-i18n="help_p">Instagram'dan yaz, en kısa sürede yardımcı olalım.</p>
+        <a class="help-btn" dir="ltr" href="https://instagram.com/rubikacademyy" target="_blank" rel="noopener">@rubikacademyy</a>
+    </div>
+    <div class="aside-card aside-quick">
+        <h3 data-i18n="quick_title">Hızlı bağlantılar</h3>
+        <a href="/icerikler/baslangic"><span class="q-ic">🧩</span><span data-i18n="quick_beginner">3x3 başlangıç rehberi</span></a>
+        <a href="/icerikler/algoritmalar/antrenor"><span class="q-ic">⏱️</span><span data-i18n="quick_trainer">Algoritma antrenörü</span></a>
+        <a href="/icerikler/algoritmalar/yazdir"><span class="q-ic">🖨️</span><span data-i18n="quick_print">Yazdırılabilir kağıtlar</span></a>
+        <a href="/icerikler/kocluklar"><span class="q-ic">🎓</span><span data-i18n="quick_coach">Birebir koçluk</span></a>
+    </div>
+</aside>
+</div>
 
 </div>
 
@@ -354,8 +401,8 @@
 </footer>
 
 <script>var PAGE_ID = "sss";</script>
-<script src="/js/i18n.js?v=20261033"></script>
-<script src="/js/common.js?v=20261033"></script>
+<script src="/js/i18n.js?v=20261034"></script>
+<script src="/js/common.js?v=20261034"></script>
 <script>
 // Adresle gelen soruyu aç (ör. /icerikler/sss#s7)
 (function () {

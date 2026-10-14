@@ -6055,7 +6055,15 @@ alg5: {
                 l_trainer: "Antrenörü aç →",
                 l_print: "Yazdır sayfasına git →",
                 l_coach: "Koçluklar sayfasına git →",
-                l_insta: "Instagram'da yaz →"
+                l_insta: "Instagram'da yaz →",
+                aside_sections: "Bölümler",
+                help_title: "Cevabını bulamadın mı?",
+                help_p: "Instagram'dan yaz, en kısa sürede yardımcı olalım.",
+                quick_title: "Hızlı bağlantılar",
+                quick_beginner: "3x3 başlangıç rehberi",
+                quick_trainer: "Algoritma antrenörü",
+                quick_print: "Yazdırılabilir kağıtlar",
+                quick_coach: "Birebir koçluk"
             },
             en: {
                 back_btn: "← Go Back",
@@ -6102,7 +6110,15 @@ alg5: {
                 l_trainer: "Open the trainer →",
                 l_print: "Go to the print page →",
                 l_coach: "Go to the Coaching page →",
-                l_insta: "Message us on Instagram →"
+                l_insta: "Message us on Instagram →",
+                aside_sections: "Sections",
+                help_title: "Didn't find your answer?",
+                help_p: "Message us on Instagram and we'll help you as soon as possible.",
+                quick_title: "Quick links",
+                quick_beginner: "3x3 beginner guide",
+                quick_trainer: "Algorithm trainer",
+                quick_print: "Printable sheets",
+                quick_coach: "One-on-one coaching"
             },
             fr: {
                 back_btn: "← Retour",
@@ -6149,7 +6165,15 @@ alg5: {
                 l_trainer: "Ouvrir l'entraîneur →",
                 l_print: "Aller à la page d'impression →",
                 l_coach: "Aller à la page Coaching →",
-                l_insta: "Écrire sur Instagram →"
+                l_insta: "Écrire sur Instagram →",
+                aside_sections: "Sections",
+                help_title: "Tu n'as pas trouvé ta réponse ?",
+                help_p: "Écris-nous sur Instagram, nous t'aiderons au plus vite.",
+                quick_title: "Liens rapides",
+                quick_beginner: "Guide débutant 3x3",
+                quick_trainer: "Entraîneur d'algorithmes",
+                quick_print: "Fiches à imprimer",
+                quick_coach: "Coaching individuel"
             },
             ru: {
                 back_btn: "← Назад",
@@ -6196,7 +6220,15 @@ alg5: {
                 l_trainer: "Открыть тренажёр →",
                 l_print: "К странице печати →",
                 l_coach: "К странице «Коучинг» →",
-                l_insta: "Написать в Instagram →"
+                l_insta: "Написать в Instagram →",
+                aside_sections: "Разделы",
+                help_title: "Не нашёл ответ?",
+                help_p: "Напиши нам в Instagram — поможем как можно скорее.",
+                quick_title: "Быстрые ссылки",
+                quick_beginner: "Руководство 3x3 для начинающих",
+                quick_trainer: "Тренажёр алгоритмов",
+                quick_print: "Листы для печати",
+                quick_coach: "Индивидуальный коучинг"
             },
             de: {
                 back_btn: "← Zurück",
@@ -6243,7 +6275,15 @@ alg5: {
                 l_trainer: "Trainer öffnen →",
                 l_print: "Zur Druckseite →",
                 l_coach: "Zur Coaching-Seite →",
-                l_insta: "Auf Instagram schreiben →"
+                l_insta: "Auf Instagram schreiben →",
+                aside_sections: "Bereiche",
+                help_title: "Keine Antwort gefunden?",
+                help_p: "Schreib uns auf Instagram, wir helfen dir so schnell wie möglich.",
+                quick_title: "Schnelllinks",
+                quick_beginner: "3x3-Anfängeranleitung",
+                quick_trainer: "Algorithmus-Trainer",
+                quick_print: "Druckbare Blätter",
+                quick_coach: "Einzelcoaching"
             },
             ar: {
                 back_btn: "← رجوع",
@@ -6290,7 +6330,15 @@ alg5: {
                 l_trainer: "افتح المدرّب ←",
                 l_print: "إلى صفحة الطباعة ←",
                 l_coach: "إلى صفحة التدريب ←",
-                l_insta: "راسلنا على إنستغرام ←"
+                l_insta: "راسلنا على إنستغرام ←",
+                aside_sections: "الأقسام",
+                help_title: "لم تجد إجابتك؟",
+                help_p: "راسلنا على إنستغرام وسنساعدك في أقرب وقت.",
+                quick_title: "روابط سريعة",
+                quick_beginner: "دليل المبتدئين 3x3",
+                quick_trainer: "مدرّب الخوارزميات",
+                quick_print: "أوراق للطباعة",
+                quick_coach: "تدريب فردي"
             }
         },
         /* Diğer sayfalar buraya aynı şekilde eklenir.
