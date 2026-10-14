@@ -31,7 +31,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261015">
+<link rel="stylesheet" href="/styles/common.css?v=20261016">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -142,6 +142,12 @@
 .chip svg { width: 46px; height: 46px; }
 .chip.on { opacity: 1; border-color: var(--card-border); color: var(--text); background: var(--tint-green); }
 .chip-learn { font-size: 9px; line-height: 1; }
+.diag-pair { display: inline-flex; gap: 3px; }
+.chip .diag-pair svg { width: 34px; height: 34px; }
+.chip:has(.diag-pair) { width: 84px; }
+.reveal-diagram:has(.diag-pair) { width: auto; padding: 0 6px; }
+.reveal-diagram .diag-pair svg { width: 66px; height: 66px; }
+.stat-table .mini .diag-pair svg { width: 26px; height: 26px; }
 
 /* ANTRENÖR */
 .trainer { text-align: center; }
@@ -416,8 +422,8 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261015"></script>
-<script src="/js/common.js?v=20261015"></script>
+<script src="/js/i18n.js?v=20261016"></script>
+<script src="/js/common.js?v=20261016"></script>
 
 <script>
 /* ============================================================
@@ -438,8 +444,15 @@ var SETS = [
     { id: "wv",         label: "WV",         file: "wv.json",         dataKey: "wv",   progress: "algo-progress-wv",         keyFmt: "subset", page: "wv",         cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
     { id: "cll",        label: "CLL",        file: "cll.json",        dataKey: "cll",  progress: "algo-progress-cll",        keyFmt: "name",   page: "cll",        cube: "2x2", draw: function (c, s) { return cllSvg(c.pattern, "full", s); } },
     { id: "ortega-oll", label: "Ortega OLL", file: "ortega-oll.json", dataKey: "oll",  progress: "algo-progress-ortega-oll", keyFmt: "subset", page: "ortega-oll", cube: "2x2", draw: function (c, s) { return ortegaOllSvg(c.pattern, s); } },
-    { id: "ortega-pbl", label: "Ortega PBL", file: "ortega-pbl.json", dataKey: "pbl",  progress: "algo-progress-ortega-pbl", keyFmt: "subset", page: "ortega-pbl", cube: "2x2", draw: function (c, s) { return ortegaSvg(c.pattern_u, "full", s); } }
+    { id: "ortega-pbl", label: "Ortega PBL", file: "ortega-pbl.json", dataKey: "pbl",  progress: "algo-progress-ortega-pbl", keyFmt: "subset", page: "ortega-pbl", cube: "2x2", draw: function (c, s) { return ortegaSvg(c.pattern_u, "full", s); } },
+    { id: "eg1",        label: "EG-1",       file: "eg.json",         dataKey: "eg1",  progress: "algo-progress-eg1",        keyFmt: "subset", page: "eg1",        cube: "2x2", draw: drawPair },
+    { id: "eg2",        label: "EG-2",       file: "eg.json",         dataKey: "eg2",  progress: "algo-progress-eg2",        keyFmt: "subset", page: "eg2",        cube: "2x2", draw: drawPair }
 ];
+
+/* EG: üst ve alt katman yan yana */
+function drawPair(c, s) {
+    return '<span class="diag-pair">' + ortegaSvg(c.pattern_u, "full", s) + ortegaSvg(c.pattern_d, "full", s) + '</span>';
+}
 
 var STATS_KEY = "trainer-stats-v1";
 var SEL_KEY = "trainer-selection-v1";
@@ -509,7 +522,7 @@ function loadAll() {
     SETS.forEach(function (s) { files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261015").then(function (r) {
+        return fetch(BASE + f + "?v=20261016").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });

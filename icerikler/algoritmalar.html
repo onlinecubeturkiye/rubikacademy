@@ -19,9 +19,9 @@
 <!-- TARAYICI SEKMESİ İÇİN LOGO -->
 <link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261015">
+<link rel="stylesheet" href="/styles/common.css?v=20261016">
 <link rel="canonical" href="https://rubikacademy.fun/algoritmalar">
-<meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, WV, Ortega ve CLL algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
+<meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, WV, Ortega, CLL ve EG algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
 <meta property="og:title" content="Rubik Academy - Algoritmalar">
 <meta property="og:description" content="Tüm küpler için algoritmaları diyagramlarıyla öğren: 3x3, 2x2 ve yakında daha fazlası.">
 <meta property="og:type" content="website">
@@ -144,6 +144,9 @@ html {
 .ortega-pbl-visual { background: var(--tint-orange); }
 .ortega-oll-visual { background: var(--tint-yellow); }
 .cll-visual { background: var(--tint-purple); }
+.eg1-visual { background: var(--tint-blue); }
+.eg2-visual { background: var(--tint-green); }
+.diagram-wrap.pair { display: flex; gap: 10px; align-items: center; }
 .coll-visual { background: var(--tint-green); }
 .wv-visual { background: var(--tint-orange); }
 
@@ -417,7 +420,7 @@ html {
 </div>
 <h1><span data-i18n="hero_title1">Algoritmaları</span> <span data-i18n="hero_titleAccent">Öğren</span></h1>
 <p data-i18n="hero_p">
-Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, WV, Ortega ve CLL case'lerini diyagramlarıyla adım adım öğren. Diğer küpler yakında.
+Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, WV, Ortega, CLL ve EG case'lerini diyagramlarıyla adım adım öğren. Diğer küpler yakında.
 </p>
 </div>
 </section>
@@ -550,7 +553,13 @@ var CARD_FALLBACK = {
     coll_p: "Kenarlar yönlüyken son katman köşelerini tek adımda hem yönlendirip hem yerine oturtan 42 case.",
     wv_level: "WV",
     wv_title: "Winter Variation (WV)",
-    wv_p: "Son F2L çiftini R U' R' ile yerleştirirken son katman köşelerini de yönlendiren 27 case — OLL atlanır."
+    wv_p: "Son F2L çiftini R U' R' ile yerleştirirken son katman köşelerini de yönlendiren 27 case — OLL atlanır.",
+    eg1_level: "EG-1",
+    eg1_title: "EG-1 Algoritmaları",
+    eg1_p: "Alt katmanda komşu iki köşe yer değiştirmişken 2x2'yi tek algoritmayla bitiren 42 case.",
+    eg2_level: "EG-2",
+    eg2_title: "EG-2 Algoritmaları",
+    eg2_p: "Alt katmanda çapraz iki köşe yer değiştirmişken 2x2'yi tek algoritmayla bitiren 42 case."
 };
 
 function getDict(lang) {
@@ -600,8 +609,8 @@ function onLanguageApplied(lang) {
 </script>
 
 <script>var PAGE_ID = "algoritmalar";</script>
-<script src="/js/i18n.js?v=20261015"></script>
-<script src="/js/common.js?v=20261015"></script>
+<script src="/js/i18n.js?v=20261016"></script>
+<script src="/js/common.js?v=20261016"></script>
 
 <!-- BU SAYFAYA ÖZEL: OLL / PLL VERİSİNİ YÜKLE VE KARTLARI OLUŞTUR -->
 <script>
@@ -795,9 +804,20 @@ var cllFetch = fetch("/icerikler/algoritmalar/cll.json")
         return "";
     });
 
-Promise.all([pblFetch, ollFetch, cllFetch])
+/* EG-1 / EG-2 verisi (yüklenemezse 2x2 bölümünde sadece Ortega ve CLL gösterilir) */
+var egFetch = fetch("/icerikler/algoritmalar/eg.json")
+    .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .catch(function(err) {
+        console.error("eg.json yüklenemedi:", err);
+        return null;
+    });
+
+Promise.all([pblFetch, ollFetch, cllFetch, egFetch])
     .then(function(diagrams) {
-        renderOrtegaCards(diagrams[0], diagrams[1], diagrams[2]);
+        renderOrtegaCards(diagrams[0], diagrams[1], diagrams[2], diagrams[3]);
     })
     .catch(function(err) {
         var errBox = document.getElementById("loadError");
@@ -805,7 +825,7 @@ Promise.all([pblFetch, ollFetch, cllFetch])
         console.error("Ortega (PBL/OLL/CLL) verisi yüklenemedi:", err);
     });
 
-function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml, cllDiagramHtml) {
+function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml, cllDiagramHtml, egData) {
     var lang = localStorage.getItem("site-lang") || "tr";
     var dict = getDict(lang);
 
@@ -849,6 +869,28 @@ function renderOrtegaCards(pblDiagramHtml, ollDiagramHtml, cllDiagramHtml) {
     html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
     html += '  </div>';
     html += '</a>';
+
+    if (egData) {
+        [["eg1", "U3"], ["eg2", "P2"]].forEach(function (pair) {
+            var id = pair[0];
+            var groups = egData[id] || [];
+            var count = countCases(groups);
+            var sample = findCaseByName(groups, pair[1]) || (groups[0] && groups[0].cases[0]);
+            var diag = sample ? ortegaSvg(sample.pattern_u, "full", 110) + ortegaSvg(sample.pattern_d, "full", 110) : "";
+            html += '<a href="/icerikler/algoritmalar/' + id + '" class="card">';
+            html += '  <div class="card-visual ' + id + '-visual">';
+            html += '    <div class="level" data-i18n="' + id + '_level">' + dict[id + "_level"] + '</div>';
+            html += '    <div class="count-badge">' + count + ' ' + dict.case_word + '</div>';
+            html += '    <div class="diagram-wrap pair">' + diag + '</div>';
+            html += '  </div>';
+            html += '  <div class="card-info">';
+            html += '    <h3 data-i18n="' + id + '_title">' + dict[id + "_title"] + '</h3>';
+            html += '    <p data-i18n="' + id + '_p">' + dict[id + "_p"] + '</p>';
+            html += '    <div class="button"><span data-i18n="cta_start">' + dict.cta_start + '</span><span class="arrow">→</span></div>';
+            html += '  </div>';
+            html += '</a>';
+        });
+    }
 
     document.getElementById("cards2x2Section").innerHTML = html;
     applyLanguage(lang);
