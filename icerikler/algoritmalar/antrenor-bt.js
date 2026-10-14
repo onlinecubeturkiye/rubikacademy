@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/gan-web-bluetooth.min.js?v=20261019";
+    var LIB_URL = "/js/vendor/gan-web-bluetooth.min.js?v=20261020";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -60,10 +60,39 @@
     var phase = "off";      // off | needSolve | scrambling | ready | solving | done
     var todo = [];          // [{f, q, fix}] yapılacak çeyrek tur sayısı (1 = X, 2 = X2, 3 = X')
     var total = 0;          // karıştırmadaki hamle sayısı
-    var gotEvent = false;
+    var gotEvent = false, connecting = false;
 
     function el(id) { return document.getElementById(id); }
-    function txt(k) { return (typeof T === "function") ? T(k) : k; }
+    /* i18n.js eski bir sürümden gelirse ham anahtar görünmesin diye Türkçe yedekler */
+    var FB = {
+        bt_title: "Bluetooth akıllı küp", bt_connect: "Bağlan", bt_reset: "Küpüm çözülmüş", bt_disconnect: "Bağlantıyı kes",
+        bt_hint: "GAN akıllı küpünü bağla: karıştırma takip edilir, süre kendiliğinden başlar ve durur.",
+        bt_unsupported: "Bluetooth küp için Chrome veya Edge gerekir (iPhone/iPad desteklenmez).",
+        bt_only3x3: "Bluetooth sadece 3x3 setlerinde çalışır", bt_cube_mode: "Bluetooth için \"Küple çalış\" modunu seç",
+        bt_need_solve: "Önce küpü çöz (ya da yaptığın hamleleri geri al). Çözülünce karıştırma başlar.",
+        bt_unknown: "Küp çözülmüş değil görünüyor. Çöz ve \"Küpüm çözülmüş\" butonuna bas.",
+        bt_fix: "Düzelt:", bt_hint_scramble: "Karıştırmayı sarı üstte, yeşil önde tutarak uygula",
+        bt_hint_solve: "Küp çözülünce karıştırma başlayacak", bt_hint_ready: "Hazır! İlk hamlende süre başlar, küp çözülünce durur",
+        bt_connected: "Bağlı", bt_connecting: "Bağlanıyor…",
+        bt_no_data: "Küpten veri gelmiyor. MAC adresi yanlış olabilir; bağlantıyı kesip tekrar dene.",
+        bt_failed: "Bağlantı kurulamadı. Küpün açık olduğundan emin ol ve tekrar dene.",
+        bt_mac_title: "Küpün MAC adresi gerekli",
+        bt_mac_intro: "GAN küpler şifreli iletişim kurar; bunun için küpün MAC adresi lazım. Tarayıcın bunu otomatik okuyamadı. İki yoldan birini kullan (sadece bir kez gerekir):",
+        bt_way_a: "Yol 1: Otomatik bulmayı aç (önerilen)",
+        bt_way_a1: "Aşağıdaki adresi kopyala ve Chrome'un adres çubuğuna yapıştır.",
+        bt_way_a2: "\"Experimental Web Platform features\" ayarını Enabled yap ve Chrome'u yeniden başlat.",
+        bt_way_a3: "Bu sayfaya dönüp tekrar Bağlan'a bas; adres otomatik bulunur.",
+        bt_way_b: "Yol 2: Adresi elle bul",
+        bt_way_b1: "Aşağıdaki adresi kopyala ve yeni sekmede Chrome'un adres çubuğuna yapıştır.",
+        bt_way_b2: "\"Start scan\" butonuna bas; listede küpünün adını (ör. GAN12i_5962) bul.",
+        bt_way_b3: "Yanındaki adresi (AB:12:34:56:78:9A gibi) aşağıya yaz.",
+        bt_copy: "Kopyala", bt_copied: "Kopyalandı ✓", bt_mac_ok: "Bağlan", bt_mac_cancel: "İptal",
+        bt_mac_bad: "MAC adresi geçersiz. Biçim: AB:12:34:56:78:9A"
+    };
+    function txt(k) {
+        var v = (typeof T === "function") ? T(k) : k;
+        return (v && v !== k) ? v : (FB[k] || k);
+    }
     function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
     function fmtMove(f, q) { return f + (q === 2 ? "2" : q === 3 ? "'" : ""); }
     function supported() { return !!(navigator.bluetooth && navigator.bluetooth.requestDevice); }
@@ -85,12 +114,16 @@
         el("btDisconnect").style.display = on ? "" : "none";
         el("btReset").style.display = on ? "" : "none";
         var st = el("btStatus");
+        el("btTitle").textContent = on ? (conn.deviceName || "GAN") + " · " + txt("bt_connected") : txt("bt_title");
+        el("btConnect").textContent = txt("bt_connect");
+        el("btReset").textContent = txt("bt_reset");
+        el("btDisconnect").textContent = txt("bt_disconnect");
         if (!supported()) { st.textContent = txt("bt_unsupported"); el("btConnect").disabled = true; return; }
+        if (connecting) { st.textContent = txt("bt_connecting"); return; }
         if (!on) { st.textContent = txt("bt_hint"); return; }
-        var name = conn.deviceName || "GAN";
-        if (current && current.cube !== "3x3") st.textContent = "🟢 " + name + " · " + txt("bt_only3x3");
-        else if (mode !== "cube") st.textContent = "🟢 " + name + " · " + txt("bt_cube_mode");
-        else st.textContent = "🟢 " + name;
+        if (current && current.cube !== "3x3") st.textContent = txt("bt_only3x3");
+        else if (mode !== "cube") st.textContent = txt("bt_cube_mode");
+        else st.textContent = txt(state === "running" ? "bt_hint_ready" : "bt_hint_scramble");
     }
 
     function renderScramble() {
@@ -188,21 +221,59 @@
     function macProvider(device, isFallback) {
         var saved = savedMacs()[device.name || "?"];
         if (!isFallback) return Promise.resolve(saved || null);
-        var mac = prompt(txt("bt_mac_prompt"), saved || "");
-        if (!mac) return Promise.resolve(null);
-        mac = mac.trim().toUpperCase();
-        if (!/^([0-9A-F]{2}[:\-]){5}[0-9A-F]{2}$/.test(mac)) { alert(txt("bt_mac_bad")); return Promise.resolve(null); }
-        return Promise.resolve(mac);
+        return askMac(saved || "");
+    }
+
+    /* Site tasarımında MAC adresi penceresi (tarayıcının prompt() kutusu yerine) */
+    function askMac(initial) {
+        return new Promise(function (resolve) {
+            var modal = el("btModal"), input = el("btMacInput"), err = el("btMacErr");
+            var map = { btMacTitle: "bt_mac_title", btMacIntro: "bt_mac_intro", btWayA: "bt_way_a", btWayA1: "bt_way_a1", btWayA2: "bt_way_a2",
+                btWayA3: "bt_way_a3", btWayB: "bt_way_b", btWayB1: "bt_way_b1", btWayB2: "bt_way_b2", btWayB3: "bt_way_b3",
+                btMacOk: "bt_mac_ok", btMacCancel: "bt_mac_cancel" };
+            Object.keys(map).forEach(function (id) { el(id).textContent = txt(map[id]); });
+            Array.prototype.forEach.call(modal.querySelectorAll(".bt-copy-btn"), function (b) {
+                b.textContent = txt("bt_copy");
+                b.onclick = function () {
+                    var code = b.parentNode.querySelector("code").textContent;
+                    var done = function () { b.textContent = txt("bt_copied"); setTimeout(function () { b.textContent = txt("bt_copy"); }, 1500); };
+                    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(done, function () {});
+                    else { var r = document.createRange(); r.selectNodeContents(b.parentNode.querySelector("code")); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+                };
+            });
+            input.value = initial; err.textContent = "";
+            modal.classList.add("show");
+            setTimeout(function () { input.focus(); }, 50);
+            function close(v) {
+                modal.classList.remove("show");
+                el("btMacOk").onclick = el("btMacCancel").onclick = input.oninput = input.onkeydown = modal.onclick = null;
+                resolve(v);
+            }
+            input.oninput = function () {
+                // yazarken iki nokta üst üsteleri kendiliğinden ekle
+                var hex = input.value.toUpperCase().replace(/[^0-9A-F]/g, "").slice(0, 12);
+                input.value = hex.replace(/(..)(?=.)/g, "$1:");
+                err.textContent = "";
+            };
+            el("btMacOk").onclick = function () {
+                var mac = input.value.trim().toUpperCase();
+                if (!/^([0-9A-F]{2}:){5}[0-9A-F]{2}$/.test(mac)) { err.textContent = txt("bt_mac_bad"); return; }
+                close(mac);
+            };
+            el("btMacCancel").onclick = function () { close(null); };
+            modal.onclick = function (e) { if (e.target === modal) close(null); };
+            input.onkeydown = function (e) { if (e.key === "Enter") el("btMacOk").onclick(); else if (e.key === "Escape") close(null); };
+        });
     }
 
     function connect() {
         if (!supported()) return;
         el("btConnect").disabled = true;
-        el("btStatus").textContent = txt("bt_connecting");
+        connecting = true; renderBar();
         loadLib().then(function () {
             return window.GanBT.connectGanCube(macProvider);
         }).then(function (c) {
-            conn = c;
+            conn = c; connecting = false;
             gotEvent = false;
             try {
                 var macs = savedMacs();
@@ -232,7 +303,7 @@
             window.btOnNewCase();
         }).catch(function (err) {
             el("btConnect").disabled = false;
-            conn = null;
+            conn = null; connecting = false;
             renderBar();
             if (err && err.name === "NotFoundError") return; // kullanıcı seçim penceresini kapattı
             el("btStatus").textContent = txt("bt_failed");
