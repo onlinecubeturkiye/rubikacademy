@@ -167,7 +167,7 @@
   </url>
 
   <url>
-    <loc>https://rubikacademy.fun/icerikler/algoritmalar/4x4-parity</loc>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/4x4</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -181,5 +181,10 @@
     <loc>https://rubikacademy.fun/icerikler/algoritmalar/skewb</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://rubikacademy.fun/icerikler/algoritmalar/5x5</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>
