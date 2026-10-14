@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261022";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261023";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -112,7 +112,11 @@
         bt_mac_bad: "MAC adresi geçersiz. Biçim: AB:12:34:56:78:9A",
         bt_pick_title: "Küpünü seç", bt_pick_intro: "Küpünün açık olduğundan emin ol (bir yüzü çevir, uyanır).",
         bt_pick_known: "Daha önce bağlandı", bt_pick_none: "Henüz kayıtlı küp yok. Yeni küp ara'ya bas ve listeden küpünü seç; sonraki seferlerde burada görünür.",
-        bt_pick_scan: "🔍 Yeni küp ara", bt_pick_go: "Bağlan →"
+        bt_pick_scan: "🔍 Yeni küp ara",
+        bt_tip_title: "Chrome listesini bir daha görmemek için (bir kez):",
+        bt_tip_1: "Aşağıdaki adresi kopyala, Chrome'un adres çubuğuna yapıştır.",
+        bt_tip_2: "\"Use the new permissions backend for Web Bluetooth\" ayarını Enabled yap, Chrome'u yeniden başlat.",
+        bt_tip_3: "Küpü bir kez daha \"Yeni küp ara\" ile eşle; sonra hep burada tek dokunuşla görünür.", bt_pick_go: "Bağlan →"
     };
     function txt(k) {
         var v = (typeof T === "function") ? T(k) : k;
@@ -309,7 +313,21 @@
         el("btPickScan").onclick = function () { close(); connect(null); };
         var getter = navigator.bluetooth.getDevices ? navigator.bluetooth.getDevices() : Promise.resolve([]);
         getter.catch(function () { return []; }).then(function (devs) {
-            if (!devs.length) { list.innerHTML = '<p class="bt-pick-empty">' + esc(txt("bt_pick_none")) + '</p>'; return; }
+            if (!devs.length) {
+                // Chrome kayıtlı küpleri bildirmiyorsa: hatırlamayı açan ayarı göster (Chrome listesi bir daha gelmesin)
+                var flag = "chrome://flags/#enable-web-bluetooth-new-permissions-backend";
+                list.innerHTML = '<p class="bt-pick-empty">' + esc(txt("bt_pick_none")) + '</p>' +
+                    '<div class="bt-way"><b>' + esc(txt("bt_tip_title")) + '</b><ol><li>' + esc(txt("bt_tip_1")) + '</li><li>' +
+                    esc(txt("bt_tip_2")) + '</li><li>' + esc(txt("bt_tip_3")) + '</li></ol>' +
+                    '<div class="bt-copy"><code dir="ltr">' + flag + '</code><button class="btn-sm" type="button" id="btTipCopy">' + esc(txt("bt_copy")) + '</button></div></div>';
+                el("btTipCopy").onclick = function () {
+                    var b = this;
+                    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(flag).then(function () {
+                        b.textContent = txt("bt_copied"); setTimeout(function () { b.textContent = txt("bt_copy"); }, 1500);
+                    }, function () {});
+                };
+                return;
+            }
             devs.forEach(function (d) {
                 var b = document.createElement("button");
                 b.type = "button"; b.className = "bt-cube";
