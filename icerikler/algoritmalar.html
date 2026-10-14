@@ -19,7 +19,7 @@
 <!-- TARAYICI SEKMESİ İÇİN LOGO -->
 <link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261014">
+<link rel="stylesheet" href="/styles/common.css?v=20261015">
 <link rel="canonical" href="https://rubikacademy.fun/algoritmalar">
 <meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, WV, Ortega ve CLL algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
 <meta property="og:title" content="Rubik Academy - Algoritmalar">
@@ -282,6 +282,52 @@ html {
 @media(max-width: 420px) {
     .soon-grid { grid-template-columns: 1fr; }
 }
+
+/* ANTRENÖR ŞERİDİ */
+.trainer-banner {
+    max-width: 1250px;
+    margin: 0 auto 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border-radius: 20px;
+    background: var(--tint-red);
+    border: var(--card-bw) solid var(--card-border);
+    box-shadow: var(--shadow);
+    color: var(--text);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.trainer-banner:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-hover); }
+.trainer-banner-icon {
+    font-size: 30px;
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+}
+.trainer-banner-text { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.trainer-banner-text strong { font-family: var(--font-display); font-size: 19px; font-weight: 800; }
+.trainer-banner-text span { font-size: 13.5px; color: var(--text-soft); line-height: 1.5; }
+.trainer-banner-btn {
+    flex-shrink: 0;
+    padding: 11px 16px;
+    border-radius: 12px;
+    background: var(--cube-yellow);
+    border: var(--card-bw) solid var(--ink);
+    color: #17171f;
+    font-size: 13px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+@media(max-width: 700px) {
+    .trainer-banner { flex-wrap: wrap; }
+    .trainer-banner-btn { width: 100%; text-align: center; }
+}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
@@ -382,6 +428,16 @@ Rubik Academy algoritma kütüphanesi: 3x3 ve 2x2 için OLL, PLL, COLL, WV, Orte
 <h2 data-i18n="section_h2">Tüm Küpler İçin Algoritmalar</h2>
 <p data-i18n="section_p">Küpünü ve yöntemini seç, tüm case'lere diyagramlarıyla göz at.</p>
 </section>
+
+<!-- ANTRENÖR ŞERİDİ -->
+<a href="/icerikler/algoritmalar/antrenor" class="trainer-banner">
+    <span class="trainer-banner-icon" aria-hidden="true">🎯</span>
+    <span class="trainer-banner-text">
+        <strong data-i18n="trainer_title">Algoritma Antrenörü</strong>
+        <span data-i18n="trainer_p">Öğrendiğin case'leri karıştırma ve süreyle çalış; zorlandıkların daha sık gelsin.</span>
+    </span>
+    <span class="trainer-banner-btn" data-i18n="trainer_btn">Antrenörü Aç →</span>
+</a>
 
 <!-- 3x3 KATEGORİSİ -->
 <div class="category-block">
@@ -544,8 +600,8 @@ function onLanguageApplied(lang) {
 </script>
 
 <script>var PAGE_ID = "algoritmalar";</script>
-<script src="/js/i18n.js?v=20261014"></script>
-<script src="/js/common.js?v=20261014"></script>
+<script src="/js/i18n.js?v=20261015"></script>
+<script src="/js/common.js?v=20261015"></script>
 
 <!-- BU SAYFAYA ÖZEL: OLL / PLL VERİSİNİ YÜKLE VE KARTLARI OLUŞTUR -->
 <script>

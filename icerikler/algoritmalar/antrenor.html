@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Algoritma Antrenörü</title>
+<link rel="icon" href="/RubikAcademyLogo.png" type="image/png">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/antrenor">
+<meta name="description" content="Rubik Academy algoritma antrenörü: OLL, PLL, COLL, WV, CLL ve Ortega case'lerini karıştırma ve süreyle çalış, zorlandığın case'ler daha sık gelsin.">
+<meta property="og:title" content="Rubik Academy - Algoritma Antrenörü">
+<meta property="og:description" content="Karıştırmayı uygula, case'i tanı, süreni ölç. Zorlandığın case'ler daha sık gelir.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/antrenor">
+<meta property="og:image" content="https://rubikacademy.fun/RubikAcademyLogo.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261015">
+
+<style>
+.wrap { max-width: 1100px; margin: 0 auto; }
+
+/* BAŞLIK */
+.intro { text-align: center; margin: 0 auto 30px; max-width: 720px; }
+.intro .badge { margin-bottom: 14px; }
+.intro h1 {
+    font-size: clamp(34px, 4.6vw, 52px);
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 12px;
+}
+.intro p { color: var(--text-soft); font-size: 15px; line-height: 1.7; }
+
+/* KUTU */
+.box {
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    padding: 22px;
+    margin-bottom: 26px;
+}
+.box-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+.box-head h2 { font-size: 19px; font-weight: 800; color: var(--text); }
+
+/* SET SEÇİMİ */
+.set-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.set-tab {
+    border: var(--card-bw) solid var(--card-border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 9px 14px;
+    font: 800 13px "Inter", sans-serif;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform .12s, box-shadow .12s, background .12s;
+}
+.set-tab small { font-weight: 700; color: var(--text-soft); margin-left: 4px; }
+.set-tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.set-tab.active { background: var(--cube-yellow); color: #17171f; }
+.set-tab.active small { color: #17171f; opacity: .7; }
+
+/* CASE SEÇİMİ */
+.sel-count { font-size: 13px; font-weight: 700; color: var(--text-soft); }
+.sel-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn-sm {
+    border: var(--card-bw) solid var(--card-border);
+    background: var(--surface-soft);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 7px 11px;
+    font: 800 12px "Inter", sans-serif;
+    cursor: pointer;
+}
+.btn-sm:hover { background: var(--primary-light); }
+.btn-sm[disabled] { opacity: .45; cursor: default; }
+
+.case-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font: 800 13px "Inter", sans-serif;
+    color: var(--primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    margin-top: 6px;
+}
+.case-groups { margin-top: 12px; display: none; }
+.case-groups.open { display: block; }
+.case-group-title {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .5px;
+    color: var(--text-soft);
+    margin: 12px 0 8px;
+}
+.case-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 76px;
+    padding: 7px 4px 6px;
+    border-radius: 12px;
+    border: var(--card-bw) solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    font: 800 11px "Inter", sans-serif;
+    color: var(--text-soft);
+    opacity: .55;
+    transition: opacity .12s, border-color .12s, background .12s;
+}
+.chip svg { width: 46px; height: 46px; }
+.chip.on { opacity: 1; border-color: var(--card-border); color: var(--text); background: var(--tint-green); }
+.chip-learn { font-size: 9px; line-height: 1; }
+
+/* ANTRENÖR */
+.trainer { text-align: center; }
+.hold-tip {
+    font-size: 12.5px;
+    color: var(--text-soft);
+    margin-bottom: 10px;
+}
+.scramble {
+    font-family: "JetBrains Mono", monospace;
+    font-size: clamp(17px, 2.6vw, 25px);
+    font-weight: 700;
+    line-height: 1.6;
+    color: var(--text);
+    word-spacing: 4px;
+    min-height: 1.6em;
+    margin: 0 auto 6px;
+    max-width: 900px;
+}
+.timer-area {
+    margin: 16px auto 10px;
+    padding: 24px 10px;
+    border-radius: 20px;
+    background: var(--surface-soft);
+    border: var(--card-bw) dashed var(--border);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+.timer {
+    font-family: "JetBrains Mono", monospace;
+    font-size: clamp(54px, 11vw, 104px);
+    font-weight: 800;
+    letter-spacing: -2px;
+    color: var(--text);
+    line-height: 1;
+}
+.timer-area.running .timer { color: var(--cube-green); }
+.timer-hint { margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--text-soft); }
+.trainer-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+.reveal-box {
+    display: none;
+    margin: 16px auto 4px;
+    max-width: 620px;
+    padding: 16px;
+    border-radius: 18px;
+    border: var(--card-bw) solid var(--card-border);
+    background: var(--surface);
+    text-align: left;
+    gap: 16px;
+    align-items: center;
+}
+.reveal-box.show { display: flex; }
+.reveal-diagram {
+    flex-shrink: 0;
+    width: 84px;
+    height: 84px;
+    border-radius: 14px;
+    background: var(--diagram-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.reveal-diagram svg { width: 74px; height: 74px; }
+.reveal-name { font-size: 18px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+.reveal-alg {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+.grade { display: none; justify-content: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+.grade.show { display: flex; }
+.btn-big {
+    border: var(--card-bw) solid var(--ink);
+    border-radius: 14px;
+    padding: 12px 20px;
+    font: 900 15px "Inter", sans-serif;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform .12s, box-shadow .12s;
+    color: #17171f;
+}
+.btn-big:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-big:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn-good { background: var(--cube-green); color: #fff; }
+.btn-hard { background: var(--cube-red); color: #fff; }
+.btn-skip { background: var(--surface); color: var(--text); }
+.key-hint { font-size: 11px; font-weight: 700; opacity: .75; margin-left: 4px; }
+.empty-note { color: var(--text-soft); font-size: 14px; padding: 18px 0; }
+
+/* İSTATİSTİK */
+.stat-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.stat-tile {
+    border: var(--card-bw) solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    background: var(--surface-soft);
+}
+.stat-tile b {
+    display: block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 21px;
+    color: var(--text);
+}
+.stat-tile span { font-size: 12px; font-weight: 700; color: var(--text-soft); }
+.stat-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.stat-table th {
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: .5px;
+    color: var(--text-soft);
+    padding: 6px 8px;
+    border-bottom: var(--card-bw) solid var(--border);
+}
+.stat-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--text); }
+.stat-table td.num { font-family: "JetBrains Mono", monospace; font-weight: 700; }
+.stat-table .mini svg { width: 34px; height: 34px; display: block; }
+.stat-table tr.hard td:first-child + td { color: var(--cube-red); }
+html[dir="rtl"] .stat-table th { text-align: right; }
+
+.load-error {
+    display: none;
+    padding: 18px;
+    border-radius: 16px;
+    border: var(--card-bw) solid var(--card-border);
+    background: var(--surface);
+    color: var(--text-soft);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 700px) {
+    .box { padding: 16px; border-radius: 18px; }
+    .stat-tiles { grid-template-columns: repeat(2, 1fr); }
+    .reveal-box { flex-direction: column; text-align: center; }
+    .stat-table .hide-sm { display: none; }
+    .chip { width: 68px; }
+    .chip svg { width: 40px; height: 40px; }
+}
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="http://rubikacademy.fun" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="http://rubikacademy.fun" data-i18n="navHome">Ana Sayfa</a>
+            <a href="http://rubikacademy.fun/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+<div class="wrap">
+
+<nav class="nav-bar">
+    <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<section class="intro">
+    <div class="badge"><i></i><span data-i18n="badge_text">ALGORİTMA ANTRENÖRÜ</span></div>
+    <h1 data-i18n="title">Algoritma Antrenörü</h1>
+    <p data-i18n="intro_p">Bir set seç, karıştırmayı çözülmüş küpe uygula, case'i tanı ve çöz. Süren ölçülür; zorlandığın case'ler daha sık gelir.</p>
+</section>
+
+<div id="loadError" class="load-error" data-i18n="load_error">Antrenör verisi yüklenemedi. Lütfen daha sonra tekrar dene.</div>
+
+<!-- SET VE CASE SEÇİMİ -->
+<section class="box" id="setupBox">
+    <div class="set-tabs" id="setTabs" role="tablist"></div>
+
+    <div class="box-head">
+        <h2 data-i18n="cases_title">Çalışılacak case'ler</h2>
+        <span class="sel-count" id="selCount"></span>
+    </div>
+    <div class="sel-actions">
+        <button class="btn-sm" id="selAll" data-i18n="sel_all">Tümü</button>
+        <button class="btn-sm" id="selLearning" data-i18n="sel_learning">Öğreniyorum olarak işaretlediklerim</button>
+        <button class="btn-sm" id="selNone" data-i18n="sel_none">Hiçbiri</button>
+    </div>
+    <button class="case-toggle" id="caseToggle" aria-expanded="false"><span data-i18n="pick_cases">Case'leri tek tek seç</span> <span id="caseToggleArrow">▾</span></button>
+    <div class="case-groups" id="caseGroups"></div>
+</section>
+
+<!-- ANTRENÖR -->
+<section class="box trainer" id="trainerBox">
+    <div class="hold-tip" id="holdTip" data-i18n="hold_tip_3x3">Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.</div>
+    <div class="scramble" id="scramble" dir="ltr"></div>
+    <div class="empty-note" id="emptyNote" style="display:none" data-i18n="empty_note">Çalışmak için en az bir case seç.</div>
+
+    <div class="timer-area" id="timerArea" role="button" tabindex="0" aria-live="polite">
+        <div class="timer" id="timer" dir="ltr">0.00</div>
+        <div class="timer-hint" id="timerHint"></div>
+    </div>
+
+    <div class="reveal-box" id="revealBox">
+        <div class="reveal-diagram" id="revealDiagram" dir="ltr"></div>
+        <div>
+            <div class="reveal-name" id="revealName"></div>
+            <div class="reveal-alg" id="revealAlg" dir="ltr"></div>
+        </div>
+    </div>
+
+    <div class="grade" id="grade">
+        <button class="btn-big btn-good" id="btnGood"><span data-i18n="btn_good">Bildim</span><span class="key-hint">(1)</span></button>
+        <button class="btn-big btn-hard" id="btnHard"><span data-i18n="btn_hard">Zorlandım</span><span class="key-hint">(2)</span></button>
+    </div>
+
+    <div class="trainer-actions" style="margin-top:12px">
+        <button class="btn-sm" id="btnSkip" data-i18n="btn_skip">Bu karıştırmayı atla</button>
+    </div>
+</section>
+
+<!-- İSTATİSTİK -->
+<section class="box" id="statsBox">
+    <div class="box-head">
+        <h2 data-i18n="stats_title">İstatistikler</h2>
+        <button class="btn-sm" id="btnReset" data-i18n="btn_reset">Bu setin istatistiklerini sıfırla</button>
+    </div>
+    <div class="stat-tiles">
+        <div class="stat-tile"><b id="stSolves">0</b><span data-i18n="st_solves">Çözüm (bu oturum)</span></div>
+        <div class="stat-tile"><b id="stAo5">-</b><span data-i18n="st_ao5">Son 5 ortalaması</span></div>
+        <div class="stat-tile"><b id="stAo12">-</b><span data-i18n="st_ao12">Son 12 ortalaması</span></div>
+        <div class="stat-tile"><b id="stBest">-</b><span data-i18n="st_best">Oturumun en iyisi</span></div>
+    </div>
+    <div id="statTableWrap"></div>
+</section>
+
+</div>
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script src="/icerikler/algoritmalar/ll.js"></script>
+<script src="/icerikler/algoritmalar/cllSvg.js"></script>
+<script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
+<script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
+
+<script>var PAGE_ID = "antrenor";</script>
+<script src="/js/i18n.js?v=20261015"></script>
+<script src="/js/common.js?v=20261015"></script>
+
+<script>
+/* ============================================================
+   ALGORİTMA ANTRENÖRÜ
+   - Case verileri mevcut algoritma JSON'larından okunur.
+   - Karıştırmalar antrenor-karistirmalar.json'da: her case için
+     küp simülasyonunda doğrulanmış, önceden üretilmiş karıştırmalar.
+   - İstatistikler ve seçimler sadece bu tarayıcıda (localStorage).
+   ============================================================ */
+var BASE = "/icerikler/algoritmalar/";
+
+/* keyFmt: algoritma sayfasının "Öğreniyorum" kaydında kullandığı anahtar biçimi
+   ("name" = sadece case adı, "subset" = "altgrup::ad") */
+var SETS = [
+    { id: "oll",        label: "OLL",        file: "oll-pll.json",    dataKey: "oll",  progress: "algo-progress-oll",        keyFmt: "name",   page: "oll",        cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
+    { id: "pll",        label: "PLL",        file: "oll-pll.json",    dataKey: "pll",  progress: "algo-progress-pll",        keyFmt: "subset", page: "pll",        cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
+    { id: "coll",       label: "COLL",       file: "coll.json",       dataKey: "coll", progress: "algo-progress-coll",       keyFmt: "subset", page: "coll",       cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
+    { id: "wv",         label: "WV",         file: "wv.json",         dataKey: "wv",   progress: "algo-progress-wv",         keyFmt: "subset", page: "wv",         cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
+    { id: "cll",        label: "CLL",        file: "cll.json",        dataKey: "cll",  progress: "algo-progress-cll",        keyFmt: "name",   page: "cll",        cube: "2x2", draw: function (c, s) { return cllSvg(c.pattern, "full", s); } },
+    { id: "ortega-oll", label: "Ortega OLL", file: "ortega-oll.json", dataKey: "oll",  progress: "algo-progress-ortega-oll", keyFmt: "subset", page: "ortega-oll", cube: "2x2", draw: function (c, s) { return ortegaOllSvg(c.pattern, s); } },
+    { id: "ortega-pbl", label: "Ortega PBL", file: "ortega-pbl.json", dataKey: "pbl",  progress: "algo-progress-ortega-pbl", keyFmt: "subset", page: "ortega-pbl", cube: "2x2", draw: function (c, s) { return ortegaSvg(c.pattern_u, "full", s); } }
+];
+
+var STATS_KEY = "trainer-stats-v1";
+var SEL_KEY = "trainer-selection-v1";
+var SET_KEY = "trainer-set-v1";
+
+/* Yedek metinler (i18n.js eski bir sürümden gelirse "undefined" görünmesin) */
+var FALLBACK = {
+    hint_ready: "Başlatmak için boşluk tuşuna bas ya da buraya dokun",
+    hint_running: "Durdurmak için herhangi bir tuşa bas ya da dokun",
+    hint_done: "Nasıldı? Bildim (1) / Zorlandım (2)",
+    sel_count: "{n} / {t} case seçili",
+    col_case: "CASE",
+    col_count: "DENEME",
+    col_avg: "ORTALAMA",
+    col_best: "EN İYİ",
+    col_hard: "ZORLANMA",
+    no_stats: "Henüz bu sette çözüm yok. İlk karıştırmayla başla!",
+    reset_confirm: "Bu setin tüm istatistikleri silinsin mi?",
+    learning_none: "Bu sette \"Öğreniyorum\" olarak işaretlediğin case yok. Algoritma sayfasında case kartlarına tıklayarak işaretleyebilirsin.",
+    hold_tip_3x3: "Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.",
+    hold_tip_2x2: "Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş 2x2'ye uygula."
+};
+
+function lang() { return localStorage.getItem("site-lang") || "tr"; }
+function T(key) {
+    var pages = (window.SITE_I18N && SITE_I18N.pages) || {};
+    var p = pages.antrenor || {};
+    var d = p[lang()] || {};
+    if (d[key]) return d[key];
+    if (p.tr && p.tr[key]) return p.tr[key];
+    return FALLBACK[key] || key;
+}
+function subsetLabel(set, subset) {
+    var pages = (window.SITE_I18N && SITE_I18N.pages) || {};
+    var p = pages[set.page] || {};
+    var d = p[lang()] || p.tr || {};
+    return d["subset_" + subset] || subset;
+}
+function load(key, def) {
+    try { var v = JSON.parse(localStorage.getItem(key)); return (v && typeof v === "object") ? v : def; } catch (e) { return def; }
+}
+function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function fmt(ms) {
+    if (ms == null || isNaN(ms)) return "-";
+    var s = ms / 1000;
+    if (s < 60) return s.toFixed(2);
+    var m = Math.floor(s / 60);
+    return m + ":" + (s - m * 60).toFixed(2).padStart(5, "0");
+}
+
+/* ---------------- VERİ ---------------- */
+var DATA = {};        // setId -> [{key, name, subset, alg, raw, scrambles}]
+var current = null;   // seçili set
+var selection = load(SEL_KEY, {});   // setId -> {caseKey: true}
+var stats = load(STATS_KEY, {});     // setId -> {caseKey: {n, sum, best, score}}
+var session = [];     // bu oturumdaki süreler (ms)
+var state = "idle";   // idle | running | done
+var curCase = null, curScramble = "", lastKey = null;
+var startTime = 0, rafId = 0, lastTime = 0;
+
+function caseKey(set, subset, name) { return subset + "::" + name; }
+function progressKey(set, c) { return set.keyFmt === "name" ? c.name : c.subset + "::" + c.name; }
+
+function loadAll() {
+    var files = {};
+    SETS.forEach(function (s) { files[s.file] = true; });
+    var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
+    return Promise.all(names.map(function (f) {
+        return fetch(BASE + f + "?v=20261015").then(function (r) {
+            if (!r.ok) throw new Error(f + " HTTP " + r.status);
+            return r.json();
+        });
+    })).then(function (jsons) {
+        var byFile = {};
+        names.forEach(function (n, i) { byFile[n] = jsons[i]; });
+        var scr = byFile["antrenor-karistirmalar.json"];
+        SETS.forEach(function (s) {
+            var groups = byFile[s.file][s.dataKey] || [];
+            var list = [];
+            groups.forEach(function (g) {
+                g.cases.forEach(function (c) {
+                    var k = caseKey(s, g.subset, c.name);
+                    var sc = (scr[s.id] && scr[s.id][k]) || [];
+                    if (!sc.length) return; // karıştırması olmayan case antrenörde gösterilmez
+                    list.push({ key: k, name: c.name, subset: g.subset, alg: c.alg, raw: c, scrambles: sc });
+                });
+            });
+            DATA[s.id] = list;
+        });
+    });
+}
+
+/* ---------------- SET SEKMELERİ ---------------- */
+function renderTabs() {
+    var html = "";
+    SETS.forEach(function (s) {
+        var n = (DATA[s.id] || []).length;
+        html += '<button class="set-tab' + (current && current.id === s.id ? " active" : "") + '" data-set="' + s.id + '" role="tab">' +
+            esc(s.label) + '<small>' + s.cube + '</small></button>';
+    });
+    document.getElementById("setTabs").innerHTML = html;
+}
+
+function selectSet(id) {
+    current = SETS.filter(function (s) { return s.id === id; })[0] || SETS[0];
+    save(SET_KEY, { id: current.id });
+    if (!selection[current.id]) {
+        selection[current.id] = {};
+        DATA[current.id].forEach(function (c) { selection[current.id][c.key] = true; });
+        save(SEL_KEY, selection);
+    }
+    renderTabs();
+    renderCases();
+    document.getElementById("holdTip").textContent = T(current.cube === "2x2" ? "hold_tip_2x2" : "hold_tip_3x3");
+    session = [];
+    lastKey = null;
+    nextCase();
+    renderStats();
+}
+
+/* ---------------- CASE SEÇİMİ ---------------- */
+function learningSet(set) {
+    var p = load(set.progress, {});
+    var out = {};
+    DATA[set.id].forEach(function (c) {
+        if (p[progressKey(set, c)] === "learning") out[c.key] = true;
+    });
+    return out;
+}
+
+function renderCases() {
+    var sel = selection[current.id];
+    var learn = learningSet(current);
+    var groups = {}, order = [];
+    DATA[current.id].forEach(function (c) {
+        if (!groups[c.subset]) { groups[c.subset] = []; order.push(c.subset); }
+        groups[c.subset].push(c);
+    });
+    var html = "";
+    order.forEach(function (sub) {
+        if (order.length > 1) html += '<div class="case-group-title">' + esc(subsetLabel(current, sub)) + '</div>';
+        html += '<div class="case-chips">';
+        groups[sub].forEach(function (c) {
+            html += '<button class="chip' + (sel[c.key] ? " on" : "") + '" data-key="' + esc(c.key) + '" aria-pressed="' + (sel[c.key] ? "true" : "false") + '">' +
+                '<span dir="ltr">' + current.draw(c.raw, 46) + '</span>' + esc(c.name) +
+                (learn[c.key] ? '<span class="chip-learn">🟡</span>' : '') + '</button>';
+        });
+        html += '</div>';
+    });
+    document.getElementById("caseGroups").innerHTML = html;
+    document.getElementById("selLearning").disabled = Object.keys(learn).length === 0;
+    updateSelCount();
+}
+
+function updateSelCount() {
+    var sel = selection[current.id];
+    var n = DATA[current.id].filter(function (c) { return sel[c.key]; }).length;
+    document.getElementById("selCount").textContent = T("sel_count").replace("{n}", n).replace("{t}", DATA[current.id].length);
+}
+
+function setSelection(map) {
+    selection[current.id] = map;
+    save(SEL_KEY, selection);
+    renderCases();
+    if (state !== "running") nextCase();
+}
+
+/* ---------------- CASE SEÇİM ALGORİTMASI ----------------
+   Ağırlık: hiç çalışılmamış case 3, sonra 1 + zorlanma puanı (0-5).
+   Aynı case art arda gelmez (seçili tek case yoksa). */
+function pickCase() {
+    var sel = selection[current.id];
+    var pool = DATA[current.id].filter(function (c) { return sel[c.key]; });
+    if (!pool.length) return null;
+    if (pool.length > 1) pool = pool.filter(function (c) { return c.key !== lastKey; });
+    var st = stats[current.id] || {};
+    var weights = pool.map(function (c) {
+        var s = st[c.key];
+        return s ? 1 + (s.score || 0) : 3;
+    });
+    var total = weights.reduce(function (a, b) { return a + b; }, 0);
+    var r = Math.random() * total;
+    for (var i = 0; i < pool.length; i++) {
+        r -= weights[i];
+        if (r <= 0) return pool[i];
+    }
+    return pool[pool.length - 1];
+}
+
+function nextCase() {
+    stopRaf();
+    state = "idle";
+    curCase = pickCase();
+    var empty = !curCase;
+    document.getElementById("emptyNote").style.display = empty ? "block" : "none";
+    document.getElementById("timerArea").style.display = empty ? "none" : "block";
+    document.getElementById("btnSkip").style.display = empty ? "none" : "inline-block";
+    document.getElementById("revealBox").classList.remove("show");
+    document.getElementById("grade").classList.remove("show");
+    document.getElementById("timerArea").classList.remove("running");
+    if (empty) { document.getElementById("scramble").textContent = ""; return; }
+    var list = curCase.scrambles;
+    curScramble = list[Math.floor(Math.random() * list.length)];
+    document.getElementById("scramble").textContent = curScramble;
+    document.getElementById("timer").textContent = "0.00";
+    document.getElementById("timerHint").textContent = T("hint_ready");
+}
+
+/* ---------------- ZAMANLAYICI ---------------- */
+function tick() {
+    document.getElementById("timer").textContent = fmt(performance.now() - startTime);
+    rafId = requestAnimationFrame(tick);
+}
+function stopRaf() { if (rafId) cancelAnimationFrame(rafId); rafId = 0; }
+
+function startTimer() {
+    if (state !== "idle" || !curCase) return;
+    state = "running";
+    startTime = performance.now();
+    document.getElementById("timerArea").classList.add("running");
+    document.getElementById("timerHint").textContent = T("hint_running");
+    tick();
+}
+
+function stopTimer() {
+    if (state !== "running") return;
+    lastTime = performance.now() - startTime;
+    stopRaf();
+    state = "done";
+    document.getElementById("timer").textContent = fmt(lastTime);
+    document.getElementById("timerArea").classList.remove("running");
+    document.getElementById("timerHint").textContent = T("hint_done");
+    document.getElementById("revealDiagram").innerHTML = current.draw(curCase.raw, 74);
+    document.getElementById("revealName").textContent = curCase.name;
+    document.getElementById("revealAlg").textContent = curCase.alg;
+    document.getElementById("revealBox").classList.add("show");
+    document.getElementById("grade").classList.add("show");
+}
+
+function grade(hard) {
+    if (state !== "done") return;
+    var setStats = stats[current.id] || (stats[current.id] = {});
+    var s = setStats[curCase.key] || (setStats[curCase.key] = { n: 0, sum: 0, best: null, score: 0, hard: 0 });
+    s.n++;
+    s.sum += lastTime;
+    s.best = s.best == null ? lastTime : Math.min(s.best, lastTime);
+    if (hard) { s.score = Math.min(5, (s.score || 0) + 2); s.hard = (s.hard || 0) + 1; }
+    else { s.score = Math.max(0, (s.score || 0) - 1); }
+    save(STATS_KEY, stats);
+    session.push(lastTime);
+    lastKey = curCase.key;
+    renderStats();
+    nextCase();
+}
+
+/* ---------------- İSTATİSTİK ---------------- */
+function avgOf(arr, n) {
+    if (arr.length < n) return null;
+    var last = arr.slice(-n).slice().sort(function (a, b) { return a - b; });
+    if (n >= 5) last = last.slice(1, -1); // en iyi ve en kötü atılır (WCA tarzı)
+    return last.reduce(function (a, b) { return a + b; }, 0) / last.length;
+}
+
+function renderStats() {
+    document.getElementById("stSolves").textContent = session.length;
+    document.getElementById("stAo5").textContent = fmt(avgOf(session, 5));
+    document.getElementById("stAo12").textContent = fmt(avgOf(session, 12));
+    document.getElementById("stBest").textContent = session.length ? fmt(Math.min.apply(null, session)) : "-";
+
+    var st = stats[current.id] || {};
+    var rows = DATA[current.id].filter(function (c) { return st[c.key]; });
+    var wrap = document.getElementById("statTableWrap");
+    if (!rows.length) { wrap.innerHTML = '<p class="empty-note">' + esc(T("no_stats")) + '</p>'; return; }
+    rows.sort(function (a, b) { return (st[b.key].sum / st[b.key].n) - (st[a.key].sum / st[a.key].n); });
+    var html = '<table class="stat-table"><thead><tr><th></th><th>' + esc(T("col_case")) + '</th><th>' + esc(T("col_avg")) + '</th><th class="hide-sm">' +
+        esc(T("col_best")) + '</th><th>' + esc(T("col_count")) + '</th><th class="hide-sm">' + esc(T("col_hard")) + '</th></tr></thead><tbody>';
+    rows.forEach(function (c) {
+        var s = st[c.key];
+        html += '<tr' + (s.score >= 2 ? ' class="hard"' : '') + '><td class="mini" dir="ltr">' + current.draw(c.raw, 34) + '</td><td><b>' + esc(c.name) + '</b></td>' +
+            '<td class="num">' + fmt(s.sum / s.n) + '</td><td class="num hide-sm">' + fmt(s.best) + '</td><td class="num">' + s.n + '</td><td class="num hide-sm">' + (s.hard || 0) + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+}
+
+/* ---------------- OLAYLAR ---------------- */
+function isTyping(e) {
+    var t = e.target;
+    return t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable);
+}
+
+document.addEventListener("keydown", function (e) {
+    if (isTyping(e) || !current) return;
+    if (state === "running") { e.preventDefault(); stopTimer(); return; }
+    if (e.code === "Space") {
+        // butona odaklıyken boşluk butonu tetiklemesin, sayfa kaymasın
+        e.preventDefault();
+    }
+    if (state === "done") {
+        if (e.key === "1") { e.preventDefault(); grade(false); }
+        else if (e.key === "2") { e.preventDefault(); grade(true); }
+    }
+});
+document.addEventListener("keyup", function (e) {
+    if (isTyping(e) || !current) return;
+    if (e.code === "Space" && state === "idle") { e.preventDefault(); startTimer(); }
+});
+
+var timerArea = document.getElementById("timerArea");
+timerArea.addEventListener("click", function () {
+    if (state === "idle") startTimer();
+    else if (state === "running") stopTimer();
+});
+// Dokunmatikte durdurmak için dokunma anında tepki ver (click gecikmesini beklemeden)
+timerArea.addEventListener("touchstart", function (e) {
+    if (state === "running") { e.preventDefault(); stopTimer(); }
+}, { passive: false });
+
+document.getElementById("btnGood").addEventListener("click", function () { grade(false); });
+document.getElementById("btnHard").addEventListener("click", function () { grade(true); });
+document.getElementById("btnSkip").addEventListener("click", function () { lastKey = curCase ? curCase.key : null; nextCase(); this.blur(); });
+document.getElementById("btnReset").addEventListener("click", function () {
+    if (!confirm(T("reset_confirm"))) return;
+    delete stats[current.id];
+    save(STATS_KEY, stats);
+    session = [];
+    renderStats();
+});
+
+document.getElementById("setTabs").addEventListener("click", function (e) {
+    var b = e.target.closest(".set-tab");
+    if (b && state !== "running") selectSet(b.getAttribute("data-set"));
+});
+document.getElementById("caseGroups").addEventListener("click", function (e) {
+    var b = e.target.closest(".chip");
+    if (!b) return;
+    var sel = selection[current.id];
+    var k = b.getAttribute("data-key");
+    if (sel[k]) delete sel[k]; else sel[k] = true;
+    save(SEL_KEY, selection);
+    b.classList.toggle("on", !!sel[k]);
+    b.setAttribute("aria-pressed", sel[k] ? "true" : "false");
+    updateSelCount();
+    if (state === "idle" && (!curCase || !sel[curCase.key])) nextCase();
+});
+document.getElementById("selAll").addEventListener("click", function () {
+    var m = {};
+    DATA[current.id].forEach(function (c) { m[c.key] = true; });
+    setSelection(m);
+});
+document.getElementById("selNone").addEventListener("click", function () { setSelection({}); });
+document.getElementById("selLearning").addEventListener("click", function () {
+    var m = learningSet(current);
+    if (!Object.keys(m).length) { alert(T("learning_none")); return; }
+    setSelection(m);
+});
+document.getElementById("caseToggle").addEventListener("click", function () {
+    var g = document.getElementById("caseGroups");
+    var open = g.classList.toggle("open");
+    this.setAttribute("aria-expanded", open ? "true" : "false");
+    document.getElementById("caseToggleArrow").textContent = open ? "▴" : "▾";
+});
+
+// Dil değişince dinamik metinleri yenile (common.js applyLanguage sonrası çağırır)
+function onLanguageApplied() {
+    if (!current) return;
+    renderCases();
+    renderStats();
+    document.getElementById("holdTip").textContent = T(current.cube === "2x2" ? "hold_tip_2x2" : "hold_tip_3x3");
+    var hint = state === "idle" ? "hint_ready" : state === "running" ? "hint_running" : "hint_done";
+    document.getElementById("timerHint").textContent = T(hint);
+}
+
+loadAll().then(function () {
+    var saved = load(SET_KEY, {});
+    selectSet(saved.id || "oll");
+}).catch(function (err) {
+    document.getElementById("loadError").style.display = "block";
+    document.getElementById("setupBox").style.display = "none";
+    document.getElementById("trainerBox").style.display = "none";
+    document.getElementById("statsBox").style.display = "none";
+    console.error("Antrenör verisi yüklenemedi:", err);
+});
+</script>
+
+</body>
+</html>
