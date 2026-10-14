@@ -220,7 +220,7 @@
 .mode-card #holdTip, .mode-card #scramble { display: none; }
 .bt-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; margin: -4px auto 12px; font-size: 12.5px; font-weight: 700; color: var(--text-soft); }
 .bt-bar.on #btStatus { color: var(--text); }
-.mode-card .bt-bar { display: none; }
+.mode-card .timer-area.running .timer { display: none; }
 .scramble .bt-done { opacity: .3; }
 .scramble .bt-cur { color: var(--cube-blue); text-decoration: underline; text-underline-offset: 5px; }
 .scramble .bt-half { color: var(--cube-orange); }
@@ -731,6 +731,7 @@ function nextCase() {
 
 /* ---------------- ZAMANLAYICI ---------------- */
 function tick() {
+    if (mode === "card") return; // kart modunda süre arka planda ölçülür, ekranda akmaz
     document.getElementById("timer").textContent = fmt(performance.now() - startTime);
     rafId = requestAnimationFrame(tick);
 }
