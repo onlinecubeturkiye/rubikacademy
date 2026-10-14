@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261024";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261025";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -83,6 +83,7 @@
     var todo = [];          // [{f, q, fix}] yapılacak çeyrek tur sayısı (1 = X, 2 = X2, 3 = X')
     var total = 0;          // karıştırmadaki hamle sayısı
     var gotEvent = false, connecting = false, afterCase = false, tooMany = false;
+    var lastDevice = null, userDisconnect = false; // bu sayfada seçilen küp: tekrar bağlanırken Chrome listesi açılmasın
     var MAX_FIX = 10; // bundan fazla düzeltme hamlesi birikirse "küpü çöz" denir
 
     function el(id) { return document.getElementById(id); }
@@ -323,6 +324,7 @@
         el("btPickScan").onclick = function () { close(); connect(null); };
         var getter = navigator.bluetooth.getDevices ? navigator.bluetooth.getDevices() : Promise.resolve([]);
         getter.catch(function () { return []; }).then(function (devs) {
+            if (lastDevice && !devs.some(function (d) { return d.id === lastDevice.id; })) devs = [lastDevice].concat(devs);
             if (!devs.length) {
                 // Chrome kayıtlı küpleri bildirmiyorsa: hatırlamayı açan ayarı göster (Chrome listesi bir daha gelmesin)
                 var flag = "chrome://flags/#enable-web-bluetooth-new-permissions-backend";
@@ -354,7 +356,12 @@
         if (!supported()) return;
         // Kayıtlı küp seçildiyse kütüphanenin cihaz seçme çağrısını bir kereliğine o küpe yönlendir
         var bt = navigator.bluetooth, origRequest = bt.requestDevice;
-        if (knownDevice) bt.requestDevice = function () { bt.requestDevice = origRequest; return Promise.resolve(knownDevice); };
+        // Kayıtlı küp varsa doğrudan onu ver; yoksa Chrome'un listesini aç ve seçilen küpü bu sayfa için hafızada tut
+        bt.requestDevice = function (opts) {
+            bt.requestDevice = origRequest;
+            if (knownDevice) return Promise.resolve(knownDevice);
+            return origRequest.call(bt, opts).then(function (d) { lastDevice = d; return d; });
+        };
         el("btConnect").disabled = true;
         connecting = true; renderBar();
         loadLib().then(function () {
@@ -375,7 +382,12 @@
                         if (ev.facelets === "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB") { model = solvedModel(); modelKnown = true; }
                         window.btOnNewCase();
                     }
-                } else if (ev.type === "DISCONNECT") { dropConnection(); }
+                } else if (ev.type === "DISCONNECT") {
+                    var wasUser = userDisconnect; userDisconnect = false;
+                    dropConnection();
+                    // Küp uykuya geçince vb. kopan bağlantıyı Chrome listesi açmadan bir kez yeniden kur
+                    if (!wasUser && lastDevice) setTimeout(function () { if (!conn && !connecting) connect(lastDevice); }, 1500);
+                }
             });
             if (!c.capabilities || c.capabilities.facelets) c.sendCommand({ type: "REQUEST_FACELETS" }).catch(function () {});
             else { model = solvedModel(); modelKnown = false; }
@@ -407,6 +419,7 @@
         if (state === "idle") setHint("hint_ready");
     }
     function disconnect() {
+        userDisconnect = true;
         var c = conn;
         dropConnection();
         if (c) c.disconnect().catch(function () {});
