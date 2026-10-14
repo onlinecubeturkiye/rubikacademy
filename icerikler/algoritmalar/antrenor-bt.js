@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261038";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261039";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -93,7 +93,7 @@
         bt_title: "Bluetooth akıllı küp", bt_connect: "Bağlan", bt_reset: "Küpüm çözülmüş", bt_disconnect: "Bağlantıyı kes",
         bt_hint: "GAN (i, i2, i3, i Carry, ui…), MoYu, QiYi, GoCube veya Giiker akıllı küpünü bağla: karıştırma takip edilir, süre kendiliğinden başlar ve case çözülünce durur.",
         bt_unsupported: "Bluetooth küp için Chrome veya Edge gerekir (iPhone/iPad desteklenmez).",
-        bt_only3x3: "Bluetooth sadece 3x3 setlerinde çalışır", bt_cube_mode: "Bluetooth için \"Küple çalış\" modunu seç",
+        bt_only3x3: "Bluetooth sadece 3x3 CFOP setlerinde çalışır", bt_cube_mode: "Bluetooth için \"Küple çalış\" modunu seç",
         bt_need_solve: "Önce küpü çöz (ya da yaptığın hamleleri geri al). Çözülünce karıştırma başlar.",
         bt_unknown: "Küp çözülmüş değil görünüyor. Çöz ve \"Küpüm çözülmüş\" butonuna bas.",
         bt_fix: "Düzelt:", bt_too_many: "Çok fazla farklı hamle yapıldı. Küpü çöz; çözülünce karıştırma baştan başlar.", bt_finish_cube: "Case tamam! Yeni karıştırma için küpü bitir (tamamen çöz) ya da algoritmanın tersini yap.", bt_hint_scramble: "Karıştırmayı sarı üstte, yeşil önde tutarak uygula",
@@ -132,7 +132,7 @@
     function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
     function fmtMove(f, q) { return f + (q === 2 ? "2" : q === 3 ? "'" : ""); }
     function supported() { return !!(navigator.bluetooth && navigator.bluetooth.requestDevice); }
-    function applies() { return conn && mode === "cube" && current && current.cube === "3x3"; }
+    function applies() { return conn && mode === "cube" && current && current.cube === "3x3" && !current.noBT; }
 
     function parseScramble(s) {
         return s.trim().split(/\s+/).filter(Boolean).map(function (t) {
@@ -162,7 +162,7 @@
         if (connecting) { st.textContent = txt("bt_connecting"); return; }
         if (!on) { st.textContent = txt("bt_hint"); return; }
         if (noData) { st.textContent = txt("bt_no_data2") + (lastMac ? " " + txt("bt_mac_used") + " " + lastMac : ""); return; }
-        if (current && current.cube !== "3x3") st.textContent = txt("bt_only3x3");
+        if (current && (current.cube !== "3x3" || current.noBT)) st.textContent = txt("bt_only3x3");
         else if (mode !== "cube") st.textContent = txt("bt_cube_mode");
         else st.textContent = txt(state === "running" ? "bt_hint_ready" : "bt_hint_scramble");
     }
