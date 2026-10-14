@@ -37,7 +37,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261041">
+<link rel="stylesheet" href="/styles/common.css?v=20261042">
 
 <style>
 .hero {
@@ -294,6 +294,8 @@ a.set-tab { text-decoration: none; }
 .case-diagram svg { width: 96px; height: 96px; }
 .case-diagram:has(svg.tall) { width: auto; height: auto; padding: 6px 10px; }
 .case-diagram svg.tall { width: 62px; height: 144px; }
+.case-diagram:has(svg.iso) { width: 112px; height: 112px; }
+.case-diagram svg.iso { width: 104px; height: 104px; }
 @media (max-width: 520px) { .nota-move { width: 74px; padding: 4px; } .nota-move small { font-size: 10px; } .set-tab { padding: 8px 12px; font-size: 14px; } }
 </style>
 
@@ -366,7 +368,7 @@ a.set-tab { text-decoration: none; }
 <section class="nota-box">
     <h2 data-i18n="not_title">Notasyon</h2>
     <p data-i18n="not_p">M: orta dikey katman, L ile aynı yönde döner. r: sağ iki katman (R + M'). R, U, F, L, D dış katmanlardır; ' ters yön, 2 yarım tur demektir. Roux'da önce iki yan blok (F2B, 1x2x3) kurulur; CMLL algoritmaları bu blokları bozmaz.</p>
-    <p data-i18n="view_note">CMLL diyagramı üstten bakıştır (kenarlar gri: önemsiz). EO diyagramı M katmanının açılımıdır: üstte arka yüz, ortada üst yüz, altta ön yüz.</p>
+    <p data-i18n="view_note">CMLL diyagramı üstten bakıştır (kenarlar gri: önemsiz). EO diyagramı küpün üst, ön ve sağ yüzünü gösterir; kenarlarda sadece sarı/beyaz etiketler görünür.</p>
 </section>
 
 <div class="set-tabs" id="setTabs"></div>
@@ -396,8 +398,8 @@ a.set-tab { text-decoration: none; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "roux_algos";</script>
-<script src="/js/i18n.js?v=20261041"></script>
-<script src="/js/common.js?v=20261041"></script>
+<script src="/js/i18n.js?v=20261042"></script>
+<script src="/js/common.js?v=20261042"></script>
 
 <script>
 /* ============================================================
@@ -471,7 +473,7 @@ function escapeHtml(str) {
 }
 /* Diyagram: geom.polys[i] çokgenine c[i] rengini ver */
 function caseSvg(c, size, g) {
-    g = g || DATA.geom; var v = g.view, out = '<svg viewBox="' + v.join(" ") + '" width="' + size + '" height="' + size + '"' + (v[2] / v[3] < 0.7 ? ' class="tall"' : '') + ' xmlns="http://www.w3.org/2000/svg">';
+    g = g || DATA.geom; var v = g.view, out = '<svg viewBox="' + v.join(" ") + '" width="' + size + '" height="' + size + '"' + (v[2] / v[3] < 0.7 ? ' class="tall"' : (v[2] / v[3] < 0.95 ? ' class="iso"' : '')) + ' xmlns="http://www.w3.org/2000/svg">';
     var sw = (v[2] / 160).toFixed(3);
     for (var i = 0; i < g.polys.length; i++) {
         var pts = g.polys[i].map(function (p) { return p[0] + "," + p[1]; }).join(" ");
@@ -515,7 +517,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/roux.json?v=20261041")
+fetch("/icerikler/algoritmalar/roux.json?v=20261042")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
