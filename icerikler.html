@@ -32,7 +32,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <!-- ORTAK STİLLER (tüm sitede aynı) -->
-<link rel="stylesheet" href="/styles/common.css?v=20261017">
+<link rel="stylesheet" href="/styles/common.css?v=20261019">
 
 <!-- BU SAYFAYA ÖZEL STİLLER -->
 <style>
@@ -178,6 +178,7 @@ html {
 .item-visual.orange { background: var(--tint-orange); }
 .item-visual.green  { background: var(--tint-green); }
 .item-visual.red    { background: var(--tint-red); }
+.item-visual.yellow { background: var(--tint-yellow); }
 
 .item-logo {
     width: 84px;
@@ -362,6 +363,25 @@ html {
     ====================================================== -->
     <section class="items">
 
+        <!-- BAŞLANGIÇ REHBERİ -->
+        <a href="/icerikler/baslangic" class="item" aria-label="Başlangıç Rehberi">
+            <div class="item-visual yellow">
+                <div class="item-logo">
+                    <svg viewBox="0 0 100 100">
+                        <rect x="16" y="16" width="20" height="20" rx="4" fill="#ffd21f"/><rect x="40" y="16" width="20" height="20" rx="4" fill="#f8fafc"/><rect x="64" y="16" width="20" height="20" rx="4" fill="#f0383a"/>
+                        <rect x="16" y="40" width="20" height="20" rx="4" fill="#16b364"/><rect x="40" y="40" width="20" height="20" rx="4" fill="#ffd21f"/><rect x="64" y="40" width="20" height="20" rx="4" fill="#1d5bff"/>
+                        <rect x="16" y="64" width="20" height="20" rx="4" fill="#ff8a1f"/><rect x="40" y="64" width="20" height="20" rx="4" fill="#f8fafc"/><rect x="64" y="64" width="20" height="20" rx="4" fill="#ffd21f"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="item-info">
+                <span class="item-tag" data-i18n="tag_beginner">YENİ BAŞLAYANLAR</span>
+                <h2 data-i18n="item_beginner">3x3 Nasıl Çözülür?</h2>
+                <p data-i18n="item_beginner_p">Hiç bilmiyorsan buradan başla: notasyon, 7 adım ve sadece 6 algoritmayla küpü çöz.</p>
+                <span class="item-start" data-i18n="cta_go">İncele →</span>
+            </div>
+        </a>
+
         <!-- VİDEOLAR -->
         <a href="/icerikler/videolar" class="item" aria-label="Videolar">
             <div class="item-visual blue">
@@ -458,7 +478,7 @@ html {
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "icerikler";</script>
-<script src="/js/i18n.js?v=20261017"></script>
+<script src="/js/i18n.js?v=20261019"></script>
 
 <!-- KART HAREKETİ (3D Efekt) — sayfaya özel -->
 <script>
@@ -491,7 +511,7 @@ window.addEventListener("resize", function() {
 });
 </script>
 
-<script src="/js/common.js?v=20261017"></script>
+<script src="/js/common.js?v=20261019"></script>
 
 </body>
 </html>
