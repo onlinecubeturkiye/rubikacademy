@@ -37,7 +37,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261037">
+<link rel="stylesheet" href="/styles/common.css?v=20261038">
 
 <style>
 .print-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin: 6px 0 14px; }
@@ -167,8 +167,8 @@
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "yazdir";</script>
-<script src="/js/i18n.js?v=20261037"></script>
-<script src="/js/common.js?v=20261037"></script>
+<script src="/js/i18n.js?v=20261038"></script>
+<script src="/js/common.js?v=20261038"></script>
 
 <script>
 /* A4 algoritma kağıtları. Veriler algoritma sayfalarıyla aynı JSON'lardan gelir.
@@ -181,8 +181,8 @@ function flat(list) {
 function multiSet(id) {
     return function (data) { return flat(data.sets.filter(function (s) { return s.id === id; })[0].groups); };
 }
-function polySvg(data, c) {
-    var g = data.geom, v = g.view, sw = (v[2] / 160).toFixed(3);
+function polySvg(data, c, geom) {
+    var g = geom ? data.geoms[geom] : data.geom, v = g.view, sw = (v[2] / 160).toFixed(3);
     return '<svg viewBox="' + v.join(" ") + '" xmlns="http://www.w3.org/2000/svg">' + g.polys.map(function (p, i) {
         return '<polygon points="' + p.map(function (q) { return q[0] + "," + q[1]; }).join(" ") + '" fill="' + (data.colors[c.c.charAt(i)] || "#5a5d66") +
             '" stroke="#17171f" stroke-width="' + sw + '" stroke-linejoin="round"/>';
@@ -195,7 +195,8 @@ var GROUPS = [
     { label: "3x3", ids: ["oll", "pll", "coll", "wv"] },
     { label: "2x2", ids: ["ortega-oll", "ortega-pbl", "cll", "eg1", "eg2"] },
     { label: "Pyraminx", ids: ["l3e", "l4e"] },
-    { label: "Skewb", ids: ["sk-beginner", "sk-intermediate", "sk-advanced"] }
+    { label: "Skewb", ids: ["sk-beginner", "sk-intermediate", "sk-advanced"] },
+    { label: "3x3 Roux", ids: ["roux-cmll", "roux-eo", "roux-l4c"] }
 ];
 var SHEETS = {
     "oll": { file: "oll-pll.json", page: "oll", title: "OLL", tab: "OLL", cases: key("oll"), cols: 5, rows: 12, diag: 15, name: 7, alg: 6.3, sub: true,
@@ -220,6 +221,9 @@ var SHEETS = {
     "l4e": { file: "pyraminx.json", page: "pyra_algos", title: "Pyraminx L4E", tab: "L4E", cases: multiSet("l4e"), cols: 6, rows: 14, diag: 15, name: 7.4, alg: 6.8, poly: true },
     "sk-beginner": { file: "skewb.json", page: "skewb_algos", title: "Skewb Sarah Beginner", tab: "Beginner", cases: multiSet("beginner"), cols: 3, rows: 5, diag: 30, name: 10, alg: 9.5, sub: true, poly: true },
     "sk-intermediate": { file: "skewb.json", page: "skewb_algos", title: "Skewb Sarah Intermediate", tab: "Intermediate", cases: multiSet("intermediate"), cols: 3, rows: 5, diag: 30, name: 10, alg: 9.5, sub: true, poly: true },
+    "roux-cmll": { file: "roux.json", page: "roux_algos", title: "Roux CMLL", tab: "CMLL", cases: multiSet("cmll"), cols: 4, rows: 11, diag: 17, name: 8, alg: 6.8, poly: true, geom: "ll" },
+    "roux-eo": { file: "roux.json", page: "roux_algos", title: "Roux EO (4a)", tab: "EO", cases: multiSet("eo"), cols: 4, rows: 6, diag: 38, name: 9, alg: 8, sub: true, poly: true, geom: "lse" },
+    "roux-l4c": { file: "roux.json", page: "roux_algos", title: "Roux 4c", tab: "4c", cases: multiSet("l4c"), cols: 3, rows: 4, diag: 52, name: 11, alg: 10, poly: true, geom: "lse" },
     "sk-advanced": { file: "skewb.json", page: "skewb_algos", title: "Skewb Sarah Advanced", tab: "Advanced", cases: multiSet("advanced"), cols: 5, rows: 14, diag: 15, name: 7.4, alg: 6.8, poly: true }
 };
 var cache = {}, curSet = null;
@@ -256,6 +260,7 @@ function render() {
         var head = cfg.title + " · " + (pageText("yazdir", "cases") || "{n} case").replace("{n}", cases.length);
         var sub = cfg.poly ? "" : (pageText("yazdir", "sheet_sub") || "");
         var dw = cfg.pair ? cfg.diag * 2 + 1 : cfg.diag;
+        if (cfg.geom && data.geoms) { var gv = data.geoms[cfg.geom].view; if (gv[2] < gv[3]) dw = cfg.diag * gv[2] / gv[3]; }
         var html = "";
         for (var p = 0; p < pages; p++) {
             var chunk = cases.slice(p * per, (p + 1) * per);
@@ -265,7 +270,7 @@ function render() {
                 '<div class="sheet-grid" style="grid-template-columns:repeat(' + cfg.cols + ',minmax(0,1fr));grid-template-rows:repeat(' + cfg.rows + ',minmax(0,1fr))">' +
                 chunk.map(function (x) {
                     var s = cfg.sub ? '<div class="g" style="font-size:' + Math.max(5, cfg.name - 1.6) + 'pt">' + esc(pageText(cfg.page, "subset_" + x.subset) || x.subset) + '</div>' : "";
-                    return '<div class="cell"><div class="d" style="width:' + dw + 'mm;height:' + cfg.diag + 'mm">' + (cfg.poly ? polySvg(data, x.c) : cfg.draw(x)) + '</div>' +
+                    return '<div class="cell"><div class="d" style="width:' + dw + 'mm;height:' + cfg.diag + 'mm">' + (cfg.poly ? polySvg(data, x.c, cfg.geom) : cfg.draw(x)) + '</div>' +
                         '<div class="tx"><div class="n" style="font-size:' + cfg.name + 'pt">' + esc(x.c.name) + '</div>' + s +
                         '<div class="a" style="font-size:' + cfg.alg + 'pt">' + esc(x.c.alg) + '</div></div></div>';
                 }).join("") + '</div></div>';
