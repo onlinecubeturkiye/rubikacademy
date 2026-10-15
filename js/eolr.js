@@ -8,7 +8,7 @@
    Varsayım: köşeler yerinde (AUF yapılmış), sarı ya da beyaz merkez üstte.
 ========================================================= */
 (function () {
-    var V = "20261086";
+    var V = "20261087";
     var SLOTS = ["UF", "UB", "UL", "UR", "DF", "DB"];
     var CYCLE = ["o", "x", "L", "l", "R", "r"];
     var COL = { Y: "#f6c719", L: "#d12d28", R: "#ff7a1a", M: "#9aa1ad", X: "#4b515c" };
