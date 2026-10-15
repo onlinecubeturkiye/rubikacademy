@@ -22,7 +22,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#ffd21f">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261055">
+<link rel="stylesheet" href="/styles/common.css?v=20261056">
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar">
 <meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, WV, Ortega, CLL ve EG algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
 <meta property="og:title" content="Rubik Academy - Algoritmalar">
@@ -300,54 +300,27 @@ html {
     .soon-grid { grid-template-columns: 1fr; }
 }
 
-/* ANTRENÖR ŞERİDİ */
-.trainer-banner {
-    max-width: 1250px;
-    margin: 0 auto 40px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 18px 20px;
-    border-radius: 20px;
-    background: var(--tint-red);
-    border: var(--card-bw) solid var(--card-border);
-    box-shadow: var(--shadow);
-    color: var(--text);
+/* ANTRENÖRLER: üç eşit kart */
+.trainers { max-width: 1250px; margin: 0 auto 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tr-card {
+    display: flex; align-items: center; gap: 14px; padding: 16px 16px 16px 14px; border-radius: 20px;
+    border: var(--card-bw) solid var(--card-border); box-shadow: var(--shadow); color: var(--text); text-decoration: none;
     transition: transform .2s ease, box-shadow .2s ease;
 }
-.trainer-banner:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-hover); }
-.trainer-banner-icon {
-    font-size: 30px;
-    width: 54px;
-    height: 54px;
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    border-radius: 14px;
-    background: var(--surface);
-    border: var(--card-bw) solid var(--card-border);
-}
-.trainer-banner-text { flex: 1; display: flex; flex-direction: column; gap: 3px; }
-.trainer-banner-text strong { font-family: var(--font-display); font-size: 19px; font-weight: 800; }
-.trainer-banner-text span { font-size: 13.5px; color: var(--text-soft); line-height: 1.5; }
-.trainer-banner-btn {
-    flex-shrink: 0;
-    padding: 11px 16px;
-    border-radius: 12px;
-    background: var(--cube-yellow);
-    border: var(--card-bw) solid var(--ink);
-    color: #17171f;
-    font-size: 13px;
-    font-weight: 900;
-    white-space: nowrap;
-}
-@media(max-width: 700px) {
-    .trainer-banner { flex-wrap: wrap; }
-    .trainer-banner-btn { width: 100%; text-align: center; }
-}
+.tr-card:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-hover); }
+.tr-red { background: var(--tint-red); } .tr-blue { background: var(--tint-blue); } .tr-green { background: var(--tint-green); }
+.tr-icon { flex-shrink: 0; width: 58px; height: 58px; display: grid; place-items: center; border-radius: 16px; background: var(--surface); border: var(--card-bw) solid var(--card-border); }
+.tr-icon svg { width: 40px; height: 40px; }
+.tr-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.tr-text strong { font-family: var(--font-display); font-size: 17px; font-weight: 800; line-height: 1.2; }
+.tr-text span { font-size: 13px; color: var(--text-soft); line-height: 1.45; }
+.tr-go { flex-shrink: 0; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: var(--cube-yellow); border: var(--card-bw) solid var(--ink); color: #17171f; font-weight: 900; font-size: 16px; }
+html[dir="rtl"] .tr-go { transform: scaleX(-1); }
+@media (max-width: 1000px) { .trainers { grid-template-columns: 1fr; gap: 12px; } }
+@media (max-width: 520px) { .tr-card { padding: 12px; gap: 12px; } .tr-icon { width: 50px; height: 50px; } .tr-icon svg { width: 34px; height: 34px; } .tr-text strong { font-size: 16px; } .tr-text span { font-size: 12.5px; } }
 
 /* ===== Algoritma kütüphanesi: küp bölümleri + doğrudan set kartları ===== */
-.tool-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: -6px 0 22px; }
+.tool-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0 0 26px; }
 .tool-link { padding: 9px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 800; font-size: 14px; text-decoration: none; box-shadow: var(--shadow-sm); }
 .tool-link:hover { background: var(--cube-yellow); color: #17171f; }
 .jump { position: sticky; top: 8px; z-index: 20; display: flex; gap: 8px; overflow-x: auto; padding: 8px; margin: 0 auto 26px; max-width: max-content;
@@ -499,22 +472,29 @@ html {
 <p data-i18n="section_p">Küpünü ve yöntemini seç, tüm case'lere diyagramlarıyla göz at.</p>
 </section>
 
-<!-- ANTRENÖR ŞERİDİ -->
-<a href="/icerikler/algoritmalar/antrenor" class="trainer-banner">
-    <span class="trainer-banner-icon" aria-hidden="true">🎯</span>
-    <span class="trainer-banner-text">
-        <strong data-i18n="trainer_title">Algoritma Antrenörü</strong>
-        <span data-i18n="trainer_p">Öğrendiğin case'leri karıştırma ve süreyle çalış; zorlandıkların daha sık gelsin.</span>
-    </span>
-    <span class="trainer-banner-btn" data-i18n="trainer_btn">Antrenörü Aç →</span>
-</a>
+<!-- ANTRENÖRLER -->
+<section class="trainers" aria-label="Antrenörler">
+    <a href="/icerikler/algoritmalar/antrenor?tool=alg" class="tr-card tr-red">
+        <span class="tr-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#fff" stroke="#17171f" stroke-width="3"/><circle cx="24" cy="24" r="12" fill="#f0383a" stroke="#17171f" stroke-width="3"/><circle cx="24" cy="24" r="5" fill="#fff" stroke="#17171f" stroke-width="2.5"/><path d="M24 24 L40 8" stroke="#17171f" stroke-width="3.5" stroke-linecap="round"/><path d="M36 6 L42 6 L42 12" fill="none" stroke="#17171f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="tr-text"><strong data-i18n="trainer_title">Algoritma Antrenörü</strong><span data-i18n="trainer_p">Öğrendiğin case'leri karıştırma ve süreyle çalış; zorlandıkların daha sık gelsin.</span></span>
+        <span class="tr-go" aria-hidden="true">→</span>
+    </a>
+    <a href="/icerikler/algoritmalar/antrenor?tool=recog" class="tr-card tr-blue">
+        <span class="tr-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5 L42 14 L24 23 L6 14 Z" fill="#ffd21f" stroke="#17171f" stroke-width="2.5" stroke-linejoin="round"/><path d="M6 14 L24 23 L24 44 L6 35 Z" fill="#2ecc71" stroke="#17171f" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 23 L42 14 L42 35 L24 44 Z" fill="#ff7a1a" stroke="#17171f" stroke-width="2.5" stroke-linejoin="round"/><path d="M12 17 L12 38 M18 20 L18 41 M30 20 L30 41 M36 17 L36 38" stroke="#17171f" stroke-width="1.6"/><path d="M6 21 L24 30 L42 21 M6 28 L24 37 L42 28" fill="none" stroke="#17171f" stroke-width="1.6"/></svg></span>
+        <span class="tr-text"><strong data-i18n="recog_title">PLL Tanıma</strong><span data-i18n="recog_p">Küpün iki yüzüne bakıp hangi PLL olduğunu bul; hızın ve doğruluğun ölçülsün.</span></span>
+        <span class="tr-go" aria-hidden="true">→</span>
+    </a>
+    <a href="/icerikler/algoritmalar/antrenor?set=cross" class="tr-card tr-green">
+        <span class="tr-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="4" width="13" height="13" rx="2.5" fill="#4b515c" stroke="#17171f" stroke-width="2.2"/><rect x="18" y="4" width="13" height="13" rx="2.5" fill="#ffffff" stroke="#17171f" stroke-width="2.2"/><rect x="32" y="4" width="13" height="13" rx="2.5" fill="#4b515c" stroke="#17171f" stroke-width="2.2"/><rect x="4" y="18" width="13" height="13" rx="2.5" fill="#ffffff" stroke="#17171f" stroke-width="2.2"/><rect x="18" y="18" width="13" height="13" rx="2.5" fill="#ffffff" stroke="#17171f" stroke-width="2.2"/><rect x="32" y="18" width="13" height="13" rx="2.5" fill="#ffffff" stroke="#17171f" stroke-width="2.2"/><rect x="4" y="32" width="13" height="13" rx="2.5" fill="#4b515c" stroke="#17171f" stroke-width="2.2"/><rect x="18" y="32" width="13" height="13" rx="2.5" fill="#ffffff" stroke="#17171f" stroke-width="2.2"/><rect x="32" y="32" width="13" height="13" rx="2.5" fill="#4b515c" stroke="#17171f" stroke-width="2.2"/></svg></span>
+        <span class="tr-text"><strong data-i18n="cross_title">Cross Antrenörü</strong><span data-i18n="cross_p">15 saniyede beyaz artıyı planla, en kısa çözümle karşılaştır. Bluetooth küp destekli.</span></span>
+        <span class="tr-go" aria-hidden="true">→</span>
+    </a>
+</section>
 
 <div class="tool-links">
     <a href="/icerikler/algoritmalar/yazdir" class="tool-link" data-i18n="link_print">🖨️ Yazdırılabilir kağıtlar (PDF)</a>
-    <a href="/icerikler/algoritmalar/antrenor?tool=recog" class="tool-link" data-i18n="link_recog">🧠 PLL tanıma antrenörü</a>
-    <a href="/icerikler/algoritmalar/antrenor?set=cross" class="tool-link" data-i18n="link_cross">✚ Cross antrenörü</a>
     <a href="#istek" class="tool-link" data-i18n="link_req">💡 Algoritma seti iste</a>
-    </div>
+</div>
 
 <nav class="jump" aria-label="Küpler"><a href="#p3">3x3 · CFOP</a><a href="#proux">3x3 · Roux</a><a href="#p2">2x2</a><a href="#ppyra">Pyraminx</a><a href="#pskewb">Skewb</a><a href="#p4">4x4</a><a href="#p5">5x5</a></nav>
 
@@ -811,8 +791,8 @@ html {
 })();
 </script>
 <script>var PAGE_ID = "algoritmalar";</script>
-<script src="/js/i18n.js?v=20261055"></script>
-<script src="/js/common.js?v=20261055"></script>
+<script src="/js/i18n.js?v=20261056"></script>
+<script src="/js/common.js?v=20261056"></script>
 
 <!-- BU SAYFAYA ÖZEL: OLL / PLL VERİSİNİ YÜKLE VE KARTLARI OLUŞTUR -->
 
