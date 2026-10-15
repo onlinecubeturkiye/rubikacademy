@@ -7,7 +7,7 @@
    - Son süreler: localStorage "vcube-times-v1"
 ========================================================= */
 (function () {
-    var V = "20261088";
+    var V = "20261089";
     var TIMES_KEY = "vcube-times-v1";
     function $(id) { return document.getElementById(id); }
     function lang() { try { return localStorage.getItem("site-lang") || "tr"; } catch (e) { return "tr"; } }

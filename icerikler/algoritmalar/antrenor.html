@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261088">
+<link rel="stylesheet" href="/styles/common.css?v=20261089">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -114,6 +114,10 @@
     transition: transform .12s, box-shadow .12s, background .12s;
 }
 .set-tab small { font-weight: 700; color: var(--text-soft); margin-left: 4px; }
+.set-tabs.grouped { flex-direction: column; gap: 8px; }
+.tab-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.tab-row-l { min-width: 84px; font-size: 11.5px; font-weight: 900; letter-spacing: .4px; text-transform: uppercase; color: var(--text-soft); }
+@media (max-width: 600px) { .tab-row-l { min-width: 100%; } }
 .set-tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
 .set-tab.active { background: var(--cube-yellow); color: #17171f; }
 .set-tab.active small { color: #17171f; opacity: .7; }
@@ -810,14 +814,14 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261088"></script>
-<script src="/js/common.js?v=20261088"></script>
+<script src="/js/i18n.js?v=20261089"></script>
+<script src="/js/common.js?v=20261089"></script>
 
 
-<script src="/js/custom-algs.js?v=20261088"></script>
-<script src="/js/cross-solver.js?v=20261088"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261088"></script>
-<script src="/js/recog-trainer.js?v=20261088"></script>
+<script src="/js/custom-algs.js?v=20261089"></script>
+<script src="/js/cross-solver.js?v=20261089"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261089"></script>
+<script src="/js/recog-trainer.js?v=20261089"></script>
 
 <script>
 /* ============================================================
@@ -832,16 +836,16 @@ var BASE = "/icerikler/algoritmalar/";
 /* keyFmt: algoritma sayfasının "Öğreniyorum" kaydında kullandığı anahtar biçimi
    ("name" = sadece case adı, "subset" = "altgrup::ad") */
 var SETS = [
-    { id: "cross",      label: "Cross",      gen: "cross", progress: "algo-progress-cross", keyFmt: "name", page: "", puzzle: "cfop", cube: "3x3", draw: crossDraw },
-    { id: "f2l",        label: "F2L", file: "f2l.json", multi: "f2l", progress: "algo-progress-f2l", keyFmt: "name", page: "f2l", puzzle: "cfop", cube: "3x3", draw: polyDraw },
-    { id: "2look-2lo",  label: "2-Look OLL", file: "2look.json", multi: "2lo", progress: "algo-progress-2look-2lo", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
-    { id: "2look-2lp",  label: "2-Look PLL", file: "2look.json", multi: "2lp", progress: "algo-progress-2look-2lp", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
-    { id: "oll",        label: "OLL",        file: "oll-pll.json",    dataKey: "oll",  progress: "algo-progress-oll",        keyFmt: "name",   page: "oll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
-    { id: "pll",        label: "PLL",        file: "oll-pll.json",    dataKey: "pll",  progress: "algo-progress-pll",        keyFmt: "subset", page: "pll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
-    { id: "oh-oll",     label: "OH OLL", file: "oh.json", multi: "oll", scrFrom: "oll", progress: "algo-progress-oh-oll", keyFmt: "name", page: "oh_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
-    { id: "oh-pll",     label: "OH PLL", file: "oh.json", multi: "pll", scrFrom: "pll", progress: "algo-progress-oh-pll", keyFmt: "name", page: "oh_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
-    { id: "coll",       label: "COLL",       file: "coll.json",       dataKey: "coll", progress: "algo-progress-coll",       keyFmt: "subset", page: "coll",       puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
-    { id: "wv",         label: "WV",         file: "wv.json",         dataKey: "wv",   progress: "algo-progress-wv",         keyFmt: "subset", page: "wv",         puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
+    { id: "cross", grp: "a",      label: "Cross",      gen: "cross", progress: "algo-progress-cross", keyFmt: "name", page: "", puzzle: "cfop", cube: "3x3", draw: crossDraw },
+    { id: "f2l", grp: "a",        label: "F2L", file: "f2l.json", multi: "f2l", progress: "algo-progress-f2l", keyFmt: "name", page: "f2l", puzzle: "cfop", cube: "3x3", draw: polyDraw },
+    { id: "2look-2lo", grp: "a",  label: "2-Look OLL", file: "2look.json", multi: "2lo", progress: "algo-progress-2look-2lo", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
+    { id: "2look-2lp", grp: "a",  label: "2-Look PLL", file: "2look.json", multi: "2lp", progress: "algo-progress-2look-2lp", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
+    { id: "oll", grp: "b",        label: "OLL",        file: "oll-pll.json",    dataKey: "oll",  progress: "algo-progress-oll",        keyFmt: "name",   page: "oll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
+    { id: "pll", grp: "b",        label: "PLL",        file: "oll-pll.json",    dataKey: "pll",  progress: "algo-progress-pll",        keyFmt: "subset", page: "pll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
+    { id: "oh-oll",     label: "OLL", file: "oh.json", multi: "oll", scrFrom: "oll", progress: "algo-progress-oh-oll", keyFmt: "name", page: "oh_algos", puzzle: "oh", cube: "3x3", draw: polyDraw },
+    { id: "oh-pll",     label: "PLL", file: "oh.json", multi: "pll", scrFrom: "pll", progress: "algo-progress-oh-pll", keyFmt: "name", page: "oh_algos", puzzle: "oh", cube: "3x3", draw: polyDraw },
+    { id: "coll", grp: "b",       label: "COLL",       file: "coll.json",       dataKey: "coll", progress: "algo-progress-coll",       keyFmt: "subset", page: "coll",       puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
+    { id: "wv", grp: "b",         label: "WV",         file: "wv.json",         dataKey: "wv",   progress: "algo-progress-wv",         keyFmt: "subset", page: "wv",         puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
     { id: "cll",        label: "CLL",        file: "cll.json",        dataKey: "cll",  progress: "algo-progress-cll",        keyFmt: "name",   page: "cll",        puzzle: "2x2", cube: "2x2", draw: function (c, s) { return cllSvg(c.pattern, "full", s); } },
     { id: "ortega-oll", label: "Ortega OLL", file: "ortega-oll.json", dataKey: "oll",  progress: "algo-progress-ortega-oll", keyFmt: "subset", page: "ortega-oll", puzzle: "2x2", cube: "2x2", draw: function (c, s) { return ortegaOllSvg(c.pattern, s); } },
     { id: "ortega-pbl", label: "Ortega PBL", file: "ortega-pbl.json", dataKey: "pbl",  progress: "algo-progress-ortega-pbl", keyFmt: "subset", page: "ortega-pbl", puzzle: "2x2", cube: "2x2", draw: function (c, s) { return ortegaSvg(c.pattern_u, "full", s); } },
@@ -849,7 +853,7 @@ var SETS = [
     { id: "eg2",        label: "EG-2",       file: "eg.json",         dataKey: "eg2",  progress: "algo-progress-eg2",        keyFmt: "subset", page: "eg2",        puzzle: "2x2", cube: "2x2", draw: drawPair },
     { id: "roux-cmll",  label: "CMLL", file: "roux.json", multi: "cmll", progress: "algo-progress-roux-cmll", keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", draw: polyDraw },
     { id: "roux-eo",    label: "EO",   file: "roux.json", multi: "eo",   progress: "algo-progress-roux-eo",   keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", draw: polyDraw },
-    { id: "oh-cmll",    label: "OH CMLL", file: "oh.json", multi: "cmll", scrFrom: "roux-cmll", progress: "algo-progress-oh-cmll", keyFmt: "name", page: "oh_algos", puzzle: "roux", cube: "3x3", draw: polyDraw },
+    { id: "oh-cmll",    label: "CMLL", file: "oh.json", multi: "cmll", scrFrom: "roux-cmll", progress: "algo-progress-oh-cmll", keyFmt: "name", page: "oh_algos", puzzle: "oh", cube: "3x3", draw: polyDraw },
     { id: "pyra-l3e",   label: "L3E",  file: "pyraminx.json", multi: "l3e", progress: "algo-progress-pyraminx-l3e", keyFmt: "name", page: "pyra_algos", puzzle: "pyra", cube: "pyra", draw: polyDraw },
     { id: "pyra-l4e",   label: "L4E",  file: "pyraminx.json", multi: "l4e", progress: "algo-progress-pyraminx-l4e", keyFmt: "name", page: "pyra_algos", puzzle: "pyra", cube: "pyra", draw: polyDraw },
     { id: "sk-beginner",     label: "Sarah Beginner",     file: "skewb.json", multi: "beginner",     progress: "algo-progress-skewb-beginner",     keyFmt: "name", page: "skewb_algos", puzzle: "skewb", cube: "skewb", draw: polyDraw },
@@ -861,6 +865,7 @@ var SETS = [
 var PUZZLES = [
     { id: "cfop",  label: "3x3 · CFOP" },
     { id: "roux",  label: "3x3 · Roux" },
+    { id: "oh",    label: "3x3 · OH" },
     { id: "2x2",   label: "2x2" },
     { id: "pyra",  label: "Pyraminx" },
     { id: "skewb", label: "Skewb" },
@@ -994,6 +999,7 @@ function statId() { return mode === "card" ? current.id + ":card" : current.id; 
 // Küple modda süre işlerken set/case değiştirilmez; kart modunda her an değiştirilebilir
 function holdTipKey() {
     if (current.gen === "cross") return "hold_tip_cross";
+    if (current.id === "oh-cmll") return "hold_tip_roux";
     return { "2x2": "hold_tip_2x2", roux: "hold_tip_roux", pyra: "hold_tip_pyra", skewb: "hold_tip_skewb", "4x4": "hold_tip_big", "5x5": "hold_tip_big" }[current.puzzle] || "hold_tip_3x3";
 }
 function busy() { return state === "running" && mode === "cube"; }
@@ -1009,7 +1015,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261088").then(function (r) {
+        return fetch(BASE + f + "?v=20261089").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -1045,13 +1051,20 @@ function setLabel(s) { return s.label; }
 
 /* ---------------- SET SEKMELERİ ---------------- */
 function renderTabs() {
-    var html = "", pz = current ? current.puzzle : "cfop";
+    var pz = current ? current.puzzle : "cfop", groups = [], byGrp = {};
     SETS.forEach(function (s) {
         if (s.puzzle !== pz || !(DATA[s.id] || []).length) return;
-        html += '<button class="set-tab' + (current && current.id === s.id ? " active" : "") + '" data-set="' + s.id + '" role="tab">' +
-            esc(setLabel(s)) + '<small>' + DATA[s.id].length + '</small></button>';
+        var g = s.grp || "";
+        if (!byGrp[g]) { byGrp[g] = []; groups.push(g); }
+        byGrp[g].push('<button class="set-tab' + (current && current.id === s.id ? " active" : "") + '" data-set="' + s.id + '" role="tab">' +
+            esc(setLabel(s)) + '<small>' + DATA[s.id].length + '</small></button>');
     });
-    document.getElementById("setTabs").innerHTML = html;
+    var el = document.getElementById("setTabs");
+    // Birden çok grup varsa (CFOP: temel adımlar / son katman) her grup kendi satırında, kısa etiketiyle
+    el.classList.toggle("grouped", groups.length > 1);
+    el.innerHTML = groups.length > 1 ? groups.map(function (g) {
+        return '<div class="tab-row"><span class="tab-row-l">' + esc(T("grp_" + g)) + '</span>' + byGrp[g].join("") + '</div>';
+    }).join("") : (byGrp[groups[0]] || []).join("");
     renderPuzzleMenu();
 }
 function puzzleSets(pz) { return SETS.filter(function (s) { return s.puzzle === pz && (DATA[s.id] || []).length; }); }
