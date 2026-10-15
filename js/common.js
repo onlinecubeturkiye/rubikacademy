@@ -7,8 +7,8 @@
    <script src="/js/common.js"></script>
 
    Bu dosya şunları yönetir:
-   - Ayarlar menüsü: karanlık mod (localStorage: "theme") ve
-     renk körlüğü temaları (localStorage: "cvd-theme")
+   - Karanlık mod (localStorage: "theme")
+   - Renk körlüğü temaları (localStorage: "cvd-theme", antrenörde sorulur)
    - Dil seçici motoru (localStorage: "site-lang")
    - Dil menüsünün otomatik oluşturulması (SITE_I18N.languages)
    - Scroll reveal (IntersectionObserver)
@@ -27,22 +27,24 @@
 })();
 
 /* =========================================
-   AYARLAR: KARANLIK MOD + RENK KÖRLÜĞÜ TEMASI
-   - Tema: localStorage "theme" (light | dark)
-   - Renk körlüğü: localStorage "cvd-theme" ("" | rg | tri)
-     Küp renkleri (CSS değişkenleri ve tüm SVG diyagramları) seçilen
-     palete çevrilir. Paletler Machado (2009) renk körlüğü benzetimiyle
-     seçildi: en zor ayrılan iki renk arasındaki OKLab farkı
-     kırmızı-yeşil temada 4 → 14,6, mavi-sarı temada 6 → 19.
+   KARANLIK MOD (sağ üstteki 🌙/☀️ düğmesi, localStorage "theme")
 ========================================= */
-function setDarkMode(isDark) {
-    document.documentElement.classList.toggle("dark-mode", isDark);
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.toggle("dark-mode");
     document.body.classList.toggle("dark-mode", isDark);
     try { localStorage.setItem("theme", isDark ? "dark" : "light"); } catch (e) {}
-    renderSettings();
+    var btn = document.getElementById("darkModeBtn");
+    if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
 }
-function toggleDarkMode() { setDarkMode(!document.documentElement.classList.contains("dark-mode")); }
 
+/* =========================================
+   RENK KÖRLÜĞÜ TEMASI (localStorage "cvd-theme": "" | rg | tri)
+   Antrenöre ilk girişte sorulur; seçim tüm sitede geçerlidir.
+   Küp renkleri (CSS değişkenleri ve tüm SVG diyagramları) seçilen
+   palete çevrilir. Paletler Machado (2009) renk körlüğü benzetimiyle
+   seçildi: en zor ayrılan iki renk arasındaki OKLab farkı
+   kırmızı-yeşil temada 4 → 14,6, mavi-sarı temada 6 → 19.
+========================================= */
 /* Sitede küp renkleri için kullanılan tonlar → renk ailesi */
 var CVD_FAMILY = {
     "#e6252f": "R", "#e53935": "R", "#d12d28": "R", "#f0383a": "R", "#ef4444": "R",
@@ -89,76 +91,24 @@ function applyCvd(theme) {
         });
         cvdObserver.observe(document.body, { childList: true, subtree: true });
     }
-    renderSettings();
 }
-
-function settingsText(k) {
-    var lang = "tr";
-    try { lang = localStorage.getItem("site-lang") || "tr"; } catch (e) {}
-    var c = (typeof SITE_I18N !== "undefined" && SITE_I18N.common) || {};
-    return (c[lang] && c[lang][k]) || (c.tr && c.tr[k]) || k;
-}
-function swatches(pal) {
+/* Renk önizlemesi (6 küçük kare) */
+function cvdSwatches(theme) {
+    var pal = CVD_PALETTES[theme];
     var p = pal ? Object.assign({ W: NORMAL_SWATCH.W }, pal) : NORMAL_SWATCH;
-    return '<span class="sm-sw" aria-hidden="true">' + ["W", "Y", "R", "O", "G", "B"].map(function (k) {
+    return '<span class="cvd-sw" aria-hidden="true">' + ["W", "Y", "R", "O", "G", "B"].map(function (k) {
         return '<i style="background:' + p[k] + '"></i>';
     }).join("") + "</span>";
 }
-function renderSettings() {
-    var menu = document.getElementById("settingsMenu");
-    if (!menu) return;
-    var dark = document.documentElement.classList.contains("dark-mode"), cvd = cvdTheme();
-    var btn = document.getElementById("settingsBtn");
-    if (btn) { btn.setAttribute("aria-label", settingsText("settings")); btn.title = settingsText("settings"); }
-    menu.innerHTML =
-        '<div class="sm-title">' + settingsText("settings") + '</div>' +
-        '<div class="sm-label">' + settingsText("set_theme") + '</div>' +
-        '<div class="sm-seg" role="group">' +
-            '<button type="button" data-dark="0" class="' + (dark ? "" : "active") + '">' + settingsText("theme_light") + '</button>' +
-            '<button type="button" data-dark="1" class="' + (dark ? "active" : "") + '">' + settingsText("theme_dark") + '</button>' +
-        '</div>' +
-        '<div class="sm-label">' + settingsText("set_cvd") + '</div>' +
-        [["", "cvd_none", null], ["rg", "cvd_rg", CVD_PALETTES.rg], ["tri", "cvd_tri", CVD_PALETTES.tri]].map(function (o) {
-            return '<button type="button" class="sm-opt' + (cvd === o[0] ? " active" : "") + '" data-cvd="' + o[0] + '" role="radio" aria-checked="' + (cvd === o[0]) + '">' +
-                '<span class="sm-opt-text">' + settingsText(o[1]) + '</span>' + swatches(o[2]) + '</button>';
-        }).join("") +
-        '<p class="sm-note">' + settingsText("cvd_note") + '</p>';
-}
-function toggleSettings(e) {
-    if (e) e.stopPropagation();
-    var menu = document.getElementById("settingsMenu"), btn = document.getElementById("settingsBtn");
-    if (!menu) return;
-    if (typeof closeLangMenu === "function") closeLangMenu();
-    renderSettings();
-    var open = !menu.classList.contains("open");
-    menu.classList.toggle("open", open);
-    if (btn) btn.setAttribute("aria-expanded", open ? "true" : "false");
-}
-function closeSettings() {
-    var menu = document.getElementById("settingsMenu"), btn = document.getElementById("settingsBtn");
-    if (menu) menu.classList.remove("open");
-    if (btn) btn.setAttribute("aria-expanded", "false");
-}
-document.addEventListener("click", function (e) {
-    var sw = document.getElementById("settingsSwitcher");
-    if (!sw) return;
-    var b = e.target.closest && e.target.closest("#settingsMenu button");
-    if (b) {
-        e.stopPropagation();
-        if (b.hasAttribute("data-dark")) setDarkMode(b.getAttribute("data-dark") === "1");
-        else if (b.hasAttribute("data-cvd")) applyCvd(b.getAttribute("data-cvd"));
-        return;
-    }
-    if (!sw.contains(e.target)) closeSettings();
-});
-document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeSettings(); });
 
 document.addEventListener("DOMContentLoaded", function () {
+    var btn = document.getElementById("darkModeBtn");
     if (localStorage.getItem("theme") === "dark") {
         document.documentElement.classList.add("dark-mode");
         document.body.classList.add("dark-mode");
-    }
-    if (cvdTheme()) applyCvd(cvdTheme()); else renderSettings();
+        if (btn) btn.innerHTML = "☀️";
+    } else if (btn) btn.innerHTML = "🌙";
+    if (cvdTheme()) applyCvd(cvdTheme());
 });
 
 /* =========================================
@@ -252,7 +202,6 @@ function applyLanguage(lang) {
     });
 
     localStorage.setItem("site-lang", lang);
-    if (typeof renderSettings === "function") renderSettings();
 
     /* Sayfaya özel ek işlem gerekiyorsa (örn. dinamik kartları
        yeniden çevirmek), sayfa kendi "onLanguageApplied" fonksiyonunu
@@ -268,7 +217,6 @@ function toggleLangMenu(e) {
     var btn = document.getElementById("langSwitchBtn");
     if (!menu) return;
     var willOpen = !menu.classList.contains("open");
-    if (willOpen && typeof closeSettings === "function") closeSettings();
     menu.classList.toggle("open", willOpen);
     if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
 }

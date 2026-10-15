@@ -912,31 +912,9 @@ html.dark-mode .card-visual::before {
 }
 .alg-editor-actions .ae-save { background: var(--cube-yellow); color: #17171f; }
 
-/* =========================================
-   AYARLAR MENÜSÜ (tema + renk körlüğü)
-========================================= */
-.settings-switcher { position: relative; }
-.settings-menu {
-    position: absolute; top: calc(100% + 12px); right: 0; width: 290px; max-width: calc(100vw - 24px);
-    background: var(--surface); color: var(--text); border: var(--card-bw) solid var(--card-border);
-    border-radius: 16px; box-shadow: var(--shadow); padding: 12px; z-index: 1100;
-    opacity: 0; visibility: hidden; transform: translateY(-8px); transition: .2s ease; text-align: start;
-}
-html[dir="rtl"] .settings-menu { right: auto; left: 0; }
-.settings-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
-.sm-title { font-family: var(--font-display, inherit); font-size: 16px; font-weight: 900; margin-bottom: 8px; }
-.sm-label { font-size: 11px; font-weight: 900; letter-spacing: .5px; text-transform: uppercase; color: var(--text-soft); margin: 10px 0 6px; }
-.sm-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 3px; border-radius: 12px; border: var(--card-bw) solid var(--border); background: var(--surface-soft); }
-.sm-seg button { border: 0; border-radius: 9px; padding: 8px; background: transparent; color: var(--text-soft); font: 800 13px Inter, sans-serif; cursor: pointer; }
-.sm-seg button.active { background: var(--cube-yellow); color: #17171f; box-shadow: var(--shadow-sm); }
-.sm-opt { display: flex; align-items: center; gap: 8px; width: 100%; margin-bottom: 5px; padding: 9px 10px; border-radius: 12px; border: var(--card-bw) solid var(--border); background: var(--surface); color: var(--text); font: 700 13px Inter, sans-serif; text-align: start; cursor: pointer; }
-.sm-opt:hover { background: var(--surface-soft); }
-.sm-opt.active { border-color: var(--card-border); background: var(--surface-soft); box-shadow: inset 0 0 0 1.5px var(--card-border); }
-.sm-opt.active .sm-opt-text::before { content: "✓ "; font-weight: 900; }
-.sm-opt-text { flex: 1; line-height: 1.3; }
-.sm-sw { display: inline-flex; gap: 2px; flex-shrink: 0; }
-.sm-sw i { width: 12px; height: 12px; border-radius: 3px; border: 1px solid #17171f; display: block; }
-.sm-note { font-size: 11.5px; color: var(--text-soft); line-height: 1.45; margin: 6px 2px 0; }
+/* Renk körlüğü teması önizlemesi (antrenördeki seçim penceresi) */
+.cvd-sw { display: inline-flex; gap: 2px; flex-shrink: 0; }
+.cvd-sw i { width: 13px; height: 13px; border-radius: 3px; border: 1px solid #17171f; display: block; }
 
 /* Renk körlüğü temaları: küp renkleri (arayüzde kullanılan değişkenler) */
 html[data-cvd="rg"], html[data-cvd="rg"] body {
