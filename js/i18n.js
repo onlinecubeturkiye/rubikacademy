@@ -378,6 +378,9 @@ var SITE_I18N = {
 
         icerikler: {
             tr: {
+                grp_learn: "Öğren",
+                grp_practice: "Pratik yap",
+                grp_help: "Destek",
                 ic_title: "Eğitim İçerikleri",
                 ic_intro: "Küp çözmeyi öğrenmek için ihtiyacın olan her şey burada: adım adım video anlatımlar, ezberlemen gereken algoritmalar ve gelişimini takip edeceğin zamanlayıcı aracı.",
                 tag_video: "VİDEO ANLATIM",
@@ -388,7 +391,7 @@ var SITE_I18N = {
                 item_algos_p: "OLL, PLL, COLL, WV, CLL, EG ve daha fazlası — hız geliştirmen için gereken tüm algoritma listeleri tek yerde.",
                 tag_trainer: "PRATİK",
                 item_trainer: "Algoritma Antrenörü",
-                item_trainer_p: "OLL, PLL, COLL, WV ve 2x2 case'lerini karıştırma ve süreyle çalış; zorlandıkların daha sık gelsin.",
+                item_trainer_p: "Case'leri karıştırma ve süreyle çalış: CFOP, Roux, 2x2, Pyraminx ve daha fazlası; cross ve PLL tanıma, Bluetooth küp desteği.",
                 tag_faq: "SSS",
                 item_faq: "Sıkça Sorulan Sorular",
                 item_faq_p: "Antrenör, akıllı küp bağlama, uygulama olarak yükleme ve koçluk hakkında merak edilenler.",
@@ -403,6 +406,9 @@ var SITE_I18N = {
                 cta_go: "İncele →"
             },
             en: {
+                grp_learn: "Learn",
+                grp_practice: "Practice",
+                grp_help: "Support",
                 ic_title: "Learning Content",
                 ic_intro: "Everything you need to learn to solve cubes: step-by-step video tutorials, the algorithms you'll need to memorize, and a timer to track your progress.",
                 tag_video: "VIDEO TUTORIALS",
@@ -413,7 +419,7 @@ var SITE_I18N = {
                 item_algos_p: "OLL, PLL, COLL, WV, CLL, EG and more — every algorithm list you need to build speed, in one place.",
                 tag_trainer: "PRACTICE",
                 item_trainer: "Algorithm Trainer",
-                item_trainer_p: "Practice OLL, PLL, COLL, WV and 2x2 cases with scrambles and a timer; the ones you struggle with come up more often.",
+                item_trainer_p: "Drill cases with scrambles and a timer: CFOP, Roux, 2x2, Pyraminx and more; cross and PLL recognition, Bluetooth cube support.",
                 tag_faq: "FAQ",
                 item_faq: "Frequently Asked Questions",
                 item_faq_p: "Everything about the trainer, connecting a smart cube, installing the app and coaching.",
@@ -428,6 +434,9 @@ var SITE_I18N = {
                 cta_go: "Explore →"
             },
             fr: {
+                grp_learn: "Apprendre",
+                grp_practice: "S'entraîner",
+                grp_help: "Aide",
                 ic_title: "Contenus d'apprentissage",
                 ic_intro: "Tout ce dont tu as besoin pour apprendre à résoudre les cubes : des vidéos explicatives étape par étape, les algorithmes à mémoriser et un chronomètre pour suivre ta progression.",
                 tag_video: "TUTORIELS VIDÉO",
@@ -438,7 +447,7 @@ var SITE_I18N = {
                 item_algos_p: "OLL, PLL, COLL, WV, CLL, EG et bien plus — toutes les listes d'algorithmes dont tu as besoin pour gagner en vitesse, au même endroit.",
                 tag_trainer: "PRATIQUE",
                 item_trainer: "Entraîneur d'algorithmes",
-                item_trainer_p: "Travaille les cas OLL, PLL, COLL, WV et 2x2 avec des mélanges et un chrono ; ceux qui te posent problème reviennent plus souvent.",
+                item_trainer_p: "Travaille les cas avec mélanges et chrono : CFOP, Roux, 2x2, Pyraminx et plus ; croix et reconnaissance PLL, cubes Bluetooth.",
                 tag_faq: "FAQ",
                 item_faq: "Questions fréquentes",
                 item_faq_p: "Tout sur l'entraîneur, la connexion d'un cube connecté, l'installation de l'application et le coaching.",
@@ -453,6 +462,9 @@ var SITE_I18N = {
                 cta_go: "Découvrir →"
             },
             ru: {
+                grp_learn: "Учись",
+                grp_practice: "Практика",
+                grp_help: "Поддержка",
                 ic_title: "Учебные материалы",
                 ic_intro: "Всё, что нужно для обучения сборке кубиков: пошаговые видеоуроки, алгоритмы для запоминания и таймер для отслеживания прогресса.",
                 tag_video: "ВИДЕОУРОКИ",
@@ -463,7 +475,7 @@ var SITE_I18N = {
                 item_algos_p: "OLL, PLL, COLL, WV, CLL, EG и многое другое — все списки алгоритмов для набора скорости в одном месте.",
                 tag_trainer: "ПРАКТИКА",
                 item_trainer: "Тренажёр алгоритмов",
-                item_trainer_p: "Тренируй кейсы OLL, PLL, COLL, WV и 2x2 со скрамблами и таймером; сложные для тебя выпадают чаще.",
+                item_trainer_p: "Тренируй кейсы со скрамблами и таймером: CFOP, Roux, 2x2, Пирамидка и другое; крест и распознавание PLL, Bluetooth-кубы.",
                 tag_faq: "FAQ",
                 item_faq: "Частые вопросы",
                 item_faq_p: "Всё о тренажёре, подключении смарт-кубика, установке приложения и коучинге.",
@@ -478,6 +490,9 @@ var SITE_I18N = {
                 cta_go: "Открыть →"
             },
             de: {
+                grp_learn: "Lernen",
+                grp_practice: "Üben",
+                grp_help: "Hilfe",
                 ic_title: "Lerninhalte",
                 ic_intro: "Alles, was du zum Würfellösen brauchst: Schritt-für-Schritt-Videoanleitungen, die Algorithmen, die du auswendig lernen musst, und ein Timer, um deinen Fortschritt zu verfolgen.",
                 tag_video: "VIDEOANLEITUNGEN",
@@ -488,7 +503,7 @@ var SITE_I18N = {
                 item_algos_p: "OLL, PLL, COLL, WV, CLL, EG und mehr — alle Algorithmuslisten, die du für mehr Geschwindigkeit brauchst, an einem Ort.",
                 tag_trainer: "ÜBEN",
                 item_trainer: "Algorithmen-Trainer",
-                item_trainer_p: "Übe OLL-, PLL-, COLL-, WV- und 2x2-Fälle mit Scrambles und Timer; schwierige Fälle kommen öfter.",
+                item_trainer_p: "Übe Fälle mit Scrambles und Timer: CFOP, Roux, 2x2, Pyraminx und mehr; Kreuz und PLL-Erkennung, Bluetooth-Würfel.",
                 tag_faq: "FAQ",
                 item_faq: "Häufige Fragen",
                 item_faq_p: "Alles zum Trainer, zum Verbinden eines Smart-Cubes, zur App-Installation und zum Coaching.",
@@ -503,6 +518,9 @@ var SITE_I18N = {
                 cta_go: "Entdecken →"
             },
             ar: {
+                grp_learn: "تعلّم",
+                grp_practice: "تدرّب",
+                grp_help: "الدعم",
                 ic_title: "المحتوى التعليمي",
                 ic_intro: "كل ما تحتاجه لتعلّم حل المكعبات: دروس فيديو خطوة بخطوة، الخوارزميات التي يجب حفظها، وأداة توقيت لتتبع تقدّمك.",
                 tag_video: "دروس فيديو",
@@ -513,7 +531,7 @@ var SITE_I18N = {
                 item_algos_p: "OLL وPLL وCOLL وWV وCLL وEG والمزيد — جميع قوائم الخوارزميات التي تحتاجها لزيادة السرعة في مكان واحد.",
                 tag_trainer: "تدريب",
                 item_trainer: "مدرّب الخوارزميات",
-                item_trainer_p: "تدرّب على حالات OLL وPLL وCOLL وWV و2x2 مع الخلط والمؤقت؛ والحالات الصعبة عليك تظهر أكثر.",
+                item_trainer_p: "تدرّب على الحالات مع الخلط والمؤقت: CFOP وRoux و2x2 وبيرامينكس وغيرها؛ الصليب والتعرّف على PLL ودعم مكعبات البلوتوث.",
                 tag_faq: "الأسئلة الشائعة",
                 item_faq: "الأسئلة الشائعة",
                 item_faq_p: "كل ما تريد معرفته عن المدرّب وتوصيل المكعب الذكي وتثبيت التطبيق والتدريب الفردي.",
