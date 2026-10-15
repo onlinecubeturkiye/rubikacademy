@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261072";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261073";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -181,6 +181,7 @@
         if (id === "coll") return matches(model, isF2L) && matches(model, isTopFace) && upToAUF(model, isTopCorner);
         if (id === "pll") return upToAUF(model, function () { return true; });
         if (id === "cross") return matches(model, isCrossSt);
+        if (id === "f2l") return matches(model, isF2L);
         // 2-Look: alt kümeye göre adımın bittiği an
         var sub = (typeof curCase !== "undefined" && curCase) ? curCase.subset : "";
         if (id === "2look-2lo") return matches(model, isF2L) && matches(model, sub === "lo_e" ? isTopEdgeUp : isTopFace);
