@@ -39,7 +39,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <!-- ORTAK STİLLER (tüm sitede aynı) -->
-<link rel="stylesheet" href="/styles/common.css?v=20261063">
+<link rel="stylesheet" href="/styles/common.css?v=20261064">
 
 <!-- BU SAYFAYA ÖZEL STİLLER -->
 <style>
@@ -252,6 +252,21 @@ html[dir="rtl"] .item-go { transform: scaleX(-1); }
     <section class="group">
         <h2 class="group-title" data-i18n="grp_learn">Öğren</h2>
         <div class="items">
+        <!-- YOL HARİTASI -->
+        <a href="/icerikler/yol-haritasi" class="item" aria-label="Öğrenme Yolu">
+            <span class="item-logo green"><svg viewBox="0 0 100 100">
+                        <path d="M22 78 C 22 55, 50 62, 50 45 S 78 32, 78 20" fill="none" stroke="#f8fafc" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 12"/>
+                        <circle cx="22" cy="78" r="9" fill="#ffd21f" stroke="#17171f" stroke-width="4"/>
+                        <circle cx="50" cy="46" r="9" fill="#2ecc71" stroke="#17171f" stroke-width="4"/>
+                        <circle cx="78" cy="20" r="9" fill="#f0383a" stroke="#17171f" stroke-width="4"/>
+                    </svg></span>
+            <span class="item-info">
+                <span class="item-tag" data-i18n="tag_path">YOL HARİTASI</span>
+                <h3 data-i18n="item_path">Öğrenme Yolu</h3>
+                <span class="item-p" data-i18n="item_path_p">Başlangıçtan ileri setlere adım adım: sıradaki adımını gör, ilerlemeni takip et.</span>
+            </span>
+            <span class="item-go" aria-hidden="true">→</span>
+        </a>
         <!-- BAŞLANGIÇ REHBERİ -->
         <a href="/icerikler/baslangic" class="item" aria-label="Başlangıç Rehberi">
             <span class="item-logo yellow"><svg viewBox="0 0 100 100">
@@ -263,6 +278,20 @@ html[dir="rtl"] .item-go { transform: scaleX(-1); }
                 <span class="item-tag" data-i18n="tag_beginner">YENİ BAŞLAYANLAR</span>
                 <h3 data-i18n="item_beginner">3x3 Nasıl Çözülür?</h3>
                 <span class="item-p" data-i18n="item_beginner_p">Hiç bilmiyorsan buradan başla: notasyon, 7 adım ve sadece 6 algoritmayla küpü çöz.</span>
+            </span>
+            <span class="item-go" aria-hidden="true">→</span>
+        </a>
+        <!-- SEZGİSEL F2L -->
+        <a href="/icerikler/f2l" class="item" aria-label="Sezgisel F2L">
+            <span class="item-logo orange"><svg viewBox="0 0 100 100">
+                        <rect x="14" y="14" width="22" height="22" rx="4" fill="#4b515c"/><rect x="39" y="14" width="22" height="22" rx="4" fill="#4b515c"/><rect x="64" y="14" width="22" height="22" rx="4" fill="#ff7a1a"/>
+                        <rect x="14" y="39" width="22" height="22" rx="4" fill="#16b364"/><rect x="39" y="39" width="22" height="22" rx="4" fill="#16b364"/><rect x="64" y="39" width="22" height="22" rx="4" fill="#ff7a1a"/>
+                        <rect x="14" y="64" width="22" height="22" rx="4" fill="#16b364"/><rect x="39" y="64" width="22" height="22" rx="4" fill="#16b364"/><rect x="64" y="64" width="22" height="22" rx="4" fill="#16b364"/>
+                    </svg></span>
+            <span class="item-info">
+                <span class="item-tag" data-i18n="tag_f2l">3x3 · CFOP</span>
+                <h3 data-i18n="item_f2l">Sezgisel F2L</h3>
+                <span class="item-p" data-i18n="item_f2l_p">İlk iki katmanı ezber yerine mantıkla çöz: köşe-kenar çiftini kur, yuvasına yerleştir.</span>
             </span>
             <span class="item-go" aria-hidden="true">→</span>
         </a>
@@ -362,10 +391,10 @@ html[dir="rtl"] .item-go { transform: scaleX(-1); }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "icerikler";</script>
-<script src="/js/i18n.js?v=20261063"></script>
+<script src="/js/i18n.js?v=20261064"></script>
 
 
-<script src="/js/common.js?v=20261063"></script>
+<script src="/js/common.js?v=20261064"></script>
 
 </body>
 </html>

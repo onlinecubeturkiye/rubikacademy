@@ -183,7 +183,9 @@ function applyLanguage(lang) {
             d = scoped[sid];
         }
         if (d && d[key]) {
-            el.textContent = d[key];
+            // data-i18n-html: çeviri metni <b>, <code> gibi etiketler içerir (i18n.js'deki sabit metinler)
+            if (el.hasAttribute("data-i18n-html")) el.innerHTML = d[key];
+            else el.textContent = d[key];
         }
     });
 
