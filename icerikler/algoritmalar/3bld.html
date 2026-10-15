@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261084">
+<link rel="stylesheet" href="/styles/common.css?v=20261085">
 
 <style>
 .hero {
@@ -407,7 +407,7 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
         <figure class="g-fig"><div id="figEdges" dir="ltr"></div><figcaption data-i18n="fig_edges">Kenar harfleri</figcaption></figure>
         <figure class="g-fig"><div id="figCorners" dir="ltr"></div><figcaption data-i18n="fig_corners">Köşe harfleri</figcaption></figure>
     </div>
-    <p data-i18n="fig_note">Koyu etiket: tampon (buffer). Tampon parçasının diğer etiketleri hedef olamaz.</p>
+    <p data-i18n="fig_note">Koyu etiketler tampon (buffer) parçasıdır: kenarlarda B ve M, köşelerde A, E ve R. Bu harfler hedef olarak kullanılmaz; kart listesinde de yer almaz.</p>
     <h3 data-i18n="g_memo_h">3. Ezberleme (iz sürme)</h3><p data-i18n="g_memo_p">Tampondaki etikete bak: o etiket hangi yere aitse o yerin harfini yaz. Sonra o yerdeki etikete bak ve aynı şekilde devam et. Tampon parçası yeniden tampona gelirse (döngü kapanırsa) henüz yerinde olmayan herhangi bir parçanın harfini yaz ve oradan sürdür. Yerinde ama ters dönmüş parçalar da böyle iki harfle çözülür.</p>
     <p class="g-tip" data-i18n="g_memo_tip">İpucu: harfleri ikişer ikişer kelimeye çevir (ör. KA → kalem, BE → bebek). Kenarları kelimelerle, köşeleri ses olarak tekrarlayarak ezberlemek kolaydır.</p>
     <h3 data-i18n="g_edges_h">4. Kenarlar</h3><p data-i18n="g_edges_p">Tampon B (üst-sağ kenarın üst etiketi), değiştirme yeri D (üst-sol kenarın üst etiketi). Her harf için: kurulum hamlesiyle hedef etiketi D yerine getir, T-perm yap, kurulumu geri al. Kurulum hamleleri tamponu ve T-perm'ün değiştirdiği köşeleri bozmaz.</p>
@@ -453,11 +453,11 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "bld";</script>
-<script src="/js/i18n.js?v=20261084"></script>
-<script src="/js/common.js?v=20261084"></script>
+<script src="/js/i18n.js?v=20261085"></script>
+<script src="/js/common.js?v=20261085"></script>
 
 
-<script src="/js/alg-player.js?v=20261084"></script>
+<script src="/js/alg-player.js?v=20261085"></script>
 
 <script>
 /* ============================================================
@@ -513,15 +513,17 @@ function netSvg(o) {
             var L = o.kind ? letterAt(f, r, c, o.kind) : null;
             var isT = L && L === o.target, isB = L && L === o.buffer, inBuf = L && o.kind && BUF_PIECE[o.kind].indexOf(L) >= 0;
             var fill = FACE_COL[f], op = 1, sw = 0.6;
-            if (isB) fill = "#17171f";
+            // Şemada tampon parçasının tüm etiketleri koyu ve harfli gösterilir
+            var dark = isB || (o.letters && inBuf);
+            if (dark) fill = "#17171f";
             else if (o.target) op = isT ? 1 : 0.22;
-            else if (o.letters && (!L || (inBuf && !isB))) op = 0.3;
+            else if (o.letters && !L) op = 0.3;
             if (isT) sw = 1.6;
             out += '<rect x="' + (x + 0.5) + '" y="' + (y + 0.5) + '" width="9" height="9" rx="1.6" fill="' + fill + '"' + (op < 1 ? ' fill-opacity="' + op + '"' : "") +
                 ' stroke="#17171f" stroke-width="' + sw + '"' + (op < 1 && !isT ? ' stroke-opacity="0.45"' : "") + '/>';
-            var showL = L && (isT || isB || (o.letters && !(inBuf && !isB)));
+            var showL = L && (isT || isB || o.letters);
             if (showL) {
-                var col = (isB || LIGHT_TXT[f]) ? "#ffffff" : "#17171f";
+                var col = (dark || LIGHT_TXT[f]) ? "#ffffff" : "#17171f";
                 txt += '<text x="' + (x + 5) + '" y="' + (y + 5.3) + '" font-size="' + (isT ? 6.4 : 5.4) + '" font-weight="800" font-family="Inter, sans-serif" text-anchor="middle" dominant-baseline="middle" fill="' + col + '">' + (isB && !o.letters ? "★" : L) + '</text>';
             }
         }
@@ -664,7 +666,7 @@ function initQuiz() {
     });
 }
 
-fetch("/icerikler/algoritmalar/bld.json?v=20261084")
+fetch("/icerikler/algoritmalar/bld.json?v=20261085")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
