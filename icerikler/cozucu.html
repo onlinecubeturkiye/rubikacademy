@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Küp Çözücü</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/cozucu">
+<meta name="description" content="3x3 Rubik küp çözücü: renkleri elle gir ya da kamerayla tara, çözümü adım adım 3B oynatıcıda izle.">
+<meta property="og:title" content="Küp Çözücü — Rubik Academy">
+<meta property="og:description" content="Renkleri gir ya da kamerayla tara, çözümü adım adım izle.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/cozucu">
+<meta property="og:image" content="https://rubikacademy.fun/og/cozucu.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/cozucu.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261074">
+
+<style>
+.wrap { max-width: 980px; margin: 0 auto; }
+.intro { text-align: center; margin: 0 auto 26px; max-width: 760px; }
+.intro .badge { margin-bottom: 14px; }
+.intro h1 { font-size: clamp(34px, 5vw, 54px); line-height: 1.05; letter-spacing: -1.5px; font-weight: 900; color: var(--text); margin-bottom: 14px; }
+.intro h1 span + span { color: var(--primary); }
+.intro p { color: var(--text-soft); font-size: 16px; line-height: 1.7; }
+.box { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 22px 24px; margin-bottom: 22px; }
+.box h2 { font-size: 22px; font-weight: 850; letter-spacing: -.3px; color: var(--text); margin-bottom: 10px; }
+.box p, .box li { color: var(--text-soft); font-size: 15px; line-height: 1.7; }
+.box p + p { margin-top: 8px; }
+.box code { font-family: "JetBrains Mono", monospace; font-weight: 700; color: var(--primary); }
+.box b { color: var(--text); }
+.p-list { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; }
+.p-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.p-links a { padding: 9px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 800; font-size: 14px; box-shadow: var(--shadow-sm); text-decoration: none; }
+.p-links a:hover { background: var(--cube-yellow); color: #17171f; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
+.btn:hover { background: var(--surface-soft); }
+.btn.primary { background: var(--cube-yellow); color: #17171f; }
+.btn:disabled { opacity: .5; cursor: default; }
+@media (max-width: 760px) { .box { padding: 18px 16px; } }
+
+.sv-tabs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 14px; border: var(--card-bw) solid var(--ink); background: var(--surface-soft); margin-bottom: 14px; }
+.sv-tab { padding: 8px 14px; border-radius: 10px; border: 0; background: transparent; color: var(--text-soft); font: 800 14px Inter, sans-serif; cursor: pointer; }
+.sv-tab.active { background: var(--cube-yellow); color: #17171f; }
+.sv-grid { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 22px; align-items: start; }
+.net { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-width: 520px; touch-action: none; user-select: none; }
+.nf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 3px; border-radius: 8px; background: var(--ink); }
+.st { aspect-ratio: 1; border: 0; border-radius: 5px; padding: 0; cursor: pointer; background: var(--surface-soft); }
+.st.empty { background: repeating-linear-gradient(45deg, var(--surface-soft) 0 5px, var(--surface) 5px 10px); }
+.st.ctr { cursor: default; box-shadow: inset 0 0 0 2px rgba(0,0,0,.25); }
+.st:focus-visible { outline: 3px solid var(--primary); outline-offset: 1px; }
+.palette { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px 8px; }
+.pc { position: relative; height: 46px; border-radius: 12px; border: 3px solid transparent; cursor: pointer; box-shadow: var(--shadow-sm); }
+.pc span { position: absolute; left: 0; right: 0; bottom: -18px; font: 800 11px Inter, sans-serif; color: var(--text-soft); }
+.pc.on { border-color: var(--ink); outline: 3px solid var(--cube-yellow); }
+.side h3 { font-size: 14px; font-weight: 850; color: var(--text); margin: 0 0 8px; }
+.side .palette { margin-bottom: 28px; }
+.side .btns { display: grid; gap: 8px; }
+.empty-count { font-size: 13px; font-weight: 700; color: var(--text-soft); margin-top: 10px; }
+.msg { margin-top: 14px; font-weight: 800; font-size: 14.5px; color: var(--text-soft); min-height: 1px; }
+.msg.bad { color: var(--cube-red); }
+.msg.ok { color: var(--cube-green); }
+.hold { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; font-size: 13px; font-weight: 800; color: var(--text-soft); }
+.hold i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-inline-end: 4px; border: 1px solid rgba(0,0,0,.3); }
+#camPanel { margin-bottom: 18px; }
+.cam-box { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 16px; align-items: start; }
+.cam-view { position: relative; border-radius: 16px; overflow: hidden; background: #000; border: var(--card-bw) solid var(--ink); }
+.cam-view video { display: block; width: 100%; height: auto; }
+.cam-view.mirror { transform: scaleX(-1); }
+.cam-grid { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); border: 3px solid #fff; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(0,0,0,.35); }
+.cam-grid i { border: 1.5px solid rgba(255,255,255,.75); display: flex; }
+.cam-grid i::after { content: ""; margin: auto; width: 26%; height: 26%; border-radius: 50%; background: var(--c, transparent); border: 2px solid #fff; }
+.cam-dots { display: flex; gap: 6px; margin: 4px 0 10px; }
+.cam-dots span { width: 26px; height: 8px; border-radius: 4px; background: var(--border); }
+.cam-dots span.done { background: var(--cube-green); }
+.cam-dots span.cur { background: var(--cube-yellow); }
+.cam-step { font-weight: 800; color: var(--text); font-size: 15px; line-height: 1.5; margin-bottom: 12px; }
+.cam-side .btns { display: grid; gap: 8px; }
+.cam-note { font-size: 13px !important; margin-top: 10px; }
+.sol-moves { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+.mv { display: inline-flex; align-items: baseline; gap: 4px; padding: 6px 10px; border-radius: 10px; background: var(--surface-soft); border: 1.5px solid var(--border); font: 800 16px "JetBrains Mono", monospace; color: var(--text); }
+.mv small { font: 700 10px Inter, sans-serif; color: var(--text-soft); }
+.sol-player twisty-player { width: 100%; height: 340px; }
+.sol-text { display: block; font-size: 13px; color: var(--text-soft); word-break: break-word; }
+@media (max-width: 760px) { .sv-grid, .cam-box { grid-template-columns: 1fr; } .net { gap: 4px; } .nf { gap: 2px; padding: 2px; } }
+
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+<div class="wrap">
+<nav class="nav-bar">
+    <a href="/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+<section class="intro">
+    <div class="badge"><i></i><span data-i18n="badge">3x3 · ÇÖZÜCÜ</span></div>
+    <h1><span data-i18n="title">Küp</span> <span data-i18n="title_accent">Çözücü</span></h1>
+    <p data-i18n="intro">Küpünün renklerini gir ya da kamerayla tara; çözücü en fazla 20 küsur hamlelik bir çözüm bulsun ve adım adım göstersin.</p>
+</section>
+
+<section class="box">
+    <div class="sv-tabs" role="tablist">
+        <button type="button" class="sv-tab active" data-tab="hand" role="tab" aria-selected="true" data-i18n="tab_hand">✏️ Elle gir</button>
+        <button type="button" class="sv-tab" data-tab="cam" role="tab" aria-selected="false" data-i18n="tab_cam">📷 Kamerayla tara</button>
+    </div>
+    <div id="camPanel" hidden>
+        <button type="button" class="btn primary" id="camStart" data-i18n="cam_start">📷 Kamerayı aç</button>
+        <div class="cam-box" id="camBox" hidden>
+            <div class="cam-view" id="camView"><video id="camVideo" playsinline muted></video><div class="cam-grid" id="camGrid" style="width:45%;aspect-ratio:1"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="cam-side">
+                <div class="cam-dots" id="camDots"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <p class="cam-step" id="camStep"></p>
+                <div class="btns">
+                    <button type="button" class="btn primary" id="camCapture" data-i18n="cam_capture">📸 Bu yüzü yakala</button>
+                    <button type="button" class="btn" id="camUndo" data-i18n="cam_undo">↩ Son yüzü geri al</button>
+                    <button type="button" class="btn" id="camStop" data-i18n="cam_stop">✕ Kamerayı kapat</button>
+                </div>
+                <p class="cam-note" data-i18n="cam_note">Küpü kareye sığdır, iyi ışıkta ve düz tut. Yanlış okunan kareleri aşağıdaki ağda düzeltebilirsin.</p>
+            </div>
+        </div>
+    </div>
+    <div class="sv-grid">
+        <div>
+            <div class="net" id="net" dir="ltr"></div>
+            <div class="hold"><span data-i18n="hold">Tutuş:</span><span><i style="background:#f6c719"></i><span data-i18n="hold_u">sarı üstte</span></span><span><i style="background:#179e4f"></i><span data-i18n="hold_f">yeşil önde</span></span></div>
+            <p class="empty-count" id="emptyCount"></p>
+        </div>
+        <div class="side">
+            <h3 data-i18n="pick">Renk seç, karelere dokun</h3>
+            <div class="palette" id="palette"></div>
+            <div class="btns">
+                <button type="button" class="btn primary" id="solveBtn" data-i18n="solve">🧩 Çöz</button>
+                <button type="button" class="btn" id="exampleBtn" data-i18n="example_btn">🎲 Örnek karıştırma</button>
+                <button type="button" class="btn" id="solvedBtn" data-i18n="solved_btn">Çözülmüş küp</button>
+                <button type="button" class="btn" id="clearBtn" data-i18n="clear">Temizle</button>
+            </div>
+        </div>
+    </div>
+    <p class="msg" id="msg" role="status" aria-live="polite"></p>
+</section>
+
+<section class="box" id="result" hidden>
+    <h2 data-i18n="sol_h">Çözüm</h2>
+    <p data-i18n="sol_p">Küpü sarı üstte, yeşil önde tut ve hamleleri sırayla yap. Oynatıcıda adım adım ilerleyebilirsin.</p>
+    <div class="sol-moves" id="solMoves" dir="ltr"></div>
+    <div class="sol-player" id="solPlayer"></div>
+    <code class="sol-text" id="solText" dir="ltr"></code>
+</section>
+
+<section class="box">
+    <h2 data-i18n="how_h">Nasıl kullanılır?</h2>
+    <ul class="p-list">
+        <li data-i18n="how1" data-i18n-html><b>Yön:</b> Ağdaki her yüz, küpü sarı üstte ve yeşil önde tutarken o yüze bakınca gördüğün gibidir. Üst yüzün alt sırası öne, alt yüzün üst sırası öne bakar.</li>
+        <li data-i18n="how2" data-i18n-html><b>Kamera:</b> Önce yeşil yüzü göster, sonra küpü sola çevirerek turuncu, mavi ve kırmızıyı; en son sarıyı (yeşil aşağıda) ve beyazı (yeşil yukarıda) tara.</li>
+        <li data-i18n="how3" data-i18n-html><b>Hata mesajı:</b> Bir renk 9'dan fazla ya da bir köşe/kenar imkansızsa çözücü uyarır. Genelde tek bir kare yanlış girilmiştir.</li>
+        <li data-i18n="how4" data-i18n-html><b>Not:</b> Bu çözüm bilgisayar algoritmasıyla (Kociemba) bulunur; öğrenmek için değil, takıldığında küpü kurtarmak içindir. Kendin çözmeyi öğrenmek için başlangıç rehberine göz at.</li>
+    </ul>
+    <div class="p-links">
+        <a href="/icerikler/baslangic" data-i18n="l_begin">🧭 Başlangıç rehberi</a>
+        <a href="/icerikler/zkttimer" data-i18n="l_timer">⏱️ ZKT Timer</a>
+    </div>
+</section>
+
+</div>
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script>var PAGE_ID = "cozucu";</script>
+<script src="/js/i18n.js?v=20261074"></script>
+<script src="/js/common.js?v=20261074"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261074"></script>
+<script src="/js/cozucu.js?v=20261074"></script>
+</body>
+</html>
