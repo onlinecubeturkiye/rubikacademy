@@ -64,10 +64,12 @@
     function stateAfter(alg) { var s = SOLVED; parse(alg).forEach(function (m) { s = step(s, m); }); return s; }
     function distance(alg) { build(); return DIST[enc(stateAfter(alg))]; }
     // En kısa çözümler (en fazla `limit` tane; aynı yüzü art arda çevirmez)
-    function solve(alg, limit) {
+    function solve(alg, limit) { return solveState(stateAfter(alg), limit); }
+    // Herhangi bir durumdan (ör. Bluetooth küpün o anki hali) en kısa çözümler
+    function solveState(start, limit) {
         build();
         limit = limit || 3;
-        var out = [], start = stateAfter(alg);
+        var out = [];
         (function dfs(s, path, last) {
             if (out.length >= limit) return;
             var d = DIST[enc(s)];
@@ -96,7 +98,9 @@
         }
         return out.join(" ");
     }
-    var api = { solve: solve, distance: distance, scramble: scramble, build: build };
+    // Durumu hamlelerle ilerlet (Bluetooth küpün artı kenarlarını izlemek için)
+    function apply(state, alg) { var s = state; parse(alg).forEach(function (m) { s = step(s, m); }); return s; }
+    var api = { solve: solve, solveState: solveState, distance: distance, scramble: scramble, build: build, apply: apply, SOLVED: SOLVED };
     if (typeof module !== "undefined" && module.exports) module.exports = api;
     else root.CrossSolver = api;
 })(this);

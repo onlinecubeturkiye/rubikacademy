@@ -37,7 +37,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261054">
+<link rel="stylesheet" href="/styles/common.css?v=20261055">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -462,11 +462,58 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 .tool-tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 0 auto 22px; }
 .tool-tab { padding: 10px 18px; border-radius: 14px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 15px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
 .tool-tab.active { background: var(--cube-yellow); color: #17171f; }
-@media (max-width: 520px) { .tool-tabs { gap: 6px; flex-wrap: nowrap; } .tool-tab { padding: 8px 9px; font-size: 12.5px; white-space: nowrap; } }
 .tool-intro { text-align: center; color: var(--text-soft); font-size: 14.5px; max-width: 660px; margin: 0 auto 16px; }
-.rc-grid .box, .cx-wrap .box { margin-bottom: 0; }
+.rc-grid .box { margin-bottom: 0; }
 .chip-known { font-size: 9px; line-height: 1; }
 
+
+/* ===== SADE DÜZEN ===== */
+.intro { margin-bottom: 14px !important; }
+.intro h1 { font-size: clamp(28px, 3.6vw, 38px) !important; margin-bottom: 0; }
+.tool-tabs { display: flex; width: max-content; max-width: 100%; margin: 0 auto 20px; gap: 4px; padding: 4px; border-radius: 16px;
+    border: var(--card-bw) solid var(--card-border); background: var(--surface-soft); flex-wrap: nowrap; }
+.tool-tab { border: 0; box-shadow: none; background: transparent; color: var(--text-soft); padding: 9px 18px; border-radius: 12px; font: 800 14px Inter, sans-serif; white-space: nowrap; }
+.tool-tab.active { background: var(--cube-yellow); color: #17171f; box-shadow: var(--shadow-sm); }
+.setup-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
+.setup-top .puzzle-pick { margin: 0; }
+.setup-top .set-tabs { margin: 0; }
+.filter-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: 12px; border: var(--card-bw) solid var(--border); background: var(--surface-soft); }
+.seg-btn { border: 0; border-radius: 9px; padding: 6px 11px; background: transparent; color: var(--text-soft); font: 800 12.5px Inter, sans-serif; cursor: pointer; }
+.seg-btn:hover:not([disabled]) { color: var(--text); }
+.seg-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 0 0 1.5px var(--card-border); }
+.seg-btn[disabled] { opacity: .4; cursor: default; }
+.filter-row .case-toggle { margin: 0; font-size: 12.5px; }
+.trainer-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-bottom: 14px; }
+.trainer-top .mode-switch { margin: 0; }
+.trainer-top .bt-bar { margin: 0; padding: 5px 6px 5px 8px; gap: 8px; border-radius: 14px; max-width: 100%; }
+.trainer-top .bt-bar:not(.on) .bt-text { flex: 0 1 auto; }
+.trainer-top .bt-bar.on, .trainer-top .bt-bar.has-msg { flex-basis: 100%; max-width: 620px; padding: 8px 10px; }
+.trainer-top .bt-icon { width: 28px; height: 28px; font-size: 14px; border-radius: 9px; }
+.bt-text span:empty { display: none; }
+.trainer-top .bt-text b { font-size: 12.5px; }
+.link-btn { display: block; margin: 12px auto 0; border: 0; background: none; color: var(--text-soft); font: 700 12px Inter, sans-serif; text-decoration: underline; cursor: pointer; }
+.link-btn:hover { color: var(--cube-red); }
+.stat-tiles { grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important; margin-bottom: 12px; }
+.stat-tile { padding: 8px 10px !important; border-radius: 12px; }
+.stat-tile b { font-size: 17px !important; }
+.stat-tile span { font-size: 11px; line-height: 1.25; display: block; }
+#statsBox .box-head { margin-bottom: 10px; }
+.mode-card.is-gen #scramble { display: block; }
+.mode-card .bt-bar, .bt-bar.unsup { display: none; }
+#setupBox.is-gen .seg { display: none; }
+.stat-scroll { min-height: 0 !important; }
+.mode-card.is-gen .card-diagram { display: none; }
+.cross-sols div + div { margin-top: 2px; opacity: .8; }
+@media (min-width: 1100px) { #statsBox .stat-tiles { grid-template-columns: repeat(2, 1fr) !important; } }
+@media (max-width: 520px) {
+    .tool-tab { padding: 8px 12px; font-size: 13px; }
+    .stat-tile b { font-size: 15px !important; }
+    .stat-tile span { font-size: 10px; }
+    .seg { flex-wrap: nowrap; }
+    .seg-btn { padding: 6px 6px; font-size: 11.5px; white-space: nowrap; }
+    .stat-tiles { grid-template-columns: repeat(2, 1fr) !important; }
+}
 /* PLL TANIMA */
 .rc-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; max-width: 1100px; margin: 0 auto; }
 .rc-stage { display: grid; justify-items: center; gap: 12px; }
@@ -503,35 +550,6 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 @media (max-width: 900px) { .rc-grid { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .rc-cube { width: 200px; height: 200px; } .rc-answers { grid-template-columns: repeat(4, 1fr); } }
 
-/* CROSS */
-.cx-wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 16px; }
-.cx-levels { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-.cx-lvl { padding: 8px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; }
-.cx-lvl.active { background: var(--cube-yellow); color: #17171f; box-shadow: var(--shadow-sm); }
-.cx-tip { text-align: center; font-size: 13.5px; color: var(--text-soft); margin-bottom: 10px; }
-.cx-scr { text-align: center; font: 800 24px/1.5 "JetBrains Mono", monospace; color: var(--text); word-spacing: 4px; margin: 4px 0 14px; }
-.cx-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-.cx-btn { padding: 10px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
-.cx-btn.primary { background: var(--cube-yellow); color: #17171f; }
-.cx-btn:disabled { opacity: .5; cursor: default; }
-.cx-insp { display: grid; place-items: center; margin: 14px auto 4px; width: 110px; height: 110px; border-radius: 50%; border: 6px solid var(--border); font: 900 34px "JetBrains Mono", monospace; color: var(--text); }
-.cx-insp.run { border-color: var(--cube-green); }
-.cx-insp.warn { border-color: var(--cube-orange, #ff7a1a); }
-.cx-insp.over { border-color: var(--cube-red); color: var(--cube-red); font-size: 18px; }
-.cx-result { margin-top: 14px; display: none; text-align: center; }
-.cx-result.show { display: block; }
-.cx-len { font-size: 18px; font-weight: 900; color: var(--text); }
-.cx-len b { color: var(--primary); }
-.cx-sols { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
-.cx-sols li { font: 800 17px "JetBrains Mono", monospace; color: var(--primary); background: var(--surface-soft); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 12px; }
-.cx-check h3 { font-size: 16px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
-.cx-check-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.cx-check input { flex: 1; min-width: 200px; padding: 10px 12px; border-radius: 12px; border: var(--card-bw) solid var(--border); background: var(--surface-soft); color: var(--text); font: 700 15px "JetBrains Mono", monospace; }
-.cx-msg { margin-top: 8px; font-weight: 800; font-size: 14px; min-height: 20px; }
-.cx-msg.ok { color: var(--cube-green); }
-.cx-msg.bad { color: var(--cube-red); }
-.cx-stats { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; font-size: 13px; color: var(--text-soft); font-weight: 700; }
-@media (max-width: 520px) { .cx-scr { font-size: 19px; } }
 </style>
 
 <!-- Google tag (gtag.js) -->
@@ -580,15 +598,12 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 </nav>
 
 <section class="intro">
-    <div class="badge"><i></i><span data-i18n="badge_text">ALGORİTMA ANTRENÖRÜ</span></div>
     <h1 data-i18n="title">Algoritma Antrenörü</h1>
-    <p data-i18n="intro_p">Bir set seç, karıştırmayı çözülmüş küpe uygula, case'i tanı ve çöz. Süren ölçülür; zorlandığın case'ler daha sık gelir.</p>
 </section>
 
 <div class="tool-tabs" id="toolTabs" role="tablist">
     <button type="button" class="tool-tab active" data-tool="alg" role="tab" data-i18n="tool_alg">🧠 Algoritma</button>
     <button type="button" class="tool-tab" data-tool="recog" role="tab" data-i18n="tool_recog">👁 PLL Tanıma</button>
-    <button type="button" class="tool-tab" data-tool="cross" role="tab" data-i18n="tool_cross">✚ Cross</button>
 </div>
 
 <div id="toolRecog" data-i18n-scope="tanima" hidden>
@@ -615,44 +630,6 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 </div>
 </div>
 
-<div id="toolCross" data-i18n-scope="cross" hidden>
-<p class="tool-intro" data-i18n="intro">Karıştırmayı uygula, 15 saniyelik incelemede beyaz artının tamamını planla. Sonra en kısa çözümle karşılaştır.</p>
-<div class="cx-wrap">
-    <section class="box">
-        <div class="cx-levels" id="cxLevels" role="tablist">
-            <button type="button" class="cx-lvl active" data-l="all" data-i18n="lvl_all">Hepsi</button>
-            <button type="button" class="cx-lvl" data-l="easy" data-i18n="lvl_easy">Kolay (≤5)</button>
-            <button type="button" class="cx-lvl" data-l="mid" data-i18n="lvl_mid">Orta (6)</button>
-            <button type="button" class="cx-lvl" data-l="hard" data-i18n="lvl_hard">Zor (7–8)</button>
-        </div>
-    </section>
-    <section class="box">
-        <p class="cx-tip" data-i18n="tip">Sarı üstte, yeşil önde tut. Beyaz artı altta kurulur.</p>
-        <div class="cx-scr" id="cxScr" dir="ltr">…</div>
-        <div class="cx-row">
-            <button type="button" class="cx-btn primary" id="cxInsp" data-i18n="insp">⏱ 15 sn inceleme</button>
-            <button type="button" class="cx-btn" id="cxLen" data-i18n="show_len">Kaç hamle?</button>
-            <button type="button" class="cx-btn" id="cxSol" data-i18n="show_sol">Çözümü göster</button>
-            <button type="button" class="cx-btn" id="cxNew" data-i18n="new">Yeni karıştırma →</button>
-        </div>
-        <div class="cx-insp" id="cxTimer" dir="ltr" hidden>15</div>
-        <div class="cx-result" id="cxResult">
-            <div class="cx-len" id="cxLenText"></div>
-            <ul class="cx-sols" id="cxSols" dir="ltr"></ul>
-        </div>
-    </section>
-    <section class="box cx-check">
-        <h3 data-i18n="check_title">Kendi çözümünü kontrol et</h3>
-        <div class="cx-check-row">
-            <input id="cxMine" dir="ltr" autocomplete="off" spellcheck="false" placeholder="ör. F R' D2 L">
-            <button type="button" class="cx-btn primary" id="cxCheck" data-i18n="check">Kontrol et</button>
-        </div>
-        <div class="cx-msg" id="cxMsg" role="status" aria-live="polite"></div>
-    </section>
-    <div class="cx-stats" id="cxStats"></div>
-</div>
-</div>
-
 <div id="toolAlg">
 <div id="loadError" class="load-error" data-i18n="load_error">Antrenör verisi yüklenemedi. Lütfen daha sonra tekrar dene.</div>
 
@@ -660,30 +637,31 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <div class="trainer-main">
 <!-- SET VE CASE SEÇİMİ -->
 <section class="box" id="setupBox">
-    <div class="puzzle-pick">
-        <button class="puzzle-btn" id="puzzleBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
-            <span class="pz-label" data-i18n="pz_label">Küp</span><b id="puzzleName">3x3 · CFOP</b><span class="pz-arrow" aria-hidden="true">▾</span>
-        </button>
-        <div class="puzzle-menu" id="puzzleMenu" role="listbox"></div>
+    <div class="setup-top">
+        <div class="puzzle-pick">
+            <button class="puzzle-btn" id="puzzleBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                <span class="pz-label" data-i18n="pz_label">Küp</span><b id="puzzleName">3x3 · CFOP</b><span class="pz-arrow" aria-hidden="true">▾</span>
+            </button>
+            <div class="puzzle-menu" id="puzzleMenu" role="listbox"></div>
+        </div>
+        <div class="set-tabs" id="setTabs" role="tablist"></div>
     </div>
-    <div class="set-tabs" id="setTabs" role="tablist"></div>
 
-    <div class="box-head">
-        <h2 data-i18n="cases_title">Çalışılacak case'ler</h2>
-        <span class="sel-count" id="selCount"></span>
+    <div class="filter-row">
+        <div class="seg sel-actions" role="group">
+            <button class="seg-btn" id="selAll" data-i18n="sel_all">Tümü</button>
+            <button class="seg-btn" id="selLearning" data-i18n="sel_learning">🟡 Öğreniyorum</button>
+            <button class="seg-btn" id="selKnown" data-i18n="sel_known">🟢 Bildiklerim</button>
+            <button class="seg-btn" id="selNone" data-i18n="sel_none">Hiçbiri</button>
+        </div>
+        <button class="case-toggle" id="caseToggle" aria-expanded="false"><span id="selCount"></span> <span id="caseToggleArrow">▾</span></button>
     </div>
-    <div class="sel-actions">
-        <button class="btn-sm" id="selAll" data-i18n="sel_all">Tümü</button>
-        <button class="btn-sm" id="selLearning" data-i18n="sel_learning">🟡 Öğreniyorum</button>
-        <button class="btn-sm" id="selKnown" data-i18n="sel_known">🟢 Bildiklerim</button>
-        <button class="btn-sm" id="selNone" data-i18n="sel_none">Hiçbiri</button>
-    </div>
-    <button class="case-toggle" id="caseToggle" aria-expanded="false"><span data-i18n="pick_cases">Case'leri tek tek seç</span> <span id="caseToggleArrow">▾</span></button>
     <div class="case-groups" id="caseGroups"></div>
 </section>
 
 <!-- ANTRENÖR -->
 <section class="box trainer" id="trainerBox">
+    <div class="trainer-top">
     <div class="mode-switch" id="modeSwitch" role="tablist">
         <button class="mode-btn" data-mode="cube" data-i18n="mode_cube">🧊 Küple çalış</button>
         <button class="mode-btn" data-mode="card" data-i18n="mode_card">🃏 Küpsüz (kart)</button>
@@ -697,6 +675,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
             <button class="btn-sm" id="btReset" style="display:none" data-i18n="bt_reset">Küpüm çözülmüş</button>
             <button class="btn-sm" id="btDisconnect" style="display:none" data-i18n="bt_disconnect">Bağlantıyı kes</button>
         </div>
+    </div>
     </div>
     <div class="hold-tip" id="holdTip">Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.</div>
     <div class="scramble" id="scramble" dir="ltr"></div>
@@ -735,7 +714,6 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <section class="box" id="statsBox">
     <div class="box-head">
         <h2 data-i18n="stats_title">İstatistikler</h2>
-        <button class="btn-sm" id="btnReset" data-i18n="btn_reset">Bu setin istatistiklerini sıfırla</button>
     </div>
     <div class="stat-tiles">
         <div class="stat-tile"><b id="stSolves">0</b><span data-i18n="st_solves">Çözüm (bu oturum)</span></div>
@@ -744,6 +722,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
         <div class="stat-tile"><b id="stBest">-</b><span data-i18n="st_best">Oturumun en iyisi</span></div>
     </div>
     <div id="statTableWrap" class="stat-scroll"></div>
+    <button class="link-btn" id="btnReset" data-i18n="btn_reset">Bu setin istatistiklerini sıfırla</button>
 </section>
 </div>
 </div><!-- /toolAlg -->
@@ -794,13 +773,12 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261054"></script>
-<script src="/js/common.js?v=20261054"></script>
-<script src="/js/custom-algs.js?v=20261054"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261054"></script>
-<script src="/js/cross-solver.js?v=20261054"></script>
-<script src="/js/recog-trainer.js?v=20261054"></script>
-<script src="/js/cross-trainer.js?v=20261054"></script>
+<script src="/js/i18n.js?v=20261055"></script>
+<script src="/js/common.js?v=20261055"></script>
+<script src="/js/custom-algs.js?v=20261055"></script>
+<script src="/js/cross-solver.js?v=20261055"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261055"></script>
+<script src="/js/recog-trainer.js?v=20261055"></script>
 
 <script>
 /* ============================================================
@@ -815,6 +793,7 @@ var BASE = "/icerikler/algoritmalar/";
 /* keyFmt: algoritma sayfasının "Öğreniyorum" kaydında kullandığı anahtar biçimi
    ("name" = sadece case adı, "subset" = "altgrup::ad") */
 var SETS = [
+    { id: "cross",      label: "Cross",      gen: "cross", progress: "algo-progress-cross", keyFmt: "name", page: "", puzzle: "cfop", cube: "3x3", draw: crossDraw },
     { id: "oll",        label: "OLL",        file: "oll-pll.json",    dataKey: "oll",  progress: "algo-progress-oll",        keyFmt: "name",   page: "oll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
     { id: "pll",        label: "PLL",        file: "oll-pll.json",    dataKey: "pll",  progress: "algo-progress-pll",        keyFmt: "subset", page: "pll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
     { id: "coll",       label: "COLL",       file: "coll.json",       dataKey: "coll", progress: "algo-progress-coll",       keyFmt: "subset", page: "coll",       puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
@@ -843,6 +822,27 @@ var PUZZLES = [
     { id: "4x4",   label: "4x4" },
     { id: "5x5",   label: "5x5" }
 ];
+/* Cross seti: case = en kısa çözüm uzunluğu; karıştırma her seferinde CrossSolver ile üretilir */
+var CROSS_LEVELS = [{ id: "easy", min: 0, max: 5 }, { id: "mid", min: 6, max: 6 }, { id: "hard", min: 7, max: 8 }];
+var crossRes = null, curBaseScramble = "";
+function crossDraw(c, size) {
+    var on = { 1: 1, 3: 1, 4: 1, 5: 1, 7: 1 }, h = "";
+    for (var i = 0; i < 9; i++) h += '<rect x="' + (1 + (i % 3) * 10) + '" y="' + (1 + Math.floor(i / 3) * 10) + '" width="10" height="10" rx="1.5" fill="' + (on[i] ? "#ffffff" : "#8b93a7") + '" stroke="#17171f" stroke-width="1"/>';
+    var n = { easy: "≤5", mid: "6", hard: "7+" }[c.lvl] || "";
+    return '<svg viewBox="0 0 32 32" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg">' + h +
+        '<text x="16" y="19.5" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900" font-size="' + (n.length > 1 ? 7 : 9) + '" fill="#17171f">' + n + '</text></svg>';
+}
+function crossCases(s) {
+    return CROSS_LEVELS.map(function (l) {
+        var raw = { lvl: l.id, alg: "", __set: s };
+        return { key: "cross::" + l.id, name: T("cross_" + l.id), subset: "cross", alg: "", raw: raw, scrambles: [], set: s, setId: s.id, lvl: l };
+    });
+}
+function crossScramble(l) {
+    var s, d, tries = 0;
+    do { s = CrossSolver.scramble(20); d = CrossSolver.distance(s); tries++; } while ((d < l.min || d > l.max) && tries < 3000);
+    return { scramble: s, res: CrossSolver.solve(s, 3) };
+}
 var PUZ_KEY = "trainer-puzzle-sets-v1"; // bulmaca -> son seçilen set
 /* Pyraminx, Skewb, 4x4, 5x5 ve Roux: veri dosyasındaki çokgen geometrisiyle çiz (algoritma sayfalarıyla aynı) */
 function polyDraw(c, size) {
@@ -888,6 +888,14 @@ var FALLBACK = {
     hold_tip_skewb: "Karıştırma Sarah notasyonundadır: bir üst köşe sana bakacak şekilde tut; F, R, L, B öndeki, sağdaki, soldaki ve arkadaki üst köşedir.",
     hold_tip_big: "Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.",
     pz_label: "Küp",
+    cross_easy: "Kolay (≤5)",
+    cross_mid: "Orta (6)",
+    cross_hard: "Zor (7–8)",
+    hold_tip_cross: "Sarı üstte, yeşil önde tutarak çözülmüş küpe uygula. Beyaz artı altta kurulur: 15 saniyede tamamını planla.",
+    hint_card_cross: "Karıştırmaya bak, artıyı aklında planla; hazır olunca dokun ya da bir tuşa bas",
+    hint_card_done_cross: "Planın en kısa çözüme yakın mıydı? İyi (1) / Zorlandım (2)",
+    cross_best: "En kısa çözüm: {n} hamle",
+    cross_yours: "Senin çözümün: {n} hamle",
     known_none: "Bu sette \"Biliyorum\" olarak işaretlediğin case yok. Algoritma sayfasında case kartlarına tıklayarak işaretleyebilirsin.",
     hint_card: "Algoritmayı aklından geçir, hazır olunca dokun ya da bir tuşa bas",
     hint_card_done: "Doğru hatırladın mı? Bildim (1) / Zorlandım (2)",
@@ -940,6 +948,7 @@ var mode = (load(MODE_KEY, {}).mode === "card") ? "card" : "cube";
 function statId() { return mode === "card" ? current.id + ":card" : current.id; }
 // Küple modda süre işlerken set/case değiştirilmez; kart modunda her an değiştirilebilir
 function holdTipKey() {
+    if (current.gen === "cross") return "hold_tip_cross";
     return { "2x2": "hold_tip_2x2", roux: "hold_tip_roux", pyra: "hold_tip_pyra", skewb: "hold_tip_skewb", "4x4": "hold_tip_big", "5x5": "hold_tip_big" }[current.puzzle] || "hold_tip_3x3";
 }
 function busy() { return state === "running" && mode === "cube"; }
@@ -952,10 +961,10 @@ function progressKey(set, c) { return set.keyFmt === "name" ? c.name : c.subset 
 
 function loadAll() {
     var files = {};
-    SETS.forEach(function (s) { files[s.file] = true; });
+    SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261054").then(function (r) {
+        return fetch(BASE + f + "?v=20261055").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -964,6 +973,7 @@ function loadAll() {
         names.forEach(function (n, i) { byFile[n] = jsons[i]; });
         var scr = byFile["antrenor-karistirmalar.json"];
         SETS.forEach(function (s) {
+            if (s.gen === "cross") { DATA[s.id] = window.CrossSolver ? crossCases(s) : []; return; }
             var groups;
             if (s.multi) {
                 var entry = (byFile[s.file].sets || []).filter(function (x) { return x.id === s.multi; })[0] || { groups: [] };
@@ -1032,6 +1042,8 @@ function selectSet(id) {
         DATA[current.id].forEach(function (c) { selection[current.id][c.key] = true; });
         save(SEL_KEY, selection);
     }
+    document.getElementById("trainerBox").classList.toggle("is-gen", !!current.gen);
+    document.getElementById("setupBox").classList.toggle("is-gen", !!current.gen);
     renderTabs();
     renderCases();
     document.getElementById("holdTip").textContent = T(holdTipKey());
@@ -1077,10 +1089,21 @@ function renderCases() {
     updateSelCount();
 }
 
+function sameKeys(a, b) {
+    var ka = Object.keys(a).filter(function (k) { return a[k]; }), kb = Object.keys(b);
+    return ka.length === kb.length && kb.every(function (k) { return a[k]; });
+}
 function updateSelCount() {
     var sel = selection[current.id];
     var n = DATA[current.id].filter(function (c) { return sel[c.key]; }).length;
     document.getElementById("selCount").textContent = T("sel_count").replace("{n}", n).replace("{t}", DATA[current.id].length);
+    // Seçim hazır filtrelerden birine denkse o düğme seçili görünür
+    var learn = markedSet(current, "learning"), known = markedSet(current, "known"), act = "";
+    if (n === DATA[current.id].length) act = "selAll";
+    else if (n === 0) act = "selNone";
+    else if (Object.keys(learn).length && sameKeys(sel, learn)) act = "selLearning";
+    else if (Object.keys(known).length && sameKeys(sel, known)) act = "selKnown";
+    ["selAll", "selLearning", "selKnown", "selNone"].forEach(function (id) { document.getElementById(id).classList.toggle("active", id === act); });
 }
 
 function setSelection(map) {
@@ -1124,8 +1147,15 @@ function nextCase() {
     document.getElementById("grade").classList.remove("show");
     document.getElementById("timerArea").classList.remove("running");
     if (empty) { document.getElementById("scramble").textContent = ""; return; }
-    var list = curCase.scrambles;
-    curScramble = list[Math.floor(Math.random() * list.length)];
+    if (current.gen === "cross") {
+        var g = crossScramble(curCase.lvl);
+        curScramble = g.scramble; crossRes = g.res;
+        curCase.alg = curCase.raw.alg = g.res.solutions[0];
+    } else {
+        var list = curCase.scrambles;
+        curScramble = list[Math.floor(Math.random() * list.length)];
+    }
+    curBaseScramble = curScramble;
     document.getElementById("scramble").textContent = curScramble;
     document.getElementById("timer").textContent = "0.00";
     if (mode === "card") {
@@ -1151,7 +1181,7 @@ function startTimer() {
     state = "running";
     startTime = performance.now();
     document.getElementById("timerArea").classList.add("running");
-    document.getElementById("timerHint").textContent = T(mode === "card" ? "hint_card" : "hint_running");
+    document.getElementById("timerHint").textContent = T(mode === "card" ? (current.gen ? "hint_card_cross" : "hint_card") : "hint_running");
     tick();
 }
 
@@ -1162,7 +1192,7 @@ function stopTimer() {
     state = "done";
     document.getElementById("timer").textContent = fmt(lastTime);
     document.getElementById("timerArea").classList.remove("running");
-    document.getElementById("timerHint").textContent = T(mode === "card" ? "hint_card_done" : "hint_done");
+    document.getElementById("timerHint").textContent = T(mode === "card" ? (current.gen ? "hint_card_done_cross" : "hint_card_done") : "hint_done");
     document.getElementById("revealDiagram").innerHTML = current.draw(curCase.raw, 74);
     document.getElementById("revealName").textContent = curCase.name;
     showRevealAlg();
@@ -1188,6 +1218,15 @@ function grade(hard) {
 
 /* Açılan cevapta algoritma + "kendi algoritman" düzenleme */
 function showRevealAlg() {
+    if (current.gen === "cross" && crossRes) {
+        document.getElementById("revealName").textContent = T("cross_best").replace("{n}", crossRes.length);
+        document.getElementById("revealAlg").innerHTML = '<div class="cross-sols">' + crossRes.solutions.map(function (x) { return "<div>" + esc(x) + "</div>"; }).join("") + "</div>";
+        var yours = (mode === "cube" && typeof btIsActive === "function" && btIsActive() && window.btSolveCount != null) ? T("cross_yours").replace("{n}", window.btSolveCount) : "";
+        document.getElementById("revealMine").textContent = yours;
+        document.getElementById("revealEdit").style.display = "none";
+        document.getElementById("revealEditHost").innerHTML = "";
+        return;
+    }
     document.getElementById("revealAlg").textContent = curCase.alg;
     var mine = curCase.alg !== curCase.raw.alg;
     var m = document.getElementById("revealMine");
@@ -1363,8 +1402,8 @@ applyMode();
 
 // Dil değişince dinamik metinleri yenile (common.js applyLanguage sonrası çağırır)
 function onLanguageApplied() {
+    (DATA.cross || []).forEach(function (c) { c.name = T("cross_" + c.lvl.id); });
     RecogTrainer.onLang();
-    CrossTrainer.onLang();
     if (!current) return;
     renderCases();
     renderStats();
@@ -1374,8 +1413,8 @@ function onLanguageApplied() {
     if (typeof btRenderBar === "function") btRenderBar();
 }
 
-/* ---------------- ARAÇ SEKMELERİ: Algoritma / PLL tanıma / Cross ---------------- */
-var TOOL_KEY = "trainer-tool-v1", TOOLS = { alg: "toolAlg", recog: "toolRecog", cross: "toolCross" };
+/* ---------------- ARAÇ SEKMELERİ: Algoritma / PLL tanıma ---------------- */
+var TOOL_KEY = "trainer-tool-v1", TOOLS = { alg: "toolAlg", recog: "toolRecog" };
 var tool = "alg";
 function selectTool(t) {
     if (!TOOLS[t]) t = "alg";
@@ -1389,13 +1428,13 @@ function selectTool(t) {
         b.setAttribute("aria-selected", on ? "true" : "false");
     });
     if (t === "recog") RecogTrainer.start();
-    if (t === "cross") CrossTrainer.start();
 }
 document.getElementById("toolTabs").addEventListener("click", function (e) {
     var b = e.target.closest(".tool-tab");
     if (b) { selectTool(b.getAttribute("data-tool")); b.blur(); }
 });
-selectTool(new URLSearchParams(location.search).get("tool") || load(TOOL_KEY, {}).tool || "alg");
+// ?set=... bağlantısıyla gelindiyse algoritma sekmesi açılır
+selectTool(new URLSearchParams(location.search).get("set") ? "alg" : (new URLSearchParams(location.search).get("tool") || load(TOOL_KEY, {}).tool || "alg"));
 
 loadAll().then(function () {
     var saved = load(SET_KEY, {});

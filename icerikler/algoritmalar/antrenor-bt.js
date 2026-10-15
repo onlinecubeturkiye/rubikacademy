@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261054";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261055";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -61,6 +61,8 @@
     function isF2L(s) { return s.p[1] < 1; }
     function isTopFace(s) { return s.n[1] === 1; }
     function isTopCorner(s) { return s.p[1] === 1 && s.p[0] !== 0 && s.p[2] !== 0; }
+    // Beyaz artı (sarı üst tutuşta alt yüz): alt merkez, 4 alt kenar ve yanlardaki eşleri
+    function isCrossSt(s) { return s.p[1] === -1 && (s.p[0] === 0 || s.p[2] === 0); }
     function upToAUF(model, test) {
         for (var k = 0; k < 4; k++) { if (matches(model, test)) return true; model = turn(model, "U", 1); }
         return false;
@@ -75,6 +77,7 @@
         if (id === "oll" || id === "wv") return matches(model, isF2L) && matches(model, isTopFace);
         if (id === "coll") return matches(model, isF2L) && matches(model, isTopFace) && upToAUF(model, isTopCorner);
         if (id === "pll") return upToAUF(model, function () { return true; });
+        if (id === "cross") return matches(model, isCrossSt);
         return isSolved(model);
     }
 
@@ -89,10 +92,18 @@
     var CONNECT_TIMEOUT = 25000;
     var lastDevice = null, userDisconnect = false; // bu sayfada seçilen küp: tekrar bağlanırken Chrome listesi açılmasın
     var MAX_FIX = 10; // bundan fazla düzeltme hamlesi birikirse "küpü çöz" denir
+    /* Cross seti: küpü her seferinde tamamen çözmek gerekmez. Artı kenarlarının durumu
+       CrossSolver ile izlenir; yeni karıştırmanın başına artıyı geri kuran kısa bir giriş eklenir. */
+    var crossSt = window.CrossSolver ? CrossSolver.SOLVED : null;
+    var inspTimer = 0, lastSolveFace = null;
+    window.btSolveCount = null; // cross çözümünde yapılan hamle sayısı (aynı yüz art arda tek sayılır)
+    function isCross() { return !!(current && current.gen === "cross"); }
+    function setSolved() { model = solvedModel(); modelKnown = true; if (window.CrossSolver) crossSt = CrossSolver.SOLVED; }
 
     function el(id) { return document.getElementById(id); }
     /* i18n.js eski bir sürümden gelirse ham anahtar görünmesin diye Türkçe yedekler */
     var FB = {
+        bt_insp: "İnceleme: {n} sn · artıyı planla, ilk hamlende süre başlar", bt_insp_over: "İnceleme süresi doldu, başla!",
         bt_title: "Bluetooth akıllı küp", bt_connect: "Bağlan", bt_reset: "Küpüm çözülmüş", bt_disconnect: "Bağlantıyı kes",
         bt_hint: "GAN (i, i2, i3, i Carry, ui…), MoYu, QiYi, GoCube veya Giiker akıllı küpünü bağla: karıştırma takip edilir, süre kendiliğinden başlar ve case çözülünce durur.",
         bt_unsupported: "Bluetooth küp için Chrome veya Edge gerekir (iPhone/iPad desteklenmez).",
@@ -164,10 +175,15 @@
         el("btConnect").textContent = txt("bt_connect");
         el("btReset").textContent = txt("bt_reset");
         el("btDisconnect").textContent = txt("bt_disconnect");
+        // Bluetooth'u desteklemeyen tarayıcıda (iPhone, Firefox) kutu hiç gösterilmez
+        bar.classList.toggle("unsup", !supported());
         if (!supported()) { st.textContent = txt("bt_unsupported"); el("btConnect").disabled = true; return; }
+        if (connecting) bar.classList.add("has-msg");
         if (connecting) { st.textContent = txt("bt_connecting") + (stage ? " (" + txt("bt_st_" + stage) + (stageName ? ": " + stageName : "") + ")" : ""); return; }
-        if (!on && lastError) { st.textContent = lastError; return; }
-        if (!on) { st.textContent = txt("bt_hint"); return; }
+        if (!on && lastError) { st.textContent = lastError; bar.classList.add("has-msg"); return; }
+        bar.classList.remove("has-msg");
+        bar.title = on ? "" : txt("bt_hint");
+        if (!on) { st.textContent = ""; return; }
         if (noData) { st.textContent = txt("bt_no_data2") + (lastMac ? " " + txt("bt_mac_used") + " " + lastMac : ""); return; }
         if (current && (current.cube !== "3x3" || current.noBT)) st.textContent = txt("bt_only3x3");
         else if (mode !== "cube") st.textContent = txt("bt_cube_mode");
@@ -215,7 +231,36 @@
     function setHint(k) { var h = el("timerHint"); if (h) h.textContent = txt(k); }
 
     /* ---------- karıştırma takibi ---------- */
+    // İki hamle dizisini birleştir; birleşme yerinde aynı yüz varsa tek hamleye indir
+    function joinMoves(a, b) {
+        var x = parseScramble(a || ""), y = parseScramble(b || "");
+        while (x.length && y.length && x[x.length - 1].f === y[0].f) {
+            var m = x.pop(), q = (m.q + y.shift().q) % 4;
+            if (q) { x.push({ f: m.f, q: q }); break; }
+        }
+        return x.concat(y).map(function (m) { return fmtMove(m.f, m.q); }).join(" ");
+    }
+    function crossPrefix() {
+        var base = (typeof curBaseScramble === "string" && curBaseScramble) || curScramble;
+        var pre = (window.CrossSolver && crossSt) ? CrossSolver.solveState(crossSt, 1).solutions[0] : "";
+        curScramble = joinMoves(pre, base);
+    }
+    function stopInsp() { clearInterval(inspTimer); inspTimer = 0; }
+    // Cross: karıştırma bitince 15 sn inceleme geri sayımı; ilk hamlede süre başlar
+    function startInsp() {
+        stopInsp();
+        var end = Date.now() + 15000;
+        function upd() {
+            var left = Math.ceil((end - Date.now()) / 1000), h = el("timerHint");
+            if (!h) return;
+            if (left <= 0) { h.textContent = txt("bt_insp_over"); stopInsp(); return; }
+            h.textContent = txt("bt_insp").replace("{n}", left);
+        }
+        upd(); inspTimer = setInterval(upd, 250);
+    }
     function startScrambleTracking() {
+        stopInsp();
+        window.btSolveCount = null;
         tooMany = false;
         todo = parseScramble(curScramble);
         total = todo.length;
@@ -228,6 +273,7 @@
         renderBar();
         if (!applies()) { phase = "off"; return; }
         afterCase = phase === "done";
+        if (isCross() && modelKnown) { crossPrefix(); startScrambleTracking(); return; }
         if (!modelKnown || !isSolved(model)) { phase = "needSolve"; renderScramble(); setHint("bt_hint_solve"); return; }
         startScrambleTracking();
     };
@@ -237,6 +283,7 @@
         var f = MAP[FACES[face]];
         var d = dir === 0 ? 1 : 3;
         model = turn(model, f, d);
+        if (crossSt && window.CrossSolver) crossSt = CrossSolver.apply(crossSt, fmtMove(f, d));
         if (!applies()) return;
         if (phase === "needSolve") {
             if (modelKnown && isSolved(model)) startScrambleTracking();
@@ -259,22 +306,27 @@
             // Çok fazla yanlış hamle: uzun düzeltme listesi yerine küpü çözmesini iste
             var fixCount = 0;
             for (var k = 0; k < todo.length && todo[k].fix; k++) fixCount += todo[k].q === 2 ? 2 : 1;
+            if (fixCount > MAX_FIX && isCross()) { crossPrefix(); startScrambleTracking(); return; }
             if (fixCount > MAX_FIX) {
                 phase = "needSolve"; tooMany = true; afterCase = false;
                 renderScramble(); setHint("bt_hint_solve");
                 return;
             }
-            if (!todo.length) { phase = "ready"; setHint("bt_hint_ready"); }
+            if (!todo.length) { phase = "ready"; setHint("bt_hint_ready"); if (isCross()) startInsp(); }
             renderScramble();
             return;
         }
         if (phase === "ready" && state === "idle") {
             phase = "solving";
+            stopInsp();
+            window.btSolveCount = 1; lastSolveFace = f;
             startTimer();
             if (caseDone(model)) { stopTimer(); phase = "done"; }
             return;
         }
         if ((phase === "solving" || state === "running") && state === "running") {
+            if (window.btSolveCount != null && f !== lastSolveFace) window.btSolveCount++;
+            lastSolveFace = f;
             if (caseDone(model)) { stopTimer(); phase = "done"; }
         }
     }
@@ -445,7 +497,7 @@
                 }
                 else if (ev.type === "FACELETS") {
                     if (!modelKnown) {
-                        if (ev.facelets === "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB") { model = solvedModel(); modelKnown = true; }
+                        if (ev.facelets === "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB") setSolved();
                         window.btOnNewCase();
                     }
                 } else if (ev.type === "DISCONNECT") {
@@ -483,7 +535,8 @@
     }
     function dropConnection() {
         if (sub) { try { sub.unsubscribe(); } catch (e) {} }
-        sub = null; conn = null; phase = "off"; noData = false;
+        sub = null; conn = null; phase = "off"; noData = false; stopInsp(); window.btSolveCount = null;
+        if (isCross() && typeof curBaseScramble === "string" && curBaseScramble) curScramble = curBaseScramble;
         renderBar();
         if (curScramble) el("scramble").textContent = curScramble;
         if (state === "idle") setHint("hint_ready");
@@ -495,7 +548,7 @@
         if (c) c.disconnect().catch(function () {});
     }
     function markSolved() {
-        model = solvedModel(); modelKnown = true;
+        setSolved();
         if (state === "running") return;
         window.btOnNewCase();
     }
