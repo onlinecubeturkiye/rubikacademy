@@ -105,36 +105,29 @@
         $("hList").innerHTML = rows.length ? rows.map(function (k) { return '<div class="h-row"><span>' + esc(k.split(":")[0]) + '</span><b>' + esc(label(res[k])) + '</b></div>'; }).join("") : '<p class="h-empty">' + esc(T("no_hist", "Henüz sonuç yok.")) + '</p>';
     }
     /* ---------- sıralama tablosu (Firebase) ---------- */
-    var SENT_KEY = "daily-sent-v1", lbTimer = 0;
+    var SENT_KEY = "daily-sent-v1", NAME_KEY = "daily-name-v1", lbTimer = 0;
     function lbOn() { return !!(window.Leaderboard && Leaderboard.enabled()); }
     function sentToday() { try { return !!(JSON.parse(localStorage.getItem(SENT_KEY)) || {})[today()]; } catch (e) { return false; } }
     function markSent() { try { var o = JSON.parse(localStorage.getItem(SENT_KEY)) || {}; o[today()] = 1; localStorage.setItem(SENT_KEY, JSON.stringify(o)); } catch (e) {} }
     function dayOf(key) { var p = key.split("-"); return String(Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000)); }
     function lbMsg(text, kind) { var m = $("lbMsg"); m.textContent = text || ""; m.className = "lb-msg" + (kind ? " " + kind : ""); }
-    function acc() { return window.Account && Account.enabled() ? Account : null; }
     function renderSend() {
         var r = official(), on = lbOn() && !!r, sent = sentToday();
-        var A = acc(), u = A && A.user(), pending = A && A.isPending();
-        // Gönderim için giriş gerekir: girişsizken "giriş yap" butonu görünür
-        $("lbSend").hidden = !on || sent || !u;
-        $("lbLogin").hidden = !on || sent || !!u || !A || pending;
+        $("lbSend").hidden = !on || sent;
         $("dPen2").disabled = $("dPenDnf").disabled = on && sent; // gönderildikten sonra ceza değişmez
         if (!on) { lbMsg(""); return; }
         $("lbName").placeholder = T("lb_name", "Adın (sıralamada görünür)");
-        if (u && !$("lbName").value) {
-            var nm = (u.displayName || (u.email || "").split("@")[0] || "").replace(/\s+/g, " ").trim().slice(0, 20);
-            $("lbName").value = nm;
-        }
+        if (!$("lbName").value) { try { $("lbName").value = localStorage.getItem(NAME_KEY) || ""; } catch (e) {} }
         if (sent) lbMsg(T("lb_sent", "Sıralamaya gönderildi ✓"), "ok");
         else if (r.t < 3000 && r.pen !== "dnf") lbMsg(T("lb_too_fast", "3 saniyenin altındaki süreler sıralamaya kabul edilmez."), "bad");
         else if ($("lbMsg").className.indexOf("bad") < 0) lbMsg("");
     }
     function sendResult() {
         var r = official(); if (!r || !lbOn() || sentToday()) return;
-        if (!acc() || !Account.user()) { if (acc()) Account.openLogin(); return; }
         var name = $("lbName").value.replace(/\s+/g, " ").trim();
         if (name.length < 2 || name.length > 20) { lbMsg(T("lb_bad_name", "Ad 2-20 karakter olmalı."), "bad"); $("lbName").focus(); return; }
         if (r.t < 3000 && r.pen !== "dnf") { lbMsg(T("lb_too_fast"), "bad"); return; }
+        try { localStorage.setItem(NAME_KEY, name); } catch (e) {}
         $("lbSendBtn").disabled = true; lbMsg(T("lb_sending", "Gönderiliyor…"));
         Leaderboard.submit(name, r.t, r.pen, dayOf(today())).then(function (res) {
             $("lbSendBtn").disabled = false;
@@ -195,9 +188,6 @@
         $("lbName").addEventListener("keydown", function (e) { e.stopPropagation(); if (e.key === "Enter") sendResult(); });
         $("lbName").addEventListener("keyup", function (e) { e.stopPropagation(); });
         $("lbRefresh").addEventListener("click", loadBoard);
-        $("lbLoginBtn").addEventListener("click", function () { if (acc()) Account.openLogin(); });
-        // Giriş/çıkış ya da başka cihazdan gelen sonuçlar: gönder bölümünü ve sıralamayı yenile
-        document.addEventListener("account-change", function () { renderSend(); loadBoard(); });
         document.addEventListener("site-lang-change", renderAll);
         renderAll();
     }
