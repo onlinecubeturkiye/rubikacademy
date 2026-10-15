@@ -113,10 +113,22 @@ function applyLanguage(lang) {
     /* Sayfaya özel anahtar varsa o kazanır, yoksa ortak (common) kullanılır */
     var dict = Object.assign({}, commonDict, pageDict);
 
+    /* data-i18n-scope="sayfa" içindeki öğeler o sayfanın çevirisini kullanır
+       (örn. antrenör sayfasındaki PLL tanıma ve cross sekmeleri) */
+    var scoped = {};
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
         var key = el.getAttribute("data-i18n");
-        if (dict && dict[key]) {
-            el.textContent = dict[key];
+        var sc = el.closest("[data-i18n-scope]"), d = dict;
+        if (sc) {
+            var sid = sc.getAttribute("data-i18n-scope");
+            if (!scoped[sid]) {
+                var sp = SITE_I18N.pages[sid] || {};
+                scoped[sid] = Object.assign({}, commonDict, sp.tr || {}, sp[lang] || {});
+            }
+            d = scoped[sid];
+        }
+        if (d && d[key]) {
+            el.textContent = d[key];
         }
     });
 

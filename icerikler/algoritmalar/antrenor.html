@@ -37,7 +37,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261053">
+<link rel="stylesheet" href="/styles/common.css?v=20261054">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -457,6 +457,80 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     .chip { width: 68px; }
     .chip svg { width: 40px; height: 40px; }
 }
+
+/* ARAÇ SEKMELERİ: Algoritma / PLL tanıma / Cross */
+.tool-tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 0 auto 22px; }
+.tool-tab { padding: 10px 18px; border-radius: 14px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 15px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
+.tool-tab.active { background: var(--cube-yellow); color: #17171f; }
+.tool-intro { text-align: center; color: var(--text-soft); font-size: 14.5px; max-width: 660px; margin: 0 auto 16px; }
+.rc-grid .box, .cx-wrap .box { margin-bottom: 0; }
+.chip-known { font-size: 9px; line-height: 1; }
+
+/* PLL TANIMA */
+.rc-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; max-width: 1100px; margin: 0 auto; }
+.rc-stage { display: grid; justify-items: center; gap: 12px; }
+.rc-cube { width: 230px; height: 230px; position: relative; }
+.rc-cube svg { width: 100%; height: 100%; }
+.rc-cube.ok::after, .rc-cube.bad::after { position: absolute; inset: auto 0 -6px 0; text-align: center; font: 900 15px Inter, sans-serif; }
+.rc-timer { font: 800 22px "JetBrains Mono", monospace; color: var(--text-soft); }
+.rc-feedback { min-height: 26px; font-weight: 900; font-size: 16px; text-align: center; }
+.rc-feedback.ok { color: var(--cube-green); }
+.rc-feedback.bad { color: var(--cube-red); }
+.rc-reveal { display: none; align-items: center; gap: 14px; padding: 10px 14px; border-radius: 16px; background: var(--surface-soft); border: 1.5px solid var(--border); }
+.rc-reveal.show { display: flex; }
+.rc-reveal svg { width: 70px; height: 70px; }
+.rc-reveal b { font-size: 16px; }
+.rc-reveal code { display: block; font: 700 12.5px "JetBrains Mono", monospace; color: var(--primary); margin-top: 3px; }
+.rc-next { padding: 9px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--cube-yellow); color: #17171f; font: 900 14px Inter, sans-serif; cursor: pointer; }
+.rc-answers { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; width: 100%; margin-top: 6px; }
+.rc-ans { padding: 10px 6px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 15px Inter, sans-serif; cursor: pointer; box-shadow: 2px 2px 0 var(--ink); transition: transform .08s; }
+.rc-ans:hover { background: var(--surface-soft); }
+.rc-ans:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
+.rc-ans.right { background: var(--cube-green); color: #fff; }
+.rc-ans.wrong { background: var(--cube-red); color: #fff; }
+.rc-ans:disabled { cursor: default; }
+.rc-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.rc-tile { border: 1.5px solid var(--border); border-radius: 14px; padding: 10px; background: var(--surface-soft); }
+.rc-tile b { display: block; font: 800 20px "JetBrains Mono", monospace; color: var(--text); }
+.rc-tile span { font-size: 12px; font-weight: 700; color: var(--text-soft); }
+.rc-weak h3 { font-size: 15px; font-weight: 900; margin-bottom: 8px; color: var(--text); }
+.rc-row { display: flex; justify-content: space-between; gap: 8px; padding: 6px 2px; border-bottom: 1px solid var(--border); font-size: 13.5px; color: var(--text); }
+.rc-row small { color: var(--text-soft); font-family: "JetBrains Mono", monospace; }
+.rc-reset { margin-top: 12px; padding: 7px 12px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface-soft); color: var(--text); font: 800 12.5px Inter, sans-serif; cursor: pointer; }
+.rc-empty { font-size: 13px; color: var(--text-soft); }
+.rc-help { font-size: 13px; color: var(--text-soft); text-align: center; margin-top: 4px; }
+@media (max-width: 900px) { .rc-grid { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .rc-cube { width: 200px; height: 200px; } .rc-answers { grid-template-columns: repeat(4, 1fr); } }
+
+/* CROSS */
+.cx-wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 16px; }
+.cx-levels { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.cx-lvl { padding: 8px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; }
+.cx-lvl.active { background: var(--cube-yellow); color: #17171f; box-shadow: var(--shadow-sm); }
+.cx-tip { text-align: center; font-size: 13.5px; color: var(--text-soft); margin-bottom: 10px; }
+.cx-scr { text-align: center; font: 800 24px/1.5 "JetBrains Mono", monospace; color: var(--text); word-spacing: 4px; margin: 4px 0 14px; }
+.cx-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.cx-btn { padding: 10px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
+.cx-btn.primary { background: var(--cube-yellow); color: #17171f; }
+.cx-btn:disabled { opacity: .5; cursor: default; }
+.cx-insp { display: grid; place-items: center; margin: 14px auto 4px; width: 110px; height: 110px; border-radius: 50%; border: 6px solid var(--border); font: 900 34px "JetBrains Mono", monospace; color: var(--text); }
+.cx-insp.run { border-color: var(--cube-green); }
+.cx-insp.warn { border-color: var(--cube-orange, #ff7a1a); }
+.cx-insp.over { border-color: var(--cube-red); color: var(--cube-red); font-size: 18px; }
+.cx-result { margin-top: 14px; display: none; text-align: center; }
+.cx-result.show { display: block; }
+.cx-len { font-size: 18px; font-weight: 900; color: var(--text); }
+.cx-len b { color: var(--primary); }
+.cx-sols { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
+.cx-sols li { font: 800 17px "JetBrains Mono", monospace; color: var(--primary); background: var(--surface-soft); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 12px; }
+.cx-check h3 { font-size: 16px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
+.cx-check-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.cx-check input { flex: 1; min-width: 200px; padding: 10px 12px; border-radius: 12px; border: var(--card-bw) solid var(--border); background: var(--surface-soft); color: var(--text); font: 700 15px "JetBrains Mono", monospace; }
+.cx-msg { margin-top: 8px; font-weight: 800; font-size: 14px; min-height: 20px; }
+.cx-msg.ok { color: var(--cube-green); }
+.cx-msg.bad { color: var(--cube-red); }
+.cx-stats { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; font-size: 13px; color: var(--text-soft); font-weight: 700; }
+@media (max-width: 520px) { .cx-scr { font-size: 19px; } }
 </style>
 
 <!-- Google tag (gtag.js) -->
@@ -510,6 +584,75 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     <p data-i18n="intro_p">Bir set seç, karıştırmayı çözülmüş küpe uygula, case'i tanı ve çöz. Süren ölçülür; zorlandığın case'ler daha sık gelir.</p>
 </section>
 
+<div class="tool-tabs" id="toolTabs" role="tablist">
+    <button type="button" class="tool-tab active" data-tool="alg" role="tab" data-i18n="tool_alg">🧠 Algoritma</button>
+    <button type="button" class="tool-tab" data-tool="recog" role="tab" data-i18n="tool_recog">👁 PLL Tanıma</button>
+    <button type="button" class="tool-tab" data-tool="cross" role="tab" data-i18n="tool_cross">✚ Cross</button>
+</div>
+
+<div id="toolRecog" data-i18n-scope="tanima" hidden>
+<p class="tool-intro" data-i18n="intro">Küpün iki yüzüne bak, hangi PLL olduğunu seç. Hızlanmanın sırrı algoritmayı değil, case'i hızlı tanımaktır.</p>
+<div class="rc-grid">
+    <section class="box rc-stage">
+        <div class="rc-cube" id="rcCube" dir="ltr"></div>
+        <div class="rc-timer" id="rcTimer" dir="ltr">0.00</div>
+        <div class="rc-feedback" id="rcFeedback" role="status" aria-live="polite"></div>
+        <div class="rc-reveal" id="rcReveal"><span id="rcRevealDiag" dir="ltr"></span><div><b id="rcRevealName"></b><code id="rcRevealAlg" dir="ltr"></code></div><button type="button" class="rc-next" id="rcNext" data-i18n="next">Devam →</button></div>
+        <div class="rc-answers" id="rcAnswers"></div>
+        <p class="rc-help" data-i18n="help">Doğru cevapta sonraki case kendiliğinden gelir. Yanlışta doğrusu gösterilir.</p>
+    </section>
+    <aside class="box">
+        <div class="rc-tiles">
+            <div class="rc-tile"><b id="stAcc">-</b><span data-i18n="st_acc">Doğruluk</span></div>
+            <div class="rc-tile"><b id="stAvg">-</b><span data-i18n="st_avg">Ortalama tanıma</span></div>
+            <div class="rc-tile"><b id="stStreak">0</b><span data-i18n="st_streak">Seri</span></div>
+            <div class="rc-tile"><b id="stCount">0</b><span data-i18n="st_count">Toplam deneme</span></div>
+        </div>
+        <div class="rc-weak"><h3 data-i18n="weak">En çok zorlandıkların</h3><div id="weakList"></div></div>
+        <button type="button" class="rc-reset" id="rcReset" data-i18n="reset">İstatistikleri sıfırla</button>
+    </aside>
+</div>
+</div>
+
+<div id="toolCross" data-i18n-scope="cross" hidden>
+<p class="tool-intro" data-i18n="intro">Karıştırmayı uygula, 15 saniyelik incelemede beyaz artının tamamını planla. Sonra en kısa çözümle karşılaştır.</p>
+<div class="cx-wrap">
+    <section class="box">
+        <div class="cx-levels" id="cxLevels" role="tablist">
+            <button type="button" class="cx-lvl active" data-l="all" data-i18n="lvl_all">Hepsi</button>
+            <button type="button" class="cx-lvl" data-l="easy" data-i18n="lvl_easy">Kolay (≤5)</button>
+            <button type="button" class="cx-lvl" data-l="mid" data-i18n="lvl_mid">Orta (6)</button>
+            <button type="button" class="cx-lvl" data-l="hard" data-i18n="lvl_hard">Zor (7–8)</button>
+        </div>
+    </section>
+    <section class="box">
+        <p class="cx-tip" data-i18n="tip">Sarı üstte, yeşil önde tut. Beyaz artı altta kurulur.</p>
+        <div class="cx-scr" id="cxScr" dir="ltr">…</div>
+        <div class="cx-row">
+            <button type="button" class="cx-btn primary" id="cxInsp" data-i18n="insp">⏱ 15 sn inceleme</button>
+            <button type="button" class="cx-btn" id="cxLen" data-i18n="show_len">Kaç hamle?</button>
+            <button type="button" class="cx-btn" id="cxSol" data-i18n="show_sol">Çözümü göster</button>
+            <button type="button" class="cx-btn" id="cxNew" data-i18n="new">Yeni karıştırma →</button>
+        </div>
+        <div class="cx-insp" id="cxTimer" dir="ltr" hidden>15</div>
+        <div class="cx-result" id="cxResult">
+            <div class="cx-len" id="cxLenText"></div>
+            <ul class="cx-sols" id="cxSols" dir="ltr"></ul>
+        </div>
+    </section>
+    <section class="box cx-check">
+        <h3 data-i18n="check_title">Kendi çözümünü kontrol et</h3>
+        <div class="cx-check-row">
+            <input id="cxMine" dir="ltr" autocomplete="off" spellcheck="false" placeholder="ör. F R' D2 L">
+            <button type="button" class="cx-btn primary" id="cxCheck" data-i18n="check">Kontrol et</button>
+        </div>
+        <div class="cx-msg" id="cxMsg" role="status" aria-live="polite"></div>
+    </section>
+    <div class="cx-stats" id="cxStats"></div>
+</div>
+</div>
+
+<div id="toolAlg">
 <div id="loadError" class="load-error" data-i18n="load_error">Antrenör verisi yüklenemedi. Lütfen daha sonra tekrar dene.</div>
 
 <div class="trainer-grid">
@@ -530,7 +673,8 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     </div>
     <div class="sel-actions">
         <button class="btn-sm" id="selAll" data-i18n="sel_all">Tümü</button>
-        <button class="btn-sm" id="selLearning" data-i18n="sel_learning">Öğreniyorum olarak işaretlediklerim</button>
+        <button class="btn-sm" id="selLearning" data-i18n="sel_learning">🟡 Öğreniyorum</button>
+        <button class="btn-sm" id="selKnown" data-i18n="sel_known">🟢 Bildiklerim</button>
         <button class="btn-sm" id="selNone" data-i18n="sel_none">Hiçbiri</button>
     </div>
     <button class="case-toggle" id="caseToggle" aria-expanded="false"><span data-i18n="pick_cases">Case'leri tek tek seç</span> <span id="caseToggleArrow">▾</span></button>
@@ -601,6 +745,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     <div id="statTableWrap" class="stat-scroll"></div>
 </section>
 </div>
+</div><!-- /toolAlg -->
 
 </div>
 </div>
@@ -648,10 +793,13 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261053"></script>
-<script src="/js/common.js?v=20261053"></script>
-<script src="/js/custom-algs.js?v=20261053"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261053"></script>
+<script src="/js/i18n.js?v=20261054"></script>
+<script src="/js/common.js?v=20261054"></script>
+<script src="/js/custom-algs.js?v=20261054"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261054"></script>
+<script src="/js/cross-solver.js?v=20261054"></script>
+<script src="/js/recog-trainer.js?v=20261054"></script>
+<script src="/js/cross-trainer.js?v=20261054"></script>
 
 <script>
 /* ============================================================
@@ -739,7 +887,7 @@ var FALLBACK = {
     hold_tip_skewb: "Karıştırma Sarah notasyonundadır: bir üst köşe sana bakacak şekilde tut; F, R, L, B öndeki, sağdaki, soldaki ve arkadaki üst köşedir.",
     hold_tip_big: "Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.",
     pz_label: "Küp",
-    learn_set: "Öğreniyorum",
+    known_none: "Bu sette \"Biliyorum\" olarak işaretlediğin case yok. Algoritma sayfasında case kartlarına tıklayarak işaretleyebilirsin.",
     hint_card: "Algoritmayı aklından geçir, hazır olunca dokun ya da bir tuşa bas",
     hint_card_done: "Doğru hatırladın mı? Bildim (1) / Zorlandım (2)",
     mode_cube: "🧊 Küple çalış",
@@ -761,7 +909,6 @@ function T(key) {
     return FALLBACK[key] || key;
 }
 function subsetLabel(set, subset) {
-    if (set.virtual) return subset;
     var pages = (window.SITE_I18N && SITE_I18N.pages) || {};
     var p = pages[set.page] || {};
     var d = p[lang()] || p.tr || {};
@@ -807,7 +954,7 @@ function loadAll() {
     SETS.forEach(function (s) { files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261053").then(function (r) {
+        return fetch(BASE + f + "?v=20261054").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -834,36 +981,10 @@ function loadAll() {
             });
             DATA[s.id] = list;
         });
-        buildLearningSets();
     });
 }
 
-/* ---------------- ⭐ ÖĞRENİYORUM SETLERİ ----------------
-   Her küp için, algoritma sayfalarında "Öğreniyorum" işaretlenen case'leri tek sette toplar */
-function buildLearningSets() {
-    PUZZLES.forEach(function (p) {
-        var real = SETS.filter(function (s) { return s.puzzle === p.id && !s.virtual; });
-        if (!real.length) return;
-        var id = "learn-" + p.id;
-        var vs = SETS.filter(function (s) { return s.id === id; })[0];
-        if (!vs) {
-            vs = { id: id, virtual: true, label: "⭐", puzzle: p.id, cube: real[0].cube,
-                   noBT: real.some(function (s) { return s.noBT; }),
-                   draw: function (raw, size) { return raw.__set.draw.call(raw.__set, raw, size); } };
-            SETS.push(vs);
-        }
-        var list = [];
-        real.forEach(function (s) {
-            var learn = learningSet(s);
-            (DATA[s.id] || []).forEach(function (c) {
-                if (!learn[c.key]) return;
-                list.push({ key: s.id + "|" + c.key, name: c.name, subset: s.label, alg: c.alg, raw: c.raw, scrambles: c.scrambles, set: s, setId: s.id });
-            });
-        });
-        DATA[id] = list;
-    });
-}
-function setLabel(s) { return s.virtual ? "⭐ " + T("learn_set") : s.label; }
+function setLabel(s) { return s.label; }
 
 /* ---------------- SET SEKMELERİ ---------------- */
 function renderTabs() {
@@ -898,7 +1019,6 @@ function selectPuzzle(pz) {
     var last = load(PUZ_KEY, {})[pz];
     var sets = puzzleSets(pz);
     if (!sets.length) return;
-    sets = sets.filter(function (s) { return !s.virtual; }).concat(sets.filter(function (s) { return s.virtual; }));
     selectSet(sets.some(function (s) { return s.id === last; }) ? last : sets[0].id);
 }
 
@@ -906,7 +1026,7 @@ function selectSet(id) {
     current = SETS.filter(function (s) { return s.id === id; })[0] || SETS[0];
     save(SET_KEY, { id: current.id });
     var pm = load(PUZ_KEY, {}); pm[current.puzzle] = current.id; save(PUZ_KEY, pm);
-    if (!selection[current.id] || current.virtual) { // ⭐ setinde işaretler değişebilir: hep tümü seçili başlar
+    if (!selection[current.id]) {
         selection[current.id] = {};
         DATA[current.id].forEach(function (c) { selection[current.id][c.key] = true; });
         save(SEL_KEY, selection);
@@ -921,23 +1041,19 @@ function selectSet(id) {
 }
 
 /* ---------------- CASE SEÇİMİ ---------------- */
-function learningSet(set) {
-    if (set.virtual) {
-        var all = {};
-        (DATA[set.id] || []).forEach(function (c) { all[c.key] = true; });
-        return all;
-    }
+/* Algoritma sayfasında "öğreniyorum" ya da "biliyorum" işaretlenen case'ler */
+function markedSet(set, status) {
     var p = load(set.progress, {});
     var out = {};
     DATA[set.id].forEach(function (c) {
-        if (p[progressKey(set, c)] === "learning") out[c.key] = true;
+        if (p[progressKey(set, c)] === status) out[c.key] = true;
     });
     return out;
 }
 
 function renderCases() {
     var sel = selection[current.id];
-    var learn = learningSet(current);
+    var learn = markedSet(current, "learning"), known = markedSet(current, "known");
     var groups = {}, order = [];
     DATA[current.id].forEach(function (c) {
         if (!groups[c.subset]) { groups[c.subset] = []; order.push(c.subset); }
@@ -950,12 +1066,13 @@ function renderCases() {
         groups[sub].forEach(function (c) {
             html += '<button class="chip' + (sel[c.key] ? " on" : "") + '" data-key="' + esc(c.key) + '" aria-pressed="' + (sel[c.key] ? "true" : "false") + '">' +
                 '<span dir="ltr">' + current.draw(c.raw, 46) + '</span>' + esc(c.name) +
-                (learn[c.key] ? '<span class="chip-learn">🟡</span>' : '') + '</button>';
+                (learn[c.key] ? '<span class="chip-learn">🟡</span>' : known[c.key] ? '<span class="chip-known">🟢</span>' : '') + '</button>';
         });
         html += '</div>';
     });
     document.getElementById("caseGroups").innerHTML = html;
     document.getElementById("selLearning").disabled = Object.keys(learn).length === 0;
+    document.getElementById("selKnown").disabled = Object.keys(known).length === 0;
     updateSelCount();
 }
 
@@ -1129,7 +1246,7 @@ function isTyping(e) {
 }
 
 document.addEventListener("keydown", function (e) {
-    if (isTyping(e) || !current) return;
+    if (isTyping(e) || !current || tool !== "alg") return;
     if (state === "running") { e.preventDefault(); stopTimer(); return; }
     if (e.code === "Space") {
         // butona odaklıyken boşluk butonu tetiklemesin, sayfa kaymasın
@@ -1141,7 +1258,7 @@ document.addEventListener("keydown", function (e) {
     }
 });
 document.addEventListener("keyup", function (e) {
-    if (isTyping(e) || !current) return;
+    if (isTyping(e) || !current || tool !== "alg") return;
     if (e.code === "Space" && state === "idle") { e.preventDefault(); startTimer(); }
 });
 
@@ -1203,8 +1320,13 @@ document.getElementById("selAll").addEventListener("click", function () {
 });
 document.getElementById("selNone").addEventListener("click", function () { setSelection({}); });
 document.getElementById("selLearning").addEventListener("click", function () {
-    var m = learningSet(current);
+    var m = markedSet(current, "learning");
     if (!Object.keys(m).length) { alert(T("learning_none")); return; }
+    setSelection(m);
+});
+document.getElementById("selKnown").addEventListener("click", function () {
+    var m = markedSet(current, "known");
+    if (!Object.keys(m).length) { alert(T("known_none")); return; }
     setSelection(m);
 });
 document.getElementById("caseToggle").addEventListener("click", function () {
@@ -1240,6 +1362,8 @@ applyMode();
 
 // Dil değişince dinamik metinleri yenile (common.js applyLanguage sonrası çağırır)
 function onLanguageApplied() {
+    RecogTrainer.onLang();
+    CrossTrainer.onLang();
     if (!current) return;
     renderCases();
     renderStats();
@@ -1248,6 +1372,29 @@ function onLanguageApplied() {
     document.getElementById("timerHint").textContent = T(hint);
     if (typeof btRenderBar === "function") btRenderBar();
 }
+
+/* ---------------- ARAÇ SEKMELERİ: Algoritma / PLL tanıma / Cross ---------------- */
+var TOOL_KEY = "trainer-tool-v1", TOOLS = { alg: "toolAlg", recog: "toolRecog", cross: "toolCross" };
+var tool = "alg";
+function selectTool(t) {
+    if (!TOOLS[t]) t = "alg";
+    if (t !== "alg" && busy()) return;
+    tool = t;
+    save(TOOL_KEY, { tool: t });
+    Object.keys(TOOLS).forEach(function (k) { document.getElementById(TOOLS[k]).hidden = k !== t; });
+    Array.prototype.forEach.call(document.querySelectorAll(".tool-tab"), function (b) {
+        var on = b.getAttribute("data-tool") === t;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    if (t === "recog") RecogTrainer.start();
+    if (t === "cross") CrossTrainer.start();
+}
+document.getElementById("toolTabs").addEventListener("click", function (e) {
+    var b = e.target.closest(".tool-tab");
+    if (b) { selectTool(b.getAttribute("data-tool")); b.blur(); }
+});
+selectTool(new URLSearchParams(location.search).get("tool") || load(TOOL_KEY, {}).tool || "alg");
 
 loadAll().then(function () {
     var saved = load(SET_KEY, {});
