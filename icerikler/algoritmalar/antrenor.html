@@ -817,6 +817,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/js/custom-algs.js?v=20261074"></script>
 <script src="/js/cross-solver.js?v=20261074"></script>
 <script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261074"></script>
+<script src="/js/streak.js?v=20261074"></script>
 <script src="/js/recog-trainer.js?v=20261074"></script>
 
 <script>
@@ -1240,6 +1241,7 @@ function stopTimer() {
     showRevealAlg();
     document.getElementById("revealBox").classList.add("show");
     document.getElementById("grade").classList.add("show");
+    if (window.Streak) Streak.mark("alg");
 }
 
 function grade(hard) {
