@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261047";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261048";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -70,7 +70,8 @@
        COLL: + köşeler yerinde (AUF hariç)
        PLL: küp AUF hariç çözülü */
     function caseDone(model) {
-        var id = current ? current.id : "";
+        // ⭐ Öğreniyorum setinde her case kendi setinin kuralını kullanır
+        var id = (typeof curCase !== "undefined" && curCase && curCase.setId) || (current ? current.id : "");
         if (id === "oll" || id === "wv") return matches(model, isF2L) && matches(model, isTopFace);
         if (id === "coll") return matches(model, isF2L) && matches(model, isTopFace) && upToAUF(model, isTopCorner);
         if (id === "pll") return upToAUF(model, function () { return true; });
