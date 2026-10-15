@@ -9,10 +9,11 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261081";
+    var V = "20261082";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
+    var OWNER_KEY = "ra-data-owner-v1"; // bu cihazdaki ilerleme hangi hesaba ait (başka hesap girince karışmasın)
 
     /* ---------- metinler ---------- */
     var TXT = {
@@ -23,7 +24,7 @@
             e_cred: "E-posta ya da şifre hatalı.", e_inuse: "Bu e-posta ile zaten bir hesap var. Giriş yap'ı dene.", e_weak: "Şifre en az 6 karakter olmalı.",
             e_email: "E-posta adresi geçersiz.", e_many: "Çok fazla deneme yapıldı. Biraz sonra tekrar dene.", e_net: "İnternet bağlantısı yok gibi görünüyor.",
             e_popup: "Açılır pencere engellendi. Tarayıcının açılır pencere iznini ver ve tekrar dene.", e_domain: "Bu adres için giriş henüz açılmamış (yetkili alan adı).",
-            e_name: "Adın 2-20 karakter olmalı.", e_gen: "Giriş yapılamadı. Tekrar dene.", e_load: "Giriş sistemi yüklenemedi. İnternet bağlantını kontrol et." },
+            e_inapp: "Google ile giriş uygulama içi tarayıcıda (Instagram, WhatsApp vb.) çalışmaz. Siteyi Chrome veya Safari'de aç ya da e-posta ile giriş yap.", e_name: "Adın 2-20 karakter olmalı.", e_gen: "Giriş yapılamadı. Tekrar dene.", e_load: "Giriş sistemi yüklenemedi. İnternet bağlantını kontrol et." },
         en: { login: "Sign in", login_t: "Sign in", signup_t: "Sign up", google: "Continue with Google", or: "or", name: "Your name", email: "Email", pass: "Password (at least 6 characters)",
             do_login: "Sign in", do_signup: "Create account", forgot: "Forgot password", reset_sent: "A password reset link has been sent to your email.", need_email: "Type your email address first.",
             why: "With an account, your progress (known cases, stats, your own algorithms) follows you on every device and you can join the daily leaderboard.",
@@ -31,7 +32,7 @@
             e_cred: "Wrong email or password.", e_inuse: "An account with this email already exists. Try signing in.", e_weak: "Password must be at least 6 characters.",
             e_email: "Invalid email address.", e_many: "Too many attempts. Try again a bit later.", e_net: "You seem to be offline.",
             e_popup: "The pop-up was blocked. Allow pop-ups in your browser and try again.", e_domain: "Sign-in is not enabled for this address yet (authorized domain).",
-            e_name: "Name must be 2–20 characters.", e_gen: "Couldn't sign in. Please try again.", e_load: "Couldn't load sign-in. Check your internet connection." },
+            e_inapp: "Google sign-in doesn't work in in-app browsers (Instagram, WhatsApp etc.). Open the site in Chrome or Safari, or use email.", e_name: "Name must be 2–20 characters.", e_gen: "Couldn't sign in. Please try again.", e_load: "Couldn't load sign-in. Check your internet connection." },
         fr: { login: "Connexion", login_t: "Se connecter", signup_t: "S'inscrire", google: "Continuer avec Google", or: "ou", name: "Ton nom", email: "E-mail", pass: "Mot de passe (6 caractères min.)",
             do_login: "Se connecter", do_signup: "Créer un compte", forgot: "Mot de passe oublié", reset_sent: "Un lien de réinitialisation a été envoyé à ton e-mail.", need_email: "Écris d'abord ton adresse e-mail.",
             why: "Avec un compte, ta progression (cas connus, statistiques, tes algorithmes) te suit sur tous tes appareils et tu participes au classement du jour.",
@@ -39,7 +40,7 @@
             e_cred: "E-mail ou mot de passe incorrect.", e_inuse: "Un compte existe déjà avec cet e-mail. Essaie de te connecter.", e_weak: "Le mot de passe doit faire au moins 6 caractères.",
             e_email: "Adresse e-mail invalide.", e_many: "Trop de tentatives. Réessaie un peu plus tard.", e_net: "Tu sembles hors ligne.",
             e_popup: "La fenêtre a été bloquée. Autorise les pop-ups et réessaie.", e_domain: "La connexion n'est pas encore activée pour cette adresse.",
-            e_name: "Le nom doit faire 2 à 20 caractères.", e_gen: "Connexion impossible. Réessaie.", e_load: "Impossible de charger la connexion. Vérifie ta connexion internet." },
+            e_inapp: "La connexion Google ne fonctionne pas dans les navigateurs intégrés (Instagram, WhatsApp…). Ouvre le site dans Chrome ou Safari, ou utilise l'e-mail.", e_name: "Le nom doit faire 2 à 20 caractères.", e_gen: "Connexion impossible. Réessaie.", e_load: "Impossible de charger la connexion. Vérifie ta connexion internet." },
         ru: { login: "Войти", login_t: "Вход", signup_t: "Регистрация", google: "Продолжить с Google", or: "или", name: "Твоё имя", email: "Эл. почта", pass: "Пароль (не менее 6 символов)",
             do_login: "Войти", do_signup: "Создать аккаунт", forgot: "Забыл пароль", reset_sent: "Ссылка для сброса пароля отправлена на почту.", need_email: "Сначала введи адрес почты.",
             why: "С аккаунтом твой прогресс (выученные случаи, статистика, свои алгоритмы) доступен на всех устройствах, и ты участвуешь в рейтинге дня.",
@@ -47,7 +48,7 @@
             e_cred: "Неверная почта или пароль.", e_inuse: "Аккаунт с этой почтой уже есть. Попробуй войти.", e_weak: "Пароль должен быть не короче 6 символов.",
             e_email: "Неверный адрес почты.", e_many: "Слишком много попыток. Попробуй позже.", e_net: "Похоже, нет подключения к интернету.",
             e_popup: "Всплывающее окно заблокировано. Разреши всплывающие окна и попробуй снова.", e_domain: "Вход для этого адреса ещё не включён.",
-            e_name: "Имя должно быть от 2 до 20 символов.", e_gen: "Не удалось войти. Попробуй снова.", e_load: "Не удалось загрузить вход. Проверь интернет." },
+            e_inapp: "Вход через Google не работает во встроенных браузерах (Instagram, WhatsApp и т. п.). Открой сайт в Chrome или Safari либо войди по e-mail.", e_name: "Имя должно быть от 2 до 20 символов.", e_gen: "Не удалось войти. Попробуй снова.", e_load: "Не удалось загрузить вход. Проверь интернет." },
         de: { login: "Anmelden", login_t: "Anmelden", signup_t: "Registrieren", google: "Mit Google fortfahren", or: "oder", name: "Dein Name", email: "E-Mail", pass: "Passwort (mind. 6 Zeichen)",
             do_login: "Anmelden", do_signup: "Konto erstellen", forgot: "Passwort vergessen", reset_sent: "Ein Link zum Zurücksetzen wurde an deine E-Mail gesendet.", need_email: "Gib zuerst deine E-Mail-Adresse ein.",
             why: "Mit einem Konto ist dein Fortschritt (gelernte Fälle, Statistiken, eigene Algorithmen) auf jedem Gerät dabei und du nimmst an der Tagesbestenliste teil.",
@@ -55,7 +56,7 @@
             e_cred: "E-Mail oder Passwort falsch.", e_inuse: "Mit dieser E-Mail gibt es schon ein Konto. Versuch dich anzumelden.", e_weak: "Das Passwort muss mindestens 6 Zeichen lang sein.",
             e_email: "Ungültige E-Mail-Adresse.", e_many: "Zu viele Versuche. Versuch es etwas später.", e_net: "Du scheinst offline zu sein.",
             e_popup: "Das Pop-up wurde blockiert. Erlaube Pop-ups und versuch es erneut.", e_domain: "Die Anmeldung ist für diese Adresse noch nicht freigeschaltet.",
-            e_name: "Der Name muss 2–20 Zeichen lang sein.", e_gen: "Anmeldung fehlgeschlagen. Versuch es erneut.", e_load: "Anmeldung konnte nicht geladen werden. Prüfe deine Internetverbindung." },
+            e_inapp: "Google-Anmeldung funktioniert nicht in In-App-Browsern (Instagram, WhatsApp usw.). Öffne die Seite in Chrome oder Safari oder nutze E-Mail.", e_name: "Der Name muss 2–20 Zeichen lang sein.", e_gen: "Anmeldung fehlgeschlagen. Versuch es erneut.", e_load: "Anmeldung konnte nicht geladen werden. Prüfe deine Internetverbindung." },
         ar: { login: "دخول", login_t: "تسجيل الدخول", signup_t: "إنشاء حساب", google: "المتابعة باستخدام Google", or: "أو", name: "اسمك", email: "البريد الإلكتروني", pass: "كلمة المرور (6 أحرف على الأقل)",
             do_login: "تسجيل الدخول", do_signup: "إنشاء الحساب", forgot: "نسيت كلمة المرور", reset_sent: "أُرسل رابط إعادة تعيين كلمة المرور إلى بريدك.", need_email: "اكتب بريدك الإلكتروني أولاً.",
             why: "مع الحساب يرافقك تقدّمك (الحالات التي تعرفها والإحصاءات وخوارزمياتك) على كل الأجهزة وتشارك في ترتيب اليوم.",
@@ -63,7 +64,7 @@
             e_cred: "البريد أو كلمة المرور غير صحيحة.", e_inuse: "يوجد حساب بهذا البريد بالفعل. جرّب تسجيل الدخول.", e_weak: "يجب أن تتكوّن كلمة المرور من 6 أحرف على الأقل.",
             e_email: "عنوان البريد غير صالح.", e_many: "محاولات كثيرة جداً. حاول لاحقاً.", e_net: "يبدو أنك غير متصل بالإنترنت.",
             e_popup: "تم حظر النافذة المنبثقة. اسمح بالنوافذ المنبثقة وحاول مجدداً.", e_domain: "تسجيل الدخول غير مفعّل لهذا العنوان بعد.",
-            e_name: "يجب أن يكون الاسم من 2 إلى 20 حرفاً.", e_gen: "تعذّر تسجيل الدخول. حاول مجدداً.", e_load: "تعذّر تحميل تسجيل الدخول. تحقّق من اتصالك." }
+            e_inapp: "تسجيل الدخول عبر Google لا يعمل داخل متصفحات التطبيقات (Instagram وWhatsApp وغيرها). افتح الموقع في Chrome أو Safari أو استخدم البريد الإلكتروني.", e_name: "يجب أن يكون الاسم من 2 إلى 20 حرفاً.", e_gen: "تعذّر تسجيل الدخول. حاول مجدداً.", e_load: "تعذّر تحميل تسجيل الدخول. تحقّق من اتصالك." }
     };
     function lang() { try { return localStorage.getItem("site-lang") || "tr"; } catch (e) { return "tr"; } }
     function t(k) { return (TXT[lang()] || TXT.tr)[k] || TXT.tr[k] || k; }
@@ -143,6 +144,7 @@
         if (/network-request-failed/.test(c)) return t("e_net");
         if (/popup-blocked/.test(c)) return t("e_popup");
         if (/unauthorized-domain/.test(c)) return t("e_domain");
+        if (/disallowed|web-storage-unsupported|operation-not-supported/.test(c)) return t("e_inapp");
         return t("e_gen") + (c ? " (" + c + ")" : "");
     }
     function buildModal() {
@@ -204,7 +206,9 @@
         setTimeout(function () { var i = modal.querySelector("[name=email]"); if (i && window.innerWidth > 700) i.focus(); }, 60);
     }
     function closeModal() { if (modal) modal.classList.remove("open"); }
+    var IN_APP = /FBAN|FBAV|Instagram|Line\/|WhatsApp|Snapchat|TikTok|musical_ly|; wv\)/i.test(navigator.userAgent || "");
     function google() {
+        if (IN_APP) { setErr(t("e_inapp")); return; }
         setErr(""); busy(true);
         loadSDK().then(function (m) {
             var p = new m.GoogleAuthProvider();
@@ -225,7 +229,11 @@
         loadSDK().then(function (m) {
             if (tab === "login") return m.signInWithEmailAndPassword(auth, email, pass);
             return m.createUserWithEmailAndPassword(auth, email, pass).then(function (cred) {
-                return m.updateProfile(cred.user, { displayName: name }).then(function () { user = auth.currentUser; renderNav(); });
+                return m.updateProfile(cred.user, { displayName: name }).then(function () {
+                    user = auth.currentUser; renderNav();
+                    listeners.forEach(function (f) { try { f(user); } catch (e) {} });
+                    try { document.dispatchEvent(new CustomEvent("account-change", { detail: user })); } catch (e) {}
+                });
             });
         }).catch(function (err) { setErr(err && err.code ? errMsg(err) : t("e_load")); }).then(function () { busy(false); });
     }
@@ -254,6 +262,7 @@
     var SYNC_PREFIX = ["algo-progress-", "recog-pll-", "recog-oll-"];
     var SYNC_KEYS = ["custom-algs-v1", "trainer-stats-v1", "roadmap-done-v1", "roadmap-track-v1", "daily-results-v1", "daily-sent-v1"];
     function synced(k) { return SYNC_KEYS.indexOf(k) >= 0 || SYNC_PREFIX.some(function (p) { return k.indexOf(p) === 0; }); }
+    function clearLocal() { localKeys().forEach(function (k) { lsSet(k, null); }); }
     function localKeys() { var out = []; try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && synced(k)) out.push(k); } } catch (e) {} return out; }
     function hash(s) { var h = 2166136261; s = String(s); for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36) + ":" + s.length; }
     function loadMeta() { try { return JSON.parse(lsGet(META_KEY)) || {}; } catch (e) { return {}; } }
@@ -319,10 +328,12 @@
     function fullSync() {
         if (!user || syncing) return Promise.resolve();
         syncing = true;
-        var meta = loadMeta();
+        var meta = loadMeta(), owner = lsGet(OWNER_KEY) || meta.uid;
         if (meta.uid !== user.uid) meta = { uid: user.uid, h: {}, t: {} }; // bu cihazda bu hesapla ilk senkron
-        meta.h = meta.h || {}; meta.t = meta.t || {};
+        // Bu cihazdaki ilerleme başka bir hesaba aitse (o hesabın bulutunda zaten var) yeni hesaba taşıma
         var applied = 0;
+        if (owner && owner !== user.uid) { clearLocal(); applied++; }
+        meta.h = meta.h || {}; meta.t = meta.t || {};
         return pull().then(function (cloud) {
             var keys = {}, up = [];
             localKeys().forEach(function (k) { keys[k] = 1; });
@@ -342,6 +353,7 @@
                 up.push(k);
             });
             saveMeta(meta);
+            lsSet(OWNER_KEY, user.uid);
             return push(up, meta);
         }).then(function () {
             syncing = false;
@@ -355,12 +367,13 @@
         }, function (e) { syncing = false; console.warn("Senkron başarısız:", e); });
     }
     // Bu cihazdaki değişiklikleri gönder (periyodik ve sayfadan çıkarken)
-    function pushChanged(keepalive) {
-        if (!user || syncing || !synced1) return Promise.resolve();
+    function pushChanged(keepalive, strict) {
+        if (!user || syncing || !synced1) return strict ? Promise.reject(new Error("not-synced")) : Promise.resolve();
         var meta = loadMeta(); if (meta.uid !== user.uid) return Promise.resolve();
         meta.h = meta.h || {}; meta.t = meta.t || {};
         var ch = localKeys().filter(function (k) { return hash(lsGet(k)) !== meta.h[k]; });
-        return push(ch, meta, keepalive).catch(function () {});
+        var p = push(ch, meta, keepalive);
+        return strict ? p : p.catch(function () {});
     }
     function startSync() {
         fullSync();
@@ -372,10 +385,15 @@
     window.addEventListener("pagehide", function () { pushChanged(true); });
 
     /* ---------- hesap işlemleri ---------- */
+    // Çıkış: değişiklikleri gönder, sonra bu cihazdaki ilerlemeyi temizle (hesapta kalır;
+    // aynı cihazda başka biri giriş yapınca önceki hesabın verisi ona geçmesin)
     function signOut() {
-        return pushChanged(false).then(function () { return loadSDK(); }).then(function (m) { return m.signOut(auth); }).then(function () {
-            lsSet(META_KEY, null);
-        });
+        var sentOk = false;
+        return (synced1 ? pushChanged(false, true).then(function () { sentOk = true; }, function () {}) : Promise.resolve())
+            .then(function () { return loadSDK(); }).then(function (m) { return m.signOut(auth); }).then(function () {
+                if (sentOk) { clearLocal(); lsSet(OWNER_KEY, null); }
+                lsSet(META_KEY, null);
+            });
     }
     function setName(name) {
         return loadSDK().then(function (m) { return m.updateProfile(auth.currentUser, { displayName: name }); }).then(function () {
@@ -409,7 +427,7 @@
                 if (!pw) throw err;
                 return m.reauthenticateWithCredential(u, m.EmailAuthProvider.credential(u.email, pw)).then(function () { return m.deleteUser(auth.currentUser); });
             });
-        }).then(function () { lsSet(META_KEY, null); lsSet(SIGNED_KEY, null); });
+        }).then(function () { lsSet(META_KEY, null); lsSet(SIGNED_KEY, null); lsSet(OWNER_KEY, null); });
     }
 
     window.Account = {
