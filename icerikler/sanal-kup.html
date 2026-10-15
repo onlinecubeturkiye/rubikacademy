@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Sanal 3D Küp</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/sanal-kup">
+<meta name="description" content="Tarayıcıda çevrilebilen sanal 3D Rubik küpü: klavye, buton ve dokunmatik kontrol, karıştırma ve otomatik süre.">
+<meta property="og:title" content="Sanal 3D Küp — Rubik Academy">
+<meta property="og:description" content="Klavyeyle ya da dokunarak çevir, karıştır ve süreni ölç.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/sanal-kup">
+<meta property="og:image" content="https://rubikacademy.fun/og/sanal-kup.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/sanal-kup.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261084">
+
+<style>
+.wrap { max-width: 980px; margin: 0 auto; }
+.intro { text-align: center; margin: 0 auto 26px; max-width: 760px; }
+.intro .badge { margin-bottom: 14px; }
+.intro h1 { font-size: clamp(34px, 5vw, 54px); line-height: 1.05; letter-spacing: -1.5px; font-weight: 900; color: var(--text); margin-bottom: 14px; }
+.intro h1 span + span { color: var(--primary); }
+.intro p { color: var(--text-soft); font-size: 16px; line-height: 1.7; }
+.box { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 22px 24px; margin-bottom: 22px; }
+.box h2 { font-size: 22px; font-weight: 850; letter-spacing: -.3px; color: var(--text); margin-bottom: 10px; }
+.box p, .box li { color: var(--text-soft); font-size: 15px; line-height: 1.7; }
+.box p + p { margin-top: 8px; }
+.box code { font-family: "JetBrains Mono", monospace; font-weight: 700; color: var(--primary); }
+.box b { color: var(--text); }
+.p-list { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; }
+.p-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.p-links a { padding: 9px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 800; font-size: 14px; box-shadow: var(--shadow-sm); text-decoration: none; }
+.p-links a:hover { background: var(--cube-yellow); color: #17171f; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); text-decoration: none; }
+.btn:hover { background: var(--surface-soft); }
+.btn.primary { background: var(--cube-yellow); color: #17171f; }
+.btn:disabled { opacity: .5; cursor: default; }
+@media (max-width: 760px) { .box { padding: 18px 16px; } }
+
+.vc-grid { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: start; }
+.vc-stage { position: relative; aspect-ratio: 1; max-height: 460px; margin: 0 auto; width: 100%; background: var(--diagram-bg); border-radius: 18px; display: grid; place-items: center; overflow: hidden; touch-action: none; }
+.vc-player { width: 100%; height: 100%; }
+.vc-msg { color: var(--text-soft); font-weight: 700; }
+.vc-scr { display: block; min-height: 1.6em; text-align: center; font: 800 17px/1.6 "JetBrains Mono", monospace; color: var(--text); word-spacing: 4px; margin: 10px 0 4px; }
+.vc-status { text-align: center; font-weight: 800; color: var(--text-soft); font-size: 14.5px; min-height: 22px; }
+.vc-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 10px 0 12px; }
+.vc-btns { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+.vc-btn { position: relative; aspect-ratio: 1.15; border: var(--card-bw) solid var(--ink); border-radius: 11px; background: var(--surface); color: var(--text); cursor: pointer; padding: 0; box-shadow: var(--shadow-sm); touch-action: manipulation; }
+.vc-btn b { font: 800 16px "JetBrains Mono", monospace; }
+.vc-btn small { position: absolute; top: 2px; right: 5px; font: 800 9.5px Inter, sans-serif; color: var(--text-soft); }
+.vc-btn.rot { background: var(--surface-soft); }
+.vc-btn:active { background: var(--cube-yellow); color: #17171f; }
+.vc-side { display: grid; gap: 12px; }
+.vc-stat { background: var(--surface-soft); border: 1.5px solid var(--border); border-radius: 14px; padding: 12px; text-align: center; }
+.vc-stat b { display: block; font: 900 30px "JetBrains Mono", monospace; color: var(--text); }
+.vc-stat span { font-size: 12px; font-weight: 800; color: var(--text-soft); }
+.vc-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vc-two .vc-stat b { font-size: 20px; }
+.vc-times h3 { display: flex; justify-content: space-between; align-items: center; font-size: 14px; margin: 0 0 6px; color: var(--text); }
+.vc-times button { border: 0; background: none; color: var(--text-soft); font: 700 12px Inter, sans-serif; cursor: pointer; text-decoration: underline; }
+.vc-times ul { list-style: none; margin: 0; padding: 0; }
+.vc-times li { display: flex; justify-content: space-between; padding: 6px 2px; border-bottom: 1px solid var(--border); font-size: 13.5px; color: var(--text-soft); }
+.vc-times li b { font-family: "JetBrains Mono", monospace; color: var(--text); }
+.vc-times li.vc-empty { border: 0; }
+@media (max-width: 760px) {
+    .vc-grid { grid-template-columns: 1fr; gap: 10px; } .vc-btns { grid-template-columns: repeat(5, 1fr); } .vc-btn small { display: none; } .vc-scr { font-size: 14px; }
+    .vc-side { order: -1; grid-template-columns: 1fr 2fr; gap: 8px; } .vc-times { display: none; }
+    .vc-stat { padding: 8px; } .vc-stat b { font-size: 22px; } .vc-two .vc-stat b { font-size: 18px; } .vc-two { gap: 8px; }
+}
+
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+<div class="wrap">
+<nav class="nav-bar">
+    <a href="/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+<section class="intro">
+    <div class="badge"><i></i><span data-i18n="badge">SANAL KÜP</span></div>
+    <h1><span data-i18n="title">Sanal 3D</span> <span data-i18n="title_accent">Küp</span></h1>
+    <p data-i18n="intro">Küpün yanında değilken de pratik yap: klavyeyle, butonlarla ya da küpe dokunarak çevir. Karıştır, ilk hamlende süre başlasın, çözünce dursun.</p>
+</section>
+
+<section class="box">
+    <div class="vc-grid">
+        <div>
+            <div class="vc-stage" id="vcStage" dir="ltr"><p class="vc-msg" id="vcMsg"></p></div>
+            <code class="vc-scr" id="vcScr" dir="ltr"></code>
+            <p class="vc-status" id="vcStatus" aria-live="polite"></p>
+            <div class="vc-actions">
+                <button type="button" class="btn primary" id="vcScramble" data-i18n="scramble">🔀 Karıştır</button>
+                <button type="button" class="btn" id="vcUndo" data-i18n="undo">↶ Geri al</button>
+                <button type="button" class="btn" id="vcReset" data-i18n="reset">↺ Sıfırla</button>
+            </div>
+            <div class="vc-btns" id="vcBtns" dir="ltr"></div>
+        </div>
+        <div class="vc-side">
+            <div class="vc-stat"><b id="vcTime" dir="ltr">0.00</b><span data-i18n="l_time">Süre</span></div>
+            <div class="vc-two">
+                <div class="vc-stat"><b id="vcCount">0</b><span data-i18n="l_moves">Hamle</span></div>
+                <div class="vc-stat"><b id="vcBest" dir="ltr">-</b><span data-i18n="l_best">En iyi</span></div>
+            </div>
+            <div class="vc-times"><h3><span data-i18n="times_h">Son süreler</span><button type="button" id="vcClear" data-i18n="clear">Temizle</button></h3><ul id="vcList"></ul></div>
+        </div>
+    </div>
+</section>
+
+<section class="box">
+    <h2 data-i18n="keys_h">⌨️ Klavye kısayolları</h2>
+    <p data-i18n="keys_p">Tuşlar csTimer ile aynıdır, iki elle hızlı çevirmeye uygundur. Butonların köşesindeki harf, o hamlenin tuşudur.</p>
+    <p data-i18n="keys_more">Boşluk: karıştır · Esc: sıfırla · Geri silme: son hamleyi geri al · U / M: r, r' · V / R: l, l'</p>
+    <h2 style="margin-top:14px" data-i18n="touch_h">📱 Dokunarak</h2>
+    <p data-i18n="touch_p">Telefonda ve tablette küpün altındaki butonları kullan ya da küpte bir yüze dokun. Küpü sürükleyerek etrafına bakabilirsin.</p>
+    <div class="p-links">
+        <a href="/icerikler/notasyon" data-i18n="l_nota">🔤 Notasyon</a>
+        <a href="/icerikler/algoritmalar" data-i18n="l_algs">📚 Algoritmalar</a>
+    </div>
+</section>
+
+</div>
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script>var PAGE_ID = "sanal_kup";</script>
+<script src="/js/i18n.js?v=20261084"></script>
+<script src="/js/common.js?v=20261084"></script>
+<script src="/js/sanal-kup.js?v=20261084"></script>
+</body>
+</html>

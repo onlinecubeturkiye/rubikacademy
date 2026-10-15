@@ -5,12 +5,14 @@
    yüklenir ve case 3B küpte adım adım oynatılır. Sarı üstte, yeşil önde.
 ========================================================= */
 (function () {
-    var V = "20261083";
+    var V = "20261084";
     var PUZ = {
         oll: "3x3x3", pll: "3x3x3", twolook_algos: "3x3x3", coll: "3x3x3", wv: "3x3x3", roux_algos: "3x3x3",
         cll: "2x2x2", eg1: "2x2x2", eg2: "2x2x2", "ortega-oll": "2x2x2", "ortega-pbl": "2x2x2",
-        alg4: "4x4x4", alg5: "5x5x5"
+        alg4: "4x4x4", alg5: "5x5x5", bld: "3x3x3"
     };
+    // Küpün başlangıç yönü: site sarı üstte çalışır; göz bağlı (3BLD) standart olarak beyaz üstte
+    var SETUP = { bld: "" };
     var TXT = {
         tr: { btn: "İzle", title: "Algoritmayı izle", close: "Kapat", load: "Yükleniyor…", err: "Oynatıcı yüklenemedi.", hint: "Oynat, durdur veya adım adım ilerle. Küpü sürükleyerek döndürebilirsin." },
         en: { btn: "Watch", title: "Watch the algorithm", close: "Close", load: "Loading…", err: "The player could not be loaded.", hint: "Play, pause or step through. Drag the cube to rotate it." },
@@ -70,7 +72,7 @@
             if (!player) {
                 player = new m.TwistyPlayer({
                     puzzle: puzzle, background: "none", controlPanel: "bottom-row", hintFacelets: "none",
-                    experimentalSetupAnchor: "end", experimentalSetupAlg: "z2", tempoScale: 1.4
+                    experimentalSetupAnchor: "end", experimentalSetupAlg: page in SETUP ? SETUP[page] : "z2", tempoScale: 1.4
                 });
                 player.className = "ap-player";
                 modal.querySelector(".ap-stage").appendChild(player);

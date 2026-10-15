@@ -7,11 +7,14 @@
    - Küpün durumu kendi modelimizde izlenir: karıştırma ilerlemesi,
      yanlış hamle düzeltmesi, ilk hamlede süre başlatma, çözülünce durdurma.
    - antrenor.html içindeki global'leri kullanır: state, current, curCase,
-     curScramble, startTimer, stopTimer, T, mode.
+     curScramble, startTimer, stopTimer, T, mode. Günün karıştırması
+     (gunluk.js) aynı global'leri sağlayarak bu modülü kullanır.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261083";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261084";
     var MAC_KEY = "trainer-bt-mac-v1";
+    // Karıştırma ve ipucu kutuları (günün karıştırması sayfası kendi kimliklerini verir)
+    var SCR_ID = (window.BT_IDS && BT_IDS.scramble) || "scramble", HINT_ID = (window.BT_IDS && BT_IDS.hint) || "timerHint";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
 
@@ -397,7 +400,7 @@
 
     function renderScramble() {
         if (!applies() || !curScramble) return;
-        var box = el("scramble");
+        var box = el(SCR_ID);
         if (phase === "needSolve") {
             box.innerHTML = '<span class="bt-warn">' + esc(txt(!modelKnown ? "bt_unknown" : mOdd ? "bt_roux_m" : tooMany ? "bt_too_many" : (afterCase ? "bt_finish_cube" : "bt_need_solve"))) + '</span>';
             return;
@@ -420,7 +423,7 @@
         box.innerHTML = html;
     }
 
-    function setHint(k) { var h = el("timerHint"); if (h) h.textContent = txt(k); }
+    function setHint(k) { var h = el(HINT_ID); if (h) h.textContent = txt(k); }
 
     /* ---------- karıştırma takibi ---------- */
     // İki hamle dizisini birleştir; birleşme yerinde aynı yüz varsa tek hamleye indir
@@ -443,7 +446,7 @@
         stopInsp();
         var end = Date.now() + 15000;
         function upd() {
-            var left = Math.ceil((end - Date.now()) / 1000), h = el("timerHint");
+            var left = Math.ceil((end - Date.now()) / 1000), h = el(HINT_ID);
             if (!h) return;
             if (left <= 0) { h.textContent = txt("bt_insp_over"); stopInsp(); return; }
             h.textContent = txt("bt_insp").replace("{n}", left);
@@ -801,7 +804,7 @@
         sub = null; conn = null; phase = "off"; noData = false; stopInsp(); window.btSolveCount = null; mCands = null;
         if (isCross() && typeof curBaseScramble === "string" && curBaseScramble) curScramble = curBaseScramble;
         renderBar();
-        if (curScramble) el("scramble").textContent = curScramble;
+        if (curScramble) el(SCR_ID).textContent = curScramble;
         if (state === "idle") setHint("hint_ready");
     }
     function disconnect() {
@@ -844,5 +847,6 @@
         renderBar();
     }
     window.btRenderBar = renderBar;
+    window.btRenderScramble = renderScramble;
     window.btIsActive = function () { return applies() && phase !== "off"; };
 })();

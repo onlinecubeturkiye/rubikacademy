@@ -48,7 +48,10 @@
     function fmt(ms) { if (ms == null) return "-"; var s = ms / 1000; if (s < 60) return s.toFixed(2); var m = Math.floor(s / 60); return m + ":" + (s - m * 60).toFixed(2).padStart(5, "0"); }
     function show(ms) { $("dTimer").textContent = fmt(ms); }
     function tick() { show(performance.now() - t0); raf = requestAnimationFrame(tick); }
-    function setState(s) { state = s; $("dTimerBox").setAttribute("data-state", s); $("dHint").textContent = T("hint_" + s); }
+    function setState(s) {
+        state = s; $("dTimerBox").setAttribute("data-state", s); $("dHint").textContent = T("hint_" + s);
+        if (window.btOnStateChange) window.btOnStateChange();
+    }
     function press() {
         if (state === "running") { stop(); return; }
         if (state !== "idle" || official()) return;
@@ -68,6 +71,24 @@
         }
         renderAll();
     }
+
+    /* ---------- Bluetooth akıllı küp (antrenor-bt.js) ----------
+       Modül antrenörün global'lerini bekler; burada günün karıştırması için sağlanır:
+       çözülmüş küpe karıştırma hamle hamle takip edilir, ilk hamlede süre başlar,
+       küp çözülünce durur. */
+    window.BT_IDS = { scramble: "dScr", hint: "dHint" };
+    window.mode = "cube";
+    window.current = { id: "daily", cube: "3x3" };
+    Object.defineProperty(window, "state", { configurable: true, get: function () { return state === "done" ? "done" : state === "running" ? "running" : "idle"; } });
+    Object.defineProperty(window, "curScramble", { configurable: true, get: function () { return official() ? "" : scramble(today(), puzzle); }, set: function () {} });
+    window.startTimer = function () { if (state === "running" || official()) return; clearTimeout(holdT); setState("running"); t0 = performance.now(); tick(); };
+    window.stopTimer = function () { if (state === "running") stop(); };
+    // Bluetooth metinleri antrenör sayfasının çevirilerinden gelir
+    // (günlük sayfaya özel metin varsa o kullanılır)
+    window.T = function (k) {
+        var g = (window.SITE_I18N && SITE_I18N.pages.gunluk) || {}, p = (window.SITE_I18N && SITE_I18N.pages.antrenor) || {};
+        return (g[lang()] && g[lang()][k]) || (p[lang()] && p[lang()][k]) || (g.tr && g.tr[k]) || (p.tr && p.tr[k]) || k;
+    };
 
     /* ---------- görünüm ---------- */
     function official() { return loadRes()[today() + ":" + puzzle] || null; }
@@ -89,6 +110,7 @@
         } else {
             var scr = scramble(day, puzzle);
             $("dScr").textContent = scr; drawNet(scr);
+            if (window.btIsActive && btIsActive()) btRenderScramble();
             if (state !== "running" && state !== "hold" && state !== "ready") { show(0); setState("idle"); }
         }
     }
@@ -188,7 +210,7 @@
         $("lbName").addEventListener("keydown", function (e) { e.stopPropagation(); if (e.key === "Enter") sendResult(); });
         $("lbName").addEventListener("keyup", function (e) { e.stopPropagation(); });
         $("lbRefresh").addEventListener("click", loadBoard);
-        document.addEventListener("site-lang-change", renderAll);
+        document.addEventListener("site-lang-change", function () { renderAll(); if (window.btRenderBar) btRenderBar(); });
         renderAll();
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
