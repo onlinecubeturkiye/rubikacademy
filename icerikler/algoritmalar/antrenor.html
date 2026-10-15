@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261087">
+<link rel="stylesheet" href="/styles/common.css?v=20261088">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -810,14 +810,14 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261087"></script>
-<script src="/js/common.js?v=20261087"></script>
+<script src="/js/i18n.js?v=20261088"></script>
+<script src="/js/common.js?v=20261088"></script>
 
 
-<script src="/js/custom-algs.js?v=20261087"></script>
-<script src="/js/cross-solver.js?v=20261087"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261087"></script>
-<script src="/js/recog-trainer.js?v=20261087"></script>
+<script src="/js/custom-algs.js?v=20261088"></script>
+<script src="/js/cross-solver.js?v=20261088"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261088"></script>
+<script src="/js/recog-trainer.js?v=20261088"></script>
 
 <script>
 /* ============================================================
@@ -838,6 +838,8 @@ var SETS = [
     { id: "2look-2lp",  label: "2-Look PLL", file: "2look.json", multi: "2lp", progress: "algo-progress-2look-2lp", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
     { id: "oll",        label: "OLL",        file: "oll-pll.json",    dataKey: "oll",  progress: "algo-progress-oll",        keyFmt: "name",   page: "oll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
     { id: "pll",        label: "PLL",        file: "oll-pll.json",    dataKey: "pll",  progress: "algo-progress-pll",        keyFmt: "subset", page: "pll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
+    { id: "oh-oll",     label: "OH OLL", file: "oh.json", multi: "oll", scrFrom: "oll", progress: "algo-progress-oh-oll", keyFmt: "name", page: "oh_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
+    { id: "oh-pll",     label: "OH PLL", file: "oh.json", multi: "pll", scrFrom: "pll", progress: "algo-progress-oh-pll", keyFmt: "name", page: "oh_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
     { id: "coll",       label: "COLL",       file: "coll.json",       dataKey: "coll", progress: "algo-progress-coll",       keyFmt: "subset", page: "coll",       puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
     { id: "wv",         label: "WV",         file: "wv.json",         dataKey: "wv",   progress: "algo-progress-wv",         keyFmt: "subset", page: "wv",         puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "pll", s); } },
     { id: "cll",        label: "CLL",        file: "cll.json",        dataKey: "cll",  progress: "algo-progress-cll",        keyFmt: "name",   page: "cll",        puzzle: "2x2", cube: "2x2", draw: function (c, s) { return cllSvg(c.pattern, "full", s); } },
@@ -847,6 +849,7 @@ var SETS = [
     { id: "eg2",        label: "EG-2",       file: "eg.json",         dataKey: "eg2",  progress: "algo-progress-eg2",        keyFmt: "subset", page: "eg2",        puzzle: "2x2", cube: "2x2", draw: drawPair },
     { id: "roux-cmll",  label: "CMLL", file: "roux.json", multi: "cmll", progress: "algo-progress-roux-cmll", keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", draw: polyDraw },
     { id: "roux-eo",    label: "EO",   file: "roux.json", multi: "eo",   progress: "algo-progress-roux-eo",   keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", draw: polyDraw },
+    { id: "oh-cmll",    label: "OH CMLL", file: "oh.json", multi: "cmll", scrFrom: "roux-cmll", progress: "algo-progress-oh-cmll", keyFmt: "name", page: "oh_algos", puzzle: "roux", cube: "3x3", draw: polyDraw },
     { id: "pyra-l3e",   label: "L3E",  file: "pyraminx.json", multi: "l3e", progress: "algo-progress-pyraminx-l3e", keyFmt: "name", page: "pyra_algos", puzzle: "pyra", cube: "pyra", draw: polyDraw },
     { id: "pyra-l4e",   label: "L4E",  file: "pyraminx.json", multi: "l4e", progress: "algo-progress-pyraminx-l4e", keyFmt: "name", page: "pyra_algos", puzzle: "pyra", cube: "pyra", draw: polyDraw },
     { id: "sk-beginner",     label: "Sarah Beginner",     file: "skewb.json", multi: "beginner",     progress: "algo-progress-skewb-beginner",     keyFmt: "name", page: "skewb_algos", puzzle: "skewb", cube: "skewb", draw: polyDraw },
@@ -1006,7 +1009,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261087").then(function (r) {
+        return fetch(BASE + f + "?v=20261088").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -1025,7 +1028,8 @@ function loadAll() {
             groups.forEach(function (g) {
                 g.cases.forEach(function (c) {
                     var k = caseKey(s, g.subset, c.name);
-                    var sc = (scr[s.id] && scr[s.id][k]) || [];
+                    var sk = s.scrFrom || s.id; // tek el setleri aynı case'lerin karıştırmalarını kullanır
+                    var sc = (scr[sk] && scr[sk][k]) || [];
                     if (!sc.length) return; // karıştırması olmayan case antrenörde gösterilmez
                     var mine = window.CustomAlgs ? CustomAlgs.get(s.page, s.multi || "", c.name) : null; // kullanıcının kendi algoritması
                     c.__set = s;

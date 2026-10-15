@@ -11,7 +11,7 @@
      (gunluk.js) aynı global'leri sağlayarak bu modülü kullanır.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261087";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261088";
     var MAC_KEY = "trainer-bt-mac-v1";
     // Karıştırma ve ipucu kutuları (günün karıştırması sayfası kendi kimliklerini verir)
     var SCR_ID = (window.BT_IDS && BT_IDS.scramble) || "scramble", HINT_ID = (window.BT_IDS && BT_IDS.hint) || "timerHint";
@@ -255,6 +255,7 @@
     function caseDone(model) {
         // ⭐ Öğreniyorum setinde her case kendi setinin kuralını kullanır
         var id = (typeof curCase !== "undefined" && curCase && curCase.setId) || (current ? current.id : "");
+        id = { "oh-oll": "oll", "oh-pll": "pll", "oh-cmll": "roux-cmll" }[id] || id; // tek el setleri aynı kuralla biter
         if (is222()) return caseDone222(model, id);
         if (id === "oll" || id === "wv") return matches(model, isF2L) && matches(model, isTopFace);
         if (id === "coll") return matches(model, isF2L) && matches(model, isTopFace) && upToAUF(model, isTopCorner);

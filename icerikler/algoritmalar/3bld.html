@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261087">
+<link rel="stylesheet" href="/styles/common.css?v=20261088">
 
 <style>
 .hero {
@@ -295,8 +295,8 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 #setTabs { display: none; }
 /* 3BLD */
 #setTabs { display: none; }
-.case-diagram { width: 124px; height: 96px; }
-.case-diagram svg { width: 118px; height: 90px; }
+.case-diagram { width: 156px; height: 120px; padding: 4px; }
+.case-diagram svg { width: 148px; height: 112px; }
 .bld-step { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; margin-top: 3px; }
 .bld-step small { font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: .3px; }
 .bld-step code { font: 700 13px "JetBrains Mono", monospace; color: var(--primary-dark); }
@@ -453,11 +453,11 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "bld";</script>
-<script src="/js/i18n.js?v=20261087"></script>
-<script src="/js/common.js?v=20261087"></script>
+<script src="/js/i18n.js?v=20261088"></script>
+<script src="/js/common.js?v=20261088"></script>
 
 
-<script src="/js/alg-player.js?v=20261087"></script>
+<script src="/js/alg-player.js?v=20261088"></script>
 
 <script>
 /* ============================================================
@@ -494,6 +494,8 @@ var FACES = "ULFRBD";
 var FACE_POS = { U: [3, 0], L: [0, 3], F: [3, 3], R: [6, 3], B: [9, 3], D: [3, 6] };
 var FACE_COL = { U: "#eef2f3", L: "#ff7a1a", F: "#179e4f", R: "#d12d28", B: "#2c6fe6", D: "#f6c719" };
 var LIGHT_TXT = { F: 1, R: 1, B: 1 };
+// Diyagramda hedef dışındaki etiketler: yüzün açık tonu (yön belli olsun, hedef öne çıksın)
+var FACE_TINT = { U: "#f3f4f6", L: "#f7dcc8", F: "#cfe8d8", R: "#f1d0ce", B: "#d3def6", D: "#f6ecc6" };
 var CPOS = [[0, 0], [0, 2], [2, 2], [2, 0]], EPOS = [[0, 1], [1, 2], [2, 1], [1, 0]];
 var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWX";
 // Tampon parçalarının etiketleri (kenar: UR = B, M; köşe: UBL = A, E, R)
@@ -516,11 +518,15 @@ function netSvg(o) {
             // Şemada tampon parçasının tüm etiketleri koyu ve harfli gösterilir
             var dark = isB || (o.letters && inBuf);
             if (dark) fill = "#17171f";
-            else if (o.target) op = isT ? 1 : 0.22;
+            else if (o.target) { if (!isT) fill = FACE_TINT[f]; }
             else if (o.letters && !L) op = 0.3;
-            if (isT) sw = 1.6;
+            if (isT) {
+                sw = 1.2;
+                // hedefin etrafında mavi vurgu halkası (beyaz yüzde de belli olsun)
+                out += '<rect x="' + (x - 0.9) + '" y="' + (y - 0.9) + '" width="11.8" height="11.8" rx="2.6" fill="none" stroke="#1d5bff" stroke-width="1.8"/>';
+            }
             out += '<rect x="' + (x + 0.5) + '" y="' + (y + 0.5) + '" width="9" height="9" rx="1.6" fill="' + fill + '"' + (op < 1 ? ' fill-opacity="' + op + '"' : "") +
-                ' stroke="#17171f" stroke-width="' + sw + '"' + (op < 1 && !isT ? ' stroke-opacity="0.45"' : "") + '/>';
+                ' stroke="#17171f" stroke-width="' + sw + '"' + ((op < 1 || (o.target && !isT && !dark)) ? ' stroke-opacity="0.35"' : "") + '/>';
             var showL = L && (isT || isB || o.letters);
             if (showL) {
                 var col = (dark || LIGHT_TXT[f]) ? "#ffffff" : "#17171f";
@@ -666,7 +672,7 @@ function initQuiz() {
     });
 }
 
-fetch("/icerikler/algoritmalar/bld.json?v=20261087")
+fetch("/icerikler/algoritmalar/bld.json?v=20261088")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
