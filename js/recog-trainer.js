@@ -1,8 +1,16 @@
-/* PLL tanıma antrenörü (antrenör sayfasındaki "PLL Tanıma" sekmesi): tanima-pll.json içinde her PLL için 3x3 simülasyonuyla üretilmiş
-   farklı görünümler (ön-AUF, son-AUF, küp döndürme) var; iki yüzlü 3B görünümden case seçilir. */
+/* Tanıma antrenörü (antrenör sayfasındaki "Tanıma" sekmesi): PLL, OLL ve CLL (2x2) modları. tanima-*.json içinde her case için
+   küp simülasyonuyla üretilmiş farklı görünümler (AUF, küp döndürme) var; 3B görünümden case seçilir. */
 (function () {
     var started = false;
-    var STATS_KEY = "recog-pll-v1";
+    var V = "20261074";
+    var MODES = {
+        pll: { file: "tanima-pll.json", key: "recog-pll-v1", set: "pll", thumbs: false },
+        oll: { file: "tanima-oll.json", key: "recog-oll-v1", set: "oll", thumbs: true, draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
+        cll: { file: "tanima-cll.json", key: "recog-cll-v1", set: "cll", thumbs: true, draw: function (c, s) { return cllSvg(c.pattern, "full", s); } }
+    };
+    var MODE_KEY = "recog-mode-v1", mode = "pll", cache = {};
+    try { if (MODES[localStorage.getItem(MODE_KEY)]) mode = localStorage.getItem(MODE_KEY); } catch (e) {}
+    var STATS_KEY = MODES[mode].key;
     var DATA = null, cur = null, startT = 0, raf = 0, answered = false, lastName = null;
     var stats = load();
     function load() { try { return JSON.parse(localStorage.getItem(STATS_KEY)) || { n: 0, ok: 0, sum: 0, streak: 0, cases: {} }; } catch (e) { return { n: 0, ok: 0, sum: 0, streak: 0, cases: {} }; } }
@@ -10,7 +18,8 @@
     function lang() { return localStorage.getItem("site-lang") || "tr"; }
     function T(k, fb) { var p = (window.SITE_I18N && SITE_I18N.pages.tanima) || {}; return (p[lang()] && p[lang()][k]) || (p.tr && p.tr[k]) || fb || k; }
     function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
-    function short(n) { return n.replace(" perm", ""); }
+    function short(n) { return n.replace(" perm", "").replace(/^OLL /, ""); }
+    function diag(c, size) { return MODES[mode].draw ? MODES[mode].draw(c, size) : llSvg(PAT[c.name], "pll", size); }
     function cubeSvg(v) {
         var g = DATA.geom, b = g.view, sw = (b[2] / 120).toFixed(3);
         return '<svg viewBox="' + b.join(" ") + '" xmlns="http://www.w3.org/2000/svg">' + g.polys.map(function (p, i) {
@@ -58,8 +67,8 @@
         } else {
             btn.classList.add("wrong");
             fb.className = "rc-feedback bad"; fb.textContent = "✗ " + T("was", "Doğrusu:") + " " + short(cur.name);
-            var mine = window.CustomAlgs ? CustomAlgs.get("pll", "", cur.name) : null;
-            document.getElementById("rcRevealDiag").innerHTML = llSvg(findPattern(cur.name), "pll", 70);
+            var mine = window.CustomAlgs ? CustomAlgs.get(MODES[mode].set, "", cur.name) : null;
+            document.getElementById("rcRevealDiag").innerHTML = diag(cur, 70);
             document.getElementById("rcRevealName").textContent = cur.name;
             document.getElementById("rcRevealAlg").textContent = mine || cur.alg;
             document.getElementById("rcReveal").classList.add("show");
@@ -67,12 +76,47 @@
         }
     }
     var PAT = {};
-    function findPattern(n) { return PAT[n]; }
     function renderAnswers() {
-        document.getElementById("rcAnswers").innerHTML = DATA.cases.map(function (c) { return c.name; }).sort().map(function (n) {
-            return '<button type="button" class="rc-ans" data-n="' + esc(n) + '">' + esc(short(n)) + '</button>';
-        }).join("");
+        var box = document.getElementById("rcAnswers");
+        box.classList.toggle("thumbs", MODES[mode].thumbs);
+        if (!MODES[mode].thumbs) {
+            box.innerHTML = DATA.cases.map(function (c) { return c.name; }).sort().map(function (n) {
+                return '<button type="button" class="rc-ans" data-n="' + esc(n) + '">' + esc(short(n)) + '</button>';
+            }).join("");
+            return;
+        }
+        // OLL / CLL: alt gruplara göre küçük diyagramlı butonlar
+        var html = "", last = null;
+        DATA.cases.forEach(function (c) {
+            if (c.subset !== last) { last = c.subset; html += '<div class="rc-sub">' + esc(c.subset) + '</div>'; }
+            html += '<button type="button" class="rc-ans rc-thumb" data-n="' + esc(c.name) + '" aria-label="' + esc(c.name) + '">' + diag(c, 46) + '<small>' + esc(short(c.name)) + '</small></button>';
+        });
+        box.innerHTML = html;
     }
+    function renderModes() {
+        Array.prototype.forEach.call(document.querySelectorAll(".rc-mode"), function (b) {
+            var on = b.getAttribute("data-mode") === mode;
+            b.classList.toggle("active", on); b.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+        var intro = document.getElementById("rcIntro");
+        intro.setAttribute("data-i18n", mode === "pll" ? "intro" : "intro_" + mode);
+        intro.textContent = T(intro.getAttribute("data-i18n"), intro.textContent);
+        document.getElementById("rcCube").classList.toggle("small", mode === "cll");
+    }
+    function loadMode(m) {
+        mode = m; STATS_KEY = MODES[m].key; stats = load();
+        try { localStorage.setItem(MODE_KEY, m); } catch (e) {}
+        renderModes(); cancelAnimationFrame(raf);
+        var got = cache[m] ? Promise.resolve(cache[m]) : fetch("/icerikler/algoritmalar/" + MODES[m].file + "?v=" + V).then(function (r) { return r.json(); });
+        return got.then(function (d) {
+            cache[m] = d; if (mode !== m) return;
+            DATA = d; lastName = null; renderAnswers(); renderStats(); next();
+        });
+    }
+    document.getElementById("rcModes").addEventListener("click", function (e) {
+        var b = e.target.closest(".rc-mode"); if (b && b.getAttribute("data-mode") !== mode) loadMode(b.getAttribute("data-mode")).catch(fail);
+    });
+    function fail() { document.getElementById("rcFeedback").textContent = T("load_err", "Veriler yüklenemedi."); }
     function renderStats() {
         document.getElementById("stAcc").textContent = stats.n ? Math.round(100 * stats.ok / stats.n) + "%" : "-";
         document.getElementById("stAvg").textContent = stats.ok ? (stats.sum / stats.ok / 1000).toFixed(2) + " s" : "-";
@@ -93,17 +137,13 @@
         if (!confirm(T("reset_confirm", "Tanıma istatistikleri silinsin mi?"))) return;
         stats = { n: 0, ok: 0, sum: 0, streak: 0, cases: {} }; save(); renderStats();
     });
-    function onLang() { if (DATA) renderStats(); }
+    function onLang() { if (DATA) { renderStats(); renderModes(); } }
     function start() {
-    if (started) return; started = true;
-    Promise.all([
-        fetch("/icerikler/algoritmalar/tanima-pll.json?v=20261073").then(function (r) { return r.json(); }),
-        fetch("/icerikler/algoritmalar/oll-pll.json").then(function (r) { return r.json(); })
-    ]).then(function (res) {
-        DATA = res[0];
-        res[1].pll.forEach(function (g) { g.cases.forEach(function (c) { PAT[c.name] = c.pattern; }); });
-        renderAnswers(); renderStats(); next();
-    }).catch(function () { document.getElementById("rcFeedback").textContent = T("load_err", "Veriler yüklenemedi."); });
+        if (started) return; started = true;
+        fetch("/icerikler/algoritmalar/oll-pll.json?v=" + V).then(function (r) { return r.json(); }).then(function (d) {
+            d.pll.forEach(function (g) { g.cases.forEach(function (c) { PAT[c.name] = c.pattern; }); });
+            return loadMode(mode);
+        }).catch(fail);
     }
     window.RecogTrainer = { start: start, onLang: onLang };
 })();

@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261073">
+<link rel="stylesheet" href="/styles/common.css?v=20261074">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -561,6 +561,15 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 .rc-empty { font-size: 13px; color: var(--text-soft); }
 .rc-help { font-size: 13px; color: var(--text-soft); text-align: center; margin-top: 4px; }
 @media (max-width: 900px) { .rc-grid { grid-template-columns: 1fr; } }
+.rc-modes { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 0 0 10px; }
+.rc-mode { padding: 7px 16px; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 14px Inter, sans-serif; cursor: pointer; box-shadow: 2px 2px 0 var(--ink); }
+.rc-mode.active { background: var(--cube-yellow); color: #17171f; }
+.rc-answers.thumbs { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); max-height: 430px; overflow-y: auto; padding: 2px 4px 4px 2px; }
+.rc-sub { grid-column: 1 / -1; font: 800 12px Inter, sans-serif; color: var(--text-soft); letter-spacing: .02em; margin-top: 6px; }
+.rc-thumb { padding: 5px 3px 3px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.rc-thumb svg { display: block; }
+.rc-thumb small { font: 800 11px Inter, sans-serif; }
+.rc-cube.small svg { transform: scale(.85); }
 @media (max-width: 520px) { .rc-cube { width: 200px; height: 200px; } .rc-answers { grid-template-columns: repeat(4, 1fr); } }
 
 </style>
@@ -617,13 +626,18 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <div class="tool-row">
 <div class="tool-tabs" id="toolTabs" role="tablist">
     <button type="button" class="tool-tab active" data-tool="alg" role="tab" data-i18n="tool_alg">🧠 Algoritma</button>
-    <button type="button" class="tool-tab" data-tool="recog" role="tab" data-i18n="tool_recog">👁 PLL Tanıma</button>
+    <button type="button" class="tool-tab" data-tool="recog" role="tab" data-i18n="tool_recog">👁 Tanıma</button>
 </div>
 <button type="button" class="cvd-open" id="cvdOpen" data-i18n="cvd_btn">🎨 Renkler</button>
 </div>
 
 <div id="toolRecog" data-i18n-scope="tanima" hidden>
-<p class="tool-intro" data-i18n="intro">Küpün iki yüzüne bak, hangi PLL olduğunu seç. Hızlanmanın sırrı algoritmayı değil, case'i hızlı tanımaktır.</p>
+<div class="rc-modes" id="rcModes" role="group">
+    <button type="button" class="rc-mode active" data-mode="pll" aria-pressed="true">PLL</button>
+    <button type="button" class="rc-mode" data-mode="oll" aria-pressed="false">OLL</button>
+    <button type="button" class="rc-mode" data-mode="cll" aria-pressed="false">CLL · 2x2</button>
+</div>
+<p class="tool-intro" id="rcIntro" data-i18n="intro">Küpün iki yüzüne bak, hangi PLL olduğunu seç. Hızlanmanın sırrı algoritmayı değil, case'i hızlı tanımaktır.</p>
 <div class="rc-grid">
     <section class="box rc-stage">
         <div class="rc-cube" id="rcCube" dir="ltr"></div>
@@ -798,12 +812,12 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261073"></script>
-<script src="/js/common.js?v=20261073"></script>
-<script src="/js/custom-algs.js?v=20261073"></script>
-<script src="/js/cross-solver.js?v=20261073"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261073"></script>
-<script src="/js/recog-trainer.js?v=20261073"></script>
+<script src="/js/i18n.js?v=20261074"></script>
+<script src="/js/common.js?v=20261074"></script>
+<script src="/js/custom-algs.js?v=20261074"></script>
+<script src="/js/cross-solver.js?v=20261074"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261074"></script>
+<script src="/js/recog-trainer.js?v=20261074"></script>
 
 <script>
 /* ============================================================
@@ -992,7 +1006,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261073").then(function (r) {
+        return fetch(BASE + f + "?v=20261074").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
