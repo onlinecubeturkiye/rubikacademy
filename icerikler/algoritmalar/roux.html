@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261079">
+<link rel="stylesheet" href="/styles/common.css?v=20261080">
 
 <style>
 .hero {
@@ -392,10 +392,10 @@ a.set-tab { text-decoration: none; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "roux_algos";</script>
-<script src="/js/i18n.js?v=20261079"></script>
-<script src="/js/common.js?v=20261079"></script>
-<script src="/js/custom-algs.js?v=20261079"></script>
-<script src="/js/alg-player.js?v=20261079"></script>
+<script src="/js/i18n.js?v=20261080"></script>
+<script src="/js/common.js?v=20261080"></script>
+<script src="/js/custom-algs.js?v=20261080"></script>
+<script src="/js/alg-player.js?v=20261080"></script>
 
 <script>
 /* ============================================================
@@ -513,7 +513,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/roux.json?v=20261079")
+fetch("/icerikler/algoritmalar/roux.json?v=20261080")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;

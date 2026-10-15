@@ -1,12 +1,11 @@
-/* Tanıma antrenörü (antrenör sayfasındaki "Tanıma" sekmesi): PLL, OLL ve CLL (2x2) modları. tanima-*.json içinde her case için
+/* Tanıma antrenörü (antrenör sayfasındaki "Tanıma" sekmesi): 3x3 PLL ve OLL modları. tanima-*.json içinde her case için
    küp simülasyonuyla üretilmiş farklı görünümler (AUF, küp döndürme) var; 3B görünümden case seçilir. */
 (function () {
     var started = false;
-    var V = "20261079";
+    var V = "20261080";
     var MODES = {
         pll: { file: "tanima-pll.json", key: "recog-pll-v1", set: "pll", thumbs: false },
-        oll: { file: "tanima-oll.json", key: "recog-oll-v1", set: "oll", thumbs: true, draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
-        cll: { file: "tanima-cll.json", key: "recog-cll-v1", set: "cll", thumbs: true, draw: function (c, s) { return cllSvg(c.pattern, "full", s); } }
+        oll: { file: "tanima-oll.json", key: "recog-oll-v1", set: "oll", thumbs: true, draw: function (c, s) { return llSvg(c.pattern, "oll", s); } }
     };
     var MODE_KEY = "recog-mode-v1", mode = "pll", cache = {};
     try { if (MODES[localStorage.getItem(MODE_KEY)]) mode = localStorage.getItem(MODE_KEY); } catch (e) {}
@@ -86,7 +85,7 @@
             }).join("");
             return;
         }
-        // OLL / CLL: alt gruplara göre küçük diyagramlı butonlar
+        // OLL: alt gruplara göre küçük diyagramlı butonlar
         var html = "", last = null;
         DATA.cases.forEach(function (c) {
             if (c.subset !== last) { last = c.subset; html += '<div class="rc-sub">' + esc(c.subset) + '</div>'; }
@@ -102,7 +101,6 @@
         var intro = document.getElementById("rcIntro");
         intro.setAttribute("data-i18n", mode === "pll" ? "intro" : "intro_" + mode);
         intro.textContent = T(intro.getAttribute("data-i18n"), intro.textContent);
-        document.getElementById("rcCube").classList.toggle("small", mode === "cll");
     }
     function loadMode(m) {
         mode = m; STATS_KEY = MODES[m].key; stats = load();
