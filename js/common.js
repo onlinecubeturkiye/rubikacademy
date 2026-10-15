@@ -211,6 +211,7 @@ function applyLanguage(lang) {
     if (typeof onLanguageApplied === "function") {
         onLanguageApplied(lang);
     }
+    try { document.dispatchEvent(new CustomEvent("site-lang-change", { detail: lang })); } catch (e) {}
 }
 
 function toggleLangMenu(e) {
