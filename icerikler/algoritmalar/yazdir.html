@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261086">
+<link rel="stylesheet" href="/styles/common.css?v=20261087">
 
 <style>
 .print-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin: 6px 0 14px; }
@@ -59,6 +59,11 @@
     color: #17171f; font-weight: 900; font-size: 15px; cursor: pointer; box-shadow: var(--shadow-sm); font-family: inherit;
 }
 .print-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.print-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.print-btn.alt { background: var(--surface); color: var(--text); }
+.print-btn.ready { background: #22c55e; color: #fff; }
+.print-btn[hidden] { display: none; }
+.print-btn:disabled { opacity: .6; cursor: progress; }
 .sheet-scroll { overflow-x: auto; padding-bottom: 8px; margin-bottom: 30px; }
 .load-error { display: none; padding: 18px; border-radius: 14px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 700; margin-bottom: 30px; }
 
@@ -146,9 +151,13 @@
 
 <div class="print-head">
     <h1 data-i18n="page_title">Yazdırılabilir Algoritma Kağıtları</h1>
-    <button class="print-btn" type="button" id="printBtn" onclick="window.print()" data-i18n="print_btn">🖨️ Yazdır / PDF</button>
+    <div class="print-btns">
+        <button class="print-btn" type="button" id="printBtn" data-i18n="print_only">🖨️ Yazdır</button>
+        <button class="print-btn alt" type="button" id="pdfBtn" data-i18n="pdf_btn">📄 PDF indir</button>
+        <button class="print-btn ready" type="button" id="pdfReady" hidden>✅ PDF hazır: aç / paylaş</button>
+    </div>
 </div>
-<p class="print-intro" data-i18n="intro">3x3, 2x2, Pyraminx ve Skewb algoritmalarının A4 çıktısı. Yazdır penceresinde "PDF olarak kaydet"i seçersen PDF dosyası alırsın.</p>
+<p class="print-intro" data-i18n="intro">3x3, 2x2, Pyraminx ve Skewb algoritmalarının A4 çıktısı. "PDF indir" her sayfayı tam A4 PDF yapar. iPhone ve iPad'de PDF hazırlanır; açılan PDF'ten yazdırabilir ya da Dosyalar'a kaydedebilirsin.</p>
 
 <div class="sheet-groups" id="sheetTabs"></div>
 
@@ -170,11 +179,11 @@
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "yazdir";</script>
-<script src="/js/i18n.js?v=20261086"></script>
-<script src="/js/common.js?v=20261086"></script>
+<script src="/js/i18n.js?v=20261087"></script>
+<script src="/js/common.js?v=20261087"></script>
 
 
-<script src="/js/custom-algs.js?v=20261086"></script>
+<script src="/js/custom-algs.js?v=20261087"></script>
 
 <script>
 /* A4 algoritma kağıtları. Veriler algoritma sayfalarıyla aynı JSON'lardan gelir.
@@ -300,6 +309,7 @@ function render() {
 
 function selectSet(id) {
     if (!SHEETS[id]) id = "oll";
+    var rb = document.getElementById("pdfReady"); if (rb) rb.hidden = true;
     curSet = id;
     renderTabs();
     document.title = "Rubik Academy - " + SHEETS[id].title + " " + (pageText("yazdir", "page_title") || "");
@@ -323,6 +333,68 @@ function fitSheet() {
     }
 }
 window.addEventListener("resize", fitSheet);
+
+/* ---------- PDF (iPhone/iPad'de tarayıcı baskısı A4'e sığmıyor: sayfalar tam A4 PDF'e çevrilir) ----------
+   html2canvas + jsPDF (MIT, /js/vendor/pdf/) sadece butona basınca yüklenir. */
+function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1); }
+function loadScript(src) {
+    return new Promise(function (res, rej) { var s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+}
+var pdfLibs = null;
+function loadPdfLibs() {
+    if (!pdfLibs) pdfLibs = Promise.all([loadScript("/js/vendor/pdf/html2canvas.min.js?v=20261087"), loadScript("/js/vendor/pdf/jspdf.umd.min.js?v=20261087")])
+        .catch(function (e) { pdfLibs = null; throw e; });
+    return pdfLibs;
+}
+function makePdf() {
+    var btn = document.getElementById("pdfBtn"), pbtn = document.getElementById("printBtn"), label = btn.textContent;
+    var sheetsEl = document.getElementById("sheets"), list = sheetsEl.querySelectorAll(".sheet");
+    if (!list.length) return;
+    btn.disabled = pbtn.disabled = true; btn.textContent = pageText("yazdir", "pdf_wait") || "⏳ Hazırlanıyor…";
+    var restore = function () { btn.disabled = pbtn.disabled = false; btn.textContent = label; fitSheet(); };
+    loadPdfLibs().then(function () {
+        // Ekrandaki küçültmeyi kaldır: sayfalar gerçek A4 boyutunda çizilsin
+        sheetsEl.style.transform = "";
+        var pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
+        var i = 0;
+        function next() {
+            if (i >= list.length) return Promise.resolve();
+            var el = list[i];
+            return html2canvas(el, { scale: 2.5, backgroundColor: "#ffffff", logging: false, useCORS: true }).then(function (cv) {
+                if (i > 0) pdf.addPage("a4", "portrait");
+                pdf.addImage(cv.toDataURL("image/jpeg", 0.9), "JPEG", 0, 0, 210, 297);
+                i++; return next();
+            });
+        }
+        return next().then(function () {
+            var name = "rubikacademy-" + curSet + ".pdf", blob = pdf.output("blob");
+            var file = null;
+            try { file = new File([blob], name, { type: "application/pdf" }); } catch (e) {}
+            // iPhone/iPad: paylaş menüsü yeni bir dokunuş ister; "PDF'i aç / paylaş" butonu gösterilir
+            if (isIOS()) { showReady(blob, file, name); return; }
+            var url = URL.createObjectURL(blob), a = document.createElement("a");
+            a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+        });
+    }).catch(function (e) { console.error("PDF oluşturulamadı:", e); alert(pageText("yazdir", "pdf_err") || "PDF oluşturulamadı. Tekrar dene."); })
+      .then(restore, restore);
+}
+var ready = null;
+function showReady(blob, file, name) {
+    if (ready && ready.url) URL.revokeObjectURL(ready.url);
+    ready = { blob: blob, file: file, name: name, url: URL.createObjectURL(blob) };
+    var b = document.getElementById("pdfReady");
+    b.hidden = false; b.textContent = pageText("yazdir", "pdf_ready") || "✅ PDF hazır: aç / paylaş";
+}
+document.getElementById("pdfReady").addEventListener("click", function () {
+    if (!ready) return;
+    if (ready.file && navigator.canShare && navigator.canShare({ files: [ready.file] })) {
+        navigator.share({ files: [ready.file], title: ready.name }).catch(function (e) { if (e && e.name !== "AbortError") window.open(ready.url, "_blank"); });
+    } else window.open(ready.url, "_blank");
+});
+document.getElementById("pdfBtn").addEventListener("click", makePdf);
+// iPhone/iPad'de "Yazdır" da PDF üzerinden gider (tarayıcı baskısı kağıda sığmıyor)
+document.getElementById("printBtn").addEventListener("click", function () { if (isIOS()) makePdf(); else window.print(); });
 
 document.getElementById("sheetTabs").addEventListener("click", function (e) {
     var b = e.target.closest(".sheet-tab");
