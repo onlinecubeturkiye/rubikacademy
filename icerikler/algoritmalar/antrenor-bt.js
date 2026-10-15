@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261075";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261076";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -170,6 +170,79 @@
         for (var k = 0; k < 4; k++) { if (matches(model, test)) return true; model = turn(model, "U", 1); }
         return false;
     }
+    /* ---------- 2x2 (GAN 251 ui) ----------
+       2x2'de merkez yok: küpün içindeki çekirdek köşelere göre dönebilir ve küp bir hamleyi
+       karşı yüzün hamlesi olarak bildirebilir (R yerine L gibi). Kullanıcının küpü hangi yönde
+       tuttuğu bu yüzden kesin bilinemez. 2x2'de takip ve "çözüldü" kontrolü yönden bağımsızdır:
+       yalnızca köşe etiketlerine bakılır, durumlar 24 dönüşe ve renk adlarına göre karşılaştırılır. */
+    var CUBE222 = /^(GAN251|GANic251)/i;
+    var CORNERS = [];
+    STK.forEach(function (s, i) { if (s.p[0] && s.p[1] && s.p[2]) CORNERS.push(i); });
+    var ROTS = (function () {
+        function rotPerm(a) { return STK.map(function (s) { return INDEX[key(rotCW(a, s.p), rotCW(a, s.n))]; }); }
+        function comp(p, q) { return p.map(function (x) { return q[x]; }); } // önce p, sonra q
+        var gens = [rotPerm(NORMALS.R), rotPerm(NORMALS.U)], id = STK.map(function (s, i) { return i; });
+        var seen = {}, out = [id], k = 0; seen[id.join()] = 1;
+        while (k < out.length) {
+            gens.forEach(function (g) { var n = comp(out[k], g), h = n.join(); if (!seen[h]) { seen[h] = 1; out.push(n); } });
+            k++;
+        }
+        return out; // 24 tüm küp dönüşü
+    })();
+    // Yönden ve renk adlarından bağımsız durum anahtarı
+    function canon222(model) {
+        var best = null;
+        ROTS.forEach(function (r) {
+            var m = new Array(model.length);
+            for (var i = 0; i < model.length; i++) m[r[i]] = model[i];
+            var names = {}, n = 0, str = "";
+            for (var j = 0; j < CORNERS.length; j++) {
+                var c = m[CORNERS[j]];
+                if (!(c in names)) names[c] = "abcdef".charAt(n++);
+                str += names[c];
+            }
+            if (best === null || str < best) best = str;
+        });
+        return best;
+    }
+    function faceUniform222(model, f) {
+        var n = NORMALS[f], c = null;
+        for (var j = 0; j < CORNERS.length; j++) {
+            var s = STK[CORNERS[j]];
+            if (s.n[0] !== n[0] || s.n[1] !== n[1] || s.n[2] !== n[2]) continue;
+            var v = model[CORNERS[j]];
+            if (c === null) c = v; else if (v !== c) return false;
+        }
+        return true;
+    }
+    function solved222(model) { for (var f in NORMALS) if (!faceUniform222(model, f)) return false; return true; }
+    function faceColor222(model, f) { var n = NORMALS[f]; for (var j = 0; j < CORNERS.length; j++) { var s = STK[CORNERS[j]]; if (s.n[0] === n[0] && s.n[1] === n[1] && s.n[2] === n[2]) return model[CORNERS[j]]; } return null; }
+    var base2 = null; // Ortega OLL: karıştırma bitince tek renk olan alt yüzün rengi
+    function caseDone222(model, id) {
+        // Ortega OLL: alt yüzün rengi ve karşısı tek renk (hangi eksende olduğu önemli değil)
+        if (id === "ortega-oll") return ["U", "R", "F"].some(function (f) {
+            if (!faceUniform222(model, f) || !faceUniform222(model, OPP[f])) return false;
+            return base2 === null || faceColor222(model, f) === base2 || faceColor222(model, OPP[f]) === base2;
+        });
+        return solved222(model); // CLL, EG-1, EG-2, Ortega PBL: son AUF dahil küp çözülü
+    }
+    // Karıştırma takibi: her ara durumun anahtarı; küp hangisindeyse o kadar ilerlenmiştir
+    var exp2 = [], prog2 = 0, off2 = 0;
+    function startTrack222() {
+        var moves = parseScramble(curScramble), m = solvedModel();
+        exp2 = [canon222(m)];
+        moves.forEach(function (mv) { m = turn(m, mv.f, mv.q); exp2.push(canon222(m)); });
+        prog2 = 0; off2 = 0;
+        todo = moves.slice();
+    }
+    function step222() {
+        var c = canon222(model), j = -1;
+        if (prog2 + 1 < exp2.length && exp2[prog2 + 1] === c) j = prog2 + 1;
+        else for (var k = exp2.length - 1; k >= 0; k--) if (exp2[k] === c) { j = k; break; }
+        if (j >= 0) { prog2 = j; off2 = 0; } else off2++;
+        todo = parseScramble(curScramble).slice(prog2);
+    }
+
     /* Case'in çözüldüğü an: sete göre (tüm küpün çözülmesi beklenmez)
        OLL / WV: ilk iki katman + üst yüz tek renk
        COLL: + köşeler yerinde (AUF hariç)
@@ -177,6 +250,7 @@
     function caseDone(model) {
         // ⭐ Öğreniyorum setinde her case kendi setinin kuralını kullanır
         var id = (typeof curCase !== "undefined" && curCase && curCase.setId) || (current ? current.id : "");
+        if (is222()) return caseDone222(model, id);
         if (id === "oll" || id === "wv") return matches(model, isF2L) && matches(model, isTopFace);
         if (id === "coll") return matches(model, isF2L) && matches(model, isTopFace) && upToAUF(model, isTopCorner);
         if (id === "pll") return upToAUF(model, function () { return true; });
@@ -217,7 +291,11 @@
         bt_title: "Bluetooth akıllı küp", bt_connect: "Bağlan", bt_reset: "Küpüm çözülmüş", bt_disconnect: "Bağlantıyı kes",
         bt_hint: "GAN (i, i2, i3, i Carry, ui…), MoYu, QiYi, GoCube veya Giiker akıllı küpünü bağla: karıştırma takip edilir, süre kendiliğinden başlar ve case çözülünce durur.",
         bt_unsupported: "Bluetooth küp için Chrome veya Edge gerekir (iPhone/iPad desteklenmez).",
-        bt_only3x3: "Bluetooth sadece 3x3 setlerinde çalışır", bt_cube_mode: "Bluetooth için \"Küple çalış\" modunu seç",
+        bt_only3x3: "Bluetooth sadece 3x3 ve 2x2 setlerinde çalışır",
+        bt_title222: "2x2 akıllı küp", bt_hint222: "2x2 akıllı küp (GAN 251 ui) bağlayabilirsin.",
+        bt_is222: "Bu bir 2x2 akıllı küp: sadece 2x2 setlerinde kullanılabilir.",
+        bt_is333: "Bu bir 3x3 akıllı küp: 2x2 setlerinde 2x2 akıllı küp (GAN 251 ui) gerekir.",
+        bt_undo222: "Yanlış hamle: son hamleni geri al.", bt_cube_mode: "Bluetooth için \"Küple çalış\" modunu seç",
         bt_hint_scramble_roux: "Karıştırmayı sarı köşeler üstte, yeşil önde tutarak uygula (merkezlerin rengi önemli değil)",
         bt_roux_m: "EO için M katmanını hizala: üstte sarı ya da beyaz merkez olsun (M2 kayık olabilir).",
         bt_need_solve: "Önce küpü çöz (ya da yaptığın hamleleri geri al). Çözülünce karıştırma başlar.",
@@ -261,7 +339,12 @@
     function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
     function fmtMove(f, q) { return f + (q === 2 ? "2" : q === 3 ? "'" : ""); }
     function supported() { return !!(navigator.bluetooth && navigator.bluetooth.requestDevice); }
-    function applies() { return conn && mode === "cube" && current && current.cube === "3x3" && !current.noBT; }
+    // Bluetooth: 3x3 setleri (CFOP, Roux) yalnızca 3x3 akıllı küple, 2x2 setleri yalnızca 2x2 akıllı küple
+    function btSet() { return !!(current && !current.noBT && (current.cube === "3x3" || current.cube === "2x2")); }
+    function kindOf(name) { return CUBE222.test(name || "") ? "2x2" : "3x3"; }
+    function connKind() { return conn ? kindOf(conn.deviceName) : null; }
+    function is222() { return !!(current && current.cube === "2x2"); }
+    function applies() { return conn && mode === "cube" && btSet() && connKind() === current.cube; }
 
     // Küp dönüşleri (x, y, z) akıllı küpte hamle olarak gelmez: takipte atlanır, ekranda sonda gösterilir
     function isRot(t) { return /^[xyz]/.test(t); }
@@ -282,22 +365,23 @@
         el("btReset").style.display = on && !noData ? "" : "none";
         bar.classList.toggle("warn", on && noData);
         var st = el("btStatus");
-        el("btTitle").textContent = on ? (conn.deviceName || "GAN") + " · " + (noData ? "⚠ " + txt("bt_no_data_t") : txt("bt_connected")) : txt("bt_title");
+        el("btTitle").textContent = on ? (conn.deviceName || "GAN") + " · " + (noData ? "⚠ " + txt("bt_no_data_t") : txt("bt_connected")) : txt(is222() ? "bt_title222" : "bt_title");
         el("btConnect").textContent = txt("bt_connect");
         el("btReset").textContent = txt("bt_reset");
         el("btDisconnect").textContent = txt("bt_disconnect");
         // Bluetooth'u desteklemeyen tarayıcıda (iPhone, Firefox) kutu hiç gösterilmez
         // Bluetooth sadece 3x3 (CFOP, Roux) setlerinde: diğer küplerde kutu hiç görünmez
-        bar.classList.toggle("unsup", !supported() || !!(current && (current.cube !== "3x3" || current.noBT)));
+        bar.classList.toggle("unsup", !supported() || !btSet());
         if (!supported()) { st.textContent = txt("bt_unsupported"); el("btConnect").disabled = true; return; }
         if (connecting) bar.classList.add("has-msg");
         if (connecting) { st.textContent = txt("bt_connecting") + (stage ? " (" + txt("bt_st_" + stage) + (stageName ? ": " + stageName : "") + ")" : ""); return; }
         if (!on && lastError) { st.textContent = lastError; bar.classList.add("has-msg"); return; }
         bar.classList.remove("has-msg");
         bar.title = on ? "" : txt("bt_hint");
-        if (!on) { st.textContent = ""; return; }
+        if (!on) { st.textContent = is222() ? txt("bt_hint222") : ""; return; }
         if (noData) { st.textContent = txt("bt_no_data2") + (lastMac ? " " + txt("bt_mac_used") + " " + lastMac : ""); return; }
-        if (current && (current.cube !== "3x3" || current.noBT)) st.textContent = txt("bt_only3x3");
+        if (!btSet()) st.textContent = txt("bt_only3x3");
+        else if (connKind() !== current.cube) st.textContent = txt(connKind() === "2x2" ? "bt_is222" : "bt_is333");
         else if (mode !== "cube") st.textContent = txt("bt_cube_mode");
         else st.textContent = txt(state === "running" ? "bt_hint_ready" : (isRoux() ? "bt_hint_scramble_roux" : "bt_hint_scramble"));
     }
@@ -316,6 +400,7 @@
         var fixes = [];
         for (var i = 0; i < todo.length && todo[i].fix; i++) fixes.push(fmtMove(todo[i].f, todo[i].q));
         if (fixes.length) html += '<span class="bt-fix">' + esc(txt("bt_fix")) + " " + esc(fixes.join(" ")) + '</span> ';
+        if (is222() && off2) html += '<span class="bt-fix">' + esc(txt("bt_undo222")) + '</span> ';
         orig.forEach(function (m, i) {
             var cls = i < doneCount ? "bt-done" : (i === doneCount ? "bt-cur" : "");
             var label = fmtMove(m.f, m.q);
@@ -362,6 +447,7 @@
         tooMany = false;
         todo = parseScramble(curScramble);
         total = todo.length;
+        if (is222()) startTrack222();
         phase = "scrambling";
         renderScramble();
         setHint(isRoux() ? "bt_hint_scramble_roux" : "bt_hint_scramble");
@@ -371,6 +457,7 @@
     function readyFrame() {
         mOdd = false;
         if (!modelKnown) return null;
+        if (is222()) return solved222(model) ? IDENT : null;
         if (!isRoux()) {
             if (!isSolved(model)) return null;
             if (window.CrossSolver && !crossSt) crossSt = CrossSolver.SOLVED;
@@ -406,6 +493,17 @@
         if (phase === "needSolve") {
             var fr = readyFrame();
             if (fr) { hold = fr; startScrambleTracking(); } else if (mOdd) renderScramble();
+            return;
+        }
+        if (phase === "scrambling" && is222()) {
+            step222();
+            if (off2 > MAX_FIX) { phase = "needSolve"; tooMany = true; afterCase = false; renderScramble(); setHint("bt_hint_solve"); return; }
+            if (prog2 === exp2.length - 1 && !off2) {
+                todo = []; phase = "ready"; setHint("bt_hint_ready");
+                var uni = Object.keys(NORMALS).filter(function (f) { return faceUniform222(model, f); });
+                base2 = uni.length === 1 ? faceColor222(model, uni[0]) : null;
+            }
+            renderScramble();
             return;
         }
         if (phase === "scrambling") {
@@ -566,6 +664,8 @@
         var getter = navigator.bluetooth.getDevices ? navigator.bluetooth.getDevices() : Promise.resolve([]);
         getter.catch(function () { return []; }).then(function (devs) {
             if (lastDevice && !devs.some(function (d) { return d.id === lastDevice.id; })) devs = [lastDevice].concat(devs);
+            var wantK = current && current.cube === "2x2" ? "2x2" : "3x3";
+            devs = devs.filter(function (d) { return kindOf(d.name) === wantK; });
             if (!devs.length) {
                 // Chrome kayıtlı küpleri bildirmiyorsa: hatırlamayı açan ayarı göster (Chrome listesi bir daha gelmesin)
                 var flag = "chrome://flags/#enable-web-bluetooth-new-permissions-backend";
@@ -600,8 +700,14 @@
         // Kayıtlı küp varsa doğrudan onu ver; yoksa Chrome'un listesini aç ve seçilen küpü bu sayfa için hafızada tut
         var id = ++attempt;
         lastError = ""; stage = ""; stageName = "";
+        var want = current && current.cube === "2x2" ? "2x2" : "3x3";
+        var P222 = ["GAN251", "gan251", "Gan251", "GANic251", "ganic251", "Ganic251"].map(function (x) { return { namePrefix: x }; });
         bt.requestDevice = function (opts) {
             bt.requestDevice = origRequest;
+            // 2x2 setinde listede sadece 2x2 küpler, 3x3 setinde 2x2 küpler hariç
+            opts = Object.assign({}, opts);
+            if (want === "2x2") { opts.filters = P222; delete opts.acceptAllDevices; }
+            else opts.exclusionFilters = P222;
             var found = function (d) { lastDevice = d; if (id === attempt) { setStage("found", d && d.name); armTimeout(id); } return d; };
             if (knownDevice) return Promise.resolve(found(knownDevice));
             setStage("pick");
@@ -613,6 +719,15 @@
             return window.GanBT.connectSmartCube(macProvider);
         }).then(function (c) {
             if (id !== attempt) { try { c.disconnect(); } catch (e) {} return; } // zaman aşımından sonra geldi
+            if (kindOf(c.deviceName) !== want) {
+                // Yanlış tür küp: 3x3 setine 2x2, 2x2 setine 3x3 bağlanmaz
+                clearTimeout(connTimer); stage = ""; connecting = false;
+                try { c.disconnect(); } catch (e) {}
+                el("btConnect").disabled = false;
+                lastError = txt(want === "2x2" ? "bt_is333" : "bt_is222");
+                renderBar();
+                return;
+            }
             clearTimeout(connTimer); stage = "";
             conn = c; connecting = false;
             gotEvent = false; noData = false; lastMac = c.deviceMAC || lastMac;
@@ -629,7 +744,7 @@
                 }
                 else if (ev.type === "FACELETS") {
                     var fm = parseFacelets(ev.facelets);
-                    if (!modelKnown || (pendingCheck && fm && rouxFrame(fm))) {
+                    if (!modelKnown || (pendingCheck && fm && (is222() ? solved222(fm) : rouxFrame(fm)))) {
                         // Küpün kendi bildirdiği durum: çözülmüş ya da (Roux) M katmanı kayık olabilir
                         if (fm) {
                             model = fm; modelKnown = true; mCands = null;
@@ -695,6 +810,8 @@
     var pendingCheck = false;
     function markSolved() {
         setSolved();
+        // 2x2: küpün kendi kaydını da çözülmüş yap (çekirdek kaymış olsa bile model ile küp aynı kalır)
+        if (is222() && conn) conn.sendCommand({ type: "REQUEST_RESET" }).catch(function () {});
         mCands = null;
         if (isRoux()) startMGuess();
         // Roux'da küp M kayık olabilir: küpün kendi durumunu iste, M dışında çözülmüşse onu kullan
