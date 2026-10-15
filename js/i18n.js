@@ -8690,7 +8690,18 @@ alg5: {
                 bd_pll: "21 PLL'in hepsini \"Biliyorum\" yap",
                 bd_oll: "57 OLL'un hepsini \"Biliyorum\" yap",
                 done_h: "Bugünü tamamladın! 🎉",
-                next_in: "Yeni karıştırmaya kalan süre:"
+                next_in: "Yeni karıştırmaya kalan süre:",
+                lb_send: "🏆 Sıralamaya gönder",
+                lb_h: "🏆 Günün sıralaması",
+                lb_note: "Her cihaz günde bir kez gönderebilir. Sıralama her gün sıfırlanır.",
+                lb_name: "Adın (sıralamada görünür)",
+                lb_sent: "Sıralamaya gönderildi ✓",
+                lb_too_fast: "3 saniyenin altındaki süreler sıralamaya kabul edilmez.",
+                lb_bad_name: "Ad 2-20 karakter olmalı.",
+                lb_sending: "Gönderiliyor…",
+                lb_err: "Gönderilemedi. İnternet bağlantını kontrol edip tekrar dene.",
+                lb_empty: "Bugün henüz kimse göndermedi. İlk sen ol!",
+                lb_load_err: "Sıralama yüklenemedi."
             },
             en: {
                 back_btn: "← Back",
@@ -8749,7 +8760,18 @@ alg5: {
                 bd_pll: "Mark all 21 PLLs as \"Known\"",
                 bd_oll: "Mark all 57 OLLs as \"Known\"",
                 done_h: "You finished today! 🎉",
-                next_in: "New scramble in:"
+                next_in: "New scramble in:",
+                lb_send: "🏆 Submit to leaderboard",
+                lb_h: "🏆 Today's leaderboard",
+                lb_note: "Each device can submit once a day. The leaderboard resets every day.",
+                lb_name: "Your name (shown on the leaderboard)",
+                lb_sent: "Submitted to the leaderboard ✓",
+                lb_too_fast: "Times under 3 seconds are not accepted on the leaderboard.",
+                lb_bad_name: "Name must be 2–20 characters.",
+                lb_sending: "Submitting…",
+                lb_err: "Couldn't submit. Check your internet connection and try again.",
+                lb_empty: "Nobody has submitted today yet. Be the first!",
+                lb_load_err: "Couldn't load the leaderboard."
             },
             fr: {
                 back_btn: "← Retour",
@@ -8808,7 +8830,18 @@ alg5: {
                 bd_pll: "Marque les 21 PLL comme « Je sais »",
                 bd_oll: "Marque les 57 OLL comme « Je sais »",
                 done_h: "Tu as terminé pour aujourd'hui ! 🎉",
-                next_in: "Nouveau mélange dans :"
+                next_in: "Nouveau mélange dans :",
+                lb_send: "🏆 Envoyer au classement",
+                lb_h: "🏆 Classement du jour",
+                lb_note: "Chaque appareil peut envoyer une fois par jour. Le classement est remis à zéro chaque jour.",
+                lb_name: "Ton nom (affiché dans le classement)",
+                lb_sent: "Envoyé au classement ✓",
+                lb_too_fast: "Les temps de moins de 3 secondes ne sont pas acceptés.",
+                lb_bad_name: "Le nom doit faire 2 à 20 caractères.",
+                lb_sending: "Envoi…",
+                lb_err: "Échec de l'envoi. Vérifie ta connexion et réessaie.",
+                lb_empty: "Personne n'a encore envoyé aujourd'hui. Sois le premier !",
+                lb_load_err: "Impossible de charger le classement."
             },
             ru: {
                 back_btn: "← Назад",
@@ -8867,7 +8900,18 @@ alg5: {
                 bd_pll: "Отметь все 21 PLL как «Знаю»",
                 bd_oll: "Отметь все 57 OLL как «Знаю»",
                 done_h: "Сегодня всё готово! 🎉",
-                next_in: "Новый скрамбл через:"
+                next_in: "Новый скрамбл через:",
+                lb_send: "🏆 Отправить в рейтинг",
+                lb_h: "🏆 Рейтинг дня",
+                lb_note: "С каждого устройства можно отправить результат раз в день. Рейтинг обнуляется каждый день.",
+                lb_name: "Твоё имя (видно в рейтинге)",
+                lb_sent: "Отправлено в рейтинг ✓",
+                lb_too_fast: "Время меньше 3 секунд в рейтинг не принимается.",
+                lb_bad_name: "Имя должно быть от 2 до 20 символов.",
+                lb_sending: "Отправка…",
+                lb_err: "Не удалось отправить. Проверь интернет и попробуй снова.",
+                lb_empty: "Сегодня ещё никто не отправил результат. Будь первым!",
+                lb_load_err: "Не удалось загрузить рейтинг."
             },
             de: {
                 back_btn: "← Zurück",
@@ -8926,7 +8970,18 @@ alg5: {
                 bd_pll: "Markiere alle 21 PLLs als „Kann ich“",
                 bd_oll: "Markiere alle 57 OLLs als „Kann ich“",
                 done_h: "Heute geschafft! 🎉",
-                next_in: "Neuer Scramble in:"
+                next_in: "Neuer Scramble in:",
+                lb_send: "🏆 In die Bestenliste",
+                lb_h: "🏆 Bestenliste des Tages",
+                lb_note: "Jedes Gerät kann einmal pro Tag einsenden. Die Bestenliste startet jeden Tag neu.",
+                lb_name: "Dein Name (in der Bestenliste sichtbar)",
+                lb_sent: "In die Bestenliste eingetragen ✓",
+                lb_too_fast: "Zeiten unter 3 Sekunden werden nicht angenommen.",
+                lb_bad_name: "Der Name muss 2–20 Zeichen lang sein.",
+                lb_sending: "Wird gesendet…",
+                lb_err: "Senden fehlgeschlagen. Prüfe deine Internetverbindung und versuch es erneut.",
+                lb_empty: "Heute hat noch niemand eingesendet. Sei der Erste!",
+                lb_load_err: "Bestenliste konnte nicht geladen werden."
             },
             ar: {
                 back_btn: "→ رجوع",
@@ -8985,7 +9040,18 @@ alg5: {
                 bd_pll: "علّم كل حالات PLL الـ21 بـ«أعرف»",
                 bd_oll: "علّم كل حالات OLL الـ57 بـ«أعرف»",
                 done_h: "أنهيت تحدّي اليوم! 🎉",
-                next_in: "الخلط الجديد بعد:"
+                next_in: "الخلط الجديد بعد:",
+                lb_send: "🏆 أرسل إلى الترتيب",
+                lb_h: "🏆 ترتيب اليوم",
+                lb_note: "يمكن لكل جهاز الإرسال مرة واحدة يومياً. يُعاد ضبط الترتيب كل يوم.",
+                lb_name: "اسمك (يظهر في الترتيب)",
+                lb_sent: "تم الإرسال إلى الترتيب ✓",
+                lb_too_fast: "لا تُقبل الأوقات الأقل من 3 ثوانٍ في الترتيب.",
+                lb_bad_name: "يجب أن يكون الاسم من 2 إلى 20 حرفاً.",
+                lb_sending: "جارٍ الإرسال…",
+                lb_err: "تعذّر الإرسال. تحقّق من اتصالك بالإنترنت وحاول مجدداً.",
+                lb_empty: "لم يرسل أحد اليوم بعد. كن الأول!",
+                lb_load_err: "تعذّر تحميل الترتيب."
             }
         },
         hiz: {

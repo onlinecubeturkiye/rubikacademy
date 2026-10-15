@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261077">
+<link rel="stylesheet" href="/styles/common.css?v=20261078">
 
 <style>
 .wrap { max-width: 980px; margin: 0 auto; }
@@ -66,7 +66,23 @@
 .d-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 22px; align-items: start; }
 .d-top { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .d-date { font-weight: 800; color: var(--text-soft); font-size: 14px; text-transform: capitalize; }
-#dPlay[hidden], #dDone[hidden] { display: none !important; }
+#dPlay[hidden], #dDone[hidden], #lbBox[hidden], #lbSend[hidden] { display: none !important; }
+.lb-send { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+.lb-send input { flex: 0 1 220px; min-width: 0; padding: 10px 12px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 700 15px Inter, sans-serif; }
+.lb-msg { margin-top: 8px !important; font-size: 13.5px !important; font-weight: 800; min-height: 1px; }
+.lb-msg.ok { color: var(--cube-green) !important; }
+.lb-msg.bad { color: var(--cube-red) !important; }
+.d-off .btn:disabled { opacity: .45; }
+.lb-ref { padding: 6px 12px; }
+.lb-list { margin-top: 8px; }
+.lb-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 6px; border-bottom: 1px solid var(--border); font-size: 15px; }
+.lb-row .rk { font: 900 14px Inter, sans-serif; color: var(--text-soft); text-align: center; }
+.lb-row .nm { font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-row .tm { font: 800 15px "JetBrains Mono", monospace; color: var(--text); }
+.lb-row.top .rk { font-size: 18px; }
+.lb-row.me { background: var(--tint-yellow, rgba(255,210,31,.18)); border-radius: 10px; }
+.lb-gap { text-align: center; color: var(--text-soft); padding: 2px; }
+.lb-empty { color: var(--text-soft); font-size: 14px; padding: 8px 2px; }
 .d-pz-tag { padding: 5px 12px; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--cube-yellow); color: #17171f; font: 900 13px Inter, sans-serif; }
 .d-done { text-align: center; padding: 18px 8px 6px; }
 .d-done-h { font: 900 22px Inter, sans-serif; color: var(--text); }
@@ -189,8 +205,19 @@
             <button type="button" class="btn" id="dPenDnf">DNF</button>
             <button type="button" class="btn primary" id="dShare" data-i18n="share">📤 Paylaş</button>
         </div>
+        <div class="lb-send" id="lbSend" hidden>
+            <input type="text" id="lbName" maxlength="20" autocomplete="nickname" spellcheck="false">
+            <button type="button" class="btn primary" id="lbSendBtn" data-i18n="lb_send">🏆 Sıralamaya gönder</button>
+        </div>
+        <p class="lb-msg" id="lbMsg" role="status" aria-live="polite"></p>
         <p class="d-note"><span data-i18n="next_in">Yeni karıştırmaya kalan süre:</span> <b id="dCountdown" dir="ltr"></b></p>
     </div>
+</section>
+
+<section class="box" id="lbBox" hidden>
+    <div class="b-head"><h2 data-i18n="lb_h">🏆 Günün sıralaması</h2><button type="button" class="btn lb-ref" id="lbRefresh" aria-label="↻">↻</button></div>
+    <div class="lb-list" id="lbList"></div>
+    <p class="d-note" data-i18n="lb_note">Her cihaz günde bir kez gönderebilir. Sıralama her gün sıfırlanır.</p>
 </section>
 
 <div class="d-grid">
@@ -229,10 +256,12 @@
 </footer>
 
 <script>var PAGE_ID = "gunluk";</script>
-<script src="/js/i18n.js?v=20261077"></script>
-<script src="/js/common.js?v=20261077"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261077"></script>
-<script src="/js/streak.js?v=20261077"></script>
-<script src="/js/gunluk.js?v=20261077"></script>
+<script src="/js/i18n.js?v=20261078"></script>
+<script src="/js/common.js?v=20261078"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261078"></script>
+<script src="/js/streak.js?v=20261078"></script>
+<script src="/js/firebase-config.js?v=20261078"></script>
+<script src="/js/leaderboard.js?v=20261078"></script>
+<script src="/js/gunluk.js?v=20261078"></script>
 </body>
 </html>
