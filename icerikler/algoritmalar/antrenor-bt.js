@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261058";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261059";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -55,6 +55,37 @@
         Object.keys(CENTER).forEach(function (f) { map[model[CENTER[f]]] = f; });
         return model.map(function (c) { return map[c]; });
     }
+    /* Roux: sarı merkez üstte olmak zorunda değil. Küp M katmanı dışında çözülüyse
+       (merkezler kayık) hazır sayılır. Tutuş çerçevesi köşelerden bulunur:
+       sarı köşe etiketlerinin olduğu yüz "üst", yeşil köşe etiketlerinin olduğu yüz "ön".
+       Döndürür: tutuş harfi -> modeldeki (merkezlere göre) yüz harfi, ya da null. */
+    var OPP = { U: "D", D: "U", R: "L", L: "R", F: "B", B: "F" };
+    function letterOf(n) { for (var f in NORMALS) if (NORMALS[f][0] === n[0] && NORMALS[f][1] === n[1] && NORMALS[f][2] === n[2]) return f; return null; }
+    function cornerFace(model, color) {
+        var face = null;
+        for (var i = 0; i < model.length; i++) {
+            var p = STK[i].p;
+            if (model[i] !== color || !p[0] || !p[1] || !p[2]) continue;
+            var f = letterOf(STK[i].n);
+            if (face && face !== f) return null;
+            face = f;
+        }
+        return face;
+    }
+    function rouxFrame(model) {
+        var ok = false;
+        for (var j = 0; j < 4 && !ok; j++) ok = isSolved(normalize(j ? turn(model, "M", j) : model));
+        if (!ok) return null;
+        var u = cornerFace(model, "U"), fr = cornerFace(model, "F");
+        if (!u || !fr) return null;
+        var r = letterOf(cross(NORMALS[u], NORMALS[fr]));
+        var m = { U: u, D: OPP[u], F: fr, B: OPP[fr], R: r, L: OPP[r] };
+        m.inv = {}; Object.keys(OPP).forEach(function (k) { m.inv[m[k]] = k; });
+        return m;
+    }
+    var IDENT = { U: "U", D: "D", F: "F", B: "B", R: "R", L: "L", inv: { U: "U", D: "D", F: "F", B: "B", R: "R", L: "L" } };
+    var hold = IDENT; // karıştırma takibinde tutuş çerçevesi
+    var mOdd = false; // Roux EO: M katmanı çeyrek kayık (case değişir)
     function solvedModel() { return STK.map(function (s) { return s.c; }); }
     function turn(model, f, q) { // q: 1 = saat yönü, 3 = ters, 2 = çift
         for (var t = 0; t < q; t++) {
@@ -82,8 +113,11 @@
     /* Roux: iki blok + üst köşeler (AUF hariç) yerinde; M katmanı kayık olabilir.
        eo = true ise kalan 6 kenarın U/D rengi U ya da D yüzünde olmalı. */
     function rouxDone(model, eo) {
-        for (var k = 0; k < 4; k++) {
-            var m = normalize(k ? turn(model, "M", k) : model);
+        // Küp x ekseninde dönmüş tutulabilir (M kayıkken merkezler başka yerde): R^r L'^r M^k hepsi denenir
+        for (var t = 0; t < 16; t++) {
+            var r = t >> 2, k = t & 3;
+            var m = r ? turn(turn(model, "R", r), "L", 4 - r) : model;
+            m = normalize(k ? turn(m, "M", k) : m);
             for (var j = 0; j < 4; j++) {
                 if (matches(m, isRouxBlock) && matches(m, isTopCorner)) {
                     if (!eo) return true;
@@ -143,6 +177,8 @@
         bt_hint: "GAN (i, i2, i3, i Carry, ui…), MoYu, QiYi, GoCube veya Giiker akıllı küpünü bağla: karıştırma takip edilir, süre kendiliğinden başlar ve case çözülünce durur.",
         bt_unsupported: "Bluetooth küp için Chrome veya Edge gerekir (iPhone/iPad desteklenmez).",
         bt_only3x3: "Bluetooth sadece 3x3 setlerinde çalışır", bt_cube_mode: "Bluetooth için \"Küple çalış\" modunu seç",
+        bt_hint_scramble_roux: "Karıştırmayı sarı köşeler üstte, yeşil önde tutarak uygula (merkezlerin rengi önemli değil)",
+        bt_roux_m: "EO için M katmanını hizala: üstte sarı ya da beyaz merkez olsun (M2 kayık olabilir).",
         bt_need_solve: "Önce küpü çöz (ya da yaptığın hamleleri geri al). Çözülünce karıştırma başlar.",
         bt_unknown: "Küp çözülmüş değil görünüyor. Çöz ve \"Küpüm çözülmüş\" butonuna bas.",
         bt_fix: "Düzelt:", bt_too_many: "Çok fazla farklı hamle yapıldı. Küpü çöz; çözülünce karıştırma baştan başlar.", bt_finish_cube: "Case tamam! Yeni karıştırma için küpü bitir (tamamen çöz) ya da algoritmanın tersini yap.", bt_hint_scramble: "Karıştırmayı sarı üstte, yeşil önde tutarak uygula",
@@ -221,14 +257,14 @@
         if (noData) { st.textContent = txt("bt_no_data2") + (lastMac ? " " + txt("bt_mac_used") + " " + lastMac : ""); return; }
         if (current && (current.cube !== "3x3" || current.noBT)) st.textContent = txt("bt_only3x3");
         else if (mode !== "cube") st.textContent = txt("bt_cube_mode");
-        else st.textContent = txt(state === "running" ? "bt_hint_ready" : "bt_hint_scramble");
+        else st.textContent = txt(state === "running" ? "bt_hint_ready" : (isRoux() ? "bt_hint_scramble_roux" : "bt_hint_scramble"));
     }
 
     function renderScramble() {
         if (!applies() || !curScramble) return;
         var box = el("scramble");
         if (phase === "needSolve") {
-            box.innerHTML = '<span class="bt-warn">' + esc(txt(!modelKnown ? "bt_unknown" : tooMany ? "bt_too_many" : (afterCase ? "bt_finish_cube" : "bt_need_solve"))) + '</span>';
+            box.innerHTML = '<span class="bt-warn">' + esc(txt(!modelKnown ? "bt_unknown" : mOdd ? "bt_roux_m" : tooMany ? "bt_too_many" : (afterCase ? "bt_finish_cube" : "bt_need_solve"))) + '</span>';
             return;
         }
         var orig = parseScramble(curScramble);
@@ -286,15 +322,29 @@
         total = todo.length;
         phase = "scrambling";
         renderScramble();
-        setHint("bt_hint_scramble");
+        setHint(isRoux() ? "bt_hint_scramble_roux" : "bt_hint_scramble");
     }
 
+    // Karıştırma başlayabilir mi? (Roux'da M katmanı kayık olabilir)
+    function readyFrame() {
+        mOdd = false;
+        if (!modelKnown) return null;
+        if (!isRoux()) return isSolved(model) ? IDENT : null;
+        var fr = rouxFrame(model);
+        // EO'da merkezler çeyrek kaymışsa (üstte yeşil/mavi merkez) case anlamı değişir
+        if (fr && current.id === "roux-eo" && fr.U !== "U" && fr.U !== "D") { mOdd = true; return null; }
+        return fr;
+    }
+    function isRoux() { return !!(current && current.puzzle === "roux"); }
     window.btOnNewCase = function () {
         renderBar();
         if (!applies()) { phase = "off"; return; }
         afterCase = phase === "done";
+        hold = IDENT;
         if (isCross() && modelKnown) { crossPrefix(); startScrambleTracking(); return; }
-        if (!modelKnown || !isSolved(model)) { phase = "needSolve"; renderScramble(); setHint("bt_hint_solve"); return; }
+        var fr = readyFrame();
+        if (!fr) { phase = "needSolve"; renderScramble(); setHint("bt_hint_solve"); return; }
+        hold = fr;
         startScrambleTracking();
     };
     window.btOnStateChange = function () { renderBar(); if (applies() && state === "done") phase = "done"; };
@@ -306,10 +356,12 @@
         if (crossSt && window.CrossSolver) crossSt = CrossSolver.apply(crossSt, fmtMove(f, d));
         if (!applies()) return;
         if (phase === "needSolve") {
-            if (modelKnown && isSolved(model)) startScrambleTracking();
+            var fr = readyFrame();
+            if (fr) { hold = fr; startScrambleTracking(); } else if (mOdd) renderScramble();
             return;
         }
         if (phase === "scrambling") {
+            f = hold.inv[f]; // merkezlere göre gelen yüz -> tutuştaki yüz
             if (todo.length && todo[0].f === f) {
                 todo[0].q = (todo[0].q - d + 8) % 4;
                 if (todo[0].q === 0) todo.shift();
