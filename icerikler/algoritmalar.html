@@ -22,7 +22,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#ffd21f">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261045">
+<link rel="stylesheet" href="/styles/common.css?v=20261046">
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar">
 <meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, WV, Ortega, CLL ve EG algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
 <meta property="og:title" content="Rubik Academy - Algoritmalar">
@@ -395,6 +395,8 @@ html {
 .req-msg { font-size: 14px; font-weight: 700; color: var(--text-soft); }
 .req-msg.ok { color: var(--cube-green); }
 .req-msg.err { color: var(--cube-red); }
+.req-mail { display: inline-block; margin-inline-start: 6px; padding: 6px 12px; border-radius: 10px; border: 1.5px solid var(--ink); background: var(--surface); color: var(--text); text-decoration: none; font-weight: 800; }
+.req-detail { display: block; margin-top: 6px; font-weight: 600; color: var(--text-soft); }
 @media (max-width: 600px) { .req-form { grid-template-columns: 1fr; } .req-box { padding: 16px; } }
 </style>
 <!-- Google tag (gtag.js) -->
@@ -742,6 +744,7 @@ html {
 (function () {
     var form = document.getElementById("reqForm");
     if (!form) return;
+    var REQ_TO = "muhammederenyalcin@gmail.com";
     function T(k, fb) {
         var p = (window.SITE_I18N && SITE_I18N.pages.algoritmalar) || {}, l = localStorage.getItem("site-lang") || "tr";
         return (p[l] && p[l][k]) || (p.tr && p.tr[k]) || fb;
@@ -759,34 +762,55 @@ html {
         if (!set) { msg.className = "req-msg err"; msg.textContent = T("req_need_set", "Set adını yaz."); form.set.focus(); return; }
         if (form._honey.value) return; // bot
         btn.disabled = true; msg.textContent = T("req_sending", "Gönderiliyor…");
-        fetch("https://formsubmit.co/ajax/muhammederenyalcin@gmail.com", {
+        var data = {
+            Kup: form.kup.value,
+            Set: set,
+            Not: form.not.value.trim() || "-",
+            Iletisim: form.iletisim.value.trim() || "-",
+            Dil: localStorage.getItem("site-lang") || "tr",
+            Sayfa: location.href
+        };
+        var subject = "Rubik Academy: algoritma seti isteği (" + data.Kup + " · " + set + ")";
+        // Gönderilemezse kullanıcının e-posta uygulamasıyla aynı bilgiyi yolla
+        function mailtoLink() {
+            var body = Object.keys(data).map(function (k) { return k + ": " + data[k]; }).join("\n");
+            return "mailto:" + REQ_TO + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        }
+        function fail(detail) {
+            msg.className = "req-msg err";
+            msg.innerHTML = "";
+            msg.appendChild(document.createTextNode(T("req_err", "Gönderilemedi.") + " "));
+            var a = document.createElement("a");
+            a.href = mailtoLink(); a.className = "req-mail"; a.textContent = T("req_mail", "📧 E-postayla gönder");
+            msg.appendChild(a);
+            if (detail) { var d = document.createElement("small"); d.className = "req-detail"; d.textContent = detail; msg.appendChild(d); }
+        }
+        var payload = Object.assign({ _subject: subject, _template: "table", _captcha: "false" }, data);
+        fetch("https://formsubmit.co/ajax/" + REQ_TO, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
-            body: JSON.stringify({
-                _subject: "Rubik Academy: algoritma seti isteği (" + form.kup.value + " · " + set + ")",
-                _template: "table",
-                Kup: form.kup.value,
-                Set: set,
-                Not: form.not.value.trim() || "-",
-                Iletisim: form.iletisim.value.trim() || "-",
-                Dil: localStorage.getItem("site-lang") || "tr",
-                Sayfa: location.href
-            })
-        }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || j.success === "false" || j.success === false) throw new Error(j.message || r.status); }); })
-          .then(function () {
-              msg.className = "req-msg ok"; msg.textContent = T("req_ok", "Teşekkürler! İsteğin bize ulaştı.");
-              form.reset();
-          })
-          .catch(function () {
-              msg.className = "req-msg err"; msg.textContent = T("req_err", "Gönderilemedi. Biraz sonra tekrar dene ya da Instagram'dan @rubikacademyy'ye yaz.");
-          })
+            body: JSON.stringify(payload)
+        }).then(function (r) {
+            return r.json().catch(function () { return {}; }).then(function (j) {
+                var ok = r.ok && String(j.success) === "true";
+                if (ok) {
+                    msg.className = "req-msg ok"; msg.textContent = T("req_ok", "Teşekkürler! İsteğin bize ulaştı.");
+                    form.reset();
+                } else if (/activat/i.test(j.message || "")) {
+                    // FormSubmit ilk kullanımda site e-postasına "Activate Form" onayı yollar; onaylanana kadar istekler iletilmez
+                    fail(T("req_activate", "Form henüz etkinleştirilmedi (site sahibinin onayı bekleniyor)."));
+                } else {
+                    fail(j.message || ("HTTP " + r.status));
+                }
+            });
+        }).catch(function (err) { fail(err && err.message); })
           .then(function () { btn.disabled = false; });
     });
 })();
 </script>
 <script>var PAGE_ID = "algoritmalar";</script>
-<script src="/js/i18n.js?v=20261045"></script>
-<script src="/js/common.js?v=20261045"></script>
+<script src="/js/i18n.js?v=20261046"></script>
+<script src="/js/common.js?v=20261046"></script>
 
 <!-- BU SAYFAYA ÖZEL: OLL / PLL VERİSİNİ YÜKLE VE KARTLARI OLUŞTUR -->
 
