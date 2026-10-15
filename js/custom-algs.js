@@ -9,12 +9,12 @@
     var KEY = "custom-algs-v1";
 
     var TXT = {
-        tr: { edit: "Algoritmayı düzenle", mine: "Senin algoritman", orig: "Orijinal:", save: "Kaydet", reset: "Orijinale dön", cancel: "İptal", ph: "Kendi algoritmanı yaz (ör. R U R' U')", bad: "Geçersiz karakter var. Sadece hamle harfleri, ', 2, parantez ve boşluk kullan." },
-        en: { edit: "Edit algorithm", mine: "Your algorithm", orig: "Original:", save: "Save", reset: "Back to original", cancel: "Cancel", ph: "Write your own algorithm (e.g. R U R' U')", bad: "Invalid characters. Use only move letters, ', 2, brackets and spaces." },
-        fr: { edit: "Modifier l'algorithme", mine: "Ton algorithme", orig: "Original :", save: "Enregistrer", reset: "Revenir à l'original", cancel: "Annuler", ph: "Écris ton algorithme (ex. R U R' U')", bad: "Caractères invalides. Utilise seulement les lettres de mouvement, ', 2, parenthèses et espaces." },
-        ru: { edit: "Изменить алгоритм", mine: "Твой алгоритм", orig: "Исходный:", save: "Сохранить", reset: "Вернуть исходный", cancel: "Отмена", ph: "Напиши свой алгоритм (напр. R U R' U')", bad: "Недопустимые символы. Используй только буквы ходов, ', 2, скобки и пробелы." },
-        de: { edit: "Algorithmus bearbeiten", mine: "Dein Algorithmus", orig: "Original:", save: "Speichern", reset: "Zum Original", cancel: "Abbrechen", ph: "Schreib deinen eigenen Algorithmus (z. B. R U R' U')", bad: "Ungültige Zeichen. Nur Zugbuchstaben, ', 2, Klammern und Leerzeichen." },
-        ar: { edit: "تعديل الخوارزمية", mine: "خوارزميتك", orig: "الأصلية:", save: "حفظ", reset: "العودة إلى الأصلية", cancel: "إلغاء", ph: "اكتب خوارزميتك (مثل R U R' U')", bad: "أحرف غير صالحة. استخدم أحرف الحركات و' و2 والأقواس والمسافات فقط." }
+        tr: { btn: "Düzenle", edit: "Algoritmayı düzenle", mine: "Senin algoritman", orig: "Orijinal:", save: "Kaydet", reset: "Orijinale dön", cancel: "İptal", ph: "Kendi algoritmanı yaz (ör. R U R' U')", bad: "Geçersiz karakter var. Sadece hamle harfleri, ', 2, parantez ve boşluk kullan." },
+        en: { btn: "Edit", edit: "Edit algorithm", mine: "Your algorithm", orig: "Original:", save: "Save", reset: "Back to original", cancel: "Cancel", ph: "Write your own algorithm (e.g. R U R' U')", bad: "Invalid characters. Use only move letters, ', 2, brackets and spaces." },
+        fr: { btn: "Modifier", edit: "Modifier l'algorithme", mine: "Ton algorithme", orig: "Original :", save: "Enregistrer", reset: "Revenir à l'original", cancel: "Annuler", ph: "Écris ton algorithme (ex. R U R' U')", bad: "Caractères invalides. Utilise seulement les lettres de mouvement, ', 2, parenthèses et espaces." },
+        ru: { btn: "Изменить", edit: "Изменить алгоритм", mine: "Твой алгоритм", orig: "Исходный:", save: "Сохранить", reset: "Вернуть исходный", cancel: "Отмена", ph: "Напиши свой алгоритм (напр. R U R' U')", bad: "Недопустимые символы. Используй только буквы ходов, ', 2, скобки и пробелы." },
+        de: { btn: "Bearbeiten", edit: "Algorithmus bearbeiten", mine: "Dein Algorithmus", orig: "Original:", save: "Speichern", reset: "Zum Original", cancel: "Abbrechen", ph: "Schreib deinen eigenen Algorithmus (z. B. R U R' U')", bad: "Ungültige Zeichen. Nur Zugbuchstaben, ', 2, Klammern und Leerzeichen." },
+        ar: { btn: "تعديل", edit: "تعديل الخوارزمية", mine: "خوارزميتك", orig: "الأصلية:", save: "حفظ", reset: "العودة إلى الأصلية", cancel: "إلغاء", ph: "اكتب خوارزميتك (مثل R U R' U')", bad: "أحرف غير صالحة. استخدم أحرف الحركات و' و2 والأقواس والمسافات فقط." }
     };
     function t(k) {
         var l = "tr";
@@ -82,16 +82,14 @@
             btn.className = "alg-edit-btn";
             btn.setAttribute("aria-label", t("edit"));
             btn.title = t("edit");
-            btn.textContent = "✏️";
-            card.appendChild(btn);
+            btn.textContent = "✏️ " + t("btn");
+            (card.querySelector(".case-body") || card).appendChild(btn);
             render(card);
         });
     }
 
-    function openEditor(card) {
-        if (card.querySelector(".alg-editor")) return;
-        var sc = scope(), name = caseName(card);
-        var cur = window.CustomAlgs.get(sc.page, sc.set, name) || card.getAttribute("data-orig") || "";
+    /* Genel düzenleme kutusu: algoritma kartlarında ve antrenörde kullanılır */
+    function makeEditor(host, current, hasCustom, onSave, onReset, onClose) {
         var box = document.createElement("div");
         box.className = "alg-editor";
         box.innerHTML =
@@ -99,35 +97,47 @@
             '<div class="alg-editor-err"></div>' +
             '<div class="alg-editor-actions">' +
             '<button type="button" class="ae-save">' + esc(t("save")) + '</button>' +
-            (window.CustomAlgs.get(sc.page, sc.set, name) ? '<button type="button" class="ae-reset">' + esc(t("reset")) + '</button>' : '') +
+            (hasCustom ? '<button type="button" class="ae-reset">' + esc(t("reset")) + '</button>' : '') +
             '<button type="button" class="ae-cancel">' + esc(t("cancel")) + '</button></div>';
-        var body = card.querySelector(".case-body") || card;
-        body.appendChild(box);
-        // Kutudaki tıklama ve tuşlar karta ulaşmasın (kartın öğreniyorum/biliyorum döngüsü çalışmasın)
+        // Kutudaki tıklama ve tuşlar dışarı (kart döngüsü, antrenör kısayolları) ulaşmasın
         box.addEventListener("click", function (e) { e.stopPropagation(); });
         box.addEventListener("keydown", function (e) { e.stopPropagation(); });
+        box.addEventListener("keyup", function (e) { e.stopPropagation(); });
+        host.appendChild(box);
         var ta = box.querySelector("textarea");
-        ta.value = cur;
+        ta.value = current || "";
         ta.focus();
         ta.setSelectionRange(ta.value.length, ta.value.length);
-        card.classList.add("editing");
-        function close() { if (box.parentNode) box.parentNode.removeChild(box); card.classList.remove("editing"); }
+        function close() { if (box.parentNode) box.parentNode.removeChild(box); if (onClose) onClose(); }
         function save() {
             var v = clean(ta.value);
             if (v && !valid(v)) { box.querySelector(".alg-editor-err").textContent = t("bad"); return; }
-            var orig = card.getAttribute("data-orig");
-            window.CustomAlgs.set(sc.page, sc.set, name, v && v !== orig ? v : null);
-            close();
-            render(card);
+            onSave(v); close();
         }
         box.querySelector(".ae-save").onclick = save;
         box.querySelector(".ae-cancel").onclick = close;
         var r = box.querySelector(".ae-reset");
-        if (r) r.onclick = function () { window.CustomAlgs.set(sc.page, sc.set, name, null); close(); render(card); };
+        if (r) r.onclick = function () { onReset(); close(); };
         ta.addEventListener("keydown", function (e) {
             if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); save(); }
             else if (e.key === "Escape") close();
         });
+        return box;
+    }
+    window.CustomAlgs.makeEditor = makeEditor;
+    window.CustomAlgs.label = function () { return "✏️ " + t("btn"); };
+    window.CustomAlgs.t = t;
+
+    function openEditor(card) {
+        if (card.querySelector(".alg-editor")) return;
+        var sc = scope(), name = caseName(card);
+        var mine = window.CustomAlgs.get(sc.page, sc.set, name);
+        var orig = card.getAttribute("data-orig") || "";
+        card.classList.add("editing");
+        makeEditor(card.querySelector(".case-body") || card, mine || orig, !!mine,
+            function (v) { window.CustomAlgs.set(sc.page, sc.set, name, v && v !== orig ? v : null); render(card); },
+            function () { window.CustomAlgs.set(sc.page, sc.set, name, null); render(card); },
+            function () { card.classList.remove("editing"); });
     }
 
     function init() {
