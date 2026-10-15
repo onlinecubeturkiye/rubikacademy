@@ -4,5 +4,7 @@
    Boş bırakılırsa sıralama tablosu sayfada görünmez. */
 window.RA_FIREBASE = {
     apiKey: "AIzaSyC5veIMb1gZLo4c36HlyCPLn2SeoJy2spI",
-    projectId: "rubikacademydb"
+    authDomain: "rubikacademydb.firebaseapp.com",
+    projectId: "rubikacademydb",
+    appId: "1:724519357215:web:1f51fb763b681c8ef1be2a"
 };

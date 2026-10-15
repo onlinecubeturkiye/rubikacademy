@@ -2,7 +2,7 @@
    küp simülasyonuyla üretilmiş farklı görünümler (AUF, küp döndürme) var; 3B görünümden case seçilir. */
 (function () {
     var started = false;
-    var V = "20261080";
+    var V = "20261081";
     var MODES = {
         pll: { file: "tanima-pll.json", key: "recog-pll-v1", set: "pll", thumbs: false },
         oll: { file: "tanima-oll.json", key: "recog-oll-v1", set: "oll", thumbs: true, draw: function (c, s) { return llSvg(c.pattern, "oll", s); } }
@@ -55,7 +55,6 @@
         stats.n++; cs.n++;
         if (ok) { stats.ok++; stats.sum += t; stats.streak++; cs.ok++; cs.sum += t; } else stats.streak = 0;
         save(); renderStats();
-        if (window.Streak) Streak.mark("recog");
         var fb = document.getElementById("rcFeedback");
         Array.prototype.forEach.call(document.querySelectorAll(".rc-ans"), function (b) {
             b.disabled = true;
