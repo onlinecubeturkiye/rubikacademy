@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Yarışma Takvimi (ZKT)</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/yarismalar">
+<meta name="description" content="Türkiye'deki ZKT (Zeka Küpü Türkiye) zeka küpü yarışmaları: tarih, şehir, branşlar ve kayıt durumu.">
+<meta property="og:title" content="Rubik Academy - Yarışma Takvimi">
+<meta property="og:description" content="Yaklaşan ve geçmiş ZKT zeka küpü yarışmaları.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/yarismalar">
+<meta property="og:image" content="https://rubikacademy.fun/og/site.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/site.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261049">
+
+<style>
+.cal-head { margin: 6px 0 20px; }
+.cal-head .badge { display: inline-flex; padding: 6px 14px; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--surface); font-weight: 900; font-size: 13px; letter-spacing: .6px; color: var(--text); }
+.cal-head h1 { font-size: 44px; font-weight: 900; line-height: 1.05; margin: 14px 0 10px; color: var(--text); }
+.cal-head h1 span + span { color: var(--primary); }
+.cal-head p { color: var(--text-soft); font-size: 15.5px; max-width: 700px; }
+.cal-sec { margin-bottom: 30px; }
+.cal-sec h2 { font-family: var(--font-display); font-size: 24px; font-weight: 900; color: var(--text); margin-bottom: 14px; padding-inline-start: 12px; border-inline-start: 6px solid var(--cube-yellow); }
+.cal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.comp { position: relative; display: grid; gap: 10px; padding: 18px; border-radius: 20px; border: var(--card-bw) solid var(--ink); background: var(--surface); box-shadow: var(--shadow-sm); color: var(--text); text-decoration: none; transition: transform .12s, box-shadow .12s; }
+a.comp:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); }
+.comp-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.comp h3 { font-family: var(--font-display); font-size: 21px; font-weight: 900; line-height: 1.15; }
+.comp-status { flex: none; padding: 5px 10px; border-radius: 10px; font-size: 11.5px; font-weight: 900; letter-spacing: .5px; text-transform: uppercase; white-space: nowrap; }
+.st-kayit { background: var(--tint-blue); color: var(--primary); }
+.st-dolu { background: var(--tint-orange); color: #b45309; }
+.st-yakinda { background: var(--surface-soft); color: var(--text-soft); }
+.st-sonuc { background: var(--tint-green); color: #15803d; }
+.dark-mode .st-sonuc { color: #4ade80; }
+.dark-mode .st-dolu { color: #fbbf24; }
+.st-devam { background: var(--cube-yellow); color: #17171f; }
+.comp-meta { font-size: 14.5px; color: var(--text-soft); font-weight: 600; }
+.comp-date { display: flex; align-items: center; gap: 12px; }
+.comp-cal { flex: none; width: 52px; border-radius: 12px; overflow: hidden; border: var(--card-bw) solid var(--ink); text-align: center; background: var(--surface); }
+.comp-cal small { display: block; background: var(--cube-red); color: #fff; font-size: 10.5px; font-weight: 900; padding: 2px 0; text-transform: uppercase; }
+.comp-cal b { display: block; font-size: 21px; font-weight: 900; padding: 2px 0 3px; color: var(--text); }
+.comp-events { display: flex; flex-wrap: wrap; gap: 6px; }
+.ev { padding: 4px 9px; border-radius: 8px; background: var(--surface-soft); border: 1px solid var(--border); font-size: 12px; font-weight: 800; color: var(--text); }
+.comp-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.comp-count { font-size: 13.5px; font-weight: 700; color: var(--text-soft); }
+.comp-bar { height: 6px; border-radius: 99px; background: var(--surface-soft); overflow: hidden; margin-top: 5px; width: 160px; max-width: 100%; }
+.comp-bar i { display: block; height: 100%; background: var(--primary); border-radius: 99px; }
+.comp-left { font-size: 13px; font-weight: 900; color: var(--primary); }
+.comp-go { font-size: 13.5px; font-weight: 900; color: var(--text); }
+.cal-note { font-size: 13px; color: var(--text-soft); margin-top: 6px; }
+.cal-note a { color: var(--primary); font-weight: 700; }
+.cal-empty { padding: 18px; border-radius: 16px; border: 2px dashed var(--border); color: var(--text-soft); font-weight: 600; }
+.past .comp { opacity: .85; }
+@media (max-width: 600px) { .cal-head h1 { font-size: 34px; } .cal-grid { grid-template-columns: 1fr; } }
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<header class="cal-head">
+    <span class="badge" data-i18n="badge">ZKT · YARIŞMALAR</span>
+    <h1><span data-i18n="title">Yarışma</span> <span data-i18n="title_accent">Takvimi</span></h1>
+    <p data-i18n="intro">Türkiye'deki ZKT (Zeka Küpü Türkiye) zeka küpü yarışmaları: tarih, şehir, branşlar ve kayıt durumu. Kayıt ve sonuçlar için yarışmaya dokun.</p>
+</header>
+
+<section class="cal-sec" id="upcomingSec">
+    <h2 data-i18n="upcoming">Yaklaşan ve Devam Eden</h2>
+    <div class="cal-grid" id="upcoming"></div>
+</section>
+
+<section class="cal-sec past" id="pastSec">
+    <h2 data-i18n="past">Geçmiş Yarışmalar</h2>
+    <div class="cal-grid" id="past"></div>
+</section>
+
+<p class="cal-note"><span data-i18n="source">Kaynak:</span> <a href="https://zekakuputurkiye.com/competitions/zkt/" target="_blank" rel="noopener">zekakuputurkiye.com</a></p>
+
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script>var PAGE_ID = "yarismalar";</script>
+<script src="/js/i18n.js?v=20261049"></script>
+<script src="/js/common.js?v=20261049"></script>
+<script>
+/* Yarışma takvimi: veriler /icerikler/yarismalar.json dosyasından (yeni yarışma = listeye bir kayıt) */
+(function () {
+    var EV = { "333": "3x3", "222": "2x2", "444": "4x4", "555": "5x5", "666": "6x6", "777": "7x7", oh: "3x3 OH", pyram: "Pyraminx", skewb: "Skewb", minx: "Megaminx", clock: "Clock", sq1: "Square-1", bf: "3x3 BLD" };
+    var data = null;
+    function lang() { return localStorage.getItem("site-lang") || "tr"; }
+    function T(k, fb) {
+        var p = (window.SITE_I18N && SITE_I18N.pages.yarismalar) || {};
+        return (p[lang()] && p[lang()][k]) || (p.tr && p.tr[k]) || fb;
+    }
+    function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+    function d(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+    function fmt(dt, opts) { try { return dt.toLocaleDateString(lang() === "ar" ? "ar" : lang(), opts); } catch (e) { return dt.toDateString(); } }
+    function range(a, b) {
+        var A = d(a), B = d(b || a);
+        if (+A === +B) return fmt(A, { day: "numeric", month: "long", year: "numeric" });
+        if (A.getMonth() === B.getMonth()) return A.getDate() + "–" + fmt(B, { day: "numeric", month: "long", year: "numeric" });
+        return fmt(A, { day: "numeric", month: "long" }) + " – " + fmt(B, { day: "numeric", month: "long", year: "numeric" });
+    }
+    function card(c, today) {
+        var A = d(c.baslangic), B = d(c.bitis || c.baslangic);
+        var running = today >= A && today <= B, past = today > B;
+        var st = running ? "devam" : (past && c.durum !== "sonuc" ? "bitti" : c.durum);
+        var label = { kayit: T("st_kayit", "Kayıt açık"), dolu: T("st_dolu", "Kontenjan doldu"), yakinda: T("st_yakinda", "Kayıt yakında"), sonuc: T("st_sonuc", "Sonuçlar yayında"), devam: T("st_devam", "Şu an devam ediyor"), bitti: T("st_bitti", "Tamamlandı") }[st] || "";
+        var days = Math.round((A - today) / 86400000);
+        var left = !past && !running ? (days === 1 ? T("tomorrow", "Yarın") : T("days_left", "{n} gün kaldı").replace("{n}", days)) : "";
+        var pct = c.kontenjan ? Math.min(100, Math.round(100 * (c.yarismaci || 0) / c.kontenjan)) : 0;
+        return '<a class="comp" href="' + esc(c.link || data.kaynak) + '" target="_blank" rel="noopener">' +
+            '<div class="comp-top"><h3>' + esc(c.ad) + '</h3><span class="comp-status st-' + (st === "bitti" ? "yakinda" : st) + '">' + esc(label) + '</span></div>' +
+            '<div class="comp-date"><span class="comp-cal"><small>' + esc(fmt(A, { month: "short" })) + '</small><b>' + A.getDate() + '</b></span>' +
+            '<span class="comp-meta">' + esc(range(c.baslangic, c.bitis)) + ' · ' + esc(c.sehir) + '</span></div>' +
+            '<div class="comp-events" dir="ltr">' + (c.branslar || []).map(function (e) { return '<span class="ev">' + esc(EV[e] || e) + '</span>'; }).join("") + '</div>' +
+            '<div class="comp-foot"><div><div class="comp-count">' + esc(T("competitors", "{n}/{m} yarışmacı").replace("{n}", c.yarismaci || 0).replace("{m}", c.kontenjan || "?")) + '</div>' +
+            (c.kontenjan ? '<div class="comp-bar"><i style="width:' + pct + '%"></i></div>' : '') + '</div>' +
+            (left ? '<span class="comp-left">⏳ ' + esc(left) + '</span>' : '<span class="comp-go">' + esc(past ? T("results", "Sonuçlar →") : T("details", "Detaylar →")) + '</span>') + '</div></a>';
+    }
+    function render() {
+        if (!data) return;
+        var today = new Date(); today.setHours(0, 0, 0, 0);
+        var list = (data.yarismalar || []).slice();
+        var up = list.filter(function (c) { return d(c.bitis || c.baslangic) >= today; }).sort(function (a, b) { return d(a.baslangic) - d(b.baslangic); });
+        var past = list.filter(function (c) { return d(c.bitis || c.baslangic) < today; }).sort(function (a, b) { return d(b.baslangic) - d(a.baslangic); });
+        document.getElementById("upcoming").innerHTML = up.length ? up.map(function (c) { return card(c, today); }).join("") : '<div class="cal-empty">' + esc(T("none_up", "Şu an duyurulmuş yaklaşan yarışma yok.")) + '</div>';
+        document.getElementById("past").innerHTML = past.map(function (c) { return card(c, today); }).join("");
+        document.getElementById("pastSec").style.display = past.length ? "" : "none";
+    }
+    window.onLanguageApplied = render;
+    fetch("/icerikler/yarismalar.json?v=20261049").then(function (r) { return r.json(); }).then(function (j) { data = j; render(); })
+        .catch(function () { document.getElementById("upcoming").innerHTML = '<div class="cal-empty">' + esc(T("load_err", "Takvim yüklenemedi.")) + '</div>'; });
+})();
+</script>
+
+</body>
+</html>

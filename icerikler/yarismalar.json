@@ -1,0 +1,63 @@
+{
+ "kaynak": "https://zekakuputurkiye.com/competitions/zkt/",
+ "not": "ZKT (Zeka Küpü Türkiye) yarışmaları. Yeni yarışma eklemek için listeye bir kayıt ekle. Tarih biçimi YYYY-AA-GG. status: 'kayit' (kayıt açık), 'dolu' (kontenjan doldu), 'yakinda' (kayıt açılmadı), 'sonuc' (sonuçlar yayında). Branşlar: 333 222 444 555 666 777 oh pyram skewb minx clock sq1 bf",
+ "yarismalar": [
+  {
+   "ad": "ZKT Bursa Sonbahar 2026",
+   "baslangic": "2026-11-14",
+   "bitis": "2026-11-15",
+   "sehir": "Bursa",
+   "durum": "kayit",
+   "yarismaci": 43,
+   "kontenjan": 120,
+   "branslar": [
+    "333",
+    "222",
+    "444",
+    "pyram",
+    "clock",
+    "oh",
+    "skewb"
+   ],
+   "link": "https://zekakuputurkiye.com/competitions/zkt/"
+  },
+  {
+   "ad": "ZKT Back to School İstanbul 2026",
+   "baslangic": "2026-10-10",
+   "bitis": "2026-10-11",
+   "sehir": "İstanbul",
+   "durum": "sonuc",
+   "yarismaci": 62,
+   "kontenjan": 120,
+   "branslar": [
+    "555",
+    "minx",
+    "oh",
+    "pyram",
+    "skewb",
+    "333",
+    "222",
+    "444"
+   ],
+   "link": "https://zekakuputurkiye.com/competitions/zkt/"
+  },
+  {
+   "ad": "ZKT Back to School Ankara 2026",
+   "baslangic": "2026-10-03",
+   "bitis": "2026-10-04",
+   "sehir": "Ankara",
+   "durum": "sonuc",
+   "yarismaci": 33,
+   "kontenjan": 120,
+   "branslar": [
+    "333",
+    "222",
+    "oh",
+    "pyram",
+    "skewb",
+    "444"
+   ],
+   "link": "https://zekakuputurkiye.com/competitions/zkt/"
+  }
+ ]
+}
