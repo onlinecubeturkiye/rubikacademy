@@ -1,9 +1,8 @@
 /* =========================================================
-   GÜNÜN KARIŞTIRMASI + SERİ + ROZETLER (gunluk.js)
+   GÜNÜN KARIŞTIRMASI + SIRALAMA (gunluk.js)
    - Karıştırma tarihten üretilir: herkes aynı gün aynı karıştırmayı görür
    - Tek hak: ilk tamamlanan deneme o günün sonucu olur ("daily-results-v1"),
      sonra karıştırma ve timer ertesi güne kadar gizlenir
-   - Seri ve rozetler streak.js ve sitedeki ilerleme kayıtlarından hesaplanır
 ========================================================= */
 (function () {
     var RES_KEY = "daily-results-v1";
@@ -14,7 +13,8 @@
     function lang() { try { return localStorage.getItem("site-lang") || "tr"; } catch (e) { return "tr"; } }
     function T(k, fb) { var p = (window.SITE_I18N && SITE_I18N.pages.gunluk) || {}; return (p[lang()] && p[lang()][k]) || (p.tr && p.tr[k]) || fb || k; }
     function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
-    function today() { return Streak.dayKey(); }
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    function today() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
     function loadRes() { try { return JSON.parse(localStorage.getItem(RES_KEY)) || {}; } catch (e) { return {}; } }
     function saveRes(o) { try { localStorage.setItem(RES_KEY, JSON.stringify(o)); } catch (e) {} }
 
@@ -64,7 +64,7 @@
         var res = loadRes(), k = today(), key = k + ":" + puzzle;
         if (!res[key]) {
             res[key] = { t: Math.round(last), pen: "" };
-            saveRes(res); Streak.mark("daily");
+            saveRes(res);
         }
         renderAll();
     }
@@ -100,74 +100,41 @@
         $("dCountdown").textContent = p(Math.floor(s / 3600)) + ":" + p(Math.floor(s / 60) % 60) + ":" + p(s % 60);
         cdTimer = setTimeout(function () { if (today() !== shownDay) { shownDay = today(); renderAll(); } else tickCountdown(); }, 1000);
     }
-    function renderStreak() {
-        $("sCur").textContent = Streak.current();
-        $("sBest").textContent = Streak.best();
-        $("sDays").textContent = Streak.totals().days;
-        var days = Streak.days(), now = new Date(), html = "";
-        // son 5 hafta, pazartesiden başlayarak
-        var start = Streak.shift(now, -((now.getDay() + 6) % 7) - 28);
-        for (var i = 0; i < 35; i++) {
-            var d = Streak.shift(start, i), k = Streak.dayKey(d), a = days[k], n = a ? (a.alg || 0) + (a.recog || 0) + (a.daily || 0) * 5 : 0;
-            var lvl = !a ? 0 : n < 10 ? 1 : n < 40 ? 2 : 3;
-            var future = d > now;
-            html += '<i class="l' + lvl + (future ? " fut" : "") + (k === today() ? " today" : "") + '" title="' + k + (a ? " · " + n : "") + '"></i>';
-        }
-        $("sCal").innerHTML = html;
-    }
-    function knownCount(key) { try { var o = JSON.parse(localStorage.getItem(key)) || {}; return Object.keys(o).filter(function (k) { return o[k] === "known"; }).length; } catch (e) { return 0; } }
-    function bestDaily(pz) { var res = loadRes(), b = Infinity; Object.keys(res).forEach(function (k) { if (k.split(":")[1] === pz) b = Math.min(b, value(res[k])); }); return b; }
-    var BADGES = [
-        ["first", "🌅", function (t) { return t.daily >= 1; }],
-        ["streak3", "🔥", function () { return Streak.best() >= 3; }],
-        ["streak7", "💪", function () { return Streak.best() >= 7; }],
-        ["streak30", "🏆", function () { return Streak.best() >= 30; }],
-        ["days10", "📅", function (t) { return t.days >= 10; }],
-        ["sub30", "⚡", function () { return bestDaily("333") < 30000; }],
-        ["sub20", "🚀", function () { return bestDaily("333") < 20000; }],
-        ["alg100", "🧠", function (t) { return t.alg >= 100; }],
-        ["alg1000", "🤖", function (t) { return t.alg >= 1000; }],
-        ["recog200", "👁", function (t) { return t.recog >= 200; }],
-        ["pll", "🟢", function () { return knownCount("algo-progress-pll") >= 21; }],
-        ["oll", "🟡", function () { return knownCount("algo-progress-oll") >= 57; }]
-    ];
-    function renderBadges() {
-        var t = Streak.totals(), got = 0;
-        $("bGrid").innerHTML = BADGES.map(function (b) {
-            var on = false; try { on = b[2](t); } catch (e) {}
-            if (on) got++;
-            return '<div class="bd' + (on ? " on" : "") + '"><span class="bi">' + b[1] + '</span><b>' + esc(T("b_" + b[0])) + '</b><small>' + esc(T("bd_" + b[0])) + '</small></div>';
-        }).join("");
-        $("bCount").textContent = got + " / " + BADGES.length;
-    }
     function renderHistory() {
         var res = loadRes(), rows = Object.keys(res).filter(function (k) { return k.split(":")[1] === puzzle; }).sort().reverse().slice(0, 7);
         $("hList").innerHTML = rows.length ? rows.map(function (k) { return '<div class="h-row"><span>' + esc(k.split(":")[0]) + '</span><b>' + esc(label(res[k])) + '</b></div>'; }).join("") : '<p class="h-empty">' + esc(T("no_hist", "Henüz sonuç yok.")) + '</p>';
     }
     /* ---------- sıralama tablosu (Firebase) ---------- */
-    var SENT_KEY = "daily-sent-v1", NAME_KEY = "daily-name-v1", lbTimer = 0;
+    var SENT_KEY = "daily-sent-v1", lbTimer = 0;
     function lbOn() { return !!(window.Leaderboard && Leaderboard.enabled()); }
     function sentToday() { try { return !!(JSON.parse(localStorage.getItem(SENT_KEY)) || {})[today()]; } catch (e) { return false; } }
     function markSent() { try { var o = JSON.parse(localStorage.getItem(SENT_KEY)) || {}; o[today()] = 1; localStorage.setItem(SENT_KEY, JSON.stringify(o)); } catch (e) {} }
     function dayOf(key) { var p = key.split("-"); return String(Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000)); }
     function lbMsg(text, kind) { var m = $("lbMsg"); m.textContent = text || ""; m.className = "lb-msg" + (kind ? " " + kind : ""); }
+    function acc() { return window.Account && Account.enabled() ? Account : null; }
     function renderSend() {
         var r = official(), on = lbOn() && !!r, sent = sentToday();
-        $("lbSend").hidden = !on || sent;
+        var A = acc(), u = A && A.user(), pending = A && A.isPending();
+        // Gönderim için giriş gerekir: girişsizken "giriş yap" butonu görünür
+        $("lbSend").hidden = !on || sent || !u;
+        $("lbLogin").hidden = !on || sent || !!u || !A || pending;
         $("dPen2").disabled = $("dPenDnf").disabled = on && sent; // gönderildikten sonra ceza değişmez
         if (!on) { lbMsg(""); return; }
         $("lbName").placeholder = T("lb_name", "Adın (sıralamada görünür)");
-        if (!$("lbName").value) { try { $("lbName").value = localStorage.getItem(NAME_KEY) || ""; } catch (e) {} }
+        if (u && !$("lbName").value) {
+            var nm = (u.displayName || (u.email || "").split("@")[0] || "").replace(/\s+/g, " ").trim().slice(0, 20);
+            $("lbName").value = nm;
+        }
         if (sent) lbMsg(T("lb_sent", "Sıralamaya gönderildi ✓"), "ok");
         else if (r.t < 3000 && r.pen !== "dnf") lbMsg(T("lb_too_fast", "3 saniyenin altındaki süreler sıralamaya kabul edilmez."), "bad");
         else if ($("lbMsg").className.indexOf("bad") < 0) lbMsg("");
     }
     function sendResult() {
         var r = official(); if (!r || !lbOn() || sentToday()) return;
+        if (!acc() || !Account.user()) { if (acc()) Account.openLogin(); return; }
         var name = $("lbName").value.replace(/\s+/g, " ").trim();
         if (name.length < 2 || name.length > 20) { lbMsg(T("lb_bad_name", "Ad 2-20 karakter olmalı."), "bad"); $("lbName").focus(); return; }
         if (r.t < 3000 && r.pen !== "dnf") { lbMsg(T("lb_too_fast"), "bad"); return; }
-        try { localStorage.setItem(NAME_KEY, name); } catch (e) {}
         $("lbSendBtn").disabled = true; lbMsg(T("lb_sending", "Gönderiliyor…"));
         Leaderboard.submit(name, r.t, r.pen, dayOf(today())).then(function (res) {
             $("lbSendBtn").disabled = false;
@@ -194,7 +161,7 @@
         }).then(function () { lbTimer = setTimeout(loadBoard, 30000); });
     }
 
-    function renderAll() { shownDay = today(); renderToday(); renderSend(); loadBoard(); renderStreak(); renderBadges(); renderHistory(); }
+    function renderAll() { shownDay = today(); renderToday(); renderSend(); loadBoard(); renderHistory(); }
 
     function setPen(p) {
         var res = loadRes(), key = today() + ":" + puzzle; if (!res[key]) return;
@@ -202,13 +169,14 @@
     }
     function share() {
         var r = official(); if (!r) return;
-        var txt = T("share_txt", "Rubik Academy · Günün Karıştırması") + " (3x3, " + today() + "): " + label(r) + " ⏱️ · 🔥 " + Streak.current() + "\nhttps://rubikacademy.fun/icerikler/gunluk";
+        var txt = T("share_txt", "Rubik Academy · Günün Karıştırması") + " (3x3, " + today() + "): " + label(r) + " ⏱️\nhttps://rubikacademy.fun/icerikler/gunluk";
         var done = function () { $("dShare").textContent = T("copied", "Kopyalandı ✓"); setTimeout(function () { $("dShare").textContent = T("share", "📤 Paylaş"); }, 1600); };
         if (navigator.share) { navigator.share({ text: txt }).catch(function () {}); return; }
         if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, function () {});
     }
 
     function init() {
+        try { localStorage.removeItem("activity-days-v1"); } catch (e) {} // eski seri kaydı (seri özelliği kaldırıldı)
         var box = $("dTimerBox");
         document.addEventListener("keydown", function (e) {
             if (e.target.closest("input, textarea, button, a") && e.code !== "Space") return;
@@ -227,6 +195,9 @@
         $("lbName").addEventListener("keydown", function (e) { e.stopPropagation(); if (e.key === "Enter") sendResult(); });
         $("lbName").addEventListener("keyup", function (e) { e.stopPropagation(); });
         $("lbRefresh").addEventListener("click", loadBoard);
+        $("lbLoginBtn").addEventListener("click", function () { if (acc()) Account.openLogin(); });
+        // Giriş/çıkış ya da başka cihazdan gelen sonuçlar: gönder bölümünü ve sıralamayı yenile
+        document.addEventListener("account-change", function () { renderSend(); loadBoard(); });
         document.addEventListener("site-lang-change", renderAll);
         renderAll();
     }

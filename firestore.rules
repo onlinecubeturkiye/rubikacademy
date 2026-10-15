@@ -1,16 +1,17 @@
 rules_version = '2';
-// Rubik Academy — Günün Karıştırması sıralama tablosu
-// Yol: days/{gün}/times/{cihaz}
-//   gün   : yerel tarihin gün numarası (UTC gece yarısından beri gün sayısı, ör. "20741")
-//   cihaz : tarayıcıda üretilen rastgele kimlik (her cihaz günde bir kez gönderebilir)
+// Rubik Academy — Firestore güvenlik kuralları
+// 1) Günün Karıştırması sıralaması: days/{gün}/times/{uid}
+//      gün : yerel tarihin gün numarası (UTC gece yarısından beri gün sayısı, ör. "20741")
+//      uid : giriş yapan hesabın kimliği (her hesap günde bir kez gönderir)
+// 2) Hesap ilerlemesi (senkron): users/{uid}/kv/{anahtar} — yalnızca hesabın sahibi okur/yazar
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /days/{day}/times/{dev} {
+    match /days/{day}/times/{uid} {
       allow read: if true;
-      allow create: if day.matches('^[0-9]{5}$')
+      allow create: if request.auth != null && request.auth.uid == uid
+        && day.matches('^[0-9]{5}$')
         && int(day) - math.floor(request.time.toMillis() / 86400000) <= 1
         && math.floor(request.time.toMillis() / 86400000) - int(day) <= 1
-        && dev.matches('^[a-z0-9]{20}$')
         && request.resource.data.keys().hasOnly(['name', 't', 'pen', 'v', 'ts'])
         && request.resource.data.name is string
         && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 20
@@ -20,7 +21,16 @@ service cloud.firestore {
         && request.resource.data.v == (request.resource.data.pen == 'dnf' ? 99999999
              : request.resource.data.t + (request.resource.data.pen == '+2' ? 2000 : 0))
         && request.resource.data.ts == request.time;
-      allow update, delete: if false;
+      allow delete: if request.auth != null && request.auth.uid == uid; // hesabı silerken
+      allow update: if false;
+    }
+    match /users/{uid}/kv/{key} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && key.matches('^[a-z0-9-]{1,64}$')
+        && request.resource.data.keys().hasOnly(['v', 't'])
+        && request.resource.data.v is string && request.resource.data.v.size() <= 500000
+        && request.resource.data.t is int;
     }
     match /{document=**} {
       allow read, write: if false;
