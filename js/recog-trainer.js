@@ -97,7 +97,7 @@
     function start() {
     if (started) return; started = true;
     Promise.all([
-        fetch("/icerikler/algoritmalar/tanima-pll.json?v=20261069").then(function (r) { return r.json(); }),
+        fetch("/icerikler/algoritmalar/tanima-pll.json?v=20261070").then(function (r) { return r.json(); }),
         fetch("/icerikler/algoritmalar/oll-pll.json").then(function (r) { return r.json(); })
     ]).then(function (res) {
         DATA = res[0];

@@ -1002,6 +1002,8 @@ var SITE_I18N = {
 
         algoritmalar: {
             tr: {
+                sd_2lo: "Önce sarı artı, sonra köşeler (10 algoritma)",
+                sd_2lp: "Önce köşeler, sonra kenarlar (6 algoritma)",
                 back_btn: "← Geri Dön",
                 badge_text: "ALGORİTMALAR",
                 hero_title1: "Algoritmaları",
@@ -1144,6 +1146,8 @@ var SITE_I18N = {
                 bottom_p: "Rubik Academy ile her küp için algoritmaları adım adım öğren."
             },
             en: {
+                sd_2lo: "Yellow cross first, then corners (10 algorithms)",
+                sd_2lp: "Corners first, then edges (6 algorithms)",
                 back_btn: "← Go Back",
                 badge_text: "ALGORITHMS",
                 hero_title1: "Learn the",
@@ -1286,6 +1290,8 @@ var SITE_I18N = {
                 bottom_p: "Learn algorithms for every puzzle step by step with Rubik Academy."
             },
             fr: {
+                sd_2lo: "D'abord la croix jaune, puis les coins (10 algorithmes)",
+                sd_2lp: "D'abord les coins, puis les arêtes (6 algorithmes)",
                 back_btn: "← Retour",
                 badge_text: "ALGORITHMES",
                 hero_title1: "Apprends les",
@@ -1428,6 +1434,8 @@ var SITE_I18N = {
                 bottom_p: "Apprends les algorithmes de chaque puzzle pas à pas avec Rubik Academy."
             },
             ru: {
+                sd_2lo: "Сначала жёлтый крест, затем углы (10 алгоритмов)",
+                sd_2lp: "Сначала углы, затем рёбра (6 алгоритмов)",
                 back_btn: "← Назад",
                 badge_text: "АЛГОРИТМЫ",
                 hero_title1: "Изучи",
@@ -1570,6 +1578,8 @@ var SITE_I18N = {
                 bottom_p: "Изучай алгоритмы для любых головоломок шаг за шагом с Rubik Academy."
             },
             de: {
+                sd_2lo: "Erst gelbes Kreuz, dann Ecken (10 Algorithmen)",
+                sd_2lp: "Erst Ecken, dann Kanten (6 Algorithmen)",
                 back_btn: "← Zurück",
                 badge_text: "ALGORITHMEN",
                 hero_title1: "Lerne die",
@@ -1712,6 +1722,8 @@ var SITE_I18N = {
                 bottom_p: "Lerne mit Rubik Academy Algorithmen für jedes Puzzle Schritt für Schritt."
             },
             ar: {
+                sd_2lo: "الصليب الأصفر أولًا ثم الزوايا (10 خوارزميات)",
+                sd_2lp: "الزوايا أولًا ثم الحواف (6 خوارزميات)",
                 back_btn: "← رجوع",
                 badge_text: "الخوارزميات",
                 hero_title1: "تعلّم",
@@ -7250,6 +7262,10 @@ alg5: {
         /* İçerikler/Yol haritası — öğrenme yolu (PAGE_ID = "yol") */
         yol: {
             tr: {
+                s_tlo_t: "2-Look OLL (10)",
+                s_tlo_d: "Önce sarı artı (3), sonra köşeleri yönlendir (7): üst yüz sarı.",
+                s_tlp_t: "2-Look PLL (6)",
+                s_tlp_d: "Önce köşeleri (2), sonra kenarları (4) yerleştir: küp çözüldü.",
                 back_btn: "← Geri Dön",
                 badge: "ÖĞRENME YOLU",
                 title: "Yol",
@@ -7315,6 +7331,10 @@ alg5: {
                 s_p5_d: "Son kenarda iki kanat ters kaldığında."
             },
             en: {
+                s_tlo_t: "2-Look OLL (10)",
+                s_tlo_d: "Yellow cross first (3), then orient the corners (7): the top is yellow.",
+                s_tlp_t: "2-Look PLL (6)",
+                s_tlp_d: "Place the corners (2), then the edges (4): the cube is solved.",
                 back_btn: "← Back",
                 badge: "LEARNING PATH",
                 title: "Learning",
@@ -7380,6 +7400,10 @@ alg5: {
                 s_p5_d: "When two wings of the last edge are swapped."
             },
             fr: {
+                s_tlo_t: "OLL 2 temps (10)",
+                s_tlo_d: "D'abord la croix jaune (3), puis oriente les coins (7) : le dessus est jaune.",
+                s_tlp_t: "PLL 2 temps (6)",
+                s_tlp_d: "Place les coins (2), puis les arêtes (4) : le cube est résolu.",
                 back_btn: "← Retour",
                 badge: "PARCOURS",
                 title: "Feuille de",
@@ -7445,6 +7469,10 @@ alg5: {
                 s_p5_d: "Quand deux ailes de la dernière arête sont échangées."
             },
             ru: {
+                s_tlo_t: "2-Look OLL (10)",
+                s_tlo_d: "Сначала жёлтый крест (3), затем ориентируй углы (7): верх жёлтый.",
+                s_tlp_t: "2-Look PLL (6)",
+                s_tlp_d: "Расставь углы (2), затем рёбра (4): куб собран.",
                 back_btn: "← Назад",
                 badge: "ПУТЬ ОБУЧЕНИЯ",
                 title: "Дорожная",
@@ -7510,6 +7538,10 @@ alg5: {
                 s_p5_d: "Когда два крыла последнего ребра переставлены."
             },
             de: {
+                s_tlo_t: "2-Look OLL (10)",
+                s_tlo_d: "Erst das gelbe Kreuz (3), dann Ecken orientieren (7): oben ist alles gelb.",
+                s_tlp_t: "2-Look PLL (6)",
+                s_tlp_d: "Erst die Ecken (2), dann die Kanten (4): der Würfel ist gelöst.",
                 back_btn: "← Zurück",
                 badge: "LERNPFAD",
                 title: "Lern-",
@@ -7575,6 +7607,10 @@ alg5: {
                 s_p5_d: "Wenn zwei Flügel der letzten Kante vertauscht sind."
             },
             ar: {
+                s_tlo_t: "2-Look OLL (10)",
+                s_tlo_d: "الصليب الأصفر أولًا (3) ثم وجّه الزوايا (7): الوجه العلوي أصفر.",
+                s_tlp_t: "2-Look PLL (6)",
+                s_tlp_d: "ضع الزوايا (2) ثم الحواف (4): المكعب محلول.",
                 back_btn: "← رجوع",
                 badge: "مسار التعلّم",
                 title: "خريطة",
@@ -7917,6 +7953,141 @@ alg5: {
                 v3_d: "أبيض الزاوية متجه للأعلى. هذه الحركة تدير الزاوية وتجمعها مع الحافة؛ فتحصل على الحالة 2 تمامًا وتُدخل بها.",
                 v4_t: "الحالة 4: الزاوية والحافة منفصلتان",
                 v4_d: "الزاوية والحافة في الأعلى لكن منفصلتان. هذه الحركة تبعد الحافة عن الخانة وتجلب الزاوية بجانبها؛ فيتكوّن الزوج وتحصل على الحالة 2 وتُدخل بها."
+            }
+        },
+        /* İçerikler/Algoritmalar/2-Look — 2-Look OLL ve PLL (PAGE_ID = "twolook_algos") */
+        twolook_algos: {
+            tr: {
+                back_btn: "← Geri Dön",
+                badge_text: "3x3 · CFOP · BAŞLANGIÇ SON KATMAN",
+                hero_title1: "2-Look",
+                hero_titleAccent: "OLL ve PLL",
+                hero_p: "Tam OLL (57) ve PLL (21) yerine son katmanı ikişer adımda çöz: 2-Look OLL'de 10, 2-Look PLL'de 6 algoritma. Hepsi 3x3 simülasyonunda doğrulandı; kartlara dokunarak öğrendiklerini işaretle.",
+                not_title: "Notasyon",
+                not_p: "R, U, F, L, D dış katmanlardır; ' ters yön, 2 yarım tur demektir. f: ön iki katman (F + S). r: sağ iki katman (R + M'). M: orta dikey katman, L ile aynı yönde.",
+                view_note: "Diyagramlar üstten bakıştır. 2-Look OLL'de sadece sarı etiketler gösterilir; artı adımında köşeler gri (önemsiz). 2-Look PLL köşe adımında kenarlar gri.",
+                set_2lo: "2-Look OLL",
+                set_2lp: "2-Look PLL",
+                desc_2lo: "Önce kenarlarla sarı artı yap (3 durum), sonra köşeleri yönlendirip üst yüzü tamamen sarı yap (7 durum). Toplam 10 algoritma.",
+                desc_2lp: "Önce köşeleri yerleştir (2 durum: komşu ya da çapraz değişim), sonra kenarları yerleştir (4 durum). Toplam 6 algoritma.",
+                subset_lo_e: "1. adım · Sarı artı (kenarlar)",
+                subset_lo_c: "2. adım · Köşeleri yönlendir",
+                subset_lp_c: "1. adım · Köşeleri yerleştir",
+                subset_lp_e: "2. adım · Kenarları yerleştir",
+                load_error: "Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.",
+                bottom_title: "🧩 Pratik zamanı",
+                bottom_p: "2-Look setlerini antrenörde süreyle çalış; oturunca tam OLL ve PLL'ye geç.",
+                go_trainer: "⏱️ Antrenörde çalış"
+            },
+            en: {
+                back_btn: "← Back",
+                badge_text: "3x3 · CFOP · BEGINNER LAST LAYER",
+                hero_title1: "2-Look",
+                hero_titleAccent: "OLL & PLL",
+                hero_p: "Instead of full OLL (57) and PLL (21), solve the last layer in two steps each: 10 algorithms for 2-Look OLL and 6 for 2-Look PLL. All verified in a 3x3 simulation; tap the cards to mark what you've learned.",
+                not_title: "Notation",
+                not_p: "R, U, F, L, D are outer layers; ' means counter-clockwise, 2 a half turn. f: the two front layers (F + S). r: the two right layers (R + M'). M: the middle vertical slice, same direction as L.",
+                view_note: "Diagrams are top views. In 2-Look OLL only yellow stickers are shown; in the cross step corners are gray (they don't matter). In the 2-Look PLL corner step edges are gray.",
+                set_2lo: "2-Look OLL",
+                set_2lp: "2-Look PLL",
+                desc_2lo: "First make the yellow cross with the edges (3 cases), then orient the corners so the whole top is yellow (7 cases). 10 algorithms in total.",
+                desc_2lp: "First place the corners (2 cases: adjacent or diagonal swap), then the edges (4 cases). 6 algorithms in total.",
+                subset_lo_e: "Step 1 · Yellow cross (edges)",
+                subset_lo_c: "Step 2 · Orient corners",
+                subset_lp_c: "Step 1 · Place corners",
+                subset_lp_e: "Step 2 · Place edges",
+                load_error: "Couldn't load the algorithm data. Please try again later.",
+                bottom_title: "🧩 Time to practice",
+                bottom_p: "Drill the 2-Look sets with a timer in the trainer; once they're solid, move on to full OLL and PLL.",
+                go_trainer: "⏱️ Practice in the trainer"
+            },
+            fr: {
+                back_btn: "← Retour",
+                badge_text: "3x3 · CFOP · DERNIÈRE COUCHE DÉBUTANT",
+                hero_title1: "OLL et PLL",
+                hero_titleAccent: "en 2 temps",
+                hero_p: "Au lieu de l'OLL complète (57) et de la PLL (21), résous la dernière couche en deux étapes chacune : 10 algorithmes pour l'OLL en 2 temps et 6 pour la PLL. Tous vérifiés dans une simulation 3x3 ; touche les cartes pour marquer ce que tu as appris.",
+                not_title: "Notation",
+                not_p: "R, U, F, L, D sont les couches extérieures ; ' = sens inverse, 2 = demi-tour. f : les deux couches avant (F + S). r : les deux couches de droite (R + M'). M : tranche verticale du milieu, même sens que L.",
+                view_note: "Les schémas sont vus du dessus. En OLL 2 temps seules les étiquettes jaunes sont montrées ; à l'étape de la croix les coins sont gris (sans importance). À l'étape des coins de la PLL, les arêtes sont grises.",
+                set_2lo: "OLL 2 temps",
+                set_2lp: "PLL 2 temps",
+                desc_2lo: "Fais d'abord la croix jaune avec les arêtes (3 cas), puis oriente les coins pour que toute la face soit jaune (7 cas). 10 algorithmes au total.",
+                desc_2lp: "Place d'abord les coins (2 cas : échange adjacent ou diagonal), puis les arêtes (4 cas). 6 algorithmes au total.",
+                subset_lo_e: "Étape 1 · Croix jaune (arêtes)",
+                subset_lo_c: "Étape 2 · Orienter les coins",
+                subset_lp_c: "Étape 1 · Placer les coins",
+                subset_lp_e: "Étape 2 · Placer les arêtes",
+                load_error: "Impossible de charger les algorithmes. Réessaie plus tard.",
+                bottom_title: "🧩 À l'entraînement",
+                bottom_p: "Travaille les sets en 2 temps avec chrono dans l'entraîneur ; ensuite passe à l'OLL et la PLL complètes.",
+                go_trainer: "⏱️ S'entraîner"
+            },
+            ru: {
+                back_btn: "← Назад",
+                badge_text: "3x3 · CFOP · ПОСЛЕДНИЙ СЛОЙ ДЛЯ НОВИЧКА",
+                hero_title1: "2-Look",
+                hero_titleAccent: "OLL и PLL",
+                hero_p: "Вместо полного OLL (57) и PLL (21) собери последний слой в два этапа каждый: 10 алгоритмов для 2-Look OLL и 6 для 2-Look PLL. Все проверены в симуляции 3x3; нажимай на карточки, чтобы отмечать выученное.",
+                not_title: "Нотация",
+                not_p: "R, U, F, L, D — внешние слои; ' — против часовой, 2 — полуоборот. f: два передних слоя (F + S). r: два правых слоя (R + M'). M: средний вертикальный слой, в ту же сторону, что L.",
+                view_note: "Схемы — вид сверху. В 2-Look OLL показаны только жёлтые наклейки; на этапе креста углы серые (не важны). На этапе углов 2-Look PLL рёбра серые.",
+                set_2lo: "2-Look OLL",
+                set_2lp: "2-Look PLL",
+                desc_2lo: "Сначала собери жёлтый крест рёбрами (3 случая), затем ориентируй углы, чтобы верх стал полностью жёлтым (7 случаев). Всего 10 алгоритмов.",
+                desc_2lp: "Сначала расставь углы (2 случая: соседняя или диагональная перестановка), затем рёбра (4 случая). Всего 6 алгоритмов.",
+                subset_lo_e: "Этап 1 · Жёлтый крест (рёбра)",
+                subset_lo_c: "Этап 2 · Ориентация углов",
+                subset_lp_c: "Этап 1 · Расстановка углов",
+                subset_lp_e: "Этап 2 · Расстановка рёбер",
+                load_error: "Не удалось загрузить алгоритмы. Попробуй позже.",
+                bottom_title: "🧩 Время практики",
+                bottom_p: "Тренируй наборы 2-Look с таймером в тренажёре; когда освоишь — переходи к полным OLL и PLL.",
+                go_trainer: "⏱️ Тренироваться"
+            },
+            de: {
+                back_btn: "← Zurück",
+                badge_text: "3x3 · CFOP · LETZTE EBENE FÜR ANFÄNGER",
+                hero_title1: "2-Look",
+                hero_titleAccent: "OLL & PLL",
+                hero_p: "Statt des kompletten OLL (57) und PLL (21) löst du die letzte Ebene in jeweils zwei Schritten: 10 Algorithmen für 2-Look OLL und 6 für 2-Look PLL. Alle in einer 3x3-Simulation geprüft; tippe auf die Karten, um Gelerntes zu markieren.",
+                not_title: "Notation",
+                not_p: "R, U, F, L, D sind äußere Ebenen; ' bedeutet gegen den Uhrzeigersinn, 2 eine halbe Drehung. f: die zwei vorderen Ebenen (F + S). r: die zwei rechten Ebenen (R + M'). M: mittlere senkrechte Scheibe, gleiche Richtung wie L.",
+                view_note: "Die Diagramme zeigen die Draufsicht. Bei 2-Look OLL sind nur gelbe Aufkleber zu sehen; im Kreuz-Schritt sind die Ecken grau (egal). Im Ecken-Schritt von 2-Look PLL sind die Kanten grau.",
+                set_2lo: "2-Look OLL",
+                set_2lp: "2-Look PLL",
+                desc_2lo: "Mach zuerst mit den Kanten das gelbe Kreuz (3 Fälle), dann orientiere die Ecken, bis oben alles gelb ist (7 Fälle). Insgesamt 10 Algorithmen.",
+                desc_2lp: "Setz zuerst die Ecken (2 Fälle: benachbarter oder diagonaler Tausch), dann die Kanten (4 Fälle). Insgesamt 6 Algorithmen.",
+                subset_lo_e: "Schritt 1 · Gelbes Kreuz (Kanten)",
+                subset_lo_c: "Schritt 2 · Ecken orientieren",
+                subset_lp_c: "Schritt 1 · Ecken setzen",
+                subset_lp_e: "Schritt 2 · Kanten setzen",
+                load_error: "Algorithmus-Daten konnten nicht geladen werden. Bitte später erneut versuchen.",
+                bottom_title: "🧩 Zeit zum Üben",
+                bottom_p: "Übe die 2-Look-Sets mit Timer im Trainer; wenn sie sitzen, geht es weiter mit vollem OLL und PLL.",
+                go_trainer: "⏱️ Im Trainer üben"
+            },
+            ar: {
+                back_btn: "← رجوع",
+                badge_text: "3x3 · CFOP · الطبقة الأخيرة للمبتدئين",
+                hero_title1: "2-Look",
+                hero_titleAccent: "OLL وPLL",
+                hero_p: "بدل OLL الكامل (57) وPLL (21) حلّ الطبقة الأخيرة على خطوتين لكلٍّ منهما: 10 خوارزميات لـ 2-Look OLL و6 لـ 2-Look PLL. كلها مُتحقَّق منها بمحاكاة 3x3؛ المس البطاقات لتحديد ما تعلّمته.",
+                not_title: "الترميز",
+                not_p: "R وU وF وL وD هي الطبقات الخارجية؛ ' عكس عقارب الساعة و2 نصف دورة. f: الطبقتان الأماميتان (F + S). r: الطبقتان اليمنيان (R + M'). M: الشريحة الرأسية الوسطى، بنفس اتجاه L.",
+                view_note: "المخططات منظر علوي. في 2-Look OLL تظهر الملصقات الصفراء فقط؛ وفي خطوة الصليب تكون الزوايا رمادية (غير مهمة). وفي خطوة الزوايا من 2-Look PLL تكون الحواف رمادية.",
+                set_2lo: "2-Look OLL",
+                set_2lp: "2-Look PLL",
+                desc_2lo: "اصنع أولًا الصليب الأصفر بالحواف (3 حالات)، ثم وجّه الزوايا حتى يصبح الوجه العلوي أصفر بالكامل (7 حالات). المجموع 10 خوارزميات.",
+                desc_2lp: "ضع الزوايا أولًا (حالتان: تبديل متجاور أو قطري)، ثم الحواف (4 حالات). المجموع 6 خوارزميات.",
+                subset_lo_e: "الخطوة 1 · الصليب الأصفر (الحواف)",
+                subset_lo_c: "الخطوة 2 · توجيه الزوايا",
+                subset_lp_c: "الخطوة 1 · وضع الزوايا",
+                subset_lp_e: "الخطوة 2 · وضع الحواف",
+                load_error: "تعذّر تحميل بيانات الخوارزميات. حاول لاحقًا.",
+                bottom_title: "🧩 وقت التدريب",
+                bottom_p: "تدرّب على مجموعات 2-Look بالمؤقت في المدرّب؛ وعندما تتقنها انتقل إلى OLL وPLL الكاملين.",
+                go_trainer: "⏱️ تدرّب في المدرّب"
             }
         },
         /* Diğer sayfalar buraya aynı şekilde eklenir.
