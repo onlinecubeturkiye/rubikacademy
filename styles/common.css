@@ -413,6 +413,7 @@ body.dark-mode .navbar {
     transition: .2s ease;
     z-index: 1100;
 }
+[dir="rtl"] .lang-menu { right: auto; left: 0; }
 
 .lang-menu.open {
     opacity: 1;
