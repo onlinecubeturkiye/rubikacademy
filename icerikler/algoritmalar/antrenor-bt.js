@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261060";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261061";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -269,7 +269,8 @@
         el("btReset").textContent = txt("bt_reset");
         el("btDisconnect").textContent = txt("bt_disconnect");
         // Bluetooth'u desteklemeyen tarayıcıda (iPhone, Firefox) kutu hiç gösterilmez
-        bar.classList.toggle("unsup", !supported());
+        // Bluetooth sadece 3x3 (CFOP, Roux) setlerinde: diğer küplerde kutu hiç görünmez
+        bar.classList.toggle("unsup", !supported() || !!(current && (current.cube !== "3x3" || current.noBT)));
         if (!supported()) { st.textContent = txt("bt_unsupported"); el("btConnect").disabled = true; return; }
         if (connecting) bar.classList.add("has-msg");
         if (connecting) { st.textContent = txt("bt_connecting") + (stage ? " (" + txt("bt_st_" + stage) + (stageName ? ": " + stageName : "") + ")" : ""); return; }
