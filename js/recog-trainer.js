@@ -56,6 +56,7 @@
         stats.n++; cs.n++;
         if (ok) { stats.ok++; stats.sum += t; stats.streak++; cs.ok++; cs.sum += t; } else stats.streak = 0;
         save(); renderStats();
+        if (window.Streak) Streak.mark("recog");
         var fb = document.getElementById("rcFeedback");
         Array.prototype.forEach.call(document.querySelectorAll(".rc-ans"), function (b) {
             b.disabled = true;
