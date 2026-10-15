@@ -11,7 +11,7 @@
      (gunluk.js) aynı global'leri sağlayarak bu modülü kullanır.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261088";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261089";
     var MAC_KEY = "trainer-bt-mac-v1";
     // Karıştırma ve ipucu kutuları (günün karıştırması sayfası kendi kimliklerini verir)
     var SCR_ID = (window.BT_IDS && BT_IDS.scramble) || "scramble", HINT_ID = (window.BT_IDS && BT_IDS.hint) || "timerHint";
@@ -483,7 +483,7 @@
         if (fr && current.id === "roux-eo" && fr.U !== "U" && fr.U !== "D") { mOdd = true; return null; }
         return fr;
     }
-    function isRoux() { return !!(current && current.puzzle === "roux"); }
+    function isRoux() { return !!(current && (current.puzzle === "roux" || current.id === "oh-cmll")); }
     window.btOnNewCase = function () {
         renderBar();
         if (!applies()) { phase = "off"; return; }

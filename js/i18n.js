@@ -4657,6 +4657,8 @@ wv: {
        /* İçerikler/Algoritmalar/Antrenör — algoritma antrenörü (PAGE_ID = "antrenor") */
 antrenor: {
     tr: {
+        grp_a: "Temel",
+        grp_b: "Son katman",
         back_btn: "← Geri Dön",
         badge_text: "ALGORİTMA ANTRENÖRÜ",
         title: "Algoritma Antrenörü",
@@ -4793,6 +4795,8 @@ antrenor: {
         learning_none: "Bu sette \"Öğreniyorum\" olarak işaretlediğin case yok. Algoritma sayfasında case kartlarına tıklayarak işaretleyebilirsin."
     },
     en: {
+        grp_a: "Basics",
+        grp_b: "Last layer",
         back_btn: "← Go Back",
         badge_text: "ALGORITHM TRAINER",
         title: "Algorithm Trainer",
@@ -4929,6 +4933,8 @@ antrenor: {
         learning_none: "You haven't marked any case in this set as \"Learning\". You can mark them by clicking the case cards on the algorithm page."
     },
     fr: {
+        grp_a: "Bases",
+        grp_b: "Dernière couche",
         back_btn: "← Retour",
         badge_text: "ENTRAÎNEUR D'ALGORITHMES",
         title: "Entraîneur d'algorithmes",
@@ -5065,6 +5071,8 @@ antrenor: {
         learning_none: "Tu n'as marqué aucun cas de ce set comme « J'apprends ». Tu peux le faire en cliquant sur les cartes de la page d'algorithmes."
     },
     ru: {
+        grp_a: "Основа",
+        grp_b: "Последний слой",
         back_btn: "← Назад",
         badge_text: "ТРЕНАЖЁР АЛГОРИТМОВ",
         title: "Тренажёр алгоритмов",
@@ -5201,6 +5209,8 @@ antrenor: {
         learning_none: "В этом наборе нет кейсов, отмеченных как «Учу». Отметить их можно, нажимая на карточки на странице алгоритмов."
     },
     de: {
+        grp_a: "Grundlagen",
+        grp_b: "Letzte Ebene",
         back_btn: "← Zurück",
         badge_text: "ALGORITHMEN-TRAINER",
         title: "Algorithmen-Trainer",
@@ -5337,6 +5347,8 @@ antrenor: {
         learning_none: "Du hast in diesem Set keinen Fall als „Ich lerne“ markiert. Das geht durch Klicken auf die Fallkarten auf der Algorithmen-Seite."
     },
     ar: {
+        grp_a: "الأساسيات",
+        grp_b: "الطبقة الأخيرة",
         back_btn: "← رجوع",
         badge_text: "مدرّب الخوارزميات",
         title: "مدرّب الخوارزميات",
