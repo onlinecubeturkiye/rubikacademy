@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261085">
+<link rel="stylesheet" href="/styles/common.css?v=20261086">
 
 <style>
 .wrap { max-width: 980px; margin: 0 auto; }
@@ -99,6 +99,7 @@
 .d-off .btn { padding: 7px 12px; font-size: 13px; }
 .d-off .btn.on { background: var(--cube-red); color: #fff; }
 .d-note { margin-top: 10px !important; font-size: 13px !important; }
+.d-hold { text-align: center; margin: 6px 0 12px !important; font-weight: 700; }
 .dnet { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
 .dn-f { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px; border-radius: 5px; background: var(--ink); }
 .dn-f.two { grid-template-columns: repeat(2, 1fr); }
@@ -263,6 +264,7 @@ html[dir="rtl"] .bt-cube { text-align: right; } html[dir="rtl"] .bt-cube .go { m
                 </div>
             </div>
             <code class="d-scr" id="dScr" dir="ltr"></code>
+            <p class="d-note d-hold" data-i18n="hold">Karıştırmayı beyaz üstte, yeşil önde tutarak çözülmüş küpe uygula.</p>
             <div class="d-timer-box" id="dTimerBox" data-state="idle" role="button" tabindex="0">
                 <div class="d-timer" id="dTimer" dir="ltr">0.00</div>
                 <div class="d-hint" id="dHint"></div>
@@ -271,7 +273,7 @@ html[dir="rtl"] .bt-cube { text-align: right; } html[dir="rtl"] .bt-cube .go { m
             <p class="d-note" data-i18n="note_first">Tek hakkın var: ilk tamamladığın çözüm bugünün sonucu olur.</p>
         </div>
         <div>
-            <h3 class="side-h" data-i18n="preview">Karıştırılmış hali (sarı üstte, yeşil önde)</h3>
+            <h3 class="side-h" data-i18n="preview">Karıştırılmış hali (beyaz üstte, yeşil önde)</h3>
             <div class="dnet" id="dNet" dir="ltr"></div>
         </div>
     </div>
@@ -344,13 +346,13 @@ html[dir="rtl"] .bt-cube { text-align: right; } html[dir="rtl"] .bt-cube .go { m
 </footer>
 
 <script>var PAGE_ID = "gunluk";</script>
-<script src="/js/i18n.js?v=20261085"></script>
-<script src="/js/common.js?v=20261085"></script>
-<script src="/js/firebase-config.js?v=20261085"></script>
+<script src="/js/i18n.js?v=20261086"></script>
+<script src="/js/common.js?v=20261086"></script>
+<script src="/js/firebase-config.js?v=20261086"></script>
 
-<script src="/js/vendor/cubejs/cube.js?v=20261085"></script>
-<script src="/js/leaderboard.js?v=20261085"></script>
-<script src="/js/gunluk.js?v=20261085"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261085"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261086"></script>
+<script src="/js/leaderboard.js?v=20261086"></script>
+<script src="/js/gunluk.js?v=20261086"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261086"></script>
 </body>
 </html>

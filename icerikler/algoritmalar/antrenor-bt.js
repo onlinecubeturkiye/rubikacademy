@@ -11,12 +11,14 @@
      (gunluk.js) aynı global'leri sağlayarak bu modülü kullanır.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261085";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261086";
     var MAC_KEY = "trainer-bt-mac-v1";
     // Karıştırma ve ipucu kutuları (günün karıştırması sayfası kendi kimliklerini verir)
     var SCR_ID = (window.BT_IDS && BT_IDS.scramble) || "scramble", HINT_ID = (window.BT_IDS && BT_IDS.hint) || "timerHint";
     var FACES = "URFDLB";
-    var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
+    // Küp çerçevesi -> sarı üst tutuş (z2). Günün karıştırması beyaz üstte çalışır: çevirme yok.
+    var WHITE_TOP = !!window.BT_WHITE_TOP;
+    var MAP = WHITE_TOP ? { U: "U", D: "D", R: "R", L: "L", F: "F", B: "B" } : { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" };
 
     /* ---------- 3x3 yüz modeli (54 etiket, sadece yüz hamleleri) ---------- */
     var NORMALS = { U: [0, 1, 0], D: [0, -1, 0], R: [1, 0, 0], L: [-1, 0, 0], F: [0, 0, 1], B: [0, 0, -1] };
@@ -114,7 +116,7 @@
         var m = new Array(STK.length);
         for (var fi = 0; fi < 6; fi++) for (var k = 0; k < 9; k++) {
             var pn = FACELET_POS[FACES[fi]](Math.floor(k / 3), k % 3);
-            var p = [-pn[0][0], -pn[0][1], pn[0][2]], n = [-pn[1][0], -pn[1][1], pn[1][2]]; // z2
+            var p = WHITE_TOP ? pn[0] : [-pn[0][0], -pn[0][1], pn[0][2]], n = WHITE_TOP ? pn[1] : [-pn[1][0], -pn[1][1], pn[1][2]]; // z2
             var col = MAP[str.charAt(fi * 9 + k)];
             if (!col) return null;
             m[INDEX[key(p, n)]] = col;

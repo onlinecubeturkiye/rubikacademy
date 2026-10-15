@@ -8665,7 +8665,7 @@ alg5: {
                 intro: "Herkes bugün aynı karıştırmayı çözüyor. Tek hakkın var: süreni kaydet ve günün sıralamasında yerini gör.",
                 official: "Bugünün sonucu:",
                 share: "📤 Paylaş",
-                preview: "Karıştırılmış hali (sarı üstte, yeşil önde)",
+                preview: "Karıştırılmış hali (beyaz üstte, yeşil önde)",
                 hist_h: "Son sonuçların",
                 hint_idle: "Karıştır, sonra boşluk tuşunu (ya da kutuyu) basılı tut; bırakınca süre başlar.",
                 hint_hold: "Bekle…",
@@ -8692,7 +8692,11 @@ alg5: {
                 lb_load_err: "Sıralama yüklenemedi.",
                 bt_hint_ready: "Hazır! İlk hamlende süre başlar, küp çözülünce durur",
                 bt_hint: "GAN, MoYu, QiYi, GoCube veya Giiker akıllı küpünü bağla: karıştırma takip edilir, süre ilk hamlede başlar ve küp çözülünce durur.",
-                bt_note: "Akıllı küpün varsa bağla: karıştırmayı doğru yaptığın takip edilir, süre ilk hamlende başlar ve küp çözülünce kendiliğinden durur."
+                bt_note: "Akıllı küpün varsa bağla: karıştırmayı doğru yaptığın takip edilir, süre ilk hamlende başlar ve küp çözülünce kendiliğinden durur.",
+                hold: "Karıştırmayı beyaz üstte, yeşil önde tutarak çözülmüş küpe uygula.",
+                bt_hint_scramble: "Karıştırmayı beyaz üstte, yeşil önde tutarak uygula",
+                lb_err_perm: "Sıralama sunucusu gönderimi kabul etmedi. Biraz sonra tekrar dene.",
+                lb_err_srv: "Gönderilemedi (sunucu hatası). Biraz sonra tekrar dene."
             },
             en: {
                 back_btn: "← Back",
@@ -8702,7 +8706,7 @@ alg5: {
                 intro: "Everyone solves the same scramble today. You get one attempt: record your time and see where you rank today.",
                 official: "Today's result:",
                 share: "📤 Share",
-                preview: "Scrambled state (yellow top, green front)",
+                preview: "Scrambled state (white on top, green in front)",
                 hist_h: "Your recent results",
                 hint_idle: "Scramble, then hold the space bar (or the box); the timer starts when you let go.",
                 hint_hold: "Wait…",
@@ -8729,7 +8733,11 @@ alg5: {
                 lb_load_err: "Couldn't load the leaderboard.",
                 bt_hint_ready: "Ready! The timer starts on your first move and stops when the cube is solved",
                 bt_hint: "Connect a GAN, MoYu, QiYi, GoCube or Giiker smart cube: the scramble is tracked, the timer starts on your first move and stops when the cube is solved.",
-                bt_note: "Got a smart cube? Connect it: your scramble is checked, the timer starts on your first move and stops by itself when the cube is solved."
+                bt_note: "Got a smart cube? Connect it: your scramble is checked, the timer starts on your first move and stops by itself when the cube is solved.",
+                hold: "Apply the scramble to a solved cube held white on top, green in front.",
+                bt_hint_scramble: "Apply the scramble white on top, green in front",
+                lb_err_perm: "The leaderboard server did not accept the submission. Try again a little later.",
+                lb_err_srv: "Could not submit (server error). Try again a little later."
             },
             fr: {
                 back_btn: "← Retour",
@@ -8739,7 +8747,7 @@ alg5: {
                 intro: "Tout le monde résout le même mélange aujourd'hui. Un seul essai : enregistre ton temps et vois ta place au classement du jour.",
                 official: "Résultat du jour :",
                 share: "📤 Partager",
-                preview: "État mélangé (jaune en haut, vert devant)",
+                preview: "État mélangé (blanc en haut, vert devant)",
                 hist_h: "Tes derniers résultats",
                 hint_idle: "Mélange, puis maintiens la barre d'espace (ou la zone) ; le chrono démarre quand tu relâches.",
                 hint_hold: "Attends…",
@@ -8766,7 +8774,11 @@ alg5: {
                 lb_load_err: "Impossible de charger le classement.",
                 bt_hint_ready: "Prêt ! Le chrono démarre à ton premier mouvement et s'arrête quand le cube est résolu",
                 bt_hint: "Connecte un cube connecté GAN, MoYu, QiYi, GoCube ou Giiker : le mélange est suivi, le chrono démarre au premier mouvement et s'arrête quand le cube est résolu.",
-                bt_note: "Tu as un cube connecté ? Connecte-le : ton mélange est vérifié, le chrono démarre au premier mouvement et s'arrête tout seul quand le cube est résolu."
+                bt_note: "Tu as un cube connecté ? Connecte-le : ton mélange est vérifié, le chrono démarre au premier mouvement et s'arrête tout seul quand le cube est résolu.",
+                hold: "Applique le mélange sur un cube résolu tenu blanc en haut, vert devant.",
+                bt_hint_scramble: "Applique le mélange, blanc en haut et vert devant",
+                lb_err_perm: "Le serveur du classement n'a pas accepté l'envoi. Réessaie un peu plus tard.",
+                lb_err_srv: "Envoi impossible (erreur du serveur). Réessaie un peu plus tard."
             },
             ru: {
                 back_btn: "← Назад",
@@ -8776,7 +8788,7 @@ alg5: {
                 intro: "Сегодня все собирают один и тот же скрамбл. У тебя одна попытка: запиши время и посмотри своё место в рейтинге дня.",
                 official: "Результат дня:",
                 share: "📤 Поделиться",
-                preview: "Состояние после скрамбла (жёлтый сверху, зелёный спереди)",
+                preview: "Состояние после скрамбла (белый сверху, зелёный спереди)",
                 hist_h: "Последние результаты",
                 hint_idle: "Запутай кубик, затем удерживай пробел (или поле); таймер стартует, когда отпустишь.",
                 hint_hold: "Жди…",
@@ -8803,7 +8815,11 @@ alg5: {
                 lb_load_err: "Не удалось загрузить рейтинг.",
                 bt_hint_ready: "Готово! Таймер стартует с первого хода и остановится, когда кубик будет собран",
                 bt_hint: "Подключи смарт-кубик GAN, MoYu, QiYi, GoCube или Giiker: скрамбл отслеживается, таймер стартует с первого хода и останавливается, когда кубик собран.",
-                bt_note: "Есть смарт-кубик? Подключи его: скрамбл проверяется, таймер стартует с первого хода и сам останавливается, когда кубик собран."
+                bt_note: "Есть смарт-кубик? Подключи его: скрамбл проверяется, таймер стартует с первого хода и сам останавливается, когда кубик собран.",
+                hold: "Выполни скрамбл на собранном кубике: белый сверху, зелёный спереди.",
+                bt_hint_scramble: "Выполни скрамбл: белый сверху, зелёный спереди",
+                lb_err_perm: "Сервер рейтинга не принял результат. Попробуй чуть позже.",
+                lb_err_srv: "Не удалось отправить (ошибка сервера). Попробуй чуть позже."
             },
             de: {
                 back_btn: "← Zurück",
@@ -8813,7 +8829,7 @@ alg5: {
                 intro: "Heute lösen alle denselben Scramble. Du hast einen Versuch: Speichere deine Zeit und sieh deinen Platz in der Tagesbestenliste.",
                 official: "Heutiges Ergebnis:",
                 share: "📤 Teilen",
-                preview: "Verdrehter Zustand (Gelb oben, Grün vorne)",
+                preview: "Verdrehter Zustand (Weiß oben, Grün vorne)",
                 hist_h: "Deine letzten Ergebnisse",
                 hint_idle: "Verdrehe den Würfel, halte dann die Leertaste (oder das Feld) gedrückt; beim Loslassen startet die Zeit.",
                 hint_hold: "Warten…",
@@ -8840,7 +8856,11 @@ alg5: {
                 lb_load_err: "Bestenliste konnte nicht geladen werden.",
                 bt_hint_ready: "Bereit! Die Zeit startet mit deinem ersten Zug und stoppt, wenn der Würfel gelöst ist",
                 bt_hint: "Verbinde einen GAN-, MoYu-, QiYi-, GoCube- oder Giiker-Smartcube: Der Scramble wird verfolgt, die Zeit startet mit dem ersten Zug und stoppt, wenn der Würfel gelöst ist.",
-                bt_note: "Du hast einen Smartcube? Verbinde ihn: Dein Scramble wird geprüft, die Zeit startet mit dem ersten Zug und stoppt von selbst, wenn der Würfel gelöst ist."
+                bt_note: "Du hast einen Smartcube? Verbinde ihn: Dein Scramble wird geprüft, die Zeit startet mit dem ersten Zug und stoppt von selbst, wenn der Würfel gelöst ist.",
+                hold: "Wende den Scramble auf einen gelösten Würfel an: Weiß oben, Grün vorne.",
+                bt_hint_scramble: "Führe den Scramble aus: Weiß oben, Grün vorne",
+                lb_err_perm: "Der Server der Bestenliste hat die Einsendung nicht angenommen. Versuche es etwas später erneut.",
+                lb_err_srv: "Senden fehlgeschlagen (Serverfehler). Versuche es etwas später erneut."
             },
             ar: {
                 back_btn: "→ رجوع",
@@ -8850,7 +8870,7 @@ alg5: {
                 intro: "الجميع يحلّ الخلط نفسه اليوم. لديك محاولة واحدة: سجّل وقتك وشاهد ترتيبك اليوم.",
                 official: "نتيجة اليوم:",
                 share: "📤 مشاركة",
-                preview: "الحالة بعد الخلط (الأصفر في الأعلى، الأخضر في الأمام)",
+                preview: "الحالة بعد الخلط (الأبيض في الأعلى، الأخضر في الأمام)",
                 hist_h: "نتائجك الأخيرة",
                 hint_idle: "اخلط المكعب، ثم اضغط مطوّلاً على مفتاح المسافة (أو المربع)؛ يبدأ المؤقت عند الإفلات.",
                 hint_hold: "انتظر…",
@@ -8877,7 +8897,11 @@ alg5: {
                 lb_load_err: "تعذّر تحميل الترتيب.",
                 bt_hint_ready: "جاهز! يبدأ المؤقت مع أول حركة ويتوقف عند حل المكعب",
                 bt_hint: "وصّل مكعبًا ذكيًا من GAN أو MoYu أو QiYi أو GoCube أو Giiker: تُتابَع الخلطة ويبدأ المؤقت مع أول حركة ويتوقف عند حل المكعب.",
-                bt_note: "لديك مكعب ذكي؟ وصّله: تُتحقَّق الخلطة ويبدأ المؤقت مع أول حركة ويتوقف تلقائيًا عند حل المكعب."
+                bt_note: "لديك مكعب ذكي؟ وصّله: تُتحقَّق الخلطة ويبدأ المؤقت مع أول حركة ويتوقف تلقائيًا عند حل المكعب.",
+                hold: "طبّق الخلطة على مكعب محلول والأبيض في الأعلى والأخضر في الأمام.",
+                bt_hint_scramble: "طبّق الخلطة والأبيض في الأعلى والأخضر في الأمام",
+                lb_err_perm: "لم يقبل خادم الترتيب الإرسال. حاول بعد قليل.",
+                lb_err_srv: "تعذّر الإرسال (خطأ في الخادم). حاول بعد قليل."
             }
         },
         kup_rehberi: {
