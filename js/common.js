@@ -38,7 +38,7 @@ function toggleDarkMode() {
 }
 
 /* =========================================
-   RENK KÖRLÜĞÜ TEMASI (localStorage "cvd-theme": "" | rg | tri)
+   RENK KÖRLÜĞÜ TEMASI (localStorage "cvd-theme": "" | pro | deu | rg | tri)
    Antrenöre ilk girişte sorulur; seçim tüm sitede geçerlidir.
    Küp renkleri (CSS değişkenleri ve tüm SVG diyagramları) seçilen
    palete çevrilir. Paletler Machado (2009) renk körlüğü benzetimiyle
@@ -51,18 +51,27 @@ var CVD_FAMILY = {
     "#ff7a1a": "O", "#f97316": "O", "#fb8c00": "O", "#ff8a1f": "O",
     "#f6c719": "Y", "#ffd21f": "Y", "#fdd835": "Y", "#ffe600": "Y",
     "#179e4f": "G", "#12a04a": "G", "#16a34a": "G", "#16b364": "G", "#2ecc71": "G",
-    "#1e6fe6": "B", "#1e6fe0": "B", "#2c6fe6": "B", "#1d5bff": "B", "#4f7dff": "B"
+    "#1e6fe6": "B", "#1e6fe0": "B", "#2c6fe6": "B", "#1d5bff": "B", "#4f7dff": "B",
+    "#eef2f3": "W"
 };
+/* pro / deu: tek türe göre seçildi (Machado 2009 benzetimi, beyaz ve gri dahil en zor ayrılan
+   iki renk arasındaki OKLab farkı: protanopi 4,1 → 15,6, döteranopi 5,5 → 17,9).
+   rg: türünü bilmeyenler için ikisinde de dengeli (14,6 / 15,1). */
 var CVD_PALETTES = {
+    pro: { R: "#f45d73", O: "#ec9b01", Y: "#fefc0c", G: "#5bcbb0", B: "#7f9ef7" },
+    deu: { R: "#b84109", O: "#f89b12", Y: "#fbfe17", G: "#3fb298", B: "#5369d3" },
     rg:  { R: "#f4390b", O: "#faa51e", Y: "#fcf765", G: "#17b1a5", B: "#0270e3" },
     tri: { R: "#9d0100", O: "#eb6014", Y: "#e2b716", G: "#4cf053", B: "#0587f7" }
 };
 var NORMAL_SWATCH = { W: "#eef2f3", Y: "#f6c719", R: "#d12d28", O: "#ff7a1a", G: "#179e4f", B: "#2c6fe6" };
 function cvdTheme() { try { return localStorage.getItem("cvd-theme") || ""; } catch (e) { return ""; } }
 
+/* Tutuş: bir sayfa window.RA_HOLD_SWAP = { Y: "W", W: "Y", ... } verirse diyagramlardaki küp renkleri
+   bu eşlemeyle değiştirilir (ör. antrenörde beyaz üst tutuş). data-hold-skip içindekiler etkilenmez. */
+function holdSwap() { return (window.RA_HOLD_SWAP && typeof window.RA_HOLD_SWAP === "object") ? window.RA_HOLD_SWAP : null; }
 /* Bir alt ağaçtaki SVG renklerini seçili palete çevir (orijinal renk data-cvdo'da saklanır) */
 function cvdRecolor(root) {
-    var pal = CVD_PALETTES[cvdTheme()] || null;
+    var pal = CVD_PALETTES[cvdTheme()] || null, swap = holdSwap();
     if (!root || !root.querySelectorAll) return;
     var list = root.querySelectorAll("[fill], [data-cvdo]");
     var els = (root.hasAttribute && (root.hasAttribute("fill") || root.hasAttribute("data-cvdo"))) ? [root] : [];
@@ -72,7 +81,8 @@ function cvdRecolor(root) {
         var fam = orig && CVD_FAMILY[orig.toLowerCase()];
         if (!fam) return;
         if (!el.hasAttribute("data-cvdo")) el.setAttribute("data-cvdo", orig);
-        var want = pal ? pal[fam] : orig;
+        var f2 = (swap && swap[fam] && !el.closest("[data-hold-skip]")) ? swap[fam] : fam;
+        var want = pal ? (pal[f2] || NORMAL_SWATCH[f2]) : (f2 === fam ? orig : NORMAL_SWATCH[f2]);
         if (el.getAttribute("fill") !== want) el.setAttribute("fill", want);
     });
 }
@@ -82,9 +92,12 @@ function applyCvd(theme) {
     document.documentElement.setAttribute("data-cvd", theme || "");
     cvdRecolor(document.body);
     // Sonradan çizilen diyagramlar (antrenör, algoritma sayfaları) da çevrilsin
-    if (theme && !cvdObserver && window.MutationObserver) {
+    if (theme) cvdWatch();
+}
+function cvdWatch() {
+    if (!cvdObserver && window.MutationObserver && document.body) {
         cvdObserver = new MutationObserver(function (muts) {
-            if (!cvdTheme()) return;
+            if (!cvdTheme() && !holdSwap()) return;
             muts.forEach(function (m) {
                 for (var i = 0; i < m.addedNodes.length; i++) if (m.addedNodes[i].nodeType === 1) cvdRecolor(m.addedNodes[i]);
             });
@@ -92,6 +105,8 @@ function applyCvd(theme) {
         cvdObserver.observe(document.body, { childList: true, subtree: true });
     }
 }
+/* Tutuş değişince (antrenör) tüm diyagramları yeniden renklendir */
+function raRecolor() { cvdRecolor(document.body); if (cvdTheme() || holdSwap()) cvdWatch(); }
 /* Renk önizlemesi (6 küçük kare) */
 function cvdSwatches(theme) {
     var pal = CVD_PALETTES[theme];
@@ -109,6 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (btn) btn.innerHTML = "☀️";
     } else if (btn) btn.innerHTML = "🌙";
     if (cvdTheme()) applyCvd(cvdTheme());
+    else if (holdSwap()) raRecolor();
 });
 
 /* =========================================

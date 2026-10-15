@@ -938,6 +938,12 @@ html.dark-mode .card-visual::before {
 html[data-cvd="rg"], html[data-cvd="rg"] body {
     --cube-red: #f4390b; --cube-orange: #faa51e; --cube-yellow: #fcf765; --cube-green: #17b1a5; --cube-blue: #0270e3;
 }
+html[data-cvd="pro"], html[data-cvd="pro"] body {
+    --cube-red: #f45d73; --cube-orange: #ec9b01; --cube-yellow: #fefc0c; --cube-green: #5bcbb0; --cube-blue: #7f9ef7;
+}
+html[data-cvd="deu"], html[data-cvd="deu"] body {
+    --cube-red: #b84109; --cube-orange: #f89b12; --cube-yellow: #fbfe17; --cube-green: #3fb298; --cube-blue: #5369d3;
+}
 html[data-cvd="tri"], html[data-cvd="tri"] body {
     --cube-red: #9d0100; --cube-orange: #eb6014; --cube-yellow: #e2b716; --cube-green: #4cf053; --cube-blue: #0587f7;
 }
