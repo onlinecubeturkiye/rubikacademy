@@ -37,7 +37,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261052">
+<link rel="stylesheet" href="/styles/common.css?v=20261053">
 
 <style>
 .rc-head { margin: 6px 0 16px; text-align: center; }
@@ -161,9 +161,9 @@
 
 <script src="/icerikler/algoritmalar/ll.js"></script>
 <script>var PAGE_ID = "tanima";</script>
-<script src="/js/i18n.js?v=20261052"></script>
-<script src="/js/common.js?v=20261052"></script>
-<script src="/js/custom-algs.js?v=20261052"></script>
+<script src="/js/i18n.js?v=20261053"></script>
+<script src="/js/common.js?v=20261053"></script>
+<script src="/js/custom-algs.js?v=20261053"></script>
 <script>
 /* PLL tanıma antrenörü: tanima-pll.json içinde her PLL için 3x3 simülasyonuyla üretilmiş
    farklı görünümler (ön-AUF, son-AUF, küp döndürme) var; iki yüzlü 3B görünümden case seçilir. */
@@ -261,7 +261,7 @@
     });
     window.onLanguageApplied = function () { if (DATA) renderStats(); };
     Promise.all([
-        fetch("/icerikler/algoritmalar/tanima-pll.json?v=20261052").then(function (r) { return r.json(); }),
+        fetch("/icerikler/algoritmalar/tanima-pll.json?v=20261053").then(function (r) { return r.json(); }),
         fetch("/icerikler/algoritmalar/oll-pll.json").then(function (r) { return r.json(); })
     ]).then(function (res) {
         DATA = res[0];
