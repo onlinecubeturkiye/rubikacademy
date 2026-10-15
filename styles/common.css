@@ -886,3 +886,29 @@ html.dark-mode .card-visual::before {
     font-weight: 800; font-size: 14px; text-decoration: none; box-shadow: var(--shadow-sm);
 }
 .print-link:hover { background: var(--cube-yellow); color: #17171f; }
+
+/* Kendi algoritman (custom-algs.js) */
+.case-card { position: relative; }
+.alg-edit-btn {
+    position: absolute; top: 8px; inset-inline-end: 8px; width: 30px; height: 30px; border-radius: 9px; cursor: pointer;
+    border: 1.5px solid var(--border); background: var(--surface); font-size: 14px; line-height: 1; opacity: .55; transition: opacity .15s, transform .15s;
+}
+.case-card:hover .alg-edit-btn, .alg-edit-btn:focus-visible, .case-card.has-custom .alg-edit-btn { opacity: 1; }
+.alg-edit-btn:hover { transform: scale(1.08); border-color: var(--ink); }
+.case-card .case-body { padding-inline-end: 26px; }
+.case-mine { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; margin-top: 4px; font-size: 11.5px; }
+.mine-label { font-weight: 800; color: var(--primary); }
+.mine-orig { font-family: "JetBrains Mono", monospace; color: var(--text-soft); }
+.alg-editor { margin-top: 10px; display: grid; gap: 6px; cursor: default; }
+.alg-editor textarea {
+    width: 100%; box-sizing: border-box; resize: vertical; min-height: 54px; padding: 8px 10px; border-radius: 10px;
+    border: var(--card-bw) solid var(--ink); background: var(--surface-soft); color: var(--text); font: 600 13px "JetBrains Mono", monospace;
+}
+.alg-editor-err { font-size: 12px; font-weight: 700; color: var(--cube-red); }
+.alg-editor-err:empty { display: none; }
+.alg-editor-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.alg-editor-actions button {
+    padding: 6px 12px; border-radius: 9px; border: 1.5px solid var(--ink); background: var(--surface); color: var(--text);
+    font: 800 12.5px Inter, sans-serif; cursor: pointer;
+}
+.alg-editor-actions .ae-save { background: var(--cube-yellow); color: #17171f; }
