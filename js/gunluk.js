@@ -6,7 +6,8 @@
 ========================================================= */
 (function () {
     var RES_KEY = "daily-results-v1";
-    var COLOR = { U: "#f6c719", R: "#ff7a1a", F: "#179e4f", D: "#eef2f3", L: "#d12d28", B: "#2c6fe6" };
+    // Günün karıştırması beyaz üstte, yeşil önde uygulanır
+    var COLOR = { U: "#eef2f3", R: "#d12d28", F: "#179e4f", D: "#f6c719", L: "#ff7a1a", B: "#2c6fe6" };
     var NET = [["U", 1, 0], ["L", 0, 1], ["F", 1, 1], ["R", 2, 1], ["B", 3, 1], ["D", 1, 2]];
     var puzzle = "333";
     function $(id) { return document.getElementById(id); }
@@ -77,6 +78,7 @@
        çözülmüş küpe karıştırma hamle hamle takip edilir, ilk hamlede süre başlar,
        küp çözülünce durur. */
     window.BT_IDS = { scramble: "dScr", hint: "dHint" };
+    window.BT_WHITE_TOP = true;
     window.mode = "cube";
     window.current = { id: "daily", cube: "3x3" };
     Object.defineProperty(window, "state", { configurable: true, get: function () { return state === "done" ? "done" : state === "running" ? "running" : "idle"; } });
@@ -154,7 +156,9 @@
         Leaderboard.submit(name, r.t, r.pen, dayOf(today())).then(function (res) {
             $("lbSendBtn").disabled = false;
             if (res.ok || res.exists) { markSent(); renderSend(); loadBoard(); }
-            else lbMsg(T("lb_err", "Gönderilemedi. İnternet bağlantını kontrol edip tekrar dene."), "bad");
+            // Sunucu reddettiyse (ör. kurallar) bağlantı hatası gibi gösterme
+            else if (res.status === "PERMISSION_DENIED" || res.status === 403) lbMsg(T("lb_err_perm", "Sıralama sunucusu gönderimi kabul etmedi. Biraz sonra tekrar dene."), "bad");
+            else lbMsg(T("lb_err_srv", "Gönderilemedi (sunucu hatası). Biraz sonra tekrar dene.") + " [" + res.status + "]", "bad");
         }, function () { $("lbSendBtn").disabled = false; lbMsg(T("lb_err"), "bad"); });
     }
     function loadBoard() {
