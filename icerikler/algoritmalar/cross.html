@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Cross Antrenörü</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/cross">
+<meta name="description" content="Cross antrenörü: karıştırmayı incele, beyaz artıyı planla ve en kısa çözümle karşılaştır.">
+<meta property="og:title" content="Rubik Academy - Cross Antrenörü">
+<meta property="og:description" content="Beyaz artıyı incelemede planla, en kısa çözümü gör.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/cross">
+<meta property="og:image" content="https://rubikacademy.fun/og/site.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/site.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261053">
+
+<style>
+.cx-head { margin: 6px 0 16px; text-align: center; }
+.cx-head .badge { display: inline-flex; padding: 6px 14px; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--surface); font-weight: 900; font-size: 13px; letter-spacing: .6px; color: var(--text); }
+.cx-head h1 { font-size: 40px; font-weight: 900; margin: 12px 0 8px; color: var(--text); }
+.cx-head h1 span + span { color: var(--primary); }
+.cx-head p { color: var(--text-soft); font-size: 15px; max-width: 660px; margin: 0 auto; }
+.cx-wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 16px; }
+.box { background: var(--surface); border: var(--card-bw) solid var(--ink); border-radius: 22px; padding: 20px; box-shadow: var(--shadow); }
+.cx-levels { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.cx-lvl { padding: 8px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; }
+.cx-lvl.active { background: var(--cube-yellow); color: #17171f; box-shadow: var(--shadow-sm); }
+.cx-tip { text-align: center; font-size: 13.5px; color: var(--text-soft); margin-bottom: 10px; }
+.cx-scr { text-align: center; font: 800 24px/1.5 "JetBrains Mono", monospace; color: var(--text); word-spacing: 4px; margin: 4px 0 14px; }
+.cx-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.cx-btn { padding: 10px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
+.cx-btn.primary { background: var(--cube-yellow); color: #17171f; }
+.cx-btn:disabled { opacity: .5; cursor: default; }
+.cx-insp { display: grid; place-items: center; margin: 14px auto 4px; width: 110px; height: 110px; border-radius: 50%; border: 6px solid var(--border); font: 900 34px "JetBrains Mono", monospace; color: var(--text); }
+.cx-insp.run { border-color: var(--cube-green); }
+.cx-insp.warn { border-color: var(--cube-orange, #ff7a1a); }
+.cx-insp.over { border-color: var(--cube-red); color: var(--cube-red); font-size: 18px; }
+.cx-result { margin-top: 14px; display: none; text-align: center; }
+.cx-result.show { display: block; }
+.cx-len { font-size: 18px; font-weight: 900; color: var(--text); }
+.cx-len b { color: var(--primary); }
+.cx-sols { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
+.cx-sols li { font: 800 17px "JetBrains Mono", monospace; color: var(--primary); background: var(--surface-soft); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 12px; }
+.cx-check h3 { font-size: 16px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
+.cx-check-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.cx-check input { flex: 1; min-width: 200px; padding: 10px 12px; border-radius: 12px; border: var(--card-bw) solid var(--border); background: var(--surface-soft); color: var(--text); font: 700 15px "JetBrains Mono", monospace; }
+.cx-msg { margin-top: 8px; font-weight: 800; font-size: 14px; min-height: 20px; }
+.cx-msg.ok { color: var(--cube-green); }
+.cx-msg.bad { color: var(--cube-red); }
+.cx-stats { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; font-size: 13px; color: var(--text-soft); font-weight: 700; }
+@media (max-width: 520px) { .cx-head h1 { font-size: 30px; } .cx-scr { font-size: 19px; } .box { padding: 14px; } }
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<header class="cx-head">
+    <span class="badge" data-i18n="badge">CROSS ANTRENÖRÜ</span>
+    <h1><span data-i18n="title">Cross</span> <span data-i18n="title_accent">Antrenörü</span></h1>
+    <p data-i18n="intro">Karıştırmayı uygula, 15 saniyelik incelemede beyaz artının tamamını planla. Sonra en kısa çözümle karşılaştır.</p>
+</header>
+
+<div class="cx-wrap">
+    <section class="box">
+        <div class="cx-levels" id="cxLevels" role="tablist">
+            <button type="button" class="cx-lvl active" data-l="all" data-i18n="lvl_all">Hepsi</button>
+            <button type="button" class="cx-lvl" data-l="easy" data-i18n="lvl_easy">Kolay (≤5)</button>
+            <button type="button" class="cx-lvl" data-l="mid" data-i18n="lvl_mid">Orta (6)</button>
+            <button type="button" class="cx-lvl" data-l="hard" data-i18n="lvl_hard">Zor (7–8)</button>
+        </div>
+    </section>
+    <section class="box">
+        <p class="cx-tip" data-i18n="tip">Sarı üstte, yeşil önde tut. Beyaz artı altta kurulur.</p>
+        <div class="cx-scr" id="cxScr" dir="ltr">…</div>
+        <div class="cx-row">
+            <button type="button" class="cx-btn primary" id="cxInsp" data-i18n="insp">⏱ 15 sn inceleme</button>
+            <button type="button" class="cx-btn" id="cxLen" data-i18n="show_len">Kaç hamle?</button>
+            <button type="button" class="cx-btn" id="cxSol" data-i18n="show_sol">Çözümü göster</button>
+            <button type="button" class="cx-btn" id="cxNew" data-i18n="new">Yeni karıştırma →</button>
+        </div>
+        <div class="cx-insp" id="cxTimer" dir="ltr" hidden>15</div>
+        <div class="cx-result" id="cxResult">
+            <div class="cx-len" id="cxLenText"></div>
+            <ul class="cx-sols" id="cxSols" dir="ltr"></ul>
+        </div>
+    </section>
+    <section class="box cx-check">
+        <h3 data-i18n="check_title">Kendi çözümünü kontrol et</h3>
+        <div class="cx-check-row">
+            <input id="cxMine" dir="ltr" autocomplete="off" spellcheck="false" placeholder="ör. F R' D2 L">
+            <button type="button" class="cx-btn primary" id="cxCheck" data-i18n="check">Kontrol et</button>
+        </div>
+        <div class="cx-msg" id="cxMsg" role="status" aria-live="polite"></div>
+    </section>
+    <div class="cx-stats" id="cxStats"></div>
+</div>
+
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script src="/js/cross-solver.js?v=20261053"></script>
+<script>var PAGE_ID = "cross";</script>
+<script src="/js/i18n.js?v=20261053"></script>
+<script src="/js/common.js?v=20261053"></script>
+<script>
+/* Cross antrenörü: rastgele karıştırma, 15 sn inceleme, en kısa beyaz artı çözümü (CrossSolver, tarayıcıda BFS) */
+(function () {
+    var LEVEL_KEY = "cross-level-v1", STATS_KEY = "cross-stats-v1";
+    var level = "all", scr = "", res = null, timer = 0, tEnd = 0;
+    try { level = localStorage.getItem(LEVEL_KEY) || "all"; } catch (e) {}
+    var stats = (function () { try { return JSON.parse(localStorage.getItem(STATS_KEY)) || { n: 0, opt: 0 }; } catch (e) { return { n: 0, opt: 0 }; } })();
+    function lang() { return localStorage.getItem("site-lang") || "tr"; }
+    function T(k, fb) { var p = (window.SITE_I18N && SITE_I18N.pages.cross) || {}; return (p[lang()] && p[lang()][k]) || (p.tr && p.tr[k]) || fb || k; }
+    function el(id) { return document.getElementById(id); }
+    function okLevel(n) { return level === "all" || (level === "easy" && n <= 5) || (level === "mid" && n === 6) || (level === "hard" && n >= 7); }
+    function newScramble() {
+        var s, r, tries = 0;
+        do { s = CrossSolver.scramble(20); r = CrossSolver.solve(s, 3); tries++; } while (!okLevel(r.length) && tries < 400);
+        scr = s; res = r;
+        el("cxScr").textContent = scr;
+        el("cxResult").classList.remove("show");
+        el("cxSols").innerHTML = ""; el("cxLenText").textContent = "";
+        el("cxMine").value = ""; el("cxMsg").textContent = ""; el("cxMsg").className = "cx-msg";
+        stopTimer(); el("cxTimer").hidden = true;
+    }
+    function showLen() {
+        el("cxResult").classList.add("show");
+        el("cxLenText").innerHTML = T("len", "En kısa çözüm: {n} hamle").replace("{n}", "<b>" + res.length + "</b>");
+    }
+    function showSol() {
+        showLen(); stopTimer();
+        el("cxSols").innerHTML = res.solutions.map(function (s) { return "<li>" + s + "</li>"; }).join("");
+    }
+    function stopTimer() { clearInterval(timer); timer = 0; }
+    function startInsp() {
+        stopTimer();
+        var t = el("cxTimer"); t.hidden = false; t.className = "cx-insp run";
+        tEnd = Date.now() + 15000;
+        function upd() {
+            var left = Math.ceil((tEnd - Date.now()) / 1000);
+            if (left <= 0) { t.className = "cx-insp over"; t.textContent = T("time_up", "Süre doldu"); stopTimer(); return; }
+            t.textContent = left; t.className = "cx-insp " + (left <= 5 ? "warn" : "run");
+        }
+        upd(); timer = setInterval(upd, 200);
+    }
+    function check() {
+        var v = el("cxMine").value.replace(/[’‘`]/g, "'").trim(), m = el("cxMsg");
+        if (!v) return;
+        var d;
+        try { d = CrossSolver.distance(scr + " " + v); } catch (e) { m.className = "cx-msg bad"; m.textContent = T("bad_moves", "Hamleleri okuyamadım. Örnek: F R' D2 L"); return; }
+        var n = v.split(/\s+/).filter(Boolean).length;
+        if (d === 0) {
+            stats.n++; if (n <= res.length) stats.opt++;
+            try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+            m.className = "cx-msg ok";
+            m.textContent = n <= res.length ? T("ok_opt", "✓ Artı çözüldü, {n} hamle: en kısa çözüm!").replace("{n}", n)
+                                            : T("ok_long", "✓ Artı çözüldü, {n} hamle (en kısa {m}).").replace("{n}", n).replace("{m}", res.length);
+            renderStats();
+        } else {
+            m.className = "cx-msg bad"; m.textContent = T("not_solved", "✗ Bu hamlelerden sonra beyaz artı tamam değil.");
+        }
+    }
+    function renderStats() {
+        el("cxStats").textContent = stats.n ? T("stats", "Kontrol edilen çözüm: {n} · en kısa bulunan: {o}").replace("{n}", stats.n).replace("{o}", stats.opt) : "";
+    }
+    function renderLevels() {
+        Array.prototype.forEach.call(document.querySelectorAll(".cx-lvl"), function (b) { b.classList.toggle("active", b.getAttribute("data-l") === level); });
+    }
+    el("cxLevels").addEventListener("click", function (e) {
+        var b = e.target.closest(".cx-lvl"); if (!b) return;
+        level = b.getAttribute("data-l"); try { localStorage.setItem(LEVEL_KEY, level); } catch (err) {}
+        renderLevels(); newScramble();
+    });
+    el("cxInsp").addEventListener("click", startInsp);
+    el("cxLen").addEventListener("click", showLen);
+    el("cxSol").addEventListener("click", showSol);
+    el("cxNew").addEventListener("click", newScramble);
+    el("cxCheck").addEventListener("click", check);
+    el("cxMine").addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+    window.onLanguageApplied = function () { renderStats(); if (el("cxResult").classList.contains("show")) showLen(); };
+    renderLevels(); renderStats();
+    setTimeout(newScramble, 0);
+})();
+</script>
+
+</body>
+</html>
