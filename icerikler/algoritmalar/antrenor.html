@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261089">
+<link rel="stylesheet" href="/styles/common.css?v=20261090">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -531,6 +531,11 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 .cvd-opt.active { border-color: var(--card-border); box-shadow: var(--shadow-sm); background: var(--surface); }
 .cvd-opt span:first-child { flex: 1; line-height: 1.35; }
 .cvd-note { font-size: 12px; color: var(--text-soft); margin: 10px 2px 0; line-height: 1.45; }
+.cvd-h { font-size: 14px; font-weight: 900; margin: 14px 2px 8px; color: var(--text); }
+.cvd-opts.two { grid-template-columns: 1fr 1fr; }
+.hold-sw { display: inline-grid; grid-template-rows: 14px 9px; gap: 2px; flex-shrink: 0; }
+.hold-sw i { display: block; width: 26px; border-radius: 3px; border: 1px solid #17171f; }
+@media (max-width: 420px) { .cvd-opts.two { grid-template-columns: 1fr; } }
 /* PLL TANIMA */
 .rc-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; max-width: 1100px; margin: 0 auto; }
 .rc-stage { display: grid; justify-items: center; gap: 12px; }
@@ -634,7 +639,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <button type="button" class="cvd-open" id="cvdOpen" data-i18n="cvd_btn">🎨 Renkler</button>
 </div>
 
-<div id="toolRecog" data-i18n-scope="tanima" hidden>
+<div id="toolRecog" data-i18n-scope="tanima" data-hold-skip hidden>
 <div class="rc-modes" id="rcModes" role="group">
     <button type="button" class="rc-mode active" data-mode="pll" aria-pressed="true">PLL</button>
     <button type="button" class="rc-mode" data-mode="oll" aria-pressed="false">OLL</button>
@@ -766,8 +771,12 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     <div class="bt-dialog">
         <h3 id="cvdTitle"></h3>
         <p id="cvdIntro"></p>
+        <h4 class="cvd-h" id="holdH"></h4>
+        <div class="cvd-opts two" id="holdOpts"></div>
+        <h4 class="cvd-h" id="cvdH"></h4>
         <div class="cvd-opts" id="cvdOpts"></div>
         <p class="cvd-note" id="cvdNote"></p>
+        <div class="bt-dialog-actions"><button class="btn-sm btn-bt" id="cvdOk" type="button"></button></div>
     </div>
 </div>
 
@@ -814,14 +823,14 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261089"></script>
-<script src="/js/common.js?v=20261089"></script>
+<script src="/js/i18n.js?v=20261090"></script>
+<script src="/js/common.js?v=20261090"></script>
 
 
-<script src="/js/custom-algs.js?v=20261089"></script>
-<script src="/js/cross-solver.js?v=20261089"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261089"></script>
-<script src="/js/recog-trainer.js?v=20261089"></script>
+<script src="/js/custom-algs.js?v=20261090"></script>
+<script src="/js/cross-solver.js?v=20261090"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261090"></script>
+<script src="/js/recog-trainer.js?v=20261090"></script>
 
 <script>
 /* ============================================================
@@ -963,6 +972,11 @@ function T(key) {
     var pages = (window.SITE_I18N && SITE_I18N.pages) || {};
     var p = pages.antrenor || {};
     var d = p[lang()] || {};
+    // Beyaz üst tutuşta renk geçen metinlerin beyaz sürümü ("_w") varsa o kullanılır
+    if (trainerHold() === "w" && key.slice(-2) !== "_w") {
+        var w = d[key + "_w"] || (p.tr && p.tr[key + "_w"]);
+        if (w) return w;
+    }
     if (d[key]) return d[key];
     if (p.tr && p.tr[key]) return p.tr[key];
     return FALLBACK[key] || key;
@@ -1015,7 +1029,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261089").then(function (r) {
+        return fetch(BASE + f + "?v=20261090").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -1105,6 +1119,7 @@ function selectSet(id) {
     document.getElementById("setupBox").classList.toggle("is-gen", !!current.gen);
     renderTabs();
     renderCases();
+    applyHold();
     document.getElementById("holdTip").textContent = T(holdTipKey());
     session = [];
     lastKey = null;
@@ -1473,6 +1488,26 @@ function onLanguageApplied() {
     if (typeof btRenderBar === "function") btRenderBar();
 }
 
+/* ---------------- TUTUŞ (localStorage "trainer-hold-v1": "y" sarı üst | "w" beyaz üst, ikisinde de yeşil önde) ----------------
+   Beyaz üstte: diyagramlar z2 ile görünen renklere çevrilir (sarı<->beyaz, turuncu<->kırmızı; yeşil ve mavi aynı),
+   ipucu metinleri beyaz sürümüyle gösterilir, Bluetooth küp modeli beyaz üst çerçevesinde izlenir.
+   Pyraminx, Skewb ve tanıma bölümü etkilenmez. Karıştırmalar aynıdır (hamleler tutuşa göredir). */
+var HOLD_KEY = "trainer-hold-v1";
+function trainerHold() { try { return localStorage.getItem(HOLD_KEY) === "w" ? "w" : "y"; } catch (e) { return "y"; } }
+function applyHold() {
+    var white = trainerHold() === "w", applies = !(current && (current.puzzle === "pyra" || current.puzzle === "skewb"));
+    window.RA_HOLD_SWAP = white && applies ? { Y: "W", W: "Y", O: "R", R: "O" } : null;
+    window.BT_WHITE_TOP = white;
+    if (typeof raRecolor === "function") raRecolor();
+}
+function setTrainerHold(h) {
+    if (h === trainerHold()) return;
+    try { localStorage.setItem(HOLD_KEY, h === "w" ? "w" : "y"); } catch (e) {}
+    applyHold();
+    if (current) document.getElementById("holdTip").textContent = T(holdTipKey());
+    if (typeof btHoldChanged === "function") btHoldChanged();
+}
+
 /* ---------------- RENK KÖRLÜĞÜ SORUSU ----------------
    İlk girişte sorulur (localStorage "cvd-asked"); seçim common.js applyCvd ile tüm sitede geçerli. */
 function ctext(k) {
@@ -1480,12 +1515,21 @@ function ctext(k) {
     return (c[lang()] && c[lang()][k]) || (c.tr && c.tr[k]) || k;
 }
 function renderCvdModal() {
-    var cur = cvdTheme();
-    document.getElementById("cvdTitle").textContent = ctext("cvd_q");
-    document.getElementById("cvdIntro").textContent = ctext("cvd_q_p");
+    var cur = cvdTheme(), asked = localStorage.getItem("cvd-asked"), hold = trainerHold();
+    document.getElementById("cvdTitle").textContent = T("colors_title");
+    document.getElementById("cvdIntro").textContent = T("colors_intro");
+    document.getElementById("holdH").textContent = T("hold_h");
+    document.getElementById("cvdH").textContent = ctext("cvd_q");
     document.getElementById("cvdNote").textContent = ctext("cvd_note");
-    document.getElementById("cvdOpts").innerHTML = [["", "cvd_none"], ["rg", "cvd_rg"], ["tri", "cvd_tri"]].map(function (o) {
-        return '<button type="button" class="cvd-opt' + (cur === o[0] && localStorage.getItem("cvd-asked") ? " active" : "") + '" data-cvd="' + o[0] + '"><span>' + esc(ctext(o[1])) + '</span>' + cvdSwatches(o[0]) + '</button>';
+    document.getElementById("cvdOk").textContent = T("colors_ok");
+    var pal = CVD_PALETTES[cur] || null;
+    function sw(top, front) { return '<span class="hold-sw" aria-hidden="true"><i style="background:' + top + '"></i><i style="background:' + front + '"></i></span>'; }
+    var Y = pal ? pal.Y : NORMAL_SWATCH.Y, G = pal ? pal.G : NORMAL_SWATCH.G;
+    document.getElementById("holdOpts").innerHTML = [["y", "hold_y", Y], ["w", "hold_w", NORMAL_SWATCH.W]].map(function (o) {
+        return '<button type="button" class="cvd-opt' + (hold === o[0] ? " active" : "") + '" data-hold="' + o[0] + '"><span>' + esc(T(o[1])) + '</span>' + sw(o[2], G) + '</button>';
+    }).join("");
+    document.getElementById("cvdOpts").innerHTML = [["", "cvd_none"], ["pro", "cvd_pro"], ["deu", "cvd_deu"], ["rg", "cvd_rg"], ["tri", "cvd_tri"]].map(function (o) {
+        return '<button type="button" class="cvd-opt' + (cur === o[0] && (asked || cur) ? " active" : "") + '" data-cvd="' + o[0] + '"><span>' + esc(ctext(o[1])) + '</span>' + cvdSwatches(o[0]) + '</button>';
     }).join("");
 }
 function openCvdModal() { renderCvdModal(); document.getElementById("cvdModal").classList.add("show"); }
@@ -1496,9 +1540,17 @@ function closeCvdModal() {
 document.getElementById("cvdOpts").addEventListener("click", function (e) {
     var b = e.target.closest(".cvd-opt");
     if (!b) return;
+    try { localStorage.setItem("cvd-asked", "1"); } catch (e2) {}
     applyCvd(b.getAttribute("data-cvd"));
-    closeCvdModal();
+    renderCvdModal();
 });
+document.getElementById("holdOpts").addEventListener("click", function (e) {
+    var b = e.target.closest(".cvd-opt");
+    if (!b) return;
+    setTrainerHold(b.getAttribute("data-hold"));
+    renderCvdModal();
+});
+document.getElementById("cvdOk").addEventListener("click", closeCvdModal);
 document.getElementById("cvdModal").addEventListener("click", function (e) { if (e.target === this) closeCvdModal(); });
 document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.getElementById("cvdModal").classList.contains("show")) closeCvdModal(); });
 document.getElementById("cvdOpen").addEventListener("click", openCvdModal);
