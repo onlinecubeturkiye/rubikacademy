@@ -8623,7 +8623,7 @@ alg5: {
                 hint_running: "Bitince herhangi bir tuşa ya da kutuya dokun.",
                 hint_done: "Tekrar çözmek için yine basılı tut.",
                 note_done: "Bugünün resmi sonucu kaydedildi. İstersen tekrar çözebilirsin; yeni denemeler kaydedilmez.",
-                note_first: "İlk tamamladığın deneme bugünün resmi sonucu olur.",
+                note_first: "Tek hakkın var: ilk tamamladığın çözüm bugünün sonucu olur.",
                 no_hist: "Henüz sonuç yok.",
                 share_txt: "Rubik Academy · Günün Karıştırması",
                 copied: "Kopyalandı ✓",
@@ -8652,7 +8652,9 @@ alg5: {
                 bd_alg1000: "Antrenörde 1000 case çöz",
                 bd_recog200: "Tanıma antrenöründe 200 cevap ver",
                 bd_pll: "21 PLL'in hepsini \"Biliyorum\" yap",
-                bd_oll: "57 OLL'un hepsini \"Biliyorum\" yap"
+                bd_oll: "57 OLL'un hepsini \"Biliyorum\" yap",
+                done_h: "Bugünü tamamladın! 🎉",
+                next_in: "Yeni karıştırmaya kalan süre:"
             },
             en: {
                 back_btn: "← Back",
@@ -8680,7 +8682,7 @@ alg5: {
                 hint_running: "Press any key or tap the box when you finish.",
                 hint_done: "Hold again to solve once more.",
                 note_done: "Today's official result is saved. You can solve again if you like; new attempts are not saved.",
-                note_first: "Your first completed attempt becomes today's official result.",
+                note_first: "You get one attempt: your first completed solve is today's result.",
                 no_hist: "No results yet.",
                 share_txt: "Rubik Academy · Scramble of the Day",
                 copied: "Copied ✓",
@@ -8709,7 +8711,9 @@ alg5: {
                 bd_alg1000: "Solve 1000 cases in the trainer",
                 bd_recog200: "Give 200 answers in the recognition trainer",
                 bd_pll: "Mark all 21 PLLs as \"Known\"",
-                bd_oll: "Mark all 57 OLLs as \"Known\""
+                bd_oll: "Mark all 57 OLLs as \"Known\"",
+                done_h: "You finished today! 🎉",
+                next_in: "New scramble in:"
             },
             fr: {
                 back_btn: "← Retour",
@@ -8737,7 +8741,7 @@ alg5: {
                 hint_running: "Appuie sur une touche ou touche la zone quand tu as fini.",
                 hint_done: "Maintiens à nouveau pour refaire une résolution.",
                 note_done: "Le résultat officiel du jour est enregistré. Tu peux refaire une résolution ; les nouveaux essais ne sont pas enregistrés.",
-                note_first: "Ton premier essai terminé devient le résultat officiel du jour.",
+                note_first: "Tu as un seul essai : ta première résolution terminée est le résultat du jour.",
                 no_hist: "Pas encore de résultat.",
                 share_txt: "Rubik Academy · Mélange du jour",
                 copied: "Copié ✓",
@@ -8766,7 +8770,9 @@ alg5: {
                 bd_alg1000: "Résous 1000 cas dans l'entraîneur",
                 bd_recog200: "Donne 200 réponses dans l'entraîneur de reconnaissance",
                 bd_pll: "Marque les 21 PLL comme « Je sais »",
-                bd_oll: "Marque les 57 OLL comme « Je sais »"
+                bd_oll: "Marque les 57 OLL comme « Je sais »",
+                done_h: "Tu as terminé pour aujourd'hui ! 🎉",
+                next_in: "Nouveau mélange dans :"
             },
             ru: {
                 back_btn: "← Назад",
@@ -8794,7 +8800,7 @@ alg5: {
                 hint_running: "Когда соберёшь, нажми любую клавишу или коснись поля.",
                 hint_done: "Удерживай снова, чтобы собрать ещё раз.",
                 note_done: "Официальный результат дня сохранён. Можешь собрать ещё раз; новые попытки не сохраняются.",
-                note_first: "Первая завершённая попытка станет официальным результатом дня.",
+                note_first: "У тебя одна попытка: первая завершённая сборка станет результатом дня.",
                 no_hist: "Пока нет результатов.",
                 share_txt: "Rubik Academy · Скрамбл дня",
                 copied: "Скопировано ✓",
@@ -8823,7 +8829,9 @@ alg5: {
                 bd_alg1000: "Реши 1000 случаев в тренажёре",
                 bd_recog200: "Дай 200 ответов в тренажёре распознавания",
                 bd_pll: "Отметь все 21 PLL как «Знаю»",
-                bd_oll: "Отметь все 57 OLL как «Знаю»"
+                bd_oll: "Отметь все 57 OLL как «Знаю»",
+                done_h: "Сегодня всё готово! 🎉",
+                next_in: "Новый скрамбл через:"
             },
             de: {
                 back_btn: "← Zurück",
@@ -8851,7 +8859,7 @@ alg5: {
                 hint_running: "Drück eine Taste oder tippe auf das Feld, wenn du fertig bist.",
                 hint_done: "Zum erneuten Lösen wieder gedrückt halten.",
                 note_done: "Das heutige offizielle Ergebnis ist gespeichert. Du kannst noch einmal lösen; neue Versuche werden nicht gespeichert.",
-                note_first: "Dein erster abgeschlossener Versuch wird das offizielle Tagesergebnis.",
+                note_first: "Du hast einen Versuch: Dein erster abgeschlossener Solve ist das heutige Ergebnis.",
                 no_hist: "Noch keine Ergebnisse.",
                 share_txt: "Rubik Academy · Scramble des Tages",
                 copied: "Kopiert ✓",
@@ -8880,7 +8888,9 @@ alg5: {
                 bd_alg1000: "Löse 1000 Fälle im Trainer",
                 bd_recog200: "Gib 200 Antworten im Erkennungstrainer",
                 bd_pll: "Markiere alle 21 PLLs als „Kann ich“",
-                bd_oll: "Markiere alle 57 OLLs als „Kann ich“"
+                bd_oll: "Markiere alle 57 OLLs als „Kann ich“",
+                done_h: "Heute geschafft! 🎉",
+                next_in: "Neuer Scramble in:"
             },
             ar: {
                 back_btn: "→ رجوع",
@@ -8908,7 +8918,7 @@ alg5: {
                 hint_running: "عند الانتهاء اضغط أي مفتاح أو المس المربع.",
                 hint_done: "اضغط مطوّلاً مرة أخرى لتحلّ من جديد.",
                 note_done: "حُفظت نتيجة اليوم الرسمية. يمكنك الحل مرة أخرى؛ المحاولات الجديدة لا تُحفظ.",
-                note_first: "أول محاولة تُكملها تصبح نتيجة اليوم الرسمية.",
+                note_first: "لديك محاولة واحدة: أول حل تُكمله هو نتيجة اليوم.",
                 no_hist: "لا توجد نتائج بعد.",
                 share_txt: "Rubik Academy · خلط اليوم",
                 copied: "تم النسخ ✓",
@@ -8937,7 +8947,9 @@ alg5: {
                 bd_alg1000: "حلّ 1000 حالة في المدرّب",
                 bd_recog200: "قدّم 200 إجابة في مدرّب التعرّف",
                 bd_pll: "علّم كل حالات PLL الـ21 بـ«أعرف»",
-                bd_oll: "علّم كل حالات OLL الـ57 بـ«أعرف»"
+                bd_oll: "علّم كل حالات OLL الـ57 بـ«أعرف»",
+                done_h: "أنهيت تحدّي اليوم! 🎉",
+                next_in: "الخلط الجديد بعد:"
             }
         },
         hiz: {

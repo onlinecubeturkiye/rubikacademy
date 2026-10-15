@@ -57,7 +57,7 @@
 .p-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
 .p-links a { padding: 9px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 800; font-size: 14px; box-shadow: var(--shadow-sm); text-decoration: none; }
 .p-links a:hover { background: var(--cube-yellow); color: #17171f; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); text-decoration: none; }
 .btn:hover { background: var(--surface-soft); }
 .btn.primary { background: var(--cube-yellow); color: #17171f; }
 .btn:disabled { opacity: .5; cursor: default; }
@@ -66,9 +66,13 @@
 .d-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 22px; align-items: start; }
 .d-top { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .d-date { font-weight: 800; color: var(--text-soft); font-size: 14px; text-transform: capitalize; }
-.d-pzs { display: inline-flex; gap: 6px; }
-.d-pz { padding: 6px 14px; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 13px Inter, sans-serif; cursor: pointer; }
-.d-pz.active { background: var(--cube-yellow); color: #17171f; }
+#dPlay[hidden], #dDone[hidden] { display: none !important; }
+.d-pz-tag { padding: 5px 12px; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--cube-yellow); color: #17171f; font: 900 13px Inter, sans-serif; }
+.d-done { text-align: center; padding: 18px 8px 6px; }
+.d-done-h { font: 900 22px Inter, sans-serif; color: var(--text); }
+.d-done-time { font: 800 clamp(54px, 10vw, 84px)/1.1 "JetBrains Mono", monospace; color: var(--text); margin: 10px 0 6px; }
+.d-done .d-off { justify-content: center; }
+.d-done .d-note b { font-family: "JetBrains Mono", monospace; color: var(--text); }
 .d-scr { display: block; padding: 14px 16px; border-radius: 14px; background: var(--surface-soft); border: 1.5px solid var(--border); font: 800 19px/1.6 "JetBrains Mono", monospace; color: var(--text); word-spacing: 4px; text-align: center; }
 .d-timer-box { margin-top: 14px; padding: 26px 12px 18px; border-radius: 18px; border: var(--card-bw) solid var(--ink); background: var(--surface); text-align: center; cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: none; }
 .d-timer { font: 800 clamp(54px, 10vw, 84px)/1 "JetBrains Mono", monospace; color: var(--text); }
@@ -76,7 +80,6 @@
 .d-timer-box[data-state="ready"] .d-timer { color: var(--cube-green); }
 .d-hint { margin-top: 10px; font-size: 13.5px; font-weight: 700; color: var(--text-soft); }
 .d-off { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
-.d-off b { font: 800 18px "JetBrains Mono", monospace; color: var(--text); margin-inline-end: auto; }
 .d-off .btn { padding: 7px 12px; font-size: 13px; }
 .d-off .btn.on { background: var(--cube-red); color: #fff; }
 .d-note { margin-top: 10px !important; font-size: 13px !important; }
@@ -163,27 +166,30 @@
 </section>
 
 <section class="box">
-    <div class="d-top"><span class="d-date" id="dDate"></span>
-        <div class="d-pzs"><button type="button" class="d-pz active" data-pz="333">3x3</button><button type="button" class="d-pz" data-pz="222">2x2</button></div></div>
-    <div class="d-grid">
+    <div class="d-top"><span class="d-date" id="dDate"></span><span class="d-pz-tag">3x3</span></div>
+    <div class="d-grid" id="dPlay">
         <div>
             <code class="d-scr" id="dScr" dir="ltr"></code>
             <div class="d-timer-box" id="dTimerBox" data-state="idle" role="button" tabindex="0">
                 <div class="d-timer" id="dTimer" dir="ltr">0.00</div>
                 <div class="d-hint" id="dHint"></div>
             </div>
-            <div class="d-off" id="dOfficial" hidden>
-                <span data-i18n="official">Bugünün sonucu:</span><b id="dOffTime" dir="ltr"></b>
-                <button type="button" class="btn" id="dPen2">+2</button>
-                <button type="button" class="btn" id="dPenDnf">DNF</button>
-                <button type="button" class="btn primary" id="dShare" data-i18n="share">📤 Paylaş</button>
-            </div>
-            <p class="d-note" id="dNote"></p>
+            <p class="d-note" data-i18n="note_first">Tek hakkın var: ilk tamamladığın çözüm bugünün sonucu olur.</p>
         </div>
         <div>
             <h3 class="side-h" data-i18n="preview">Karıştırılmış hali (sarı üstte, yeşil önde)</h3>
             <div class="dnet" id="dNet" dir="ltr"></div>
         </div>
+    </div>
+    <div class="d-done" id="dDone" hidden>
+        <div class="d-done-h" data-i18n="done_h">Bugünü tamamladın! 🎉</div>
+        <div class="d-done-time" id="dOffTime" dir="ltr"></div>
+        <div class="d-off">
+            <button type="button" class="btn" id="dPen2">+2</button>
+            <button type="button" class="btn" id="dPenDnf">DNF</button>
+            <button type="button" class="btn primary" id="dShare" data-i18n="share">📤 Paylaş</button>
+        </div>
+        <p class="d-note"><span data-i18n="next_in">Yeni karıştırmaya kalan süre:</span> <b id="dCountdown" dir="ltr"></b></p>
     </div>
 </section>
 

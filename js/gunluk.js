@@ -1,15 +1,15 @@
 /* =========================================================
    GÜNÜN KARIŞTIRMASI + SERİ + ROZETLER (gunluk.js)
    - Karıştırma tarihten üretilir: herkes aynı gün aynı karıştırmayı görür
-   - İlk tamamlanan deneme o günün resmi sonucu olur ("daily-results-v1")
+   - Tek hak: ilk tamamlanan deneme o günün sonucu olur ("daily-results-v1"),
+     sonra karıştırma ve timer ertesi güne kadar gizlenir
    - Seri ve rozetler streak.js ve sitedeki ilerleme kayıtlarından hesaplanır
 ========================================================= */
 (function () {
-    var RES_KEY = "daily-results-v1", PZ_KEY = "daily-puzzle-v1";
+    var RES_KEY = "daily-results-v1";
     var COLOR = { U: "#f6c719", R: "#ff7a1a", F: "#179e4f", D: "#eef2f3", L: "#d12d28", B: "#2c6fe6" };
     var NET = [["U", 1, 0], ["L", 0, 1], ["F", 1, 1], ["R", 2, 1], ["B", 3, 1], ["D", 1, 2]];
     var puzzle = "333";
-    try { if (localStorage.getItem(PZ_KEY) === "222") puzzle = "222"; } catch (e) {}
     function $(id) { return document.getElementById(id); }
     function lang() { try { return localStorage.getItem("site-lang") || "tr"; } catch (e) { return "tr"; } }
     function T(k, fb) { var p = (window.SITE_I18N && SITE_I18N.pages.gunluk) || {}; return (p[lang()] && p[lang()][k]) || (p.tr && p.tr[k]) || fb || k; }
@@ -23,11 +23,6 @@
     function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
     function scramble(day, pz) {
         var r = rng(hash("rubikacademy:" + pz + ":" + day)), sfx = ["", "'", "2"], out = [];
-        if (pz === "222") {
-            var f2 = "RUF", last2 = -1;
-            while (out.length < 10) { var g = Math.floor(r() * 3); if (g === last2) continue; out.push(f2[g] + sfx[Math.floor(r() * 3)]); last2 = g; }
-            return out.join(" ");
-        }
         var faces = "URFDLB", last = -1, prev = -1;
         while (out.length < 20) {
             var f = Math.floor(r() * 6);
@@ -36,13 +31,13 @@
         }
         return out.join(" ");
     }
-    function drawNet(alg, pz) {
+    function drawNet(alg) {
         var c = new Cube(); c.move(alg);
-        var s = c.asString(), html = "", idx = pz === "222" ? [0, 2, 6, 8] : [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        var s = c.asString(), html = "";
         NET.forEach(function (n) {
             var fi = "URFDLB".indexOf(n[0]);
-            html += '<div class="dn-f' + (pz === "222" ? " two" : "") + '" style="grid-column:' + (n[1] + 1) + ';grid-row:' + (n[2] + 1) + '">';
-            idx.forEach(function (i) { html += '<i style="background:' + COLOR[s[fi * 9 + i]] + '"></i>'; });
+            html += '<div class="dn-f" style="grid-column:' + (n[1] + 1) + ';grid-row:' + (n[2] + 1) + '">';
+            for (var i = 0; i < 9; i++) html += '<i style="background:' + COLOR[s[fi * 9 + i]] + '"></i>';
             html += "</div>";
         });
         $("dNet").innerHTML = html;
@@ -56,12 +51,12 @@
     function setState(s) { state = s; $("dTimerBox").setAttribute("data-state", s); $("dHint").textContent = T("hint_" + s); }
     function press() {
         if (state === "running") { stop(); return; }
-        if (state !== "idle" && state !== "done") return;
+        if (state !== "idle" || official()) return;
         setState("hold"); show(0);
         holdT = setTimeout(function () { if (state === "hold") setState("ready"); }, 300);
     }
     function release() {
-        if (state === "hold") { clearTimeout(holdT); setState(last ? "done" : "idle"); if (last) show(last); return; }
+        if (state === "hold") { clearTimeout(holdT); setState("idle"); return; }
         if (state === "ready") { setState("running"); t0 = performance.now(); tick(); }
     }
     function stop() {
@@ -79,21 +74,31 @@
     function value(r) { if (!r) return null; if (r.pen === "dnf") return Infinity; return r.t + (r.pen === "+2" ? 2000 : 0); }
     function label(r) { if (!r) return "-"; if (r.pen === "dnf") return "DNF"; return fmt(value(r)) + (r.pen === "+2" ? "+" : ""); }
     function renderToday() {
-        var day = today(), scr = scramble(day, puzzle);
+        var day = today();
         var d = new Date(), loc = { tr: "tr-TR", en: "en-GB", fr: "fr-FR", ru: "ru-RU", de: "de-DE", ar: "ar" }[lang()] || "tr-TR";
         $("dDate").textContent = d.toLocaleDateString(loc, { day: "numeric", month: "long", year: "numeric", weekday: "long" });
-        $("dScr").textContent = scr;
-        drawNet(scr, puzzle);
-        Array.prototype.forEach.call(document.querySelectorAll(".d-pz"), function (b) { var on = b.getAttribute("data-pz") === puzzle; b.classList.toggle("active", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
         var r = official();
-        $("dOfficial").hidden = !r;
+        // Çözüldüyse karıştırma ve timer ertesi güne kadar gizlenir
+        $("dPlay").hidden = !!r; $("dDone").hidden = !r;
         if (r) {
+            $("dScr").textContent = ""; $("dNet").innerHTML = "";
             $("dOffTime").textContent = label(r);
             $("dPen2").classList.toggle("on", r.pen === "+2");
             $("dPenDnf").classList.toggle("on", r.pen === "dnf");
+            tickCountdown();
+        } else {
+            var scr = scramble(day, puzzle);
+            $("dScr").textContent = scr; drawNet(scr);
+            if (state !== "running" && state !== "hold" && state !== "ready") { show(0); setState("idle"); }
         }
-        if (state !== "running" && state !== "hold" && state !== "ready") { show(r ? value(r) === Infinity ? null : value(r) : 0); if (r && r.pen === "dnf") $("dTimer").textContent = "DNF"; setState(r ? "done" : "idle"); last = r ? r.t : 0; }
-        $("dNote").textContent = r ? T("note_done", "Bugünün resmi sonucu kaydedildi. İstersen tekrar çözebilirsin; yeni denemeler kaydedilmez.") : T("note_first", "İlk tamamladığın deneme bugünün resmi sonucu olur.");
+    }
+    var cdTimer = 0, shownDay = null;
+    function tickCountdown() {
+        clearTimeout(cdTimer);
+        var now = new Date(), mid = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1), s = Math.max(0, Math.round((mid - now) / 1000));
+        var p = function (n) { return (n < 10 ? "0" : "") + n; };
+        $("dCountdown").textContent = p(Math.floor(s / 3600)) + ":" + p(Math.floor(s / 60) % 60) + ":" + p(s % 60);
+        cdTimer = setTimeout(function () { if (today() !== shownDay) { shownDay = today(); renderAll(); } else tickCountdown(); }, 1000);
     }
     function renderStreak() {
         $("sCur").textContent = Streak.current();
@@ -120,7 +125,6 @@
         ["days10", "📅", function (t) { return t.days >= 10; }],
         ["sub30", "⚡", function () { return bestDaily("333") < 30000; }],
         ["sub20", "🚀", function () { return bestDaily("333") < 20000; }],
-        ["sub5_2", "🎯", function () { return bestDaily("222") < 5000; }],
         ["alg100", "🧠", function (t) { return t.alg >= 100; }],
         ["alg1000", "🤖", function (t) { return t.alg >= 1000; }],
         ["recog200", "👁", function (t) { return t.recog >= 200; }],
@@ -140,18 +144,18 @@
         var res = loadRes(), rows = Object.keys(res).filter(function (k) { return k.split(":")[1] === puzzle; }).sort().reverse().slice(0, 7);
         $("hList").innerHTML = rows.length ? rows.map(function (k) { return '<div class="h-row"><span>' + esc(k.split(":")[0]) + '</span><b>' + esc(label(res[k])) + '</b></div>'; }).join("") : '<p class="h-empty">' + esc(T("no_hist", "Henüz sonuç yok.")) + '</p>';
     }
-    function renderAll() { renderToday(); renderStreak(); renderBadges(); renderHistory(); }
+    function renderAll() { shownDay = today(); renderToday(); renderStreak(); renderBadges(); renderHistory(); }
 
     function setPen(p) {
         var res = loadRes(), key = today() + ":" + puzzle; if (!res[key]) return;
-        res[key].pen = res[key].pen === p ? "" : p; saveRes(res); state = "idle"; renderAll();
+        res[key].pen = res[key].pen === p ? "" : p; saveRes(res); renderAll();
     }
     function share() {
         var r = official(); if (!r) return;
-        var txt = T("share_txt", "Rubik Academy · Günün Karıştırması") + " (" + (puzzle === "222" ? "2x2" : "3x3") + ", " + today() + "): " + label(r) + " ⏱️ · 🔥 " + Streak.current() + "\nhttps://rubikacademy.fun/icerikler/gunluk";
+        var txt = T("share_txt", "Rubik Academy · Günün Karıştırması") + " (3x3, " + today() + "): " + label(r) + " ⏱️ · 🔥 " + Streak.current() + "\nhttps://rubikacademy.fun/icerikler/gunluk";
         var done = function () { $("dShare").textContent = T("copied", "Kopyalandı ✓"); setTimeout(function () { $("dShare").textContent = T("share", "📤 Paylaş"); }, 1600); };
         if (navigator.share) { navigator.share({ text: txt }).catch(function () {}); return; }
-        if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, function () {}); 
+        if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, function () {});
     }
 
     function init() {
@@ -166,11 +170,6 @@
         box.addEventListener("touchend", function (e) { e.preventDefault(); release(); }, { passive: false });
         box.addEventListener("mousedown", function () { press(); });
         box.addEventListener("mouseup", function () { release(); });
-        document.querySelector(".d-pzs").addEventListener("click", function (e) {
-            var b = e.target.closest(".d-pz"); if (!b || state === "running") return;
-            puzzle = b.getAttribute("data-pz"); try { localStorage.setItem(PZ_KEY, puzzle); } catch (x) {}
-            state = "idle"; last = 0; renderAll(); b.blur();
-        });
         $("dPen2").addEventListener("click", function () { setPen("+2"); });
         $("dPenDnf").addEventListener("click", function () { setPen("dnf"); });
         $("dShare").addEventListener("click", share);
