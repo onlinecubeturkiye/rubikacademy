@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261081">
+<link rel="stylesheet" href="/styles/common.css?v=20261082">
 
 <style>
 .hero {
@@ -383,12 +383,12 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "alg5";</script>
-<script src="/js/i18n.js?v=20261081"></script>
-<script src="/js/common.js?v=20261081"></script>
-<script src="/js/firebase-config.js?v=20261081"></script>
-<script src="/js/account.js?v=20261081"></script>
-<script src="/js/custom-algs.js?v=20261081"></script>
-<script src="/js/alg-player.js?v=20261081"></script>
+<script src="/js/i18n.js?v=20261082"></script>
+<script src="/js/common.js?v=20261082"></script>
+<script src="/js/firebase-config.js?v=20261082"></script>
+<script src="/js/account.js?v=20261082"></script>
+<script src="/js/custom-algs.js?v=20261082"></script>
+<script src="/js/alg-player.js?v=20261082"></script>
 
 <script>
 /* ============================================================
@@ -505,7 +505,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/5x5.json?v=20261081")
+fetch("/icerikler/algoritmalar/5x5.json?v=20261082")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
