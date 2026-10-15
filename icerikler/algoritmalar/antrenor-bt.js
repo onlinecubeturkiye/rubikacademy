@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261069";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261070";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -137,6 +137,7 @@
     }
     function isF2L(s) { return s.p[1] < 1; }
     function isTopFace(s) { return s.n[1] === 1; }
+    function isTopEdgeUp(s) { return s.n[1] === 1 && (s.p[0] === 0 || s.p[2] === 0); } // üst yüzün artısı (merkez + 4 kenar)
     function isTopCorner(s) { return s.p[1] === 1 && s.p[0] !== 0 && s.p[2] !== 0; }
     // Beyaz artı (sarı üst tutuşta alt yüz): alt merkez, 4 alt kenar ve yanlardaki eşleri
     function isCrossSt(s) { return s.p[1] === -1 && (s.p[0] === 0 || s.p[2] === 0); }
@@ -180,6 +181,10 @@
         if (id === "coll") return matches(model, isF2L) && matches(model, isTopFace) && upToAUF(model, isTopCorner);
         if (id === "pll") return upToAUF(model, function () { return true; });
         if (id === "cross") return matches(model, isCrossSt);
+        // 2-Look: alt kümeye göre adımın bittiği an
+        var sub = (typeof curCase !== "undefined" && curCase) ? curCase.subset : "";
+        if (id === "2look-2lo") return matches(model, isF2L) && matches(model, sub === "lo_e" ? isTopEdgeUp : isTopFace);
+        if (id === "2look-2lp") return sub === "lp_c" ? (matches(model, isF2L) && upToAUF(model, isTopCorner)) : upToAUF(model, function () { return true; });
         if (id === "roux-cmll") return rouxDone(model, false);
         if (id === "roux-eo") return rouxDone(model, true);
         return isSolved(model);

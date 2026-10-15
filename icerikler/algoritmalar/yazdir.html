@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261069">
+<link rel="stylesheet" href="/styles/common.css?v=20261070">
 
 <style>
 .print-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin: 6px 0 14px; }
@@ -168,9 +168,9 @@
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "yazdir";</script>
-<script src="/js/i18n.js?v=20261069"></script>
-<script src="/js/common.js?v=20261069"></script>
-<script src="/js/custom-algs.js?v=20261069"></script>
+<script src="/js/i18n.js?v=20261070"></script>
+<script src="/js/common.js?v=20261070"></script>
+<script src="/js/custom-algs.js?v=20261070"></script>
 
 <script>
 /* A4 algoritma kağıtları. Veriler algoritma sayfalarıyla aynı JSON'lardan gelir.
@@ -201,13 +201,15 @@ function pairSvg(c) { return ortegaSvg(c.pattern_u, "full", 60) + ortegaSvg(c.pa
 function key(k) { return function (data) { return flat(data[k]); }; }
 
 var GROUPS = [
-    { label: "3x3", ids: ["oll", "pll", "coll", "wv"] },
+    { label: "3x3", ids: ["2look-2lo", "2look-2lp", "oll", "pll", "coll", "wv"] },
     { label: "2x2", ids: ["ortega-oll", "ortega-pbl", "cll", "eg1", "eg2"] },
     { label: "Pyraminx", ids: ["l3e", "l4e"] },
     { label: "Skewb", ids: ["sk-beginner", "sk-intermediate", "sk-advanced"] },
     { label: "3x3 Roux", ids: ["roux-cmll", "roux-eo"] }
 ];
 var SHEETS = {
+    "2look-2lo": { file: "2look.json", page: "twolook_algos", title: "2-Look OLL", tab: "2-Look OLL", cases: multiSet("2lo"), cols: 3, rows: 4, diag: 30, name: 11, alg: 9.5, sub: true, poly: true, geom: "ll" },
+    "2look-2lp": { file: "2look.json", page: "twolook_algos", title: "2-Look PLL", tab: "2-Look PLL", cases: multiSet("2lp"), cols: 3, rows: 2, diag: 36, name: 12, alg: 10, sub: true, poly: true, geom: "ll" },
     "oll": { file: "oll-pll.json", page: "oll", title: "OLL", tab: "OLL", cases: key("oll"), cols: 5, rows: 12, diag: 15, name: 7, alg: 6.3, sub: true,
              draw: function (x) { return llSvg(x.c.pattern, "oll", 60); } },
     "pll": { file: "oll-pll.json", page: "pll", title: "PLL", tab: "PLL", cases: key("pll"), cols: 3, rows: 7, diag: 27, name: 10, alg: 8.4,
