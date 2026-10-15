@@ -4548,7 +4548,7 @@ antrenor: {
         sel_known: "🟢 Bildiklerim",
         known_none: "Bu sette \"Biliyorum\" olarak işaretlediğin case yok. Algoritma sayfasında case kartlarına tıklayarak işaretleyebilirsin.",
         tool_alg: "🧠 Algoritma",
-        tool_recog: "👁 PLL Tanıma",
+        tool_recog: "👁 Tanıma",
         cross_easy: "Kolay (≤5)",
         cross_mid: "Orta (6)",
         cross_hard: "Zor (7–8)",
@@ -4678,7 +4678,7 @@ antrenor: {
         sel_known: "🟢 Known",
         known_none: "You haven't marked any case in this set as \"Known\". You can mark them by clicking the case cards on the algorithm page.",
         tool_alg: "🧠 Algorithms",
-        tool_recog: "👁 PLL Recognition",
+        tool_recog: "👁 Recognition",
         cross_easy: "Easy (≤5)",
         cross_mid: "Medium (6)",
         cross_hard: "Hard (7–8)",
@@ -4808,7 +4808,7 @@ antrenor: {
         sel_known: "🟢 Je connais",
         known_none: "Tu n'as marqué aucun cas de ce set comme « Je connais ». Tu peux le faire en cliquant sur les cartes de la page d'algorithmes.",
         tool_alg: "🧠 Algorithmes",
-        tool_recog: "👁 Reconnaissance PLL",
+        tool_recog: "👁 Reconnaissance",
         cross_easy: "Facile (≤5)",
         cross_mid: "Moyen (6)",
         cross_hard: "Difficile (7–8)",
@@ -4938,7 +4938,7 @@ antrenor: {
         sel_known: "🟢 Знаю",
         known_none: "В этом наборе нет кейсов, отмеченных как «Знаю». Отметить их можно, нажимая на карточки на странице алгоритмов.",
         tool_alg: "🧠 Алгоритмы",
-        tool_recog: "👁 Распознавание PLL",
+        tool_recog: "👁 Распознавание",
         cross_easy: "Лёгкий (≤5)",
         cross_mid: "Средний (6)",
         cross_hard: "Сложный (7–8)",
@@ -5068,7 +5068,7 @@ antrenor: {
         sel_known: "🟢 Kann ich",
         known_none: "Du hast in diesem Set keinen Fall als „Kann ich“ markiert. Markiere sie durch Klick auf die Fallkarten auf der Algorithmus-Seite.",
         tool_alg: "🧠 Algorithmen",
-        tool_recog: "👁 PLL-Erkennung",
+        tool_recog: "👁 Erkennung",
         cross_easy: "Leicht (≤5)",
         cross_mid: "Mittel (6)",
         cross_hard: "Schwer (7–8)",
@@ -5198,7 +5198,7 @@ antrenor: {
         sel_known: "🟢 أعرفها",
         known_none: "لم تحدد أي حالة في هذه المجموعة على أنها «أعرفها». يمكنك تحديدها بالنقر على بطاقات الحالات في صفحة الخوارزميات.",
         tool_alg: "🧠 الخوارزميات",
-        tool_recog: "👁 التعرف على PLL",
+        tool_recog: "👁 التعرّف",
         cross_easy: "سهل (≤5)",
         cross_mid: "متوسط (6)",
         cross_hard: "صعب (7–8)",
@@ -7161,7 +7161,9 @@ alg5: {
                 was: "Doğrusu:",
                 no_stats: "Henüz deneme yok.",
                 reset_confirm: "Tanıma istatistikleri silinsin mi?",
-                load_err: "Veriler yüklenemedi."
+                load_err: "Veriler yüklenemedi.",
+                intro_oll: "Üstten ve iki yandan bak, hangi OLL olduğunu seç. Sarı olan parçalar gösterilir; diyagramlardan doğrusunu bul.",
+                intro_cll: "2x2 küpün üç yüzüne bak, hangi CLL olduğunu seç. Alt katman çözülmüş; renklerden case'i tanı."
             },
             en: {
                 back_btn: "← Back",
@@ -7180,7 +7182,9 @@ alg5: {
                 was: "It was:",
                 no_stats: "No attempts yet.",
                 reset_confirm: "Delete recognition stats?",
-                load_err: "Couldn't load the data."
+                load_err: "Couldn't load the data.",
+                intro_oll: "Look at the top and two sides, then pick the OLL. Yellow stickers are shown; find the matching diagram.",
+                intro_cll: "Look at three faces of the 2x2 and pick the CLL. The bottom layer is solved; recognise the case from the colours."
             },
             fr: {
                 back_btn: "← Retour",
@@ -7199,7 +7203,9 @@ alg5: {
                 was: "C'était :",
                 no_stats: "Pas encore d'essai.",
                 reset_confirm: "Supprimer les statistiques ?",
-                load_err: "Impossible de charger les données."
+                load_err: "Impossible de charger les données.",
+                intro_oll: "Regarde le dessus et deux côtés, puis choisis l'OLL. Les autocollants jaunes sont affichés ; trouve le bon diagramme.",
+                intro_cll: "Regarde trois faces du 2x2 et choisis le CLL. La couche du bas est résolue ; reconnais le cas grâce aux couleurs."
             },
             ru: {
                 back_btn: "← Назад",
@@ -7218,7 +7224,9 @@ alg5: {
                 was: "Правильно:",
                 no_stats: "Попыток пока нет.",
                 reset_confirm: "Удалить статистику распознавания?",
-                load_err: "Не удалось загрузить данные."
+                load_err: "Не удалось загрузить данные.",
+                intro_oll: "Посмотри на верх и две стороны и выбери OLL. Показаны жёлтые наклейки; найди подходящую схему.",
+                intro_cll: "Посмотри на три грани 2x2 и выбери CLL. Нижний слой собран; узнай случай по цветам."
             },
             de: {
                 back_btn: "← Zurück",
@@ -7237,7 +7245,9 @@ alg5: {
                 was: "Richtig war:",
                 no_stats: "Noch keine Versuche.",
                 reset_confirm: "Erkennungsstatistik löschen?",
-                load_err: "Daten konnten nicht geladen werden."
+                load_err: "Daten konnten nicht geladen werden.",
+                intro_oll: "Schau auf die Oberseite und zwei Seiten und wähle den OLL. Gelbe Sticker werden gezeigt; finde das passende Diagramm.",
+                intro_cll: "Schau auf drei Seiten des 2x2 und wähle den CLL. Die untere Ebene ist gelöst; erkenne den Fall an den Farben."
             },
             ar: {
                 back_btn: "← رجوع",
@@ -7256,7 +7266,9 @@ alg5: {
                 was: "الصحيح:",
                 no_stats: "لا محاولات بعد.",
                 reset_confirm: "حذف إحصاءات التعرّف؟",
-                load_err: "تعذّر تحميل البيانات."
+                load_err: "تعذّر تحميل البيانات.",
+                intro_oll: "انظر إلى الوجه العلوي والجانبين ثم اختر حالة OLL. تظهر الملصقات الصفراء؛ ابحث عن المخطط المطابق.",
+                intro_cll: "انظر إلى ثلاثة أوجه من مكعب 2x2 ثم اختر حالة CLL. الطبقة السفلية محلولة؛ تعرّف على الحالة من الألوان."
             }
         },
         /* İçerikler/Yol haritası — öğrenme yolu (PAGE_ID = "yol") */
