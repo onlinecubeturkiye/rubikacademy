@@ -7679,6 +7679,7 @@ alg5: {
         /* İçerikler/F2L — sezgisel F2L (PAGE_ID = "f2l") */
         f2l: {
             tr: {
+                l_train: "⏱️ F2L antrenöründe çalış",
                 back_btn: "← Geri Dön",
                 badge: "3x3 · CFOP · 2. ADIM",
                 title: "Sezgisel",
@@ -7725,6 +7726,7 @@ alg5: {
                 v4_d: "Köşe ve kenar üstte ama ayrı. Bu hamle kenarı yuvadan uzaklaştırıp köşeyi yanına getirir; çift oluşur ve durum Vaka 2 olur, onunla yerleştir."
             },
             en: {
+                l_train: "⏱️ Practice in the F2L trainer",
                 back_btn: "← Back",
                 badge: "3x3 · CFOP · STEP 2",
                 title: "Intuitive",
@@ -7771,6 +7773,7 @@ alg5: {
                 v4_d: "Corner and edge are on top but apart. This move takes the edge away from the slot and brings the corner next to it; the pair forms and you get Case 2, so insert with it."
             },
             fr: {
+                l_train: "⏱️ S'entraîner au F2L",
                 back_btn: "← Retour",
                 badge: "3x3 · CFOP · ÉTAPE 2",
                 title: "F2L",
@@ -7817,6 +7820,7 @@ alg5: {
                 v4_d: "Le coin et l'arête sont en haut mais séparés. Ce mouvement éloigne l'arête de l'emplacement et amène le coin à côté ; la paire se forme et tu obtiens le cas 2, insère avec lui."
             },
             ru: {
+                l_train: "⏱️ Тренажёр F2L",
                 back_btn: "← Назад",
                 badge: "3x3 · CFOP · ШАГ 2",
                 title: "Интуитивный",
@@ -7863,6 +7867,7 @@ alg5: {
                 v4_d: "Угол и ребро наверху, но отдельно. Это движение уводит ребро от слота и подводит к нему угол; пара собирается и получается случай 2 — вставь им."
             },
             de: {
+                l_train: "⏱️ Im F2L-Trainer üben",
                 back_btn: "← Zurück",
                 badge: "3x3 · CFOP · SCHRITT 2",
                 title: "Intuitives",
@@ -7909,6 +7914,7 @@ alg5: {
                 v4_d: "Ecke und Kante sind oben, aber getrennt. Dieser Zug nimmt die Kante vom Slot weg und bringt die Ecke daneben; das Paar entsteht und du hast Fall 2, setze damit ein."
             },
             ar: {
+                l_train: "⏱️ تدرّب في مدرّب F2L",
                 back_btn: "← رجوع",
                 badge: "3x3 · CFOP · الخطوة 2",
                 title: "F2L",

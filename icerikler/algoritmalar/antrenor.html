@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261072">
+<link rel="stylesheet" href="/styles/common.css?v=20261073">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -798,12 +798,12 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261072"></script>
-<script src="/js/common.js?v=20261072"></script>
-<script src="/js/custom-algs.js?v=20261072"></script>
-<script src="/js/cross-solver.js?v=20261072"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261072"></script>
-<script src="/js/recog-trainer.js?v=20261072"></script>
+<script src="/js/i18n.js?v=20261073"></script>
+<script src="/js/common.js?v=20261073"></script>
+<script src="/js/custom-algs.js?v=20261073"></script>
+<script src="/js/cross-solver.js?v=20261073"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261073"></script>
+<script src="/js/recog-trainer.js?v=20261073"></script>
 
 <script>
 /* ============================================================
@@ -819,6 +819,7 @@ var BASE = "/icerikler/algoritmalar/";
    ("name" = sadece case adı, "subset" = "altgrup::ad") */
 var SETS = [
     { id: "cross",      label: "Cross",      gen: "cross", progress: "algo-progress-cross", keyFmt: "name", page: "", puzzle: "cfop", cube: "3x3", draw: crossDraw },
+    { id: "f2l",        label: "F2L", file: "f2l.json", multi: "f2l", progress: "algo-progress-f2l", keyFmt: "name", page: "f2l", puzzle: "cfop", cube: "3x3", draw: polyDraw },
     { id: "2look-2lo",  label: "2-Look OLL", file: "2look.json", multi: "2lo", progress: "algo-progress-2look-2lo", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
     { id: "2look-2lp",  label: "2-Look PLL", file: "2look.json", multi: "2lp", progress: "algo-progress-2look-2lp", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
     { id: "oll",        label: "OLL",        file: "oll-pll.json",    dataKey: "oll",  progress: "algo-progress-oll",        keyFmt: "name",   page: "oll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
@@ -991,7 +992,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261072").then(function (r) {
+        return fetch(BASE + f + "?v=20261073").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
