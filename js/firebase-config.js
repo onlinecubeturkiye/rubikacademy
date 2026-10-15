@@ -3,6 +3,6 @@
    Bu değerler gizli değildir; güvenlik /firestore.rules dosyasındaki kurallarla sağlanır.
    Boş bırakılırsa sıralama tablosu sayfada görünmez. */
 window.RA_FIREBASE = {
-    apiKey: "",
-    projectId: ""
+    apiKey: "AIzaSyC5veIMb1gZLo4c36HlyCPLn2SeoJy2spI",
+    projectId: "rubikacademydb"
 };
