@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261067";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261068";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -139,6 +139,9 @@
         // Küp x ekseninde dönmüş tutulabilir (M kayıkken merkezler başka yerde): R^r L'^r M^k hepsi denenir
         for (var t = 0; t < 16; t++) {
             var r = t >> 2, k = t & 3;
+            // R^r L'^r = x^r M^r, yani toplam M kayması r+k. EO yalnızca M katmanı düz ya da M2 kaymışken
+            // geçerlidir; çeyrek kaymışken kenarlar bir an "yönlü" görünür ve süre son M'den önce dururdu.
+            if (eo && (r + k) % 2) continue;
             var m = r ? turn(turn(model, "R", r), "L", 4 - r) : model;
             m = normalize(k ? turn(m, "M", k) : m);
             for (var j = 0; j < 4; j++) {
