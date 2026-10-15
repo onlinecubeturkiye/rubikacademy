@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261059";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261060";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -86,6 +86,29 @@
     var IDENT = { U: "U", D: "D", F: "F", B: "B", R: "R", L: "L", inv: { U: "U", D: "D", F: "F", B: "B", R: "R", L: "L" } };
     var hold = IDENT; // karıştırma takibinde tutuş çerçevesi
     var mOdd = false; // Roux EO: M katmanı çeyrek kayık (case değişir)
+    /* Küpün gönderdiği durum (Kociemba sırası URFDLB, küpün kendi beyaz-üst çerçevesinde)
+       -> bizim model (sarı-üst tutuş, z2). Merkezler her zaman sabittir: M kayık bir küp de
+       merkezlere göre doğru raporlanır, böylece sarı merkezi üste almak gerekmez. */
+    var FACELET_POS = {
+        U: function (r, c) { return [[c - 1, 1, r - 1], [0, 1, 0]]; },
+        R: function (r, c) { return [[1, 1 - r, 1 - c], [1, 0, 0]]; },
+        F: function (r, c) { return [[c - 1, 1 - r, 1], [0, 0, 1]]; },
+        D: function (r, c) { return [[c - 1, -1, 1 - r], [0, -1, 0]]; },
+        L: function (r, c) { return [[-1, 1 - r, c - 1], [-1, 0, 0]]; },
+        B: function (r, c) { return [[1 - c, 1 - r, -1], [0, 0, -1]]; }
+    };
+    function parseFacelets(str) {
+        if (!str || str.length !== 54) return null;
+        var m = new Array(STK.length);
+        for (var fi = 0; fi < 6; fi++) for (var k = 0; k < 9; k++) {
+            var pn = FACELET_POS[FACES[fi]](Math.floor(k / 3), k % 3);
+            var p = [-pn[0][0], -pn[0][1], pn[0][2]], n = [-pn[1][0], -pn[1][1], pn[1][2]]; // z2
+            var col = MAP[str.charAt(fi * 9 + k)];
+            if (!col) return null;
+            m[INDEX[key(p, n)]] = col;
+        }
+        return m;
+    }
     function solvedModel() { return STK.map(function (s) { return s.c; }); }
     function turn(model, f, q) { // q: 1 = saat yönü, 3 = ters, 2 = çift
         for (var t = 0; t < q; t++) {
@@ -329,7 +352,11 @@
     function readyFrame() {
         mOdd = false;
         if (!modelKnown) return null;
-        if (!isRoux()) return isSolved(model) ? IDENT : null;
+        if (!isRoux()) {
+            if (!isSolved(model)) return null;
+            if (window.CrossSolver && !crossSt) crossSt = CrossSolver.SOLVED;
+            return IDENT;
+        }
         var fr = rouxFrame(model);
         // EO'da merkezler çeyrek kaymışsa (üstte yeşil/mavi merkez) case anlamı değişir
         if (fr && current.id === "roux-eo" && fr.U !== "U" && fr.U !== "D") { mOdd = true; return null; }
@@ -341,7 +368,7 @@
         if (!applies()) { phase = "off"; return; }
         afterCase = phase === "done";
         hold = IDENT;
-        if (isCross() && modelKnown) { crossPrefix(); startScrambleTracking(); return; }
+        if (isCross() && modelKnown && crossSt) { crossPrefix(); startScrambleTracking(); return; }
         var fr = readyFrame();
         if (!fr) { phase = "needSolve"; renderScramble(); setHint("bt_hint_solve"); return; }
         hold = fr;
@@ -565,10 +592,17 @@
                     onMove(ev.face, ev.direction);
                 }
                 else if (ev.type === "FACELETS") {
-                    if (!modelKnown) {
-                        if (ev.facelets === "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB") setSolved();
-                        window.btOnNewCase();
+                    var fm = parseFacelets(ev.facelets);
+                    if (!modelKnown || (pendingCheck && fm && rouxFrame(fm))) {
+                        // Küpün kendi bildirdiği durum: çözülmüş ya da (Roux) M katmanı kayık olabilir
+                        if (fm) {
+                            model = fm; modelKnown = true;
+                            crossSt = (window.CrossSolver && isSolved(fm)) ? CrossSolver.SOLVED : null;
+                        }
+                        pendingCheck = false;
+                        if (state !== "running") window.btOnNewCase();
                     }
+                    pendingCheck = false;
                 } else if (ev.type === "DISCONNECT") {
                     var wasUser = userDisconnect; userDisconnect = false;
                     dropConnection();
@@ -622,8 +656,14 @@
         dropConnection();
         if (c) c.disconnect().catch(function () {});
     }
+    var pendingCheck = false;
     function markSolved() {
         setSolved();
+        // Roux'da küp M kayık olabilir: küpün kendi durumunu iste, M dışında çözülmüşse onu kullan
+        if (conn && (!conn.capabilities || conn.capabilities.facelets)) {
+            pendingCheck = true;
+            conn.sendCommand({ type: "REQUEST_FACELETS" }).catch(function () { pendingCheck = false; });
+        }
         if (state === "running") return;
         window.btOnNewCase();
     }
