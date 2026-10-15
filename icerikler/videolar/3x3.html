@@ -2,6 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"")}catch(e){}</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- TEMA VE DİL AYARLARI -->
@@ -38,7 +39,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/styles/common.css?v=20261057">
+    <link rel="stylesheet" href="/styles/common.css?v=20261058">
 
     <!-- Google tag (gtag.js) -->
     <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
@@ -113,9 +114,7 @@
 
             </div>
 
-            <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">
-                🌙
-            </button>
+            <div class="settings-switcher" id="settingsSwitcher"><button class="dark-mode-btn" id="settingsBtn" type="button" onclick="toggleSettings(event)" aria-haspopup="true" aria-expanded="false" aria-label="Ayarlar" title="Ayarlar">⚙️</button><div class="settings-menu" id="settingsMenu"></div></div>
 
         </div>
     </header>
@@ -260,8 +259,8 @@
     </div>
 
     <script>var PAGE_ID = "3x3";</script>
-    <script src="/js/i18n.js?v=20261057"></script>
-    <script src="/js/common.js?v=20261057"></script>
+    <script src="/js/i18n.js?v=20261058"></script>
+    <script src="/js/common.js?v=20261058"></script>
 
 </body>
 </html>

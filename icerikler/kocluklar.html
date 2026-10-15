@@ -2,6 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"")}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- TEMA VE DİL BAŞLANGIÇ AYARLARI -->
@@ -38,7 +39,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <!-- ORTAK STİLLER (tüm sitede aynı) -->
-<link rel="stylesheet" href="/styles/common.css?v=20261057">
+<link rel="stylesheet" href="/styles/common.css?v=20261058">
 
 <!-- BU SAYFAYA ÖZEL STİLLER -->
 <style>
@@ -393,7 +394,7 @@ html {
             </div>
         </div>
 
-        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+        <div class="settings-switcher" id="settingsSwitcher"><button class="dark-mode-btn" id="settingsBtn" type="button" onclick="toggleSettings(event)" aria-haspopup="true" aria-expanded="false" aria-label="Ayarlar" title="Ayarlar">⚙️</button><div class="settings-menu" id="settingsMenu"></div></div>
 
     </div>
 
@@ -512,7 +513,7 @@ html {
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "kocluklar";</script>
-<script src="/js/i18n.js?v=20261057"></script>
+<script src="/js/i18n.js?v=20261058"></script>
 
 <!-- KART HAREKETİ (3D Efekt) — sayfaya özel -->
 <script>
@@ -545,7 +546,7 @@ window.addEventListener("resize", function() {
 });
 </script>
 
-<script src="/js/common.js?v=20261057"></script>
+<script src="/js/common.js?v=20261058"></script>
 
 </body>
 </html>
