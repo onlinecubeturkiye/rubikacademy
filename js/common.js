@@ -273,6 +273,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+/* Kaldırılan hesap sisteminden kalan kayıtlar */
+try { ["ra-auth-v1", "ra-sync-meta-v1", "ra-data-owner-v1"].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+
 /* Çevrimdışı kullanım ve "ana ekrana ekle" için service worker */
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
