@@ -37,7 +37,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261044">
+<link rel="stylesheet" href="/styles/common.css?v=20261045">
 
 <style>
 .print-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin: 6px 0 14px; }
@@ -167,8 +167,9 @@
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "yazdir";</script>
-<script src="/js/i18n.js?v=20261044"></script>
-<script src="/js/common.js?v=20261044"></script>
+<script src="/js/i18n.js?v=20261045"></script>
+<script src="/js/common.js?v=20261045"></script>
+<script src="/js/custom-algs.js?v=20261045"></script>
 
 <script>
 /* A4 algoritma kağıtları. Veriler algoritma sayfalarıyla aynı JSON'lardan gelir.
@@ -179,7 +180,14 @@ function flat(list) {
     return out;
 }
 function multiSet(id) {
-    return function (data) { return flat(data.sets.filter(function (s) { return s.id === id; })[0].groups); };
+    var f = function (data) { return flat(data.sets.filter(function (s) { return s.id === id; })[0].groups); };
+    f.setId = id;
+    return f;
+}
+/* Kullanıcı algoritma sayfasında kendi algoritmasını yazdıysa kağıtta o çıksın */
+function algOf(cfg, c) {
+    var mine = window.CustomAlgs ? CustomAlgs.get(cfg.page, cfg.cases.setId || "", c.name) : null;
+    return mine || c.alg;
 }
 function polySvg(data, c, geom) {
     var g = geom ? data.geoms[geom] : data.geom, v = g.view, sw = (v[2] / 160).toFixed(3);
@@ -271,7 +279,7 @@ function render() {
                     var s = cfg.sub ? '<div class="g" style="font-size:' + Math.max(5, cfg.name - 1.6) + 'pt">' + esc(pageText(cfg.page, "subset_" + x.subset) || x.subset) + '</div>' : "";
                     return '<div class="cell"><div class="d" style="width:' + dw + 'mm;height:' + cfg.diag + 'mm">' + (cfg.poly ? polySvg(data, x.c, cfg.geom) : cfg.draw(x)) + '</div>' +
                         '<div class="tx"><div class="n" style="font-size:' + cfg.name + 'pt">' + esc(x.c.name) + '</div>' + s +
-                        '<div class="a" style="font-size:' + cfg.alg + 'pt">' + esc(x.c.alg) + '</div></div></div>';
+                        '<div class="a" style="font-size:' + cfg.alg + 'pt">' + esc(algOf(cfg, x.c)) + '</div></div></div>';
                 }).join("") + '</div></div>';
         }
         document.getElementById("sheets").innerHTML = html;
