@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - 3BLD Algoritmaları (Göz Bağlı, Old Pochmann)</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/3bld">
+<meta name="description" content="Göz bağlı 3x3 çözüm (Old Pochmann): adım adım rehber, Speffz harf şeması, harf testi ve her harf için kurulum hamleleri.">
+<meta property="og:title" content="Rubik Academy - 3BLD Algoritmaları (Göz Bağlı)">
+<meta property="og:description" content="Göz bağlı 3x3 çözüm (Old Pochmann): adım adım rehber, Speffz harf şeması, harf testi ve her harf için kurulum hamleleri.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/3bld">
+<meta property="og:image" content="https://rubikacademy.fun/og/3bld.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/3bld.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261084">
+
+<style>
+.hero {
+    max-width: 1250px;
+    min-height: 220px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 45px 65px;
+    background: var(--tint-purple);
+    border: var(--card-bw) solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    right: -180px;
+    top: -180px;
+}
+
+.hero-text { position: relative; z-index: 3; max-width: 700px; }
+
+.hero .badge { color: var(--primary-dark); }
+
+.hero h1 {
+    font-size: clamp(36px, 4.5vw, 54px);
+    line-height: 1;
+    letter-spacing: -2.5px;
+    font-weight: 950;
+    margin-bottom: 14px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary-dark); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 560px;
+}
+
+/* CASE GRID */
+.subsets-wrap { max-width: 1250px; margin: 0 auto; }
+.subset-block { margin-bottom: 48px; }
+
+.subset-heading {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding-left: 14px;
+    border-left: 5px solid var(--primary);
+}
+
+.case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media(max-width: 1000px) { .case-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(max-width: 700px) { .case-grid { grid-template-columns: 1fr; } }
+
+.case-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.case-card:hover {
+    transform: translateY(-4px);
+    border-color: #dcbb5c;
+    box-shadow: var(--shadow-hover);
+}
+
+.case-card:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ÖĞRENME DURUMLARI */
+.case-card.state-learning {
+    background: #fff8d6;
+    border-color: #f2c94c;
+}
+.case-card.state-known {
+    background: #dcfce7;
+    border-color: #22c55e;
+}
+.case-card.state-learning:hover { border-color: #e0b12a; box-shadow: var(--shadow-hover); }
+.case-card.state-known:hover { border-color: #16a34a; box-shadow: var(--shadow-hover); }
+
+html.dark-mode .case-card.state-learning {
+    background: #3a3212;
+    border-color: #b8901f;
+}
+html.dark-mode .case-card.state-known {
+    background: #123524;
+    border-color: #22a35a;
+}
+
+.case-status {
+    font-size: 11px;
+    font-weight: 800;
+    margin-top: 8px;
+    display: none;
+}
+.case-card.state-learning .case-status { display: block; color: #a16207; }
+.case-card.state-known .case-status { display: block; color: #15803d; }
+html.dark-mode .case-card.state-learning .case-status { color: #facc15; }
+html.dark-mode .case-card.state-known .case-status { color: #4ade80; }
+
+/* İLERLEME ÖZETİ */
+.progress-summary {
+    max-width: 1250px;
+    margin: 0 auto 28px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    font-weight: 800;
+}
+.progress-summary span {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    color: var(--text);
+}
+
+.case-diagram {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    background: var(--diagram-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+.case-diagram svg { width: 62px; height: 62px; }
+
+.case-body { flex: 1; min-width: 0; }
+
+.case-name {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+}
+
+.case-alg {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--primary-dark);
+    font-weight: 600;
+    overflow-wrap: break-word;
+}
+
+.case-alts {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.case-alt-line {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-soft);
+    overflow-wrap: break-word;
+}
+
+.load-error {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    text-align: center;
+    font-size: 14px;
+}
+
+.bottom {
+    max-width: 1250px;
+    margin: 38px auto 0;
+    padding: 32px;
+    text-align: center;
+    border-radius: 25px;
+    background: var(--bottom-bg);
+    border: 1px solid #d5eafa;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .bottom { background: var(--surface); border-color: var(--border); }
+
+.bottom h3 { color: #18578c; font-size: 21px; margin-bottom: 7px; }
+html.dark-mode .bottom h3 { color: #60a5fa; }
+
+@media(max-width: 1000px) { .hero { padding: 40px; background: var(--tint-purple); border: var(--card-bw) solid var(--hero-border); } }
+@media(max-width: 700px) {
+    .hero { min-height: auto; padding: 34px 24px; border-radius: 27px; background: var(--tint-purple); border: var(--card-bw) solid var(--hero-border); }
+    .hero h1 { font-size: 38px; }
+    .hero p { font-size: 13px; }
+    .subset-heading { font-size: 19px; }
+}
+
+
+/* SET SEKMELERİ + NOTASYON */
+.set-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0 auto 14px; }
+.set-tab {
+    border: var(--card-bw) solid var(--ink); border-radius: 14px; padding: 10px 18px; cursor: pointer;
+    font: 800 15px "Inter", sans-serif; background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm);
+    transition: transform .12s, box-shadow .12s;
+}
+.set-tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.set-tab.active { background: var(--cube-yellow); color: #17171f; }
+.set-desc { max-width: 760px; margin: 0 auto 22px; text-align: center; font-size: 14.5px; color: var(--text-soft); line-height: 1.6; }
+.nota-box {
+    max-width: 900px; margin: 0 auto 26px; padding: 18px 20px; border-radius: 20px;
+    border: var(--card-bw) solid var(--card-border); background: var(--surface); box-shadow: var(--shadow);
+}
+.nota-box h2 { font-family: var(--font-display); font-size: 20px; margin: 0 0 10px; color: var(--text); }
+.nota-moves { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 10px; }
+.nota-move { text-align: center; padding: 6px 8px 8px; border-radius: 14px; background: var(--surface-soft); border: var(--card-bw) solid var(--border); width: 120px; }
+.nota-move svg { width: 100%; height: auto; max-width: 104px; }
+.nota-move b { display: block; font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--text); }
+.nota-move small { font-size: 11px; font-weight: 700; color: var(--text-soft); }
+.nota-box p { font-size: 13.5px; color: var(--text-soft); line-height: 1.6; margin: 6px 0 0; }
+.case-diagram svg { width: 96px; height: 96px; }
+@media (max-width: 520px) { .nota-move { width: 74px; padding: 4px; } .nota-move small { font-size: 10px; } .set-tab { padding: 8px 12px; font-size: 14px; } }
+/* Set seçimi Algoritmalar sayfasından yapılır; sayfa içinde başka sete geçiş yok */
+#setTabs { display: none; }
+/* 3BLD */
+#setTabs { display: none; }
+.case-diagram { width: 124px; height: 96px; }
+.case-diagram svg { width: 118px; height: 90px; }
+.bld-step { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; margin-top: 3px; }
+.bld-step small { font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: .3px; }
+.bld-step code { font: 700 13px "JetBrains Mono", monospace; color: var(--primary-dark); }
+.bld-step.sw code { color: var(--text); background: var(--surface-soft); border: 1px solid var(--border); border-radius: 7px; padding: 1px 7px; }
+.case-name { font-size: 24px; line-height: 1; margin-bottom: 4px; }
+.guide { max-width: 980px; margin: 0 auto 26px; padding: 22px 24px; border-radius: 22px; border: var(--card-bw) solid var(--card-border); background: var(--surface); box-shadow: var(--shadow); }
+.guide h2 { font-family: var(--font-display); font-size: 22px; margin: 0 0 10px; color: var(--text); }
+.guide h3 { font-size: 16.5px; margin: 18px 0 6px; color: var(--text); }
+.guide p { font-size: 14px; color: var(--text-soft); line-height: 1.65; margin: 0 0 8px; }
+.guide code { font: 700 13.5px "JetBrains Mono", monospace; color: var(--text); background: var(--surface-soft); border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; display: inline-block; }
+.g-figs { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin: 10px 0 6px; }
+.g-fig { margin: 0; text-align: center; background: var(--diagram-bg); border-radius: 16px; padding: 10px; flex: 1 1 280px; max-width: 420px; }
+.g-fig svg { width: 100%; height: auto; }
+.g-fig figcaption { font-size: 13px; font-weight: 800; color: var(--text); margin-top: 4px; }
+.g-tip { background: var(--tint-yellow, #fff6d6); border-radius: 12px; padding: 10px 12px; }
+.quiz { max-width: 980px; margin: 0 auto 26px; padding: 20px 24px; border-radius: 22px; border: var(--card-bw) solid var(--card-border); background: var(--surface); box-shadow: var(--shadow); }
+.quiz h2 { font-family: var(--font-display); font-size: 21px; margin: 0 0 4px; color: var(--text); }
+.quiz-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.quiz-top p { margin: 0; font-size: 14px; color: var(--text-soft); }
+.quiz-modes { display: flex; gap: 6px; }
+.quiz-mode { border: var(--card-bw) solid var(--ink); border-radius: 10px; padding: 6px 12px; font: 800 13px Inter, sans-serif; background: var(--surface); color: var(--text); cursor: pointer; }
+.quiz-mode.active { background: var(--cube-yellow); color: #17171f; }
+.quiz-body { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: center; }
+.quiz-net { background: var(--diagram-bg); border-radius: 16px; padding: 8px; width: 300px; max-width: 100%; }
+.quiz-net svg { width: 100%; height: auto; display: block; }
+.quiz-side { flex: 1 1 260px; max-width: 420px; }
+.quiz-keys { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.quiz-key { aspect-ratio: 1; border: var(--card-bw) solid var(--ink); border-radius: 9px; background: var(--surface-soft); color: var(--text); font: 900 15px Inter, sans-serif; cursor: pointer; padding: 0; }
+.quiz-key:hover { background: var(--primary-light); }
+.quiz-key.ok { background: #22c55e; color: #fff; }
+.quiz-key.bad { background: var(--cube-red); color: #fff; }
+.quiz-msg { min-height: 22px; font-weight: 800; font-size: 14.5px; margin: 10px 0 2px; color: var(--text-soft); }
+.quiz-msg.ok { color: #16a34a; } .quiz-msg.bad { color: var(--cube-red); }
+.quiz-score { font-size: 13px; font-weight: 800; color: var(--text-soft); }
+.swap-box { max-width: 980px; margin: 0 auto 22px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 16px 20px; border-radius: 20px; border: var(--card-bw) solid var(--card-border); background: var(--surface); box-shadow: var(--shadow-sm); }
+.swap-diag { background: var(--diagram-bg); border-radius: 14px; padding: 6px; width: 180px; }
+.swap-diag svg { width: 100%; height: auto; display: block; }
+.swap-text { flex: 1 1 260px; }
+.swap-text h3 { font-size: 16px; margin: 0 0 6px; color: var(--text); }
+.swap-text code { font: 700 14px "JetBrains Mono", monospace; color: var(--primary-dark); overflow-wrap: anywhere; }
+.swap-text p { font-size: 13.5px; color: var(--text-soft); margin: 6px 0 0; line-height: 1.5; }
+@media (max-width: 520px) { .quiz-keys { grid-template-columns: repeat(6, 1fr); } .guide, .quiz { padding: 16px; } }
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<section class="hero reveal">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+<span data-i18n="badge_text">3x3 · GÖZ BAĞLI</span>
+</div>
+<h1><span data-i18n="hero_title1">3BLD</span> <span data-i18n="hero_titleAccent">Algoritmaları</span></h1>
+<p data-i18n="hero_p">Old Pochmann yöntemiyle göz bağlı çözüm: adım adım rehber, harf şeması, harf testi ve her harf için kurulum hamleleri. Hepsi simülasyonla doğrulandı.</p>
+</div>
+</section>
+
+<section class="guide" id="rehber">
+    <h2 data-i18n="guide_h">📘 Rehber: Old Pochmann ile göz bağlı çözüm</h2>
+    <p data-i18n="g_intro">Göz bağlı çözümde küpü önce inceleyip ezberlersin, sonra gözlerini kapatıp hiç bakmadan çözersin. Old Pochmann yönteminde her seferinde tek bir parça yerine gider. Bunun için iki algoritma (T-perm ve değiştirilmiş Y-perm) ile kısa kurulum hamleleri yeter.</p>
+    <h3 data-i18n="g_hold_h">1. Tutuş</h3><p data-i18n="g_hold_p">Küpü beyaz üstte, yeşil önde tut ve çözüm boyunca hiç döndürme. Bu sayfadaki tüm harfler ve hamleler bu tutuşa göredir.</p>
+    <h3 data-i18n="g_scheme_h">2. Harf şeması (Speffz)</h3><p data-i18n="g_scheme_p">Her etikete bir harf verilir. Her yüzde sol üstten başlayıp saat yönünde ilerlenir; köşeler ve kenarlar ayrı ayrı A–X harflerini alır. Yüz sırası: üst (A–D), sol (E–H), ön (I–L), sağ (M–P), arka (Q–T), alt (U–X).</p>
+    <div class="g-figs">
+        <figure class="g-fig"><div id="figEdges" dir="ltr"></div><figcaption data-i18n="fig_edges">Kenar harfleri</figcaption></figure>
+        <figure class="g-fig"><div id="figCorners" dir="ltr"></div><figcaption data-i18n="fig_corners">Köşe harfleri</figcaption></figure>
+    </div>
+    <p data-i18n="fig_note">Koyu etiket: tampon (buffer). Tampon parçasının diğer etiketleri hedef olamaz.</p>
+    <h3 data-i18n="g_memo_h">3. Ezberleme (iz sürme)</h3><p data-i18n="g_memo_p">Tampondaki etikete bak: o etiket hangi yere aitse o yerin harfini yaz. Sonra o yerdeki etikete bak ve aynı şekilde devam et. Tampon parçası yeniden tampona gelirse (döngü kapanırsa) henüz yerinde olmayan herhangi bir parçanın harfini yaz ve oradan sürdür. Yerinde ama ters dönmüş parçalar da böyle iki harfle çözülür.</p>
+    <p class="g-tip" data-i18n="g_memo_tip">İpucu: harfleri ikişer ikişer kelimeye çevir (ör. KA → kalem, BE → bebek). Kenarları kelimelerle, köşeleri ses olarak tekrarlayarak ezberlemek kolaydır.</p>
+    <h3 data-i18n="g_edges_h">4. Kenarlar</h3><p data-i18n="g_edges_p">Tampon B (üst-sağ kenarın üst etiketi), değiştirme yeri D (üst-sol kenarın üst etiketi). Her harf için: kurulum hamlesiyle hedef etiketi D yerine getir, T-perm yap, kurulumu geri al. Kurulum hamleleri tamponu ve T-perm'ün değiştirdiği köşeleri bozmaz.</p>
+    <p><code dir="ltr">T-perm: R U R' U' R' F R2 U' R' U' R U R' F'</code></p>
+    <h3 data-i18n="g_corners_h">5. Köşeler</h3><p data-i18n="g_corners_p">Tampon A (üst-sol-arka köşenin üst etiketi), değiştirme yeri P (sağ-ön-alt köşenin sağ etiketi). Her harf için: kurulum, değiştirilmiş Y-perm, kurulumu geri al.</p>
+    <p><code dir="ltr">Y-perm*: R U' R' U' R U R' F' R U R' U' R' F R</code></p>
+    <h3 data-i18n="g_parity_h">6. Parite</h3><p data-i18n="g_parity_p">Kenar harflerinin sayısı tekse (bu durumda köşe harfleri de tektir) kenarları bitirdikten sonra, köşelere başlamadan önce şu algoritmayı yap:</p>
+    <p><code dir="ltr" id="parityAlg">R U' R' U' R U R D R' U' R D' R' U2 R' U'</code></p>
+    <h3 data-i18n="g_order_h">7. Çözüm sırası</h3><p data-i18n="g_order_p">Köşeleri ve kenarları ezberle → gözlerini kapat → kenarlar → gerekirse parite → köşeler. Bu sıra ve tüm algoritmalar 300 rastgele karıştırmada simülasyonla denendi; hepsinde küp çözüldü.</p>
+</section>
+
+<section class="quiz" id="quizBox">
+    <div class="quiz-top"><div><h2 data-i18n="quiz_h">🔤 Harf testi</h2><p data-i18n="quiz_p">Vurgulanan etiketin harfini seç.</p></div>
+        <div class="quiz-modes"><button type="button" class="quiz-mode active" data-kind="E" data-i18n="quiz_edges">Kenarlar</button><button type="button" class="quiz-mode" data-kind="C" data-i18n="quiz_corners">Köşeler</button></div></div>
+    <div class="quiz-body">
+        <div class="quiz-net" id="quizNet" dir="ltr"></div>
+        <div class="quiz-side"><div class="quiz-keys" id="quizKeys" dir="ltr"></div><p class="quiz-msg" id="quizMsg" aria-live="polite"></p><div class="quiz-score" id="quizScore"></div></div>
+    </div>
+</section>
+
+<div class="set-tabs" id="setTabs"></div>
+<p class="set-desc" id="setDesc"></p>
+<div class="swap-box" id="swapBox"></div>
+
+<!-- İlerleme özeti -->
+<div class="progress-summary" id="progressSummary"></div>
+
+<div class="subsets-wrap" id="subsetsWrap"></div>
+
+<div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.</div>
+
+<section class="bottom reveal">
+<h3 data-i18n="bottom_title">🧩 Pratik zamanı</h3>
+<p data-i18n="bottom_p">Önce gözün açıkken harfleri sesli söyleyerek çöz; rahatlayınca gözlerini kapat. Her denemede ezberleme ve çözüm süreni ayrı ayrı not et.</p>
+</section>
+
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+
+<!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
+<script>var PAGE_ID = "bld";</script>
+<script src="/js/i18n.js?v=20261084"></script>
+<script src="/js/common.js?v=20261084"></script>
+
+
+<script src="/js/alg-player.js?v=20261084"></script>
+
+<script>
+/* ============================================================
+   3BLD (OLD POCHMANN) ALGORİTMALARI
+   Veri: bld.json (kurulum hamleleri simülasyonla bulunup doğrulandı)
+   Diyagramlar: küp açılımı (beyaz üst, yeşil ön) + Speffz harfleri
+   ============================================================ */
+var PAGE_KEY = "bld";
+var STATES = ["", "learning", "known"];
+var PROGRESS_TEXT = {
+    tr: { learning: "Öğreniyorum", known: "Biliyorum" },
+    en: { learning: "Learning",    known: "Known" },
+    de: { learning: "Ich lerne",   known: "Kann ich" },
+    fr: { learning: "J'apprends",  known: "Je sais" },
+    ru: { learning: "Учу",         known: "Знаю" },
+    ar: { learning: "أتعلم",       known: "أعرف" }
+};
+var DATA = null, currentSet = null;
+
+function currentLang() { return localStorage.getItem("site-lang") || "tr"; }
+function progressText() { return PROGRESS_TEXT[currentLang()] || PROGRESS_TEXT.tr; }
+function T(key, fallback) {
+    var pages = (window.SITE_I18N && SITE_I18N.pages) || {};
+    var p = pages[PAGE_ID] || {};
+    var d = p[currentLang()] || {};
+    return d[key] || (p.tr && p.tr[key]) || fallback || key;
+}
+function escapeHtml(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/* ---------- küp açılımı ---------- */
+var FACES = "ULFRBD";
+var FACE_POS = { U: [3, 0], L: [0, 3], F: [3, 3], R: [6, 3], B: [9, 3], D: [3, 6] };
+var FACE_COL = { U: "#eef2f3", L: "#ff7a1a", F: "#179e4f", R: "#d12d28", B: "#2c6fe6", D: "#f6c719" };
+var LIGHT_TXT = { F: 1, R: 1, B: 1 };
+var CPOS = [[0, 0], [0, 2], [2, 2], [2, 0]], EPOS = [[0, 1], [1, 2], [2, 1], [1, 0]];
+var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWX";
+// Tampon parçalarının etiketleri (kenar: UR = B, M; köşe: UBL = A, E, R)
+var BUF_PIECE = { E: "BM", C: "AER" };
+function letterAt(face, r, c, kind) {
+    var list = kind === "E" ? EPOS : CPOS;
+    for (var k = 0; k < 4; k++) if (list[k][0] === r && list[k][1] === c) return LETTERS[FACES.indexOf(face) * 4 + k];
+    return null;
+}
+function netSvg(o) {
+    var s = 10, out = '<svg viewBox="-1 -1 122 92" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+    var txt = "";
+    FACES.split("").forEach(function (f) {
+        var fp = FACE_POS[f];
+        for (var r = 0; r < 3; r++) for (var c = 0; c < 3; c++) {
+            var x = (fp[0] + c) * s, y = (fp[1] + r) * s;
+            var L = o.kind ? letterAt(f, r, c, o.kind) : null;
+            var isT = L && L === o.target, isB = L && L === o.buffer, inBuf = L && o.kind && BUF_PIECE[o.kind].indexOf(L) >= 0;
+            var fill = FACE_COL[f], op = 1, sw = 0.6;
+            if (isB) fill = "#17171f";
+            else if (o.target) op = isT ? 1 : 0.22;
+            else if (o.letters && (!L || (inBuf && !isB))) op = 0.3;
+            if (isT) sw = 1.6;
+            out += '<rect x="' + (x + 0.5) + '" y="' + (y + 0.5) + '" width="9" height="9" rx="1.6" fill="' + fill + '"' + (op < 1 ? ' fill-opacity="' + op + '"' : "") +
+                ' stroke="#17171f" stroke-width="' + sw + '"' + (op < 1 && !isT ? ' stroke-opacity="0.45"' : "") + '/>';
+            var showL = L && (isT || isB || (o.letters && !(inBuf && !isB)));
+            if (showL) {
+                var col = (isB || LIGHT_TXT[f]) ? "#ffffff" : "#17171f";
+                txt += '<text x="' + (x + 5) + '" y="' + (y + 5.3) + '" font-size="' + (isT ? 6.4 : 5.4) + '" font-weight="800" font-family="Inter, sans-serif" text-anchor="middle" dominant-baseline="middle" fill="' + col + '">' + (isB && !o.letters ? "★" : L) + '</text>';
+            }
+        }
+    });
+    return out + txt + "</svg>";
+}
+
+/* ---------- ilerleme ---------- */
+function progressKey() { return "algo-progress-" + PAGE_KEY + "-" + currentSet; }
+function loadProgress() {
+    try { var p = JSON.parse(localStorage.getItem(progressKey())); return (p && typeof p === "object") ? p : {}; } catch (e) { return {}; }
+}
+function saveProgress(p) { try { localStorage.setItem(progressKey(), JSON.stringify(p)); } catch (e) {} }
+function stateOfCard(card) {
+    if (card.classList.contains("state-known")) return "known";
+    if (card.classList.contains("state-learning")) return "learning";
+    return "";
+}
+function applyState(card, state) {
+    card.classList.remove("state-learning", "state-known");
+    if (state) card.classList.add("state-" + state);
+    var s = card.querySelector(".case-status");
+    if (s) s.textContent = state ? progressText()[state] : "";
+}
+function updateSummary() {
+    var cards = document.querySelectorAll(".case-card"), learning = 0, known = 0;
+    for (var i = 0; i < cards.length; i++) {
+        var st = stateOfCard(cards[i]);
+        if (st === "learning") learning++;
+        if (st === "known") known++;
+    }
+    var t = progressText();
+    document.getElementById("progressSummary").innerHTML =
+        '<span>🟡 ' + t.learning + ': ' + learning + '</span>' + '<span>🟢 ' + t.known + ': ' + known + ' / ' + cards.length + '</span>';
+}
+function cycleCard(card) {
+    var name = card.getAttribute("data-case"), p = loadProgress();
+    var next = STATES[(STATES.indexOf(p[name] || "") + 1) % STATES.length];
+    if (next) p[name] = next; else delete p[name];
+    saveProgress(p);
+    applyState(card, next);
+    updateSummary();
+}
+
+/* ---------- setler ---------- */
+function curSetObj() { return DATA.sets.filter(function (s) { return s.id === currentSet; })[0] || DATA.sets[0]; }
+function renderTabs() {
+    var html = "";
+    DATA.sets.forEach(function (s) {
+        html += '<button class="set-tab' + (s.id === currentSet ? " active" : "") + '" data-set="' + s.id + '">' + escapeHtml(T("set_" + s.id, s.id)) + '</button>';
+    });
+    document.getElementById("setTabs").innerHTML = html;
+    document.getElementById("setDesc").textContent = T("desc_" + currentSet, "");
+    var set = curSetObj(), kind = set.id === "edges" ? "E" : "C";
+    document.getElementById("swapBox").innerHTML =
+        '<div class="swap-diag" dir="ltr">' + netSvg({ kind: kind, target: set.target, buffer: set.buffer }) + '</div>' +
+        '<div class="swap-text"><h3>' + escapeHtml(T("swap_" + set.id)) + '</h3>' +
+        '<code dir="ltr">' + escapeHtml(set.swap) + '</code>' +
+        '<p><b>★ ' + escapeHtml(T("buf_lbl")) + ':</b> ' + set.buffer + ' · <b>' + escapeHtml(T("tgt_lbl")) + ':</b> ' + set.target + '</p>' +
+        '<p class="swap-note">' + escapeHtml(T("swap_note")) + '</p></div>';
+}
+function renderSet() {
+    var set = curSetObj();
+    currentSet = set.id;
+    try { localStorage.setItem("algo-set-" + PAGE_KEY, currentSet); } catch (e) {}
+    renderTabs();
+    var progress = loadProgress(), t = progressText(), html = "", kind = set.id === "edges" ? "E" : "C";
+    var swName = set.id === "edges" ? "T-perm" : "Y-perm*";
+    set.groups.forEach(function (group) {
+        if (!group.cases.length) return;
+        html += '<div class="subset-block"><h2 class="subset-heading">' + escapeHtml(T("subset_" + group.subset, group.subset)) + '</h2><div class="case-grid">';
+        group.cases.forEach(function (c) {
+            var st = progress[c.name] || "";
+            var steps = c.setup
+                ? '<div class="bld-step"><small>' + escapeHtml(T("lbl_setup")) + '</small><code dir="ltr">' + escapeHtml(c.setup) + '</code></div>' +
+                  '<div class="bld-step sw"><code dir="ltr">' + swName + '</code></div>' +
+                  '<div class="bld-step"><small>' + escapeHtml(T("lbl_undo")) + '</small><code dir="ltr">' + escapeHtml(c.undo) + '</code></div>'
+                : '<div class="bld-step"><small>' + escapeHtml(T("lbl_none")) + '</small></div><div class="bld-step sw"><code dir="ltr">' + swName + '</code></div>';
+            html += '<div class="case-card' + (st ? " state-" + st : "") + '" data-case="' + escapeHtml(c.name) + '" role="button" tabindex="0">' +
+                '<div class="case-diagram" dir="ltr">' + netSvg({ kind: kind, target: c.name, buffer: set.buffer }) + '</div>' +
+                '<div class="case-body"><div class="case-name">' + escapeHtml(c.name) + '</div>' + steps +
+                '<div class="case-alg" dir="ltr" hidden>' + escapeHtml(c.alg) + '</div>' +
+                '<div class="case-status">' + escapeHtml(st ? t[st] : "") + '</div></div></div>';
+        });
+        html += '</div></div>';
+    });
+    document.getElementById("subsetsWrap").innerHTML = html;
+    updateSummary();
+}
+
+/* ---------- rehber şekilleri ---------- */
+function renderFigures() {
+    document.getElementById("figEdges").innerHTML = netSvg({ kind: "E", letters: true, buffer: "B" });
+    document.getElementById("figCorners").innerHTML = netSvg({ kind: "C", letters: true, buffer: "A" });
+    document.getElementById("parityAlg").textContent = (DATA && DATA.parity) || "R U' R' U' R U R D R' U' R D' R' U2 R' U'";
+}
+
+/* ---------- harf testi ---------- */
+var quiz = { kind: "E", letter: null, ok: 0, n: 0, locked: false };
+function quizNew() {
+    var prev = quiz.letter;
+    do { quiz.letter = LETTERS[Math.floor(Math.random() * 24)]; } while (quiz.letter === prev);
+    quiz.locked = false;
+    document.getElementById("quizNet").innerHTML = netSvg({ kind: quiz.kind, target: quiz.letter, hideTargetLetter: true });
+    // hedef harfi gizle (soru)
+    var t = document.querySelectorAll("#quizNet text"); for (var i = 0; i < t.length; i++) t[i].textContent = "?";
+    document.getElementById("quizMsg").textContent = "";
+    document.getElementById("quizMsg").className = "quiz-msg";
+    Array.prototype.forEach.call(document.querySelectorAll(".quiz-key"), function (b) { b.classList.remove("ok", "bad"); b.disabled = false; });
+}
+function quizRender() {
+    document.getElementById("quizKeys").innerHTML = LETTERS.split("").map(function (l) { return '<button type="button" class="quiz-key" data-l="' + l + '">' + l + '</button>'; }).join("");
+    document.querySelectorAll(".quiz-mode").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-kind") === quiz.kind); });
+    quizScore();
+}
+function quizScore() { document.getElementById("quizScore").textContent = T("quiz_score").replace("{a}", quiz.ok).replace("{b}", quiz.n); }
+function quizAnswer(l) {
+    if (quiz.locked) return;
+    quiz.locked = true; quiz.n++;
+    var right = l === quiz.letter, msg = document.getElementById("quizMsg");
+    if (right) quiz.ok++;
+    document.querySelector('.quiz-key[data-l="' + quiz.letter + '"]').classList.add("ok");
+    if (!right) document.querySelector('.quiz-key[data-l="' + l + '"]').classList.add("bad");
+    var t = document.querySelectorAll("#quizNet text"); for (var i = 0; i < t.length; i++) t[i].textContent = quiz.letter;
+    msg.textContent = right ? T("quiz_ok") : T("quiz_bad").replace("{x}", quiz.letter);
+    msg.className = "quiz-msg " + (right ? "ok" : "bad");
+    quizScore();
+    setTimeout(quizNew, right ? 800 : 1800);
+}
+function initQuiz() {
+    quizRender(); quizNew();
+    document.getElementById("quizKeys").addEventListener("click", function (e) { var b = e.target.closest(".quiz-key"); if (b) quizAnswer(b.getAttribute("data-l")); });
+    document.querySelectorAll(".quiz-mode").forEach(function (b) {
+        b.addEventListener("click", function () { quiz.kind = b.getAttribute("data-kind"); quiz.ok = quiz.n = 0; quizRender(); quizNew(); });
+    });
+    document.addEventListener("keydown", function (e) {
+        if (e.target.closest("input, textarea")) return;
+        var k = (e.key || "").toUpperCase();
+        if (k.length === 1 && LETTERS.indexOf(k) >= 0 && document.getElementById("quizBox").getBoundingClientRect().top < innerHeight) quizAnswer(k);
+    });
+}
+
+fetch("/icerikler/algoritmalar/bld.json?v=20261084")
+    .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    .then(function (data) {
+        DATA = data;
+        renderFigures();
+        var saved = null;
+        try { saved = localStorage.getItem("algo-set-" + PAGE_KEY); } catch (e) {}
+        var fromHash = (location.hash || "").replace("#", "");
+        currentSet = [fromHash, saved].filter(function (id) { return id && data.sets.some(function (s) { return s.id === id; }); })[0] || data.sets[0].id;
+        renderSet();
+        var wrap = document.getElementById("subsetsWrap");
+        wrap.addEventListener("click", function (e) {
+            var sel = window.getSelection ? String(window.getSelection()) : "";
+            if (sel.length > 0) return;
+            var card = e.target.closest(".case-card");
+            if (card) cycleCard(card);
+        });
+        wrap.addEventListener("keydown", function (e) {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            var card = e.target.closest(".case-card");
+            if (!card) return;
+            e.preventDefault(); cycleCard(card);
+        });
+        document.getElementById("setTabs").addEventListener("click", function (e) {
+            var b = e.target.closest(".set-tab");
+            if (!b) return;
+            currentSet = b.getAttribute("data-set");
+            history.replaceState(null, "", "#" + currentSet);
+            renderSet();
+        });
+    })
+    .catch(function (err) {
+        document.getElementById("loadError").style.display = "block";
+        console.error("bld.json yüklenemedi:", err);
+    });
+renderFigures();
+initQuiz();
+
+// Algoritmalar sayfasından #edges / #corners ile gelince ya da adres değişince
+window.addEventListener("hashchange", function () {
+    var h = (location.hash || "").replace("#", "");
+    if (DATA && DATA.sets.some(function (s) { return s.id === h; })) { currentSet = h; renderSet(); }
+});
+// Dil değişince (common.js applyLanguage sonrası çağırır)
+function onLanguageApplied() { quizScore(); if (DATA) renderSet(); }
+</script>
+
+</body>
+</html>
