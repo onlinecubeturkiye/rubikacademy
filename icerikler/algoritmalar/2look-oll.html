@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - 2-Look OLL</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/2look-oll">
+<meta name="description" content="2-Look OLL: üst yüzü iki adımda sarı yap; önce sarı artı (3 durum), sonra köşeler (7 durum). 10 algoritma, diyagramlı, 3x3 simülasyonunda doğrulanmış.">
+<meta property="og:title" content="Rubik Academy - 2-Look OLL Algoritmaları">
+<meta property="og:description" content="2-Look OLL: üst yüzü iki adımda sarı yap; önce sarı artı (3 durum), sonra köşeler (7 durum). 10 algoritma, diyagramlı, 3x3 simülasyonunda doğrulanmış.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/2look-oll">
+<meta property="og:image" content="https://rubikacademy.fun/og/2look-oll.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/2look-oll.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261072">
+
+<style>
+.hero {
+    max-width: 1250px;
+    min-height: 220px;
+    margin: 0 auto 45px;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 45px 65px;
+    background: var(--tint-purple);
+    border: var(--card-bw) solid var(--hero-border);
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 430px;
+    height: 430px;
+    border-radius: 50%;
+    border: 70px solid rgba(255, 255, 255, .15);
+    right: -180px;
+    top: -180px;
+}
+
+.hero-text { position: relative; z-index: 3; max-width: 700px; }
+
+.hero .badge { color: var(--primary-dark); }
+
+.hero h1 {
+    font-size: clamp(36px, 4.5vw, 54px);
+    line-height: 1;
+    letter-spacing: -2.5px;
+    font-weight: 950;
+    margin-bottom: 14px;
+    color: var(--text);
+}
+
+.hero h1 span { color: var(--primary-dark); }
+
+.hero p {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 560px;
+}
+
+/* CASE GRID */
+.subsets-wrap { max-width: 1250px; margin: 0 auto; }
+.subset-block { margin-bottom: 48px; }
+
+.subset-heading {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding-left: 14px;
+    border-left: 5px solid var(--primary);
+}
+
+.case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media(max-width: 1000px) { .case-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(max-width: 700px) { .case-grid { grid-template-columns: 1fr; } }
+
+.case-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.case-card:hover {
+    transform: translateY(-4px);
+    border-color: #dcbb5c;
+    box-shadow: var(--shadow-hover);
+}
+
+.case-card:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ÖĞRENME DURUMLARI */
+.case-card.state-learning {
+    background: #fff8d6;
+    border-color: #f2c94c;
+}
+.case-card.state-known {
+    background: #dcfce7;
+    border-color: #22c55e;
+}
+.case-card.state-learning:hover { border-color: #e0b12a; box-shadow: var(--shadow-hover); }
+.case-card.state-known:hover { border-color: #16a34a; box-shadow: var(--shadow-hover); }
+
+html.dark-mode .case-card.state-learning {
+    background: #3a3212;
+    border-color: #b8901f;
+}
+html.dark-mode .case-card.state-known {
+    background: #123524;
+    border-color: #22a35a;
+}
+
+.case-status {
+    font-size: 11px;
+    font-weight: 800;
+    margin-top: 8px;
+    display: none;
+}
+.case-card.state-learning .case-status { display: block; color: #a16207; }
+.case-card.state-known .case-status { display: block; color: #15803d; }
+html.dark-mode .case-card.state-learning .case-status { color: #facc15; }
+html.dark-mode .case-card.state-known .case-status { color: #4ade80; }
+
+/* İLERLEME ÖZETİ */
+.progress-summary {
+    max-width: 1250px;
+    margin: 0 auto 28px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    font-weight: 800;
+}
+.progress-summary span {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: var(--card-bw) solid var(--card-border);
+    color: var(--text);
+}
+
+.case-diagram {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    background: var(--diagram-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+.case-diagram svg { width: 62px; height: 62px; }
+
+.case-body { flex: 1; min-width: 0; }
+
+.case-name {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+}
+
+.case-alg {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--primary-dark);
+    font-weight: 600;
+    overflow-wrap: break-word;
+}
+
+.case-alts {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.case-alt-line {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-soft);
+    overflow-wrap: break-word;
+}
+
+.load-error {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    text-align: center;
+    font-size: 14px;
+}
+
+.bottom {
+    max-width: 1250px;
+    margin: 38px auto 0;
+    padding: 32px;
+    text-align: center;
+    border-radius: 25px;
+    background: var(--bottom-bg);
+    border: 1px solid #d5eafa;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+html.dark-mode .bottom { background: var(--surface); border-color: var(--border); }
+
+.bottom h3 { color: #18578c; font-size: 21px; margin-bottom: 7px; }
+html.dark-mode .bottom h3 { color: #60a5fa; }
+
+@media(max-width: 1000px) { .hero { padding: 40px; background: var(--tint-purple); border: var(--card-bw) solid var(--hero-border); } }
+@media(max-width: 700px) {
+    .hero { min-height: auto; padding: 34px 24px; border-radius: 27px; background: var(--tint-purple); border: var(--card-bw) solid var(--hero-border); }
+    .hero h1 { font-size: 38px; }
+    .hero p { font-size: 13px; }
+    .subset-heading { font-size: 19px; }
+}
+
+
+/* SET SEKMELERİ + NOTASYON */
+.set-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0 auto 14px; }
+.set-tab {
+    border: var(--card-bw) solid var(--ink); border-radius: 14px; padding: 10px 18px; cursor: pointer;
+    font: 800 15px "Inter", sans-serif; background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm);
+    transition: transform .12s, box-shadow .12s;
+}
+.set-tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.set-tab.active { background: var(--cube-yellow); color: #17171f; }
+.strip3 { margin: 4px auto 22px; }
+.strip3 .set-tabs-label { width: 100%; text-align: center; font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--text-soft); margin-bottom: 2px; }
+a.set-tab { text-decoration: none; }
+.set-desc { max-width: 760px; margin: 0 auto 22px; text-align: center; font-size: 14.5px; color: var(--text-soft); line-height: 1.6; }
+.nota-box {
+    max-width: 900px; margin: 0 auto 26px; padding: 18px 20px; border-radius: 20px;
+    border: var(--card-bw) solid var(--card-border); background: var(--surface); box-shadow: var(--shadow);
+}
+.nota-box h2 { font-family: var(--font-display); font-size: 20px; margin: 0 0 10px; color: var(--text); }
+.nota-moves { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 10px; }
+.nota-move { text-align: center; padding: 6px 8px 8px; border-radius: 14px; background: var(--surface-soft); border: var(--card-bw) solid var(--border); width: 120px; }
+.nota-move svg { width: 100%; height: auto; max-width: 104px; }
+.nota-move b { display: block; font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--text); }
+.nota-move small { font-size: 11px; font-weight: 700; color: var(--text-soft); }
+.nota-box p { font-size: 13.5px; color: var(--text-soft); line-height: 1.6; margin: 6px 0 0; }
+.case-diagram svg { width: 96px; height: 96px; }
+.case-diagram:has(svg.tall) { width: auto; height: auto; padding: 6px 10px; }
+.case-diagram svg.tall { width: 62px; height: 144px; }
+.case-diagram:has(svg.iso) { width: 112px; height: 112px; }
+.case-diagram svg.iso { width: 104px; height: 104px; }
+@media (max-width: 520px) { .nota-move { width: 74px; padding: 4px; } .nota-move small { font-size: 10px; } .set-tab { padding: 8px 12px; font-size: 14px; } }
+/* Set seçimi Algoritmalar sayfasından yapılır; sayfa içinde başka sete geçiş yok */
+#setTabs { display: none; }
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="/icerikler/algoritmalar" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<section class="hero reveal">
+<div class="hero-text">
+<div class="badge">
+<i></i>
+<span data-i18n="badge_text">3x3 · CFOP · BAŞLANGIÇ SON KATMAN</span>
+</div>
+<h1><span id="heroT1" data-i18n="hero_title1_2lo">2-Look</span> <span id="heroAccent" data-i18n="hero_titleAccent_2lo">OLL</span></h1>
+<p id="heroP" data-i18n="hero_p_2lo">Tam OLL (57) yerine üst yüzü iki adımda sarı yap: önce sarı artı (3 durum), sonra köşeler (7 durum). Toplam 10 algoritma; hepsi 3x3 simülasyonunda doğrulandı, kartlara dokunarak öğrendiklerini işaretle.</p>
+</div>
+</section>
+
+<section class="nota-box">
+    <h2 data-i18n="not_title">Notasyon</h2>
+    <p data-i18n="not_p">R, U, F, L, D dış katmanlardır; ' ters yön, 2 yarım tur demektir. f: ön iki katman (F + S). r: sağ iki katman (R + M'). M: orta dikey katman, L ile aynı yönde.</p>
+    <p id="viewNote" data-i18n="view_note_2lo">Diyagramlar üstten bakıştır ve sadece sarı etiketleri gösterir. Artı adımında köşeler gri (önemsiz).</p>
+</section>
+
+<div class="set-tabs" id="setTabs"></div>
+<p class="set-desc" id="setDesc"></p>
+
+<div class="print-row"><a class="print-link" id="printLink" href="/icerikler/algoritmalar/yazdir?set=2look-2lo" data-i18n="print_btn">🖨️ Yazdır / PDF</a></div>
+
+<!-- İlerleme özeti -->
+<div class="progress-summary" id="progressSummary"></div>
+
+<div class="subsets-wrap" id="subsetsWrap"></div>
+
+<div id="loadError" class="load-error" style="display:none;" data-i18n="load_error">Algoritma verisi yüklenemedi. Lütfen daha sonra tekrar dene.</div>
+
+<section class="bottom reveal">
+<h3 data-i18n="bottom_title">🧩 Pratik zamanı</h3>
+<p id="bottomP" data-i18n="bottom_p_2lo">2-Look OLL'yi antrenörde süreyle çalış; oturunca tam OLL'ye geç.</p>
+<a class="print-link" id="trainLink" href="/icerikler/algoritmalar/antrenor?set=2look-2lo" style="margin-top:12px" data-i18n="go_trainer">⏱️ Antrenörde çalış</a>
+</section>
+
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+
+<!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
+<script>var PAGE_ID = "twolook_algos";</script>
+<script src="/js/i18n.js?v=20261072"></script>
+<script src="/js/common.js?v=20261072"></script>
+<script src="/js/custom-algs.js?v=20261072"></script>
+
+<script>
+/* ============================================================
+   2-LOOK OLL / PLL SETLERİ
+   Veri: 2look.json (simülasyonla bulunup doğrulanmış algoritmalar)
+   Diyagramlar sayfada çizilir: geom = etiket çokgenleri, c = renk harfleri
+   Her setin ilerlemesi ayrı localStorage anahtarında tutulur.
+   ============================================================ */
+var PAGE_KEY = "2look";
+var FIXED_SET = "2lo"; // 2-Look OLL sayfası
+var STATES = ["", "learning", "known"];
+var PROGRESS_TEXT = {
+    tr: { learning: "Öğreniyorum", known: "Biliyorum" },
+    en: { learning: "Learning",    known: "Known" },
+    de: { learning: "Ich lerne",   known: "Kann ich" },
+    fr: { learning: "J'apprends",  known: "Je sais" },
+    ru: { learning: "Учу",         known: "Знаю" },
+    ar: { learning: "أتعلم",       known: "أعرف" }
+};
+var DATA = null, currentSet = null;
+
+function currentLang() { return localStorage.getItem("site-lang") || "tr"; }
+function progressText() { return PROGRESS_TEXT[currentLang()] || PROGRESS_TEXT.tr; }
+function T(key, fallback) {
+    var pages = (window.SITE_I18N && SITE_I18N.pages) || {};
+    var p = pages[PAGE_ID] || {};
+    var d = p[currentLang()] || {};
+    return d[key] || (p.tr && p.tr[key]) || fallback || key;
+}
+function progressKey() { return "algo-progress-" + PAGE_KEY + "-" + currentSet; }
+function loadProgress() {
+    try { var p = JSON.parse(localStorage.getItem(progressKey())); return (p && typeof p === "object") ? p : {}; } catch (e) { return {}; }
+}
+function saveProgress(p) { try { localStorage.setItem(progressKey(), JSON.stringify(p)); } catch (e) {} }
+function stateOfCard(card) {
+    if (card.classList.contains("state-known")) return "known";
+    if (card.classList.contains("state-learning")) return "learning";
+    return "";
+}
+function applyState(card, state) {
+    card.classList.remove("state-learning", "state-known");
+    if (state) card.classList.add("state-" + state);
+    var s = card.querySelector(".case-status");
+    if (s) s.textContent = state ? progressText()[state] : "";
+}
+function updateSummary() {
+    var cards = document.querySelectorAll(".case-card"), learning = 0, known = 0;
+    for (var i = 0; i < cards.length; i++) {
+        var st = stateOfCard(cards[i]);
+        if (st === "learning") learning++;
+        if (st === "known") known++;
+    }
+    var t = progressText();
+    document.getElementById("progressSummary").innerHTML =
+        '<span>🟡 ' + t.learning + ': ' + learning + '</span>' + '<span>🟢 ' + t.known + ': ' + known + ' / ' + cards.length + '</span>';
+}
+function refreshProgressLabels() {
+    var cards = document.querySelectorAll(".case-card");
+    for (var i = 0; i < cards.length; i++) applyState(cards[i], stateOfCard(cards[i]));
+    updateSummary();
+}
+function cycleCard(card) {
+    var name = card.getAttribute("data-case"), p = loadProgress();
+    var next = STATES[(STATES.indexOf(p[name] || "") + 1) % STATES.length];
+    if (next) p[name] = next; else delete p[name];
+    saveProgress(p);
+    applyState(card, next);
+    updateSummary();
+}
+function escapeHtml(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+/* Diyagram: geom.polys[i] çokgenine c[i] rengini ver */
+function caseSvg(c, size, g) {
+    g = g || DATA.geom; var v = g.view, out = '<svg viewBox="' + v.join(" ") + '" width="' + size + '" height="' + size + '"' + (v[2] / v[3] < 0.7 ? ' class="tall"' : (v[2] / v[3] < 0.95 ? ' class="iso"' : '')) + ' xmlns="http://www.w3.org/2000/svg">';
+    var sw = (v[2] / 160).toFixed(3);
+    for (var i = 0; i < g.polys.length; i++) {
+        var pts = g.polys[i].map(function (p) { return p[0] + "," + p[1]; }).join(" ");
+        out += '<polygon points="' + pts + '" fill="' + (DATA.colors[c.charAt(i)] || "#5a5d66") + '" stroke="#17171f" stroke-width="' + sw + '" stroke-linejoin="round"/>';
+    }
+    return out + '</svg>';
+}
+function renderTabs() {
+    var html = "";
+    DATA.sets.forEach(function (s) {
+        html += '<button class="set-tab' + (s.id === currentSet ? " active" : "") + '" data-set="' + s.id + '" data-i18n="set_' + s.id + '">' + escapeHtml(T("set_" + s.id, s.id)) + '</button>';
+    });
+    document.getElementById("setTabs").innerHTML = html;
+    var d = document.getElementById("setDesc");
+    d.setAttribute("data-i18n", "desc_" + currentSet);
+    d.textContent = T("desc_" + currentSet, "");
+    // Başlık ve metinler sadece seçili türden (OLL ya da PLL) bahseder
+    [["heroT1", "hero_title1_"], ["heroAccent", "hero_titleAccent_"], ["heroP", "hero_p_"], ["viewNote", "view_note_"], ["bottomP", "bottom_p_"]].forEach(function (x) {
+        var el = document.getElementById(x[0]);
+        if (!el) return;
+        el.setAttribute("data-i18n", x[1] + currentSet);
+        el.textContent = T(x[1] + currentSet, el.textContent);
+    });
+    document.getElementById("trainLink").href = "/icerikler/algoritmalar/antrenor?set=2look-" + currentSet;
+    document.title = "Rubik Academy - 2-Look " + (currentSet === "2lp" ? "PLL" : "OLL");
+}
+function renderSet() {
+    var set = DATA.sets.filter(function (s) { return s.id === currentSet; })[0] || DATA.sets[0];
+    currentSet = set.id;
+    renderTabs();
+    document.getElementById("printLink").href = "/icerikler/algoritmalar/yazdir?set=2look-" + currentSet;
+    var progress = loadProgress(), t = progressText(), html = "";
+    var geom = (DATA.geoms && set.geom) ? DATA.geoms[set.geom] : DATA.geom;
+    set.groups.forEach(function (group) {
+        var key = "subset_" + group.subset;
+        html += '<div class="subset-block"><h2 class="subset-heading" data-i18n="' + key + '">' + escapeHtml(T(key, group.subset)) + '</h2><div class="case-grid">';
+        group.cases.forEach(function (c) {
+            var st = progress[c.name] || "";
+            html += '<div class="case-card' + (st ? " state-" + st : "") + '" data-case="' + escapeHtml(c.name) + '" role="button" tabindex="0">' +
+                '<div class="case-diagram" dir="ltr">' + caseSvg(c.c, 96, geom) + '</div>' +
+                '<div class="case-body"><div class="case-name">' + escapeHtml(c.name) + '</div>' +
+                '<div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>' +
+                (c.alts && c.alts.length ? '<div class="case-alts" dir="ltr">' + c.alts.map(function (a) { return '<div class="case-alt-line">' + escapeHtml(a) + '</div>'; }).join("") + '</div>' : '') +
+                '<div class="case-status">' + escapeHtml(st ? t[st] : "") + '</div></div></div>';
+        });
+        html += '</div></div>';
+    });
+    document.getElementById("subsetsWrap").innerHTML = html;
+    updateSummary();
+}
+
+fetch("/icerikler/algoritmalar/2look.json?v=20261072")
+    .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    .then(function (data) {
+        DATA = data;
+        var saved = null;
+        try { saved = localStorage.getItem("algo-set-" + PAGE_KEY); } catch (e) {}
+        currentSet = FIXED_SET; // bu sayfa yalnızca tek seti gösterir
+        renderSet();
+        var wrap = document.getElementById("subsetsWrap");
+        wrap.addEventListener("click", function (e) {
+            var sel = window.getSelection ? String(window.getSelection()) : "";
+            if (sel.length > 0) return;
+            var card = e.target.closest(".case-card");
+            if (card) cycleCard(card);
+        });
+        wrap.addEventListener("keydown", function (e) {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            var card = e.target.closest(".case-card");
+            if (!card) return;
+            e.preventDefault(); cycleCard(card);
+        });
+        document.getElementById("setTabs").addEventListener("click", function (e) {
+            var b = e.target.closest(".set-tab");
+            if (!b) return;
+            currentSet = b.getAttribute("data-set");
+            history.replaceState(null, "", "#" + currentSet);
+            renderSet();
+        });
+    })
+    .catch(function (err) {
+        document.getElementById("loadError").style.display = "block";
+        console.error("2look.json yüklenemedi:", err);
+    });
+
+// Dil değişince (common.js applyLanguage sonrası çağırır)
+function onLanguageApplied() { if (DATA) { renderTabs(); refreshProgressLabels(); } }
+</script>
+
+</body>
+</html>
