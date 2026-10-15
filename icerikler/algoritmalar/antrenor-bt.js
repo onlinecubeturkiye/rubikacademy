@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261068";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261069";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -85,6 +85,15 @@
     }
     var IDENT = { U: "U", D: "D", F: "F", B: "B", R: "R", L: "L", inv: { U: "U", D: "D", F: "F", B: "B", R: "R", L: "L" } };
     var hold = IDENT; // karıştırma takibinde tutuş çerçevesi
+    /* Roux + "Küpüm çözülmüş": küp durumunu göndermiyorsa M katmanının kayması bilinmez.
+       Dört aday (M, M2, M' kayık ya da düz) tutulur; ilk karıştırma hamlesi hangisi olduğunu belirler. */
+    var mCands = null;
+    function startMGuess() {
+        mCands = [0, 1, 2, 3].map(function (k) {
+            var m = k ? turn(turn(solvedModel(), "R", k), "L", 4 - k) : solvedModel();
+            return { model: m, frame: rouxFrame(m) || IDENT };
+        });
+    }
     var mOdd = false; // Roux EO: M katmanı çeyrek kayık (case değişir)
     /* Küpün gönderdiği durum (Kociemba sırası URFDLB, küpün kendi beyaz-üst çerçevesinde)
        -> bizim model (sarı-üst tutuş, z2). Merkezler her zaman sabittir: M kayık bir küp de
@@ -372,6 +381,7 @@
         if (!applies()) { phase = "off"; return; }
         afterCase = phase === "done";
         hold = IDENT;
+        if (!isRoux()) mCands = null;
         if (isCross() && modelKnown && crossSt) { crossPrefix(); startScrambleTracking(); return; }
         var fr = readyFrame();
         if (!fr) { phase = "needSolve"; renderScramble(); setHint("bt_hint_solve"); return; }
@@ -384,6 +394,7 @@
         var f = MAP[FACES[face]];
         var d = dir === 0 ? 1 : 3;
         model = turn(model, f, d);
+        if (mCands) mCands.forEach(function (c) { c.model = turn(c.model, f, d); });
         if (crossSt && window.CrossSolver) crossSt = CrossSolver.apply(crossSt, fmtMove(f, d));
         if (!applies()) return;
         if (phase === "needSolve") {
@@ -392,6 +403,20 @@
             return;
         }
         if (phase === "scrambling") {
+            if (mCands) {
+                // Beklenen karıştırma hamlesine uyan adayları tut; tek aday kalınca onu kabul et
+                var want = todo.length && !todo[0].fix ? todo[0].f : null, mf = f;
+                var keep = want ? mCands.filter(function (c) { return c.frame.inv[mf] === want; }) : [];
+                if (keep.length === 1 || !keep.length) {
+                    var pick = keep[0] || mCands[0];
+                    model = pick.model; hold = pick.frame; mCands = null;
+                    // EO'da M çeyrek kayıksa case anlamı değişir: hizalamasını iste
+                    if (current.id === "roux-eo" && hold.U !== "U" && hold.U !== "D") {
+                        mOdd = true; phase = "needSolve"; renderScramble(); setHint("bt_hint_solve"); return;
+                    }
+                } else mCands = keep;
+                if (mCands) hold = mCands[0].frame; // kalanlar bu hamle için aynı yüzü verir (ör. R, L)
+            }
             f = hold.inv[f]; // merkezlere göre gelen yüz -> tutuştaki yüz
             if (todo.length && todo[0].f === f) {
                 todo[0].q = (todo[0].q - d + 8) % 4;
@@ -415,6 +440,7 @@
                 renderScramble(); setHint("bt_hint_solve");
                 return;
             }
+            if (!todo.length && mCands) { model = mCands[0].model; hold = mCands[0].frame; mCands = null; }
             if (!todo.length) { phase = "ready"; setHint("bt_hint_ready"); if (isCross()) startInsp(); }
             renderScramble();
             return;
@@ -600,7 +626,7 @@
                     if (!modelKnown || (pendingCheck && fm && rouxFrame(fm))) {
                         // Küpün kendi bildirdiği durum: çözülmüş ya da (Roux) M katmanı kayık olabilir
                         if (fm) {
-                            model = fm; modelKnown = true;
+                            model = fm; modelKnown = true; mCands = null;
                             crossSt = (window.CrossSolver && isSolved(fm)) ? CrossSolver.SOLVED : null;
                         }
                         pendingCheck = false;
@@ -642,7 +668,7 @@
     }
     function dropConnection() {
         if (sub) { try { sub.unsubscribe(); } catch (e) {} }
-        sub = null; conn = null; phase = "off"; noData = false; stopInsp(); window.btSolveCount = null;
+        sub = null; conn = null; phase = "off"; noData = false; stopInsp(); window.btSolveCount = null; mCands = null;
         if (isCross() && typeof curBaseScramble === "string" && curBaseScramble) curScramble = curBaseScramble;
         renderBar();
         if (curScramble) el("scramble").textContent = curScramble;
@@ -663,6 +689,8 @@
     var pendingCheck = false;
     function markSolved() {
         setSolved();
+        mCands = null;
+        if (isRoux()) startMGuess();
         // Roux'da küp M kayık olabilir: küpün kendi durumunu iste, M dışında çözülmüşse onu kullan
         if (conn && (!conn.capabilities || conn.capabilities.facelets)) {
             pendingCheck = true;
