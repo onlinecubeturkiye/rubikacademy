@@ -10,7 +10,7 @@
      curScramble, startTimer, stopTimer, T, mode.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261076";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261077";
     var MAC_KEY = "trainer-bt-mac-v1";
     var FACES = "URFDLB";
     var MAP = { U: "D", D: "U", R: "L", L: "R", F: "F", B: "B" }; // küp çerçevesi -> sarı üst tutuş
@@ -290,7 +290,8 @@
         bt_insp: "İnceleme: {n} sn · artıyı planla, ilk hamlende süre başlar", bt_insp_over: "İnceleme süresi doldu, başla!",
         bt_title: "Bluetooth akıllı küp", bt_connect: "Bağlan", bt_reset: "Küpüm çözülmüş", bt_disconnect: "Bağlantıyı kes",
         bt_hint: "GAN (i, i2, i3, i Carry, ui…), MoYu, QiYi, GoCube veya Giiker akıllı küpünü bağla: karıştırma takip edilir, süre kendiliğinden başlar ve case çözülünce durur.",
-        bt_unsupported: "Bluetooth küp için Chrome veya Edge gerekir (iPhone/iPad desteklenmez).",
+        bt_unsupported: "Bu tarayıcı Bluetooth desteklemiyor. Akıllı küp için Chrome veya Edge kullan (Android, Windows, Mac).",
+        bt_unsup_ios: "iPad ve iPhone'daki tarayıcılar (Safari, Chrome) Bluetooth desteklemiyor. Akıllı küp için bu sayfayı App Store'daki Bluefy tarayıcısıyla aç.",
         bt_only3x3: "Bluetooth sadece 3x3 ve 2x2 setlerinde çalışır",
         bt_title222: "2x2 akıllı küp", bt_hint222: "2x2 akıllı küp (GAN 251 ui) bağlayabilirsin.",
         bt_is222: "Bu bir 2x2 akıllı küp: sadece 2x2 setlerinde kullanılabilir.",
@@ -339,6 +340,8 @@
     function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
     function fmtMove(f, q) { return f + (q === 2 ? "2" : q === 3 ? "'" : ""); }
     function supported() { return !!(navigator.bluetooth && navigator.bluetooth.requestDevice); }
+    // iPadOS masaüstü sitesi isterken kendini Mac olarak tanıtır: dokunmatik Mac = iPad
+    function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1); }
     // Bluetooth: 3x3 setleri (CFOP, Roux) yalnızca 3x3 akıllı küple, 2x2 setleri yalnızca 2x2 akıllı küple
     function btSet() { return !!(current && !current.noBT && (current.cube === "3x3" || current.cube === "2x2")); }
     function kindOf(name) { return CUBE222.test(name || "") ? "2x2" : "3x3"; }
@@ -369,10 +372,16 @@
         el("btConnect").textContent = txt("bt_connect");
         el("btReset").textContent = txt("bt_reset");
         el("btDisconnect").textContent = txt("bt_disconnect");
-        // Bluetooth'u desteklemeyen tarayıcıda (iPhone, Firefox) kutu hiç gösterilmez
-        // Bluetooth sadece 3x3 (CFOP, Roux) setlerinde: diğer küplerde kutu hiç görünmez
-        bar.classList.toggle("unsup", !supported() || !btSet());
-        if (!supported()) { st.textContent = txt("bt_unsupported"); el("btConnect").disabled = true; return; }
+        // Bluetooth sadece 3x3 ve 2x2 setlerinde: diğer küplerde kutu hiç görünmez
+        bar.classList.toggle("unsup", !btSet());
+        // Tarayıcı Bluetooth desteklemiyorsa (iPad/iPhone, Firefox, Samsung Internet) kutu gizlenmez: nedenini ve çözümünü söyler
+        bar.classList.toggle("nobt", !supported());
+        if (!supported()) {
+            el("btConnect").style.display = "none";
+            bar.classList.add("has-msg");
+            st.textContent = txt(isIOS() ? "bt_unsup_ios" : "bt_unsupported");
+            return;
+        }
         if (connecting) bar.classList.add("has-msg");
         if (connecting) { st.textContent = txt("bt_connecting") + (stage ? " (" + txt("bt_st_" + stage) + (stageName ? ": " + stageName : "") + ")" : ""); return; }
         if (!on && lastError) { st.textContent = lastError; bar.classList.add("has-msg"); return; }
