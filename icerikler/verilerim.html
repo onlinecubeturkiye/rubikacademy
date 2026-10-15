@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261091">
+<link rel="stylesheet" href="/styles/common.css?v=20261092">
 
 <style>
 .wrap { max-width: 980px; margin: 0 auto; }
@@ -72,6 +72,22 @@
 .vr-msg.ok { color: #16a34a; } .vr-msg.bad { color: var(--cube-red); }
 .btn.danger { border-color: var(--cube-red); color: var(--cube-red); }
 .btn.danger:hover { background: var(--cube-red); color: #fff; }
+
+.tr-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 10px; }
+#trBox [hidden], .vr-btns [hidden] { display: none !important; }
+.tr-col { min-width: 0; background: var(--surface-soft); border: 1.5px solid var(--border); border-radius: 16px; padding: 16px; display: grid; gap: 10px; align-content: start; justify-items: start; }
+.tr-col > * { max-width: 100%; }
+.tr-col h3 { font-size: 15px; margin: 0; color: var(--text); }
+.tr-code-box { width: 100%; text-align: center; }
+.tr-code { font: 900 40px/1.1 "JetBrains Mono", monospace; letter-spacing: 3px; color: var(--text); background: var(--surface); border: var(--card-bw) solid var(--ink); border-radius: 14px; padding: 12px 6px; box-shadow: var(--shadow-sm); }
+.tr-bar { height: 6px; border-radius: 6px; background: var(--border); margin: 10px 0 4px; overflow: hidden; }
+.tr-bar i { display: block; height: 100%; width: 100%; background: var(--cube-blue); transition: width .2s linear; }
+.tr-code-box small { font-weight: 800; color: var(--text-soft); }
+.tr-in { display: flex; gap: 8px; width: 100%; box-sizing: border-box; justify-self: stretch; }
+.tr-in .btn { flex: none; }
+.tr-in input { flex: 1 1 0; width: 0; min-width: 0; box-sizing: border-box; padding: 12px 8px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 24px "JetBrains Mono", monospace; letter-spacing: 2px; text-align: center; }
+#trBox.off .tr-grid { opacity: .5; pointer-events: none; }
+@media (max-width: 700px) { .tr-grid { grid-template-columns: minmax(0, 1fr); } .tr-code { font-size: 30px; letter-spacing: 2px; } .tr-col { padding: 12px; } .tr-in input { font-size: 20px; letter-spacing: 1px; } }
 @media (max-width: 600px) { .vr-stats { grid-template-columns: repeat(2, 1fr); } }
 
 </style>
@@ -131,13 +147,39 @@
     <p id="vrEmpty" hidden data-i18n="empty">Bu tarayıcıda henüz kayıtlı ilerleme yok.</p>
 </section>
 
+<section class="box" id="trBox">
+    <h2 data-i18n="tr_h">📲 Kodla başka cihaza aktar</h2>
+    <p data-i18n="tr_p">Dosyayla uğraşmadan aktar: verilerin olduğu cihazda "Kod oluştur"a bas, çıkan 8 haneli kodu diğer cihazda gir. Kod 30 saniyede bir yenilenir; bilgiler kodla şifrelenip aktarılır ve hemen silinir.</p>
+    <div class="tr-grid">
+        <div class="tr-col">
+            <h3 data-i18n="tr_send_h">Bu cihazdan gönder</h3>
+            <button type="button" class="btn primary" id="trSend" data-i18n="tr_send">📲 Kod oluştur</button>
+            <div class="tr-code-box" id="trCodeBox" hidden>
+                <div class="tr-code" id="trCode" dir="ltr">····-····</div>
+                <div class="tr-bar"><i id="trBar"></i></div>
+                <small id="trLeft" dir="ltr"></small>
+            </div>
+            <button type="button" class="btn" id="trStop" hidden data-i18n="tr_stop">Durdur</button>
+            <p class="vr-msg" id="trMsg" role="status" aria-live="polite"></p>
+        </div>
+        <div class="tr-col">
+            <h3 data-i18n="tr_get_h">Bu cihaza al</h3>
+            <div class="tr-in">
+                <input type="text" id="trInput" inputmode="numeric" autocomplete="one-time-code" maxlength="9" placeholder="0000-0000" dir="ltr">
+                <button type="button" class="btn primary" id="trGet" data-i18n="tr_get">Al</button>
+            </div>
+            <p class="vr-msg" id="trInMsg" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+</section>
+
 <section class="box">
     <h2 data-i18n="backup_h">💾 Yedekle ve geri yükle</h2>
     <p data-i18n="backup_p">Yedek dosyasını sakla (ör. telefonda Dosyalar'a, bilgisayarda bir klasöre). Yeni cihazda bu sayfayı açıp "Yedeği yükle" ile seç; yedekteki kayıtlar bu cihazdakilerin yerine geçer.</p>
     <div class="vr-btns">
         <button type="button" class="btn primary" id="vrDownload" data-i18n="download">💾 Yedeği indir</button>
         <button type="button" class="btn" id="vrUpload" data-i18n="upload">📂 Yedeği yükle</button>
-        <input type="file" id="vrFile" accept="application/json,.json" hidden>
+        <input type="file" id="vrFile" hidden>
     </div>
     <p class="vr-msg" id="vrMsg" role="status" aria-live="polite"></p>
 </section>
@@ -156,9 +198,10 @@
 </footer>
 
 <script>var PAGE_ID = "verilerim";</script>
-<script src="/js/i18n.js?v=20261091"></script>
-<script src="/js/common.js?v=20261091"></script>
-<script src="/js/search.js?v=20261091"></script>
-<script src="/js/verilerim.js?v=20261091"></script>
+<script src="/js/i18n.js?v=20261092"></script>
+<script src="/js/common.js?v=20261092"></script>
+<script src="/js/search.js?v=20261092"></script>
+<script src="/js/firebase-config.js?v=20261092"></script>
+<script src="/js/verilerim.js?v=20261092"></script>
 </body>
 </html>

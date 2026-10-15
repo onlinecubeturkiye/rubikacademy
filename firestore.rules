@@ -3,6 +3,9 @@ rules_version = '2';
 // Yol: days/{gün}/times/{cihaz}
 //   gün   : yerel tarihin gün numarası (UTC gece yarısından beri gün sayısı, ör. "20741")
 //   cihaz : tarayıcıda üretilen rastgele kimlik (her cihaz günde bir kez gönderebilir)
+// Cihazdan cihaza aktarma: transfer/{kimlik}
+//   kimlik: 8 haneli kodun özeti (kodun kendisi saklanmaz); içerik kodla şifrelidir (AES-GCM)
+//   en fazla 90 saniye geçerlidir; listelenemez, değiştirilemez; alan cihaz okuyunca siler
 service cloud.firestore {
   match /databases/{database}/documents {
     match /days/{day}/times/{dev} {
@@ -21,6 +24,18 @@ service cloud.firestore {
              : request.resource.data.t + (request.resource.data.pen == '+2' ? 2000 : 0))
         && request.resource.data.ts == request.time;
       allow update, delete: if false;
+    }
+    match /transfer/{id} {
+      allow get: if resource.data.exp > request.time;
+      allow list, update: if false;
+      allow create: if id.matches('^[a-f0-9]{32}$')
+        && request.resource.data.keys().hasOnly(['d', 'iv', 'exp'])
+        && request.resource.data.d is string && request.resource.data.d.size() <= 900000
+        && request.resource.data.iv is string && request.resource.data.iv.size() <= 40
+        && request.resource.data.exp is timestamp
+        && request.resource.data.exp > request.time
+        && request.resource.data.exp <= request.time + duration.value(90, 's');
+      allow delete: if id.matches('^[a-f0-9]{32}$');
     }
     match /{document=**} {
       allow read, write: if false;
