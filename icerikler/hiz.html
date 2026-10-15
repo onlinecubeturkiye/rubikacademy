@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Look-ahead ve TPS</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/hiz">
+<meta name="description" content="Look-ahead ve TPS egzersizleri: metronomla akıcılık çalış, duraksamaları azalt, TPS hesapla.">
+<meta property="og:title" content="Look-ahead ve TPS — Rubik Academy">
+<meta property="og:description" content="Metronom, look-ahead egzersizleri ve TPS hesaplayıcı.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/hiz">
+<meta property="og:image" content="https://rubikacademy.fun/og/hiz.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/hiz.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261074">
+
+<style>
+.wrap { max-width: 980px; margin: 0 auto; }
+.intro { text-align: center; margin: 0 auto 26px; max-width: 760px; }
+.intro .badge { margin-bottom: 14px; }
+.intro h1 { font-size: clamp(34px, 5vw, 54px); line-height: 1.05; letter-spacing: -1.5px; font-weight: 900; color: var(--text); margin-bottom: 14px; }
+.intro h1 span + span { color: var(--primary); }
+.intro p { color: var(--text-soft); font-size: 16px; line-height: 1.7; }
+.box { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 22px 24px; margin-bottom: 22px; }
+.box h2 { font-size: 22px; font-weight: 850; letter-spacing: -.3px; color: var(--text); margin-bottom: 10px; }
+.box p, .box li { color: var(--text-soft); font-size: 15px; line-height: 1.7; }
+.box p + p { margin-top: 8px; }
+.box code { font-family: "JetBrains Mono", monospace; font-weight: 700; color: var(--primary); }
+.box b { color: var(--text); }
+.p-list { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; }
+.p-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.p-links a { padding: 9px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 800; font-size: 14px; box-shadow: var(--shadow-sm); text-decoration: none; }
+.p-links a:hover { background: var(--cube-yellow); color: #17171f; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); text-decoration: none; }
+.btn:hover { background: var(--surface-soft); }
+.btn.primary { background: var(--cube-yellow); color: #17171f; }
+.btn:disabled { opacity: .5; cursor: default; }
+@media (max-width: 760px) { .box { padding: 18px 16px; } }
+
+.h-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.h-row2 .box { margin-bottom: 22px; }
+.metro { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 22px; align-items: center; }
+.m-dial { text-align: center; }
+.m-pulse { width: 150px; height: 150px; margin: 0 auto; border-radius: 50%; border: var(--card-bw) solid var(--ink); background: var(--surface-soft); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.m-pulse b { font: 900 46px/1 Inter, sans-serif; color: var(--text); }
+.m-pulse span { font-size: 12px; font-weight: 800; color: var(--text-soft); margin-top: 4px; }
+.m-pulse.hit { animation: hit .18s ease-out; }
+@keyframes hit { 0% { background: var(--cube-yellow); transform: scale(1.06); } 100% { background: var(--surface-soft); transform: scale(1); } }
+.m-tps { margin-top: 10px; font-weight: 800; color: var(--text-soft); font-size: 14px; }
+.m-tps b { color: var(--primary); font-size: 18px; }
+.m-ctrl { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.m-ctrl input[type=range] { flex: 1; accent-color: var(--primary); }
+.m-ctrl .btn { padding: 6px 12px; }
+.m-alg { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface-soft); color: var(--text); font: 700 15px "JetBrains Mono", monospace; }
+.m-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+.m-presets button { padding: 5px 10px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font: 800 12px Inter, sans-serif; cursor: pointer; }
+.m-presets button:hover { background: var(--cube-yellow); color: #17171f; }
+.m-seq { display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; padding: 8px; border-radius: 12px; background: var(--surface-soft); }
+.mm { padding: 6px 10px; border-radius: 8px; font: 800 17px "JetBrains Mono", monospace; color: var(--text); background: var(--surface); border: 1.5px solid var(--border); transition: background .05s; }
+.mm.rot { color: var(--text-soft); }
+.mm.on { background: var(--cube-yellow); color: #17171f; border-color: var(--ink); }
+.mm-empty { font-size: 13px; color: var(--text-soft); }
+.m-opts { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 12px; font-size: 13.5px; font-weight: 700; color: var(--text-soft); }
+.m-opts input[type=number] { width: 56px; padding: 4px 6px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font: 700 13px Inter, sans-serif; }
+.m-opts label { display: inline-flex; align-items: center; gap: 6px; }
+.m-go { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.m-go .btn.on { background: var(--cube-red); color: #fff; }
+.m-go span { font-weight: 800; color: var(--text-soft); font-size: 13.5px; }
+.drills { display: grid; gap: 12px; }
+.drill { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 16px; border: 1.5px solid var(--border); background: var(--surface-soft); }
+.drill .n { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font: 900 18px Inter, sans-serif; background: var(--cube-yellow); color: #17171f; border: 2px solid var(--ink); }
+.drill h3 { font-size: 16px; font-weight: 850; color: var(--text); margin: 0 0 3px; }
+.drill p { font-size: 14px !important; margin: 0; }
+.drill .btn { padding: 7px 12px; font-size: 13px; white-space: nowrap; }
+.tps-calc { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 10px; }
+.tps-calc label { font-size: 12.5px; font-weight: 800; color: var(--text-soft); display: block; margin-bottom: 4px; }
+.tps-res { display: flex; gap: 18px; margin-top: 12px; font-weight: 800; color: var(--text-soft); }
+.tps-res b { font: 900 24px Inter, sans-serif; color: var(--text); margin-inline-end: 4px; }
+.lv { width: 100%; border-collapse: collapse; font-size: 14px; }
+.lv td { padding: 7px 4px; border-bottom: 1px solid var(--border); color: var(--text-soft); }
+.lv td:last-child { text-align: end; font-weight: 800; color: var(--text); font-family: "JetBrains Mono", monospace; }
+@media (max-width: 760px) { .h-row2, .metro { grid-template-columns: 1fr; } .drill { grid-template-columns: 40px minmax(0, 1fr); } .drill .btn { grid-column: 2; justify-self: start; } }
+
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+<div class="wrap">
+<nav class="nav-bar">
+    <a href="/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+<section class="intro">
+    <div class="badge"><i></i><span data-i18n="badge">HIZLANMA</span></div>
+    <h1><span data-i18n="title">Look-ahead</span> <span data-i18n="title_accent">ve TPS</span></h1>
+    <p data-i18n="intro">Hızlı çözmenin sırrı el hızı değil, durmadan çözmek. Metronomla akıcılığını çalış, look-ahead egzersizleriyle duraksamaları azalt.</p>
+</section>
+
+<div class="h-row2">
+<section class="box">
+    <h2 data-i18n="tps_h">TPS nedir?</h2>
+    <p data-i18n="tps_p" data-i18n-html><b>TPS</b> (turns per second), saniyede yaptığın hamle sayısıdır. 60 hamlelik bir çözümü 20 saniyede bitirirsen ortalama TPS'in 3'tür. Ortalamayı asıl düşüren şey yavaş el değil, <b>duraksamalardır</b>.</p>
+    <table class="lv">
+        <tr><td data-i18n="lv1">Yeni başlayan</td><td>1–2</td></tr>
+        <tr><td data-i18n="lv2">Sub-30</td><td>3–4</td></tr>
+        <tr><td data-i18n="lv3">Sub-15</td><td>5–6</td></tr>
+        <tr><td data-i18n="lv4">Üst seviye</td><td>8+</td></tr>
+    </table>
+</section>
+<section class="box">
+    <h2 data-i18n="la_h">Look-ahead nedir?</h2>
+    <p data-i18n="la_p" data-i18n-html>Bir adımı yaparken gözünle bir sonrakini aramaktır. Örneğin bir F2L çiftini yerleştirirken sıradaki çiftin parçalarını bulursun. Böylece adımlar arasında durmazsın.</p>
+    <p data-i18n="la_p2" data-i18n-html>Kural basit: <b>yavaş ama hiç durmadan</b> çözmek, hızlı çevirip durmaktan daha hızlıdır. Metronom bu yüzden işe yarar.</p>
+</section>
+</div>
+
+<section class="box" id="metro">
+    <h2 data-i18n="m_h">⏱️ Metronom</h2>
+    <p data-i18n="m_p">Her vuruşta bir hamle yap. Önce rahat bir hızda hatasız çevir, sonra BPM'i artır. Sıradaki hamle sarıyla gösterilir.</p>
+    <div class="metro">
+        <div class="m-dial">
+            <div class="m-pulse" id="mPulse"><b id="mBpmVal">90</b><span>BPM</span></div>
+            <div class="m-tps">= <b id="mTps">1.50</b> TPS</div>
+        </div>
+        <div>
+            <div class="m-ctrl"><button type="button" class="btn" id="mMinus" aria-label="-5 BPM">−5</button><input type="range" id="mBpm" min="30" max="300" step="1" value="90" aria-label="BPM"><button type="button" class="btn" id="mPlus" aria-label="+5 BPM">+5</button></div>
+            <input type="text" class="m-alg" id="mAlg" dir="ltr" spellcheck="false" autocomplete="off" value="R U R' U'" aria-label="Algoritma">
+            <div class="m-presets" dir="ltr">
+                <button type="button" data-alg="R U R' U'">Sexy</button>
+                <button type="button" data-alg="R U R' U R U2 R'">Sune</button>
+                <button type="button" data-alg="R U R' U' R' F R2 U' R' U' R U R' F'">T perm</button>
+                <button type="button" data-alg="R U R' F' R U R' U' R' F R2 U' R'">Jb perm</button>
+                <button type="button" data-alg="R U' R U R U R U' R' U' R2">Ua perm</button>
+                <button type="button" data-alg="F R U R' U' F'">F sexy F'</button>
+                <button type="button" data-alg="R' F R F'">Sledgehammer</button>
+            </div>
+            <div class="m-seq" id="mSeq" dir="ltr"></div>
+            <div class="m-opts">
+                <label><input type="checkbox" id="mRamp"> <span data-i18n="m_ramp">Her turda hızlan</span></label>
+                <label>+<input type="number" id="mRampStep" value="5" min="1" max="30"> BPM</label>
+                <label><input type="checkbox" id="mMute"> <span data-i18n="m_mute">Sessiz</span></label>
+            </div>
+            <div class="m-go"><button type="button" class="btn primary" id="mStart" data-i18n="m_start">▶ Başlat</button><span><span data-i18n="m_rounds">Tur:</span> <b id="mRounds">0</b></span></div>
+        </div>
+    </div>
+</section>
+
+<section class="box">
+    <h2 data-i18n="d_h">Look-ahead egzersizleri</h2>
+    <p data-i18n="d_p">Her egzersizi birkaç gün, günde 5–10 çözüm yap. Butona basınca metronom önerilen hıza ayarlanır.</p>
+    <div class="drills">
+        <div class="drill"><span class="n">1</span><div><h3 data-i18n="d1_t">Yavaş ama durmadan</h3><p data-i18n="d1_p">Tüm çözümü saniyede 1 hamleyle, hiç durmadan yap. Durmak zorunda kalıyorsan daha da yavaşla. Amaç akıcılık.</p></div><button type="button" class="btn" data-bpm="60" data-i18n="d_btn60">60 BPM</button></div>
+        <div class="drill"><span class="n">2</span><div><h3 data-i18n="d2_t">Cross + ilk çift</h3><p data-i18n="d2_p">İncelemede cross'u planla ve ilk F2L çiftinin parçalarını da bul. Cross biterken gözün zaten o çiftte olsun.</p></div><a class="btn" href="/icerikler/algoritmalar/antrenor?set=cross" data-i18n="d_cross">✚ Cross antrenörü</a></div>
+        <div class="drill"><span class="n">3</span><div><h3 data-i18n="d3_t">Çifti gözle takip</h3><p data-i18n="d3_p">Bir çifti yerleştirirken ona bakma; elin hamleyi bilir. Gözlerinle bir sonraki köşe ve kenarı ara. F2L'i 80 BPM'de çalış.</p></div><button type="button" class="btn" data-bpm="80" data-i18n="d_btn80">80 BPM</button></div>
+        <div class="drill"><span class="n">4</span><div><h3 data-i18n="d4_t">Algoritma akıcılığı</h3><p data-i18n="d4_p">Sık kullandığın algoritmaları metronomla, her turda hızlanarak tekrarla. Duraksamadan yapabildiğin en yüksek BPM'i not al.</p></div><button type="button" class="btn" data-bpm="120" data-alg2="R U R' U' R' F R2 U' R' U' R U R' F'" data-i18n="d_btn_t">T perm · 120</button></div>
+        <div class="drill"><span class="n">5</span><div><h3 data-i18n="d5_t">Az küp döndürme</h3><p data-i18n="d5_p">F2L'de y dönüşlerini azalt: çifti U ile ön yuvalara getir, arka yuvaları gerekirse sol elle çöz. Her dönüş look-ahead'i bozar.</p></div><a class="btn" href="/icerikler/f2l" data-i18n="d_f2l">F2L rehberi</a></div>
+        <div class="drill"><span class="n">6</span><div><h3 data-i18n="d6_t">Parmak hileleri</h3><p data-i18n="d6_p">R U R' U' gibi kısa dizileri bilekten değil parmaklardan çevir. Önce 150 BPM'de temiz, sonra 200+.</p></div><button type="button" class="btn" data-bpm="150" data-alg2="R U R' U'" data-i18n="d_btn_s">Sexy · 150</button></div>
+    </div>
+</section>
+
+<section class="box">
+    <h2 data-i18n="t_h">TPS hesaplayıcı</h2>
+    <p data-i18n="t_p">Algoritmayı ya da çözümünü yapıştır ve süreni gir. Küp döndürmeleri (x, y, z) hamle sayılmaz.</p>
+    <div class="tps-calc">
+        <div><label for="tAlg" data-i18n="t_alg">Hamleler</label><input type="text" class="m-alg" id="tAlg" dir="ltr" spellcheck="false" autocomplete="off" value="R U R' U' R' F R2 U' R' U' R U R' F'"></div>
+        <div><label for="tTime" data-i18n="t_time">Süre (sn)</label><input type="text" class="m-alg" id="tTime" inputmode="decimal" value="2.5"></div>
+    </div>
+    <div class="tps-res"><span><b id="tMoves">0</b><span data-i18n="t_moves">hamle</span></span><span><b id="tOut">-</b>TPS</span></div>
+    <div class="p-links">
+        <a href="/icerikler/gunluk" data-i18n="l_daily">🔥 Günün karıştırması</a>
+        <a href="/icerikler/algoritmalar/antrenor" data-i18n="l_trainer">🧠 Algoritma antrenörü</a>
+    </div>
+</section>
+
+</div>
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script>var PAGE_ID = "hiz";</script>
+<script src="/js/i18n.js?v=20261074"></script>
+<script src="/js/common.js?v=20261074"></script>
+<script src="/js/hiz.js?v=20261074"></script>
+</body>
+</html>
