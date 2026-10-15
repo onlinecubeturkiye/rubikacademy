@@ -1,0 +1,29 @@
+rules_version = '2';
+// Rubik Academy — Günün Karıştırması sıralama tablosu
+// Yol: days/{gün}/times/{cihaz}
+//   gün   : yerel tarihin gün numarası (UTC gece yarısından beri gün sayısı, ör. "20741")
+//   cihaz : tarayıcıda üretilen rastgele kimlik (her cihaz günde bir kez gönderebilir)
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /days/{day}/times/{dev} {
+      allow read: if true;
+      allow create: if day.matches('^[0-9]{5}$')
+        && int(day) - math.floor(request.time.toMillis() / 86400000) <= 1
+        && math.floor(request.time.toMillis() / 86400000) - int(day) <= 1
+        && dev.matches('^[a-z0-9]{20}$')
+        && request.resource.data.keys().hasOnly(['name', 't', 'pen', 'v', 'ts'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 20
+        && request.resource.data.t is int
+        && request.resource.data.t >= 3000 && request.resource.data.t <= 3600000
+        && request.resource.data.pen in ['', '+2', 'dnf']
+        && request.resource.data.v == (request.resource.data.pen == 'dnf' ? 99999999
+             : request.resource.data.t + (request.resource.data.pen == '+2' ? 2000 : 0))
+        && request.resource.data.ts == request.time;
+      allow update, delete: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
