@@ -1,0 +1,6 @@
+cubing.js (https://github.com/cubing/cubing.js) v0.66.0
+Copyright (c) cubing.js contributors.
+Licensed under the Mozilla Public License 2.0 (MPL-2.0) OR GPL-3.0-or-later.
+This directory contains an unmodified esbuild bundle of the "cubing/twisty" module.
+MPL-2.0 text: https://www.mozilla.org/en-US/MPL/2.0/
+Source code: https://github.com/cubing/cubing.js/tree/v0.66.0
