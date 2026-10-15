@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261061">
+<link rel="stylesheet" href="/styles/common.css?v=20261062">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -516,6 +516,17 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     .seg-btn { padding: 6px 6px; font-size: 11.5px; white-space: nowrap; }
     .stat-tiles { grid-template-columns: repeat(2, 1fr) !important; }
 }
+/* RENK KÖRLÜĞÜ SORUSU */
+.tool-row { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 0 auto 20px; }
+.tool-row .tool-tabs { margin: 0; }
+.cvd-open { border: var(--card-bw) solid var(--border); background: var(--surface); color: var(--text-soft); border-radius: 12px; padding: 8px 12px; font: 800 13px Inter, sans-serif; cursor: pointer; }
+.cvd-open:hover { color: var(--text); border-color: var(--card-border); }
+.cvd-opts { display: grid; gap: 8px; }
+.cvd-opt { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; border-radius: 14px; border: var(--card-bw) solid var(--border); background: var(--surface-soft); color: var(--text); font: 800 14px Inter, sans-serif; text-align: start; cursor: pointer; }
+.cvd-opt:hover { border-color: var(--card-border); }
+.cvd-opt.active { border-color: var(--card-border); box-shadow: var(--shadow-sm); background: var(--surface); }
+.cvd-opt span:first-child { flex: 1; line-height: 1.35; }
+.cvd-note { font-size: 12px; color: var(--text-soft); margin: 10px 2px 0; line-height: 1.45; }
 /* PLL TANIMA */
 .rc-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; max-width: 1100px; margin: 0 auto; }
 .rc-stage { display: grid; justify-items: center; gap: 12px; }
@@ -588,7 +599,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
             <div class="lang-menu" id="langMenu" role="menu"></div>
         </div>
 
-        <div class="settings-switcher" id="settingsSwitcher"><button class="dark-mode-btn" id="settingsBtn" type="button" onclick="toggleSettings(event)" aria-haspopup="true" aria-expanded="false" aria-label="Ayarlar" title="Ayarlar">⚙️</button><div class="settings-menu" id="settingsMenu"></div></div>
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
     </div>
 </header>
 
@@ -603,9 +614,12 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     <h1 data-i18n="title">Algoritma Antrenörü</h1>
 </section>
 
+<div class="tool-row">
 <div class="tool-tabs" id="toolTabs" role="tablist">
     <button type="button" class="tool-tab active" data-tool="alg" role="tab" data-i18n="tool_alg">🧠 Algoritma</button>
     <button type="button" class="tool-tab" data-tool="recog" role="tab" data-i18n="tool_recog">👁 PLL Tanıma</button>
+</div>
+<button type="button" class="cvd-open" id="cvdOpen" data-i18n="cvd_btn">🎨 Renkler</button>
 </div>
 
 <div id="toolRecog" data-i18n-scope="tanima" hidden>
@@ -731,6 +745,16 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 </div>
 </div>
 
+<!-- Renk körlüğü sorusu: antrenöre ilk girişte açılır -->
+<div class="bt-modal" id="cvdModal" role="dialog" aria-modal="true" aria-labelledby="cvdTitle">
+    <div class="bt-dialog">
+        <h3 id="cvdTitle"></h3>
+        <p id="cvdIntro"></p>
+        <div class="cvd-opts" id="cvdOpts"></div>
+        <p class="cvd-note" id="cvdNote"></p>
+    </div>
+</div>
+
 <div class="bt-modal" id="btPick" role="dialog" aria-modal="true" aria-labelledby="btPickTitle">
     <div class="bt-dialog">
         <h3 id="btPickTitle"></h3>
@@ -774,12 +798,12 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261061"></script>
-<script src="/js/common.js?v=20261061"></script>
-<script src="/js/custom-algs.js?v=20261061"></script>
-<script src="/js/cross-solver.js?v=20261061"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261061"></script>
-<script src="/js/recog-trainer.js?v=20261061"></script>
+<script src="/js/i18n.js?v=20261062"></script>
+<script src="/js/common.js?v=20261062"></script>
+<script src="/js/custom-algs.js?v=20261062"></script>
+<script src="/js/cross-solver.js?v=20261062"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261062"></script>
+<script src="/js/recog-trainer.js?v=20261062"></script>
 
 <script>
 /* ============================================================
@@ -965,7 +989,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261061").then(function (r) {
+        return fetch(BASE + f + "?v=20261062").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -1403,6 +1427,7 @@ applyMode();
 
 // Dil değişince dinamik metinleri yenile (common.js applyLanguage sonrası çağırır)
 function onLanguageApplied() {
+    if (document.getElementById("cvdModal").classList.contains("show")) renderCvdModal();
     (DATA.cross || []).forEach(function (c) { c.name = T("cross_" + c.lvl.id); });
     RecogTrainer.onLang();
     if (!current) return;
@@ -1413,6 +1438,37 @@ function onLanguageApplied() {
     document.getElementById("timerHint").textContent = T(hint);
     if (typeof btRenderBar === "function") btRenderBar();
 }
+
+/* ---------------- RENK KÖRLÜĞÜ SORUSU ----------------
+   İlk girişte sorulur (localStorage "cvd-asked"); seçim common.js applyCvd ile tüm sitede geçerli. */
+function ctext(k) {
+    var c = (window.SITE_I18N && SITE_I18N.common) || {};
+    return (c[lang()] && c[lang()][k]) || (c.tr && c.tr[k]) || k;
+}
+function renderCvdModal() {
+    var cur = cvdTheme();
+    document.getElementById("cvdTitle").textContent = ctext("cvd_q");
+    document.getElementById("cvdIntro").textContent = ctext("cvd_q_p");
+    document.getElementById("cvdNote").textContent = ctext("cvd_note");
+    document.getElementById("cvdOpts").innerHTML = [["", "cvd_none"], ["rg", "cvd_rg"], ["tri", "cvd_tri"]].map(function (o) {
+        return '<button type="button" class="cvd-opt' + (cur === o[0] && localStorage.getItem("cvd-asked") ? " active" : "") + '" data-cvd="' + o[0] + '"><span>' + esc(ctext(o[1])) + '</span>' + cvdSwatches(o[0]) + '</button>';
+    }).join("");
+}
+function openCvdModal() { renderCvdModal(); document.getElementById("cvdModal").classList.add("show"); }
+function closeCvdModal() {
+    try { localStorage.setItem("cvd-asked", "1"); } catch (e) {}
+    document.getElementById("cvdModal").classList.remove("show");
+}
+document.getElementById("cvdOpts").addEventListener("click", function (e) {
+    var b = e.target.closest(".cvd-opt");
+    if (!b) return;
+    applyCvd(b.getAttribute("data-cvd"));
+    closeCvdModal();
+});
+document.getElementById("cvdModal").addEventListener("click", function (e) { if (e.target === this) closeCvdModal(); });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.getElementById("cvdModal").classList.contains("show")) closeCvdModal(); });
+document.getElementById("cvdOpen").addEventListener("click", openCvdModal);
+try { if (!localStorage.getItem("cvd-asked") && !cvdTheme()) openCvdModal(); } catch (e) {}
 
 /* ---------------- ARAÇ SEKMELERİ: Algoritma / PLL tanıma ---------------- */
 var TOOL_KEY = "trainer-tool-v1", TOOLS = { alg: "toolAlg", recog: "toolRecog" };
