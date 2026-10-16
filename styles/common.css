@@ -94,12 +94,12 @@ html.dark-mode,
 body.dark-mode {
     --cube-blue: #4f7dff;
 
-    --tint-red: #3a1d22;
-    --tint-orange: #3a2717;
-    --tint-yellow: #3a3214;
-    --tint-green: #15352a;
-    --tint-blue: #1b2650;
-    --tint-purple: #2a2150;
+    --tint-red: #4f232c;
+    --tint-orange: #4e3525;
+    --tint-yellow: #494125;
+    --tint-green: #1b4136;
+    --tint-blue: #29365f;
+    --tint-purple: #3d365f;
 
     --ink: #050509;
 
@@ -125,7 +125,7 @@ body.dark-mode {
     --btn-bg: var(--cube-yellow);
     --btn-hover-bg: #ffdf5c;
     --btn-text: #17171f;
-    --bottom-bg: #1b2650;
+    --bottom-bg: #29365f;
     --bottom-border: #3a3d54;
     --bottom-text: var(--text);
 }
