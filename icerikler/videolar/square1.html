@@ -39,7 +39,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261095">
+<link rel="stylesheet" href="/styles/common.css?v=20261096">
 
 <style>
 html {
@@ -134,26 +134,7 @@ Square-1 mekanizmasını ve temel çözüm algoritmalarını adım adım öğren
 </div>
 
 <!-- HERO SQUARE-1 (2D) -->
-<svg class="hero-cube" viewBox="0 0 300 300">
-<defs>
-  <filter id="sq1-hero-shadow" x="-10%" y="-10%" width="120%" height="120%">
-    <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
-  </filter>
-</defs>
-<g filter="url(#sq1-hero-shadow)">
-  <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
-  <g fill="#ffd21f" stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M 150 148 L 133 41 L 167 41 Z"/>
-    <path d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
-    <path d="M 152 150 L 259 133 L 259 167 Z"/>
-    <path d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
-    <path d="M 150 152 L 167 259 L 133 259 Z"/>
-    <path d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
-    <path d="M 148 150 L 41 167 L 41 133 Z"/>
-    <path d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
-  </g>
-</g>
-</svg>
+<svg class="hero-cube" viewBox="0 0 300 300"><polygon points="150.0,32.0 252.2,91.0 150.0,150.0 47.8,91.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="47.8,91.0 150.0,150.0 150.0,268.0 47.8,209.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="150.0,150.0 252.2,91.0 252.2,209.0 150.0,268.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="150.0,84.3 120.1,54.4 150.0,37.1 179.9,54.4" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="156.8,87.1 186.7,57.1 208.6,69.8" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="161.6,91.0 213.4,73.7 243.3,91.0 213.4,108.3" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="156.8,94.9 208.6,112.2 186.7,124.9" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="150.0,97.7 179.9,127.6 150.0,144.9 120.1,127.6" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="143.2,94.9 113.3,124.9 91.4,112.2" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="138.4,91.0 86.6,108.3 56.7,91.0 86.6,73.7" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="143.2,87.1 91.4,69.8 113.3,57.1" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,95.4 82.7,114.1 82.7,150.7 50.4,132.0" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="87.8,117.0 110.0,129.9 110.0,166.5 87.8,153.6" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="115.2,132.8 147.4,151.5 147.4,188.1 115.2,169.4" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,137.9 147.4,194.0 147.4,221.1 50.4,165.0" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,170.9 82.7,189.6 82.7,226.2 50.4,207.5" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="87.8,192.5 110.0,205.4 110.0,242.0 87.8,229.1" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="115.2,208.3 147.4,227.0 147.4,263.6 115.2,244.9" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,151.5 184.8,132.8 184.8,169.4 152.6,188.1" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="190.0,129.9 212.2,117.0 212.2,153.6 190.0,166.5" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="217.3,114.1 249.6,95.4 249.6,132.0 217.3,150.7" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,194.0 198.5,167.4 198.5,194.5 152.6,221.1" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="203.7,164.5 249.6,137.9 249.6,165.0 203.7,191.6" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,227.0 184.8,208.3 184.8,244.9 152.6,263.6" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="190.0,205.4 212.2,192.5 212.2,229.1 190.0,242.0" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="217.3,189.6 249.6,170.9 249.6,207.5 217.3,226.2" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/></svg>
 </section>
 
 <!-- BAŞLIK -->
@@ -170,26 +151,7 @@ Square-1 mekanizmasını ve temel çözüm algoritmalarını adım adım öğren
 <a href="/yakinda" class="card">
 <div class="card-visual beginner">
 <div class="level" data-i18n="level_beginner">BAŞLANGIÇ SEVİYESİ</div>
-<svg class="cube" viewBox="0 0 300 300">
-<defs>
-  <filter id="sq1-beg-shadow" x="-10%" y="-10%" width="120%" height="120%">
-    <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
-  </filter>
-</defs>
-<g filter="url(#sq1-beg-shadow)">
-  <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
-  <g stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-    <path fill="#ffd21f" d="M 150 148 L 133 41 L 167 41 Z"/>
-    <path fill="#ffffff" d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
-    <path fill="#ffd21f" d="M 152 150 L 259 133 L 259 167 Z"/>
-    <path fill="#ffffff" d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
-    <path fill="#ffd21f" d="M 150 152 L 167 259 L 133 259 Z"/>
-    <path fill="#ffffff" d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
-    <path fill="#ffd21f" d="M 148 150 L 41 167 L 41 133 Z"/>
-    <path fill="#ffffff" d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
-  </g>
-</g>
-</svg>
+<svg class="cube" viewBox="0 0 300 300"><polygon points="150.0,32.0 252.2,91.0 150.0,150.0 47.8,91.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="47.8,91.0 150.0,150.0 150.0,268.0 47.8,209.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="150.0,150.0 252.2,91.0 252.2,209.0 150.0,268.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="150.0,84.3 120.1,54.4 150.0,37.1 179.9,54.4" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="156.8,87.1 186.7,57.1 208.6,69.8" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="161.6,91.0 213.4,73.7 243.3,91.0 213.4,108.3" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="156.8,94.9 208.6,112.2 186.7,124.9" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="150.0,97.7 179.9,127.6 150.0,144.9 120.1,127.6" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="143.2,94.9 113.3,124.9 91.4,112.2" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="138.4,91.0 86.6,108.3 56.7,91.0 86.6,73.7" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="143.2,87.1 91.4,69.8 113.3,57.1" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,95.4 82.7,114.1 82.7,150.7 50.4,132.0" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="87.8,117.0 110.0,129.9 110.0,166.5 87.8,153.6" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="115.2,132.8 147.4,151.5 147.4,188.1 115.2,169.4" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,137.9 147.4,194.0 147.4,221.1 50.4,165.0" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,170.9 82.7,189.6 82.7,226.2 50.4,207.5" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="87.8,192.5 110.0,205.4 110.0,242.0 87.8,229.1" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="115.2,208.3 147.4,227.0 147.4,263.6 115.2,244.9" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,151.5 184.8,132.8 184.8,169.4 152.6,188.1" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="190.0,129.9 212.2,117.0 212.2,153.6 190.0,166.5" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="217.3,114.1 249.6,95.4 249.6,132.0 217.3,150.7" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,194.0 198.5,167.4 198.5,194.5 152.6,221.1" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="203.7,164.5 249.6,137.9 249.6,165.0 203.7,191.6" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,227.0 184.8,208.3 184.8,244.9 152.6,263.6" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="190.0,205.4 212.2,192.5 212.2,229.1 190.0,242.0" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="217.3,189.6 249.6,170.9 249.6,207.5 217.3,226.2" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/></svg>
 </div>
 <div class="card-info">
 <h3 data-i18n="beginner_title">Başlangıç Methodu</h3>
@@ -205,26 +167,7 @@ Square-1 mekanizmasını ve temel çözüm algoritmalarını adım adım öğren
 <a href="/yakinda" class="card">
 <div class="card-visual middle">
 <div class="level" data-i18n="level_middle">ORTA SEVİYESİ</div>
-<svg class="cube" viewBox="0 0 300 300">
-<defs>
-  <filter id="sq1-mid-shadow" x="-10%" y="-10%" width="120%" height="120%">
-    <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
-  </filter>
-</defs>
-<g filter="url(#sq1-mid-shadow)">
-  <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
-  <g stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-    <path fill="#ffffff" d="M 150 148 L 133 41 L 167 41 Z"/>
-    <path fill="#ffffff" d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
-    <path fill="#ffd21f" d="M 152 150 L 259 133 L 259 167 Z"/>
-    <path fill="#ffd21f" d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
-    <path fill="#ffffff" d="M 150 152 L 167 259 L 133 259 Z"/>
-    <path fill="#ffffff" d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
-    <path fill="#ffd21f" d="M 148 150 L 41 167 L 41 133 Z"/>
-    <path fill="#ffd21f" d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
-  </g>
-</g>
-</svg>
+<svg class="cube" viewBox="0 0 300 300"><polygon points="150.0,32.0 252.2,91.0 150.0,150.0 47.8,91.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="47.8,91.0 150.0,150.0 150.0,268.0 47.8,209.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="150.0,150.0 252.2,91.0 252.2,209.0 150.0,268.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="150.0,84.3 120.1,54.4 150.0,37.1 179.9,54.4" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="156.8,87.1 186.7,57.1 208.6,69.8" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="161.6,91.0 213.4,73.7 243.3,91.0 213.4,108.3" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="156.8,94.9 208.6,112.2 186.7,124.9" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="150.0,97.7 179.9,127.6 150.0,144.9 120.1,127.6" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="143.2,94.9 113.3,124.9 91.4,112.2" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="138.4,91.0 86.6,108.3 56.7,91.0 86.6,73.7" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="143.2,87.1 91.4,69.8 113.3,57.1" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,95.4 82.7,114.1 82.7,150.7 50.4,132.0" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="87.8,117.0 110.0,129.9 110.0,166.5 87.8,153.6" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="115.2,132.8 147.4,151.5 147.4,188.1 115.2,169.4" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,137.9 147.4,194.0 147.4,221.1 50.4,165.0" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,170.9 82.7,189.6 82.7,226.2 50.4,207.5" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="87.8,192.5 110.0,205.4 110.0,242.0 87.8,229.1" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="115.2,208.3 147.4,227.0 147.4,263.6 115.2,244.9" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,151.5 184.8,132.8 184.8,169.4 152.6,188.1" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="190.0,129.9 212.2,117.0 212.2,153.6 190.0,166.5" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="217.3,114.1 249.6,95.4 249.6,132.0 217.3,150.7" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,194.0 198.5,167.4 198.5,194.5 152.6,221.1" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="203.7,164.5 249.6,137.9 249.6,165.0 203.7,191.6" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,227.0 184.8,208.3 184.8,244.9 152.6,263.6" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="190.0,205.4 212.2,192.5 212.2,229.1 190.0,242.0" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="217.3,189.6 249.6,170.9 249.6,207.5 217.3,226.2" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/></svg>
 </div>
 <div class="card-info">
 <h3 data-i18n="middle_title">Orta Seviye Methodu</h3>
@@ -240,26 +183,7 @@ Square-1 mekanizmasını ve temel çözüm algoritmalarını adım adım öğren
 <a href="/yakinda" class="card">
 <div class="card-visual advanced">
 <div class="level" data-i18n="level_advanced">İLERİ SEVİYE</div>
-<svg class="cube" viewBox="0 0 300 300">
-<defs>
-  <filter id="sq1-adv-shadow" x="-10%" y="-10%" width="120%" height="120%">
-    <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f1e32" flood-opacity="0.3"/>
-  </filter>
-</defs>
-<g filter="url(#sq1-adv-shadow)">
-  <rect x="35" y="35" width="230" height="230" rx="26" fill="#111827" stroke="#111827" stroke-width="4"/>
-  <g stroke="#111827" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-    <path fill="#ffd21f" d="M 150 148 L 133 41 L 167 41 Z"/>
-    <path fill="#ffd21f" d="M 152 148 L 171 41 L 239 41 A 20 20 0 0 1 259 61 L 259 129 Z"/>
-    <path fill="#ffffff" d="M 152 150 L 259 133 L 259 167 Z"/>
-    <path fill="#ffffff" d="M 152 152 L 259 171 L 259 239 A 20 20 0 0 1 239 259 L 171 259 Z"/>
-    <path fill="#ffd21f" d="M 150 152 L 167 259 L 133 259 Z"/>
-    <path fill="#ffd21f" d="M 148 152 L 129 259 L 61 259 A 20 20 0 0 1 41 239 L 41 171 Z"/>
-    <path fill="#ffffff" d="M 148 150 L 41 167 L 41 133 Z"/>
-    <path fill="#ffffff" d="M 148 148 L 41 129 L 41 61 A 20 20 0 0 1 61 41 L 129 41 Z"/>
-  </g>
-</g>
-</svg>
+<svg class="cube" viewBox="0 0 300 300"><polygon points="150.0,32.0 252.2,91.0 150.0,150.0 47.8,91.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="47.8,91.0 150.0,150.0 150.0,268.0 47.8,209.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="150.0,150.0 252.2,91.0 252.2,209.0 150.0,268.0" fill="#111827" stroke="#111827" stroke-width="14.0" stroke-linejoin="round"/><polygon points="150.0,84.3 120.1,54.4 150.0,37.1 179.9,54.4" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="156.8,87.1 186.7,57.1 208.6,69.8" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="161.6,91.0 213.4,73.7 243.3,91.0 213.4,108.3" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="156.8,94.9 208.6,112.2 186.7,124.9" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="150.0,97.7 179.9,127.6 150.0,144.9 120.1,127.6" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="143.2,94.9 113.3,124.9 91.4,112.2" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="138.4,91.0 86.6,108.3 56.7,91.0 86.6,73.7" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="143.2,87.1 91.4,69.8 113.3,57.1" fill="#ffd21f" stroke="#ffd21f" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,95.4 82.7,114.1 82.7,150.7 50.4,132.0" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="87.8,117.0 110.0,129.9 110.0,166.5 87.8,153.6" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="115.2,132.8 147.4,151.5 147.4,188.1 115.2,169.4" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,137.9 147.4,194.0 147.4,221.1 50.4,165.0" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="50.4,170.9 82.7,189.6 82.7,226.2 50.4,207.5" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="87.8,192.5 110.0,205.4 110.0,242.0 87.8,229.1" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="115.2,208.3 147.4,227.0 147.4,263.6 115.2,244.9" fill="#119545" stroke="#119545" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,151.5 184.8,132.8 184.8,169.4 152.6,188.1" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="190.0,129.9 212.2,117.0 212.2,153.6 190.0,166.5" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="217.3,114.1 249.6,95.4 249.6,132.0 217.3,150.7" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,194.0 198.5,167.4 198.5,194.5 152.6,221.1" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="203.7,164.5 249.6,137.9 249.6,165.0 203.7,191.6" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="152.6,227.0 184.8,208.3 184.8,244.9 152.6,263.6" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="190.0,205.4 212.2,192.5 212.2,229.1 190.0,242.0" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/><polygon points="217.3,189.6 249.6,170.9 249.6,207.5 217.3,226.2" fill="#e66e17" stroke="#e66e17" stroke-width="2.0" stroke-linejoin="round"/></svg>
 </div>
 <div class="card-info">
 <h3 data-i18n="advanced_title">İleri Seviye Methodu</h3>
@@ -282,9 +206,9 @@ Square-1 mekanizmasını ve temel çözüm algoritmalarını adım adım öğren
 </div>
 
 <script>var PAGE_ID = "square1";</script>
-<script src="/js/i18n.js?v=20261095"></script>
-<script src="/js/common.js?v=20261095"></script>
-<script src="/js/search.js?v=20261095"></script>
+<script src="/js/i18n.js?v=20261096"></script>
+<script src="/js/common.js?v=20261096"></script>
+<script src="/js/search.js?v=20261096"></script>
 
 
 
