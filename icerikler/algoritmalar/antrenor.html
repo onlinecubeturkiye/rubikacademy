@@ -27,10 +27,10 @@
 <meta property="og:description" content="Karıştırmayı uygula, case'i tanı, süreni ölç. Zorlandığın case'ler daha sık gelir.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/antrenor">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261098">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261099">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261098">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261099">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261098">
+<link rel="stylesheet" href="/styles/common.css?v=20261099">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -255,7 +255,13 @@
 .mode-card .timer-area { padding: 18px 10px; }
 .mode-card .reveal-diagram { display: none; }
 .mode-card .reveal-box { justify-content: center; text-align: center; }
-.mode-card #holdTip, .mode-card #scramble, .mode-card #btBar { display: none; }
+.mode-card #holdTip, .mode-card #scramble, .mode-card #btWrap { display: none; }
+.bt-wrap { max-width: 620px; margin: 0 auto 14px; text-align: center; }
+.bt-toggle { background: var(--surface-soft); border: var(--card-bw) solid var(--border); color: var(--text-soft); border-radius: 14px; padding: 9px 14px; font: 800 13px Inter, sans-serif; cursor: pointer; }
+.bt-toggle:hover { color: var(--text); border-color: var(--card-border); }
+.bt-wrap .bt-bar { display: none; margin: 10px auto 0; }
+.bt-wrap.open .bt-bar { display: flex; }
+.bt-wrap.open .bt-toggle { display: none; }
 .bt-bar {
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     max-width: 620px; margin: 0 auto 14px; padding: 10px 12px;
@@ -707,6 +713,8 @@ html[dir="rtl"] .stat-table th { text-align: right; }
         <button class="mode-btn" data-mode="cube" data-i18n="mode_cube">🧊 Küple çalış</button>
         <button class="mode-btn" data-mode="card" data-i18n="mode_card">🃏 Küpsüz (kart)</button>
     </div>
+    <div class="bt-wrap" id="btWrap">
+    <button type="button" class="bt-toggle" id="btToggle" title="Bluetooth akıllı küp">🧊 Akıllı küp bağla</button>
     <div class="bt-bar" id="btBar">
         <div class="bt-icon" aria-hidden="true">🧊</div>
         <div class="bt-text"><b id="btTitle">Bluetooth akıllı küp</b><span id="btStatus"></span></div>
@@ -715,6 +723,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
             <button class="btn-sm" id="btReset" style="display:none" data-i18n="bt_reset">Küpüm çözülmüş</button>
             <button class="btn-sm" id="btDisconnect" style="display:none" data-i18n="bt_disconnect">Bağlantıyı kes</button>
         </div>
+    </div>
     </div>
     </div>
     <div class="hold-tip" id="holdTip">Karıştırmayı sarı üstte, yeşil önde tutarak çözülmüş küpe uygula.</div>
@@ -827,15 +836,15 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261098"></script>
-<script src="/js/common.js?v=20261098"></script>
-<script src="/js/search.js?v=20261098"></script>
+<script src="/js/i18n.js?v=20261099"></script>
+<script src="/js/common.js?v=20261099"></script>
+<script src="/js/search.js?v=20261099"></script>
 
 
-<script src="/js/custom-algs.js?v=20261098"></script>
-<script src="/js/cross-solver.js?v=20261098"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261098"></script>
-<script src="/js/recog-trainer.js?v=20261098"></script>
+<script src="/js/custom-algs.js?v=20261099"></script>
+<script src="/js/cross-solver.js?v=20261099"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261099"></script>
+<script src="/js/recog-trainer.js?v=20261099"></script>
 
 <script>
 /* ============================================================
@@ -1034,7 +1043,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261098").then(function (r) {
+        return fetch(BASE + f + "?v=20261099").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -1076,14 +1085,12 @@ function renderTabs() {
         var g = s.grp || "";
         if (!byGrp[g]) { byGrp[g] = []; groups.push(g); }
         byGrp[g].push('<button class="set-tab' + (current && current.id === s.id ? " active" : "") + '" data-set="' + s.id + '" role="tab">' +
-            esc(setLabel(s)) + '<small>' + DATA[s.id].length + '</small></button>');
+            esc(setLabel(s)) + '</button>');
     });
     var el = document.getElementById("setTabs");
     // Birden çok grup varsa (CFOP: temel adımlar / son katman) her grup kendi satırında, kısa etiketiyle
-    el.classList.toggle("grouped", groups.length > 1);
-    el.innerHTML = groups.length > 1 ? groups.map(function (g) {
-        return '<div class="tab-row"><span class="tab-row-l">' + esc(T("grp_" + g)) + '</span>' + byGrp[g].join("") + '</div>';
-    }).join("") : (byGrp[groups[0]] || []).join("");
+    el.classList.remove("grouped");
+    el.innerHTML = groups.map(function (g) { return byGrp[g].join(""); }).join("");
     renderPuzzleMenu();
 }
 function puzzleSets(pz) { return SETS.filter(function (s) { return s.puzzle === pz && (DATA[s.id] || []).length; }); }
@@ -1448,6 +1455,10 @@ document.getElementById("selKnown").addEventListener("click", function () {
     if (!Object.keys(m).length) { alert(T("known_none")); return; }
     setSelection(m);
 });
+(function () {
+    var bw = document.getElementById("btWrap"), bt = document.getElementById("btToggle");
+    if (bt && bw) bt.addEventListener("click", function () { bw.classList.add("open"); });
+})();
 document.getElementById("caseToggle").addEventListener("click", function () {
     var g = document.getElementById("casePanel");
     var open = g.classList.toggle("open");
