@@ -23,7 +23,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#ffd21f">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261093">
+<link rel="stylesheet" href="/styles/common.css?v=20261094">
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar">
 <meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, WV, Ortega, CLL ve EG algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
 <meta property="og:title" content="Rubik Academy - Algoritmalar">
@@ -310,6 +310,14 @@ html {
 }
 .tr-card:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-hover); }
 .tr-red { background: var(--tint-red); } .tr-blue { background: var(--tint-blue); } .tr-green { background: var(--tint-green); }
+/* Karanlık modda düz çamurlu dolgular yerine zarif, hafif renkli cam görünümü + renkli ikon halkası */
+html.dark-mode .tr-card { background: var(--surface); }
+html.dark-mode .tr-red { background: linear-gradient(135deg, rgba(255,91,87,.16), rgba(255,91,87,.03) 55%, var(--surface)); }
+html.dark-mode .tr-blue { background: linear-gradient(135deg, rgba(95,139,255,.18), rgba(95,139,255,.03) 55%, var(--surface)); }
+html.dark-mode .tr-green { background: linear-gradient(135deg, rgba(53,196,107,.16), rgba(53,196,107,.03) 55%, var(--surface)); }
+html.dark-mode .tr-red .tr-icon { border-color: rgba(255,91,87,.5); color: #ff7b78; }
+html.dark-mode .tr-blue .tr-icon { border-color: rgba(95,139,255,.5); color: #7ea2ff; }
+html.dark-mode .tr-green .tr-icon { border-color: rgba(53,196,107,.5); color: #4fd584; }
 .tr-icon { flex-shrink: 0; width: 58px; height: 58px; display: grid; place-items: center; border-radius: 16px; background: var(--surface); border: var(--card-bw) solid var(--card-border); }
 .tr-icon svg { width: 40px; height: 40px; }
 .tr-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -837,9 +845,9 @@ html[dir="rtl"] .tr-go { transform: scaleX(-1); }
 })();
 </script>
 <script>var PAGE_ID = "algoritmalar";</script>
-<script src="/js/i18n.js?v=20261093"></script>
-<script src="/js/common.js?v=20261093"></script>
-<script src="/js/search.js?v=20261093"></script>
+<script src="/js/i18n.js?v=20261094"></script>
+<script src="/js/common.js?v=20261094"></script>
+<script src="/js/search.js?v=20261094"></script>
 
 
 
