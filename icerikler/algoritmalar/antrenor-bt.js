@@ -11,7 +11,7 @@
      (gunluk.js) aynı global'leri sağlayarak bu modülü kullanır.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261092";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261093";
     var MAC_KEY = "trainer-bt-mac-v1";
     // Karıştırma ve ipucu kutuları (günün karıştırması sayfası kendi kimliklerini verir)
     var SCR_ID = (window.BT_IDS && BT_IDS.scramble) || "scramble", HINT_ID = (window.BT_IDS && BT_IDS.hint) || "timerHint";
@@ -149,6 +149,21 @@
     function isTopCorner(s) { return s.p[1] === 1 && s.p[0] !== 0 && s.p[2] !== 0; }
     // Beyaz artı (sarı üst tutuşta alt yüz): alt merkez, 4 alt kenar ve yanlardaki eşleri
     function isCrossSt(s) { return s.p[1] === -1 && (s.p[0] === 0 || s.p[2] === 0); }
+    /* Artı bir yüzde (fy = -1 alt, +1 üst) tamamlanmış mı? Rengi önemsemez: o yüzün 4 kenarının
+       yüze bakan stickerları merkezle aynı renk, yan stickerları da yan merkezlerle eşli olmalı.
+       Böylece kişi beyaz ya da sarı artıyı, üstte ya da altta yapmış olsun algılanır. */
+    function faceCrossDone(model, fy) {
+        var cen = model[INDEX[key([0, fy, 0], [0, fy, 0])]];
+        for (var i = 0; i < STK.length; i++) {
+            var s = STK[i];
+            if (s.p[1] !== fy) continue;
+            if ((s.p[0] === 0) === (s.p[2] === 0)) continue; // yalnız kenarlar (tam bir koordinatı 0)
+            if (s.n[1] === fy) { if (model[i] !== cen) return false; }          // yüze bakan: merkezle aynı
+            else if (s.n[1] === 0 && model[i] !== model[INDEX[key(s.n, s.n)]]) return false; // yan: yan merkezle eşli
+        }
+        return true;
+    }
+    function crossDone(model) { return faceCrossDone(model, -1) || faceCrossDone(model, 1); }
     function isRouxBlock(s) { return s.p[0] !== 0 && s.p[1] < 1; }
     function isLseOnUD(s) { return s.p[0] === 0 && s.p[2] !== 0 ? s.n[1] !== 0 : (s.p[2] === 0 && s.p[1] === 1 && s.p[0] !== 0 && s.n[1] === 1); }
     /* Roux: iki blok + üst köşeler (AUF hariç) yerinde; M katmanı kayık olabilir.
@@ -263,7 +278,7 @@
         if (id === "oll" || id === "wv") return matches(model, isF2L) && matches(model, isTopFace);
         if (id === "coll") return matches(model, isF2L) && matches(model, isTopFace) && upToAUF(model, isTopCorner);
         if (id === "pll") return upToAUF(model, function () { return true; });
-        if (id === "cross") return matches(model, isCrossSt);
+        if (id === "cross") return crossDone(model);
         if (id === "f2l") return matches(model, isF2L);
         // 2-Look: alt kümeye göre adımın bittiği an
         var sub = (typeof curCase !== "undefined" && curCase) ? curCase.subset : "";
