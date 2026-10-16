@@ -27,10 +27,10 @@
 <meta property="og:description" content="Karıştırmayı uygula, case'i tanı, süreni ölç. Zorlandığın case'ler daha sık gelir.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/antrenor">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261097">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261098">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261097">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261098">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261097">
+<link rel="stylesheet" href="/styles/common.css?v=20261098">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -149,7 +149,9 @@
     padding: 4px 0;
     margin-top: 6px;
 }
-.case-groups { margin-top: 12px; display: none; }
+.case-panel { display: none; margin-top: 12px; }
+.case-panel.open { display: block; }
+.case-groups { margin-top: 12px; }
 .case-groups.open { display: block; }
 .case-group-title {
     font-size: 12px;
@@ -253,7 +255,7 @@
 .mode-card .timer-area { padding: 18px 10px; }
 .mode-card .reveal-diagram { display: none; }
 .mode-card .reveal-box { justify-content: center; text-align: center; }
-.mode-card #holdTip, .mode-card #scramble { display: none; }
+.mode-card #holdTip, .mode-card #scramble, .mode-card #btBar { display: none; }
 .bt-bar {
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     max-width: 620px; margin: 0 auto 14px; padding: 10px 12px;
@@ -523,7 +525,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 /* RENK KÖRLÜĞÜ SORUSU */
 .tool-row { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 0 auto 20px; }
 .tool-row .tool-tabs { margin: 0; }
-.cvd-open { border: var(--card-bw) solid var(--border); background: var(--surface); color: var(--text-soft); border-radius: 12px; padding: 8px 12px; font: 800 13px Inter, sans-serif; cursor: pointer; }
+.cvd-open { border: var(--card-bw) solid var(--border); background: var(--surface); color: var(--text-soft); border-radius: 12px; width: 42px; height: 42px; display: grid; place-items: center; font-size: 19px; line-height: 1; cursor: pointer; flex-shrink: 0; }
 .cvd-open:hover { color: var(--text); border-color: var(--card-border); }
 .cvd-opts { display: grid; gap: 8px; }
 .cvd-opt { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; border-radius: 14px; border: var(--card-bw) solid var(--border); background: var(--surface-soft); color: var(--text); font: 800 14px Inter, sans-serif; text-align: start; cursor: pointer; }
@@ -636,7 +638,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     <button type="button" class="tool-tab active" data-tool="alg" role="tab" data-i18n="tool_alg">🧠 Algoritma</button>
     <button type="button" class="tool-tab" data-tool="recog" role="tab" data-i18n="tool_recog">👁 Tanıma</button>
 </div>
-<button type="button" class="cvd-open" id="cvdOpen" data-i18n="cvd_btn">🎨 Renkler</button>
+<button type="button" class="cvd-open" id="cvdOpen" title="Renk şeması ve tutuş" aria-label="Renk şeması ve tutuş">🎨</button>
 </div>
 
 <div id="toolRecog" data-i18n-scope="tanima" data-hold-skip hidden>
@@ -685,15 +687,17 @@ html[dir="rtl"] .stat-table th { text-align: right; }
     </div>
 
     <div class="filter-row">
+        <button class="case-toggle" id="caseToggle" aria-expanded="false"><span id="selCount"></span> <span id="caseToggleArrow">▾</span></button>
+    </div>
+    <div class="case-panel" id="casePanel">
         <div class="seg sel-actions" role="group">
             <button class="seg-btn" id="selAll" data-i18n="sel_all">Tümü</button>
             <button class="seg-btn" id="selLearning" data-i18n="sel_learning">🟡 Öğreniyorum</button>
             <button class="seg-btn" id="selKnown" data-i18n="sel_known">🟢 Bildiklerim</button>
             <button class="seg-btn" id="selNone" data-i18n="sel_none">Hiçbiri</button>
         </div>
-        <button class="case-toggle" id="caseToggle" aria-expanded="false"><span id="selCount"></span> <span id="caseToggleArrow">▾</span></button>
+        <div class="case-groups" id="caseGroups"></div>
     </div>
-    <div class="case-groups" id="caseGroups"></div>
 </section>
 
 <!-- ANTRENÖR -->
@@ -823,15 +827,15 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261097"></script>
-<script src="/js/common.js?v=20261097"></script>
-<script src="/js/search.js?v=20261097"></script>
+<script src="/js/i18n.js?v=20261098"></script>
+<script src="/js/common.js?v=20261098"></script>
+<script src="/js/search.js?v=20261098"></script>
 
 
-<script src="/js/custom-algs.js?v=20261097"></script>
-<script src="/js/cross-solver.js?v=20261097"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261097"></script>
-<script src="/js/recog-trainer.js?v=20261097"></script>
+<script src="/js/custom-algs.js?v=20261098"></script>
+<script src="/js/cross-solver.js?v=20261098"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261098"></script>
+<script src="/js/recog-trainer.js?v=20261098"></script>
 
 <script>
 /* ============================================================
@@ -1030,7 +1034,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261097").then(function (r) {
+        return fetch(BASE + f + "?v=20261098").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -1445,7 +1449,7 @@ document.getElementById("selKnown").addEventListener("click", function () {
     setSelection(m);
 });
 document.getElementById("caseToggle").addEventListener("click", function () {
-    var g = document.getElementById("caseGroups");
+    var g = document.getElementById("casePanel");
     var open = g.classList.toggle("open");
     this.setAttribute("aria-expanded", open ? "true" : "false");
     document.getElementById("caseToggleArrow").textContent = open ? "▴" : "▾";
