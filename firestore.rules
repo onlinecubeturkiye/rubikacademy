@@ -37,6 +37,15 @@ service cloud.firestore {
         && request.resource.data.exp <= request.time + duration.value(90, 's');
       allow delete: if id.matches('^[a-f0-9]{32}$');
     }
+    // Hesap ilerleme senkronu: users/{uid}/kv/{anahtar} — yalnız hesabın sahibi okur/yazar
+    match /users/{uid}/kv/{key} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && key.matches('^[a-z0-9-]{1,64}$')
+        && request.resource.data.keys().hasOnly(['v', 't'])
+        && request.resource.data.v is string && request.resource.data.v.size() <= 500000
+        && request.resource.data.t is int;
+    }
     match /{document=**} {
       allow read, write: if false;
     }
