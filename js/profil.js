@@ -65,6 +65,7 @@
       '<button class="p-btn" id="pEdit">✎ Düzenle</button>' +
       '<button class="p-btn" id="pOut">Çıkış yap</button>' +
       '<button class="p-btn danger" id="pDel">Hesabı sil</button>' +
+      (window.Account.isAdmin && window.Account.isAdmin() ? '<a class="p-btn" href="/icerikler/admin">🛠 Yönetim paneli</a>' : '') +
       '</div><div class="p-msg" id="pMsg"></div>' +
       '<div id="pEditBox" hidden><div class="p-edit">' +
       '<input id="pName" maxlength="24" placeholder="Görünen ad" value="' + esc(name) + '">' +

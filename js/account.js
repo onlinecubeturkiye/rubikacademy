@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261106";
+    var V = "20261107";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -413,6 +413,8 @@
     }
 
     /* ---------- herkese açık profil dokümanı + ziyaret kaydı ---------- */
+    var ADMIN_EMAIL = "pikapikachuyt0@gmail.com";
+    function isAdmin() { return !!(user && user.email === ADMIN_EMAIL && user.providerData && user.providerData.some(function (p) { return p.providerId === "google.com"; })); }
     var PROF_KEY = "ra-profile-v1"; // yerel profil tercihleri: { name, bio, joined }
     var STAT_SETS = [["oll", 57], ["pll", 21], ["2look-2lo", 10], ["2look-2lp", 6], ["f2l", 41], ["coll", 42], ["wv", 27], ["cll", 42], ["eg1", 42], ["eg2", 42], ["ortega-oll", 7], ["ortega-pbl", 5], ["roux-cmll", 42]];
     function computeStats() {
@@ -470,6 +472,7 @@
         },
         user: function () { return user; },
         uid: function () { return user ? user.uid : null; },
+        isAdmin: isAdmin,
         token: token,
         onChange: function (f) { listeners.push(f); if (sdkP) f(user); },
         openLogin: openLogin,
