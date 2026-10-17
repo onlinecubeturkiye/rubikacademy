@@ -298,3 +298,70 @@ if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("/sw.js").catch(function () {});
     });
 }
+
+/* =========================================================
+   2-LOOK <-> TAM OLL/PLL İLERLEME SENKRONU
+   2-Look OLL köşeleri (OCLL) ve 2-Look PLL kenarları, tam OLL/PLL'deki
+   aynı case'lerle birebir aynıdır. Birinde "Öğreniyorum/Biliyorum"
+   işaretlenince diğerinde de işaretlenir (işaret kaldırma dahil).
+========================================================= */
+(function () {
+    "use strict";
+    var RANK = { "": 0, learning: 1, known: 2 };
+    // [2look-store, 2look-case, full-store, full-case]
+    var SYNC = [
+        ["algo-progress-2look-2lo", "Sune",       "algo-progress-oll", "OLL 27"],
+        ["algo-progress-2look-2lo", "Antisune",   "algo-progress-oll", "OLL 26"],
+        ["algo-progress-2look-2lo", "H",          "algo-progress-oll", "OLL 21"],
+        ["algo-progress-2look-2lo", "Pi",         "algo-progress-oll", "OLL 22"],
+        ["algo-progress-2look-2lo", "Headlights", "algo-progress-oll", "OLL 23"],
+        ["algo-progress-2look-2lo", "T",          "algo-progress-oll", "OLL 24"],
+        ["algo-progress-2look-2lo", "Bowtie",     "algo-progress-oll", "OLL 25"],
+        ["algo-progress-2look-2lp", "Ua", "algo-progress-pll", "Edge perm::Ua perm"],
+        ["algo-progress-2look-2lp", "Ub", "algo-progress-pll", "Edge perm::Ub perm"],
+        ["algo-progress-2look-2lp", "H",  "algo-progress-pll", "Edge perm::H perm"],
+        ["algo-progress-2look-2lp", "Z",  "algo-progress-pll", "Edge perm::Z perm"]
+    ];
+    var WATCH = {}, LOOK = {};
+    SYNC.forEach(function (e) {
+        WATCH[e[0]] = 1; WATCH[e[2]] = 1;
+        LOOK[e[0] + "||" + e[1]] = [e[2], e[3]];
+        LOOK[e[2] + "||" + e[3]] = [e[0], e[1]];
+    });
+    var _set, store;
+    try { store = window.localStorage; _set = store.setItem.bind(store); } catch (e) { return; }
+    function parse(k) { try { return JSON.parse(store.getItem(k)) || {}; } catch (e) { return {}; } }
+    var syncing = false;
+    store.setItem = function (k, v) {
+        if (syncing || !WATCH[k]) return _set(k, v);
+        var prev = parse(k);
+        _set(k, v);
+        var next; try { next = JSON.parse(v) || {}; } catch (e) { return; }
+        syncing = true;
+        try {
+            var seen = {}, writes = {};
+            Object.keys(prev).concat(Object.keys(next)).forEach(function (c) {
+                if (seen[c]) return; seen[c] = 1;
+                var pv = prev[c] || "", nv = next[c] || "";
+                if (pv === nv) return;
+                var t = LOOK[k + "||" + c]; if (!t) return;
+                if (!writes[t[0]]) writes[t[0]] = parse(t[0]);
+                if (nv) writes[t[0]][t[1]] = nv; else delete writes[t[0]][t[1]];
+            });
+            Object.keys(writes).forEach(function (ts) { _set(ts, JSON.stringify(writes[ts])); });
+        } finally { syncing = false; }
+    };
+    // Tek seferlik uzlaştırma: mevcut işaretleri iki tarafta eşitle (yalnız yükseltir)
+    try {
+        var cache = {}, dirty = {};
+        function get(s) { if (!(s in cache)) cache[s] = parse(s); return cache[s]; }
+        SYNC.forEach(function (e) {
+            var a = get(e[0]), b = get(e[2]), av = a[e[1]] || "", bv = b[e[3]] || "";
+            if (av === bv) return;
+            var hi = RANK[av] >= RANK[bv] ? av : bv;
+            if (av !== hi) { if (hi) a[e[1]] = hi; else delete a[e[1]]; dirty[e[0]] = 1; }
+            if (bv !== hi) { if (hi) b[e[3]] = hi; else delete b[e[3]]; dirty[e[2]] = 1; }
+        });
+        Object.keys(dirty).forEach(function (s) { _set(s, JSON.stringify(cache[s])); });
+    } catch (e) {}
+})();

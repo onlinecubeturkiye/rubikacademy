@@ -27,10 +27,10 @@
 <meta property="og:description" content="Başlangıç ile F2L arasındaki köprü: boş yuvayı kullanarak orta katmanı algoritmasız çöz.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/keyhole">
-<meta property="og:image" content="https://rubikacademy.fun/og/keyhole.png?v=20261102">
+<meta property="og:image" content="https://rubikacademy.fun/og/keyhole.png?v=20261103">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/keyhole.png?v=20261102">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/keyhole.png?v=20261103">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261102">
+<link rel="stylesheet" href="/styles/common.css?v=20261103">
 
 <style>
 .wrap { max-width: 900px; margin: 0 auto; }
@@ -60,6 +60,11 @@
 .k-step p { font-size: 14.5px; }
 .video-wrap { position: relative; width: 100%; aspect-ratio: 16/9; border: var(--card-bw) solid var(--ink); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); background: #000; }
 .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-facade { position: absolute; inset: 0; cursor: pointer; background-size: cover; background-position: center; display: grid; place-items: center; }
+.video-facade::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,.25); }
+.video-facade .play { position: relative; z-index: 1; width: 78px; height: 78px; border-radius: 50%; background: var(--cube-red); border: var(--card-bw) solid #fff; display: grid; place-items: center; box-shadow: 0 6px 20px rgba(0,0,0,.4); transition: transform .15s; }
+.video-facade:hover .play { transform: scale(1.08); }
+.video-facade .play::before { content: ""; width: 0; height: 0; border-style: solid; border-width: 15px 0 15px 26px; border-color: transparent transparent transparent #fff; margin-left: 5px; }
 .k-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
 .k-links a { padding: 9px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 800; font-size: 14px; box-shadow: var(--shadow-sm); text-decoration: none; }
 .k-links a:hover { background: var(--cube-yellow); color: #17171f; }
@@ -138,8 +143,25 @@
     <h2>Video anlatım</h2>
     <p>Boş yuvayı kapı gibi kullanma mantığını görerek anlamak için:</p>
     <div class="video-wrap">
-        <iframe src="https://www.youtube-nocookie.com/embed/5WCEX9Aj3fw" title="Keyhole yöntemi video anlatım" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <div class="video-facade" id="vidFacade" role="button" tabindex="0" aria-label="Videoyu oynat" style="background-image:url('https://i.ytimg.com/vi/5WCEX9Aj3fw/hqdefault.jpg')">
+            <span class="play" aria-hidden="true"></span>
+        </div>
     </div>
+    <script>
+    (function () {
+        var f = document.getElementById("vidFacade");
+        function play() {
+            var i = document.createElement("iframe");
+            i.src = "https://www.youtube-nocookie.com/embed/5WCEX9Aj3fw?autoplay=1";
+            i.title = "Keyhole yöntemi video anlatım";
+            i.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+            i.setAttribute("allowfullscreen", "");
+            i.referrerPolicy = "strict-origin-when-cross-origin";
+            f.replaceWith(i);
+        }
+        if (f) { f.addEventListener("click", play); f.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); play(); } }); }
+    })();
+    </script>
 </section>
 
 <section class="box">
@@ -171,9 +193,9 @@
 </footer>
 
 <script>var PAGE_ID = "keyhole";</script>
-<script src="/js/i18n.js?v=20261102"></script>
-<script src="/js/common.js?v=20261102"></script>
-<script src="/js/search.js?v=20261102"></script>
+<script src="/js/i18n.js?v=20261103"></script>
+<script src="/js/common.js?v=20261103"></script>
+<script src="/js/search.js?v=20261103"></script>
 
 </body>
 </html>
