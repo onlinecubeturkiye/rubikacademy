@@ -228,6 +228,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://rubikacademy.fun/icerikler/keyhole</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://rubikacademy.fun/icerikler/algoritmalar/2look-oll</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
