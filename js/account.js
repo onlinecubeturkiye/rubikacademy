@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261104";
+    var V = "20261105";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -412,8 +412,62 @@
         }).then(function () { lsSet(META_KEY, null); lsSet(SIGNED_KEY, null); });
     }
 
+    /* ---------- herkese açık profil dokümanı + ziyaret kaydı ---------- */
+    var PROF_KEY = "ra-profile-v1"; // yerel profil tercihleri: { name, bio, joined }
+    var STAT_SETS = [["oll", 57], ["pll", 21], ["2look-2lo", 10], ["2look-2lp", 6], ["f2l", 41], ["coll", 42], ["wv", 27], ["cll", 42], ["eg1", 42], ["eg2", 42], ["ortega-oll", 7], ["ortega-pbl", 5], ["roux-cmll", 42]];
+    function computeStats() {
+        var known = 0, learning = 0, sets = {};
+        STAT_SETS.forEach(function (s) {
+            var o = parse(lsGet("algo-progress-" + s[0])) || {}, kn = 0, ln = 0;
+            if (isObj(o)) for (var c in o) { if (o[c] === "known") kn++; else if (o[c] === "learning") ln++; }
+            if (kn || ln) sets[s[0]] = { k: kn, l: ln, t: s[1] };
+            known += kn; learning += ln;
+        });
+        var tr = parse(lsGet("trainer-stats-v1")) || {}, solves = 0;
+        if (isObj(tr)) for (var set in tr) { var cs = tr[set]; if (isObj(cs)) for (var cc in cs) { var n = cs[cc] && cs[cc].n; if (typeof n === "number") solves += n; } }
+        var dr = parse(lsGet("daily-results-v1")) || {}, best = 0, dcount = 0;
+        if (isObj(dr)) for (var d in dr) { var r = dr[d]; dcount++; var v = r && r.t; if (typeof v === "number" && r.pen !== "dnf" && (!best || v < best)) best = v; }
+        return { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount };
+    }
+    function localProfile() { var p = parse(lsGet(PROF_KEY)); return isObj(p) ? p : {}; }
+    function writeProfile() {
+        if (!user) return Promise.resolve();
+        var prof = localProfile();
+        if (!prof.joined) { prof.joined = Date.now(); lsSet(PROF_KEY, JSON.stringify(prof)); }
+        var name = (prof.name || user.displayName || (user.email || "?").split("@")[0] || "Cuber").slice(0, 24);
+        var fields = {
+            name: { stringValue: name },
+            photo: { stringValue: String(user.photoURL || "").slice(0, 400) },
+            bio: { stringValue: String(prof.bio || "").slice(0, 160) },
+            joined: { integerValue: String(prof.joined) },
+            seen: { integerValue: String(Date.now()) },
+            stats: { stringValue: JSON.stringify(computeStats()).slice(0, 8000) }
+        };
+        var mask = "?updateMask.fieldPaths=name&updateMask.fieldPaths=photo&updateMask.fieldPaths=bio&updateMask.fieldPaths=joined&updateMask.fieldPaths=seen&updateMask.fieldPaths=stats";
+        return api("/users/" + user.uid + mask, { method: "PATCH", body: JSON.stringify({ fields: fields }) }).catch(function () {});
+    }
+    function logVisit() {
+        if (!user) return;
+        var p = String(location.pathname || "/").slice(0, 120), sk = "ra-visit:" + p;
+        try { if (sessionStorage.getItem(sk)) return; sessionStorage.setItem(sk, "1"); } catch (e) {}
+        api("/users/" + user.uid + "/visits", { method: "POST", body: JSON.stringify({ fields: { p: { stringValue: p }, ts: { timestampValue: new Date().toISOString() } } }) }).catch(function () {});
+    }
+    document.addEventListener("account-synced", function () { writeProfile(); logVisit(); });
+
     window.Account = {
         enabled: function () { return enabled; },
+        writeProfile: writeProfile,
+        computeStats: computeStats,
+        localProfile: localProfile,
+        setProfile: function (o) { var p = localProfile(); for (var k in o) p[k] = o[k]; lsSet(PROF_KEY, JSON.stringify(p)); return writeProfile(); },
+        getProfile: function (uid) {
+            var u = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents/users/" + encodeURIComponent(uid) + "?key=" + encodeURIComponent(cfg.apiKey);
+            return fetch(u).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+                if (!d || !d.fields) return null; var f = d.fields, g = function (x) { return f[x] && (f[x].stringValue != null ? f[x].stringValue : f[x].integerValue); };
+                var st = {}; try { st = JSON.parse(g("stats") || "{}"); } catch (e) {}
+                return { name: g("name") || "Cuber", photo: g("photo") || "", bio: g("bio") || "", joined: +(g("joined") || 0), seen: +(g("seen") || 0), stats: st };
+            }).catch(function () { return null; });
+        },
         user: function () { return user; },
         uid: function () { return user ? user.uid : null; },
         token: token,

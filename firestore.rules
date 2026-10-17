@@ -1,19 +1,26 @@
 rules_version = '2';
-// Rubik Academy — Günün Karıştırması sıralama tablosu
-// Yol: days/{gün}/times/{cihaz}
-//   gün   : yerel tarihin gün numarası (UTC gece yarısından beri gün sayısı, ör. "20741")
-//   cihaz : tarayıcıda üretilen rastgele kimlik (her cihaz günde bir kez gönderebilir)
-// Cihazdan cihaza aktarma: transfer/{kimlik}
-//   kimlik: 8 haneli kodun özeti (kodun kendisi saklanmaz); içerik kodla şifrelidir (AES-GCM)
-//   en fazla 90 saniye geçerlidir; listelenemez, değiştirilemez; alan cihaz okuyunca siler
+// Rubik Academy — Firestore güvenlik kuralları
+//  days/{gün}/times/{uid} : Günün karıştırması sıralaması (hesaba bağlı). Herkes okur;
+//        sahibi günde bir kez yazar (varsa tekrar yazamaz); admin ya da sahibi siler.
+//  users/{uid}            : Herkese açık profil (ad, foto, bio, özet). Sahibi yazar.
+//  users/{uid}/kv/{a}     : İlerleme/trainer/günlük senkronu. Sahibi + admin okur; sahibi yazar.
+//  users/{uid}/visits/{v} : Sayfa ziyaret kaydı (admin paneli için). Sahibi ekler; admin + sahibi okur.
+//  transfer/{id}          : Cihazlar arası geçici şifreli aktarım.
+//  Admin: pikapikachuyt0@gmail.com (Google ile giriş).
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /days/{day}/times/{dev} {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'pikapikachuyt0@gmail.com'
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    match /days/{day}/times/{uid} {
       allow read: if true;
-      allow create: if day.matches('^[0-9]{5}$')
+      allow create: if request.auth != null && request.auth.uid == uid
+        && day.matches('^[0-9]{5}$')
         && int(day) - math.floor(request.time.toMillis() / 86400000) <= 1
         && math.floor(request.time.toMillis() / 86400000) - int(day) <= 1
-        && dev.matches('^[a-z0-9]{20}$')
         && request.resource.data.keys().hasOnly(['name', 't', 'pen', 'v', 'ts'])
         && request.resource.data.name is string
         && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 20
@@ -23,8 +30,41 @@ service cloud.firestore {
         && request.resource.data.v == (request.resource.data.pen == 'dnf' ? 99999999
              : request.resource.data.t + (request.resource.data.pen == '+2' ? 2000 : 0))
         && request.resource.data.ts == request.time;
-      allow update, delete: if false;
+      allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow update: if false;
     }
+
+    match /users/{uid} {
+      allow get: if true;               // profil linkle paylaşılabilir (tekil okuma herkese açık)
+      allow list: if isAdmin();         // tüm kullanıcıları yalnız admin listeler
+      allow create, update: if (request.auth != null && request.auth.uid == uid)
+        && request.resource.data.keys().hasOnly(['name', 'photo', 'bio', 'joined', 'seen', 'stats'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 24
+        && (!('photo' in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() <= 400))
+        && (!('bio' in request.resource.data) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 160))
+        && (!('stats' in request.resource.data) || (request.resource.data.stats is string && request.resource.data.stats.size() <= 8000));
+      allow delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+
+      match /kv/{key} {
+        allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+        allow delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && key.matches('^[a-z0-9-]{1,64}$')
+          && request.resource.data.keys().hasOnly(['v', 't'])
+          && request.resource.data.v is string && request.resource.data.v.size() <= 500000
+          && request.resource.data.t is int;
+      }
+
+      match /visits/{vid} {
+        allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+        allow create: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['p', 'ts'])
+          && request.resource.data.p is string && request.resource.data.p.size() <= 120
+          && request.resource.data.ts is timestamp;
+        allow update, delete: if isAdmin();
+      }
+    }
+
     match /transfer/{id} {
       allow get: if resource.data.exp > request.time;
       allow list, update: if false;
@@ -37,15 +77,12 @@ service cloud.firestore {
         && request.resource.data.exp <= request.time + duration.value(90, 's');
       allow delete: if id.matches('^[a-f0-9]{32}$');
     }
-    // Hesap ilerleme senkronu: users/{uid}/kv/{anahtar} — yalnız hesabın sahibi okur/yazar
-    match /users/{uid}/kv/{key} {
-      allow read, delete: if request.auth != null && request.auth.uid == uid;
-      allow create, update: if request.auth != null && request.auth.uid == uid
-        && key.matches('^[a-z0-9-]{1,64}$')
-        && request.resource.data.keys().hasOnly(['v', 't'])
-        && request.resource.data.v is string && request.resource.data.v.size() <= 500000
-        && request.resource.data.t is int;
+
+    // Admin paneli: tüm kullanıcıları ve alt koleksiyonlarını listeleyip okuyabilir
+    match /users/{uid}/{sub=**} {
+      allow read: if isAdmin();
     }
+
     match /{document=**} {
       allow read, write: if false;
     }
