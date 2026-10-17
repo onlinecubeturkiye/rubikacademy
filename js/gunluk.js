@@ -45,7 +45,7 @@
     }
 
     /* ---------- zamanlayıcı ---------- */
-    var state = "idle", t0 = 0, raf = 0, holdT = 0, last = 0;
+    var state = "idle", t0 = 0, raf = 0, holdT = 0, last = 0, pending = null;
     function fmt(ms) { if (ms == null) return "-"; var s = ms / 1000; if (s < 60) return s.toFixed(2); var m = Math.floor(s / 60); return m + ":" + (s - m * 60).toFixed(2).padStart(5, "0"); }
     function show(ms) { $("dTimer").textContent = fmt(ms); }
     function tick() { show(performance.now() - t0); raf = requestAnimationFrame(tick); }
@@ -55,7 +55,7 @@
     }
     function press() {
         if (state === "running") { stop(); return; }
-        if (state !== "idle" || official()) return;
+        if (state !== "idle" || locked()) return;
         setState("hold"); show(0);
         holdT = setTimeout(function () { if (state === "hold") setState("ready"); }, 300);
     }
@@ -65,11 +65,8 @@
     }
     function stop() {
         cancelAnimationFrame(raf); last = performance.now() - t0; show(last); setState("done");
-        var res = loadRes(), k = today(), key = k + ":" + puzzle;
-        if (!res[key]) {
-            res[key] = { t: Math.round(last), pen: "" };
-            saveRes(res);
-        }
+        // Çözüm henüz kilitlenmez: kullanıcı "Sıralamaya gönder" demedikçe tekrar deneyebilir.
+        pending = { t: Math.round(last), pen: "" };
         renderAll();
     }
 
@@ -82,8 +79,8 @@
     window.mode = "cube";
     window.current = { id: "daily", cube: "3x3" };
     Object.defineProperty(window, "state", { configurable: true, get: function () { return state === "done" ? "done" : state === "running" ? "running" : "idle"; } });
-    Object.defineProperty(window, "curScramble", { configurable: true, get: function () { return official() ? "" : scramble(today(), puzzle); }, set: function () {} });
-    window.startTimer = function () { if (state === "running" || official()) return; clearTimeout(holdT); setState("running"); t0 = performance.now(); tick(); };
+    Object.defineProperty(window, "curScramble", { configurable: true, get: function () { return locked() ? "" : scramble(today(), puzzle); }, set: function () {} });
+    window.startTimer = function () { if (state === "running" || locked()) return; clearTimeout(holdT); setState("running"); t0 = performance.now(); tick(); };
     window.stopTimer = function () { if (state === "running") stop(); };
     // Bluetooth metinleri antrenör sayfasının çevirilerinden gelir
     // (günlük sayfaya özel metin varsa o kullanılır)
@@ -92,29 +89,95 @@
         return (g[lang()] && g[lang()][k]) || (p[lang()] && p[lang()][k]) || (g.tr && g.tr[k]) || (p.tr && p.tr[k]) || k;
     };
 
-    /* ---------- görünüm ---------- */
+    /* ---------- görünüm ----------
+       Model: çözüm hemen kilitlenmez. "Sıralamaya gönder" (= paylaş) denince
+       hesaba bağlı olarak days/{gün}/times/{uid}'ye yazılır ve o günün sonucu
+       olarak kilitlenir. Gönderilmezse kullanıcı tekrar çözebilir (2. hak).
+       Admin sıralamadan silerse gönderim geri alınır, kullanıcı tekrar çözebilir. */
+    var SENT_KEY = "daily-sent-v1", lbTimer = 0, reconciled = false;
+    function lbOn() { return !!(window.Leaderboard && Leaderboard.enabled()); }
+    function sentToday() { try { return !!(JSON.parse(localStorage.getItem(SENT_KEY)) || {})[today()]; } catch (e) { return false; } }
+    function markSent() { try { var o = JSON.parse(localStorage.getItem(SENT_KEY)) || {}; o[today()] = 1; localStorage.setItem(SENT_KEY, JSON.stringify(o)); } catch (e) {} }
+    function unmarkSent() { try { var o = JSON.parse(localStorage.getItem(SENT_KEY)) || {}; delete o[today()]; localStorage.setItem(SENT_KEY, JSON.stringify(o)); } catch (e) {} }
+    function locked() { return sentToday(); }               // gönderilmiş = o gün kilitli
     function official() { return loadRes()[today() + ":" + puzzle] || null; }
     function value(r) { if (!r) return null; if (r.pen === "dnf") return Infinity; return r.t + (r.pen === "+2" ? 2000 : 0); }
     function label(r) { if (!r) return "-"; if (r.pen === "dnf") return "DNF"; return fmt(value(r)) + (r.pen === "+2" ? "+" : ""); }
+    function dayOf(key) { var p = key.split("-"); return String(Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000)); }
+    function lbMsg(text, kind) { var m = $("lbMsg"); m.textContent = text || ""; m.className = "lb-msg" + (kind ? " " + kind : ""); }
+
     function renderToday() {
         var day = today();
         var d = new Date(), loc = { tr: "tr-TR", en: "en-GB", fr: "fr-FR", ru: "ru-RU", de: "de-DE", ar: "ar" }[lang()] || "tr-TR";
         $("dDate").textContent = d.toLocaleDateString(loc, { day: "numeric", month: "long", year: "numeric", weekday: "long" });
-        var r = official();
-        // Çözüldüyse karıştırma ve timer ertesi güne kadar gizlenir
-        $("dPlay").hidden = !!r; $("dDone").hidden = !r;
-        if (r) {
+        var lk = locked(), pend = !lk && !!pending, r = lk ? (official() || pending) : pending;
+        var done = lk || pend;
+        $("dPlay").hidden = done; $("dDone").hidden = !done;
+        if (done) {
             $("dScr").textContent = ""; $("dNet").innerHTML = "";
+            r = r || { t: 0, pen: "" };
             $("dOffTime").textContent = label(r);
+            $("dDoneH").textContent = lk ? T("done_h", "Bugünü tamamladın! 🎉") : T("attempt_h", "Süren");
             $("dPen2").classList.toggle("on", r.pen === "+2");
             $("dPenDnf").classList.toggle("on", r.pen === "dnf");
-            tickCountdown();
+            $("dPen2").disabled = $("dPenDnf").disabled = lk;   // gönderildikten sonra ceza değişmez
+            $("dAttempt").hidden = lk; $("dLocked").hidden = !lk;
+            $("dRetryNote").hidden = lk; $("dCountWrap").hidden = !lk;
+            renderAttemptMsg(r, lk);
+            if (lk) tickCountdown();
         } else {
             var scr = scramble(day, puzzle);
             $("dScr").textContent = scr; drawNet(scr);
             if (window.btIsActive && btIsActive()) btRenderScramble();
             if (state !== "running" && state !== "hold" && state !== "ready") { show(0); setState("idle"); }
         }
+    }
+    function renderAttemptMsg(r, lk) {
+        if (lk) { lbMsg(T("lb_sent", "Sıralamaya gönderildi ✓"), "ok"); return; }
+        var tooFast = r.t < 3000 && r.pen !== "dnf";
+        $("dSubmit").disabled = tooFast || !lbOn();
+        if (tooFast) { lbMsg(T("lb_too_fast", "3 saniyenin altındaki süreler sıralamaya kabul edilmez. Tekrar dene."), "bad"); return; }
+        if (!lbOn()) { lbMsg(T("lb_off", "Sıralama şu an kullanılamıyor."), "bad"); return; }
+        if (!Leaderboard.signedIn()) lbMsg(T("lb_need_login", "Sıralamaya göndermek ve kaydetmek için giriş yap."), "");
+        else if ($("lbMsg").className.indexOf("bad") < 0) lbMsg("");
+    }
+    function submitAttempt() {
+        if (!pending || locked()) return;
+        var r = pending;
+        if (r.t < 3000 && r.pen !== "dnf") { lbMsg(T("lb_too_fast"), "bad"); return; }
+        if (!lbOn()) { lbMsg(T("lb_off", "Sıralama şu an kullanılamıyor."), "bad"); return; }
+        if (!Leaderboard.signedIn()) {
+            lbMsg(T("lb_need_login", "Sıralamaya göndermek ve kaydetmek için giriş yap."), "");
+            if (window.Account) window.Account.openLogin();
+            return;
+        }
+        $("dSubmit").disabled = true; lbMsg(T("lb_sending", "Gönderiliyor…"));
+        Leaderboard.submit(r.t, r.pen, dayOf(today())).then(function (res) {
+            $("dSubmit").disabled = false;
+            if (res.ok || res.exists) {
+                var all = loadRes(); all[today() + ":" + puzzle] = { t: r.t, pen: r.pen }; saveRes(all);
+                pending = null; markSent();
+                if (window.Account && window.Account.syncNow) window.Account.syncNow();
+                renderAll();
+            } else if (res.needAuth) { lbMsg(T("lb_need_login"), ""); if (window.Account) window.Account.openLogin(); }
+            else if (res.badName) lbMsg(T("lb_bad_name", "Sıralamada görünecek bir ad gerekli. Profilinden ad ekle."), "bad");
+            else if (res.status === "PERMISSION_DENIED" || res.status === 403) lbMsg(T("lb_err_perm", "Sıralama sunucusu gönderimi kabul etmedi. Biraz sonra tekrar dene."), "bad");
+            else lbMsg(T("lb_err_srv", "Gönderilemedi (sunucu hatası). Biraz sonra tekrar dene.") + " [" + res.status + "]", "bad");
+        }, function () { $("dSubmit").disabled = false; lbMsg(T("lb_err", "Gönderilemedi."), "bad"); });
+    }
+    function retry() { pending = null; setState("idle"); renderAll(); }
+    // Admin sıralamadan silince (ya da hiç gönderilmemişse) kilidi aç → tekrar çözülebilsin
+    function reconcile() {
+        if (reconciled || !lbOn() || !Leaderboard.signedIn() || !locked()) return;
+        reconciled = true;
+        Leaderboard.hasSubmitted(dayOf(today())).then(function (has) {
+            if (has === false) {
+                var all = loadRes(); delete all[today() + ":" + puzzle]; saveRes(all);
+                unmarkSent(); pending = null;
+                if (window.Account && window.Account.syncNow) window.Account.syncNow();
+                renderAll();
+            }
+        });
     }
     var cdTimer = 0, shownDay = null;
     function tickCountdown() {
@@ -129,38 +192,6 @@
         $("hList").innerHTML = rows.length ? rows.map(function (k) { return '<div class="h-row"><span>' + esc(k.split(":")[0]) + '</span><b>' + esc(label(res[k])) + '</b></div>'; }).join("") : '<p class="h-empty">' + esc(T("no_hist", "Henüz sonuç yok.")) + '</p>';
     }
     /* ---------- sıralama tablosu (Firebase) ---------- */
-    var SENT_KEY = "daily-sent-v1", NAME_KEY = "daily-name-v1", lbTimer = 0;
-    function lbOn() { return !!(window.Leaderboard && Leaderboard.enabled()); }
-    function sentToday() { try { return !!(JSON.parse(localStorage.getItem(SENT_KEY)) || {})[today()]; } catch (e) { return false; } }
-    function markSent() { try { var o = JSON.parse(localStorage.getItem(SENT_KEY)) || {}; o[today()] = 1; localStorage.setItem(SENT_KEY, JSON.stringify(o)); } catch (e) {} }
-    function dayOf(key) { var p = key.split("-"); return String(Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000)); }
-    function lbMsg(text, kind) { var m = $("lbMsg"); m.textContent = text || ""; m.className = "lb-msg" + (kind ? " " + kind : ""); }
-    function renderSend() {
-        var r = official(), on = lbOn() && !!r, sent = sentToday();
-        $("lbSend").hidden = !on || sent;
-        $("dPen2").disabled = $("dPenDnf").disabled = on && sent; // gönderildikten sonra ceza değişmez
-        if (!on) { lbMsg(""); return; }
-        $("lbName").placeholder = T("lb_name", "Adın (sıralamada görünür)");
-        if (!$("lbName").value) { try { $("lbName").value = localStorage.getItem(NAME_KEY) || ""; } catch (e) {} }
-        if (sent) lbMsg(T("lb_sent", "Sıralamaya gönderildi ✓"), "ok");
-        else if (r.t < 3000 && r.pen !== "dnf") lbMsg(T("lb_too_fast", "3 saniyenin altındaki süreler sıralamaya kabul edilmez."), "bad");
-        else if ($("lbMsg").className.indexOf("bad") < 0) lbMsg("");
-    }
-    function sendResult() {
-        var r = official(); if (!r || !lbOn() || sentToday()) return;
-        var name = $("lbName").value.replace(/\s+/g, " ").trim();
-        if (name.length < 2 || name.length > 20) { lbMsg(T("lb_bad_name", "Ad 2-20 karakter olmalı."), "bad"); $("lbName").focus(); return; }
-        if (r.t < 3000 && r.pen !== "dnf") { lbMsg(T("lb_too_fast"), "bad"); return; }
-        try { localStorage.setItem(NAME_KEY, name); } catch (e) {}
-        $("lbSendBtn").disabled = true; lbMsg(T("lb_sending", "Gönderiliyor…"));
-        Leaderboard.submit(name, r.t, r.pen, dayOf(today())).then(function (res) {
-            $("lbSendBtn").disabled = false;
-            if (res.ok || res.exists) { markSent(); renderSend(); loadBoard(); }
-            // Sunucu reddettiyse (ör. kurallar) bağlantı hatası gibi gösterme
-            else if (res.status === "PERMISSION_DENIED" || res.status === 403) lbMsg(T("lb_err_perm", "Sıralama sunucusu gönderimi kabul etmedi. Biraz sonra tekrar dene."), "bad");
-            else lbMsg(T("lb_err_srv", "Gönderilemedi (sunucu hatası). Biraz sonra tekrar dene.") + " [" + res.status + "]", "bad");
-        }, function () { $("lbSendBtn").disabled = false; lbMsg(T("lb_err"), "bad"); });
-    }
     function loadBoard() {
         if (!lbOn()) { $("lbBox").hidden = true; return; }
         $("lbBox").hidden = false;
@@ -180,11 +211,11 @@
         }).then(function () { lbTimer = setTimeout(loadBoard, 30000); });
     }
 
-    function renderAll() { shownDay = today(); renderToday(); renderSend(); loadBoard(); renderHistory(); }
+    function renderAll() { shownDay = today(); renderToday(); loadBoard(); renderHistory(); reconcile(); }
 
     function setPen(p) {
-        var res = loadRes(), key = today() + ":" + puzzle; if (!res[key]) return;
-        res[key].pen = res[key].pen === p ? "" : p; saveRes(res); renderAll();
+        if (locked() || !pending) return;           // ceza yalnızca gönderilmeden önce değişir
+        pending.pen = pending.pen === p ? "" : p; renderAll();
     }
     function share() {
         var r = official(); if (!r) return;
@@ -196,6 +227,9 @@
 
     function init() {
         try { localStorage.removeItem("activity-days-v1"); } catch (e) {} // eski seri kaydı (seri özelliği kaldırıldı)
+        try { localStorage.removeItem("daily-name-v1"); } catch (e) {}     // ad artık hesaptan gelir
+        // Eski modelden kalan, gönderilmemiş bugünkü sonucu temizle (yeni modelde yalnızca gönderince kilitlenir)
+        try { var all = loadRes(), k = today() + ":" + puzzle; if (all[k] && !sentToday()) { delete all[k]; saveRes(all); } } catch (e) {}
         var box = $("dTimerBox");
         document.addEventListener("keydown", function (e) {
             if (e.target.closest("input, textarea, button, a") && e.code !== "Space") return;
@@ -210,11 +244,12 @@
         $("dPen2").addEventListener("click", function () { setPen("+2"); });
         $("dPenDnf").addEventListener("click", function () { setPen("dnf"); });
         $("dShare").addEventListener("click", share);
-        $("lbSendBtn").addEventListener("click", sendResult);
-        $("lbName").addEventListener("keydown", function (e) { e.stopPropagation(); if (e.key === "Enter") sendResult(); });
-        $("lbName").addEventListener("keyup", function (e) { e.stopPropagation(); });
+        $("dSubmit").addEventListener("click", submitAttempt);
+        $("dRetry").addEventListener("click", retry);
         $("lbRefresh").addEventListener("click", loadBoard);
         document.addEventListener("site-lang-change", function () { renderAll(); if (window.btRenderBar) btRenderBar(); });
+        // Giriş/çıkış olunca sıralama durumu ve kilidi yeniden değerlendir
+        if (window.Account && window.Account.onChange) window.Account.onChange(function () { reconciled = false; renderAll(); });
         renderAll();
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
