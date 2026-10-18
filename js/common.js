@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
     if (cvdTheme()) applyCvd(cvdTheme());
     else if (holdSwap()) raRecolor();
-    raBuildSettings();
+    raInitSettings();
 });
 
 /* =========================================
@@ -149,8 +149,8 @@ function raSetTheme(mode) {
     var btn = document.getElementById("darkModeBtn"); if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
     renderSettingsMenu();
 }
-function renderSettingsMenu() {
-    var menu = document.getElementById("raSetMenu"); if (!menu) return;
+function renderSettingsMenu(target) {
+    var menu = target || document.getElementById("raSetMenu"); if (!menu) return;
     var L = SETTINGS_TXT[raSetLang()] || SETTINGS_TXT.tr;
     var th = (function () { try { return localStorage.getItem("theme") || "dark"; } catch (e) { return "dark"; } })();
     var langs = getLanguages(), curLang = raSetLang(), cvd = cvdTheme();
@@ -171,21 +171,21 @@ function renderSettingsMenu() {
     menu.innerHTML = html;
     Array.prototype.forEach.call(menu.querySelectorAll("[data-theme]"), function (b) { b.onclick = function () { raSetTheme(b.getAttribute("data-theme")); }; });
     Array.prototype.forEach.call(menu.querySelectorAll("[data-lang]"), function (b) { b.onclick = function () { selectLanguage(b.getAttribute("data-lang")); }; });
-    Array.prototype.forEach.call(menu.querySelectorAll("[data-cvd]"), function (b) { b.onclick = function () { applyCvd(b.getAttribute("data-cvd")); renderSettingsMenu(); }; });
+    Array.prototype.forEach.call(menu.querySelectorAll("[data-cvd]"), function (b) { b.onclick = function () { applyCvd(b.getAttribute("data-cvd")); renderSettingsMenu(target); }; });
 }
-function raBuildSettings() {
-    var right = document.querySelector(".nav-right");
-    if (!right || document.getElementById("raSettings")) return;
+/* Ayarlar artık ayrı sayfada (/ayarlar). Sayfa bu fonksiyonla kendi kabını doldurur. */
+window.raRenderSettings = function (el) { renderSettingsMenu(el); };
+/* Footer'a "Ayarlar" bağlantısı ekle (giriş yapılmamışken de erişilsin) */
+function raInitSettings() {
     var L = SETTINGS_TXT[raSetLang()] || SETTINGS_TXT.tr;
-    var wrap = document.createElement("div");
-    wrap.className = "ra-set"; wrap.id = "raSettings";
-    wrap.innerHTML = '<button class="ra-set-btn" id="raSetBtn" aria-haspopup="true" aria-expanded="false" aria-label="' + raEsc(L.set) + '">⚙️</button><div class="ra-set-menu" id="raSetMenu" role="menu"></div>';
-    right.appendChild(wrap);
-    renderSettingsMenu();
-    var btn = document.getElementById("raSetBtn");
-    btn.addEventListener("click", function (e) { e.stopPropagation(); var open = wrap.classList.toggle("open"); btn.setAttribute("aria-expanded", open ? "true" : "false"); });
-    document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) { wrap.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); } });
-    document.addEventListener("site-lang-change", renderSettingsMenu);
+    var foot = document.querySelector("footer");
+    if (foot && !document.getElementById("raFootSet")) {
+        var a = document.createElement("a");
+        a.id = "raFootSet"; a.className = "foot-set"; a.href = "/ayarlar";
+        a.textContent = "⚙️ " + L.set;
+        foot.appendChild(a);
+        document.addEventListener("site-lang-change", function () { a.textContent = "⚙️ " + ((SETTINGS_TXT[raSetLang()] || SETTINGS_TXT.tr).set); });
+    }
 }
 
 /* =========================================
