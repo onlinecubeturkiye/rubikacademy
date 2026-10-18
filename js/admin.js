@@ -34,9 +34,9 @@
                     try { st = JSON.parse(gv(f, "stats") || "{}"); } catch (e) {}
                     return { uid: uid, name: gv(f, "name") || "?", photo: gv(f, "photo") || "", bio: gv(f, "bio") || "", joined: +gv(f, "joined") || 0, seen: +gv(f, "seen") || 0, stats: st, meta: null };
                 }).sort(function (a, b) { return (b.seen || 0) - (a.seen || 0); });
-                // Her üyenin özel bilgisini (e-posta, tema, işaretler) paralel çek
+                // Her üyenin özel bilgisini (e-posta, tema, işaretler) + ziyaretlerini paralel çek
                 return Promise.all(users.map(function (u) {
-                    return fetchMeta(u.uid).then(function (m) { u.meta = m; return u; });
+                    return Promise.all([fetchMeta(u.uid), listVisits(u.uid, 100)]).then(function (res) { u.meta = res[0]; u.visits = res[1] || []; return u; });
                 }));
             });
     }
@@ -104,6 +104,10 @@
                 '<span class="a-note">(biliyorum ' + known.length + ', öğreniyorum ' + learning.length + ')</span><div>' + kh + lh + '</div></div>';
         }).join("");
     }
+    function visitsHtml(vs) {
+        if (!vs || !vs.length) return '<p class="a-note">Kayıtlı ziyaret yok.</p>';
+        return vs.map(function (v) { return '<div class="v-row"><span class="vp">' + esc(v.p) + '</span><span>' + esc(dateFmt(v.ts)) + '</span></div>'; }).join("");
+    }
     function userCard(u) {
         var st = u.stats || {}, sets = st.sets || {}, setIds = Object.keys(sets), me = u.meta || {};
         var ini = (u.name || "?").trim().charAt(0).toUpperCase() || "?";
@@ -111,33 +115,26 @@
         var pills = setIds.slice(0, 16).map(function (id) { var s = sets[id]; return '<span class="pill">' + esc(SET_LBL[id] || id) + ": " + (s.k || 0) + (s.t ? "/" + s.t : "") + "</span>"; }).join("");
         var acct = '<h4>Hesap bilgileri</h4><div class="a-note">' +
             'E-posta: <b style="font-family:\'JetBrains Mono\',monospace">' + esc(me.email || "—") + '</b><br>' +
+            'Kullanıcı ID: <span style="font-family:\'JetBrains Mono\',monospace">' + esc(u.uid) + '</span><br>' +
             'Giriş türü: ' + esc(provLabel(me.provider)) + '<br>' +
             'Tema: ' + (me.theme === "dark" ? "🌙 Karanlık mod" : "☀️ Açık") + (me.cvd ? ' · Renk körlüğü: ' + esc(me.cvd) : '') + '<br>' +
             'Dil: ' + esc((me.lang || "—").toUpperCase()) + ' · Üyelik: ' + esc(dateFmt(u.joined)) + '</div>';
-        return '<div class="u-card" data-uid="' + esc(u.uid) + '">' +
+        return '<div class="u-card open" data-uid="' + esc(u.uid) + '">' +
             '<div class="u-top"><div class="u-ava">' + ava + '</div>' +
             '<div class="u-id"><b>' + esc(u.name) + '</b><small>' + esc(me.email || u.uid) + '</small>' +
             '<div class="u-stat">Bilinen ' + (st.known || 0) + ' · Öğrenilen ' + (st.learning || 0) + ' · Trainer ' + (st.solves || 0) + ' · Günlük en iyi ' + fmt(st.best) + ' · Son görülme ' + dateFmt(u.seen) + '</div></div>' +
-            '<button class="a-btn sm" data-expand>Detay</button></div>' +
+            '<button class="a-btn sm" data-expand>Gizle</button></div>' +
             '<div class="u-detail">' + acct + (u.bio ? '<h4>Bio</h4><p class="a-note">“' + esc(u.bio) + '”</p>' : '') +
             (pills ? '<h4>İlerleme özeti</h4><div>' + pills + '</div>' : '') +
             '<h4>İşaretlediği case\'ler</h4><div>' + marksHtml(me.marks) + '</div>' +
-            '<h4>Son sayfa ziyaretleri</h4><div class="v-list"><p class="a-note">…</p></div></div></div>';
+            '<h4>Son sayfa ziyaretleri (' + (u.visits ? u.visits.length : 0) + ')</h4><div class="v-list">' + visitsHtml(u.visits) + '</div></div></div>';
     }
     function bindUserCards(container) {
         Array.prototype.forEach.call(container.querySelectorAll(".u-card"), function (card) {
-            var btn = card.querySelector("[data-expand]"), loaded = false;
+            var btn = card.querySelector("[data-expand]");
             btn.addEventListener("click", function () {
                 var open = card.classList.toggle("open");
                 btn.textContent = open ? "Gizle" : "Detay";
-                if (open && !loaded) {
-                    loaded = true;
-                    var uid = card.getAttribute("data-uid"), vl = card.querySelector(".v-list");
-                    listVisits(uid, 50).then(function (vs) {
-                        vl.innerHTML = vs.length ? vs.map(function (v) { return '<div class="v-row"><span class="vp">' + esc(v.p) + '</span><span>' + esc(dateFmt(v.ts)) + '</span></div>'; }).join("")
-                            : '<p class="a-note">Kayıtlı ziyaret yok.</p>';
-                    }, function () { vl.innerHTML = '<p class="a-note">Ziyaretler yüklenemedi.</p>'; loaded = false; });
-                }
             });
         });
     }
@@ -161,11 +158,13 @@
             '<p class="a-note">Yanlış bir süreyi sil; o kullanıcı o gün için yeniden gönderebilir.</p>' +
             '<div class="a-msg" id="aDailyMsg"></div><div id="aDailyList" class="a-list"></div></div>' +
             '<div class="box"><h2>👥 Kullanıcılar <span class="a-sub" id="aUsersCount" style="margin:0"></span></h2>' +
-            '<div class="a-ctrl"><button class="a-btn main" id="aUsersLoad">Kullanıcıları yükle</button></div>' +
+            '<div class="a-ctrl"><button class="a-btn main" id="aUsersLoad">↻ Yenile</button></div>' +
+            '<p class="a-note">Her üyenin e-postası, giriş türü, teması, işaretlediği case\'ler ve gezdiği sayfalar otomatik yüklenir.</p>' +
             '<div id="aUsersList"></div></div>';
         $id("aDailyLoad").addEventListener("click", renderDaily);
         $id("aUsersLoad").addEventListener("click", renderUsers);
         renderDaily();
+        renderUsers();   // kullanıcılar ve tüm verileri otomatik gelsin
     }
     function renderGate(kind) {
         if (kind === "forbidden") {

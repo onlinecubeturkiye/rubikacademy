@@ -54,6 +54,8 @@
 
   function renderOwn() {
     var u = window.Account.user(), prof = window.Account.localProfile(), st = window.Account.computeStats();
+    // Paylaşım linki çalışsın diye herkese açık profil dokümanının yazıldığından emin ol
+    if (window.Account.writeProfile) window.Account.writeProfile();
     var name = prof.name || (u && u.displayName) || (u && (u.email || "").split("@")[0]) || "Cuber";
     root.innerHTML =
       '<div class="box"><div class="p-head"><div class="p-ava">' + avatar(u && u.photoURL, name) + '</div>' +
