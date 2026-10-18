@@ -82,7 +82,7 @@ service cloud.firestore {
       match /meta/{m} {
         allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
         allow create, update: if request.auth != null && request.auth.uid == uid
-          && request.resource.data.keys().hasOnly(['email', 'provider', 'name', 'theme', 'cvd', 'lang', 'seen', 'marks'])
+          && request.resource.data.keys().hasOnly(['email', 'provider', 'name', 'theme', 'cvd', 'lang', 'seen', 'dev', 'marks'])
           && request.resource.data.email is string && request.resource.data.email.size() <= 120
           && (!('marks' in request.resource.data) || (request.resource.data.marks is string && request.resource.data.marks.size() <= 40000));
         allow delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
@@ -110,6 +110,12 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['role'])
         && request.resource.data.role in ['uye', 'gelistirici', 'tester'];
       allow delete: if isAdmin();
+    }
+
+    // Site ayarı (bakım modu): herkes okur, yalnız admin yazar
+    match /config/{id} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
     }
 
     // Herkese açık duyurular: yalnız admin yazar, herkes okur

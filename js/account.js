@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261121";
+    var V = "20261122";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -536,9 +536,10 @@
             cvd: { stringValue: String(lsGet("cvd-theme") || "").slice(0, 24) },
             lang: { stringValue: String(lsGet("site-lang") || "tr").slice(0, 8) },
             seen: { integerValue: String(Date.now()) },
+            dev: { stringValue: deviceStr().slice(0, 40) },
             marks: { stringValue: JSON.stringify(allMarks()).slice(0, 40000) }
         };
-        var mask = "?" + ["email", "provider", "name", "theme", "cvd", "lang", "seen", "marks"].map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
+        var mask = "?" + ["email", "provider", "name", "theme", "cvd", "lang", "seen", "dev", "marks"].map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
         return api("/users/" + user.uid + "/meta/self" + mask, { method: "PATCH", body: JSON.stringify({ fields: fields }) }).catch(function () {});
     }
     document.addEventListener("account-synced", function () { writeProfile(); writeMeta(); logVisit(); });
@@ -549,6 +550,11 @@
     // Bildirim gönder (admin)
     function sendNotif(tid, text) { if (!isAdmin()) return Promise.resolve(false); return api("/users/" + tid + "/notifications", { method: "POST", body: JSON.stringify({ fields: { text: { stringValue: String(text).slice(0, 500) }, ts: { timestampValue: new Date().toISOString() } } }) }).then(function (r) { return r.ok; }); }
     function sendBroadcast(text) { if (!isAdmin()) return Promise.resolve(false); return api("/broadcasts", { method: "POST", body: JSON.stringify({ fields: { text: { stringValue: String(text).slice(0, 500) }, ts: { timestampValue: new Date().toISOString() } } }) }).then(function (r) { return r.ok; }); }
+    function listBroadcasts() { return pubList("/broadcasts").then(function (docs) { return docs.map(function (d) { var f = d.fields || {}; return { id: d.name.split("/").pop(), text: (f.text && f.text.stringValue) || "", ts: Date.parse((f.ts && f.ts.timestampValue) || "") || 0 }; }).sort(function (a, b) { return b.ts - a.ts; }); }); }
+    function deleteBroadcast(id) { if (!isAdmin()) return Promise.resolve(false); return api("/broadcasts/" + id, { method: "DELETE" }).then(function (r) { return r.ok; }); }
+    // Bakım modu (config/site): herkes okur, admin yazar
+    function getConfig() { return fetch(pubUrl("/config/site")).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { var f = (d && d.fields) || {}; return { maintenance: !!(f.maintenance && f.maintenance.booleanValue), msg: (f.msg && f.msg.stringValue) || "" }; }).catch(function () { return { maintenance: false, msg: "" }; }); }
+    function setMaintenance(on, msg) { if (!isAdmin()) return Promise.resolve(false); return api("/config/site?updateMask.fieldPaths=maintenance&updateMask.fieldPaths=msg", { method: "PATCH", body: JSON.stringify({ fields: { maintenance: { booleanValue: !!on }, msg: { stringValue: String(msg || "").slice(0, 300) } } }) }).then(function (r) { return r.ok; }); }
     // Bildirim oku (yeni broadcast + kendi okunmamış bildirimlerim)
     function fetchNotes() {
         var out = [], seenB = 0; try { seenB = +(lsGet("ra-bcast-seen") || 0); } catch (e) {}
@@ -637,6 +643,19 @@
             if (before && mine && mine < before) signOut();
         }).catch(function () {});
     }
+    // Bakım modu: açıksa admin olmayan herkese tam ekran "bakımda" göster
+    function checkMaintenance() {
+        if (!enabled) return;
+        getConfig().then(function (c) {
+            var o = document.getElementById("raMaint");
+            if (!c.maintenance || isAdmin()) { if (o) o.remove(); return; }
+            if (o) return;
+            o = document.createElement("div"); o.id = "raMaint"; o.className = "ra-maint";
+            o.innerHTML = '<div class="ra-maint-box"><div class="ra-maint-ic">🛠️</div><h1>Bakımdayız</h1><p></p><a class="ra-maint-a" href="/giris">Yönetici girişi</a></div>';
+            o.querySelector("p").textContent = c.msg || "Site kısa süreliğine bakımda. Birazdan tekrar dene.";
+            (document.body || document.documentElement).appendChild(o);
+        });
+    }
 
     window.Account = {
         enabled: function () { return enabled; },
@@ -676,6 +695,7 @@
         load: loadSDK,
         isPending: function () { return lsGet(SIGNED_KEY) === "1" && !sdkP; },
         sendNotif: sendNotif, sendBroadcast: sendBroadcast, showNotes: showNotes,
+        listBroadcasts: listBroadcasts, deleteBroadcast: deleteBroadcast, getConfig: getConfig, setMaintenance: setMaintenance,
         notifyPermission: function () { if (!("Notification" in window)) return Promise.resolve("unsupported"); return Notification.requestPermission(); },
         isPasswordUser: isPasswordUser, emailVerified: emailVerified, verifyEmail: verifyEmail, changePassword: changePassword,
         listSessions: listSessions, logoutOthers: logoutOthers, sessId: sessId
@@ -690,6 +710,9 @@
         // Duyurular/bildirimler: herkese açık broadcast'leri her sayfada, kişisel bildirimleri girişten sonra göster
         setTimeout(showNotes, 1800);
         document.addEventListener("account-synced", function () { setTimeout(showNotes, 400); });
+        // Bakım modu kontrolü (admin oturumu çözülsün diye kısa gecikme) + giriş/çıkışta yeniden
+        setTimeout(checkMaintenance, 2200);
+        document.addEventListener("account-change", function () { checkMaintenance(); });
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
