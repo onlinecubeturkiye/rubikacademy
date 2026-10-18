@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"");if((localStorage.getItem("theme")||"dark")==="dark")document.documentElement.classList.add("dark-mode");}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rubik Academy - Zamanlayıcı</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/zamanlayici">
+<meta name="description" content="Rubik küp zamanlayıcısı: her küp için scramble, inspection, +2/DNF, kişisel rekor (PB), ao5/ao12 ve çözüm geçmişi. Hesabında saklanır.">
+<meta property="og:title" content="Zamanlayıcı — Rubik Academy">
+<meta property="og:description" content="Scramble, inspection, PB ve ao5/ao12 ile çöz; süreler hesabında saklanır.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/zamanlayici">
+<meta property="og:image" content="https://rubikacademy.fun/og/zamanlayici.png?v=20261118">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/zamanlayici.png?v=20261118">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles/common.css?v=20261118">
+<style>
+.wrap { max-width: 920px; margin: 0 auto; }
+.z-top { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 14px; }
+.z-cube { padding: 8px 14px; border-radius: 999px; border: var(--card-bw) solid var(--card-border); background: var(--surface); color: var(--text); font: 800 13.5px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
+.z-cube.on { background: var(--cube-yellow); color: #17171f; border-color: var(--ink); }
+.z-scr { display: flex; align-items: center; gap: 12px; justify-content: center; margin: 4px auto 14px; max-width: 760px; }
+.z-scr code { flex: 1; text-align: center; font: 800 18px/1.6 "JetBrains Mono", monospace; color: var(--text); word-spacing: 3px; }
+.z-scr button { flex-shrink: 0; }
+.z-box { margin: 0 auto 16px; padding: 34px 12px 22px; border-radius: 22px; border: var(--card-bw) solid var(--ink); background: var(--surface); text-align: center; cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: none; box-shadow: var(--shadow); }
+.z-time { font: 800 clamp(58px, 13vw, 104px)/1 "JetBrains Mono", monospace; color: var(--text); }
+.z-box[data-state="hold"] .z-time { color: var(--cube-red); }
+.z-box[data-state="ready"] .z-time { color: var(--cube-green); }
+.z-box[data-state="inspect"] .z-time { color: var(--cube-orange, #ff7a1a); }
+.z-hint { margin-top: 10px; font-size: 13.5px; font-weight: 700; color: var(--text-soft); }
+.z-ctrl { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 18px; }
+.z-btn { padding: 9px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 13.5px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
+.z-btn.on { background: var(--cube-red); color: #fff; }
+.z-btn:disabled { opacity: .45; cursor: default; }
+.z-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.z-stat { border: var(--card-bw) solid var(--border); border-radius: 16px; background: var(--surface); padding: 13px; text-align: center; }
+.z-stat b { display: block; font: 800 22px "JetBrains Mono", monospace; color: var(--text); }
+.z-stat span { font-size: 11.5px; font-weight: 700; color: var(--text-soft); }
+.z-stat.pb b { color: var(--cube-green); }
+.z-list { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 18px; box-shadow: var(--shadow-sm); padding: 8px 10px; }
+.z-row { display: grid; grid-template-columns: 34px 1fr auto auto; gap: 8px; align-items: center; padding: 8px 6px; border-bottom: 1px solid var(--border); font-size: 14px; }
+.z-row:last-child { border-bottom: 0; }
+.z-row .n { color: var(--text-soft); font-weight: 800; text-align: center; font-size: 12px; }
+.z-row .tm { font: 800 16px "JetBrains Mono", monospace; color: var(--text); }
+.z-row small { color: var(--text-soft); font-size: 11px; }
+.z-row .acts { display: flex; gap: 4px; }
+.z-mini { padding: 4px 8px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface-soft); color: var(--text); font: 800 11px Inter, sans-serif; cursor: pointer; }
+.z-mini.on { background: var(--cube-red); color: #fff; }
+.z-empty { color: var(--text-soft); font-size: 14px; text-align: center; padding: 16px; }
+.z-sync { text-align: center; color: var(--text-soft); font-size: 12.5px; margin: 10px 0 4px; }
+.intro { text-align: center; margin: 0 auto 18px; max-width: 640px; }
+.intro h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 900; letter-spacing: -1px; color: var(--text); }
+.intro p { color: var(--text-soft); font-size: 15px; margin-top: 6px; }
+@media (max-width: 600px) { .z-scr code { font-size: 15px; } }
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-F7KXWC8B5N');</script>
+</head>
+<body>
+<div class="bg-glow"></div>
+<header class="navbar">
+    <a href="/" class="nav-logo"><img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy"><span class="nav-logo-text">Rubik Academy</span></a>
+    <div class="nav-right">
+        <nav class="nav-links"><a href="/" data-i18n="navHome">Ana Sayfa</a><a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a></nav>
+    </div>
+</header>
+<div class="page">
+<div class="wrap">
+<nav class="nav-bar"><a href="/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a></nav>
+<section class="intro"><h1>Zamanlayıcı</h1><p>Scramble’ı uygula, boşluk tuşunu (ya da kutuyu) basılı tutup bırak. Süreler hesabına kaydolur; kişisel rekorun profilinde görünür.</p></section>
+
+<div class="z-top" id="zCubes"></div>
+<div class="z-scr"><button class="z-btn" id="zNew" type="button" title="Yeni scramble">↻</button><code id="zScr" dir="ltr"></code></div>
+<div class="z-box" id="zBox" data-state="idle" role="button" tabindex="0"><div class="z-time" id="zTime" dir="ltr">0.00</div><div class="z-hint" id="zHint"></div></div>
+<div class="z-ctrl">
+    <button class="z-btn" id="zInspect" type="button">⏱️ Inspection: Kapalı</button>
+    <button class="z-btn" id="zPen2" type="button" disabled>+2</button>
+    <button class="z-btn" id="zDnf" type="button" disabled>DNF</button>
+    <button class="z-btn" id="zDelLast" type="button" disabled>Son çözümü sil</button>
+</div>
+<div class="z-stats" id="zStats"></div>
+<div class="z-sync" id="zSync"></div>
+<div class="z-list" id="zList"></div>
+</div>
+</div>
+<footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
+<script src="/js/i18n.js?v=20261118"></script>
+<script src="/js/common.js?v=20261118"></script>
+<script src="/js/firebase-config.js?v=20261118"></script>
+<script src="/js/account.js?v=20261118"></script>
+<script>
+(function () {
+    var KEY = "timer-solves-v1";
+    var CUBES = ["3x3", "2x2", "4x4", "5x5", "6x6", "7x7", "Pyraminx", "Skewb", "Megaminx", "3x3 OH"];
+    var $ = function (id) { return document.getElementById(id); };
+    function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+    function save(o) { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {} if (window.Account && Account.syncNow) Account.syncNow(); }
+    function fmt(ms) { if (ms == null) return "—"; if (ms === Infinity) return "DNF"; var s = ms / 1000; if (s < 60) return s.toFixed(2); var m = Math.floor(s / 60); return m + ":" + (s - m * 60).toFixed(2).padStart(5, "0"); }
+    function val(r) { return r.pen === "dnf" ? Infinity : r.t + (r.pen === "+2" ? 2000 : 0); }
+    function label(r) { return r.pen === "dnf" ? "DNF" : fmt(val(r)) + (r.pen === "+2" ? "+" : ""); }
+
+    /* ---------- scramble üreticileri ---------- */
+    function rnd(n) { return Math.floor(Math.random() * n); }
+    function basic(faces, n) {
+        var sfx = ["", "'", "2"], out = [], last = -1, prev = -1;
+        while (out.length < n) {
+            var f = rnd(faces.length);
+            if (f === last) continue;
+            if (faces.length >= 6 && (f % 3 === last % 3 && f % 3 === prev % 3)) continue;
+            out.push(faces[f] + sfx[rnd(3)]); prev = last; last = f;
+        }
+        return out.join(" ");
+    }
+    function wide(bases, n) {
+        var sfx = ["", "'", "2"], out = [], last = -1;
+        while (out.length < n) { var f = rnd(bases.length); if (f === last) continue; out.push(bases[f] + sfx[rnd(3)]); last = f; }
+        return out.join(" ");
+    }
+    function pyra() {
+        var f = ["U", "L", "R", "B"], sfx = ["", "'"], out = [], last = -1;
+        for (var i = 0; i < 10; i++) { var g = rnd(4); if (g === last) { i--; continue; } out.push(f[g] + sfx[rnd(2)]); last = g; }
+        var tips = ["u", "l", "r", "b"]; tips.forEach(function (t) { if (rnd(3)) out.push(t + (rnd(2) ? "'" : "")); });
+        return out.join(" ");
+    }
+    function mega() {
+        var lines = [], S = ["R", "D"];
+        for (var l = 0; l < 7; l++) {
+            var row = [];
+            for (var i = 0; i < 10; i++) row.push(S[i % 2] + (rnd(2) ? "++" : "--"));
+            row.push(rnd(2) ? "U" : "U'");
+            lines.push(row.join(" "));
+        }
+        return lines.join("\n");
+    }
+    function scrambleFor(cube) {
+        switch (cube) {
+            case "2x2": return basic("URF".split(""), 11);
+            case "4x4": return wide(["U", "R", "F", "D", "L", "B", "Uw", "Rw", "Fw"], 45);
+            case "5x5": return wide(["U", "R", "F", "D", "L", "B", "Uw", "Rw", "Fw", "Lw", "Dw", "Bw"], 60);
+            case "6x6": return wide(["U", "R", "F", "D", "L", "B", "Uw", "Rw", "Fw", "3Uw", "3Rw", "3Fw"], 80);
+            case "7x7": return wide(["U", "R", "F", "D", "L", "B", "Uw", "Rw", "Fw", "3Uw", "3Rw", "3Fw"], 100);
+            case "Pyraminx": return pyra();
+            case "Skewb": return basic("URLB".split(""), 10);
+            case "Megaminx": return mega();
+            default: return basic("URFDLB".split(""), 20); // 3x3, 3x3 OH
+        }
+    }
+
+    /* ---------- durum ---------- */
+    var cube = (function () { try { return localStorage.getItem("timer-cube") || "3x3"; } catch (e) { return "3x3"; } })();
+    if (CUBES.indexOf(cube) < 0) cube = "3x3";
+    var curScr = "", lastKey = null;
+    function solves() { return load()[cube] || []; }
+    function setSolves(arr) { var o = load(); o[cube] = arr.slice(-500); save(o); }
+
+    /* ---------- zamanlayıcı ---------- */
+    var state = "idle", t0 = 0, raf = 0, holdT = 0, last = 0, inspect = false, insEnd = 0, insTimer = 0;
+    function show(ms) { $("zTime").textContent = fmt(ms); }
+    function setState(s) { state = s; $("zBox").setAttribute("data-state", s); $("zHint").textContent = hint(s); }
+    function hint(s) {
+        return { idle: "Boşluğu / kutuyu basılı tut, bırakınca başlar", hold: "Bekle…", ready: "Bırak!", running: "Durdurmak için tuşa / kutuya dok.", done: "Tekrar için basılı tut", inspect: "Hazırlan — başlamak için basılı tut" }[s] || "";
+    }
+    function tick() { show(performance.now() - t0); raf = requestAnimationFrame(tick); }
+    function startInspection() {
+        setState("inspect"); insEnd = performance.now() + 15000;
+        clearInterval(insTimer);
+        insTimer = setInterval(function () {
+            var left = Math.ceil((insEnd - performance.now()) / 1000);
+            $("zTime").textContent = left > 0 ? String(left) : (left > -2 ? "+2" : "DNF");
+            if (left <= -2) { clearInterval(insTimer); }
+        }, 100);
+    }
+    function press() {
+        if (state === "running") { stop(); return; }
+        if (state === "done" || state === "idle") {
+            if (inspect && state !== "inspect" && !pendingInspect()) { startInspection(); pend = true; return; }
+        }
+        setState("hold"); if (!inspect || pend) show(0);
+        holdT = setTimeout(function () { if (state === "hold") setState("ready"); }, 300);
+    }
+    var pend = false;
+    function pendingInspect() { return pend; }
+    function release() {
+        if (state === "hold") { clearTimeout(holdT); setState(pend ? "inspect" : "idle"); return; }
+        if (state === "ready") { clearInterval(insTimer); pend = false; setState("running"); t0 = performance.now(); tick(); }
+    }
+    function stop() {
+        cancelAnimationFrame(raf); last = performance.now() - t0; show(last); setState("done");
+        var pen = ""; if (inspect) { var over = performance.now() - insEnd; if (over > 2000) pen = "dnf"; else if (over > 0) pen = "+2"; }
+        var arr = solves(); arr.push({ t: Math.round(last), pen: pen, scr: curScr, ts: Date.now() });
+        setSolves(arr); render(); newScramble();
+    }
+
+    /* ---------- istatistik ---------- */
+    function avg(list) { // ao5/ao12: en iyi & en kötü atılır
+        if (list.length < 3) return null;
+        var vals = list.map(val), dnf = vals.filter(function (v) { return v === Infinity; }).length;
+        if (dnf > 1) return Infinity;
+        var sorted = vals.slice().sort(function (a, b) { return a - b; });
+        sorted = sorted.slice(1, sorted.length - 1);
+        var sum = sorted.reduce(function (a, b) { return a + b; }, 0);
+        return sum / sorted.length;
+    }
+    function best(list) { var v = list.map(val).filter(function (x) { return x !== Infinity; }); return v.length ? Math.min.apply(null, v) : null; }
+    function renderStats() {
+        var s = solves(), a5 = avg(s.slice(-5)), a12 = avg(s.slice(-12));
+        var tiles = [["pb", "PB", fmt(best(s))], ["", "ao5", a5 == null ? "—" : fmt(a5)], ["", "ao12", a12 == null ? "—" : fmt(a12)], ["", "Çözüm", s.length], ["", "Son", s.length ? label(s[s.length - 1]) : "—"]];
+        $("zStats").innerHTML = tiles.map(function (t) { return '<div class="z-stat ' + t[0] + '"><b dir="ltr">' + t[2] + '</b><span>' + t[1] + '</span></div>'; }).join("");
+    }
+    function renderList() {
+        var s = solves();
+        if (!s.length) { $("zList").innerHTML = '<p class="z-empty">Henüz çözüm yok. İlk süreni ekle!</p>'; return; }
+        var html = "";
+        for (var i = s.length - 1; i >= Math.max(0, s.length - 30); i--) {
+            var r = s[i], n = i + 1;
+            html += '<div class="z-row" data-i="' + i + '"><span class="n">' + n + '</span>' +
+                '<span><span class="tm" dir="ltr">' + label(r) + '</span></span>' +
+                '<div class="acts"><button class="z-mini' + (r.pen === "+2" ? " on" : "") + '" data-act="+2">+2</button>' +
+                '<button class="z-mini' + (r.pen === "dnf" ? " on" : "") + '" data-act="dnf">DNF</button>' +
+                '<button class="z-mini" data-act="del">✕</button></div></div>';
+        }
+        $("zList").innerHTML = html;
+        Array.prototype.forEach.call($("zList").querySelectorAll(".z-row"), function (row) {
+            var idx = +row.getAttribute("data-i");
+            Array.prototype.forEach.call(row.querySelectorAll("[data-act]"), function (b) {
+                b.onclick = function () {
+                    var arr = solves(); if (!arr[idx]) return; var act = b.getAttribute("data-act");
+                    if (act === "del") arr.splice(idx, 1);
+                    else arr[idx].pen = arr[idx].pen === act ? "" : act;
+                    setSolves(arr); render();
+                };
+            });
+        });
+    }
+    function render() {
+        var s = solves(), has = s.length > 0;
+        $("zPen2").disabled = $("zDnf").disabled = $("zDelLast").disabled = !has;
+        if (has) { $("zPen2").classList.toggle("on", s[s.length - 1].pen === "+2"); $("zDnf").classList.toggle("on", s[s.length - 1].pen === "dnf"); }
+        renderStats(); renderList();
+    }
+
+    function newScramble() { curScr = scrambleFor(cube); $("zScr").innerHTML = curScr.replace(/\n/g, "<br>"); }
+    function renderCubes() {
+        $("zCubes").innerHTML = CUBES.map(function (c) { return '<button class="z-cube' + (c === cube ? " on" : "") + '" data-c="' + c + '">' + c + '</button>'; }).join("");
+        Array.prototype.forEach.call($("zCubes").querySelectorAll(".z-cube"), function (b) {
+            b.onclick = function () { cube = b.getAttribute("data-c"); try { localStorage.setItem("timer-cube", cube); } catch (e) {} renderCubes(); newScramble(); render(); };
+        });
+    }
+    function syncLine() {
+        $("zSync").textContent = (window.Account && Account.uid && Account.uid()) ? "✓ Süreler hesabına kaydediliyor" : "ⓘ Giriş yapınca süreler tüm cihazlarında görünür";
+    }
+
+    function init() {
+        renderCubes(); newScramble(); render(); syncLine();
+        var box = $("zBox");
+        document.addEventListener("keydown", function (e) {
+            if (e.target.closest("input, textarea, a, button") && e.code !== "Space") return;
+            if (e.code === "Space") { e.preventDefault(); if (!e.repeat) press(); }
+            else if (state === "running") stop();
+        });
+        document.addEventListener("keyup", function (e) { if (e.code === "Space") { e.preventDefault(); release(); } });
+        box.addEventListener("touchstart", function (e) { e.preventDefault(); press(); }, { passive: false });
+        box.addEventListener("touchend", function (e) { e.preventDefault(); release(); }, { passive: false });
+        box.addEventListener("mousedown", function () { press(); });
+        box.addEventListener("mouseup", function () { release(); });
+        $("zNew").onclick = newScramble;
+        $("zInspect").onclick = function () { inspect = !inspect; $("zInspect").textContent = "⏱️ Inspection: " + (inspect ? "Açık (15 sn)" : "Kapalı"); $("zInspect").classList.toggle("on", inspect); };
+        function penLast(p) { var arr = solves(); if (!arr.length) return; arr[arr.length - 1].pen = arr[arr.length - 1].pen === p ? "" : p; setSolves(arr); render(); }
+        $("zPen2").onclick = function () { penLast("+2"); };
+        $("zDnf").onclick = function () { penLast("dnf"); };
+        $("zDelLast").onclick = function () { var arr = solves(); arr.pop(); setSolves(arr); render(); };
+        if (window.Account && Account.onChange) Account.onChange(function () { syncLine(); });
+        document.addEventListener("account-synced", render);
+    }
+    if (document.readyState !== "loading") init(); else document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>

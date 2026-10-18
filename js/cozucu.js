@@ -7,7 +7,7 @@
    Tutuş: sarı üstte (U), yeşil önde (F), turuncu sağda (R).
 ========================================================= */
 (function () {
-    var V = "20261117";
+    var V = "20261118";
     var FACES = "URFDLB";
     var COLOR = { U: "#f6c719", R: "#ff7a1a", F: "#179e4f", D: "#eef2f3", L: "#d12d28", B: "#2c6fe6" };
     var CNAME = { U: "c_yellow", R: "c_orange", F: "c_green", D: "c_white", L: "c_red", B: "c_blue" };
@@ -52,6 +52,15 @@
         });
         var n = 0; state.forEach(function (c) { if (!c) n++; });
         $("emptyCount").textContent = n ? T("left", "{n} kare boş").replace("{n}", n) : T("all_set", "Tüm kareler dolu");
+        // Canlı renk sayacı: her renkten 9 olmalı — tarama hatalarını anında gösterir
+        var cc = $("colorCount");
+        if (cc) {
+            var cnt = {}; state.forEach(function (c) { if (c) cnt[c] = (cnt[c] || 0) + 1; });
+            cc.innerHTML = FACES.split("").map(function (f) {
+                var k = cnt[f] || 0, ok = k === 9;
+                return '<span class="cc' + (ok ? " ok" : (k > 9 ? " over" : "")) + '"><i style="background:' + COLOR[f] + '"></i>' + k + '/9</span>';
+            }).join("");
+        }
     }
     function buildPalette() {
         $("palette").innerHTML = FACES.split("").map(function (f) {

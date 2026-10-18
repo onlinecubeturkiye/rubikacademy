@@ -35,6 +35,15 @@
     var rows = [["Bilinen case", st.known || 0], ["Öğrenilen", st.learning || 0], ["Trainer çözüm", st.solves || 0], ["Günlük en iyi", fmt(st.best)], ["Günlük gün", st.daily || 0]];
     return '<div class="stat-tiles">' + rows.map(function (r) { return '<div class="stat-tile"><b>' + esc(r[1]) + "</b><span>" + r[0] + "</span></div>"; }).join("") + "</div>";
   }
+  function pbGrid(st) {
+    var pbs = (st && st.pbs) || {}, ids = Object.keys(pbs);
+    if (!ids.length) return '<p class="p-note">Henüz zamanlayıcı rekoru yok.</p>';
+    var order = ["3x3", "2x2", "4x4", "5x5", "6x6", "7x7", "Pyraminx", "Skewb", "Megaminx", "3x3 OH"];
+    ids.sort(function (a, b) { var ia = order.indexOf(a), ib = order.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
+    return '<div class="p-daily">' + ids.map(function (c) {
+      return '<div class="p-drow"><span>' + esc(c) + '</span><b dir="ltr">' + esc(fmt(pbs[c])) + '</b></div>';
+    }).join("") + "</div>";
+  }
   function dailyGrid(st) {
     var dl = (st && st.dlist) || [];
     if (!dl.length) return '<p class="p-note">Henüz günlük çözüm yok.</p>';
@@ -64,6 +73,7 @@
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistikler</h2>' + statTiles(data.stats) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerleme</h2>' + setsGrid(data.stats) + '</div>' +
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">⏱️ Kişisel rekorlar</h2>' + pbGrid(data.stats) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümler</h2>' + dailyGrid(data.stats) + '</div>';
     showRole(uid);
     if (isMe) bindShare(uid);
@@ -106,6 +116,7 @@
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistiklerim</h2>' + statTiles(st) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerlemem</h2>' + setsGrid(st) + '</div>' +
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">⏱️ Kişisel rekorlarım</h2>' + pbGrid(st) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>';
 
     showRole(u.uid);

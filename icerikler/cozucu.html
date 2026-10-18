@@ -27,10 +27,10 @@
 <meta property="og:description" content="Renkleri gir ya da kamerayla tara, çözümü adım adım izle.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/cozucu">
-<meta property="og:image" content="https://rubikacademy.fun/og/cozucu.png?v=20261117">
+<meta property="og:image" content="https://rubikacademy.fun/og/cozucu.png?v=20261118">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/cozucu.png?v=20261117">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/cozucu.png?v=20261118">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261117">
+<link rel="stylesheet" href="/styles/common.css?v=20261118">
 
 <style>
 .wrap { max-width: 980px; margin: 0 auto; }
@@ -81,6 +81,11 @@
 .side .palette { margin-bottom: 28px; }
 .side .btns { display: grid; gap: 8px; }
 .empty-count { font-size: 13px; font-weight: 700; color: var(--text-soft); margin-top: 10px; }
+.color-count { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.color-count .cc { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; border: 1.5px solid var(--cube-red); background: var(--surface-soft); color: var(--text); font: 800 12px "JetBrains Mono", monospace; }
+.color-count .cc.ok { border-color: var(--cube-green); }
+.color-count .cc.over { border-color: var(--cube-orange, #ff7a1a); }
+.color-count .cc i { width: 13px; height: 13px; border-radius: 3px; border: 1px solid #17171f; }
 .msg { margin-top: 14px; font-weight: 800; font-size: 14.5px; color: var(--text-soft); min-height: 1px; }
 .msg.bad { color: var(--cube-red); }
 .msg.ok { color: var(--cube-green); }
@@ -185,6 +190,7 @@
             <div class="net" id="net" dir="ltr"></div>
             <div class="hold"><span data-i18n="hold">Tutuş:</span><span><i style="background:#f6c719"></i><span data-i18n="hold_u">sarı üstte</span></span><span><i style="background:#179e4f"></i><span data-i18n="hold_f">yeşil önde</span></span></div>
             <p class="empty-count" id="emptyCount"></p>
+            <div class="color-count" id="colorCount" aria-hidden="true"></div>
         </div>
         <div class="side">
             <h3 data-i18n="pick">Renk seç, karelere dokun</h3>
@@ -230,13 +236,13 @@
 </footer>
 
 <script>var PAGE_ID = "cozucu";</script>
-<script src="/js/i18n.js?v=20261117"></script>
-<script src="/js/common.js?v=20261117"></script>
-<script src="/js/firebase-config.js?v=20261117"></script>
-<script src="/js/account.js?v=20261117"></script>
+<script src="/js/i18n.js?v=20261118"></script>
+<script src="/js/common.js?v=20261118"></script>
+<script src="/js/firebase-config.js?v=20261118"></script>
+<script src="/js/account.js?v=20261118"></script>
 
 
-<script src="/js/vendor/cubejs/cube.js?v=20261117"></script>
-<script src="/js/cozucu.js?v=20261117"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261118"></script>
+<script src="/js/cozucu.js?v=20261118"></script>
 </body>
 </html>
