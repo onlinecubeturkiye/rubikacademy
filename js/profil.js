@@ -17,16 +17,31 @@
   function initials(n) { n = (n || "?").trim().split(/\s+/); return ((n[0] || "?")[0] + (n[1] ? n[1][0] : "")).toUpperCase(); }
   function avatar(photo, name) { return photo ? '<img src="' + esc(photo) + '" alt="" referrerpolicy="no-referrer">' : esc(initials(name)); }
   function dateStr(ms) { if (!ms) return ""; try { return new Date(ms).toLocaleDateString("tr-TR", { year: "numeric", month: "long" }); } catch (e) { return ""; } }
+  // Yüklenen fotoğrafı kare kırpıp küçültür, data URL döndürür (profil dokümanına sığsın diye)
+  function downscalePhoto(file, cb) {
+    if (!file || !/^image\//.test(file.type)) { cb(null); return; }
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function () {
+      var s = Math.min(img.width, img.height), sx = (img.width - s) / 2, sy = (img.height - s) / 2;
+      function render(size, q) { var c = document.createElement("canvas"); c.width = c.height = size; c.getContext("2d").drawImage(img, sx, sy, s, s, 0, 0, size, size); return c.toDataURL("image/jpeg", q); }
+      var data = render(180, 0.72), q = 0.72;
+      while (data.length > 38000 && q > 0.35) { q -= 0.1; data = render(180, q); }
+      if (data.length > 38000) data = render(120, 0.6);
+      URL.revokeObjectURL(url); cb(data.length <= 40000 ? data : null);
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); cb(null); };
+    img.src = url;
+  }
   function roleBadge(role) {
     if (role === "gelistirici") return '<span class="p-badge dev">Geliştirici</span>';
     if (role === "tester") return '<span class="p-badge test">Tester</span>';
-    return "";
+    return '<span class="p-badge member">Üye</span>';
   }
   function showRole(uid) {
     if (!window.Account.getRole) return;
     window.Account.getRole(uid).then(function (role) {
       var h = $("profRoot") && $("profRoot").querySelector("h1");
-      if (h && role && role !== "uye" && !h.querySelector(".p-badge")) h.insertAdjacentHTML("beforeend", " " + roleBadge(role));
+      if (h && !h.querySelector(".p-badge")) h.insertAdjacentHTML("beforeend", " " + roleBadge(role || "uye"));
     });
   }
 
@@ -107,6 +122,9 @@
       (window.Account.isAdmin && window.Account.isAdmin() ? '<a class="p-btn" href="/icerikler/admin">🛠 Yönetim paneli</a>' : '') +
       '</div><div class="p-msg" id="pMsg"></div>' +
       '<div id="pEditBox" hidden><div class="p-edit">' +
+      '<div class="p-fld"><label>Profil fotoğrafı</label><div class="p-photo"><div class="p-ava sm" id="pPhotoPrev">' + avatar((prof.photo || (u && u.photoURL)), name) + '</div>' +
+      '<label class="p-btn" for="pPhoto">📷 Yükle</label><input type="file" id="pPhoto" accept="image/*" hidden>' +
+      '<button type="button" class="p-btn" id="pPhotoClear">Kaldır</button></div><div class="p-msg" id="pPhotoMsg"></div></div>' +
       '<input id="pName" maxlength="24" placeholder="Görünen ad" value="' + esc(name) + '">' +
       '<textarea id="pBio" maxlength="160" placeholder="Kısa bio (opsiyonel)">' + esc(prof.bio || "") + '</textarea>' +
       '<div class="p-fld"><label>Vurgu rengi</label><div class="p-accents" id="pAccents">' +
@@ -122,13 +140,30 @@
     showRole(u.uid);
     bindShare(u.uid);
     $("pEdit").onclick = function () { var e = $("pEditBox"); e.hidden = !e.hidden; };
-    var pickedAcc = prof.accent || "";
+    var pickedAcc = prof.accent || "", pickedPhoto = prof.photo || "", photoChanged = false;
     if ($("pAccents")) Array.prototype.forEach.call($("pAccents").querySelectorAll(".p-acc"), function (b) {
       b.onclick = function () { pickedAcc = b.getAttribute("data-acc"); Array.prototype.forEach.call($("pAccents").querySelectorAll(".p-acc"), function (x) { x.classList.toggle("on", x === b); }); };
     });
+    if ($("pPhoto")) $("pPhoto").onchange = function () {
+      var f = this.files && this.files[0]; if (!f) return;
+      var pm = $("pPhotoMsg"); if (pm) pm.textContent = "İşleniyor…";
+      downscalePhoto(f, function (data) {
+        if (!data) { if (pm) pm.textContent = "Görsel işlenemedi."; return; }
+        pickedPhoto = data; photoChanged = true;
+        var pv = $("pPhotoPrev"); if (pv) pv.innerHTML = '<img src="' + data + '" alt="">';
+        if (pm) pm.textContent = "Hazır — Kaydet'e bas.";
+      });
+    };
+    if ($("pPhotoClear")) $("pPhotoClear").onclick = function () {
+      pickedPhoto = ""; photoChanged = true;
+      var pv = $("pPhotoPrev"); if (pv) pv.innerHTML = avatar((u && u.photoURL), name);
+      var pm = $("pPhotoMsg"); if (pm) pm.textContent = "Fotoğraf kaldırıldı — Kaydet'e bas.";
+    };
     $("pSave").onclick = function () {
       var nm = $("pName").value.trim().slice(0, 24) || name, bio = $("pBio").value.trim().slice(0, 160);
-      window.Account.setProfile({ name: nm, bio: bio, accent: pickedAcc, fav: $("pFav").value });
+      var upd = { name: nm, bio: bio, accent: pickedAcc, fav: $("pFav").value };
+      if (photoChanged) upd.photo = pickedPhoto;
+      window.Account.setProfile(upd);
       var m = $("pMsg"); if (m) { m.textContent = "Kaydedildi ✓"; setTimeout(function () { m.textContent = ""; }, 2500); }
       setTimeout(renderOwn, 300);
     };
