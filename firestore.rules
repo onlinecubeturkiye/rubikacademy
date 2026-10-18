@@ -63,6 +63,16 @@ service cloud.firestore {
           && request.resource.data.ts is timestamp;
         allow update, delete: if isAdmin();
       }
+
+      // Özel üye bilgisi (e-posta, giriş türü, tema, dil, işaretler) — herkese açık DEĞİL
+      match /meta/{m} {
+        allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['email', 'provider', 'name', 'theme', 'cvd', 'lang', 'seen', 'marks'])
+          && request.resource.data.email is string && request.resource.data.email.size() <= 120
+          && (!('marks' in request.resource.data) || (request.resource.data.marks is string && request.resource.data.marks.size() <= 40000));
+        allow delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+      }
     }
 
     match /transfer/{id} {

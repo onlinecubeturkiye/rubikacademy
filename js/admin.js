@@ -29,12 +29,25 @@
         return authed(docsBase() + ":runQuery", { method: "POST", body: JSON.stringify(body) })
             .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
             .then(function (rows) {
-                return (rows || []).filter(function (x) { return x.document; }).map(function (x) {
+                var users = (rows || []).filter(function (x) { return x.document; }).map(function (x) {
                     var f = x.document.fields || {}, uid = x.document.name.split("/").pop(), st = {};
                     try { st = JSON.parse(gv(f, "stats") || "{}"); } catch (e) {}
-                    return { uid: uid, name: gv(f, "name") || "?", photo: gv(f, "photo") || "", bio: gv(f, "bio") || "", joined: +gv(f, "joined") || 0, seen: +gv(f, "seen") || 0, stats: st };
+                    return { uid: uid, name: gv(f, "name") || "?", photo: gv(f, "photo") || "", bio: gv(f, "bio") || "", joined: +gv(f, "joined") || 0, seen: +gv(f, "seen") || 0, stats: st, meta: null };
                 }).sort(function (a, b) { return (b.seen || 0) - (a.seen || 0); });
+                // Her üyenin özel bilgisini (e-posta, tema, işaretler) paralel çek
+                return Promise.all(users.map(function (u) {
+                    return fetchMeta(u.uid).then(function (m) { u.meta = m; return u; });
+                }));
             });
+    }
+    function fetchMeta(uid) {
+        return authed(docsBase() + "/users/" + uid + "/meta/self", { method: "GET" })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) {
+                if (!d || !d.fields) return null; var f = d.fields, marks = {};
+                try { marks = JSON.parse(gv(f, "marks") || "{}"); } catch (e) {}
+                return { email: gv(f, "email") || "", provider: gv(f, "provider") || "", theme: gv(f, "theme") || "", cvd: gv(f, "cvd") || "", lang: gv(f, "lang") || "", marks: marks };
+            }).catch(function () { return null; });
     }
     function listVisits(uid, limit) {
         var body = { structuredQuery: { from: [{ collectionId: "visits" }], orderBy: [{ field: { fieldPath: "ts" }, direction: "DESCENDING" }], limit: limit || 40 } };
@@ -77,18 +90,38 @@
     }
 
     /* ---------- kullanıcılar ---------- */
+    var SET_LBL = { oll: "OLL", pll: "PLL", "2look-2lo": "2-Look OLL", "2look-2lp": "2-Look PLL", f2l: "F2L", coll: "COLL", wv: "WV", cll: "CLL", eg1: "EG-1", eg2: "EG-2", "ortega-oll": "Ortega OLL", "ortega-pbl": "Ortega PBL", "roux-cmll": "Roux CMLL" };
+    function provLabel(p) { return p === "google.com" ? "Google" : (p === "password" ? "E-posta/şifre" : (p || "—")); }
+    function marksHtml(marks) {
+        var ids = Object.keys(marks || {});
+        if (!ids.length) return '<p class="a-note">Henüz işaret yok.</p>';
+        return ids.map(function (id) {
+            var m = marks[id], known = [], learning = [];
+            for (var c in m) { if (m[c] === "k") known.push(c); else if (m[c] === "l") learning.push(c); }
+            var kh = known.map(function (c) { return '<span class="pill" style="background:var(--tint-green)">' + esc(c) + "</span>"; }).join("");
+            var lh = learning.map(function (c) { return '<span class="pill" style="background:var(--tint-yellow,rgba(255,210,31,.25))">' + esc(c) + "</span>"; }).join("");
+            return '<div style="margin:4px 0"><b style="font-size:12.5px">' + esc(SET_LBL[id] || id) + '</b> ' +
+                '<span class="a-note">(biliyorum ' + known.length + ', öğreniyorum ' + learning.length + ')</span><div>' + kh + lh + '</div></div>';
+        }).join("");
+    }
     function userCard(u) {
-        var st = u.stats || {}, sets = st.sets || {}, setIds = Object.keys(sets);
+        var st = u.stats || {}, sets = st.sets || {}, setIds = Object.keys(sets), me = u.meta || {};
         var ini = (u.name || "?").trim().charAt(0).toUpperCase() || "?";
         var ava = u.photo ? '<img src="' + esc(u.photo) + '" alt="" referrerpolicy="no-referrer">' : esc(ini);
-        var pills = setIds.slice(0, 16).map(function (id) { var s = sets[id]; return '<span class="pill">' + esc(id) + ": " + (s.k || 0) + (s.t ? "/" + s.t : "") + "</span>"; }).join("");
+        var pills = setIds.slice(0, 16).map(function (id) { var s = sets[id]; return '<span class="pill">' + esc(SET_LBL[id] || id) + ": " + (s.k || 0) + (s.t ? "/" + s.t : "") + "</span>"; }).join("");
+        var acct = '<h4>Hesap bilgileri</h4><div class="a-note">' +
+            'E-posta: <b style="font-family:\'JetBrains Mono\',monospace">' + esc(me.email || "—") + '</b><br>' +
+            'Giriş türü: ' + esc(provLabel(me.provider)) + '<br>' +
+            'Tema: ' + (me.theme === "dark" ? "🌙 Karanlık mod" : "☀️ Açık") + (me.cvd ? ' · Renk körlüğü: ' + esc(me.cvd) : '') + '<br>' +
+            'Dil: ' + esc((me.lang || "—").toUpperCase()) + ' · Üyelik: ' + esc(dateFmt(u.joined)) + '</div>';
         return '<div class="u-card" data-uid="' + esc(u.uid) + '">' +
             '<div class="u-top"><div class="u-ava">' + ava + '</div>' +
-            '<div class="u-id"><b>' + esc(u.name) + '</b><small>' + esc(u.uid) + '</small>' +
+            '<div class="u-id"><b>' + esc(u.name) + '</b><small>' + esc(me.email || u.uid) + '</small>' +
             '<div class="u-stat">Bilinen ' + (st.known || 0) + ' · Öğrenilen ' + (st.learning || 0) + ' · Trainer ' + (st.solves || 0) + ' · Günlük en iyi ' + fmt(st.best) + ' · Son görülme ' + dateFmt(u.seen) + '</div></div>' +
             '<button class="a-btn sm" data-expand>Detay</button></div>' +
-            '<div class="u-detail">' + (u.bio ? '<p class="a-note">“' + esc(u.bio) + '”</p>' : '') +
-            (pills ? '<h4>İlerleme setleri</h4><div>' + pills + '</div>' : '') +
+            '<div class="u-detail">' + acct + (u.bio ? '<h4>Bio</h4><p class="a-note">“' + esc(u.bio) + '”</p>' : '') +
+            (pills ? '<h4>İlerleme özeti</h4><div>' + pills + '</div>' : '') +
+            '<h4>İşaretlediği case\'ler</h4><div>' + marksHtml(me.marks) + '</div>' +
             '<h4>Son sayfa ziyaretleri</h4><div class="v-list"><p class="a-note">…</p></div></div></div>';
     }
     function bindUserCards(container) {
