@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261107";
+    var V = "20261108";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -454,7 +454,30 @@
         try { if (sessionStorage.getItem(sk)) return; sessionStorage.setItem(sk, "1"); } catch (e) {}
         api("/users/" + user.uid + "/visits", { method: "POST", body: JSON.stringify({ fields: { p: { stringValue: p }, ts: { timestampValue: new Date().toISOString() } } }) }).catch(function () {});
     }
-    document.addEventListener("account-synced", function () { writeProfile(); logVisit(); });
+    // İşaretlenen tüm case'ler (bildiklerim/öğreniyorum) — admin paneli için
+    function allMarks() {
+        var out = {};
+        STAT_SETS.forEach(function (s) { var o = parse(lsGet("algo-progress-" + s[0])); if (isObj(o)) { var kept = {}, any = false; for (var c in o) { if (o[c] === "known" || o[c] === "learning") { kept[c] = o[c] === "known" ? "k" : "l"; any = true; } } if (any) out[s[0]] = kept; } });
+        return out;
+    }
+    // Özel üye bilgisi (yalnızca sahibi + admin okur): e-posta, giriş türü, tema, dil, işaretler
+    function writeMeta() {
+        if (!user) return Promise.resolve();
+        var prov = (user.providerData && user.providerData[0] && user.providerData[0].providerId) || "password";
+        var fields = {
+            email: { stringValue: String(user.email || "").slice(0, 120) },
+            provider: { stringValue: String(prov).slice(0, 40) },
+            name: { stringValue: String(user.displayName || (localProfile().name) || "").slice(0, 60) },
+            theme: { stringValue: (lsGet("theme") === "dark" ? "dark" : "light") },
+            cvd: { stringValue: String(lsGet("cvd-theme") || "").slice(0, 24) },
+            lang: { stringValue: String(lsGet("site-lang") || "tr").slice(0, 8) },
+            seen: { integerValue: String(Date.now()) },
+            marks: { stringValue: JSON.stringify(allMarks()).slice(0, 40000) }
+        };
+        var mask = "?" + ["email", "provider", "name", "theme", "cvd", "lang", "seen", "marks"].map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
+        return api("/users/" + user.uid + "/meta/self" + mask, { method: "PATCH", body: JSON.stringify({ fields: fields }) }).catch(function () {});
+    }
+    document.addEventListener("account-synced", function () { writeProfile(); writeMeta(); logVisit(); });
 
     window.Account = {
         enabled: function () { return enabled; },
