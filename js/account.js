@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261108";
+    var V = "20261109";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -110,18 +110,22 @@
             var lang = document.getElementById("langSwitcher");
             right.insertBefore(navBtn, lang || right.firstChild);
             navBtn.addEventListener("click", function (e) {
-                if (!user) { e.preventDefault(); openLogin(); }
+                // Yalnızca gerçekten çıkışsa giriş penceresi aç; oturum yüklenirken profile git
+                if (!user && lsGet(SIGNED_KEY) !== "1") { e.preventDefault(); openLogin(); }
             });
         }
-        if (user) {
-            var nm = user.displayName || (user.email || "?").split("@")[0];
+        // Daha önce giriş yapılmışsa, oturum geri yüklenene kadar "giriş yap" GÖSTERME (flicker önlenir)
+        var restoring = !user && lsGet(SIGNED_KEY) === "1";
+        if (user || restoring) {
+            var prof = (function () { try { return JSON.parse(lsGet(PROF_KEY)) || {}; } catch (e) { return {}; } })();
+            var nm = (user && (user.displayName || (user.email || "?").split("@")[0])) || prof.name || "·";
             navBtn.href = "/icerikler/profil";
-            navBtn.title = t("profile") + " · " + nm;
+            navBtn.title = t("profile") + (user ? " · " + nm : "");
             navBtn.setAttribute("aria-label", t("profile"));
             navBtn.classList.add("in");
-            navBtn.innerHTML = user.photoURL
+            navBtn.innerHTML = (user && user.photoURL)
                 ? '<img src="' + esc(user.photoURL) + '" alt="" referrerpolicy="no-referrer">'
-                : '<span class="acc-ini">' + esc(nm.charAt(0).toUpperCase()) + '</span>';
+                : '<span class="acc-ini">' + esc((nm.charAt(0) || "·").toUpperCase()) + '</span>';
         } else {
             navBtn.href = "#";
             navBtn.classList.remove("in");
