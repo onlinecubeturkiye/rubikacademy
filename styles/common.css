@@ -1087,3 +1087,11 @@ html[dir="rtl"] .acc-mi { text-align: right; }
 .ra-toast-tx { flex: 1; min-width: 0; font-weight: 700; font-size: 14px; line-height: 1.4; }
 .ra-toast-x { flex-shrink: 0; border: 0; background: transparent; color: var(--text-soft, #6b7280); font-size: 15px; cursor: pointer; }
 @keyframes ra-toast-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Bakım modu tam ekran */
+.ra-maint { position: fixed; inset: 0; z-index: 5000; display: grid; place-items: center; padding: 24px; background: var(--background, #0f1117); }
+.ra-maint-box { text-align: center; max-width: 420px; }
+.ra-maint-ic { font-size: 56px; }
+.ra-maint-box h1 { font-size: 30px; font-weight: 900; color: var(--text, #fff); margin: 10px 0 8px; }
+.ra-maint-box p { color: var(--text-soft, #9aa0a6); font-size: 15px; line-height: 1.6; }
+.ra-maint-a { display: inline-block; margin-top: 16px; padding: 10px 16px; border-radius: 12px; border: var(--card-bw, 2.5px) solid var(--card-border, #17171f); background: var(--surface, #fff); color: var(--text, #17171f); font-weight: 800; text-decoration: none; box-shadow: var(--shadow-sm); }
