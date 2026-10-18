@@ -59,6 +59,16 @@
     function deleteTime(day, uid) {
         return authed(docsBase() + "/days/" + day + "/times/" + uid, { method: "DELETE" }).then(function (r) { return r.ok; });
     }
+    function fetchRole(uid) {
+        return authed(docsBase() + "/roles/" + uid, { method: "GET" })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) { return (d && d.fields && d.fields.role && d.fields.role.stringValue) || "uye"; })
+            .catch(function () { return "uye"; });
+    }
+    function setRole(uid, role) {
+        return authed(docsBase() + "/roles/" + uid + "?updateMask.fieldPaths=role", { method: "PATCH", body: JSON.stringify({ fields: { role: { stringValue: role } } }) })
+            .then(function (r) { return r.ok; });
+    }
 
     /* ---------- günlük moderasyon ---------- */
     function renderDaily() {
@@ -127,13 +137,39 @@
             '<h4>İşaretlediği case\'ler</h4><div>' + marksHtml(me.marks) + '</div>' +
             '<h4>Son sayfa ziyaretleri (' + (visits ? visits.length : 0) + ')</h4><div class="v-list">' + visitsHtml(visits) + '</div>';
     }
+    var ROLES = [["uye", "Üye"], ["gelistirici", "Geliştirici"], ["tester", "Tester"]];
+    function roleBox(uid, role) {
+        var opts = ROLES.map(function (r) { return '<option value="' + r[0] + '"' + (r[0] === role ? ' selected' : '') + '>' + r[1] + '</option>'; }).join("");
+        return '<h4>Rol</h4><div class="a-ctrl"><select id="roleSel">' + opts + '</select>' +
+            '<button class="a-btn main sm" id="roleSave">Kaydet</button><span class="a-msg" id="roleMsg" style="margin:0"></span></div>';
+    }
     function selectUser(u, detailBox, pickBtn, picker) {
         Array.prototype.forEach.call(picker.querySelectorAll(".u-pick"), function (b) { b.classList.remove("on"); });
         if (pickBtn) pickBtn.classList.add("on");
         detailBox.innerHTML = '<div class="u-card open"><p class="a-note">Yükleniyor…</p></div>';
-        Promise.all([fetchMeta(u.uid), listVisits(u.uid, 200)]).then(function (res) {
-            detailBox.innerHTML = '<div class="u-card open">' + userDetailHtml(u, res[0] || {}, res[1] || []) + '</div>';
+        Promise.all([fetchMeta(u.uid), listVisits(u.uid, 200), fetchRole(u.uid)]).then(function (res) {
+            var role = res[2] || "uye";
+            detailBox.innerHTML = '<div class="u-card open">' + roleBox(u.uid, role) + userDetailHtml(u, res[0] || {}, res[1] || []) + '</div>';
+            var save = $id("roleSave");
+            if (save) save.addEventListener("click", function () {
+                var val = $id("roleSel").value;
+                save.disabled = true; msg($id("roleMsg"), "Kaydediliyor…");
+                setRole(u.uid, val).then(function (ok) {
+                    save.disabled = false;
+                    if (ok) { msg($id("roleMsg"), "Rol kaydedildi ✓", "ok"); refreshPickBadge(pickBtn, val); }
+                    else msg($id("roleMsg"), "Kaydedilemedi (kuralları yayımladın mı?)", "bad");
+                }, function () { save.disabled = false; msg($id("roleMsg"), "Kaydedilemedi.", "bad"); });
+            });
         }, function () { detailBox.innerHTML = '<div class="u-card open"><p class="a-note">Kullanıcı verisi yüklenemedi.</p></div>'; });
+    }
+    function refreshPickBadge(btn, role) {
+        if (!btn) return;
+        var b = btn.querySelector(".role-badge"); if (b) b.remove();
+        if (role && role !== "uye") {
+            var span = document.createElement("span"); span.className = "role-badge " + role;
+            span.textContent = role === "gelistirici" ? "Geliştirici" : "Tester";
+            btn.querySelector(".u-pick-id").appendChild(span);
+        }
     }
     function renderUsers() {
         var box = $id("aUsersList"); box.innerHTML = '<p class="a-note">Yükleniyor…</p>';

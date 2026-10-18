@@ -13,6 +13,18 @@
   function initials(n) { n = (n || "?").trim().split(/\s+/); return ((n[0] || "?")[0] + (n[1] ? n[1][0] : "")).toUpperCase(); }
   function avatar(photo, name) { return photo ? '<img src="' + esc(photo) + '" alt="" referrerpolicy="no-referrer">' : esc(initials(name)); }
   function dateStr(ms) { if (!ms) return ""; try { return new Date(ms).toLocaleDateString("tr-TR", { year: "numeric", month: "long" }); } catch (e) { return ""; } }
+  function roleBadge(role) {
+    if (role === "gelistirici") return '<span class="p-badge dev">Geliştirici</span>';
+    if (role === "tester") return '<span class="p-badge test">Tester</span>';
+    return "";
+  }
+  function showRole(uid) {
+    if (!window.Account.getRole) return;
+    window.Account.getRole(uid).then(function (role) {
+      var h = $("profRoot") && $("profRoot").querySelector("h1");
+      if (h && role && role !== "uye" && !h.querySelector(".p-badge")) h.insertAdjacentHTML("beforeend", " " + roleBadge(role));
+    });
+  }
 
   function statTiles(st) {
     st = st || {};
@@ -39,6 +51,7 @@
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistikler</h2>' + statTiles(data.stats) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerleme</h2>' + setsGrid(data.stats) + '</div>';
+    showRole(uid);
     if (isMe) bindShare(uid);
   }
 
@@ -77,6 +90,7 @@
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistiklerim</h2>' + statTiles(st) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerlemem</h2>' + setsGrid(st) + '</div>';
 
+    showRole(u.uid);
     bindShare(u.uid);
     $("pEdit").onclick = function () { var e = $("pEditBox"); e.hidden = !e.hidden; };
     $("pSave").onclick = function () {

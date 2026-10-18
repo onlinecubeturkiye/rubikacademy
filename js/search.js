@@ -5,7 +5,7 @@
    - Algoritma sonucu ?case=AD ile açılır: sayfa o kartı bulup vurgular
 ========================================================= */
 (function () {
-    var V = "20261110";
+    var V = "20261111";
     var TXT = {
         tr: { btn: "Ara", ph: "Ara: OLL 27, T perm, Sune, parity…", none: "Sonuç bulunamadı.", load: "Yükleniyor…", pages: "Sayfa", hint: "↑↓ seç · Enter aç · Esc kapat" },
         en: { btn: "Search", ph: "Search: OLL 27, T perm, Sune, parity…", none: "No results.", load: "Loading…", pages: "Page", hint: "↑↓ select · Enter open · Esc close" },
