@@ -105,10 +105,11 @@
         return ids.map(function (id) {
             var m = marks[id], known = [], learning = [];
             for (var c in m) { if (m[c] === "k") known.push(c); else if (m[c] === "l") learning.push(c); }
-            var kh = known.map(function (c) { return '<span class="pill" style="background:var(--tint-green)">' + esc(c) + "</span>"; }).join("");
-            var lh = learning.map(function (c) { return '<span class="pill" style="background:var(--tint-yellow,rgba(255,210,31,.25))">' + esc(c) + "</span>"; }).join("");
-            return '<div style="margin:4px 0"><b style="font-size:12.5px">' + esc(SET_LBL[id] || id) + '</b> ' +
-                '<span class="a-note">(biliyorum ' + known.length + ', öğreniyorum ' + learning.length + ')</span><div>' + kh + lh + '</div></div>';
+            var kh = known.map(function (c) { return '<span class="pill k">' + esc(c) + "</span>"; }).join("");
+            var lh = learning.map(function (c) { return '<span class="pill l">' + esc(c) + "</span>"; }).join("");
+            return '<details class="m-set"><summary><b>' + esc(SET_LBL[id] || id) + '</b>' +
+                '<span class="a-note"> biliyorum ' + known.length + ' · öğreniyorum ' + learning.length + '</span></summary>' +
+                '<div class="m-pills">' + kh + lh + '</div></details>';
         }).join("");
     }
     function visitsHtml(vs) {
@@ -119,23 +120,28 @@
         var ini = (u.name || "?").trim().charAt(0).toUpperCase() || "?";
         return u.photo ? '<img src="' + esc(u.photo) + '" alt="" referrerpolicy="no-referrer">' : esc(ini);
     }
-    // Seçilen kullanıcının tüm verisi
+    function infoRow(k, v) { return '<div class="ir"><span>' + k + '</span><b>' + v + '</b></div>'; }
+    // Seçilen kullanıcının tüm verisi — derli toplu
     function userDetailHtml(u, me, visits) {
         var st = u.stats || {}, sets = st.sets || {}, setIds = Object.keys(sets);
-        var pills = setIds.slice(0, 16).map(function (id) { var s = sets[id]; return '<span class="pill">' + esc(SET_LBL[id] || id) + ": " + (s.k || 0) + (s.t ? "/" + s.t : "") + "</span>"; }).join("");
-        var acct = '<h4>Hesap bilgileri</h4><div class="a-note">' +
-            'E-posta: <b style="font-family:\'JetBrains Mono\',monospace">' + esc(me.email || "—") + '</b><br>' +
-            'Kullanıcı ID: <span style="font-family:\'JetBrains Mono\',monospace">' + esc(u.uid) + '</span><br>' +
-            'Giriş türü: ' + esc(provLabel(me.provider)) + '<br>' +
-            'Tema: ' + (me.theme === "dark" ? "🌙 Karanlık mod" : "☀️ Açık") + (me.cvd ? ' · Renk körlüğü: ' + esc(me.cvd) : '') + '<br>' +
-            'Dil: ' + esc((me.lang || "—").toUpperCase()) + ' · Üyelik: ' + esc(dateFmt(u.joined)) + ' · Son görülme: ' + esc(dateFmt(u.seen)) + '</div>';
+        var markCount = 0, mk = me.marks || {}; for (var s0 in mk) { for (var c0 in mk[s0]) markCount++; }
+        var pills = setIds.slice(0, 20).map(function (id) { var s = sets[id]; return '<span class="pill">' + esc(SET_LBL[id] || id) + " " + (s.k || 0) + (s.t ? "/" + s.t : "") + "</span>"; }).join("");
+        var acct = '<div class="info-grid">' +
+            infoRow("E-posta", '<span class="mono">' + esc(me.email || "—") + '</span>') +
+            infoRow("Kullanıcı ID", '<span class="mono small">' + esc(u.uid) + '</span>') +
+            infoRow("Giriş türü", esc(provLabel(me.provider))) +
+            infoRow("Tema", me.theme === "dark" ? "🌙 Karanlık" : "☀️ Açık") +
+            infoRow("Renk körlüğü", esc(me.cvd || "—")) +
+            infoRow("Dil", esc((me.lang || "—").toUpperCase())) +
+            infoRow("Üyelik", esc(dateFmt(u.joined))) +
+            infoRow("Son görülme", esc(dateFmt(u.seen))) + '</div>';
         return '<div class="u-top"><div class="u-ava">' + avatarMini(u) + '</div>' +
             '<div class="u-id"><b>' + esc(u.name) + '</b><small>' + esc(me.email || u.uid) + '</small>' +
             '<div class="u-stat">Bilinen ' + (st.known || 0) + ' · Öğrenilen ' + (st.learning || 0) + ' · Trainer ' + (st.solves || 0) + ' · Günlük en iyi ' + fmt(st.best) + '</div></div></div>' +
-            acct + (u.bio ? '<h4>Bio</h4><p class="a-note">“' + esc(u.bio) + '”</p>' : '') +
-            (pills ? '<h4>İlerleme özeti</h4><div>' + pills + '</div>' : '') +
-            '<h4>İşaretlediği case\'ler</h4><div>' + marksHtml(me.marks) + '</div>' +
-            '<h4>Son sayfa ziyaretleri (' + (visits ? visits.length : 0) + ')</h4><div class="v-list">' + visitsHtml(visits) + '</div>';
+            '<h4>Hesap bilgileri</h4>' + acct + (u.bio ? '<h4>Bio</h4><p class="a-note">“' + esc(u.bio) + '”</p>' : '') +
+            (pills ? '<h4>İlerleme özeti</h4><div class="pill-wrap">' + pills + '</div>' : '') +
+            '<details class="sec"><summary><b>İşaretlediği case\'ler</b> <span class="a-note">(' + markCount + ')</span></summary><div class="sec-body">' + marksHtml(me.marks) + '</div></details>' +
+            '<details class="sec"><summary><b>Gezdiği sayfalar</b> <span class="a-note">(' + (visits ? visits.length : 0) + ')</span></summary><div class="sec-body v-list">' + visitsHtml(visits) + '</div></details>';
     }
     var ROLES = [["uye", "Üye"], ["gelistirici", "Geliştirici"], ["tester", "Tester"]];
     function roleBox(uid, role) {
