@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20261109">
+<link rel="stylesheet" href="/styles/common.css?v=20261110">
 <style>
 .wrap { max-width: 1040px; margin: 0 auto; }
 .box { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 20px 22px; margin-bottom: 20px; }
@@ -55,6 +55,17 @@
 .u-stat { font-size: 12.5px; color: var(--text-soft); margin-top: 2px; }
 .u-detail { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; display: none; }
 .u-card.open .u-detail { display: block; }
+.u-split { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 16px; align-items: start; }
+.u-picker { display: flex; flex-direction: column; gap: 6px; max-height: 70vh; overflow-y: auto; }
+.u-pick { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 8px 10px; border-radius: 12px; border: var(--card-bw) solid var(--border); background: var(--surface-soft); color: var(--text); cursor: pointer; }
+.u-pick:hover { border-color: var(--ink); }
+.u-pick.on { border-color: var(--cube-yellow); background: var(--tint-yellow, rgba(255,210,31,.18)); }
+.u-ava.sm { width: 32px; height: 32px; border-radius: 10px; font-size: 14px; }
+.u-pick-id { min-width: 0; }
+.u-pick-id b { display: block; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.u-pick-id small { font-size: 11px; color: var(--text-soft); }
+.u-detailwrap .u-detail { display: block; }
+@media (max-width: 720px) { .u-split { grid-template-columns: 1fr; } .u-picker { flex-direction: row; flex-wrap: wrap; max-height: none; } .u-pick { width: auto; } .u-pick-id small { display: none; } }
 .u-detail h4 { font-size: 13px; font-weight: 850; color: var(--text); margin: 8px 0 4px; }
 .v-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--text-soft); padding: 3px 0; border-bottom: 1px dashed var(--border); }
 .v-row .vp { font-family: "JetBrains Mono", monospace; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -81,11 +92,11 @@
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20261109"></script>
-<script src="/js/common.js?v=20261109"></script>
-<script src="/js/firebase-config.js?v=20261109"></script>
-<script src="/js/account.js?v=20261109"></script>
-<script src="/js/leaderboard.js?v=20261109"></script>
-<script src="/js/admin.js?v=20261109"></script>
+<script src="/js/i18n.js?v=20261110"></script>
+<script src="/js/common.js?v=20261110"></script>
+<script src="/js/firebase-config.js?v=20261110"></script>
+<script src="/js/account.js?v=20261110"></script>
+<script src="/js/leaderboard.js?v=20261110"></script>
+<script src="/js/admin.js?v=20261110"></script>
 </body>
 </html>
