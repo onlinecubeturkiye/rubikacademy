@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20261119">
+<link rel="stylesheet" href="/styles/common.css?v=20261120">
 <style>
 .set-wrap { max-width: 540px; margin: 0 auto; }
 .set-card { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 16px 16px 10px; margin-bottom: 18px; }
@@ -62,22 +62,23 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
     <a class="srow" href="/gizlilik"><span class="ico">🔒</span><span>Gizlilik</span><span class="go">→</span></a>
 </div>
 
-<div class="set-card"><h2 id="hData">Veriler</h2>
+<div class="set-card"><h2 id="hData">Veriler &amp; Bildirimler</h2>
+    <button type="button" class="srow" id="btnNotify"><span class="ico">🔔</span><span>Bildirimlere izin ver</span><span class="go" id="notifState">→</span></button>
     <button type="button" class="srow" id="btnInstall" hidden><span class="ico">📲</span><span>Uygulama olarak yükle</span><span class="go">→</span></button>
     <button type="button" class="srow danger" id="btnReset"><span class="ico">🗑️</span><span>Bu cihazdaki ilerlemeyi sıfırla</span></button>
     <div class="set-msg" id="dataMsg"></div>
 </div>
 
 <div class="set-card"><h2 id="hAbout">Hakkında</h2>
-    <div class="about">Rubik Academy · Sürüm <b id="verTxt">20261119</b><br>Türkiye'nin kapsamlı küp öğrenme platformu.</div>
+    <div class="about">Rubik Academy · Sürüm <b id="verTxt">20261120</b><br>Türkiye'nin kapsamlı küp öğrenme platformu.</div>
 </div>
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20261119"></script>
-<script src="/js/common.js?v=20261119"></script>
-<script src="/js/firebase-config.js?v=20261119"></script>
-<script src="/js/account.js?v=20261119"></script>
+<script src="/js/i18n.js?v=20261120"></script>
+<script src="/js/common.js?v=20261120"></script>
+<script src="/js/firebase-config.js?v=20261120"></script>
+<script src="/js/account.js?v=20261120"></script>
 <script>
 (function () {
     function $(id) { return document.getElementById(id); }
@@ -132,7 +133,18 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
         deferredPrompt.userChoice.then(function () { deferredPrompt = null; $("btnInstall").hidden = true; });
     };
 
-    function start() { renderAppearance(); renderAccount(); }
+    // Bildirim izni
+    function notifState() {
+        var el = $("notifState"); if (!el) return;
+        if (!("Notification" in window)) { el.textContent = "desteklenmiyor"; $("btnNotify").disabled = true; return; }
+        el.textContent = Notification.permission === "granted" ? "✓ Açık" : (Notification.permission === "denied" ? "engelli" : "→");
+    }
+    $("btnNotify").onclick = function () {
+        if (!("Notification" in window)) return;
+        if (window.Account && Account.notifyPermission) Account.notifyPermission().then(notifState);
+        else Notification.requestPermission().then(notifState);
+    };
+    function start() { renderAppearance(); renderAccount(); notifState(); }
     if (document.readyState !== "loading") start(); else document.addEventListener("DOMContentLoaded", start);
     document.addEventListener("site-lang-change", renderAppearance);
     if (window.Account && window.Account.onChange) window.Account.onChange(function () { renderAccount(); });

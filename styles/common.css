@@ -1076,3 +1076,14 @@ html[dir="rtl"] .acc-mi { text-align: right; }
 /* Footer "Ayarlar" bağlantısı */
 .foot-set { display: inline-block; margin-top: 10px; color: var(--text-soft, #9aa0a6); font: 700 13px Inter, sans-serif; text-decoration: none; opacity: .85; }
 .foot-set:hover { opacity: 1; text-decoration: underline; }
+
+/* =========================================
+   BİLDİRİM / DUYURU TOAST'LARI
+========================================= */
+.ra-toasts { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 8px; width: min(420px, calc(100vw - 24px)); pointer-events: none; }
+.ra-toast { pointer-events: auto; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; border: var(--card-bw, 2.5px) solid var(--card-border, #17171f); background: var(--surface, #fff); color: var(--text, #17171f); box-shadow: var(--shadow, 6px 6px 0 #17171f); animation: ra-toast-in .25s ease; }
+.ra-toast.go { opacity: 0; transform: translateY(-6px); transition: opacity .4s, transform .4s; }
+.ra-toast-ic { font-size: 18px; flex-shrink: 0; }
+.ra-toast-tx { flex: 1; min-width: 0; font-weight: 700; font-size: 14px; line-height: 1.4; }
+.ra-toast-x { flex-shrink: 0; border: 0; background: transparent; color: var(--text-soft, #6b7280); font-size: 15px; cursor: pointer; }
+@keyframes ra-toast-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }

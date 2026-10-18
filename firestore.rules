@@ -64,6 +64,28 @@ service cloud.firestore {
         allow update, delete: if isAdmin();
       }
 
+      // Takip: sahibi kimleri takip ettiğini yazar; sahibi + admin okur
+      match /following/{fid} {
+        allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['t']) && request.resource.data.t is int;
+        allow delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+      }
+      // Beğeni: herkes sayar (okur); beğenen kendi beğenisini ekler/siler
+      match /likes/{liker} {
+        allow read: if true;
+        allow create, update: if request.auth != null && request.auth.uid == liker
+          && request.resource.data.keys().hasOnly(['t']) && request.resource.data.t is int;
+        allow delete: if (request.auth != null && request.auth.uid == liker) || isAdmin();
+      }
+      // Bildirimler: yalnız admin gönderir; sahibi + admin okur
+      match /notifications/{nid} {
+        allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+        allow create: if isAdmin()
+          && request.resource.data.keys().hasOnly(['text', 'ts'])
+          && request.resource.data.text is string && request.resource.data.text.size() <= 500;
+        allow update, delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+      }
       // Özel üye bilgisi (e-posta, giriş türü, tema, dil, işaretler) — herkese açık DEĞİL
       match /meta/{m} {
         allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
@@ -96,6 +118,15 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['role'])
         && request.resource.data.role in ['uye', 'gelistirici', 'tester'];
       allow delete: if isAdmin();
+    }
+
+    // Herkese açık duyurular: yalnız admin yazar, herkes okur
+    match /broadcasts/{id} {
+      allow read: if true;
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['text', 'ts'])
+        && request.resource.data.text is string && request.resource.data.text.size() <= 500;
+      allow update, delete: if isAdmin();
     }
 
     match /users/{uid}/{sub=**} {

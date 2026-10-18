@@ -191,6 +191,9 @@
             Array.prototype.forEach.call(picker.querySelectorAll(".u-pick"), function (btn) {
                 btn.addEventListener("click", function () { selectUser(users[+btn.getAttribute("data-i")], detailBox, btn, picker); });
             });
+            // Bildirim hedef listesini doldur
+            var sel = $id("bcTarget");
+            if (sel) { sel.innerHTML = '<option value="all">📢 Herkese (duyuru)</option>' + users.map(function (u) { return '<option value="' + esc(u.uid) + '">' + esc(u.name) + '</option>'; }).join(""); }
         }, function (e) {
             var code = e && e.message;
             var hint = (code === "403" || code === 403) ? ' — Firestore kurallarını Firebase Console’dan yayımladığından ve bu hesabın yönetici (pikapikachuyt0@gmail.com, Google) olduğundan emin ol.' : '';
@@ -204,6 +207,12 @@
     function renderPanel() {
         root.innerHTML =
             '<h1 class="a-h1">Yönetim paneli</h1><p class="a-sub">Yalnızca sen görüyorsun. Günlük sıralamayı düzenle ve kullanıcı etkinliğini izle.</p>' +
+            '<div class="box"><h2>🔔 Bildirim gönder</h2>' +
+            '<p class="a-note">Yazdığın mesaj seçtiğin kişiye (ya da herkese) bildirim olarak gider. Bildirime izin veren kullanıcılarda telefon/sistem bildirimi; herkeste site içi bildirim olarak düşer.</p>' +
+            '<div class="a-ctrl" style="flex-direction:column;align-items:stretch">' +
+            '<textarea id="bcText" maxlength="500" rows="2" placeholder="Bildirim metni…" style="width:100%;box-sizing:border-box;padding:11px 12px;border-radius:12px;border:var(--card-bw) solid var(--ink);background:var(--surface);color:var(--text);font:600 14.5px Inter,sans-serif"></textarea>' +
+            '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><select id="bcTarget"><option value="all">📢 Herkese (duyuru)</option></select>' +
+            '<button class="a-btn main" id="bcSend">Gönder</button><span class="a-msg" id="bcMsg" style="margin:0"></span></div></div></div>' +
             '<div class="box"><h2>🏆 Günlük sıralama moderasyonu</h2>' +
             '<div class="a-ctrl"><input type="date" id="aDate" value="' + todayStr() + '"><button class="a-btn main" id="aDailyLoad">Getir</button></div>' +
             '<p class="a-note">Yanlış bir süreyi sil; o kullanıcı o gün için yeniden gönderebilir.</p>' +
@@ -214,6 +223,17 @@
             '<div id="aUsersList"></div></div>';
         $id("aDailyLoad").addEventListener("click", renderDaily);
         $id("aUsersLoad").addEventListener("click", renderUsers);
+        $id("bcSend").addEventListener("click", function () {
+            var text = $id("bcText").value.trim(), to = $id("bcTarget").value;
+            if (text.length < 2) { msg($id("bcMsg"), "Mesaj yaz.", "bad"); return; }
+            $id("bcSend").disabled = true; msg($id("bcMsg"), "Gönderiliyor…");
+            var p = (to === "all") ? window.Account.sendBroadcast(text) : window.Account.sendNotif(to, text);
+            p.then(function (ok) {
+                $id("bcSend").disabled = false;
+                if (ok) { msg($id("bcMsg"), "Gönderildi ✓", "ok"); $id("bcText").value = ""; }
+                else msg($id("bcMsg"), "Gönderilemedi (kuralları yayımladın mı?)", "bad");
+            }, function () { $id("bcSend").disabled = false; msg($id("bcMsg"), "Gönderilemedi.", "bad"); });
+        });
         renderDaily();
         renderUsers();   // kullanıcılar ve tüm verileri otomatik gelsin
     }
