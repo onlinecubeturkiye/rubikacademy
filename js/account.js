@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261119";
+    var V = "20261120";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -543,6 +543,60 @@
     }
     document.addEventListener("account-synced", function () { writeProfile(); writeMeta(); logVisit(); });
 
+    /* ---------- sosyal: takip, beğeni, bildirim ---------- */
+    function pubUrl(path) { return base() + path + (path.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey); }
+    function pubList(path) { return fetch(pubUrl(path + (path.indexOf("?") < 0 ? "?" : "&") + "pageSize=300")).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { return (d && d.documents) || []; }).catch(function () { return []; }); }
+    function tfield() { return { fields: { t: { integerValue: String(Date.now()) } } }; }
+    // Takip
+    function follow(tid) { if (!user || !tid || tid === user.uid) return Promise.resolve(false); return api("/users/" + user.uid + "/following/" + tid, { method: "PATCH", body: JSON.stringify(tfield()) }).then(function (r) { return r.ok; }); }
+    function unfollow(tid) { if (!user) return Promise.resolve(false); return api("/users/" + user.uid + "/following/" + tid, { method: "DELETE" }).then(function (r) { return r.ok; }); }
+    function isFollowing(tid) { if (!user) return Promise.resolve(false); return api("/users/" + user.uid + "/following/" + tid, { method: "GET" }).then(function (r) { return r.ok; }).catch(function () { return false; }); }
+    function following() { if (!user) return Promise.resolve([]); return api("/users/" + user.uid + "/following?pageSize=300", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { return ((d && d.documents) || []).map(function (x) { return x.name.split("/").pop(); }); }).catch(function () { return []; }); }
+    // Beğeni
+    function like(tid) { if (!user || !tid) return Promise.resolve(false); return api("/users/" + tid + "/likes/" + user.uid, { method: "PATCH", body: JSON.stringify(tfield()) }).then(function (r) { return r.ok; }); }
+    function unlike(tid) { if (!user) return Promise.resolve(false); return api("/users/" + tid + "/likes/" + user.uid, { method: "DELETE" }).then(function (r) { return r.ok; }); }
+    function likeInfo(tid) { return pubList("/users/" + tid + "/likes").then(function (docs) { var me = user && user.uid; return { count: docs.length, mine: !!me && docs.some(function (d) { return d.name.split("/").pop() === me; }) }; }); }
+    // Bildirim gönder (admin)
+    function sendNotif(tid, text) { if (!isAdmin()) return Promise.resolve(false); return api("/users/" + tid + "/notifications", { method: "POST", body: JSON.stringify({ fields: { text: { stringValue: String(text).slice(0, 500) }, ts: { timestampValue: new Date().toISOString() } } }) }).then(function (r) { return r.ok; }); }
+    function sendBroadcast(text) { if (!isAdmin()) return Promise.resolve(false); return api("/broadcasts", { method: "POST", body: JSON.stringify({ fields: { text: { stringValue: String(text).slice(0, 500) }, ts: { timestampValue: new Date().toISOString() } } }) }).then(function (r) { return r.ok; }); }
+    // Bildirim oku (yeni broadcast + kendi okunmamış bildirimlerim)
+    function fetchNotes() {
+        var out = [], seenB = 0; try { seenB = +(lsGet("ra-bcast-seen") || 0); } catch (e) {}
+        var pB = pubList("/broadcasts").then(function (docs) { docs.forEach(function (d) { var f = d.fields || {}, ts = Date.parse((f.ts && f.ts.timestampValue) || "") || 0, txt = (f.text && f.text.stringValue) || ""; if (ts > seenB && txt) out.push({ id: "b:" + ts, text: txt, ts: ts }); }); });
+        var pN = user ? api("/users/" + user.uid + "/notifications?pageSize=50", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            var seen = {}; try { (JSON.parse(lsGet("ra-note-seen")) || []).forEach(function (x) { seen[x] = 1; }); } catch (e) {}
+            ((d && d.documents) || []).forEach(function (x) { var id = x.name.split("/").pop(), f = x.fields || {}, txt = (f.text && f.text.stringValue) || "", ts = Date.parse((f.ts && f.ts.timestampValue) || "") || 0; if (!seen[id] && txt) out.push({ id: "n:" + id, text: txt, ts: ts }); });
+        }).catch(function () {}) : Promise.resolve();
+        return Promise.all([pB, pN]).then(function () { return out.sort(function (a, b) { return b.ts - a.ts; }); });
+    }
+    function markNotesSeen(notes) {
+        var maxB = 0, ids = [];
+        notes.forEach(function (n) { if (n.id.indexOf("b:") === 0) maxB = Math.max(maxB, n.ts); else if (n.id.indexOf("n:") === 0) ids.push(n.id.slice(2)); });
+        if (maxB) try { lsSet("ra-bcast-seen", String(Math.max(maxB, +(lsGet("ra-bcast-seen") || 0)))); } catch (e) {}
+        if (ids.length) try { var cur = JSON.parse(lsGet("ra-note-seen")) || []; lsSet("ra-note-seen", JSON.stringify(cur.concat(ids).slice(-300))); } catch (e) {}
+    }
+    // Site içi banner + (izin varsa) sistem/telefon bildirimi
+    function showToast(text) {
+        var host = document.getElementById("raToasts");
+        if (!host) { host = document.createElement("div"); host.id = "raToasts"; host.className = "ra-toasts"; (document.body || document.documentElement).appendChild(host); }
+        var el = document.createElement("div"); el.className = "ra-toast";
+        el.innerHTML = '<span class="ra-toast-ic">🔔</span><div class="ra-toast-tx"></div><button class="ra-toast-x" aria-label="Kapat">✕</button>';
+        el.querySelector(".ra-toast-tx").textContent = text;
+        el.querySelector(".ra-toast-x").onclick = function () { el.remove(); };
+        host.appendChild(el); setTimeout(function () { el.classList.add("go"); }, 12000);
+    }
+    function showNotes() {
+        if (!enabled) return;
+        fetchNotes().then(function (notes) {
+            if (!notes.length) return;
+            notes.slice(0, 5).forEach(function (n) { showToast(n.text); });
+            if ("Notification" in window && Notification.permission === "granted" && navigator.serviceWorker) {
+                navigator.serviceWorker.ready.then(function (reg) { notes.slice(0, 5).forEach(function (n) { try { reg.showNotification("Rubik Academy", { body: n.text, icon: "/icons/icon-192.png", tag: n.id }); } catch (e) {} }); }).catch(function () {});
+            }
+            markNotesSeen(notes);
+        });
+    }
+
     window.Account = {
         enabled: function () { return enabled; },
         writeProfile: writeProfile,
@@ -579,7 +633,11 @@
         deleteAccount: deleteAccount,
         syncNow: function () { return pushChanged(false); },
         load: loadSDK,
-        isPending: function () { return lsGet(SIGNED_KEY) === "1" && !sdkP; }
+        isPending: function () { return lsGet(SIGNED_KEY) === "1" && !sdkP; },
+        follow: follow, unfollow: unfollow, isFollowing: isFollowing, following: following,
+        like: like, unlike: unlike, likeInfo: likeInfo,
+        sendNotif: sendNotif, sendBroadcast: sendBroadcast, showNotes: showNotes,
+        notifyPermission: function () { if (!("Notification" in window)) return Promise.resolve("unsupported"); return Notification.requestPermission(); }
     };
 
     function init() {
@@ -588,6 +646,9 @@
         // Daha önce giriş yapılmışsa oturumu geri yükle (yoksa SDK hiç yüklenmez)
         if (lsGet(SIGNED_KEY) === "1" || window.RA_ACCOUNT_EAGER) loadSDK().catch(function () {});
         document.addEventListener("site-lang-change", function () { renderNav(); if (modal && modal.classList.contains("open")) renderModal(); });
+        // Duyurular/bildirimler: herkese açık broadcast'leri her sayfada, kişisel bildirimleri girişten sonra göster
+        setTimeout(showNotes, 1800);
+        document.addEventListener("account-synced", function () { setTimeout(showNotes, 400); });
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
