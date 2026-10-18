@@ -1016,3 +1016,38 @@ html[data-cvd="tri"], html[data-cvd="tri"] body {
 .acc-box button:disabled { opacity: .6; cursor: default; }
 .acc-priv { margin: 12px 0 0; font-size: 12px; color: var(--text-soft); text-align: center; }
 .acc-priv a { color: var(--primary); font-weight: 700; }
+
+/* =========================================
+   AYARLAR MENÜSÜ (⚙) — eski dil/karanlık düğmelerinin yerine
+========================================= */
+#langSwitcher, #darkModeBtn { display: none !important; }
+.ra-set { position: relative; display: flex; align-items: center; }
+.ra-set-btn {
+    width: 42px; height: 42px; border-radius: 12px; cursor: pointer;
+    border: var(--card-bw, 2.5px) solid var(--card-border, #17171f);
+    background: var(--surface, #fff); color: var(--text, #17171f);
+    font-size: 19px; line-height: 1; display: grid; place-items: center;
+    box-shadow: var(--shadow-sm, 2px 2px 0 #17171f);
+}
+.ra-set-btn:hover { transform: translate(-1px, -1px); }
+.ra-set-menu {
+    position: absolute; right: 0; top: calc(100% + 10px); width: 250px; max-height: 76vh; overflow-y: auto;
+    background: var(--surface, #fff); border: var(--card-bw, 2.5px) solid var(--card-border, #17171f);
+    border-radius: 16px; box-shadow: var(--shadow, 6px 6px 0 #17171f); padding: 10px; z-index: 1200; display: none;
+}
+.ra-set.open .ra-set-menu { display: block; }
+html[dir="rtl"] .ra-set-menu { right: auto; left: 0; }
+.set-grp { padding: 6px 2px; }
+.set-grp + .set-grp { border-top: 1px solid var(--border, #e5e7eb); margin-top: 4px; }
+.set-h { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--text-soft, #6b7280); margin: 2px 6px 6px; }
+.set-opt {
+    display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
+    padding: 9px 10px; border-radius: 10px; border: 0; background: transparent;
+    color: var(--text, #17171f); font: 700 14px Inter, sans-serif; cursor: pointer;
+}
+html[dir="rtl"] .set-opt { text-align: right; }
+.set-opt:hover { background: var(--surface-soft, #f3f4f6); }
+.set-opt[aria-current="true"] { background: var(--tint-yellow, rgba(255,210,31,.22)); outline: 2px solid var(--cube-yellow, #ffd21f); }
+.set-opt.cvd { font-weight: 700; }
+.set-opt.cvd span { flex: 1; min-width: 0; }
+@media (max-width: 560px) { .ra-set-menu { width: min(250px, calc(100vw - 32px)); } }

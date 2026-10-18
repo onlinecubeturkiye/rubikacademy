@@ -118,14 +118,75 @@ function cvdSwatches(theme) {
 
 document.addEventListener("DOMContentLoaded", function () {
     var btn = document.getElementById("darkModeBtn");
-    if (localStorage.getItem("theme") === "dark") {
-        document.documentElement.classList.add("dark-mode");
-        document.body.classList.add("dark-mode");
-        if (btn) btn.innerHTML = "☀️";
-    } else if (btn) btn.innerHTML = "🌙";
+    // Varsayılan karanlık mod: "light" açıkça seçilmedikçe karanlık
+    var isDark = (localStorage.getItem("theme") || "dark") !== "light";
+    document.documentElement.classList.toggle("dark-mode", isDark);
+    document.body.classList.toggle("dark-mode", isDark);
+    if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
     if (cvdTheme()) applyCvd(cvdTheme());
     else if (holdSwap()) raRecolor();
+    raBuildSettings();
 });
+
+/* =========================================
+   AYARLAR MENÜSÜ (⚙) — tema, dil, renk körlüğü tek yerde
+========================================= */
+var SETTINGS_TXT = {
+    tr: { set: "Ayarlar", theme: "Tema", dark: "Karanlık", light: "Açık", lang: "Dil", cvd: "Renk körlüğü", cvd_off: "Kapalı (normal)", cvd_pro: "Protanopi", cvd_deu: "Döteranopi", cvd_rg: "Kırmızı-Yeşil", cvd_tri: "Tritanopi (mavi-sarı)" },
+    en: { set: "Settings", theme: "Theme", dark: "Dark", light: "Light", lang: "Language", cvd: "Color blindness", cvd_off: "Off (normal)", cvd_pro: "Protanopia", cvd_deu: "Deuteranopia", cvd_rg: "Red-Green", cvd_tri: "Tritanopia (blue-yellow)" },
+    fr: { set: "Paramètres", theme: "Thème", dark: "Sombre", light: "Clair", lang: "Langue", cvd: "Daltonisme", cvd_off: "Désactivé (normal)", cvd_pro: "Protanopie", cvd_deu: "Deutéranopie", cvd_rg: "Rouge-Vert", cvd_tri: "Tritanopie (bleu-jaune)" },
+    ru: { set: "Настройки", theme: "Тема", dark: "Тёмная", light: "Светлая", lang: "Язык", cvd: "Дальтонизм", cvd_off: "Выкл (обычный)", cvd_pro: "Протанопия", cvd_deu: "Дейтеранопия", cvd_rg: "Красно-зелёный", cvd_tri: "Тританопия (сине-жёлтый)" },
+    de: { set: "Einstellungen", theme: "Thema", dark: "Dunkel", light: "Hell", lang: "Sprache", cvd: "Farbenblindheit", cvd_off: "Aus (normal)", cvd_pro: "Protanopie", cvd_deu: "Deuteranopie", cvd_rg: "Rot-Grün", cvd_tri: "Tritanopie (Blau-Gelb)" },
+    ar: { set: "الإعدادات", theme: "السمة", dark: "داكن", light: "فاتح", lang: "اللغة", cvd: "عمى الألوان", cvd_off: "إيقاف (عادي)", cvd_pro: "بروتانوبيا", cvd_deu: "ديوترانوبيا", cvd_rg: "أحمر-أخضر", cvd_tri: "تريتانوبيا (أزرق-أصفر)" }
+};
+function raSetLang() { try { return localStorage.getItem("site-lang") || "tr"; } catch (e) { return "tr"; } }
+function raEsc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function raSetTheme(mode) {
+    var isDark = mode !== "light";
+    document.documentElement.classList.toggle("dark-mode", isDark);
+    document.body.classList.toggle("dark-mode", isDark);
+    try { localStorage.setItem("theme", isDark ? "dark" : "light"); } catch (e) {}
+    var btn = document.getElementById("darkModeBtn"); if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
+    renderSettingsMenu();
+}
+function renderSettingsMenu() {
+    var menu = document.getElementById("raSetMenu"); if (!menu) return;
+    var L = SETTINGS_TXT[raSetLang()] || SETTINGS_TXT.tr;
+    var th = (function () { try { return localStorage.getItem("theme") || "dark"; } catch (e) { return "dark"; } })();
+    var langs = getLanguages(), curLang = raSetLang(), cvd = cvdTheme();
+    var cur = function (c) { return c ? ' aria-current="true"' : ''; };
+    var html = '<div class="set-grp"><div class="set-h">' + raEsc(L.theme) + '</div>' +
+        '<button class="set-opt" data-theme="dark"' + cur(th !== "light") + '>🌙 ' + raEsc(L.dark) + '</button>' +
+        '<button class="set-opt" data-theme="light"' + cur(th === "light") + '>☀️ ' + raEsc(L.light) + '</button></div>';
+    var codes = Object.keys(langs);
+    if (codes.length) {
+        html += '<div class="set-grp"><div class="set-h">' + raEsc(L.lang) + '</div>';
+        codes.forEach(function (c) { html += '<button class="set-opt" data-lang="' + c + '"' + cur(c === curLang) + '>' + raEsc(langs[c].name || c) + '</button>'; });
+        html += '</div>';
+    }
+    var opts = [["", "off"], ["pro", "pro"], ["deu", "deu"], ["rg", "rg"], ["tri", "tri"]];
+    html += '<div class="set-grp"><div class="set-h">' + raEsc(L.cvd) + '</div>';
+    opts.forEach(function (o) { html += '<button class="set-opt cvd" data-cvd="' + o[0] + '"' + cur(o[0] === cvd) + '>' + cvdSwatches(o[0]) + '<span>' + raEsc(L["cvd_" + o[1]]) + '</span></button>'; });
+    html += '</div>';
+    menu.innerHTML = html;
+    Array.prototype.forEach.call(menu.querySelectorAll("[data-theme]"), function (b) { b.onclick = function () { raSetTheme(b.getAttribute("data-theme")); }; });
+    Array.prototype.forEach.call(menu.querySelectorAll("[data-lang]"), function (b) { b.onclick = function () { selectLanguage(b.getAttribute("data-lang")); }; });
+    Array.prototype.forEach.call(menu.querySelectorAll("[data-cvd]"), function (b) { b.onclick = function () { applyCvd(b.getAttribute("data-cvd")); renderSettingsMenu(); }; });
+}
+function raBuildSettings() {
+    var right = document.querySelector(".nav-right");
+    if (!right || document.getElementById("raSettings")) return;
+    var L = SETTINGS_TXT[raSetLang()] || SETTINGS_TXT.tr;
+    var wrap = document.createElement("div");
+    wrap.className = "ra-set"; wrap.id = "raSettings";
+    wrap.innerHTML = '<button class="ra-set-btn" id="raSetBtn" aria-haspopup="true" aria-expanded="false" aria-label="' + raEsc(L.set) + '">⚙️</button><div class="ra-set-menu" id="raSetMenu" role="menu"></div>';
+    right.appendChild(wrap);
+    renderSettingsMenu();
+    var btn = document.getElementById("raSetBtn");
+    btn.addEventListener("click", function (e) { e.stopPropagation(); var open = wrap.classList.toggle("open"); btn.setAttribute("aria-expanded", open ? "true" : "false"); });
+    document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) { wrap.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); } });
+    document.addEventListener("site-lang-change", renderSettingsMenu);
+}
 
 /* =========================================
    DİL SEÇİCİ
