@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20261120">
+<link rel="stylesheet" href="/styles/common.css?v=20261121">
 <style>
 .set-wrap { max-width: 540px; margin: 0 auto; }
 .set-card { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 16px 16px 10px; margin-bottom: 18px; }
@@ -55,6 +55,13 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
 
 <div class="set-card"><h2 id="hAccount">Hesap</h2><div id="acctRoot"></div><div class="set-msg" id="acctMsg"></div></div>
 
+<div class="set-card" id="secCard" hidden><h2>Güvenlik</h2><div id="secRoot"></div><div class="set-msg" id="secMsg"></div></div>
+
+<div class="set-card" id="sessCard" hidden><h2>Oturumlar (cihazlar)</h2><div id="sessRoot"><p class="about">Yükleniyor…</p></div>
+    <button type="button" class="srow danger" id="btnLogoutAll"><span class="ico">🚪</span><span>Tüm cihazlardan çık</span></button>
+    <div class="set-msg" id="sessMsg"></div>
+</div>
+
 <div class="set-card"><h2 id="hShortcuts">Kısayollar</h2>
     <a class="srow" href="/icerikler/gunluk"><span class="ico">📅</span><span>Günün karıştırması</span><span class="go">→</span></a>
     <a class="srow" href="/icerikler/kocluklar"><span class="ico">🎓</span><span>Koçluklar</span><span class="go">→</span></a>
@@ -70,15 +77,15 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
 </div>
 
 <div class="set-card"><h2 id="hAbout">Hakkında</h2>
-    <div class="about">Rubik Academy · Sürüm <b id="verTxt">20261120</b><br>Türkiye'nin kapsamlı küp öğrenme platformu.</div>
+    <div class="about">Rubik Academy · Sürüm <b id="verTxt">20261121</b><br>Türkiye'nin kapsamlı küp öğrenme platformu.</div>
 </div>
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20261120"></script>
-<script src="/js/common.js?v=20261120"></script>
-<script src="/js/firebase-config.js?v=20261120"></script>
-<script src="/js/account.js?v=20261120"></script>
+<script src="/js/i18n.js?v=20261121"></script>
+<script src="/js/common.js?v=20261121"></script>
+<script src="/js/firebase-config.js?v=20261121"></script>
+<script src="/js/account.js?v=20261121"></script>
 <script>
 (function () {
     function $(id) { return document.getElementById(id); }
@@ -103,11 +110,48 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
                 if (!confirm("Hesabın, buluttaki ilerlemen ve sıralamadaki girdilerin KALICI olarak silinsin mi? Bu geri alınamaz.")) return;
                 msg($("acctMsg"), "Siliniyor…"); A.deleteAccount().then(function () { msg($("acctMsg"), "Hesap silindi.", 0); location.href = "/"; }, function () { msg($("acctMsg"), "Silinemedi. Tekrar giriş yapıp dene.", 1); });
             };
+            renderSecurity(); renderSessions();
+            $("secCard").hidden = false; $("sessCard").hidden = false;
         } else {
             box.innerHTML = '<a class="srow" href="/giris"><span class="ico">👤</span><span>Giriş yap / Kayıt ol</span><span class="go">→</span></a>' +
                 '<p class="about">Giriş yaparsan ilerlemen tüm cihazlarında görünür ve paylaşılabilir profilin olur.</p>';
+            $("secCard").hidden = true; $("sessCard").hidden = true;
         }
     }
+    function renderSecurity() {
+        var A = window.Account, u = A.user(), box = $("secRoot"), html = "";
+        if (u && u.email && !A.emailVerified()) html += '<button type="button" class="srow" id="secVerify"><span class="ico">✉️</span><span>E-postanı doğrula</span><span class="go">→</span></button>';
+        else if (u && u.email) html += '<p class="about">✓ E-posta doğrulanmış.</p>';
+        if (A.isPasswordUser()) html += '<button type="button" class="srow" id="secPass"><span class="ico">🔑</span><span>Şifre değiştir</span><span class="go">→</span></button>';
+        else html += '<p class="about">Google ile giriş yaptığın için şifre Google tarafında yönetilir.</p>';
+        box.innerHTML = html;
+        if ($("secVerify")) $("secVerify").onclick = function () { msg($("secMsg"), "Gönderiliyor…"); A.verifyEmail().then(function () { msg($("secMsg"), "Doğrulama e-postası gönderildi ✓"); }, function () { msg($("secMsg"), "Gönderilemedi.", 1); }); };
+        if ($("secPass")) $("secPass").onclick = function () {
+            var np = prompt("Yeni şifre (en az 6 karakter):"); if (!np) return;
+            if (np.length < 6) { msg($("secMsg"), "Şifre en az 6 karakter olmalı.", 1); return; }
+            msg($("secMsg"), "Değiştiriliyor…");
+            A.changePassword(np).then(function () { msg($("secMsg"), "Şifre değiştirildi ✓"); }, function (err) {
+                if (err && err.code === "need-current") { var cp = prompt("Güvenlik için mevcut şifreni gir:"); if (!cp) { msg($("secMsg"), ""); return; } A.changePassword(np, cp).then(function () { msg($("secMsg"), "Şifre değiştirildi ✓"); }, function () { msg($("secMsg"), "Değiştirilemedi (mevcut şifre yanlış olabilir).", 1); }); }
+                else msg($("secMsg"), "Değiştirilemedi.", 1);
+            });
+        };
+    }
+    function fmtDT(ms) { if (!ms) return ""; try { return new Date(ms).toLocaleString("tr-TR", { dateStyle: "short", timeStyle: "short" }); } catch (e) { return ""; } }
+    function renderSessions() {
+        var A = window.Account;
+        A.listSessions().then(function (list) {
+            var box = $("sessRoot");
+            if (!list.length) { box.innerHTML = '<p class="about">Kayıtlı oturum yok.</p>'; return; }
+            box.innerHTML = list.map(function (s) {
+                return '<div class="srow" style="cursor:default"><span class="ico">💻</span><span>' + (s.device || "?").replace(/</g, "&lt;") + (s.me ? ' <b>(bu cihaz)</b>' : '') + '<br><small style="color:var(--text-soft)">' + fmtDT(s.ts) + '</small></span></div>';
+            }).join("");
+        });
+    }
+    $("btnLogoutAll").onclick = function () {
+        if (!confirm("Tüm cihazlardaki oturumlar kapatılsın mı? (Bu cihaz dahil, tekrar giriş yapman gerekir.)")) return;
+        msg($("sessMsg"), "Kapatılıyor…");
+        window.Account.logoutOthers().then(function () { window.Account.signOut(); location.href = "/giris"; }, function () { msg($("sessMsg"), "Yapılamadı.", 1); });
+    };
     function msg(el, text, bad) { if (!el) return; el.textContent = text || ""; el.className = "set-msg" + (bad ? " bad" : ""); }
 
     // İlerlemeyi sıfırla (bu cihaz)

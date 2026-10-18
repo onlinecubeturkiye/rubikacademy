@@ -194,6 +194,15 @@
             // Bildirim hedef listesini doldur
             var sel = $id("bcTarget");
             if (sel) { sel.innerHTML = '<option value="all">📢 Herkese (duyuru)</option>' + users.map(function (u) { return '<option value="' + esc(u.uid) + '">' + esc(u.name) + '</option>'; }).join(""); }
+            // Genel bakış
+            var ov = $id("aOverview");
+            if (ov) {
+                var now = Date.now(), d1 = 86400000, d7 = 7 * d1;
+                function cnt(f) { return users.filter(f).length; }
+                var tiles = [["Toplam üye", users.length], ["Son 24 saat aktif", cnt(function (u) { return u.seen && now - u.seen < d1; })], ["Son 7 gün aktif", cnt(function (u) { return u.seen && now - u.seen < d7; })], ["Bu hafta katılan", cnt(function (u) { return u.joined && now - u.joined < d7; })]];
+                ov.innerHTML = tiles.map(function (t) { return '<div class="stat-tile"><b>' + t[1] + '</b><span>' + t[0] + '</span></div>'; }).join("") + '<div class="stat-tile"><b id="ovDaily">…</b><span>Bugün günlük gönderim</span></div>';
+                window.Leaderboard.fetchDay(dayNumOf(todayStr()), 300).then(function (rows) { var e = $id("ovDaily"); if (e) e.textContent = rows.length; }, function () {});
+            }
         }, function (e) {
             var code = e && e.message;
             var hint = (code === "403" || code === 403) ? ' — Firestore kurallarını Firebase Console’dan yayımladığından ve bu hesabın yönetici (pikapikachuyt0@gmail.com, Google) olduğundan emin ol.' : '';
@@ -207,6 +216,7 @@
     function renderPanel() {
         root.innerHTML =
             '<h1 class="a-h1">Yönetim paneli</h1><p class="a-sub">Yalnızca sen görüyorsun. Günlük sıralamayı düzenle ve kullanıcı etkinliğini izle.</p>' +
+            '<div class="box"><h2>📊 Genel bakış</h2><div id="aOverview" class="stat-tiles"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🔔 Bildirim gönder</h2>' +
             '<p class="a-note">Yazdığın mesaj seçtiğin kişiye (ya da herkese) bildirim olarak gider. Bildirime izin veren kullanıcılarda telefon/sistem bildirimi; herkeste site içi bildirim olarak düşer.</p>' +
             '<div class="a-ctrl" style="flex-direction:column;align-items:stretch">' +

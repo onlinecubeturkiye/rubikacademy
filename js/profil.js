@@ -84,7 +84,6 @@
       '<div class="box"><div class="p-head"><div class="p-ava"' + avaStyle(acc) + '>' + avatar(data.photo, data.name) + '</div>' +
       '<div class="p-id"><h1>' + esc(data.name) + '</h1>' + (data.bio ? '<div class="p-bio">' + esc(data.bio) + '</div>' : '') +
       (data.joined ? '<div class="p-meta">📅 ' + esc(dateStr(data.joined)) + '\'den beri üye</div>' : '') + favLine(fav) + '</div></div>' +
-      '<div class="p-actions" id="pSocial"></div>' +
       (isMe ? '<div class="p-actions"><button class="p-btn" id="pShare">🔗 Paylaşım linkini kopyala</button><a class="p-btn" href="/icerikler/profil">← Kendi panona dön</a></div><div class="p-msg" id="pMsg"></div>' : '') +
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistikler</h2>' + statTiles(data.stats) + '</div>' +
@@ -92,53 +91,7 @@
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">⏱️ Kişisel rekorlar</h2>' + pbGrid(data.stats) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümler</h2>' + dailyGrid(data.stats) + '</div>';
     showRole(uid);
-    fillSocial(uid, isMe);
     if (isMe) bindShare(uid);
-  }
-
-  // Takip ettiklerim listesi + aldığın beğeni sayısı (kendi panonda)
-  function fillFollowing(myUid) {
-    var A = window.Account;
-    A.likeInfo(myUid).then(function (li) { var h = $("pFollowH"); if (h) h.innerHTML = '👥 Takip ettiklerim <span style="color:var(--text-soft);font-size:14px;font-weight:700">· ❤️ ' + li.count + ' beğeni aldın</span>'; });
-    A.following().then(function (ids) {
-      var box = $("pFollowing"); if (!box) return;
-      if (!ids.length) { box.innerHTML = '<p class="p-note">Henüz kimseyi takip etmiyorsun. Birinin profilinde “Takip et”e bas.</p>'; return; }
-      Promise.all(ids.slice(0, 60).map(function (id) { return A.getProfile(id).then(function (d) { return { id: id, name: (d && d.name) || "Cuber", photo: (d && d.photo) || "" }; }); })).then(function (list) {
-        box.innerHTML = '<div class="p-follow">' + list.map(function (x) {
-          var ini = (x.name || "?").trim().charAt(0).toUpperCase();
-          var av = x.photo ? '<img src="' + esc(x.photo) + '" alt="" referrerpolicy="no-referrer">' : esc(ini);
-          return '<a class="p-fitem" href="/icerikler/profil?u=' + encodeURIComponent(x.id) + '"><span class="p-fava">' + av + '</span><b>' + esc(x.name) + '</b></a>';
-        }).join("") + '</div>';
-      });
-    });
-  }
-  // Beğeni + takip barı (profil başlığının altında)
-  function fillSocial(uid, isMe) {
-    var host = $("pSocial"); if (!host || !window.Account) return;
-    var A = window.Account, signedIn = !!A.uid();
-    A.likeInfo(uid).then(function (li) {
-      var likeBtn = '<button class="p-btn" id="pLike">' + (li.mine ? "❤️" : "🤍") + ' <span id="pLikeN">' + li.count + '</span></button>';
-      var followBtn = (signedIn && !isMe) ? '<button class="p-btn main" id="pFollow">…</button>' : '';
-      host.innerHTML = likeBtn + followBtn;
-      var lb = $("pLike");
-      if (lb) lb.onclick = function () {
-        if (!signedIn) { A.openLogin(); return; }
-        var now = $("pLike").textContent.indexOf("❤️") >= 0;
-        (now ? A.unlike(uid) : A.like(uid)).then(function () {
-          var n = +$("pLikeN").textContent + (now ? -1 : 1);
-          $("pLike").innerHTML = (now ? "🤍" : "❤️") + ' <span id="pLikeN">' + Math.max(0, n) + '</span>';
-        });
-      };
-      if (signedIn && !isMe) A.isFollowing(uid).then(function (f) {
-        var fb = $("pFollow"); if (!fb) return;
-        function paint(on) { fb.textContent = on ? "✓ Takiptesin" : "➕ Takip et"; fb.classList.toggle("main", !on); }
-        paint(f);
-        fb.onclick = function () {
-          var on = fb.textContent.indexOf("✓") >= 0;
-          (on ? A.unfollow(uid) : A.follow(uid)).then(function () { paint(!on); });
-        };
-      });
-    });
   }
 
   function bindShare(uid) {
@@ -182,10 +135,8 @@
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistiklerim</h2>' + statTiles(st) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerlemem</h2>' + setsGrid(st) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">⏱️ Kişisel rekorlarım</h2>' + pbGrid(st) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px" id="pFollowH">👥 Takip ettiklerim</h2><div id="pFollowing"><p class="p-note">Yükleniyor…</p></div></div>';
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>';
 
-    fillFollowing(u.uid);
     showRole(u.uid);
     bindShare(u.uid);
     $("pEdit").onclick = function () { var e = $("pEditBox"); e.hidden = !e.hidden; };

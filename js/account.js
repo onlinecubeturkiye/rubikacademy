@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261120";
+    var V = "20261121";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -87,7 +87,7 @@
                 user = u;
                 lsSet(SIGNED_KEY, u ? "1" : null);
                 renderNav();
-                if (u) { closeModal(); startSync(); } else stopSync();
+                if (u) { closeModal(); startSync(); logSession(); checkLogoutAll(); } else stopSync();
                 listeners.forEach(function (f) { try { f(u); } catch (e) {} });
                 try { document.dispatchEvent(new CustomEvent("account-change", { detail: u })); } catch (e) {}
             });
@@ -546,16 +546,6 @@
     /* ---------- sosyal: takip, beğeni, bildirim ---------- */
     function pubUrl(path) { return base() + path + (path.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey); }
     function pubList(path) { return fetch(pubUrl(path + (path.indexOf("?") < 0 ? "?" : "&") + "pageSize=300")).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { return (d && d.documents) || []; }).catch(function () { return []; }); }
-    function tfield() { return { fields: { t: { integerValue: String(Date.now()) } } }; }
-    // Takip
-    function follow(tid) { if (!user || !tid || tid === user.uid) return Promise.resolve(false); return api("/users/" + user.uid + "/following/" + tid, { method: "PATCH", body: JSON.stringify(tfield()) }).then(function (r) { return r.ok; }); }
-    function unfollow(tid) { if (!user) return Promise.resolve(false); return api("/users/" + user.uid + "/following/" + tid, { method: "DELETE" }).then(function (r) { return r.ok; }); }
-    function isFollowing(tid) { if (!user) return Promise.resolve(false); return api("/users/" + user.uid + "/following/" + tid, { method: "GET" }).then(function (r) { return r.ok; }).catch(function () { return false; }); }
-    function following() { if (!user) return Promise.resolve([]); return api("/users/" + user.uid + "/following?pageSize=300", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { return ((d && d.documents) || []).map(function (x) { return x.name.split("/").pop(); }); }).catch(function () { return []; }); }
-    // Beğeni
-    function like(tid) { if (!user || !tid) return Promise.resolve(false); return api("/users/" + tid + "/likes/" + user.uid, { method: "PATCH", body: JSON.stringify(tfield()) }).then(function (r) { return r.ok; }); }
-    function unlike(tid) { if (!user) return Promise.resolve(false); return api("/users/" + tid + "/likes/" + user.uid, { method: "DELETE" }).then(function (r) { return r.ok; }); }
-    function likeInfo(tid) { return pubList("/users/" + tid + "/likes").then(function (docs) { var me = user && user.uid; return { count: docs.length, mine: !!me && docs.some(function (d) { return d.name.split("/").pop() === me; }) }; }); }
     // Bildirim gönder (admin)
     function sendNotif(tid, text) { if (!isAdmin()) return Promise.resolve(false); return api("/users/" + tid + "/notifications", { method: "POST", body: JSON.stringify({ fields: { text: { stringValue: String(text).slice(0, 500) }, ts: { timestampValue: new Date().toISOString() } } }) }).then(function (r) { return r.ok; }); }
     function sendBroadcast(text) { if (!isAdmin()) return Promise.resolve(false); return api("/broadcasts", { method: "POST", body: JSON.stringify({ fields: { text: { stringValue: String(text).slice(0, 500) }, ts: { timestampValue: new Date().toISOString() } } }) }).then(function (r) { return r.ok; }); }
@@ -597,6 +587,57 @@
         });
     }
 
+    /* ---------- güvenlik: e-posta doğrulama, şifre değiştir ---------- */
+    function isPasswordUser() { return !!(user && user.providerData && user.providerData.some(function (p) { return p.providerId === "password"; })); }
+    function emailVerified() { return !!(user && user.emailVerified); }
+    function verifyEmail() { if (!user) return Promise.reject(new Error("signed-out")); return loadSDK().then(function (m) { return m.sendEmailVerification(auth.currentUser); }); }
+    function changePassword(newPass, curPass) {
+        if (!user) return Promise.reject(new Error("signed-out"));
+        return loadSDK().then(function (m) {
+            return m.updatePassword(auth.currentUser, newPass).catch(function (err) {
+                if (!err || !/requires-recent-login/.test(err.code || "")) throw err;
+                if (!curPass) { var e = new Error("reauth"); e.code = "need-current"; throw e; }
+                return m.reauthenticateWithCredential(auth.currentUser, m.EmailAuthProvider.credential(user.email, curPass)).then(function () { return m.updatePassword(auth.currentUser, newPass); });
+            });
+        });
+    }
+
+    /* ---------- oturum geçmişi + tüm cihazlardan çıkış ---------- */
+    function sessId() { var id = lsGet("ra-sess-id"); if (!id || !/^[a-z0-9]{16}$/.test(id)) { var a = "abcdefghijklmnopqrstuvwxyz0123456789", r = ""; for (var i = 0; i < 16; i++) r += a.charAt(Math.floor(Math.random() * a.length)); id = r; lsSet("ra-sess-id", id); } return id; }
+    function deviceStr() {
+        var ua = navigator.userAgent || "", os = /Windows/.test(ua) ? "Windows" : /Android/.test(ua) ? "Android" : /iPhone|iPad|iPod/.test(ua) ? "iOS" : /Mac/.test(ua) ? "Mac" : /Linux/.test(ua) ? "Linux" : "?";
+        var br = /Edg/.test(ua) ? "Edge" : /OPR|Opera/.test(ua) ? "Opera" : /SamsungBrowser/.test(ua) ? "Samsung" : /Chrome/.test(ua) ? "Chrome" : /Firefox/.test(ua) ? "Firefox" : /Safari/.test(ua) ? "Safari" : "Tarayıcı";
+        return br + " · " + os;
+    }
+    function logSession() {
+        if (!user) return;
+        try { if (sessionStorage.getItem("ra-sess-logged")) { return; } sessionStorage.setItem("ra-sess-logged", "1"); } catch (e) {}
+        lsSet("ra-login-ts", String(Date.now()));
+        api("/users/" + user.uid + "/sessions/" + sessId() + "?updateMask.fieldPaths=device&updateMask.fieldPaths=ts", { method: "PATCH", body: JSON.stringify({ fields: { device: { stringValue: deviceStr() }, ts: { integerValue: String(Date.now()) } } }) }).catch(function () {});
+    }
+    function listSessions() {
+        if (!user) return Promise.resolve([]);
+        return api("/users/" + user.uid + "/sessions?pageSize=100", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            var me = sessId();
+            return ((d && d.documents) || []).filter(function (x) { return x.name.split("/").pop() !== "control"; }).map(function (x) {
+                var f = x.fields || {}; return { sid: x.name.split("/").pop(), device: (f.device && f.device.stringValue) || "?", ts: +((f.ts && f.ts.integerValue) || 0), me: x.name.split("/").pop() === me };
+            }).sort(function (a, b) { return b.ts - a.ts; });
+        }).catch(function () { return []; });
+    }
+    function logoutOthers() {
+        if (!user) return Promise.resolve(false);
+        return api("/users/" + user.uid + "/sessions/control?updateMask.fieldPaths=before", { method: "PATCH", body: JSON.stringify({ fields: { before: { integerValue: String(Date.now()) } } }) })
+            .then(function (r) { lsSet("ra-login-ts", String(Date.now())); try { sessionStorage.setItem("ra-sess-logged", "1"); } catch (e) {} return r.ok; });
+    }
+    function checkLogoutAll() {
+        if (!user) return;
+        api("/users/" + user.uid + "/sessions/control", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            var before = d && d.fields && d.fields.before && +d.fields.before.integerValue;
+            var mine = +(lsGet("ra-login-ts") || 0);
+            if (before && mine && mine < before) signOut();
+        }).catch(function () {});
+    }
+
     window.Account = {
         enabled: function () { return enabled; },
         writeProfile: writeProfile,
@@ -634,10 +675,10 @@
         syncNow: function () { return pushChanged(false); },
         load: loadSDK,
         isPending: function () { return lsGet(SIGNED_KEY) === "1" && !sdkP; },
-        follow: follow, unfollow: unfollow, isFollowing: isFollowing, following: following,
-        like: like, unlike: unlike, likeInfo: likeInfo,
         sendNotif: sendNotif, sendBroadcast: sendBroadcast, showNotes: showNotes,
-        notifyPermission: function () { if (!("Notification" in window)) return Promise.resolve("unsupported"); return Notification.requestPermission(); }
+        notifyPermission: function () { if (!("Notification" in window)) return Promise.resolve("unsupported"); return Notification.requestPermission(); },
+        isPasswordUser: isPasswordUser, emailVerified: emailVerified, verifyEmail: verifyEmail, changePassword: changePassword,
+        listSessions: listSessions, logoutOthers: logoutOthers, sessId: sessId
     };
 
     function init() {

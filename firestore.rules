@@ -64,19 +64,11 @@ service cloud.firestore {
         allow update, delete: if isAdmin();
       }
 
-      // Takip: sahibi kimleri takip ettiğini yazar; sahibi + admin okur
-      match /following/{fid} {
+      // Oturumlar (cihaz geçmişi + "tüm cihazlardan çık"): sahibi yazar/okur; admin okur
+      match /sessions/{sid} {
         allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
-        allow create, update: if request.auth != null && request.auth.uid == uid
-          && request.resource.data.keys().hasOnly(['t']) && request.resource.data.t is int;
+        allow create, update: if request.auth != null && request.auth.uid == uid;
         allow delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
-      }
-      // Beğeni: herkes sayar (okur); beğenen kendi beğenisini ekler/siler
-      match /likes/{liker} {
-        allow read: if true;
-        allow create, update: if request.auth != null && request.auth.uid == liker
-          && request.resource.data.keys().hasOnly(['t']) && request.resource.data.t is int;
-        allow delete: if (request.auth != null && request.auth.uid == liker) || isAdmin();
       }
       // Bildirimler: yalnız admin gönderir; sahibi + admin okur
       match /notifications/{nid} {
