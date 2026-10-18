@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20261110">
+<link rel="stylesheet" href="/styles/common.css?v=20261111">
 <style>
 .wrap { max-width: 1040px; margin: 0 auto; }
 .box { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 20px 22px; margin-bottom: 20px; }
@@ -64,6 +64,10 @@
 .u-pick-id { min-width: 0; }
 .u-pick-id b { display: block; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .u-pick-id small { font-size: 11px; color: var(--text-soft); }
+.role-badge { display: inline-block; margin-top: 3px; padding: 1px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 800; color: #fff; }
+.role-badge.gelistirici { background: var(--cube-blue, #2c6fe6); }
+.role-badge.tester { background: var(--cube-green, #179e4f); }
+#roleSel { padding: 8px 11px; border-radius: 10px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 700 14px Inter, sans-serif; }
 .u-detailwrap .u-detail { display: block; }
 @media (max-width: 720px) { .u-split { grid-template-columns: 1fr; } .u-picker { flex-direction: row; flex-wrap: wrap; max-height: none; } .u-pick { width: auto; } .u-pick-id small { display: none; } }
 .u-detail h4 { font-size: 13px; font-weight: 850; color: var(--text); margin: 8px 0 4px; }
@@ -92,11 +96,11 @@
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20261110"></script>
-<script src="/js/common.js?v=20261110"></script>
-<script src="/js/firebase-config.js?v=20261110"></script>
-<script src="/js/account.js?v=20261110"></script>
-<script src="/js/leaderboard.js?v=20261110"></script>
-<script src="/js/admin.js?v=20261110"></script>
+<script src="/js/i18n.js?v=20261111"></script>
+<script src="/js/common.js?v=20261111"></script>
+<script src="/js/firebase-config.js?v=20261111"></script>
+<script src="/js/account.js?v=20261111"></script>
+<script src="/js/leaderboard.js?v=20261111"></script>
+<script src="/js/admin.js?v=20261111"></script>
 </body>
 </html>

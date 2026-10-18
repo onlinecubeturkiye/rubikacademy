@@ -89,6 +89,15 @@ service cloud.firestore {
     }
 
     // Admin paneli: tüm kullanıcıları ve alt koleksiyonlarını listeleyip okuyabilir
+    // Roller: herkes okur (profil rozeti), yalnızca admin yazar
+    match /roles/{uid} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['role'])
+        && request.resource.data.role in ['uye', 'gelistirici', 'tester'];
+      allow delete: if isAdmin();
+    }
+
     match /users/{uid}/{sub=**} {
       allow read: if isAdmin();
     }

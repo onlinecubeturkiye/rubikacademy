@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261110";
+    var V = "20261111";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -500,6 +500,12 @@
         user: function () { return user; },
         uid: function () { return user ? user.uid : null; },
         isAdmin: isAdmin,
+        getRole: function (uid) {
+            var u = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents/roles/" + encodeURIComponent(uid) + "?key=" + encodeURIComponent(cfg.apiKey);
+            return fetch(u).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+                return (d && d.fields && d.fields.role && d.fields.role.stringValue) || "uye";
+            }).catch(function () { return "uye"; });
+        },
         token: token,
         onChange: function (f) { listeners.push(f); if (sdkP) f(user); },
         openLogin: openLogin,
