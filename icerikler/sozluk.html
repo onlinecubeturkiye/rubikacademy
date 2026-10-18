@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"");if((localStorage.getItem("theme")||"dark")==="dark")document.documentElement.classList.add("dark-mode");}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rubik Academy - Küp Sözlüğü</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffd21f">
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/sozluk">
+<meta name="description" content="Rubik küp terimleri sözlüğü: CFOP, F2L, OLL, PLL, lookahead, ao5, parity ve daha fazlası — Türkçe açıklamalarıyla.">
+<meta property="og:title" content="Küp Sözlüğü — Rubik Academy">
+<meta property="og:description" content="Küp terimleri Türkçe açıklamalarıyla: yöntemler, algoritmalar, timer ve donanım.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/sozluk">
+<meta property="og:image" content="https://rubikacademy.fun/og/sozluk.png?v=20261117">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/sozluk.png?v=20261117">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles/common.css?v=20261117">
+<style>
+.wrap { max-width: 880px; margin: 0 auto; }
+.intro { text-align: center; margin: 0 auto 22px; max-width: 680px; }
+.intro h1 { font-size: clamp(32px, 5vw, 48px); font-weight: 900; letter-spacing: -1.2px; color: var(--text); line-height: 1.05; margin-bottom: 10px; }
+.intro p { color: var(--text-soft); font-size: 16px; line-height: 1.6; }
+.sz-tools { position: sticky; top: 8px; z-index: 5; background: var(--background); padding: 8px 0 10px; }
+.sz-search { width: 100%; box-sizing: border-box; padding: 14px 16px; border-radius: 14px; border: var(--card-bw) solid var(--card-border); background: var(--surface); color: var(--text); font: 600 16px Inter, sans-serif; box-shadow: var(--shadow-sm); }
+.sz-search:focus { outline: 2px solid var(--cube-yellow); }
+.sz-cats { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.sz-cat { padding: 7px 13px; border-radius: 999px; border: var(--card-bw) solid var(--card-border); background: var(--surface); color: var(--text); font: 800 13px Inter, sans-serif; cursor: pointer; }
+.sz-cat.on { background: var(--cube-yellow); color: #17171f; border-color: var(--ink); }
+.sz-list { display: grid; gap: 12px; margin-top: 8px; }
+.sz-term { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 16px; box-shadow: var(--shadow-sm); padding: 15px 17px; }
+.sz-term h3 { font-size: 17px; font-weight: 850; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sz-term .tag { font-size: 11px; font-weight: 800; padding: 2px 9px; border-radius: 999px; background: var(--surface-soft); color: var(--text-soft); }
+.sz-term p { color: var(--text-soft); font-size: 14.5px; line-height: 1.65; margin-top: 6px; }
+.sz-term code { font-family: "JetBrains Mono", monospace; color: var(--primary); font-weight: 700; }
+.sz-empty { text-align: center; color: var(--text-soft); padding: 24px; }
+.sz-count { text-align: center; color: var(--text-soft); font-size: 13px; margin-top: 14px; }
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-F7KXWC8B5N');</script>
+</head>
+<body>
+<div class="bg-glow"></div>
+<header class="navbar">
+    <a href="/" class="nav-logo"><img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy"><span class="nav-logo-text">Rubik Academy</span></a>
+    <div class="nav-right">
+        <nav class="nav-links"><a href="/" data-i18n="navHome">Ana Sayfa</a><a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a></nav>
+    </div>
+</header>
+<div class="page">
+<div class="wrap">
+<nav class="nav-bar"><a href="/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a></nav>
+<section class="intro">
+    <h1>Küp Sözlüğü</h1>
+    <p>Rubik küp dünyasının terimleri, kısaltmaları ve kavramları — Türkçe açıklamalarıyla. Aramak için yaz ya da bir kategori seç.</p>
+</section>
+<div class="sz-tools">
+    <input type="search" class="sz-search" id="szSearch" placeholder="Ara: F2L, lookahead, parity, ao5…" autocomplete="off" spellcheck="false">
+    <div class="sz-cats" id="szCats"></div>
+</div>
+<div class="sz-list" id="szList"></div>
+<div class="sz-count" id="szCount"></div>
+</div>
+</div>
+<footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
+<script src="/js/i18n.js?v=20261117"></script>
+<script src="/js/common.js?v=20261117"></script>
+<script>
+(function () {
+    var CATS = { method: "Yöntemler", algo: "Algoritmalar", timer: "Timer & Çözüm", hardware: "Donanım", notation: "Notasyon" };
+    var TERMS = [
+        ["CFOP", "method", "En yaygın hız çözme yöntemi: Cross → F2L → OLL → PLL. Jessica Fridrich ile anıldığı için “Fridrich” de denir."],
+        ["Roux", "method", "Bloklar ve <code>M</code> hamleleriyle çözen, az hamle kullanan alternatif yöntem. Rotasyon neredeyse yoktur."],
+        ["ZZ", "method", "Önce kenar yönelimi (EO) çözülür, ardından blok ve son katman. <code>R</code> ve <code>U</code> ağırlıklıdır."],
+        ["Petrus", "method", "Blok kurup kenarları yöneltme üzerine kurulu, düşük hamleli bir yöntem."],
+        ["Cross", "method", "CFOP’un ilk adımı: bir yüzde artı (kenarlar) kurma. Genelde beyaz ile başlanır."],
+        ["F2L", "algo", "First Two Layers — ilk iki katman. Köşe + kenar çiftlerini sezgisel ya da algoritmayla birlikte yerleştirme."],
+        ["OLL", "algo", "Orientation of the Last Layer — son katmanın üst rengini tamamlama. 57 vaka."],
+        ["PLL", "algo", "Permutation of the Last Layer — son katman taşlarını yerine dizme. 21 vaka."],
+        ["2-Look OLL/PLL", "algo", "OLL ve PLL’i ikişer adıma bölerek daha az algoritmayla çözme. Başlangıç için idealdir."],
+        ["COLL", "algo", "Son katman köşelerini üst yüz ve sıralama birlikte çözen set (kenarlar yönelmiş olmalı)."],
+        ["WV", "algo", "Winter Variation — son F2L çifti yerleşirken üst yüzü aynı anda çözen set."],
+        ["ZBLL", "algo", "Kenarlar yönelmişken son katmanı tek algoritmayla bitiren ileri set (çok sayıda vaka)."],
+        ["CLL / EG", "algo", "2x2’de son katmanı çözen setler. EG-1 ve EG-2, yüz çözülmediğinde devreye girer."],
+        ["Ortega", "algo", "2x2 için orta seviye yöntem: yüz → yön → PBL. Az algoritma, iyi hız."],
+        ["Sune / Antisune", "algo", "En sık görülen iki OLL deseni; <code>R U R' U R U2 R'</code> en temel algoritmalardandır."],
+        ["AUF", "notation", "Adjust Upper Face — algoritma öncesi/sonrası üst yüzü <code>U</code> ile hizalama."],
+        ["Lookahead", "timer", "Mevcut hamleyi yaparken bir sonraki çifti gözle takip etme. Hızın en kritik becerisi."],
+        ["TPS", "timer", "Turns Per Second — saniyedeki hamle sayısı. Ham hız ölçüsü."],
+        ["Inspection", "timer", "Çözüme başlamadan önceki inceleme süresi (WCA’da 15 saniye)."],
+        ["ao5 / ao12", "timer", "Son 5 / 12 çözümün ortalaması; en iyi ve en kötü atılarak hesaplanır. Tutarlılık ölçüsü."],
+        ["mo3", "timer", "Mean of 3 — son 3 çözümün düz ortalaması (atma yok)."],
+        ["PB", "timer", "Personal Best — kişisel rekor (tek çözüm ya da ortalama)."],
+        ["DNF", "timer", "Did Not Finish — geçersiz çözüm (küp çözülmedi ya da ceza). Sıralamada en sona yazılır."],
+        ["+2", "timer", "İki saniye ceza: inspection aşımı ya da bitişte tek hamle eksik kalması."],
+        ["Sub-X", "timer", "“X saniyenin altı” demek. Örn. sub-20 = 20 saniyenin altında ortalama."],
+        ["Scramble", "notation", "Küpü rastgele karıştıran resmi hamle dizisi. Herkes aynı scramble ile yarışır."],
+        ["Notasyon", "notation", "<code>R U F L D B</code> yüz hamleleri; <code>'</code> ters, <code>2</code> çift tur demektir."],
+        ["Slice (M E S)", "notation", "Orta katman hamleleri: <code>M</code> (R-L arası), <code>E</code> (U-D arası), <code>S</code> (F-B arası)."],
+        ["Wide (r u f)", "notation", "Küçük harf ya da <code>w</code>: iki katmanı birlikte çevirme (ör. <code>Rw</code>)."],
+        ["Rotasyon (x y z)", "notation", "Tüm küpü çevirme. <code>x</code> R ekseni, <code>y</code> U ekseni, <code>z</code> F ekseni etrafında."],
+        ["Sexy move", "notation", "<code>R U R' U'</code> dörtlüsü. Pek çok algoritmanın yapı taşıdır."],
+        ["Setup move", "notation", "Bir taşı tanıdık konuma getirip algoritma sonrası geri alınan hazırlık hamlesi (özellikle BLD’de)."],
+        ["Parity", "algo", "Çift sayılı küplerde (4x4, 6x6…) tek küpte olmayan, ekstra algoritma gerektiren son katman durumu."],
+        ["Commutator", "algo", "<code>A B A' B'</code> yapısı; iki-üç taşı yan etki bırakmadan değiştirir. BLD’nin temeli."],
+        ["BLD", "method", "Blindfolded — küpü ezberleyip gözü kapalı çözme. 3BLD en yaygın olanıdır."],
+        ["Buffer", "algo", "BLD’de taşların geçici olarak uğradığı sabit konum."],
+        ["Cubie / Sticker", "hardware", "Cubie: tek bir küçük küp (köşe/kenar/merkez). Sticker: üzerindeki renkli kare."],
+        ["Corner cutting", "hardware", "Küpün tam hizalanmamış katmanlarda bile hamleyi tamamlayabilmesi. İyi küpün göstergesi."],
+        ["Pop", "hardware", "Bir taşın küpten fırlaması. Gevşek küplerde olur."],
+        ["Lockup", "hardware", "Küpün bir hamlede takılıp akmaması. Genelde gerginlik/yağ ayarıyla düzelir."],
+        ["Mıknatıslı küp", "hardware", "Katmanları hizaya oturtan mini mıknatıslar içeren küp. Daha stabil his verir."],
+        ["Tensioning", "hardware", "Vida gerginliğini ayarlayarak küpün hızını ve stabilitesini dengeleme."],
+        ["Lube", "hardware", "Yağlama. Küpü yumuşatır (akışkan) ya da yavaşlatıp stabilize eder (kıvamlı)."],
+        ["Main", "hardware", "Bir sporcunun yarışmalarda kullandığı baş küp (ana küpü)."],
+        ["Akıllı küp", "hardware", "Bluetooth ile hamleleri uygulamaya gönderen küp (GAN, MoYu, QiYi…). Antrenörle takip edilir."]
+    ];
+    var $ = function (id) { return document.getElementById(id); };
+    function norm(s) { return String(s || "").toLocaleLowerCase("tr").replace(/[ıİ]/g, "i").replace(/ş/g, "s").replace(/ç/g, "c").replace(/ğ/g, "g").replace(/ö/g, "o").replace(/ü/g, "u"); }
+    function strip(h) { return h.replace(/<[^>]+>/g, ""); }
+    var cur = "all", q = "";
+    function renderCats() {
+        var html = '<button class="sz-cat on" data-c="all">Tümü</button>';
+        for (var k in CATS) html += '<button class="sz-cat" data-c="' + k + '">' + CATS[k] + '</button>';
+        $("szCats").innerHTML = html;
+        Array.prototype.forEach.call($("szCats").querySelectorAll(".sz-cat"), function (b) {
+            b.onclick = function () {
+                cur = b.getAttribute("data-c");
+                Array.prototype.forEach.call($("szCats").querySelectorAll(".sz-cat"), function (x) { x.classList.toggle("on", x === b); });
+                render();
+            };
+        });
+    }
+    function render() {
+        var nq = norm(q), out = TERMS.filter(function (t) {
+            if (cur !== "all" && t[1] !== cur) return false;
+            if (!nq) return true;
+            return norm(t[0]).indexOf(nq) >= 0 || norm(strip(t[2])).indexOf(nq) >= 0;
+        });
+        if (!out.length) { $("szList").innerHTML = '<p class="sz-empty">Sonuç bulunamadı.</p>'; $("szCount").textContent = ""; return; }
+        $("szList").innerHTML = out.map(function (t) {
+            return '<div class="sz-term"><h3>' + t[0] + ' <span class="tag">' + CATS[t[1]] + '</span></h3><p>' + t[2] + '</p></div>';
+        }).join("");
+        $("szCount").textContent = out.length + " terim";
+    }
+    $("szSearch").addEventListener("input", function () { q = this.value; render(); });
+    renderCats(); render();
+})();
+</script>
+</body>
+</html>

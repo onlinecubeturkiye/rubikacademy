@@ -9,6 +9,10 @@
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function fmt(ms) { if (!ms) return "—"; var s = ms / 1000; if (s < 60) return s.toFixed(2); var m = Math.floor(s / 60); return m + ":" + (s - m * 60).toFixed(2).padStart(5, "0"); }
   var root = $("profRoot");
+  var ACCENTS = [["", "Varsayılan"], ["#d12d28", "Kırmızı"], ["#ff7a1a", "Turuncu"], ["#f6c719", "Sarı"], ["#179e4f", "Yeşil"], ["#2c6fe6", "Mavi"], ["#8b5cf6", "Mor"], ["#ec4899", "Pembe"]];
+  var CUBES = ["", "3x3", "2x2", "4x4", "5x5", "6x6", "7x7", "Pyraminx", "Skewb", "Megaminx", "Square-1", "Clock", "FTO"];
+  function avaStyle(acc) { return acc ? ' style="border-color:' + acc + ';box-shadow:0 0 0 4px ' + acc + '33"' : ''; }
+  function favLine(fav) { return fav ? '<div class="p-meta">⭐ Favori küp: ' + esc(fav) + '</div>' : ''; }
   var SET_LABELS = { oll: "OLL", pll: "PLL", "2look-2lo": "2-Look OLL", "2look-2lp": "2-Look PLL", f2l: "F2L", coll: "COLL", wv: "WV", cll: "CLL", eg1: "EG-1", eg2: "EG-2", "ortega-oll": "Ortega OLL", "ortega-pbl": "Ortega PBL", "roux-cmll": "Roux CMLL" };
   function initials(n) { n = (n || "?").trim().split(/\s+/); return ((n[0] || "?")[0] + (n[1] ? n[1][0] : "")).toUpperCase(); }
   function avatar(photo, name) { return photo ? '<img src="' + esc(photo) + '" alt="" referrerpolicy="no-referrer">' : esc(initials(name)); }
@@ -51,10 +55,11 @@
 
   function renderShared(uid, data, isMe) {
     if (!data) { root.innerHTML = '<div class="box"><h1 style="font-size:24px;font-weight:900">Profil bulunamadı</h1><p class="p-note" style="margin-top:8px">Bu profil herkese açık değil ya da hiç giriş yapılmamış.</p></div>'; return; }
+    var acc = (data.stats && data.stats.accent) || "", fav = (data.stats && data.stats.fav) || "";
     root.innerHTML =
-      '<div class="box"><div class="p-head"><div class="p-ava">' + avatar(data.photo, data.name) + '</div>' +
+      '<div class="box"><div class="p-head"><div class="p-ava"' + avaStyle(acc) + '>' + avatar(data.photo, data.name) + '</div>' +
       '<div class="p-id"><h1>' + esc(data.name) + '</h1>' + (data.bio ? '<div class="p-bio">' + esc(data.bio) + '</div>' : '') +
-      (data.joined ? '<div class="p-meta">📅 ' + esc(dateStr(data.joined)) + '\'den beri üye</div>' : '') + '</div></div>' +
+      (data.joined ? '<div class="p-meta">📅 ' + esc(dateStr(data.joined)) + '\'den beri üye</div>' : '') + favLine(fav) + '</div></div>' +
       (isMe ? '<div class="p-actions"><button class="p-btn" id="pShare">🔗 Paylaşım linkini kopyala</button><a class="p-btn" href="/icerikler/profil">← Kendi panona dön</a></div><div class="p-msg" id="pMsg"></div>' : '') +
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistikler</h2>' + statTiles(data.stats) + '</div>' +
@@ -80,9 +85,9 @@
     if (window.Account.writeProfile) window.Account.writeProfile();
     var name = prof.name || (u && u.displayName) || (u && (u.email || "").split("@")[0]) || "Cuber";
     root.innerHTML =
-      '<div class="box"><div class="p-head"><div class="p-ava">' + avatar(u && u.photoURL, name) + '</div>' +
+      '<div class="box"><div class="p-head"><div class="p-ava"' + avaStyle(prof.accent) + '>' + avatar(u && u.photoURL, name) + '</div>' +
       '<div class="p-id"><h1>' + esc(name) + '</h1>' + (prof.bio ? '<div class="p-bio">' + esc(prof.bio) + '</div>' : '') +
-      '<div class="p-meta">' + esc((u && u.email) || "") + '</div></div></div>' +
+      '<div class="p-meta">' + esc((u && u.email) || "") + '</div>' + favLine(prof.fav) + '</div></div>' +
       '<div class="p-actions">' +
       '<button class="p-btn main" id="pShare">🔗 Profilimi paylaş</button>' +
       '<a class="p-btn" id="pView" href="/icerikler/profil?u=' + encodeURIComponent(u.uid) + '">👁 Herkese açık halini gör</a>' +
@@ -94,6 +99,9 @@
       '<div id="pEditBox" hidden><div class="p-edit">' +
       '<input id="pName" maxlength="24" placeholder="Görünen ad" value="' + esc(name) + '">' +
       '<textarea id="pBio" maxlength="160" placeholder="Kısa bio (opsiyonel)">' + esc(prof.bio || "") + '</textarea>' +
+      '<div class="p-fld"><label>Vurgu rengi</label><div class="p-accents" id="pAccents">' +
+      ACCENTS.map(function (a) { return '<button type="button" class="p-acc' + ((prof.accent || "") === a[0] ? ' on' : '') + '" data-acc="' + a[0] + '" title="' + a[1] + '" style="background:' + (a[0] || "var(--border)") + '"></button>'; }).join("") + '</div></div>' +
+      '<div class="p-fld"><label>Favori küp</label><select id="pFav">' + CUBES.map(function (c) { return '<option value="' + c + '"' + ((prof.fav || "") === c ? ' selected' : '') + '>' + (c || "— Yok —") + '</option>'; }).join("") + '</select></div>' +
       '<button class="p-btn main" id="pSave" style="justify-self:start">Kaydet</button></div></div>' +
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistiklerim</h2>' + statTiles(st) + '</div>' +
@@ -103,9 +111,13 @@
     showRole(u.uid);
     bindShare(u.uid);
     $("pEdit").onclick = function () { var e = $("pEditBox"); e.hidden = !e.hidden; };
+    var pickedAcc = prof.accent || "";
+    if ($("pAccents")) Array.prototype.forEach.call($("pAccents").querySelectorAll(".p-acc"), function (b) {
+      b.onclick = function () { pickedAcc = b.getAttribute("data-acc"); Array.prototype.forEach.call($("pAccents").querySelectorAll(".p-acc"), function (x) { x.classList.toggle("on", x === b); }); };
+    });
     $("pSave").onclick = function () {
       var nm = $("pName").value.trim().slice(0, 24) || name, bio = $("pBio").value.trim().slice(0, 160);
-      window.Account.setProfile({ name: nm, bio: bio });
+      window.Account.setProfile({ name: nm, bio: bio, accent: pickedAcc, fav: $("pFav").value });
       var m = $("pMsg"); if (m) { m.textContent = "Kaydedildi ✓"; setTimeout(function () { m.textContent = ""; }, 2500); }
       setTimeout(renderOwn, 300);
     };
