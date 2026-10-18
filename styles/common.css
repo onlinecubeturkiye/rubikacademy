@@ -1051,3 +1051,24 @@ html[dir="rtl"] .set-opt { text-align: right; }
 .set-opt.cvd { font-weight: 700; }
 .set-opt.cvd span { flex: 1; min-width: 0; }
 @media (max-width: 560px) { .ra-set-menu { width: min(250px, calc(100vw - 32px)); } }
+
+/* =========================================
+   HESAP MENÜSÜ (profil butonuna tıklayınca açılır)
+========================================= */
+.acc-wrap { position: relative; display: flex; align-items: center; }
+.acc-menu {
+    position: absolute; right: 0; top: calc(100% + 10px); width: 210px;
+    background: var(--surface, #fff); border: var(--card-bw, 2.5px) solid var(--card-border, #17171f);
+    border-radius: 16px; box-shadow: var(--shadow, 6px 6px 0 #17171f); padding: 8px; z-index: 1200; display: none;
+}
+.acc-wrap.open .acc-menu { display: block; }
+html[dir="rtl"] .acc-menu { right: auto; left: 0; }
+.acc-mi {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    padding: 10px 11px; border-radius: 11px; border: 0; background: transparent;
+    color: var(--text, #17171f); font: 700 14.5px Inter, sans-serif; cursor: pointer; text-decoration: none;
+}
+html[dir="rtl"] .acc-mi { text-align: right; }
+.acc-mi:hover { background: var(--surface-soft, #f3f4f6); }
+.acc-mi.danger { color: var(--cube-red, #d12d28); }
+.acc-mi.danger:hover { background: var(--tint-red, rgba(209,45,40,.12)); }
