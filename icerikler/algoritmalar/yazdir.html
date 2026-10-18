@@ -27,10 +27,10 @@
 <meta property="og:description" content="OLL, PLL ve CLL için tek sayfalık A4 algoritma kağıtları.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/yazdir">
-<meta property="og:image" content="https://rubikacademy.fun/og/yazdir.png?v=20261116">
+<meta property="og:image" content="https://rubikacademy.fun/og/yazdir.png?v=20261117">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/yazdir.png?v=20261116">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/yazdir.png?v=20261117">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,12 +38,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261116">
+<link rel="stylesheet" href="/styles/common.css?v=20261117">
 
 <style>
 .print-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin: 6px 0 14px; }
 .print-head h1 { font-size: 30px; font-weight: 900; color: var(--text); }
 .print-intro { color: var(--text-soft); font-size: 14px; max-width: 720px; margin-bottom: 16px; }
+.only-unknown { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 16px; padding: 10px 14px; border-radius: 12px; border: var(--card-bw, 2.5px) solid var(--card-border, #17171f); background: var(--surface); color: var(--text); font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: var(--shadow-sm); }
+.only-unknown input { width: 18px; height: 18px; cursor: pointer; }
+@media print { .only-unknown { display: none !important; } }
 .sheet-groups { display: grid; gap: 10px; margin-bottom: 20px; }
 .sheet-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .sheet-group-label { min-width: 84px; font-size: 13px; font-weight: 900; color: var(--text-soft); }
@@ -159,6 +162,8 @@
 </div>
 <p class="print-intro" data-i18n="intro">3x3, 2x2, Pyraminx ve Skewb algoritmalarının A4 çıktısı. "PDF indir" her sayfayı tam A4 PDF yapar. iPhone ve iPad'de PDF hazırlanır; açılan PDF'ten yazdırabilir ya da Dosyalar'a kaydedebilirsin.</p>
 
+<label class="only-unknown"><input type="checkbox" id="onlyUnknown"> <span data-i18n="only_unknown">Sadece bilmediğim case'ler (işaretlerime göre)</span></label>
+
 <div class="sheet-groups" id="sheetTabs"></div>
 
 <div class="sheet-scroll" id="sheetScroll">
@@ -179,13 +184,13 @@
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "yazdir";</script>
-<script src="/js/i18n.js?v=20261116"></script>
-<script src="/js/common.js?v=20261116"></script>
-<script src="/js/firebase-config.js?v=20261116"></script>
-<script src="/js/account.js?v=20261116"></script>
+<script src="/js/i18n.js?v=20261117"></script>
+<script src="/js/common.js?v=20261117"></script>
+<script src="/js/firebase-config.js?v=20261117"></script>
+<script src="/js/account.js?v=20261117"></script>
 
 
-<script src="/js/custom-algs.js?v=20261116"></script>
+<script src="/js/custom-algs.js?v=20261117"></script>
 
 <script>
 /* A4 algoritma kağıtları. Veriler algoritma sayfalarıyla aynı JSON'lardan gelir.
@@ -281,6 +286,15 @@ function render() {
     getData(cfg.file).then(function (data) {
         if (id !== curSet) return;
         var cases = cfg.cases(data);
+        // "Sadece bilmediklerim": işaretlerinde "known" olanları çıkar (ad ya da subset::ad eşleşmesi)
+        var ou = document.getElementById("onlyUnknown");
+        if (ou && ou.checked) {
+            var prog = {}; try { prog = JSON.parse(localStorage.getItem("algo-progress-" + curSet) || "{}"); } catch (e) {}
+            cases = cases.filter(function (x) {
+                var k2 = x.subset ? (x.subset + "::" + x.c.name) : null;
+                return prog[x.c.name] !== "known" && (!k2 || prog[k2] !== "known");
+            });
+        }
         var per = cfg.cols * cfg.rows, pages = Math.ceil(cases.length / per);
         var head = cfg.title + " · " + (pageText("yazdir", "cases") || "{n} case").replace("{n}", cases.length);
         var sub = cfg.poly ? "" : (pageText("yazdir", "sheet_sub") || "");
@@ -344,7 +358,7 @@ function loadScript(src) {
 }
 var pdfLibs = null;
 function loadPdfLibs() {
-    if (!pdfLibs) pdfLibs = Promise.all([loadScript("/js/vendor/pdf/html2canvas.min.js?v=20261116"), loadScript("/js/vendor/pdf/jspdf.umd.min.js?v=20261116")])
+    if (!pdfLibs) pdfLibs = Promise.all([loadScript("/js/vendor/pdf/html2canvas.min.js?v=20261117"), loadScript("/js/vendor/pdf/jspdf.umd.min.js?v=20261117")])
         .catch(function (e) { pdfLibs = null; throw e; });
     return pdfLibs;
 }
@@ -403,6 +417,15 @@ document.getElementById("sheetTabs").addEventListener("click", function (e) {
     if (b) selectSet(b.getAttribute("data-set"));
 });
 function onLanguageApplied() { if (curSet) render(); }
+
+(function () {
+    var ou = document.getElementById("onlyUnknown");
+    try { ou.checked = localStorage.getItem("yazdir-only-unknown") === "1"; } catch (e) {}
+    ou.addEventListener("change", function () {
+        try { localStorage.setItem("yazdir-only-unknown", ou.checked ? "1" : "0"); } catch (e) {}
+        if (curSet) render();
+    });
+})();
 
 selectSet(new URLSearchParams(location.search).get("set") || "oll");
 </script>

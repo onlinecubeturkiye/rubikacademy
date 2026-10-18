@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261116";
+    var V = "20261117";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -490,13 +490,17 @@
         var prof = localProfile();
         if (!prof.joined) { prof.joined = Date.now(); lsSet(PROF_KEY, JSON.stringify(prof)); }
         var name = (prof.name || user.displayName || (user.email || "?").split("@")[0] || "Cuber").slice(0, 24);
+        var st = computeStats();
+        // Profil özelleştirme (renk vurgusu + favori küp) stats içine gömülür — kural değişikliği gerektirmez
+        if (prof.accent) st.accent = String(prof.accent).slice(0, 12);
+        if (prof.fav) st.fav = String(prof.fav).slice(0, 24);
         var fields = {
             name: { stringValue: name },
             photo: { stringValue: String(user.photoURL || "").slice(0, 400) },
             bio: { stringValue: String(prof.bio || "").slice(0, 160) },
             joined: { integerValue: String(prof.joined) },
             seen: { integerValue: String(Date.now()) },
-            stats: { stringValue: JSON.stringify(computeStats()).slice(0, 8000) }
+            stats: { stringValue: JSON.stringify(st).slice(0, 8000) }
         };
         var mask = "?updateMask.fieldPaths=name&updateMask.fieldPaths=photo&updateMask.fieldPaths=bio&updateMask.fieldPaths=joined&updateMask.fieldPaths=seen&updateMask.fieldPaths=stats";
         return api("/users/" + user.uid + mask, { method: "PATCH", body: JSON.stringify({ fields: fields }) }).catch(function () {});
