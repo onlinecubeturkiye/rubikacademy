@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261114";
+    var V = "20261115";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -110,13 +110,11 @@
     var navBtn = null, navWrap = null, navMenu = null;
     function accMenuHtml() {
         return '<a class="acc-mi" href="/icerikler/profil">👤 ' + esc(mt("profile")) + '</a>' +
-            '<button type="button" class="acc-mi" data-act="settings">⚙️ ' + esc(mt("settings")) + '</button>' +
+            '<a class="acc-mi" href="/ayarlar">⚙️ ' + esc(mt("settings")) + '</a>' +
             '<a class="acc-mi" href="/icerikler/sss">❓ ' + esc(mt("help")) + '</a>' +
             '<button type="button" class="acc-mi danger" data-act="logout">🚪 ' + esc(mt("logout")) + '</button>';
     }
     function bindAccMenu() {
-        var s = navMenu.querySelector('[data-act="settings"]');
-        if (s) s.onclick = function () { navWrap.classList.remove("open"); var b = document.getElementById("raSetBtn"); if (b) b.click(); };
         var o = navMenu.querySelector('[data-act="logout"]');
         if (o) o.onclick = function () { navWrap.classList.remove("open"); signOut(); };
     }
