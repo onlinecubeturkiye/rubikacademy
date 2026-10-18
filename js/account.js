@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261118";
+    var V = "20261119";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -503,7 +503,7 @@
         if (prof.fav) st.fav = String(prof.fav).slice(0, 24);
         var fields = {
             name: { stringValue: name },
-            photo: { stringValue: String(user.photoURL || "").slice(0, 400) },
+            photo: { stringValue: String(prof.photo || user.photoURL || "").slice(0, 40000) },
             bio: { stringValue: String(prof.bio || "").slice(0, 160) },
             joined: { integerValue: String(prof.joined) },
             seen: { integerValue: String(Date.now()) },
