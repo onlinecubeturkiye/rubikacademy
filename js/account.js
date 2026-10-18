@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261113";
+    var V = "20261114";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -97,22 +97,46 @@
         return sdkP;
     }
 
-    /* ---------- navbar butonu ---------- */
-    var navBtn = null;
+    /* ---------- navbar butonu + hesap menüsü ---------- */
+    var MENU_TXT = {
+        tr: { profile: "Profilim", settings: "Ayarlar", help: "Yardım", logout: "Çıkış yap" },
+        en: { profile: "My profile", settings: "Settings", help: "Help", logout: "Sign out" },
+        fr: { profile: "Mon profil", settings: "Paramètres", help: "Aide", logout: "Déconnexion" },
+        ru: { profile: "Мой профиль", settings: "Настройки", help: "Помощь", logout: "Выйти" },
+        de: { profile: "Mein Profil", settings: "Einstellungen", help: "Hilfe", logout: "Abmelden" },
+        ar: { profile: "ملفي", settings: "الإعدادات", help: "مساعدة", logout: "تسجيل الخروج" }
+    };
+    function mt(k) { return (MENU_TXT[lang()] || MENU_TXT.tr)[k] || MENU_TXT.tr[k]; }
+    var navBtn = null, navWrap = null, navMenu = null;
+    function accMenuHtml() {
+        return '<a class="acc-mi" href="/icerikler/profil">👤 ' + esc(mt("profile")) + '</a>' +
+            '<button type="button" class="acc-mi" data-act="settings">⚙️ ' + esc(mt("settings")) + '</button>' +
+            '<a class="acc-mi" href="/icerikler/sss">❓ ' + esc(mt("help")) + '</a>' +
+            '<button type="button" class="acc-mi danger" data-act="logout">🚪 ' + esc(mt("logout")) + '</button>';
+    }
+    function bindAccMenu() {
+        var s = navMenu.querySelector('[data-act="settings"]');
+        if (s) s.onclick = function () { navWrap.classList.remove("open"); var b = document.getElementById("raSetBtn"); if (b) b.click(); };
+        var o = navMenu.querySelector('[data-act="logout"]');
+        if (o) o.onclick = function () { navWrap.classList.remove("open"); signOut(); };
+    }
     function renderNav() {
         if (!enabled) return;
         var right = document.querySelector(".nav-right");
         if (!right) return;
-        if (!navBtn) {
-            navBtn = document.createElement("a");
-            navBtn.className = "acc-btn";
-            navBtn.id = "accBtn";
-            var lang = document.getElementById("langSwitcher");
-            right.insertBefore(navBtn, lang || right.firstChild);
+        if (!navWrap) {
+            navWrap = document.createElement("div"); navWrap.className = "acc-wrap"; navWrap.id = "accWrap";
+            navBtn = document.createElement("a"); navBtn.className = "acc-btn"; navBtn.id = "accBtn";
+            navMenu = document.createElement("div"); navMenu.className = "acc-menu"; navMenu.id = "accMenu"; navMenu.setAttribute("role", "menu");
+            navWrap.appendChild(navBtn); navWrap.appendChild(navMenu);
+            var lang0 = document.getElementById("langSwitcher");
+            right.insertBefore(navWrap, lang0 || right.firstChild);
             navBtn.addEventListener("click", function (e) {
-                // Yalnızca gerçekten çıkışsa giriş penceresi aç; oturum yüklenirken profile git
-                if (!user && lsGet(SIGNED_KEY) !== "1") { e.preventDefault(); openLogin(); }
+                e.preventDefault();
+                if (user || lsGet(SIGNED_KEY) === "1") navWrap.classList.toggle("open");
+                else openLogin();
             });
+            document.addEventListener("click", function (e) { if (navWrap && !navWrap.contains(e.target)) navWrap.classList.remove("open"); });
         }
         // Daha önce giriş yapılmışsa, oturum geri yüklenene kadar "giriş yap" GÖSTERME (flicker önlenir)
         var restoring = !user && lsGet(SIGNED_KEY) === "1";
@@ -126,12 +150,14 @@
             navBtn.innerHTML = (user && user.photoURL)
                 ? '<img src="' + esc(user.photoURL) + '" alt="" referrerpolicy="no-referrer">'
                 : '<span class="acc-ini">' + esc((nm.charAt(0) || "·").toUpperCase()) + '</span>';
+            navMenu.innerHTML = accMenuHtml(); bindAccMenu();
         } else {
-            navBtn.href = "#";
+            navBtn.href = LOGIN_URL;
             navBtn.classList.remove("in");
             navBtn.title = t("login_t");
             navBtn.setAttribute("aria-label", t("login_t"));
             navBtn.innerHTML = '<span class="acc-ico" aria-hidden="true">👤</span><span class="acc-txt">' + esc(t("login")) + '</span>';
+            navWrap.classList.remove("open"); navMenu.innerHTML = "";
         }
     }
 
@@ -198,16 +224,36 @@
     }
     function setErr(m, ok) { var e = modal.querySelector(".acc-err"); e.textContent = m || ""; e.classList.toggle("ok", !!ok); }
     function busy(b) { Array.prototype.forEach.call(modal.querySelectorAll("button, input"), function (x) { if (!x.hasAttribute("data-x")) x.disabled = b; }); }
+    var LOGIN_URL = "/giris";
+    // Giriş artık ayrı sayfada (panel değil): mevcut sayfaya dönebilmek için ?return eklenir
     function openLogin(which) {
         if (!enabled) return;
-        if (!modal) buildModal();
-        tab = which || "login";
-        renderModal(); setErr("");
-        modal.classList.add("open");
-        loadSDK().catch(function () { setErr(t("e_load")); });
-        setTimeout(function () { var i = modal.querySelector("[name=email]"); if (i && window.innerWidth > 700) i.focus(); }, 60);
+        if (user) return;
+        var here = location.pathname + location.search;
+        if (location.pathname.replace(/\.html$/, "") === LOGIN_URL) return;
+        var ret = /\/giris/.test(here) ? "" : "?return=" + encodeURIComponent(here) + (which === "signup" ? "&mod=signup" : "");
+        location.href = LOGIN_URL + ret;
     }
     function closeModal() { if (modal) modal.classList.remove("open"); }
+    /* ---------- giriş sayfası (giris.html) için genel API ---------- */
+    function doGoogle() {
+        return loadSDK().then(function (m) {
+            var p = new m.GoogleAuthProvider(); p.setCustomParameters({ prompt: "select_account" });
+            return m.signInWithPopup(auth, p).catch(function (err) {
+                if (err && /popup-blocked|operation-not-supported/.test(err.code || "")) return m.signInWithRedirect(auth, p);
+                throw err;
+            });
+        });
+    }
+    function doEmail(mode, email, pass, name) {
+        return loadSDK().then(function (m) {
+            if (mode === "signup") return m.createUserWithEmailAndPassword(auth, email, pass).then(function (cred) {
+                return m.updateProfile(cred.user, { displayName: name }).then(function () { user = auth.currentUser; renderNav(); });
+            });
+            return m.signInWithEmailAndPassword(auth, email, pass);
+        });
+    }
+    function doReset(email) { return loadSDK().then(function (m) { return m.sendPasswordResetEmail(auth, email); }); }
     function google() {
         setErr(""); busy(true);
         loadSDK().then(function (m) {
@@ -509,6 +555,11 @@
         token: token,
         onChange: function (f) { listeners.push(f); if (sdkP) f(user); },
         openLogin: openLogin,
+        googleSignIn: doGoogle,
+        emailAuth: doEmail,
+        resetPassword: doReset,
+        errText: function (err) { return errMsg(err); },
+        txt: function (k) { return t(k); },
         signOut: signOut,
         setName: setName,
         deleteAccount: deleteAccount,
