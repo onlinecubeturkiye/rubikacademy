@@ -34,10 +34,7 @@
                     try { st = JSON.parse(gv(f, "stats") || "{}"); } catch (e) {}
                     return { uid: uid, name: gv(f, "name") || "?", photo: gv(f, "photo") || "", bio: gv(f, "bio") || "", joined: +gv(f, "joined") || 0, seen: +gv(f, "seen") || 0, stats: st, meta: null };
                 }).sort(function (a, b) { return (b.seen || 0) - (a.seen || 0); });
-                // Her üyenin özel bilgisini (e-posta, tema, işaretler) + ziyaretlerini paralel çek
-                return Promise.all(users.map(function (u) {
-                    return Promise.all([fetchMeta(u.uid), listVisits(u.uid, 100)]).then(function (res) { u.meta = res[0]; u.visits = res[1] || []; return u; });
-                }));
+                return users;   // hafif liste; ayrıntı (meta + ziyaret) seçince çekilir
             });
     }
     function fetchMeta(uid) {
@@ -108,43 +105,55 @@
         if (!vs || !vs.length) return '<p class="a-note">Kayıtlı ziyaret yok.</p>';
         return vs.map(function (v) { return '<div class="v-row"><span class="vp">' + esc(v.p) + '</span><span>' + esc(dateFmt(v.ts)) + '</span></div>'; }).join("");
     }
-    function userCard(u) {
-        var st = u.stats || {}, sets = st.sets || {}, setIds = Object.keys(sets), me = u.meta || {};
+    function avatarMini(u) {
         var ini = (u.name || "?").trim().charAt(0).toUpperCase() || "?";
-        var ava = u.photo ? '<img src="' + esc(u.photo) + '" alt="" referrerpolicy="no-referrer">' : esc(ini);
+        return u.photo ? '<img src="' + esc(u.photo) + '" alt="" referrerpolicy="no-referrer">' : esc(ini);
+    }
+    // Seçilen kullanıcının tüm verisi
+    function userDetailHtml(u, me, visits) {
+        var st = u.stats || {}, sets = st.sets || {}, setIds = Object.keys(sets);
         var pills = setIds.slice(0, 16).map(function (id) { var s = sets[id]; return '<span class="pill">' + esc(SET_LBL[id] || id) + ": " + (s.k || 0) + (s.t ? "/" + s.t : "") + "</span>"; }).join("");
         var acct = '<h4>Hesap bilgileri</h4><div class="a-note">' +
             'E-posta: <b style="font-family:\'JetBrains Mono\',monospace">' + esc(me.email || "—") + '</b><br>' +
             'Kullanıcı ID: <span style="font-family:\'JetBrains Mono\',monospace">' + esc(u.uid) + '</span><br>' +
             'Giriş türü: ' + esc(provLabel(me.provider)) + '<br>' +
             'Tema: ' + (me.theme === "dark" ? "🌙 Karanlık mod" : "☀️ Açık") + (me.cvd ? ' · Renk körlüğü: ' + esc(me.cvd) : '') + '<br>' +
-            'Dil: ' + esc((me.lang || "—").toUpperCase()) + ' · Üyelik: ' + esc(dateFmt(u.joined)) + '</div>';
-        return '<div class="u-card open" data-uid="' + esc(u.uid) + '">' +
-            '<div class="u-top"><div class="u-ava">' + ava + '</div>' +
+            'Dil: ' + esc((me.lang || "—").toUpperCase()) + ' · Üyelik: ' + esc(dateFmt(u.joined)) + ' · Son görülme: ' + esc(dateFmt(u.seen)) + '</div>';
+        return '<div class="u-top"><div class="u-ava">' + avatarMini(u) + '</div>' +
             '<div class="u-id"><b>' + esc(u.name) + '</b><small>' + esc(me.email || u.uid) + '</small>' +
-            '<div class="u-stat">Bilinen ' + (st.known || 0) + ' · Öğrenilen ' + (st.learning || 0) + ' · Trainer ' + (st.solves || 0) + ' · Günlük en iyi ' + fmt(st.best) + ' · Son görülme ' + dateFmt(u.seen) + '</div></div>' +
-            '<button class="a-btn sm" data-expand>Gizle</button></div>' +
-            '<div class="u-detail">' + acct + (u.bio ? '<h4>Bio</h4><p class="a-note">“' + esc(u.bio) + '”</p>' : '') +
+            '<div class="u-stat">Bilinen ' + (st.known || 0) + ' · Öğrenilen ' + (st.learning || 0) + ' · Trainer ' + (st.solves || 0) + ' · Günlük en iyi ' + fmt(st.best) + '</div></div></div>' +
+            acct + (u.bio ? '<h4>Bio</h4><p class="a-note">“' + esc(u.bio) + '”</p>' : '') +
             (pills ? '<h4>İlerleme özeti</h4><div>' + pills + '</div>' : '') +
             '<h4>İşaretlediği case\'ler</h4><div>' + marksHtml(me.marks) + '</div>' +
-            '<h4>Son sayfa ziyaretleri (' + (u.visits ? u.visits.length : 0) + ')</h4><div class="v-list">' + visitsHtml(u.visits) + '</div></div></div>';
+            '<h4>Son sayfa ziyaretleri (' + (visits ? visits.length : 0) + ')</h4><div class="v-list">' + visitsHtml(visits) + '</div>';
     }
-    function bindUserCards(container) {
-        Array.prototype.forEach.call(container.querySelectorAll(".u-card"), function (card) {
-            var btn = card.querySelector("[data-expand]");
-            btn.addEventListener("click", function () {
-                var open = card.classList.toggle("open");
-                btn.textContent = open ? "Gizle" : "Detay";
-            });
-        });
+    function selectUser(u, detailBox, pickBtn, picker) {
+        Array.prototype.forEach.call(picker.querySelectorAll(".u-pick"), function (b) { b.classList.remove("on"); });
+        if (pickBtn) pickBtn.classList.add("on");
+        detailBox.innerHTML = '<div class="u-card open"><p class="a-note">Yükleniyor…</p></div>';
+        Promise.all([fetchMeta(u.uid), listVisits(u.uid, 200)]).then(function (res) {
+            detailBox.innerHTML = '<div class="u-card open">' + userDetailHtml(u, res[0] || {}, res[1] || []) + '</div>';
+        }, function () { detailBox.innerHTML = '<div class="u-card open"><p class="a-note">Kullanıcı verisi yüklenemedi.</p></div>'; });
     }
     function renderUsers() {
         var box = $id("aUsersList"); box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
         listUsers().then(function (users) {
             $id("aUsersCount").textContent = users.length + " kullanıcı";
-            box.innerHTML = users.length ? users.map(userCard).join("") : '<p class="a-note">Kullanıcı yok.</p>';
-            bindUserCards(box);
-        }, function (e) { box.innerHTML = '<p class="a-note">Kullanıcılar yüklenemedi (' + esc(e && e.message) + ').</p>'; });
+            if (!users.length) { box.innerHTML = '<p class="a-note">Henüz kayıtlı kullanıcı yok.</p>'; return; }
+            box.innerHTML = '<div class="u-split"><div class="u-picker" id="uPicker"></div><div class="u-detailwrap" id="uDetail"><p class="a-note">Soldan bir kullanıcı seç; tüm verisi burada görünür.</p></div></div>';
+            var picker = $id("uPicker"), detailBox = $id("uDetail");
+            picker.innerHTML = users.map(function (u, i) {
+                return '<button type="button" class="u-pick" data-i="' + i + '"><span class="u-ava sm">' + avatarMini(u) + '</span>' +
+                    '<span class="u-pick-id"><b>' + esc(u.name) + '</b><small>' + esc(dateFmt(u.seen)) + '</small></span></button>';
+            }).join("");
+            Array.prototype.forEach.call(picker.querySelectorAll(".u-pick"), function (btn) {
+                btn.addEventListener("click", function () { selectUser(users[+btn.getAttribute("data-i")], detailBox, btn, picker); });
+            });
+        }, function (e) {
+            var code = e && e.message;
+            var hint = (code === "403" || code === 403) ? ' — Firestore kurallarını Firebase Console’dan yayımladığından ve bu hesabın yönetici (pikapikachuyt0@gmail.com, Google) olduğundan emin ol.' : '';
+            box.innerHTML = '<p class="a-note">Kullanıcılar yüklenemedi (' + esc(code) + ')' + hint + '</p>';
+        });
     }
 
     /* ---------- kabuk ---------- */
