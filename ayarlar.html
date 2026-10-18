@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"");if((localStorage.getItem("theme")||"dark")==="dark")document.documentElement.classList.add("dark-mode");}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>window.RA_ACCOUNT_EAGER = true;</script>
 <title>Rubik Academy - Ayarlar</title>
 <link rel="icon" href="/icons/favicon-48.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
@@ -14,16 +15,27 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20261115">
+<link rel="stylesheet" href="/styles/common.css?v=20261116">
 <style>
-.set-wrap { max-width: 520px; margin: 0 auto; }
-.set-card { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 18px 18px 10px; }
-.set-card h1 { font-size: 26px; font-weight: 900; color: var(--text); letter-spacing: -.5px; padding: 6px 6px 14px; }
-/* ayarlar menüsü (common.js raRenderSettings) burada daha büyük görünür */
-#setRoot .set-grp { padding: 10px 4px; }
-#setRoot .set-grp + .set-grp { border-top: 1px solid var(--border); margin-top: 6px; }
+.set-wrap { max-width: 540px; margin: 0 auto; }
+.set-card { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 16px 16px 10px; margin-bottom: 18px; }
+.set-card > h2 { font-size: 15px; font-weight: 850; color: var(--text-soft); text-transform: uppercase; letter-spacing: .04em; padding: 4px 6px 10px; }
+.set-h1 { font-size: 30px; font-weight: 900; color: var(--text); letter-spacing: -.8px; margin: 2px 0 16px; padding: 0 2px; }
+#setRoot .set-grp { padding: 8px 4px; }
+#setRoot .set-grp + .set-grp { border-top: 1px solid var(--border); margin-top: 4px; }
 #setRoot .set-opt { padding: 12px 12px; font-size: 15.5px; border-radius: 12px; }
 #setRoot .set-h { font-size: 12px; margin: 2px 8px 8px; }
+.srow { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 13px 12px; border-radius: 12px; border: 0; background: transparent; color: var(--text); font: 700 15px Inter, sans-serif; cursor: pointer; text-decoration: none; }
+.srow:hover { background: var(--surface-soft); }
+.srow .ico { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.srow .go { margin-left: auto; color: var(--text-soft); }
+html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-left: 0; margin-right: auto; }
+.srow.danger { color: var(--cube-red); }
+.srow + .srow { border-top: 1px solid var(--border); }
+.set-msg { font-size: 13px; font-weight: 700; min-height: 16px; padding: 2px 12px; color: var(--cube-green); }
+.set-msg.bad { color: var(--cube-red); }
+.about { color: var(--text-soft); font-size: 13px; padding: 6px 12px 10px; line-height: 1.7; }
+.about b { color: var(--text); }
 </style>
 </head>
 <body>
@@ -37,24 +49,93 @@
 <div class="page">
 <div class="set-wrap">
 <nav class="nav-bar"><a href="/" class="back-btn" data-i18n="back_btn">← Geri Dön</a></nav>
-<div class="set-card">
-    <h1 id="setH">Ayarlar</h1>
-    <div id="setRoot"></div>
+<h1 class="set-h1" id="setH">Ayarlar</h1>
+
+<div class="set-card"><h2 id="hAppear">Görünüm</h2><div id="setRoot"></div></div>
+
+<div class="set-card"><h2 id="hAccount">Hesap</h2><div id="acctRoot"></div><div class="set-msg" id="acctMsg"></div></div>
+
+<div class="set-card"><h2 id="hShortcuts">Kısayollar</h2>
+    <a class="srow" href="/icerikler/gunluk"><span class="ico">📅</span><span>Günün karıştırması</span><span class="go">→</span></a>
+    <a class="srow" href="/icerikler/kocluklar"><span class="ico">🎓</span><span>Koçluklar</span><span class="go">→</span></a>
+    <a class="srow" href="/icerikler/sss"><span class="ico">❓</span><span>Yardım (SSS)</span><span class="go">→</span></a>
+    <a class="srow" href="/gizlilik"><span class="ico">🔒</span><span>Gizlilik</span><span class="go">→</span></a>
+</div>
+
+<div class="set-card"><h2 id="hData">Veriler</h2>
+    <button type="button" class="srow" id="btnInstall" hidden><span class="ico">📲</span><span>Uygulama olarak yükle</span><span class="go">→</span></button>
+    <button type="button" class="srow danger" id="btnReset"><span class="ico">🗑️</span><span>Bu cihazdaki ilerlemeyi sıfırla</span></button>
+    <div class="set-msg" id="dataMsg"></div>
+</div>
+
+<div class="set-card"><h2 id="hAbout">Hakkında</h2>
+    <div class="about">Rubik Academy · Sürüm <b id="verTxt">20261116</b><br>Türkiye'nin kapsamlı küp öğrenme platformu.</div>
 </div>
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20261115"></script>
-<script src="/js/common.js?v=20261115"></script>
+<script src="/js/i18n.js?v=20261116"></script>
+<script src="/js/common.js?v=20261116"></script>
+<script src="/js/firebase-config.js?v=20261116"></script>
+<script src="/js/account.js?v=20261116"></script>
 <script>
 (function () {
-    function start() {
-        var L = (window.SETTINGS_TXT && (SETTINGS_TXT[localStorage.getItem("site-lang") || "tr"] || SETTINGS_TXT.tr)) || null;
-        if (L) document.getElementById("setH").textContent = L.set;
-        if (window.raRenderSettings) window.raRenderSettings(document.getElementById("setRoot"));
+    function $(id) { return document.getElementById(id); }
+    function L() { return (window.SETTINGS_TXT && (SETTINGS_TXT[localStorage.getItem("site-lang") || "tr"] || SETTINGS_TXT.tr)) || {}; }
+    function renderAppearance() {
+        var l = L(); if (l.set) $("setH").textContent = l.set;
+        if (window.raRenderSettings) window.raRenderSettings($("setRoot"));
     }
+    function renderAccount() {
+        var A = window.Account, box = $("acctRoot");
+        if (!A || !A.enabled()) { box.innerHTML = '<p class="about">Hesap sistemi kullanılamıyor.</p>'; return; }
+        var u = A.user(), signedIn = !!u || (A.isPending && A.isPending());
+        if (signedIn) {
+            var email = (u && u.email) || "";
+            box.innerHTML =
+                (email ? '<p class="about">Giriş: <b>' + email.replace(/</g, "&lt;") + '</b></p>' : '') +
+                '<a class="srow" href="/icerikler/profil"><span class="ico">👤</span><span>Profilim</span><span class="go">→</span></a>' +
+                '<button type="button" class="srow" id="aOut"><span class="ico">🚪</span><span>Çıkış yap</span></button>' +
+                '<button type="button" class="srow danger" id="aDel"><span class="ico">⚠️</span><span>Hesabımı sil</span></button>';
+            var out = $("aOut"); if (out) out.onclick = function () { A.signOut(); };
+            var del = $("aDel"); if (del) del.onclick = function () {
+                if (!confirm("Hesabın, buluttaki ilerlemen ve sıralamadaki girdilerin KALICI olarak silinsin mi? Bu geri alınamaz.")) return;
+                msg($("acctMsg"), "Siliniyor…"); A.deleteAccount().then(function () { msg($("acctMsg"), "Hesap silindi.", 0); location.href = "/"; }, function () { msg($("acctMsg"), "Silinemedi. Tekrar giriş yapıp dene.", 1); });
+            };
+        } else {
+            box.innerHTML = '<a class="srow" href="/giris"><span class="ico">👤</span><span>Giriş yap / Kayıt ol</span><span class="go">→</span></a>' +
+                '<p class="about">Giriş yaparsan ilerlemen tüm cihazlarında görünür ve paylaşılabilir profilin olur.</p>';
+        }
+    }
+    function msg(el, text, bad) { if (!el) return; el.textContent = text || ""; el.className = "set-msg" + (bad ? " bad" : ""); }
+
+    // İlerlemeyi sıfırla (bu cihaz)
+    $("btnReset").onclick = function () {
+        if (!confirm("Bu cihazdaki tüm işaretler, antrenör istatistikleri ve günlük sonuçların silinsin mi?")) return;
+        try {
+            var del = [];
+            for (var i = 0; i < localStorage.length; i++) {
+                var k = localStorage.key(i);
+                if (/^algo-progress-|^algo-set-|^recog-|^trainer-|^roadmap-|^daily-results-v1|^daily-sent-v1|^custom-algs-v1/.test(k)) del.push(k);
+            }
+            del.forEach(function (k) { localStorage.removeItem(k); });
+            msg($("dataMsg"), "İlerleme sıfırlandı (" + del.length + " kayıt).");
+        } catch (e) { msg($("dataMsg"), "Sıfırlanamadı.", 1); }
+    };
+
+    // Uygulama olarak yükle (PWA)
+    var deferredPrompt = null;
+    window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; $("btnInstall").hidden = false; });
+    $("btnInstall").onclick = function () {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function () { deferredPrompt = null; $("btnInstall").hidden = true; });
+    };
+
+    function start() { renderAppearance(); renderAccount(); }
     if (document.readyState !== "loading") start(); else document.addEventListener("DOMContentLoaded", start);
-    document.addEventListener("site-lang-change", start);
+    document.addEventListener("site-lang-change", renderAppearance);
+    if (window.Account && window.Account.onChange) window.Account.onChange(function () { renderAccount(); });
 })();
 </script>
 </body>

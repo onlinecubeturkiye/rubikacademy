@@ -24,9 +24,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20261115">
+<link rel="stylesheet" href="/styles/common.css?v=20261116">
 <style>
 .wrap { max-width: 1040px; margin: 0 auto; }
+body { overflow-x: hidden; }
+.box, .u-card, .u-detailwrap, .sec-body { max-width: 100%; overflow-x: hidden; }
 .box { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 20px 22px; margin-bottom: 20px; }
 .box h2 { font-size: 20px; font-weight: 850; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .a-h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 900; letter-spacing: -1px; color: var(--text); margin-bottom: 4px; }
@@ -50,8 +52,10 @@
 .u-ava { width: 40px; height: 40px; border-radius: 12px; border: 1.5px solid var(--ink); background: var(--tint-blue); display: grid; place-items: center; font: 900 16px Inter; color: var(--text); overflow: hidden; flex-shrink: 0; }
 .u-ava img { width: 100%; height: 100%; object-fit: cover; }
 .u-id { flex: 1; min-width: 160px; }
-.u-id b { color: var(--text); font-size: 15px; display: block; }
-.u-id small { color: var(--text-soft); font-size: 12px; font-family: "JetBrains Mono", monospace; }
+.u-id { min-width: 0; }
+.u-id b { color: var(--text); font-size: 15px; display: block; overflow-wrap: anywhere; }
+.u-id small { color: var(--text-soft); font-size: 12px; font-family: "JetBrains Mono", monospace; display: block; overflow-wrap: anywhere; word-break: break-all; }
+.u-stat { overflow-wrap: anywhere; }
 .u-stat { font-size: 12.5px; color: var(--text-soft); margin-top: 2px; }
 .u-detail { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; display: none; }
 .u-card.open .u-detail { display: block; }
@@ -77,11 +81,11 @@
 .pill.k { background: var(--tint-green); }
 .pill.l { background: var(--tint-yellow, rgba(255,210,31,.3)); }
 .pill-wrap { display: flex; flex-wrap: wrap; gap: 2px; }
-.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 6px 16px; margin-top: 4px; }
-.ir { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
-.ir > span { color: var(--text-soft); font-weight: 700; }
-.ir > b { color: var(--text); text-align: right; overflow: hidden; text-overflow: ellipsis; }
-.mono { font-family: "JetBrains Mono", monospace; } .mono.small { font-size: 11px; }
+.info-grid { display: grid; grid-template-columns: 1fr; gap: 2px; margin-top: 4px; }
+.ir { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 13px; min-width: 0; }
+.ir > span { color: var(--text-soft); font-weight: 700; flex-shrink: 0; }
+.ir > b { color: var(--text); text-align: right; min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+.mono { font-family: "JetBrains Mono", monospace; overflow-wrap: anywhere; } .mono.small { font-size: 11px; word-break: break-all; }
 details.sec { border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px; margin-top: 10px; background: var(--surface); }
 details.sec > summary, details.m-set > summary { cursor: pointer; font-size: 14px; }
 details.sec[open] > summary { margin-bottom: 8px; }
@@ -111,11 +115,11 @@ details.m-set > summary { font-size: 12.5px; }
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20261115"></script>
-<script src="/js/common.js?v=20261115"></script>
-<script src="/js/firebase-config.js?v=20261115"></script>
-<script src="/js/account.js?v=20261115"></script>
-<script src="/js/leaderboard.js?v=20261115"></script>
-<script src="/js/admin.js?v=20261115"></script>
+<script src="/js/i18n.js?v=20261116"></script>
+<script src="/js/common.js?v=20261116"></script>
+<script src="/js/firebase-config.js?v=20261116"></script>
+<script src="/js/account.js?v=20261116"></script>
+<script src="/js/leaderboard.js?v=20261116"></script>
+<script src="/js/admin.js?v=20261116"></script>
 </body>
 </html>

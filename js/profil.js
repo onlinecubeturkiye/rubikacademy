@@ -31,6 +31,14 @@
     var rows = [["Bilinen case", st.known || 0], ["Öğrenilen", st.learning || 0], ["Trainer çözüm", st.solves || 0], ["Günlük en iyi", fmt(st.best)], ["Günlük gün", st.daily || 0]];
     return '<div class="stat-tiles">' + rows.map(function (r) { return '<div class="stat-tile"><b>' + esc(r[1]) + "</b><span>" + r[0] + "</span></div>"; }).join("") + "</div>";
   }
+  function dailyGrid(st) {
+    var dl = (st && st.dlist) || [];
+    if (!dl.length) return '<p class="p-note">Henüz günlük çözüm yok.</p>';
+    return '<div class="p-daily">' + dl.map(function (r) {
+      var lbl = r.pen === "dnf" ? "DNF" : (fmt(r.t + (r.pen === "+2" ? 2000 : 0)) + (r.pen === "+2" ? "+" : ""));
+      return '<div class="p-drow"><span>' + esc(r.d) + '</span><b dir="ltr">' + esc(lbl) + '</b></div>';
+    }).join("") + "</div>";
+  }
   function setsGrid(st) {
     var sets = (st && st.sets) || {}, ids = Object.keys(sets);
     if (!ids.length) return '<p class="p-note">Henüz işaretlenmiş case yok.</p>';
@@ -50,7 +58,8 @@
       (isMe ? '<div class="p-actions"><button class="p-btn" id="pShare">🔗 Paylaşım linkini kopyala</button><a class="p-btn" href="/icerikler/profil">← Kendi panona dön</a></div><div class="p-msg" id="pMsg"></div>' : '') +
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistikler</h2>' + statTiles(data.stats) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerleme</h2>' + setsGrid(data.stats) + '</div>';
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerleme</h2>' + setsGrid(data.stats) + '</div>' +
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümler</h2>' + dailyGrid(data.stats) + '</div>';
     showRole(uid);
     if (isMe) bindShare(uid);
   }
@@ -88,7 +97,8 @@
       '<button class="p-btn main" id="pSave" style="justify-self:start">Kaydet</button></div></div>' +
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistiklerim</h2>' + statTiles(st) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerlemem</h2>' + setsGrid(st) + '</div>';
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerlemem</h2>' + setsGrid(st) + '</div>' +
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>';
 
     showRole(u.uid);
     bindShare(u.uid);

@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261115";
+    var V = "20261116";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -475,9 +475,14 @@
         });
         var tr = parse(lsGet("trainer-stats-v1")) || {}, solves = 0;
         if (isObj(tr)) for (var set in tr) { var cs = tr[set]; if (isObj(cs)) for (var cc in cs) { var n = cs[cc] && cs[cc].n; if (typeof n === "number") solves += n; } }
-        var dr = parse(lsGet("daily-results-v1")) || {}, best = 0, dcount = 0;
-        if (isObj(dr)) for (var d in dr) { var r = dr[d]; dcount++; var v = r && r.t; if (typeof v === "number" && r.pen !== "dnf" && (!best || v < best)) best = v; }
-        return { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount };
+        var dr = parse(lsGet("daily-results-v1")) || {}, best = 0, dcount = 0, dlist = [];
+        if (isObj(dr)) for (var d in dr) {
+            var r = dr[d]; dcount++; var v = r && r.t;
+            if (typeof v === "number" && r.pen !== "dnf" && (!best || v < best)) best = v;
+            if (r && typeof r.t === "number") dlist.push({ d: d.split(":")[0], t: r.t, pen: r.pen || "" });
+        }
+        dlist.sort(function (a, b) { return a.d < b.d ? 1 : -1; });
+        return { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount, dlist: dlist.slice(0, 20) };
     }
     function localProfile() { var p = parse(lsGet(PROF_KEY)); return isObj(p) ? p : {}; }
     function writeProfile() {
