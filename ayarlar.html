@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20261131">
+<link rel="stylesheet" href="/styles/common.css?v=20261132">
 <style>
 .set-wrap { max-width: 540px; margin: 0 auto; }
 .set-card { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 22px; box-shadow: var(--shadow); padding: 16px 16px 10px; margin-bottom: 18px; }
@@ -36,21 +36,6 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
 .set-msg.bad { color: var(--cube-red); }
 .about { color: var(--text-soft); font-size: 13px; padding: 6px 12px 10px; line-height: 1.7; }
 .about b { color: var(--text); }
-.de-tabs { display: flex; gap: 6px; padding: 0 4px 10px; flex-wrap: wrap; }
-.de-tab { border: 1px solid var(--border); background: var(--surface-soft); color: var(--text); font: 800 13px Inter, sans-serif; padding: 8px 12px; border-radius: 999px; cursor: pointer; }
-.de-tab.on { background: var(--cube-blue, #2c6fe6); color: #fff; border-color: transparent; }
-.de-body { padding: 0 4px 6px; }
-.de-set { border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; padding: 6px 10px; }
-.de-set > summary { cursor: pointer; font-weight: 800; padding: 6px 0; display: flex; align-items: center; gap: 8px; }
-.de-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border); font-size: 14px; }
-.de-nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
-.de-v { color: var(--text-soft); font-size: 12.5px; font-variant-numeric: tabular-nums; }
-.de-x, .de-del { border: 0; background: transparent; color: var(--cube-red); font: 800 13px Inter, sans-serif; cursor: pointer; padding: 4px 8px; border-radius: 8px; }
-.de-x:hover, .de-del:hover { background: var(--surface-soft); }
-.de-del { margin-left: auto; }
-.de-sel { font: 700 13px Inter, sans-serif; padding: 4px 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
-.de-empty, .de-note { color: var(--text-soft); font-size: 13px; padding: 8px 2px; }
-.de-lock { color: var(--text-soft); font-size: 12px; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -84,7 +69,7 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
     <a class="srow" href="/gizlilik"><span class="ico">🔒</span><span>Gizlilik</span><span class="go">→</span></a>
 </div>
 
-<div class="set-card"><h2 id="hEdit">Verilerimi düzenle</h2><div id="dataEditor"></div><div class="set-msg" id="deMsg"></div></div>
+<div class="set-card"><h2 id="hEdit">Verilerimi düzenle</h2><div id="dataEditor"></div></div>
 
 <div class="set-card"><h2 id="hData">Veriler &amp; Bildirimler</h2>
     <button type="button" class="srow" id="btnNotify"><span class="ico">🔔</span><span>Bildirimlere izin ver</span><span class="go" id="notifState">→</span></button>
@@ -94,16 +79,16 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
 </div>
 
 <div class="set-card"><h2 id="hAbout">Hakkında</h2>
-    <div class="about">Rubik Academy · Sürüm <b id="verTxt">20261131</b><br>Türkiye'nin kapsamlı küp öğrenme platformu.</div>
+    <div class="about">Rubik Academy · Sürüm <b id="verTxt">20261132</b><br>Türkiye'nin kapsamlı küp öğrenme platformu.</div>
 </div>
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20261131"></script>
-<script src="/js/common.js?v=20261131"></script>
-<script src="/js/firebase-config.js?v=20261131"></script>
-<script src="/js/account.js?v=20261131"></script>
-<script src="/js/data-editor.js?v=20261131"></script>
+<script src="/js/i18n.js?v=20261132"></script>
+<script src="/js/common.js?v=20261132"></script>
+<script src="/js/firebase-config.js?v=20261132"></script>
+<script src="/js/account.js?v=20261132"></script>
+<script src="/js/data-editor.js?v=20261132"></script>
 <script>
 (function () {
     function $(id) { return document.getElementById(id); }

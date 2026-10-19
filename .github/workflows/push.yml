@@ -1,4 +1,4 @@
-name: Bildirim gönder (Web Push)
+name: Bildirim gönder (Web Push) + hesap temizliği
 # Site statik olduğu için telefon/arka plan bildirimlerini bu iş gönderir.
 # Gerekli gizli anahtarlar (Settings → Secrets and variables → Actions):
 #   FIREBASE_SERVICE_ACCOUNT : Firebase hizmet hesabı JSON'u
@@ -27,6 +27,12 @@ jobs:
           cache-dependency-path: .github/push/package-lock.json
       - run: npm ci --no-audit --no-fund
         working-directory: .github/push
+      - name: Silinen hesapları kaldır
+        run: node cleanup.mjs
+        working-directory: .github/push
+        continue-on-error: true
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       - run: node send.mjs
         working-directory: .github/push
         env:
