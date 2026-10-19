@@ -139,6 +139,11 @@
         var ini = (u.name || "?").trim().charAt(0).toUpperCase() || "?";
         return u.photo ? '<img src="' + esc(u.photo) + '" alt="" referrerpolicy="no-referrer">' : esc(ini);
     }
+    function skinLabel(k) {
+        var S = { standart: ["Standart", "#6c5ce7"], rubik: ["Rubik's Cube", "#ffd21f"], neon: ["Neon", "#22d3ee"], gunbatimi: ["Gün Batımı", "#e8573a"] };
+        var x = S[k || ""]; if (!x) return k ? esc(k) : "—";
+        return '<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:' + x[1] + ';margin-inline-end:6px;vertical-align:middle"></span>' + x[0];
+    }
     function infoRow(k, v) { return '<div class="ir"><span>' + k + '</span><b>' + v + '</b></div>'; }
     // Seçilen kullanıcının tüm verisi — derli toplu
     function userDetailHtml(u, me, visits) {
@@ -150,12 +155,14 @@
             infoRow("Kullanıcı ID", '<span class="mono small">' + esc(u.uid) + '</span>') +
             infoRow("Giriş türü", esc(provLabel(me.provider))) +
             infoRow("Tema", me.theme === "dark" ? "🌙 Karanlık" : "☀️ Açık") +
+            infoRow("Tema stili", skinLabel(me.skin)) +
             infoRow("Renk körlüğü", esc(me.cvd || "—")) +
             infoRow("Dil", esc((me.lang || "—").toUpperCase())) +
             infoRow("Üyelik", esc(dateFmt(u.joined))) +
             infoRow("Son görülme", esc(dateFmt(u.seen))) + '</div>';
         return '<div class="u-top"><div class="u-ava">' + avatarMini(u) + '</div>' +
             '<div class="u-id"><b>' + esc(u.name) + '</b><small>' + esc(me.email || u.uid) + '</small>' +
+            '<a class="a-btn sm u-prof" href="/icerikler/profil?u=' + encodeURIComponent(u.uid) + '" target="_blank" rel="noopener">👤 Profiline git ↗</a>' +
             '<div class="u-stat">Bilinen ' + (st.known || 0) + ' · Öğrenilen ' + (st.learning || 0) + ' · Trainer ' + (st.solves || 0) + ' · Günlük en iyi ' + fmt(st.best) + '</div></div></div>' +
             '<h4>Hesap bilgileri</h4>' + acct + (u.bio ? '<h4>Bio</h4><p class="a-note">“' + esc(u.bio) + '”</p>' : '') +
             (pills ? '<h4>İlerleme özeti</h4><div class="pill-wrap">' + pills + '</div>' : '') +

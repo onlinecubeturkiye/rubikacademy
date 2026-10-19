@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261136";
+    var V = "20261137";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -589,12 +589,13 @@
             name: { stringValue: String(user.displayName || (localProfile().name) || "").slice(0, 60) },
             theme: { stringValue: (lsGet("theme") === "dark" ? "dark" : "light") },
             cvd: { stringValue: String(lsGet("cvd-theme") || "").slice(0, 24) },
+            skin: { stringValue: String(lsGet("site-skin") || "standart").slice(0, 24) },
             lang: { stringValue: String(lsGet("site-lang") || "tr").slice(0, 8) },
             seen: { integerValue: String(Date.now()) },
             dev: { stringValue: deviceStr().slice(0, 40) },
             marks: { stringValue: JSON.stringify(allMarks()).slice(0, 40000) }
         };
-        var mask = "?" + ["email", "provider", "name", "theme", "cvd", "lang", "seen", "dev", "marks"].map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
+        var mask = "?" + ["email", "provider", "name", "theme", "cvd", "skin", "lang", "seen", "dev", "marks"].map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
         return api("/users/" + user.uid + "/meta/self" + mask, { method: "PATCH", body: JSON.stringify({ fields: fields }) }).catch(function () {});
     }
     document.addEventListener("account-synced", function () { writeProfile(); writeMeta(); logVisit(); });
