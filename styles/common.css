@@ -244,7 +244,7 @@ html.dark-mode .bg-glow::after {
     align-items: center;
     justify-content: space-between;
     padding: 14px 7%;
-    background: rgba(255, 255, 255, 0.82);
+    background: var(--nav-bg, rgba(255, 255, 255, 0.82));
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: var(--card-bw) solid var(--card-border);
@@ -265,7 +265,7 @@ html.dark-mode .bg-glow::after {
 
 html.dark-mode .navbar,
 body.dark-mode .navbar {
-    background: rgba(11, 13, 20, 0.82);
+    background: var(--nav-bg-dark, rgba(11, 13, 20, 0.82));
 }
 
 .nav-logo {
@@ -1112,3 +1112,143 @@ html[dir="rtl"] .acc-mi { text-align: right; }
 .ra-pushask button { border-radius: 10px; padding: 8px 12px; font: 800 13px Inter, sans-serif; cursor: pointer; border: var(--card-bw, 2px) solid var(--ink, #111); }
 .ra-pushask-ok { background: var(--ui-accent); color: var(--ui-accent-text); }
 .ra-pushask-no { background: transparent; color: var(--text-soft, #555); border-color: var(--border, #ccc) !important; }
+
+
+/* =========================================================
+   TEMA STİLLERİ (Ayarlar → Tema stili, localStorage "site-skin")
+   standart  : Aurora (varsayılan, yukarıdaki değişkenler)
+   rubik     : Rubik's Cube — krem zemin, kalın çerçeve, ofset gölge, sarı vurgu
+   neon      : Neon — siyah zemin, camgöbeği/pembe ışıltı
+   gunbatimi : Gün Batımı — sıcak şeftali/mercan tonları, serif başlıklar
+   Not: body.dark-mode de değişken tanımladığı için seçiciler body'yi de kapsar.
+========================================================= */
+
+/* ---------- Rubik's Cube ---------- */
+html[data-skin="rubik"], html[data-skin="rubik"] body {
+    --tint-red: #ffe1df; --tint-orange: #ffe9d3; --tint-yellow: #fff3c4; --tint-green: #d6f6e5; --tint-blue: #dfe8ff; --tint-purple: #ece4ff;
+    --ink: #17171f; --card-bw: 2px;
+    --font-display: "Rubik", "Inter", sans-serif;
+    --ui-accent: #ffd21f; --ui-accent-hover: #ffc400; --ui-accent-text: #17171f; --ui-accent-soft: #fff3c4;
+    --background: #fff8ec; --surface: #ffffff; --surface-soft: #f6efe2;
+    --primary: #1d5bff; --primary-dark: #1446d1; --primary-light: #e3ebff;
+    --text: #17171f; --text-soft: #5b5b6e; --border: #eadfcb; --card-border: #17171f;
+    --shadow: 5px 5px 0 #17171f; --shadow-sm: 3px 3px 0 #17171f; --shadow-hover: 8px 8px 0 #17171f;
+    --diagram-bg: #f6efe2; --dot: rgba(23, 23, 31, .07);
+    --badge-bg: #dfe8ff; --badge-border: #17171f; --badge-text: #1d5bff;
+    --hero-bg: #ffd21f; --hero-border: #17171f;
+    --btn-bg: #ffd21f; --btn-hover-bg: #ffc400; --btn-text: #17171f;
+    --bottom-bg: #dfe8ff; --bottom-border: #17171f;
+    --nav-bg: rgba(255, 252, 245, .92);
+}
+html.dark-mode[data-skin="rubik"], html.dark-mode[data-skin="rubik"] body {
+    --tint-red: #4f232c; --tint-orange: #4e3525; --tint-yellow: #494125; --tint-green: #1b4136; --tint-blue: #29365f; --tint-purple: #3d365f;
+    --ink: #050509;
+    --ui-accent: #ffd21f; --ui-accent-hover: #ffdf5c; --ui-accent-text: #17171f; --ui-accent-soft: #494125;
+    --background: #111219; --surface: #1c1d27; --surface-soft: #272938;
+    --primary: #6b93ff; --primary-dark: #8aa9ff; --primary-light: #1f2a52;
+    --text: #f6f6fa; --text-soft: #b9bbcc; --border: #2d3042; --card-border: #3a3d54;
+    --shadow: 5px 5px 0 #050509; --shadow-sm: 3px 3px 0 #050509; --shadow-hover: 8px 8px 0 #050509;
+    --diagram-bg: #151620; --dot: rgba(255, 255, 255, .05);
+    --badge-bg: #29365f; --badge-border: #3a3d54;
+    --hero-bg: #24252f; --hero-border: #3a3d54;
+    --btn-bg: #ffd21f; --btn-hover-bg: #ffdf5c; --btn-text: #17171f;
+    --bottom-bg: #29365f; --bottom-border: #3a3d54;
+    --nav-bg-dark: rgba(17, 18, 25, .92);
+}
+html[data-skin="rubik"] .navbar::after {
+    bottom: calc(-4px - var(--card-bw)); height: 4px; opacity: 1;
+    background: linear-gradient(90deg, var(--cube-red) 0 20%, var(--cube-orange) 20% 40%, var(--cube-yellow) 40% 60%, var(--cube-green) 60% 80%, var(--cube-blue) 80% 100%);
+}
+html[data-skin="rubik"] .navbar { border-bottom-color: var(--ink); }
+html[data-skin="rubik"] .gradient-text { background: none; -webkit-text-fill-color: currentColor; color: var(--text); z-index: 0; }
+html[data-skin="rubik"] .gradient-text::after { content: ""; position: absolute; left: -4px; right: -6px; bottom: .08em; height: .38em; background: var(--cube-yellow); border-radius: 6px; transform: rotate(-1.5deg); z-index: -1; }
+html[data-skin="rubik"] .bg-glow::before { background: var(--cube-yellow); }
+html[data-skin="rubik"] .bg-glow::after { background: var(--cube-blue); }
+
+/* ---------- Neon ---------- */
+html[data-skin="neon"], html[data-skin="neon"] body {
+    --tint-red: #ffeef3; --tint-orange: #fff3ea; --tint-yellow: #fffbe6; --tint-green: #e9fbf4; --tint-blue: #e8f9fd; --tint-purple: #f6ecff;
+    --ink: #d6e4ee; --card-bw: 1px;
+    --font-display: "Space Grotesk", "Inter", sans-serif;
+    --ui-accent: #0891b2; --ui-accent-hover: #0e7490; --ui-accent-text: #ffffff; --ui-accent-soft: #e0f7fc;
+    --background: #f3f8fb; --surface: #ffffff; --surface-soft: #eaf2f7;
+    --primary: #0891b2; --primary-dark: #0e7490; --primary-light: #e0f7fc;
+    --text: #0b1620; --text-soft: #4f6475; --border: #dce8f0; --card-border: #d6e4ee;
+    --shadow: 0 1px 2px rgba(8, 145, 178, .06), 0 8px 24px rgba(8, 145, 178, .08);
+    --shadow-sm: 0 1px 2px rgba(8, 145, 178, .08), 0 2px 8px rgba(8, 145, 178, .06);
+    --shadow-hover: 0 2px 4px rgba(8, 145, 178, .08), 0 16px 36px rgba(8, 145, 178, .16);
+    --diagram-bg: #eaf2f7;
+    --badge-bg: #e0f7fc; --badge-text: #0891b2;
+    --hero-bg: linear-gradient(135deg, #e0f7fc 0%, #f3f8fb 50%, #fbeaff 100%); --hero-border: #d6e4ee;
+    --btn-bg: #0891b2; --btn-hover-bg: #0e7490; --btn-text: #ffffff;
+    --bottom-bg: #e0f7fc; --bottom-border: #d6e4ee;
+    --nav-bg: rgba(255, 255, 255, .85);
+}
+html.dark-mode[data-skin="neon"], html.dark-mode[data-skin="neon"] body {
+    --tint-red: #2a0f1d; --tint-orange: #2a170d; --tint-yellow: #26220c; --tint-green: #0c2420; --tint-blue: #0b2030; --tint-purple: #1f0f30;
+    --ink: #1b2236;
+    --ui-accent: #22d3ee; --ui-accent-hover: #67e8f9; --ui-accent-text: #04121a; --ui-accent-soft: #0b2a33;
+    --background: #05060b; --surface: #0c0f19; --surface-soft: #121726;
+    --primary: #22d3ee; --primary-dark: #67e8f9; --primary-light: #0b2a33;
+    --text: #e8f6ff; --text-soft: #8aa0b8; --border: #161c2c; --card-border: #1b2236;
+    --shadow: 0 0 0 1px rgba(34, 211, 238, .06), 0 10px 30px rgba(34, 211, 238, .07);
+    --shadow-sm: 0 0 0 1px rgba(34, 211, 238, .05), 0 3px 12px rgba(34, 211, 238, .06);
+    --shadow-hover: 0 0 0 1px rgba(34, 211, 238, .35), 0 0 28px rgba(34, 211, 238, .25), 0 18px 40px rgba(217, 70, 239, .15);
+    --diagram-bg: #0a0d16;
+    --badge-bg: #0b2a33; --badge-text: #22d3ee;
+    --hero-bg: radial-gradient(120% 140% at 0% 0%, #0b2a33 0%, #0c0f19 45%, #230b2f 100%); --hero-border: #1b2236;
+    --btn-bg: #22d3ee; --btn-hover-bg: #67e8f9; --btn-text: #04121a;
+    --bottom-bg: #0b2030; --bottom-border: #1b2236;
+    --nav-bg-dark: rgba(5, 6, 11, .85);
+}
+html[data-skin="neon"] .navbar::after { background: linear-gradient(90deg, transparent, #22d3ee 30%, #d946ef 70%, transparent); opacity: .7; }
+html[data-skin="neon"] .gradient-text { background-image: linear-gradient(90deg, #22d3ee 0%, #d946ef 100%); }
+html.dark-mode[data-skin="neon"] .hero h1, html.dark-mode[data-skin="neon"] .section-title h2 { text-shadow: 0 0 24px rgba(34, 211, 238, .25); }
+html[data-skin="neon"] .bg-glow::before { background: #22d3ee; }
+html[data-skin="neon"] .bg-glow::after { background: #d946ef; }
+
+/* ---------- Gün Batımı ---------- */
+html[data-skin="gunbatimi"], html[data-skin="gunbatimi"] body {
+    --tint-red: #ffece8; --tint-orange: #fff0e3; --tint-yellow: #fff6dc; --tint-green: #eef7ea; --tint-blue: #eef1fb; --tint-purple: #f6eef8;
+    --ink: #f0dfd3; --card-bw: 1px;
+    --font-display: "Fraunces", Georgia, serif;
+    --ui-accent: #e8573a; --ui-accent-hover: #d24427; --ui-accent-text: #ffffff; --ui-accent-soft: #ffe9e2;
+    --background: #fdf6f0; --surface: #fffcf9; --surface-soft: #f8ece3;
+    --primary: #d9482b; --primary-dark: #b93a20; --primary-light: #ffe9e2;
+    --text: #2a1712; --text-soft: #7a5d52; --border: #f1e2d7; --card-border: #f0dfd3;
+    --shadow: 0 1px 2px rgba(122, 61, 30, .05), 0 10px 26px rgba(122, 61, 30, .08);
+    --shadow-sm: 0 1px 2px rgba(122, 61, 30, .06), 0 3px 10px rgba(122, 61, 30, .06);
+    --shadow-hover: 0 2px 4px rgba(122, 61, 30, .06), 0 18px 38px rgba(122, 61, 30, .14);
+    --diagram-bg: #f8ece3;
+    --badge-bg: #ffe9e2; --badge-text: #d9482b;
+    --hero-bg: linear-gradient(135deg, #ffe7d6 0%, #fff1e8 45%, #fde3ec 100%); --hero-border: #f0dfd3;
+    --btn-bg: #e8573a; --btn-hover-bg: #d24427; --btn-text: #ffffff;
+    --bottom-bg: #fff0e3; --bottom-border: #f0dfd3;
+    --nav-bg: rgba(253, 246, 240, .86);
+}
+html.dark-mode[data-skin="gunbatimi"], html.dark-mode[data-skin="gunbatimi"] body {
+    --tint-red: #33181a; --tint-orange: #33200f; --tint-yellow: #2f2611; --tint-green: #1b2618; --tint-blue: #1c1f2e; --tint-purple: #2a1a2c;
+    --ink: #3a2722;
+    --ui-accent: #ff7a59; --ui-accent-hover: #ff9375; --ui-accent-text: #1f0d08; --ui-accent-soft: #3a1d15;
+    --background: #140d0b; --surface: #1d1411; --surface-soft: #261a16;
+    --primary: #ff8a6a; --primary-dark: #ffa58b; --primary-light: #3a1d15;
+    --text: #fbeee7; --text-soft: #c4a79b; --border: #2f211c; --card-border: #3a2722;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 28px rgba(0, 0, 0, .35);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35), 0 3px 10px rgba(0, 0, 0, .3);
+    --shadow-hover: 0 2px 4px rgba(0, 0, 0, .35), 0 18px 40px rgba(255, 122, 89, .14);
+    --diagram-bg: #180f0d;
+    --badge-bg: #3a1d15; --badge-text: #ff8a6a;
+    --hero-bg: linear-gradient(135deg, #3a1d15 0%, #1d1411 50%, #2e1426 100%); --hero-border: #3a2722;
+    --btn-bg: #ff7a59; --btn-hover-bg: #ff9375; --btn-text: #1f0d08;
+    --bottom-bg: #33200f; --bottom-border: #3a2722;
+    --nav-bg-dark: rgba(20, 13, 11, .86);
+}
+html[data-skin="gunbatimi"] .navbar::after { background: linear-gradient(90deg, transparent, #ff7a59 30%, #f5b14c 70%, transparent); opacity: .5; }
+html[data-skin="gunbatimi"] .gradient-text { background-image: linear-gradient(90deg, #e8573a 0%, #f5a524 100%); }
+html[data-skin="gunbatimi"] h1, html[data-skin="gunbatimi"] h2 { letter-spacing: -.5px; }
+html[data-skin="gunbatimi"] .bg-glow::before { background: #ff7a59; }
+html[data-skin="gunbatimi"] .bg-glow::after { background: #f5b14c; }
+
+/* Ayarlar: tema stili önizleme kutuları */
+.skin-sw { display: inline-flex; gap: 3px; margin-inline-end: 4px; }
+.skin-sw i { width: 14px; height: 14px; border-radius: 4px; display: block; border: 1px solid rgba(0, 0, 0, .12); }
