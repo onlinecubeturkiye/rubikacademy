@@ -423,3 +423,35 @@ if ("serviceWorker" in navigator) {
         Object.keys(dirty).forEach(function (s) { _set(s, JSON.stringify(cache[s])); });
     } catch (e) {}
 })();
+
+/* ---------- MAKRO ENGELLEYİCİ ----------
+   <body data-macro-guard> olan sayfalarda (günlük karıştırma, antrenör):
+   - Betik/makro ile üretilmiş sahte olaylar (event.isTrusted === false) zamanlayıcıya ve
+     [data-guard] düğmelerine ulaşmadan engellenir.
+   - Saniyede 15'ten fazla basış "makro" sayılır.
+   Sayfa RAGuard.flag ile denemenin şüpheli olup olmadığını kontrol eder, RAGuard.reset() ile sıfırlar. */
+(function () {
+    var G = { flag: false, reason: "", hits: [] };
+    G.reset = function () { G.flag = false; G.reason = ""; G.hits = []; };
+    window.RAGuard = G;
+    function on() { return document.body && document.body.hasAttribute("data-macro-guard"); }
+    ["keydown", "keyup", "mousedown", "mouseup", "touchstart", "touchend", "click", "pointerdown", "pointerup"].forEach(function (type) {
+        document.addEventListener(type, function (e) {
+            if (!on()) return;
+            var tg = e.target && e.target.closest ? e.target : null;
+            var guarded = type.indexOf("key") === 0 ? !(tg && tg.closest("input, textarea, select, [contenteditable]")) : !!(tg && tg.closest("[data-guard]"));
+            if (!guarded) return;
+            if (e.isTrusted === false) {
+                e.stopImmediatePropagation(); e.preventDefault();
+                G.flag = true; G.reason = "synthetic";
+                return;
+            }
+            if (type === "keydown" || type === "mousedown" || type === "touchstart") {
+                if (type === "keydown" && e.repeat) return;
+                var n = performance.now();
+                G.hits.push(n); G.hits = G.hits.filter(function (x) { return n - x < 1000; });
+                if (G.hits.length > 15) { G.flag = true; G.reason = "rapid"; }
+            }
+        }, true);
+    });
+})();

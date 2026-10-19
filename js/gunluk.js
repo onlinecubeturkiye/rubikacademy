@@ -61,12 +61,12 @@
     }
     function release() {
         if (state === "hold") { clearTimeout(holdT); setState("idle"); return; }
-        if (state === "ready") { setState("running"); t0 = performance.now(); tick(); }
+        if (state === "ready") { if (window.RAGuard) RAGuard.reset(); setState("running"); t0 = performance.now(); tick(); }
     }
     function stop() {
         cancelAnimationFrame(raf); last = performance.now() - t0; show(last); setState("done");
         // Çözüm henüz kilitlenmez: kullanıcı "Sıralamaya gönder" demedikçe tekrar deneyebilir.
-        pending = { t: Math.round(last), pen: "" };
+        pending = { t: Math.round(last), pen: "", macro: !!(window.RAGuard && RAGuard.flag) };
         renderAll();
     }
 
@@ -145,6 +145,7 @@
         if (!pending || locked()) return;
         var r = pending;
         if (r.t < 3000 && r.pen !== "dnf") { lbMsg(T("lb_too_fast"), "bad"); return; }
+        if (r.macro || (window.RAGuard && RAGuard.flag)) { lbMsg(T("lb_macro", "Makro ya da otomatik giriş algılandı; bu çözüm sıralamaya gönderilemez. Tekrar dene."), "bad"); return; }
         if (!lbOn()) { lbMsg(T("lb_off", "Sıralama şu an kullanılamıyor."), "bad"); return; }
         if (!Leaderboard.signedIn()) {
             lbMsg(T("lb_need_login", "Sıralamaya göndermek ve kaydetmek için giriş yap."), "");
