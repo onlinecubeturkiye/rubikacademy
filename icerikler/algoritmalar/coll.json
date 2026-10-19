@@ -15,19 +15,25 @@
         {
           "name": "H2",
           "alg": "F R U R' U' R U R' U' R U R' U' F'",
-          "alts": [],
+          "alts": [
+            "F U R U' R' U R U' R' U R U' R' F'"
+          ],
           "pattern": "BUBUUUFUFUXULXLUXURXR"
         },
         {
           "name": "H3",
           "alg": "F R U' R' U R U2 R' U' R U R' U' F'",
-          "alts": [],
+          "alts": [
+            "f R U R' U' f' R U R' U' R' F R F'"
+          ],
           "pattern": "LURUUUBUBRXLUXUFXFUXU"
         },
         {
           "name": "H4",
           "alg": "R U R' U R U2 R' F R U' R' U' R U2 R' U' F'",
-          "alts": [],
+          "alts": [
+            "R U' L' U R2 U' R L U2 R' U' R"
+          ],
           "pattern": "LURUUUFUFUXUBXLUXUBXR"
         }
       ]
@@ -46,13 +52,17 @@
         {
           "name": "Pi2",
           "alg": "L U' R' U L' U R U R' U R",
-          "alts": [],
+          "alts": [
+            "L' U R U' L U' R' U' R U' R'"
+          ],
           "pattern": "LURUUULURUXBUXUUXFBXF"
         },
         {
           "name": "Pi3",
           "alg": "F' R U F2 R' U R U' F2 U' R' F",
-          "alts": [],
+          "alts": [
+            "R' U2 R2 U R U R2 D' R U' R' D U' R'"
+          ],
           "pattern": "FUFUUULURBXBRXUUXULXU"
         },
         {
@@ -66,13 +76,17 @@
         {
           "name": "Pi5",
           "alg": "F' U' F U' R2 F' U2 F U2 F R2 F'",
-          "alts": [],
+          "alts": [
+            "(U2) R' F2 R U2 R U2 R' F2 U' R U' R'"
+          ],
           "pattern": "BURUUULUBUXLUXUUXFRXF"
         },
         {
           "name": "Pi6",
           "alg": "R U R' U' R' F R2 U R' U' R U R' U' F'",
-          "alts": [],
+          "alts": [
+            "R B2 R' U2 R' U2 R B2 U R' U R"
+          ],
           "pattern": "LUBUUUBURRXULXFFXUUXU"
         }
       ]
@@ -83,7 +97,9 @@
         {
           "name": "U1",
           "alg": "R2 D' R U2 R' D R U2 R",
-          "alts": [],
+          "alts": [
+            "L U L' U L U2 L2 U R U' L U R'"
+          ],
           "pattern": "RUBUUUUUUFXRLXBUXUFXL"
         },
         {
@@ -123,7 +139,9 @@
         {
           "name": "U6",
           "alg": "F R U' R' U' R U2 R' U' R U' R' U' R U2 R' U' F'",
-          "alts": [],
+          "alts": [
+            "R' U2 R F U' R' U' R U F'"
+          ],
           "pattern": "BUBUUUUUURXLLXFUXURXF"
         }
       ]
@@ -134,31 +152,41 @@
         {
           "name": "T1",
           "alg": "r U R' U' r' F R F'",
-          "alts": [],
+          "alts": [
+            "L F R' F' L' F R F'"
+          ],
           "pattern": "FUUUUURUUUXFBXRUXLLXB"
         },
         {
           "name": "T2",
           "alg": "l' U' L U R U' r' F",
-          "alts": [],
+          "alts": [
+            "R' F' r U R U' r' F"
+          ],
           "pattern": "UUFUUUUULFXURXBRXUBXL"
         },
         {
           "name": "T3",
           "alg": "R U' R' U2 L R U' R' U L'",
-          "alts": [],
+          "alts": [
+            "L' U R' U' R L U2 R' U' R"
+          ],
           "pattern": "UUUUUULURBXBLXUFXFRXU"
         },
         {
           "name": "T4",
           "alg": "F R U R' U' R U' R' U' R U R' F'",
-          "alts": [],
+          "alts": [
+            "R F R' U R U2 R' U R U F' R'"
+          ],
           "pattern": "UUUUUUBUBRXLFXULXRFXU"
         },
         {
           "name": "T5",
           "alg": "R' U R2 D r' U2 r D' R2 U' R",
-          "alts": [],
+          "alts": [
+            "R2 U R' D' R U R' D R' U' R2 U' R2"
+          ],
           "pattern": "RULUUUUUURXLUXFBXBUXF"
         },
         {
@@ -177,7 +205,9 @@
         {
           "name": "L1",
           "alg": "R' U2 R' D' R U2 R' D R2",
-          "alts": [],
+          "alts": [
+            "R' U R U' R' U F' R U2 R' U2 R' F R2"
+          ],
           "pattern": "BUUUUUUUBFXLFXUUXRRXL"
         },
         {
@@ -200,7 +230,9 @@
         {
           "name": "L4",
           "alg": "F R' F' r U R U' r'",
-          "alts": [],
+          "alts": [
+            "(U) R2 D R' U R D' R' U' R'"
+          ],
           "pattern": "UUFUUUBUUUXFUXRRXLBXL"
         },
         {
@@ -214,7 +246,9 @@
         {
           "name": "L6",
           "alg": "R F' D2 F R' U2 R F' D2 F R'",
-          "alts": [],
+          "alts": [
+            "R U R' U R U' R' U R U' R' U R U2 R'"
+          ],
           "pattern": "UULUUUBUURXBFXLFXURXU"
         }
       ]
@@ -234,7 +268,9 @@
         {
           "name": "S2",
           "alg": "R U' L' U R' U' L",
-          "alts": [],
+          "alts": [
+            "R U' r' F R' F' r"
+          ],
           "pattern": "BUFUUUUULRXUUXBUXLRXF"
         },
         {
@@ -248,19 +284,25 @@
         {
           "name": "S4",
           "alg": "F R' U2 R F' R' F U2 F' R",
-          "alts": [],
+          "alts": [
+            "R U R' U R U' R D R' U' R D' R2"
+          ],
           "pattern": "BUFUUULUUBXFUXRUXLRXU"
         },
         {
           "name": "S5",
           "alg": "R U R' U R2 D R' U2 R D' R2",
-          "alts": [],
+          "alts": [
+            "R' U2 R U F R' U R U' F'"
+          ],
           "pattern": "BUUUUUFULLXUFXBUXRRXU"
         },
         {
           "name": "S6",
           "alg": "R U R' U L' U R U' L U2 R'",
-          "alts": [],
+          "alts": [
+            "R U R' U r' F R F' r U2 R'"
+          ],
           "pattern": "BUUUUURUFFXUBXLUXLRXU"
         }
       ]
@@ -296,7 +338,9 @@
         {
           "name": "AS4",
           "alg": "R' U' R U' L U' R' U L' U2 R",
-          "alts": [],
+          "alts": [
+            "F R U' R2 U' R U' R' U2 R2 U R' F'"
+          ],
           "pattern": "RUBUUUFUUUXLLXFBXUUXR"
         },
         {
@@ -310,7 +354,9 @@
         {
           "name": "AS6",
           "alg": "R2 D R' U R D' R' U R' U' R U' R'",
-          "alts": [],
+          "alts": [
+            "R' F U2 F' R F R' U2 R F'"
+          ],
           "pattern": "LUBUUURUUUXFLXRFXUUXB"
         }
       ]
