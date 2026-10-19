@@ -15,9 +15,15 @@ service cloud.firestore {
         && request.auth.token.firebase.sign_in_provider == 'google.com';
     }
 
+    // Askıya alınmış hesap (roles/{uid}.role == 'askida') yazamaz
+    function suspended(uid) {
+      return exists(/databases/$(database)/documents/roles/$(uid))
+        && get(/databases/$(database)/documents/roles/$(uid)).data.role == 'askida';
+    }
+
     match /days/{day}/times/{uid} {
       allow read: if true;
-      allow create: if request.auth != null && request.auth.uid == uid
+      allow create: if request.auth != null && request.auth.uid == uid && !suspended(uid)
         && day.matches('^[0-9]{5}$')
         && int(day) - math.floor(request.time.toMillis() / 86400000) <= 1
         && math.floor(request.time.toMillis() / 86400000) - int(day) <= 1
@@ -37,7 +43,7 @@ service cloud.firestore {
     match /users/{uid} {
       allow get: if true;               // profil linkle paylaşılabilir (tekil okuma herkese açık)
       allow list: if isAdmin();         // tüm kullanıcıları yalnız admin listeler
-      allow create, update: if (request.auth != null && request.auth.uid == uid)
+      allow create, update: if (request.auth != null && request.auth.uid == uid) && !suspended(uid)
         && request.resource.data.keys().hasOnly(['name', 'photo', 'bio', 'joined', 'seen', 'stats'])
         && request.resource.data.name is string && request.resource.data.name.size() <= 24
         && (!('photo' in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() <= 40000))
@@ -74,7 +80,7 @@ service cloud.firestore {
       match /notifications/{nid} {
         allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
         allow create: if isAdmin()
-          && request.resource.data.keys().hasOnly(['text', 'ts'])
+          && request.resource.data.keys().hasOnly(['text', 'ts', 'at', 'pushed'])
           && request.resource.data.text is string && request.resource.data.text.size() <= 500;
         allow update, delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
       }
@@ -108,7 +114,7 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isAdmin()
         && request.resource.data.keys().hasOnly(['role'])
-        && request.resource.data.role in ['uye', 'gelistirici', 'tester'];
+        && request.resource.data.role in ['uye', 'gelistirici', 'tester', 'askida'];
       allow delete: if isAdmin();
     }
 
@@ -122,9 +128,21 @@ service cloud.firestore {
     match /broadcasts/{id} {
       allow read: if true;
       allow create: if isAdmin()
-        && request.resource.data.keys().hasOnly(['text', 'ts'])
+        && request.resource.data.keys().hasOnly(['text', 'ts', 'at', 'pushed'])
         && request.resource.data.text is string && request.resource.data.text.size() <= 500;
       allow update, delete: if isAdmin();
+    }
+
+    // Web Push abonelikleri: herkes kendi cihazını kaydeder (uid boş ya da kendisi); yalnız admin okur.
+    // Gönderimi GitHub Actions'taki gönderici (hizmet hesabı) yapar.
+    match /pushsubs/{id} {
+      allow get, list, delete: if isAdmin();
+      allow create, update: if id.matches('^[a-f0-9]{32}$')
+        && request.resource.data.keys().hasOnly(['sub', 'uid', 'ts'])
+        && request.resource.data.sub is string && request.resource.data.sub.size() <= 2000
+        && request.resource.data.uid is string
+        && (request.resource.data.uid == '' || (request.auth != null && request.auth.uid == request.resource.data.uid))
+        && request.resource.data.ts is timestamp;
     }
 
     match /users/{uid}/{sub=**} {
