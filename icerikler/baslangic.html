@@ -19,7 +19,7 @@
 <link rel="icon" href="/icons/favicon-48.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#ffd21f">
+<meta name="theme-color" content="#0b0d14">
 
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/baslangic">
 <meta name="description" content="3x3 Rubik küpü hiç bilmeyenler için adım adım nasıl çözülür: notasyon, 7 adım ve sadece 6 algoritma, her adım için diyagramlar.">
@@ -27,10 +27,10 @@
 <meta property="og:description" content="Başlangıç rehberi: notasyon, 7 adım ve sadece 6 algoritma.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/baslangic">
-<meta property="og:image" content="https://rubikacademy.fun/og/baslangic.png?v=20261134">
+<meta property="og:image" content="https://rubikacademy.fun/og/baslangic.png?v=20261135">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/baslangic.png?v=20261134">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/baslangic.png?v=20261135">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261134">
+<link rel="stylesheet" href="/styles/common.css?v=20261135">
 
 <style>
 .wrap { max-width: 980px; margin: 0 auto; }
@@ -51,7 +51,7 @@
 .toc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .toc-chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px 7px 7px; border-radius: 12px; border: var(--card-bw) solid var(--card-border); background: var(--surface-soft); font-size: 13px; font-weight: 800; color: var(--text); transition: transform .12s, box-shadow .12s; }
 .toc-chip:hover { transform: translate(-1px,-1px); box-shadow: var(--shadow-sm); }
-.toc-n { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; background: var(--cube-yellow); color: #17171f; font-size: 12px; font-weight: 900; border: var(--card-bw) solid var(--ink); }
+.toc-n { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; background: var(--ui-accent); color: var(--ui-accent-text); font-size: 12px; font-weight: 900; border: var(--card-bw) solid var(--ink); }
 .step { scroll-margin-top: 90px; }
 .step h2 { font-size: 24px; font-weight: 800; letter-spacing: -.4px; color: var(--text); margin-bottom: 12px; }
 .step p { color: var(--text-soft); font-size: 15px; line-height: 1.75; margin-bottom: 12px; }
@@ -60,7 +60,7 @@
 .step-num { flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-family: var(--font-display); font-size: 21px; font-weight: 900; border: var(--card-bw) solid var(--ink); color: #fff; }
 .step-num.red { background: var(--cube-red); } .step-num.orange { background: var(--cube-orange); }
 .step-num.yellow { background: var(--cube-yellow); color: #17171f; } .step-num.green { background: var(--cube-green); } .step-num.blue { background: var(--cube-blue); }
-.alg { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 15px; font-weight: 800; color: #17171f; background: var(--cube-yellow); border: var(--card-bw) solid var(--ink); border-radius: 10px; padding: 4px 10px; margin: 2px 0; box-shadow: 2px 2px 0 var(--ink); white-space: nowrap; }
+.alg { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 15px; font-weight: 800; color: var(--ui-accent-text); background: var(--ui-accent); border: var(--card-bw) solid var(--ink); border-radius: 10px; padding: 4px 10px; margin: 2px 0; box-shadow: var(--shadow-sm); white-space: nowrap; }
 .alg-rows p { margin-bottom: 8px; }
 .figs { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin: 16px 0 14px; }
 .fig { margin: 0; flex: 0 1 190px; text-align: center; }
@@ -80,7 +80,7 @@
 .done p { color: var(--text-soft); margin-bottom: 16px; }
 .next-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 .next-link { padding: 11px 16px; border-radius: 13px; background: var(--surface); border: var(--card-bw) solid var(--ink); box-shadow: var(--shadow-sm); font-weight: 800; font-size: 14px; color: var(--text); transition: transform .12s, box-shadow .12s; }
-.next-link:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
+.next-link:hover { transform: translate(-2px,-2px); box-shadow: var(--shadow); }
 html.dark-mode .fig-img, html.dark-mode .move { background: #e9e4da; border-color: #3a3d54; }
 html.dark-mode .move b, html.dark-mode .move small { color: #17171f; }
 @media (max-width: 760px) { .moves { grid-template-columns: repeat(4, 1fr); } }
@@ -245,10 +245,10 @@ document.querySelectorAll(".fig-img.ll").forEach(function (el) {
 </script>
 
 <script>var PAGE_ID = "baslangic";</script>
-<script src="/js/i18n.js?v=20261134"></script>
-<script src="/js/common.js?v=20261134"></script>
-<script src="/js/firebase-config.js?v=20261134"></script>
-<script src="/js/account.js?v=20261134"></script>
+<script src="/js/i18n.js?v=20261135"></script>
+<script src="/js/common.js?v=20261135"></script>
+<script src="/js/firebase-config.js?v=20261135"></script>
+<script src="/js/account.js?v=20261135"></script>
 
 
 

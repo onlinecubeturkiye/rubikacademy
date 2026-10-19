@@ -9,7 +9,7 @@
 <link rel="icon" href="/icons/favicon-48.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#ffd21f">
+<meta name="theme-color" content="#0b0d14">
 
 <link rel="canonical" href="https://rubikacademy.fun/">
 <meta name="description" content="Rubik Academy - Rubik küp öğren, algoritmaları keşfet ve hızını geliştir.">
@@ -17,10 +17,10 @@
 <meta property="og:description" content="Rubik küp çözmeyi adım adım öğren! Başlangıçtan profesyonel seviyeye kadar en iyi eğitimler.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/">
-<meta property="og:image" content="https://rubikacademy.fun/og/site.png?v=20261134">
+<meta property="og:image" content="https://rubikacademy.fun/og/site.png?v=20261135">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/site.png?v=20261134">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/site.png?v=20261135">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +28,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <!-- ORTAK STİLLER (tüm sitede aynı) -->
-<link rel="stylesheet" href="/styles/common.css?v=20261134">
+<link rel="stylesheet" href="/styles/common.css?v=20261135">
 
 <!-- BU SAYFAYA ÖZEL STİLLER -->
 <style>
@@ -106,20 +106,11 @@
     position: relative;
     display: inline-block;
     color: var(--text);
-    z-index: 0;
-}
-
-.gradient-text::after {
-    content: "";
-    position: absolute;
-    left: -4px;
-    right: -6px;
-    bottom: .08em;
-    height: .38em;
-    background: var(--cube-yellow);
-    border-radius: 6px;
-    transform: rotate(-1.5deg);
-    z-index: -1;
+    background: linear-gradient(90deg, var(--ui-accent) 0%, #ec4899 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding-bottom: .06em;
 }
 
 .hero p {
@@ -142,21 +133,21 @@
 }
 
 .btn-primary {
-    color: #17171f;
-    background: var(--cube-yellow);
+    color: var(--ui-accent-text);
+    background: var(--ui-accent);
     border: var(--card-bw) solid var(--ink);
     box-shadow: var(--shadow);
 }
 
 .btn-primary:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 7px 7px 0 var(--ink);
+    box-shadow: var(--shadow-hover);
     background: var(--btn-hover-bg);
 }
 
 .btn-primary:active {
     transform: translate(3px, 3px);
-    box-shadow: 2px 2px 0 var(--ink);
+    box-shadow: var(--shadow-sm);
 }
 
 .hero-btns { display: flex; flex-wrap: wrap; gap: 14px; }
@@ -170,7 +161,7 @@
 
 .btn-secondary:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 7px 7px 0 var(--ink);
+    box-shadow: var(--shadow-hover);
 }
 
 .card-go {
@@ -192,10 +183,10 @@ a.card, a.learning-card { display: block; color: inherit; }
     gap: 24px;
     padding: 34px 36px;
     border-radius: 26px;
-    background: var(--cube-yellow);
+    background: var(--ui-accent);
     border: var(--card-bw) solid var(--ink);
     box-shadow: var(--shadow);
-    color: #17171f;
+    color: var(--ui-accent-text);
 }
 .coach-tag {
     display: inline-block;
@@ -311,9 +302,9 @@ section {
     display: inline-block;
     padding: 6px 12px;
     border-radius: 9px;
-    background: var(--cube-yellow);
+    background: var(--ui-accent);
     border: var(--card-bw) solid var(--ink);
-    color: #17171f;
+    color: var(--ui-accent-text);
     font-size: 12px;
     font-weight: 900;
     letter-spacing: 1.5px;
@@ -470,7 +461,7 @@ section {
 
 .social-card:active {
     transform: translate(3px, 3px);
-    box-shadow: 2px 2px 0 var(--ink);
+    box-shadow: var(--shadow-sm);
 }
 
 .social-icon {
@@ -510,18 +501,18 @@ section {
     display: inline-block;
     padding: 14px 20px;
     border-radius: 13px;
-    background: var(--cube-yellow);
-    color: #17171f;
+    background: var(--ui-accent);
+    color: var(--ui-accent-text);
     font-weight: 800;
     border: var(--card-bw) solid var(--ink);
-    box-shadow: 4px 4px 0 var(--ink);
+    box-shadow: var(--shadow);
     word-break: break-all;
     transition: transform .15s ease, box-shadow .15s ease;
 }
 
 .email:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--ink);
+    box-shadow: var(--shadow-hover);
 }
 
 /* MOBİL */
@@ -801,10 +792,10 @@ section {
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "index";</script>
-<script src="/js/i18n.js?v=20261134"></script>
-<script src="/js/common.js?v=20261134"></script>
-<script src="/js/firebase-config.js?v=20261134"></script>
-<script src="/js/account.js?v=20261134"></script>
+<script src="/js/i18n.js?v=20261135"></script>
+<script src="/js/common.js?v=20261135"></script>
+<script src="/js/firebase-config.js?v=20261135"></script>
+<script src="/js/account.js?v=20261135"></script>
 
 
 

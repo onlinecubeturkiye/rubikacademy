@@ -19,7 +19,7 @@
 <link rel="icon" href="/icons/favicon-48.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#ffd21f">
+<meta name="theme-color" content="#0b0d14">
 
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/4x4">
 <meta name="description" content="4x4 OLL ve PLL parity algoritmaları: diyagramlı, simülasyonla doğrulanmış.">
@@ -27,10 +27,10 @@
 <meta property="og:description" content="4x4 OLL ve PLL parity algoritmaları: diyagramlı, simülasyonla doğrulanmış.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/4x4">
-<meta property="og:image" content="https://rubikacademy.fun/og/4x4.png?v=20261134">
+<meta property="og:image" content="https://rubikacademy.fun/og/4x4.png?v=20261135">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/4x4.png?v=20261134">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/4x4.png?v=20261135">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261134">
+<link rel="stylesheet" href="/styles/common.css?v=20261135">
 
 <style>
 .hero {
@@ -275,8 +275,8 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
     font: 800 15px "Inter", sans-serif; background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm);
     transition: transform .12s, box-shadow .12s;
 }
-.set-tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
-.set-tab.active { background: var(--cube-yellow); color: #17171f; }
+.set-tab:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
+.set-tab.active { background: var(--ui-accent); color: var(--ui-accent-text); }
 .set-desc { max-width: 760px; margin: 0 auto 22px; text-align: center; font-size: 14.5px; color: var(--text-soft); line-height: 1.6; }
 .nota-box {
     max-width: 900px; margin: 0 auto 26px; padding: 18px 20px; border-radius: 20px;
@@ -383,14 +383,14 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "alg4";</script>
-<script src="/js/i18n.js?v=20261134"></script>
-<script src="/js/common.js?v=20261134"></script>
-<script src="/js/firebase-config.js?v=20261134"></script>
-<script src="/js/account.js?v=20261134"></script>
+<script src="/js/i18n.js?v=20261135"></script>
+<script src="/js/common.js?v=20261135"></script>
+<script src="/js/firebase-config.js?v=20261135"></script>
+<script src="/js/account.js?v=20261135"></script>
 
 
-<script src="/js/custom-algs.js?v=20261134"></script>
-<script src="/js/alg-player.js?v=20261134"></script>
+<script src="/js/custom-algs.js?v=20261135"></script>
+<script src="/js/alg-player.js?v=20261135"></script>
 
 <script>
 /* ============================================================
@@ -507,7 +507,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/4x4.json?v=20261134")
+fetch("/icerikler/algoritmalar/4x4.json?v=20261135")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
