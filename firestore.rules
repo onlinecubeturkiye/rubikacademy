@@ -90,7 +90,7 @@ service cloud.firestore {
       match /meta/{m} {
         allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
         allow create, update: if request.auth != null && request.auth.uid == uid
-          && request.resource.data.keys().hasOnly(['email', 'provider', 'name', 'theme', 'cvd', 'lang', 'seen', 'dev', 'marks'])
+          && request.resource.data.keys().hasOnly(['email', 'provider', 'name', 'theme', 'cvd', 'skin', 'lang', 'seen', 'dev', 'marks'])
           && request.resource.data.email is string && request.resource.data.email.size() <= 120
           && (!('marks' in request.resource.data) || (request.resource.data.marks is string && request.resource.data.marks.size() <= 40000));
         allow delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
@@ -127,6 +127,34 @@ service cloud.firestore {
       allow create, update: if isAdmin()
         && request.resource.data.keys().hasOnly(['ts', 'name'])
         && request.resource.data.ts is timestamp;
+    }
+
+    // Canlı düello (akıllı küp sayfası): iki oyuncu, aynı karıştırma. Giriş yapan okur (kodu bilen).
+    match /duels/{code} {
+      function dk() { return ['host', 'hName', 'guest', 'gName', 'round', 'scr', 'hT', 'gT', 'hSt', 'gSt', 'hW', 'gW', 'sc', 'ts']; }
+      function chg() { return request.resource.data.diff(resource.data).affectedKeys(); }
+      allow get: if request.auth != null;
+      allow list: if false;
+      allow create: if request.auth != null && code.matches('^[A-Z0-9]{5}$')
+        && request.resource.data.keys().hasOnly(dk())
+        && request.resource.data.host == request.auth.uid && request.resource.data.guest == ''
+        && request.resource.data.hName is string && request.resource.data.hName.size() <= 24
+        && request.resource.data.scr is string && request.resource.data.scr.size() <= 200;
+      allow update: if request.auth != null && request.resource.data.keys().hasOnly(dk())
+        && request.resource.data.host == resource.data.host
+        && (
+          (request.auth.uid == resource.data.host
+            && chg().hasOnly(['round', 'scr', 'hT', 'gT', 'hSt', 'gSt', 'hW', 'gW', 'sc', 'hName', 'ts']))
+          || (request.auth.uid == resource.data.guest
+            && chg().hasOnly(['gT', 'gSt', 'gName', 'ts']))
+          || (resource.data.guest == '' && request.resource.data.guest == request.auth.uid
+            && request.auth.uid != resource.data.host
+            && chg().hasOnly(['guest', 'gName', 'gSt', 'ts']))
+        )
+        && (!('gName' in request.resource.data) || request.resource.data.gName.size() <= 24)
+        && (!('hSt' in request.resource.data) || request.resource.data.hSt.size() <= 40)
+        && (!('gSt' in request.resource.data) || request.resource.data.gSt.size() <= 40);
+      allow delete: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin());
     }
 
     // Site ayarı (bakım modu): herkes okur, yalnız admin yazar
