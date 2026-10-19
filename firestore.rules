@@ -67,7 +67,8 @@ service cloud.firestore {
           && request.resource.data.keys().hasOnly(['p', 'ts'])
           && request.resource.data.p is string && request.resource.data.p.size() <= 120
           && request.resource.data.ts is timestamp;
-        allow update, delete: if isAdmin();
+        allow update: if isAdmin();
+        allow delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
       }
 
       // Oturumlar (cihaz geçmişi + "tüm cihazlardan çık"): sahibi yazar/okur; admin okur
@@ -115,7 +116,8 @@ service cloud.firestore {
       allow create, update: if isAdmin()
         && request.resource.data.keys().hasOnly(['role'])
         && request.resource.data.role in ['uye', 'gelistirici', 'tester', 'askida'];
-      allow delete: if isAdmin();
+      // Hesabını silen üye kendi rol kaydını da siler (askıya alınmışsa silemez)
+      allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid && resource.data.role != 'askida');
     }
 
     // Site ayarı (bakım modu): herkes okur, yalnız admin yazar
@@ -136,7 +138,8 @@ service cloud.firestore {
     // Web Push abonelikleri: herkes kendi cihazını kaydeder (uid boş ya da kendisi); yalnız admin okur.
     // Gönderimi GitHub Actions'taki gönderici (hizmet hesabı) yapar.
     match /pushsubs/{id} {
-      allow get, list, delete: if isAdmin();
+      allow get, list: if isAdmin();
+      allow delete: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
       allow create, update: if id.matches('^[a-f0-9]{32}$')
         && request.resource.data.keys().hasOnly(['sub', 'uid', 'ts'])
         && request.resource.data.sub is string && request.resource.data.sub.size() <= 2000

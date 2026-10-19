@@ -387,11 +387,13 @@ if ("serviceWorker" in navigator) {
         LOOK[e[2] + "||" + e[3]] = [e[0], e[1]];
     });
     var _set, store;
-    try { store = window.localStorage; _set = store.setItem.bind(store); } catch (e) { return; }
+    var _proto;
+    try { store = window.localStorage; _proto = Storage.prototype.setItem; _set = function (k, v) { return _proto.call(store, k, v); }; store.removeItem("setItem"); } catch (e) { return; }
     function parse(k) { try { return JSON.parse(store.getItem(k)) || {}; } catch (e) { return {}; } }
     var syncing = false;
-    store.setItem = function (k, v) {
-        if (syncing || !WATCH[k]) return _set(k, v);
+    // Storage nesnesine atama yapılamaz (anahtar olarak kaydedilir); prototype üzerinden sar.
+    Storage.prototype.setItem = function (k, v) {
+        if (this !== store || syncing || !WATCH[k]) return _proto.call(this, k, v);
         var prev = parse(k);
         _set(k, v);
         var next; try { next = JSON.parse(v) || {}; } catch (e) { return; }
