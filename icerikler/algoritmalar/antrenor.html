@@ -27,10 +27,10 @@
 <meta property="og:description" content="Karıştırmayı uygula, case'i tanı, süreni ölç. Zorlandığın case'ler daha sık gelir.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/antrenor">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261128">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261129">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261128">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261129">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261128">
+<link rel="stylesheet" href="/styles/common.css?v=20261129">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -609,8 +609,10 @@ details.case-group[open] > summary::before { transform: rotate(90deg); }
 .pref-row small { display: block; font-size: 12.5px; color: var(--text-soft); line-height: 1.4; margin-top: 2px; }
 .manual-time { display: none; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 12px; }
 .manual-on .manual-time { display: flex; }
+.manual-on:not(.mode-card) #timerArea { display: none !important; }
 .mode-card .manual-time { display: none !important; }
 .manual-time input { width: 140px; padding: 10px 12px; border-radius: 12px; border: var(--card-bw) solid var(--card-border); background: var(--surface); color: var(--text); font: 800 18px "JetBrains Mono", monospace; text-align: center; }
+.manual-err.ok { color: #16a34a; }
 .manual-err { width: 100%; text-align: center; color: #dc2626; font-size: 12.5px; font-weight: 700; min-height: 1px; }
 </style>
 
@@ -869,24 +871,24 @@ details.case-group[open] > summary::before { transform: rotate(90deg); }
     <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
 </footer>
 
-<script src="/icerikler/algoritmalar/mgSvg.js?v=20261128"></script>
-<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261128"></script>
+<script src="/icerikler/algoritmalar/mgSvg.js?v=20261129"></script>
+<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261129"></script>
 <script src="/icerikler/algoritmalar/ll.js"></script>
 <script src="/icerikler/algoritmalar/cllSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261128"></script>
-<script src="/js/common.js?v=20261128"></script>
-<script src="/js/firebase-config.js?v=20261128"></script>
-<script src="/js/account.js?v=20261128"></script>
+<script src="/js/i18n.js?v=20261129"></script>
+<script src="/js/common.js?v=20261129"></script>
+<script src="/js/firebase-config.js?v=20261129"></script>
+<script src="/js/account.js?v=20261129"></script>
 
 
-<script src="/js/custom-algs.js?v=20261128"></script>
-<script src="/js/cross-solver.js?v=20261128"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261128"></script>
-<script src="/js/recog-trainer.js?v=20261128"></script>
+<script src="/js/custom-algs.js?v=20261129"></script>
+<script src="/js/cross-solver.js?v=20261129"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261129"></script>
+<script src="/js/recog-trainer.js?v=20261129"></script>
 
 <script>
 /* ============================================================
@@ -1123,7 +1125,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json", "xcross.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261128").then(function (r) {
+        return fetch(BASE + f + "?v=20261129").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -1356,8 +1358,11 @@ function tick() {
 }
 function stopRaf() { if (rafId) cancelAnimationFrame(rafId); rafId = 0; }
 
+var autoNextAt = 0; // algoritma gösterimi kapalıyken durdurma tuşu/dokunuşu yeni süreyi hemen başlatmasın
 function startTimer() {
     if (state !== "idle" || !curCase) return;
+    if (performance.now() - autoNextAt < 700) return;
+    if (mode === "cube" && prefs().manual) return; // elle girişte süre ölçülmez
     state = "running";
     startTime = performance.now();
     document.getElementById("timerArea").classList.add("running");
@@ -1385,6 +1390,7 @@ function stopTimer(manualMs) {
     if (!prefs().reveal) {
         // Algoritma/değerlendirme gösterilmez: süreyi kaydet, ekranda bırak, sıradaki karıştırmaya geç
         var shown = lastTime;
+        autoNextAt = performance.now();
         grade(false);
         document.getElementById("timer").textContent = fmt(shown);
         document.getElementById("timerHint").textContent = T("hint_saved_next");
@@ -1516,10 +1522,12 @@ document.getElementById("btnGood").addEventListener("click", function () { grade
 document.getElementById("manualForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var inp = document.getElementById("manualInput"), err = document.getElementById("manualErr"), ms = parseTime(inp.value);
+    err.classList.remove("ok");
     if (ms == null) { err.textContent = T("manual_bad"); inp.focus(); return; }
     if (state === "done") { err.textContent = T("manual_grade_first"); return; }
-    err.textContent = ""; inp.value = "";
+    err.textContent = ""; err.classList.remove("ok"); inp.value = "";
     stopTimer(ms);
+    if (!prefs().reveal) { err.textContent = "✓ " + fmt(ms) + " · " + T("hint_saved_next"); err.classList.add("ok"); }
 });
 (function () {
     var m = document.getElementById("prefModal");
