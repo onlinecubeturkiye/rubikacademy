@@ -18,7 +18,7 @@ service cloud.firestore {
     // Askıya alınmış hesap (roles/{uid}.role == 'askida') yazamaz
     function suspended(uid) {
       return exists(/databases/$(database)/documents/roles/$(uid))
-        && get(/databases/$(database)/documents/roles/$(uid)).data.role == 'askida';
+        && get(/databases/$(database)/documents/roles/$(uid)).data.role in ['askida', 'silindi'];
     }
 
     match /days/{day}/times/{uid} {
@@ -54,7 +54,8 @@ service cloud.firestore {
       match /kv/{key} {
         allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
         allow delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
-        allow create, update: if request.auth != null && request.auth.uid == uid
+        // Sahibi yazar; admin de düzenleyebilir (admin paneli veri düzenleyicisi)
+        allow create, update: if ((request.auth != null && request.auth.uid == uid) || isAdmin())
           && key.matches('^[a-z0-9-]{1,64}$')
           && request.resource.data.keys().hasOnly(['v', 't'])
           && request.resource.data.v is string && request.resource.data.v.size() <= 500000
@@ -115,9 +116,17 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isAdmin()
         && request.resource.data.keys().hasOnly(['role'])
-        && request.resource.data.role in ['uye', 'gelistirici', 'tester', 'askida'];
-      // Hesabını silen üye kendi rol kaydını da siler (askıya alınmışsa silemez)
-      allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid && resource.data.role != 'askida');
+        && request.resource.data.role in ['uye', 'gelistirici', 'tester', 'askida', 'silindi'];
+      // Hesabını silen üye kendi rol kaydını da siler (askıya alınmış / silinmişse silemez)
+      allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid && !(resource.data.role in ['askida', 'silindi']));
+    }
+
+    // Admin'in sildiği hesaplar: Firebase giriş hesabını GitHub Actions'taki görev siler, sonra kaydı kaldırır
+    match /deletions/{uid} {
+      allow read, delete: if isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['ts', 'name'])
+        && request.resource.data.ts is timestamp;
     }
 
     // Site ayarı (bakım modu): herkes okur, yalnız admin yazar

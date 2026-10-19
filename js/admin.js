@@ -162,18 +162,20 @@
             '<details class="sec"><summary><b>İşaretlediği case\'ler</b> <span class="a-note">(' + markCount + ')</span></summary><div class="sec-body">' + marksHtml(me.marks) + '</div></details>' +
             '<details class="sec"><summary><b>Gezdiği sayfalar</b> <span class="a-note">(' + (visits ? visits.length : 0) + ')</span></summary><div class="sec-body v-list">' + visitsHtml(visits) + '</div></details>';
     }
-    var ROLES = [["uye", "Üye"], ["gelistirici", "Geliştirici"], ["tester", "Tester"], ["askida", "⛔ Askıda"]];
+    var ROLES = [["uye", "Üye"], ["gelistirici", "Geliştirici"], ["tester", "Tester"], ["askida", "⛔ Askıda"], ["silindi", "🗑️ Silindi"]];
     function roleBox(uid, role) {
         var opts = ROLES.map(function (r) { return '<option value="' + r[0] + '"' + (r[0] === role ? ' selected' : '') + '>' + r[1] + '</option>'; }).join("");
         return '<h4>Rol</h4><div class="a-ctrl"><select id="roleSel">' + opts + '</select>' +
             '<button class="a-btn main sm" id="roleSave">Kaydet</button><span class="a-msg" id="roleMsg" style="margin:0"></span></div>';
     }
-    function roleName(r) { return r === "gelistirici" ? "Geliştirici" : (r === "tester" ? "Tester" : (r === "askida" ? "Askıda" : "Üye")); }
+    function roleName(r) { return r === "gelistirici" ? "Geliştirici" : (r === "tester" ? "Tester" : (r === "askida" ? "Askıda" : (r === "silindi" ? "Silindi" : "Üye"))); }
     function dangerBox(role) {
         return '<h4>Hesap işlemleri</h4><div class="a-ctrl">' +
             '<button class="a-btn sm" id="uSuspend">' + (role === "askida" ? "✅ Askıdan çıkar" : "⛔ Askıya al") + '</button>' +
-            '<button class="a-btn danger sm" id="uWipe">🗑️ Tüm verisini sil</button><span class="a-msg" id="uDangerMsg" style="margin:0"></span></div>' +
-            '<p class="a-note">Askıya alınan kişi oturumdan atılır; günlük sıralamaya ve profiline yazamaz. Silme; profil, ilerleme, ziyaret, oturum ve bildirim kayıtlarını kaldırır (giriş hesabı Firebase Authentication’da kalır).</p>';
+            '<button class="a-btn danger sm" id="uWipe">🗑️ Tüm verilerini sil</button>' +
+            '<button class="a-btn danger sm" id="uDelete">⚠️ Hesabı tamamen sil</button><span class="a-msg" id="uDangerMsg" style="margin:0"></span></div>' +
+            '<p class="a-note"><b>Tüm verilerini sil:</b> ilerleme, antrenör, günlük sonuçlar, sıralama girdileri, ziyaret/bildirim kayıtları silinir; kişinin cihazları da bir sonraki açılışta temizlenir (veriler geri gelmez). Hesap kalır.<br>' +
+            '<b>Hesabı tamamen sil:</b> yukarıdakilere ek olarak profil, oturumlar, bildirim abonelikleri ve Firebase giriş hesabı silinir. Giriş hesabını GitHub Actions’taki görev (FIREBASE_SERVICE_ACCOUNT) birkaç dakika içinde siler; kişi siteye girerse hesap orada da kapatılır.</p>';
     }
     function listDocNames(path) {
         var out = [];
@@ -185,18 +187,55 @@
         return page("");
     }
     function delDoc(path) { return authed(docsBase() + path, { method: "DELETE" }).then(function (r) { return r.ok; }, function () { return false; }); }
-    function wipeUser(uid) {
-        var subs = ["kv", "visits", "sessions", "notifications", "meta"];
-        return Promise.all(subs.map(function (c) { return listDocNames("/users/" + uid + "/" + c); })).then(function (lists) {
-            var all = [].concat.apply([], lists);
-            // küçük gruplar halinde sil
-            var i = 0;
-            function next() { var chunk = all.slice(i, i + 20); i += 20; if (!chunk.length) return Promise.resolve(); return Promise.all(chunk.map(delDoc)).then(next); }
-            return next();
-        }).then(function () { return Promise.all([delDoc("/users/" + uid), delDoc("/roles/" + uid)]); });
+    function docName(path) { return "projects/" + cfg.projectId + "/databases/(default)/documents" + path; }
+    // Toplu yazma (400'lük parçalar)
+    function commit(writes) {
+        var chunks = []; for (var i = 0; i < writes.length; i += 400) chunks.push(writes.slice(i, i + 400));
+        return chunks.reduce(function (p, w) {
+            return p.then(function () { return authed(docsBase() + ":commit", { method: "POST", body: JSON.stringify({ writes: w }) }); })
+                .then(function (r) { if (!r.ok) throw new Error("commit " + r.status); });
+        }, Promise.resolve());
+    }
+    function dayRange() { var td = Math.floor(Date.now() / 86400000), out = []; for (var d = td - 370; d <= td + 1; d++) out.push(d); return out; }
+    function kvWrite(uid, key, v) {
+        var t = Date.now();
+        return authed(docsBase() + "/users/" + uid + "/kv/" + encodeURIComponent(key), { method: "PATCH", body: JSON.stringify({ fields: { v: { stringValue: v }, t: { integerValue: String(t) } } }) })
+            .then(function (r) { return r.ok; });
+    }
+    // Tüm verileri sil (hesap kalır): kv + sıralama + ziyaret/bildirim/meta; "wipe-v1" işaretiyle cihazlar da temizlenir
+    function wipeUserData(uid) {
+        var now = Date.now();
+        return Promise.all(["kv", "visits", "notifications", "meta"].map(function (c) { return listDocNames("/users/" + uid + "/" + c); })).then(function (lists) {
+            var writes = [].concat.apply([], lists).filter(function (p) { return !/\/kv\/wipe-v1$/.test(p); }).map(function (p) { return { delete: docName(p) }; });
+            dayRange().forEach(function (dn) { writes.push({ delete: docName("/days/" + dn + "/times/" + uid) }); });
+            writes.push({ delete: docName("/users/" + uid) });
+            writes.push({ update: { name: docName("/users/" + uid + "/kv/wipe-v1"), fields: { v: { stringValue: String(now) }, t: { integerValue: String(now) } } } });
+            return commit(writes);
+        });
+    }
+    function listPushSubsOf(uid) {
+        var out = [];
+        function page(tok) {
+            return authed(docsBase() + "/pushsubs?pageSize=300&mask.fieldPaths=uid" + (tok ? "&pageToken=" + encodeURIComponent(tok) : ""), { method: "GET" })
+                .then(function (r) { return r.ok ? r.json() : {}; })
+                .then(function (d) { (d.documents || []).forEach(function (x) { if (gv(x.fields || {}, "uid") === uid) out.push(x.name.split("/documents")[1]); }); return d.nextPageToken ? page(d.nextPageToken) : out; });
+        }
+        return page("");
+    }
+    // Hesabı tamamen sil: tüm belgeler + rol "silindi" (cihazlar kendini kapatır) + deletions kuyruğu (Auth hesabını Actions siler)
+    function deleteUserFully(u) {
+        var uid = u.uid;
+        return Promise.all(["kv", "visits", "sessions", "notifications", "meta"].map(function (c) { return listDocNames("/users/" + uid + "/" + c); }).concat([listPushSubsOf(uid)])).then(function (lists) {
+            var writes = [].concat.apply([], lists).map(function (p) { return { delete: docName(p) }; });
+            dayRange().forEach(function (dn) { writes.push({ delete: docName("/days/" + dn + "/times/" + uid) }); });
+            writes.push({ delete: docName("/users/" + uid) });
+            writes.push({ update: { name: docName("/roles/" + uid), fields: { role: { stringValue: "silindi" } } } });
+            writes.push({ update: { name: docName("/deletions/" + uid), fields: { ts: { timestampValue: new Date().toISOString() }, name: { stringValue: String(u.name || "").slice(0, 40) } } } });
+            return commit(writes);
+        });
     }
     function bindDanger(u, role, pickBtn) {
-        var sb = $id("uSuspend"), wb = $id("uWipe");
+        var sb = $id("uSuspend"), wb = $id("uWipe"), db = $id("uDelete");
         if (sb) sb.addEventListener("click", function () {
             var to = role === "askida" ? "uye" : "askida";
             if (to === "askida" && !confirm(u.name + " askıya alınsın mı?")) return;
@@ -211,9 +250,48 @@
             });
         });
         if (wb) wb.addEventListener("click", function () {
-            if (prompt("“" + u.name + "” kullanıcısının TÜM verisi silinecek. Onay için SİL yaz:") !== "SİL") return;
+            if (prompt("“" + u.name + "” kullanıcısının TÜM verileri (ilerleme, antrenör, günlük, sıralama) kalıcı olarak silinecek. Onay için SİL yaz:") !== "SİL") return;
             wb.disabled = true; msg($id("uDangerMsg"), "Siliniyor…");
-            wipeUser(u.uid).then(function () { msg($id("uDangerMsg"), "Silindi ✓", "ok"); renderUsers(); }, function () { wb.disabled = false; msg($id("uDangerMsg"), "Silinemedi.", "bad"); });
+            wipeUserData(u.uid).then(function () { msg($id("uDangerMsg"), "Tüm verileri silindi ✓", "ok"); wb.disabled = false; }, function (e) { wb.disabled = false; msg($id("uDangerMsg"), "Silinemedi (" + esc(e && e.message) + ") — kuralları yayımladın mı?", "bad"); });
+        });
+        if (db) db.addEventListener("click", function () {
+            if (prompt("“" + u.name + "” hesabı Firebase dahil TAMAMEN silinecek, geri alınamaz. Onay için HESABI SİL yaz:") !== "HESABI SİL") return;
+            db.disabled = true; msg($id("uDangerMsg"), "Siliniyor…");
+            deleteUserFully(u).then(function () { msg($id("uDangerMsg"), "Hesap silindi ✓ (giriş hesabı birkaç dakika içinde kaldırılır)", "ok"); setTimeout(renderUsers, 1200); }, function (e) { db.disabled = false; msg($id("uDangerMsg"), "Silinemedi (" + esc(e && e.message) + ") — kuralları yayımladın mı?", "bad"); });
+        });
+    }
+    // Kullanıcının bulut verisi (users/{uid}/kv) — veri düzenleyici için
+    function loadKv(uid) {
+        var kv = {};
+        function page(tok) {
+            return authed(docsBase() + "/users/" + uid + "/kv?pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : ""), { method: "GET" })
+                .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+                .then(function (d) {
+                    (d.documents || []).forEach(function (x) { var k = decodeURIComponent(x.name.split("/kv/")[1]); kv[k] = { v: gv(x.fields || {}, "v") || "", t: +gv(x.fields || {}, "t") || 0 }; });
+                    return d.nextPageToken ? page(d.nextPageToken) : kv;
+                });
+        }
+        return page("");
+    }
+    function adminStore(uid, kv) {
+        return {
+            get: function (k) { try { var v = JSON.parse((kv[k] || {}).v); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; } },
+            put: function (k, obj) { var v = JSON.stringify(obj); kv[k] = { v: v, t: Date.now() }; return kvWrite(uid, k, v); },
+            keys: function () { return Object.keys(kv); },
+            deleteDaily: function (d) { return deleteTime(dayNumOf(d), uid); }
+        };
+    }
+    function bindEditor(u) {
+        var sec = $id("uEditSec"), box = $id("uEditor"); if (!sec || !box) return;
+        var done = false;
+        sec.addEventListener("toggle", function () {
+            if (!sec.open || done) return; done = true;
+            box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
+            loadKv(u.uid).then(function (kv) {
+                if (!window.DataEditor) { box.innerHTML = '<p class="a-note">Düzenleyici yüklenemedi.</p>'; return; }
+                box.innerHTML = "";
+                window.DataEditor.mount(box, adminStore(u.uid, kv));
+            }, function (e) { done = false; box.innerHTML = '<p class="a-note">Veriler yüklenemedi (' + esc(e && e.message) + ').</p>'; });
         });
     }
     function selectUser(u, detailBox, pickBtn, picker) {
@@ -222,8 +300,10 @@
         detailBox.innerHTML = '<div class="u-card open"><p class="a-note">Yükleniyor…</p></div>';
         Promise.all([fetchMeta(u.uid), listVisits(u.uid, 200), fetchRole(u.uid)]).then(function (res) {
             var role = res[2] || "uye";
-            detailBox.innerHTML = '<div class="u-card open">' + roleBox(u.uid, role) + userDetailHtml(u, res[0] || {}, res[1] || []) + dangerBox(role) + '</div>';
-            bindDanger(u, role, pickBtn);
+            detailBox.innerHTML = '<div class="u-card open">' + roleBox(u.uid, role) + userDetailHtml(u, res[0] || {}, res[1] || []) +
+                '<details class="sec" id="uEditSec"><summary><b>✏️ Verilerini düzenle</b> <span class="a-note">(antrenör · günlük · bilinen algoritmalar)</span></summary><div class="sec-body"><p class="a-note">Değişiklikler kişinin buluttaki verisine yazılır; cihazları bir sonraki senkronda alır.</p><div id="uEditor"></div></div></details>' +
+                dangerBox(role) + '</div>';
+            bindDanger(u, role, pickBtn); bindEditor(u);
             var save = $id("roleSave");
             if (save) save.addEventListener("click", function () {
                 var val = $id("roleSel").value;

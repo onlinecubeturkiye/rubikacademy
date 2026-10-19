@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261131";
+    var V = "20261132";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -87,7 +87,7 @@
                 user = u;
                 lsSet(SIGNED_KEY, u ? "1" : null);
                 renderNav();
-                if (u) { closeModal(); startSync(); logSession(); checkLogoutAll(); checkSuspended(); ensurePush(); } else stopSync();
+                if (u) { closeModal(); startSync(); logSession(); checkLogoutAll(); checkSuspended(); ensurePush(); } else { stopSync(); setTimeout(checkRemovedSignedOut, 1500); }
                 listeners.forEach(function (f) { try { f(u); } catch (e) {} });
                 try { document.dispatchEvent(new CustomEvent("account-change", { detail: u })); } catch (e) {}
             });
@@ -446,6 +446,9 @@
     function sentDays() {
         var sent = parse(lsGet("daily-sent-v1")) || {}, out = [];
         Object.keys(sent).forEach(function (d) { var p = d.split("-"); if (p.length === 3) out.push(Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000)); });
+        // Bu cihazda kaydı olmayan günler de silinsin: son ~1 yılın tamamı (olmayan belgeyi silmek zararsız)
+        var td = Math.floor(Date.now() / 86400000);
+        for (var d = td - 370; d <= td + 1; d++) if (out.indexOf(d) < 0) out.push(d);
         return out;
     }
     function commit(writes) {
@@ -516,11 +519,7 @@
                 .then(function () { return api("/roles/" + uid, { method: "DELETE" }).catch(function () {}); })
                 .then(function () { return dropPushSub(); })
                 .then(function () { return m.deleteUser(auth.currentUser); });
-        }).then(function () {
-            wipeLocal();
-            ["ra-profile-v1", "ra-push-saved", "ra-wipe-seen", "ra-login-ts"].forEach(function (k) { lsSet(k, null); });
-            lsSet(META_KEY, null); lsSet(SIGNED_KEY, null);
-        });
+        }).then(clearAccountLocal);
     }
 
     /* ---------- herkese açık profil dokümanı + ziyaret kaydı ---------- */
@@ -775,10 +774,34 @@
         markNotesSeen([{ id: d.tag && d.tag.indexOf("n:") === 0 ? d.tag : "b:" + (+String(d.tag || "").slice(2) || 0), ts: +String(d.tag || "").slice(2) || 0 }]);
     });
 
+    /* ---------- yönetici tarafından silinmiş hesap ---------- */
+    // roles/{uid} = "silindi": bu cihazdaki verileri temizle, (mümkünse) hesabı sil, çıkış yap
+    function clearAccountLocal() {
+        wipeLocal();
+        ["ra-profile-v1", "ra-push-saved", "ra-wipe-seen", "ra-login-ts"].forEach(function (k) { lsSet(k, null); });
+        lsSet(META_KEY, null); lsSet(SIGNED_KEY, null);
+    }
+    function removedByAdmin() {
+        clearAccountLocal();
+        loadSDK().then(function (m) {
+            return m.deleteUser(auth.currentUser).catch(function () { return m.signOut(auth); });
+        }).catch(function () {}).then(function () {
+            clearAccountLocal();
+            setTimeout(function () { alert("Hesabın yönetici tarafından silindi."); location.href = "/"; }, 200);
+        });
+    }
+    // Hesap silinip oturum kendiliğinden kapandıysa (son giriş yapılan hesap bilgisi duruyor) kontrol et
+    function checkRemovedSignedOut() {
+        var meta = loadMeta(); if (!meta.uid || sessionStorage.getItem("ra-rm-chk") === meta.uid) return;
+        try { sessionStorage.setItem("ra-rm-chk", meta.uid); } catch (e) {}
+        window.Account.getRole(meta.uid).then(function (r) { if (r === "silindi" && !user) clearAccountLocal(); }, function () {});
+    }
+
     /* ---------- askıya alınmış hesap ---------- */
     function checkSuspended() {
         if (!user || isAdmin()) return;
         window.Account.getRole(user.uid).then(function (r) {
+            if (r === "silindi") { removedByAdmin(); return; }
             if (r !== "askida") return;
             signOut();
             setTimeout(function () { alert("Hesabın yönetici tarafından askıya alındı. Bir hata olduğunu düşünüyorsan bizimle iletişime geç."); }, 300);

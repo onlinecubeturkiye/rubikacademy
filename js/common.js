@@ -457,3 +457,56 @@ if ("serviceWorker" in navigator) {
         }, true);
     });
 })();
+
+/* =========================================================
+   ALGORİTMA SETLERİ: "Hepsini seç" çubuğu
+   Sayfanın kendi loadProgress/saveProgress/applyState/updateSummary
+   fonksiyonlarını kullanır; ekrandaki tüm case'leri tek seferde işaretler.
+========================================================= */
+(function () {
+    var TXT = {
+        tr: { all: "Hepsini:", k: "🟢 Biliyorum", l: "🟡 Öğreniyorum", c: "⚪ Temizle", ask: "Bu sayfadaki tüm case'lerin işaretleri temizlensin mi?" },
+        en: { all: "Mark all:", k: "🟢 Known", l: "🟡 Learning", c: "⚪ Clear", ask: "Clear the marks of all cases on this page?" },
+        de: { all: "Alle:", k: "🟢 Kann ich", l: "🟡 Ich lerne", c: "⚪ Leeren", ask: "Markierungen aller Fälle auf dieser Seite löschen?" },
+        fr: { all: "Tout :", k: "🟢 Je sais", l: "🟡 J'apprends", c: "⚪ Effacer", ask: "Effacer les marques de tous les cas de cette page ?" },
+        ru: { all: "Все:", k: "🟢 Знаю", l: "🟡 Учу", c: "⚪ Сбросить", ask: "Сбросить отметки всех случаев на этой странице?" },
+        ar: { all: "الكل:", k: "🟢 أعرف", l: "🟡 أتعلم", c: "⚪ مسح", ask: "مسح علامات جميع الحالات في هذه الصفحة؟" }
+    };
+    function t() { var l = "tr"; try { l = localStorage.getItem("site-lang") || "tr"; } catch (e) {} return TXT[l] || TXT.tr; }
+    function ready() {
+        var sum = document.getElementById("progressSummary");
+        if (!sum || document.getElementById("raMarkAll")) return;
+        if (typeof window.loadProgress !== "function" || typeof window.saveProgress !== "function" || typeof window.applyState !== "function") return;
+        var css = document.createElement("style");
+        css.textContent = ".ra-markall{max-width:1250px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:-16px auto 24px}" +
+            ".ra-markall span{font-size:13px;font-weight:800;color:var(--text-soft)}" +
+            ".ra-markall button{border:1px solid var(--border);background:var(--surface);color:var(--text);font:800 13px Inter,sans-serif;padding:7px 12px;border-radius:999px;cursor:pointer}" +
+            ".ra-markall button:hover{background:var(--surface-soft)}";
+        document.head.appendChild(css);
+        var bar = document.createElement("div"); bar.id = "raMarkAll"; bar.className = "ra-markall";
+        function draw() { var x = t(); bar.innerHTML = '<span>' + x.all + '</span><button type="button" data-st="known">' + x.k + '</button><button type="button" data-st="learning">' + x.l + '</button><button type="button" data-st="">' + x.c + '</button>'; }
+        draw();
+        sum.parentNode.insertBefore(bar, sum.nextSibling);
+        document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest("#langMenu")) setTimeout(draw, 60); });
+        bar.addEventListener("click", function (e) {
+            var b = e.target.closest("button"); if (!b) return;
+            var st = b.getAttribute("data-st");
+            if (!st && !confirm(t().ask)) return;
+            // Görünen case'ler (arama/filtreyle gizlenenler hariç); hiçbiri görünmüyorsa hepsi
+            var all = Array.prototype.slice.call(document.querySelectorAll(".case-card[data-case]"));
+            var vis = all.filter(function (c) { return c.offsetParent !== null || c.closest("details:not([open])"); });
+            var cards = vis.length ? vis : all;
+            var p = window.loadProgress() || {};
+            cards.forEach(function (c) {
+                var n = c.getAttribute("data-case");
+                if (st) p[n] = st; else delete p[n];
+                window.applyState(c, st);
+            });
+            window.saveProgress(p);
+            if (typeof window.updateSummary === "function") window.updateSummary();
+        });
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(ready, 0); });
+    else setTimeout(ready, 0);
+    window.addEventListener("load", ready);
+})();
