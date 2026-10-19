@@ -116,7 +116,9 @@
         {
           "name": "U1",
           "alg": "R U2 R U2 R U R2",
-          "alts": [],
+          "alts": [
+            "(U') R2 U' R' U2 R' U2 R'"
+          ],
           "pattern_u": "LLUUBFFRUUBR",
           "pattern_d": "DDDDFRFBBRLL"
         },

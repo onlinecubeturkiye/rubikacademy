@@ -20,13 +20,17 @@
         {
           "name": "WV 2",
           "alg": "R U' R'",
-          "alts": [],
+          "alts": [
+            "U R' U' R2 U' R' U R' U R"
+          ],
           "pattern": "UUUUUUFFXRRUXXXXXXXXD"
         },
         {
           "name": "WV 3",
           "alg": "R U R' U' R U' R'",
-          "alts": [],
+          "alts": [
+            "R U' R' F' U' F U' F' U2 F"
+          ],
           "pattern": "XUUUUUFFURRXXXXXXXUXD"
         },
         {
@@ -73,13 +77,17 @@
         {
           "name": "WV 8",
           "alg": "R U R2 U' R2 U' R2 U2 R",
-          "alts": [],
+          "alts": [
+            "U' R' U2 R U R' U R2 U2 R'"
+          ],
           "pattern": "XUXUUUFFURRXXXXUXUXXD"
         },
         {
           "name": "WV 9",
           "alg": "R' U' R2 U' R2 U2 R2 U2 R'",
-          "alts": [],
+          "alts": [
+            "U R U2 R'"
+          ],
           "pattern": "UUXUUUFFXRRXUXUXXXXXD"
         },
         {
@@ -180,13 +188,17 @@
         {
           "name": "WV 20",
           "alg": "R U' R2 U' R U' R' U2 R",
-          "alts": [],
+          "alts": [
+            "R U' R' U R U2 R' U' R U' R'"
+          ],
           "pattern": "XUXUUUFFXRRUXXXXXUUXD"
         },
         {
           "name": "WV 21",
           "alg": "R U' R2 U2 R U R' U R",
-          "alts": [],
+          "alts": [
+            "R U' R' U R U R' U R U2 R'"
+          ],
           "pattern": "XUXUUUFFXRRXUXUUXXXXD"
         },
         {

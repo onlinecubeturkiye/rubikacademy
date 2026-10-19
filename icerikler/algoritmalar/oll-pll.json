@@ -15,37 +15,49 @@
         {
           "name": "OLL 22",
           "alg": "R U2 R2 U' R2 U' R2 U2 R",
-          "alts": [],
+          "alts": [
+            "R' U2 R2 U R2 U R2 U2 R'"
+          ],
           "pattern": "FULUUUBULRBUFRBRLUUFU"
         },
         {
           "name": "OLL 23",
           "alg": "R2 D R' U2 R D' R' U2 R'",
-          "alts": [],
+          "alts": [
+            "(U2) R2 D' R U2 R' D R U2 R"
+          ],
           "pattern": "UUUUUURUFUFUFRLBBRLLB"
         },
         {
           "name": "OLL 24",
           "alg": "r U R' U' r' F R F'",
-          "alts": [],
+          "alts": [
+            "L F R' F' L' F R F'"
+          ],
           "pattern": "FUUUUURUUUFFBRRUBLLLB"
         },
         {
           "name": "OLL 25",
           "alg": "F' r U R' U' r' F R",
-          "alts": [],
+          "alts": [
+            "(U') F R' F' r U R U' r'"
+          ],
           "pattern": "FUUUUUUUBFFUBRRRBLULL"
         },
         {
           "name": "OLL 26",
           "alg": "R U2 R' U' R U' R'",
-          "alts": [],
+          "alts": [
+            "(U') R' U' R U' R' U2 R"
+          ],
           "pattern": "FUUUUURUBUFLLLURRFUBB"
         },
         {
           "name": "OLL 27",
           "alg": "R U R' U R U2 R'",
-          "alts": [],
+          "alts": [
+            "(U') R' U2 R U R' U R"
+          ],
           "pattern": "RUFUUUUULBFUUBBULLFRR"
         }
       ]
@@ -152,13 +164,17 @@
         {
           "name": "OLL 5",
           "alg": "r' U2 R U R' U r",
-          "alts": [],
+          "alts": [
+            "(U2) l' U2 L U L' U l"
+          ],
           "pattern": "RRFBUUBUURFBULLUULFUU"
         },
         {
           "name": "OLL 6",
           "alg": "r U2 R' U' R U' r'",
-          "alts": [],
+          "alts": [
+            "(U2) l U2 L' U' L U' l'"
+          ],
           "pattern": "FUUFUURRBUULLLURBFUUB"
         }
       ]
@@ -169,13 +185,17 @@
         {
           "name": "OLL 51",
           "alg": "F (U R U' R') (U R U' R') F'",
-          "alts": [],
+          "alts": [
+            "(U2) f R U R' U' R U R' U' f'"
+          ],
           "pattern": "LFBUUULRFUURUBUUURBLF"
         },
         {
           "name": "OLL 52",
           "alg": "R' F' U' F U' R U R' U R",
-          "alts": [],
+          "alts": [
+            "(U2) R U R' U R U' B U' B' R'"
+          ],
           "pattern": "RUBLURRUFFFULULBBUUUU"
         },
         {
@@ -221,7 +241,9 @@
         {
           "name": "OLL 35",
           "alg": "R U2 R2 F R F' R U2 R'",
-          "alts": [],
+          "alts": [
+            "(U) L' U2 L2 F' L' F L' U2 L"
+          ],
           "pattern": "URRBUUBUUUFRULBLUFFUL"
         },
         {
@@ -240,13 +262,17 @@
         {
           "name": "OLL 7",
           "alg": "r U R' U R U2 r'",
-          "alts": [],
+          "alts": [
+            "F R' F' R U2 R U2 R'"
+          ],
           "pattern": "RUFUUFULLBUUUUBUBLFRR"
         },
         {
           "name": "OLL 8",
           "alg": "r' U' R U' R' U2 r",
-          "alts": [],
+          "alts": [
+            "(U2) l' U' L U' L' U2 l"
+          ],
           "pattern": "ULLUUBRUBUFLFUUFUURRB"
         },
         {
@@ -299,19 +325,25 @@
         {
           "name": "OLL 14",
           "alg": "(R' F R) U (R' F' R) (F U' F')",
-          "alts": [],
+          "alts": [
+            "F' U' L' U2 L U L' U' L F"
+          ],
           "pattern": "RFLUUUBRUUUFFBRBUUULL"
         },
         {
           "name": "OLL 15",
           "alg": "l' U' l L' U' L U l' U l",
-          "alts": [],
+          "alts": [
+            "(U2) r' U' r R' U' R U r' U r"
+          ],
           "pattern": "UFFUUUBLLRUUURBFULRBU"
         },
         {
           "name": "OLL 16",
           "alg": "r U r' R U R' U' r U' r'",
-          "alts": [],
+          "alts": [
+            "(U2) l U l' L U L' U' l U' l'"
+          ],
           "pattern": "FFUUUURRBUULLBURUFULB"
         }
       ]
@@ -322,7 +354,9 @@
         {
           "name": "OLL 29",
           "alg": "r2 D' r U r' D r2 U' r' U' r",
-          "alts": [],
+          "alts": [
+            "M U R U R' U' R' F R F' M'"
+          ],
           "pattern": "UBUUUFBUFRRRLUUBUFLLU"
         },
         {
@@ -345,7 +379,9 @@
         {
           "name": "OLL 42",
           "alg": "R' U' R U' R' U2 R F R U R' U' F'",
-          "alts": [],
+          "alts": [
+            "(U) R' F R F' R' F R F' R U R' U' R U R'"
+          ],
           "pattern": "UFUUURBUBULUFURLURFBL"
         }
       ]
@@ -356,7 +392,9 @@
         {
           "name": "OLL 31",
           "alg": "R' U' F U R U' R' F' R",
-          "alts": [],
+          "alts": [
+            "(U2) S' L' U' L U L F' L' f"
+          ],
           "pattern": "BUUBUULFUUUFBRRULLRUF"
         },
         {
@@ -378,7 +416,9 @@
         {
           "name": "OLL 44",
           "alg": "F U R U' R' F'",
-          "alts": [],
+          "alts": [
+            "(U2) f R U R' U' f'"
+          ],
           "pattern": "UULUUFUBLRUFUUURRBBLF"
         }
       ]
@@ -389,13 +429,17 @@
         {
           "name": "OLL 33",
           "alg": "(R U R' U') (R' F R F')",
-          "alts": [],
+          "alts": [
+            "F R U' R' U R U R' F'"
+          ],
           "pattern": "FFUUUURRUUUFBBRUULLLB"
         },
         {
           "name": "OLL 45",
           "alg": "F R U R' U' F'",
-          "alts": [],
+          "alts": [
+            "(U2) F' L' U' L U F"
+          ],
           "pattern": "RFUUUURRUFULBBFBULULU"
         }
       ]
@@ -415,7 +459,9 @@
         {
           "name": "OLL 46",
           "alg": "R' U' R' F R F' U R",
-          "alts": [],
+          "alts": [
+            "(U2) L U L F' L' F U' L'"
+          ],
           "pattern": "UULFULUULRRFUUURBBBUF"
         }
       ]
@@ -426,37 +472,49 @@
         {
           "name": "OLL 47",
           "alg": "F' (L' U' L U) (L' U' L U) F",
-          "alts": [],
+          "alts": [
+            "R' U' R' F R F' R' F R F' U R"
+          ],
           "pattern": "LUBFUULBFUURURUULRBUF"
         },
         {
           "name": "OLL 48",
           "alg": "F (R U R' U') (R U R' U') F'",
-          "alts": [],
+          "alts": [
+            "R U2 R' U' R U R' U2 R' F R F'"
+          ],
           "pattern": "BURUUFFBRLUUBUFLRUULU"
         },
         {
           "name": "OLL 49",
           "alg": "r U' r2 U r2 U r2 U' r",
-          "alts": [],
+          "alts": [
+            "(U2) R B' R2 F R2 B R2 F' R"
+          ],
           "pattern": "FULBUUBLLRUUFRBRFUUUU"
         },
         {
           "name": "OLL 50",
           "alg": "r' U r2 U' r2 U' r2 U r'",
-          "alts": [],
+          "alts": [
+            "(U2) R' F R2 B' R2 F' R2 B R'"
+          ],
           "pattern": "FLLFUUBULRBUFRBRUUUUU"
         },
         {
           "name": "OLL 53",
           "alg": "r' U' R U' R' U R U' R' U2 r",
-          "alts": [],
+          "alts": [
+            "(U') l' U2 L U L' U' L U L' U l"
+          ],
           "pattern": "BRBBUUFUFLFRULULURUUU"
         },
         {
           "name": "OLL 54",
           "alg": "r U R' U R U' R' U R U2 r'",
-          "alts": [],
+          "alts": [
+            "(U') r U2 R' U' R U R' U' R U' r'"
+          ],
           "pattern": "BUBFUUFRFLURULULBRUUU"
         }
       ]
@@ -491,19 +549,25 @@
         {
           "name": "Aa perm",
           "alg": "x (R' U R') D2 (R U' R') D2 R2 x'",
-          "alts": [],
+          "alts": [
+            "R' F R' B2 R F' R' B2 R2"
+          ],
           "pattern": "UUUUUUUUUFFBFRLRBRBLL"
         },
         {
           "name": "Ab perm",
           "alg": "x R2' D2 (R U R') D2 (R U' R) x'",
-          "alts": [],
+          "alts": [
+            "(U) R B' R F2 R' B R F2 R2"
+          ],
           "pattern": "UUUUUUUUUFFRBRBFBLRLL"
         },
         {
           "name": "F perm",
           "alg": "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R",
-          "alts": [],
+          "alts": [
+            "(U) R' U2 R' d' R' F' R2 U' R' U R' F R U' F"
+          ],
           "pattern": "UUUUUUUUUFBRFRBBFRLLL"
         },
         {
@@ -519,7 +583,9 @@
         {
           "name": "Jb perm",
           "alg": "(R U R' F') (R U R' U') R' F R2 U' R' U'",
-          "alts": [],
+          "alts": [
+            "R U2 R' U' R U2 L' U R' U' L"
+          ],
           "pattern": "UUUUUUUUUFRRFFBBBRLLL"
         },
         {
@@ -533,13 +599,17 @@
         {
           "name": "Rb perm",
           "alg": "(R' U2 R U2) R' F (R U R' U') R' F' R2",
-          "alts": [],
+          "alts": [
+            "(U) R2 F R U R U' R' F' R U2 R' U2 R"
+          ],
           "pattern": "UUUUUUUUULFLRLFFRBRBB"
         },
         {
           "name": "T perm",
           "alg": "(R U R' U') R' F R2 U' R' U' (R U R' F')",
-          "alts": [],
+          "alts": [
+            "F R U' R' U R U R2 F' R U R U' R'"
+          ],
           "pattern": "UUUUUUUUUFFRFLBBBRLRL"
         }
       ]
@@ -598,13 +668,17 @@
         {
           "name": "Ga perm",
           "alg": "R2 U R' U R' U' R U' R2 D U' R' U R D'",
-          "alts": [],
+          "alts": [
+            "R2 u R' U R' U' R u' R2 F' U F"
+          ],
           "pattern": "UUUUUUUUUFRRFLBBFRLBL"
         },
         {
           "name": "Gb perm",
           "alg": "R' U' R U D' R2 U R' U R U' R U' R2 D",
-          "alts": [],
+          "alts": [
+            "R' U' R y R2 u R' U R U' R u' R2"
+          ],
           "pattern": "UUUUUUUUUFBRFFBBLRLRL"
         },
         {
@@ -618,7 +692,9 @@
         {
           "name": "Gd perm",
           "alg": "R U R' U' D R2 U' R U' R' U R' U R2 D'",
-          "alts": [],
+          "alts": [
+            "R U R' y' R2 u' R U' R' U R' u R2"
+          ],
           "pattern": "UUUUUUUUUFLRFBBBFRLRL"
         }
       ]
@@ -629,7 +705,9 @@
         {
           "name": "H perm",
           "alg": "M2 U' M2 U2 M2 U' M2",
-          "alts": [],
+          "alts": [
+            "R2 U2 R U2 R2 U2 R2 U2 R U2 R2"
+          ],
           "pattern": "UUUUUUUUUFBFRLRBFBLRL"
         },
         {

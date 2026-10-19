@@ -27,10 +27,10 @@
 <meta property="og:description" content="Göz bağlı 3x3 çözüm (Old Pochmann): adım adım rehber, Speffz harf şeması, harf testi ve her harf için kurulum hamleleri.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/3bld">
-<meta property="og:image" content="https://rubikacademy.fun/og/3bld.png?v=20261131">
+<meta property="og:image" content="https://rubikacademy.fun/og/3bld.png?v=20261133">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/3bld.png?v=20261131">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/3bld.png?v=20261133">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261131">
+<link rel="stylesheet" href="/styles/common.css?v=20261133">
 
 <style>
 .hero {
@@ -453,13 +453,13 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "bld";</script>
-<script src="/js/i18n.js?v=20261131"></script>
-<script src="/js/common.js?v=20261131"></script>
-<script src="/js/firebase-config.js?v=20261131"></script>
-<script src="/js/account.js?v=20261131"></script>
+<script src="/js/i18n.js?v=20261133"></script>
+<script src="/js/common.js?v=20261133"></script>
+<script src="/js/firebase-config.js?v=20261133"></script>
+<script src="/js/account.js?v=20261133"></script>
 
 
-<script src="/js/alg-player.js?v=20261131"></script>
+<script src="/js/alg-player.js?v=20261133"></script>
 
 <script>
 /* ============================================================
@@ -614,6 +614,11 @@ function renderSet() {
                 '<div class="case-diagram" dir="ltr">' + netSvg({ kind: kind, target: c.name, buffer: set.buffer }) + '</div>' +
                 '<div class="case-body"><div class="case-name">' + escapeHtml(c.name) + '</div>' + steps +
                 '<div class="case-alg" dir="ltr" hidden>' + escapeHtml(c.alg) + '</div>' +
+                (c.alts && c.alts.length ? '<div class="case-alts" dir="ltr">' + c.alts.map(function (a) {
+                    var i = a.indexOf(set.swap), s, u;
+                    if (i >= 0) { s = a.slice(0, i).trim(); u = a.slice(i + set.swap.length).trim(); a = (s ? s + " · " : "") + swName + (u ? " · " + u : ""); }
+                    return '<div class="case-alt-line">' + escapeHtml(a) + '</div>';
+                }).join("") + '</div>' : '') +
                 '<div class="case-status">' + escapeHtml(st ? t[st] : "") + '</div></div></div>';
         });
         html += '</div></div>';
@@ -674,7 +679,7 @@ function initQuiz() {
     });
 }
 
-fetch("/icerikler/algoritmalar/bld.json?v=20261131")
+fetch("/icerikler/algoritmalar/bld.json?v=20261133")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
