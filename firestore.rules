@@ -131,7 +131,7 @@ service cloud.firestore {
 
     // Canlı düello (akıllı küp sayfası): iki oyuncu, aynı karıştırma. Giriş yapan okur (kodu bilen).
     match /duels/{code} {
-      function dk() { return ['host', 'hName', 'guest', 'gName', 'round', 'scr', 'hT', 'gT', 'hSt', 'gSt', 'hW', 'gW', 'sc', 'ts']; }
+      function dk() { return ['host', 'hName', 'guest', 'gName', 'round', 'scr', 'hT', 'gT', 'hSt', 'gSt', 'hW', 'gW', 'sc', 'ts', 'fmt', 'hL', 'gL']; }
       function chg() { return request.resource.data.diff(resource.data).affectedKeys(); }
       allow get: if request.auth != null;
       allow list: if false;
@@ -139,21 +139,24 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(dk())
         && request.resource.data.host == request.auth.uid && request.resource.data.guest == ''
         && request.resource.data.hName is string && request.resource.data.hName.size() <= 24
-        && request.resource.data.scr is string && request.resource.data.scr.size() <= 200;
+        && request.resource.data.scr is string && request.resource.data.scr.size() <= 200
+        && request.resource.data.fmt in [3, 5, 12];
       allow update: if request.auth != null && request.resource.data.keys().hasOnly(dk())
         && request.resource.data.host == resource.data.host
         && (
           (request.auth.uid == resource.data.host
-            && chg().hasOnly(['round', 'scr', 'hT', 'gT', 'hSt', 'gSt', 'hW', 'gW', 'sc', 'hName', 'ts']))
+            && chg().hasOnly(['round', 'scr', 'hT', 'gT', 'hSt', 'gSt', 'hW', 'gW', 'sc', 'hName', 'ts', 'hL', 'gL']))
           || (request.auth.uid == resource.data.guest
-            && chg().hasOnly(['gT', 'gSt', 'gName', 'ts']))
+            && chg().hasOnly(['gT', 'gSt', 'gName', 'ts', 'gL']))
           || (resource.data.guest == '' && request.resource.data.guest == request.auth.uid
             && request.auth.uid != resource.data.host
             && chg().hasOnly(['guest', 'gName', 'gSt', 'ts']))
         )
         && (!('gName' in request.resource.data) || request.resource.data.gName.size() <= 24)
         && (!('hSt' in request.resource.data) || request.resource.data.hSt.size() <= 40)
-        && (!('gSt' in request.resource.data) || request.resource.data.gSt.size() <= 40);
+        && (!('gSt' in request.resource.data) || request.resource.data.gSt.size() <= 40)
+        && (!('hL' in request.resource.data) || request.resource.data.hL.size() <= 200)
+        && (!('gL' in request.resource.data) || request.resource.data.gL.size() <= 200);
       allow delete: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin());
     }
 
