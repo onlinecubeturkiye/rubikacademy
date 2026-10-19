@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261122";
+    var V = "20261123";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -87,7 +87,7 @@
                 user = u;
                 lsSet(SIGNED_KEY, u ? "1" : null);
                 renderNav();
-                if (u) { closeModal(); startSync(); logSession(); checkLogoutAll(); } else stopSync();
+                if (u) { closeModal(); startSync(); logSession(); checkLogoutAll(); checkSuspended(); ensurePush(); } else stopSync();
                 listeners.forEach(function (f) { try { f(u); } catch (e) {} });
                 try { document.dispatchEvent(new CustomEvent("account-change", { detail: u })); } catch (e) {}
             });
@@ -548,9 +548,16 @@
     function pubUrl(path) { return base() + path + (path.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey); }
     function pubList(path) { return fetch(pubUrl(path + (path.indexOf("?") < 0 ? "?" : "&") + "pageSize=300")).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { return (d && d.documents) || []; }).catch(function () { return []; }); }
     // Bildirim gönder (admin)
-    function sendNotif(tid, text) { if (!isAdmin()) return Promise.resolve(false); return api("/users/" + tid + "/notifications", { method: "POST", body: JSON.stringify({ fields: { text: { stringValue: String(text).slice(0, 500) }, ts: { timestampValue: new Date().toISOString() } } }) }).then(function (r) { return r.ok; }); }
-    function sendBroadcast(text) { if (!isAdmin()) return Promise.resolve(false); return api("/broadcasts", { method: "POST", body: JSON.stringify({ fields: { text: { stringValue: String(text).slice(0, 500) }, ts: { timestampValue: new Date().toISOString() } } }) }).then(function (r) { return r.ok; }); }
-    function listBroadcasts() { return pubList("/broadcasts").then(function (docs) { return docs.map(function (d) { var f = d.fields || {}; return { id: d.name.split("/").pop(), text: (f.text && f.text.stringValue) || "", ts: Date.parse((f.ts && f.ts.timestampValue) || "") || 0 }; }).sort(function (a, b) { return b.ts - a.ts; }); }); }
+    // at: planlı gönderim zamanı (ms) — yoksa hemen. pushed:false → Web Push göndericisi alır
+    function noteFields(text, at) {
+        var f = { text: { stringValue: String(text).slice(0, 500) }, ts: { timestampValue: new Date().toISOString() }, pushed: { booleanValue: false } };
+        if (at && at > Date.now()) f.at = { timestampValue: new Date(at).toISOString() };
+        return JSON.stringify({ fields: f });
+    }
+    function sendNotif(tid, text, at) { if (!isAdmin()) return Promise.resolve(false); return api("/users/" + tid + "/notifications", { method: "POST", body: noteFields(text, at) }).then(function (r) { return r.ok; }); }
+    function sendBroadcast(text, at) { if (!isAdmin()) return Promise.resolve(false); return api("/broadcasts", { method: "POST", body: noteFields(text, at) }).then(function (r) { return r.ok; }); }
+    function effTs(f) { return Date.parse((f.at && f.at.timestampValue) || (f.ts && f.ts.timestampValue) || "") || 0; }
+    function listBroadcasts() { return pubList("/broadcasts").then(function (docs) { return docs.map(function (d) { var f = d.fields || {}; return { id: d.name.split("/").pop(), text: (f.text && f.text.stringValue) || "", ts: Date.parse((f.ts && f.ts.timestampValue) || "") || 0, at: Date.parse((f.at && f.at.timestampValue) || "") || 0, pushed: !!(f.pushed && f.pushed.booleanValue) }; }).sort(function (a, b) { return (b.at || b.ts) - (a.at || a.ts); }); }); }
     function deleteBroadcast(id) { if (!isAdmin()) return Promise.resolve(false); return api("/broadcasts/" + id, { method: "DELETE" }).then(function (r) { return r.ok; }); }
     // Bakım modu (config/site): herkes okur, admin yazar
     function getConfig() { return fetch(pubUrl("/config/site")).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { var f = (d && d.fields) || {}; return { maintenance: !!(f.maintenance && f.maintenance.booleanValue), msg: (f.msg && f.msg.stringValue) || "" }; }).catch(function () { return { maintenance: false, msg: "" }; }); }
@@ -558,10 +565,10 @@
     // Bildirim oku (yeni broadcast + kendi okunmamış bildirimlerim)
     function fetchNotes() {
         var out = [], seenB = 0; try { seenB = +(lsGet("ra-bcast-seen") || 0); } catch (e) {}
-        var pB = pubList("/broadcasts").then(function (docs) { docs.forEach(function (d) { var f = d.fields || {}, ts = Date.parse((f.ts && f.ts.timestampValue) || "") || 0, txt = (f.text && f.text.stringValue) || ""; if (ts > seenB && txt) out.push({ id: "b:" + ts, text: txt, ts: ts }); }); });
+        var pB = pubList("/broadcasts").then(function (docs) { docs.forEach(function (d) { var f = d.fields || {}, ts = effTs(f), txt = (f.text && f.text.stringValue) || ""; if (ts > seenB && ts <= Date.now() && txt) out.push({ id: "b:" + ts, text: txt, ts: ts }); }); });
         var pN = user ? api("/users/" + user.uid + "/notifications?pageSize=50", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var seen = {}; try { (JSON.parse(lsGet("ra-note-seen")) || []).forEach(function (x) { seen[x] = 1; }); } catch (e) {}
-            ((d && d.documents) || []).forEach(function (x) { var id = x.name.split("/").pop(), f = x.fields || {}, txt = (f.text && f.text.stringValue) || "", ts = Date.parse((f.ts && f.ts.timestampValue) || "") || 0; if (!seen[id] && txt) out.push({ id: "n:" + id, text: txt, ts: ts }); });
+            ((d && d.documents) || []).forEach(function (x) { var id = x.name.split("/").pop(), f = x.fields || {}, txt = (f.text && f.text.stringValue) || "", ts = effTs(f); if (!seen[id] && txt && ts <= Date.now()) out.push({ id: "n:" + id, text: txt, ts: ts }); });
         }).catch(function () {}) : Promise.resolve();
         return Promise.all([pB, pN]).then(function () { return out.sort(function (a, b) { return b.ts - a.ts; }); });
     }
@@ -570,6 +577,8 @@
         notes.forEach(function (n) { if (n.id.indexOf("b:") === 0) maxB = Math.max(maxB, n.ts); else if (n.id.indexOf("n:") === 0) ids.push(n.id.slice(2)); });
         if (maxB) try { lsSet("ra-bcast-seen", String(Math.max(maxB, +(lsGet("ra-bcast-seen") || 0)))); } catch (e) {}
         if (ids.length) try { var cur = JSON.parse(lsGet("ra-note-seen")) || []; lsSet("ra-note-seen", JSON.stringify(cur.concat(ids).slice(-300))); } catch (e) {}
+        // Sitede görüldüyse telefona ayrıca gönderilmesin
+        if (ids.length && user) ids.forEach(function (id) { api("/users/" + user.uid + "/notifications/" + id + "?updateMask.fieldPaths=pushed", { method: "PATCH", body: JSON.stringify({ fields: { pushed: { booleanValue: true } } }) }).catch(function () {}); });
     }
     // Site içi banner + (izin varsa) sistem/telefon bildirimi
     function showToast(text) {
@@ -587,7 +596,13 @@
             if (!notes.length) return;
             notes.slice(0, 5).forEach(function (n) { showToast(n.text); });
             if ("Notification" in window && Notification.permission === "granted" && navigator.serviceWorker) {
-                navigator.serviceWorker.ready.then(function (reg) { notes.slice(0, 5).forEach(function (n) { try { reg.showNotification("Rubik Academy", { body: n.text, icon: "/icons/icon-192.png", tag: n.id }); } catch (e) {} }); }).catch(function () {});
+                // Push aboneliği varsa sistem bildirimini gönderici yapar (çift bildirim olmasın)
+                navigator.serviceWorker.ready.then(function (reg) {
+                    return (reg.pushManager ? reg.pushManager.getSubscription() : Promise.resolve(null)).then(function (sub) {
+                        if (sub || document.hasFocus()) return;
+                        notes.slice(0, 5).forEach(function (n) { try { reg.showNotification("Rubik Academy", { body: n.text, icon: "/icons/icon-192.png", tag: n.id, data: { url: "/" } }); } catch (e) {} });
+                    });
+                }).catch(function () {});
             }
             markNotesSeen(notes);
         });
@@ -643,6 +658,68 @@
             if (before && mine && mine < before) signOut();
         }).catch(function () {});
     }
+    /* ---------- Web Push aboneliği (arka plan / telefon bildirimi) ---------- */
+    var VAPID_PUBLIC = "BMpaJpKyVf1rBuvqAtht6TAvoDqLokvcjkMvjB5-XZNG_ptzEqBV9xwaJTOr0Q-QX-qRo3eZ5DqxK5EvEB4wAfo";
+    function pushSupported() { return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window; }
+    function b64ToBytes(b) { b = b.replace(/-/g, "+").replace(/_/g, "/"); while (b.length % 4) b += "="; var raw = atob(b), out = new Uint8Array(raw.length); for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out; }
+    function subId(endpoint) {
+        return crypto.subtle.digest("SHA-256", new TextEncoder().encode(endpoint)).then(function (h) {
+            return Array.prototype.map.call(new Uint8Array(h), function (x) { return (x < 16 ? "0" : "") + x.toString(16); }).join("").slice(0, 32);
+        });
+    }
+    // Aboneliği pushsubs/{id} belgesine yaz (giriş yapılmışsa kullanıcıya bağlı)
+    function saveSub(sub) {
+        var json = JSON.stringify(sub), uid = user ? user.uid : "", key = uid + "|" + sub.endpoint;
+        if (lsGet("ra-push-saved") === key) return Promise.resolve(true);
+        return subId(sub.endpoint).then(function (id) {
+            var body = JSON.stringify({ fields: { sub: { stringValue: json }, uid: { stringValue: uid }, ts: { timestampValue: new Date().toISOString() } } });
+            var path = "/pushsubs/" + id + "?updateMask.fieldPaths=sub&updateMask.fieldPaths=uid&updateMask.fieldPaths=ts";
+            var p = user ? api(path, { method: "PATCH", body: body }) : fetch(pubUrl(path), { method: "PATCH", headers: { "Content-Type": "application/json" }, body: body });
+            return p.then(function (r) { if (r.ok) lsSet("ra-push-saved", key); return r.ok; });
+        }).catch(function () { return false; });
+    }
+    function ensurePush() {
+        if (!enabled || !pushSupported() || Notification.permission !== "granted") return Promise.resolve(false);
+        return navigator.serviceWorker.ready.then(function (reg) {
+            return reg.pushManager.getSubscription().then(function (sub) {
+                return sub || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(VAPID_PUBLIC) });
+            });
+        }).then(saveSub).catch(function () { return false; });
+    }
+    function enablePush() {
+        if (!("Notification" in window)) return Promise.resolve("unsupported");
+        return Notification.requestPermission().then(function (perm) { if (perm === "granted") return ensurePush().then(function () { return perm; }); return perm; });
+    }
+    // Siteye girene bildirim izni sor (kibar banner; "Sonra" derse 7 gün sormaz)
+    function askPushBanner() {
+        if (!enabled || !pushSupported() || Notification.permission !== "default") return;
+        if (+(lsGet("ra-push-ask") || 0) > Date.now() || document.getElementById("raPushAsk") || document.getElementById("raMaint")) return;
+        var el = document.createElement("div"); el.id = "raPushAsk"; el.className = "ra-pushask";
+        el.innerHTML = '<span class="ra-pushask-ic">🔔</span><div class="ra-pushask-tx"><b>Bildirimleri aç</b><span>Duyuruları ve sana özel mesajları site kapalıyken de al.</span></div>' +
+            '<button class="ra-pushask-ok">Aç</button><button class="ra-pushask-no" aria-label="Sonra">Sonra</button>';
+        el.querySelector(".ra-pushask-ok").onclick = function () { el.remove(); enablePush().then(function (p) { if (p === "granted") showToast("Bildirimler açıldı ✓"); }); };
+        el.querySelector(".ra-pushask-no").onclick = function () { el.remove(); lsSet("ra-push-ask", String(Date.now() + 7 * 86400000)); };
+        (document.body || document.documentElement).appendChild(el);
+    }
+    // Site öndeyken gelen push → site içi bildirim
+    if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", function (e) {
+        var d = e.data || {}; if (d.type !== "ra-push" || !d.body) return;
+        var tag = String(d.tag || ""), n = +tag.slice(2) || 0;
+        try { if (tag.indexOf("n:") === 0 ? (JSON.parse(lsGet("ra-note-seen")) || []).indexOf(tag.slice(2)) >= 0 : n <= +(lsGet("ra-bcast-seen") || 0)) return; } catch (x) {}
+        showToast(d.body);
+        markNotesSeen([{ id: d.tag && d.tag.indexOf("n:") === 0 ? d.tag : "b:" + (+String(d.tag || "").slice(2) || 0), ts: +String(d.tag || "").slice(2) || 0 }]);
+    });
+
+    /* ---------- askıya alınmış hesap ---------- */
+    function checkSuspended() {
+        if (!user || isAdmin()) return;
+        window.Account.getRole(user.uid).then(function (r) {
+            if (r !== "askida") return;
+            signOut();
+            setTimeout(function () { alert("Hesabın yönetici tarafından askıya alındı. Bir hata olduğunu düşünüyorsan bizimle iletişime geç."); }, 300);
+        });
+    }
+
     // Bakım modu: açıksa admin olmayan herkese tam ekran "bakımda" göster
     function checkMaintenance() {
         if (!enabled) return;
@@ -696,7 +773,7 @@
         isPending: function () { return lsGet(SIGNED_KEY) === "1" && !sdkP; },
         sendNotif: sendNotif, sendBroadcast: sendBroadcast, showNotes: showNotes,
         listBroadcasts: listBroadcasts, deleteBroadcast: deleteBroadcast, getConfig: getConfig, setMaintenance: setMaintenance,
-        notifyPermission: function () { if (!("Notification" in window)) return Promise.resolve("unsupported"); return Notification.requestPermission(); },
+        notifyPermission: enablePush, enablePush: enablePush, pushSupported: pushSupported,
         isPasswordUser: isPasswordUser, emailVerified: emailVerified, verifyEmail: verifyEmail, changePassword: changePassword,
         listSessions: listSessions, logoutOthers: logoutOthers, sessId: sessId
     };
@@ -712,6 +789,8 @@
         document.addEventListener("account-synced", function () { setTimeout(showNotes, 400); });
         // Bakım modu kontrolü (admin oturumu çözülsün diye kısa gecikme) + giriş/çıkışta yeniden
         setTimeout(checkMaintenance, 2200);
+        // Bildirim izni: verilmişse aboneliği tazele, verilmemişse sor
+        setTimeout(function () { ensurePush(); askPushBanner(); }, 4000);
         document.addEventListener("account-change", function () { checkMaintenance(); });
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();

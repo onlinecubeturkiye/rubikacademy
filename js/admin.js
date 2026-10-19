@@ -143,11 +143,59 @@
             '<details class="sec"><summary><b>İşaretlediği case\'ler</b> <span class="a-note">(' + markCount + ')</span></summary><div class="sec-body">' + marksHtml(me.marks) + '</div></details>' +
             '<details class="sec"><summary><b>Gezdiği sayfalar</b> <span class="a-note">(' + (visits ? visits.length : 0) + ')</span></summary><div class="sec-body v-list">' + visitsHtml(visits) + '</div></details>';
     }
-    var ROLES = [["uye", "Üye"], ["gelistirici", "Geliştirici"], ["tester", "Tester"]];
+    var ROLES = [["uye", "Üye"], ["gelistirici", "Geliştirici"], ["tester", "Tester"], ["askida", "⛔ Askıda"]];
     function roleBox(uid, role) {
         var opts = ROLES.map(function (r) { return '<option value="' + r[0] + '"' + (r[0] === role ? ' selected' : '') + '>' + r[1] + '</option>'; }).join("");
         return '<h4>Rol</h4><div class="a-ctrl"><select id="roleSel">' + opts + '</select>' +
             '<button class="a-btn main sm" id="roleSave">Kaydet</button><span class="a-msg" id="roleMsg" style="margin:0"></span></div>';
+    }
+    function roleName(r) { return r === "gelistirici" ? "Geliştirici" : (r === "tester" ? "Tester" : (r === "askida" ? "Askıda" : "Üye")); }
+    function dangerBox(role) {
+        return '<h4>Hesap işlemleri</h4><div class="a-ctrl">' +
+            '<button class="a-btn sm" id="uSuspend">' + (role === "askida" ? "✅ Askıdan çıkar" : "⛔ Askıya al") + '</button>' +
+            '<button class="a-btn danger sm" id="uWipe">🗑️ Tüm verisini sil</button><span class="a-msg" id="uDangerMsg" style="margin:0"></span></div>' +
+            '<p class="a-note">Askıya alınan kişi oturumdan atılır; günlük sıralamaya ve profiline yazamaz. Silme; profil, ilerleme, ziyaret, oturum ve bildirim kayıtlarını kaldırır (giriş hesabı Firebase Authentication’da kalır).</p>';
+    }
+    function listDocNames(path) {
+        var out = [];
+        function page(tok) {
+            return authed(docsBase() + path + "?pageSize=300&mask.fieldPaths=zz" + (tok ? "&pageToken=" + encodeURIComponent(tok) : ""), { method: "GET" })
+                .then(function (r) { return r.ok ? r.json() : {}; })
+                .then(function (d) { (d.documents || []).forEach(function (x) { out.push(x.name.split("/documents")[1]); }); return d.nextPageToken ? page(d.nextPageToken) : out; });
+        }
+        return page("");
+    }
+    function delDoc(path) { return authed(docsBase() + path, { method: "DELETE" }).then(function (r) { return r.ok; }, function () { return false; }); }
+    function wipeUser(uid) {
+        var subs = ["kv", "visits", "sessions", "notifications", "meta"];
+        return Promise.all(subs.map(function (c) { return listDocNames("/users/" + uid + "/" + c); })).then(function (lists) {
+            var all = [].concat.apply([], lists);
+            // küçük gruplar halinde sil
+            var i = 0;
+            function next() { var chunk = all.slice(i, i + 20); i += 20; if (!chunk.length) return Promise.resolve(); return Promise.all(chunk.map(delDoc)).then(next); }
+            return next();
+        }).then(function () { return Promise.all([delDoc("/users/" + uid), delDoc("/roles/" + uid)]); });
+    }
+    function bindDanger(u, role, pickBtn) {
+        var sb = $id("uSuspend"), wb = $id("uWipe");
+        if (sb) sb.addEventListener("click", function () {
+            var to = role === "askida" ? "uye" : "askida";
+            if (to === "askida" && !confirm(u.name + " askıya alınsın mı?")) return;
+            sb.disabled = true;
+            setRole(u.uid, to).then(function (ok) {
+                sb.disabled = false;
+                if (!ok) { msg($id("uDangerMsg"), "Olmadı (kuralları yayımladın mı?)", "bad"); return; }
+                role = to; u.role = to; refreshPickBadge(pickBtn, to);
+                sb.textContent = to === "askida" ? "✅ Askıdan çıkar" : "⛔ Askıya al";
+                var rs = $id("roleSel"); if (rs) rs.value = to;
+                msg($id("uDangerMsg"), to === "askida" ? "Askıya alındı ✓" : "Askıdan çıkarıldı ✓", "ok");
+            });
+        });
+        if (wb) wb.addEventListener("click", function () {
+            if (prompt("“" + u.name + "” kullanıcısının TÜM verisi silinecek. Onay için SİL yaz:") !== "SİL") return;
+            wb.disabled = true; msg($id("uDangerMsg"), "Siliniyor…");
+            wipeUser(u.uid).then(function () { msg($id("uDangerMsg"), "Silindi ✓", "ok"); renderUsers(); }, function () { wb.disabled = false; msg($id("uDangerMsg"), "Silinemedi.", "bad"); });
+        });
     }
     function selectUser(u, detailBox, pickBtn, picker) {
         Array.prototype.forEach.call(picker.querySelectorAll(".u-pick"), function (b) { b.classList.remove("on"); });
@@ -155,7 +203,8 @@
         detailBox.innerHTML = '<div class="u-card open"><p class="a-note">Yükleniyor…</p></div>';
         Promise.all([fetchMeta(u.uid), listVisits(u.uid, 200), fetchRole(u.uid)]).then(function (res) {
             var role = res[2] || "uye";
-            detailBox.innerHTML = '<div class="u-card open">' + roleBox(u.uid, role) + userDetailHtml(u, res[0] || {}, res[1] || []) + '</div>';
+            detailBox.innerHTML = '<div class="u-card open">' + roleBox(u.uid, role) + userDetailHtml(u, res[0] || {}, res[1] || []) + dangerBox(role) + '</div>';
+            bindDanger(u, role, pickBtn);
             var save = $id("roleSave");
             if (save) save.addEventListener("click", function () {
                 var val = $id("roleSel").value;
@@ -173,7 +222,7 @@
         var b = btn.querySelector(".role-badge"); if (b) b.remove();
         if (role && role !== "uye") {
             var span = document.createElement("span"); span.className = "role-badge " + role;
-            span.textContent = role === "gelistirici" ? "Geliştirici" : "Tester";
+            span.textContent = roleName(role);
             btn.querySelector(".u-pick-id").appendChild(span);
         }
     }
@@ -196,7 +245,7 @@
         var list = _users.filter(matchesFilter);
         if (!list.length) { picker.innerHTML = '<p class="a-note" style="padding:8px">Eşleşen kullanıcı yok.</p>'; updateBulkBar(); return; }
         picker.innerHTML = list.map(function (u) {
-            var badge = (u.role && u.role !== "uye") ? '<span class="role-badge ' + u.role + '">' + (u.role === "gelistirici" ? "Geliştirici" : "Tester") + '</span>' : '';
+            var badge = (u.role && u.role !== "uye") ? '<span class="role-badge ' + u.role + '">' + roleName(u.role) + '</span>' : '';
             return '<div class="u-pick-wrap"><input type="checkbox" class="u-chk" data-uid="' + esc(u.uid) + '"' + (_selected[u.uid] ? ' checked' : '') + '>' +
                 '<button type="button" class="u-pick" data-uid="' + esc(u.uid) + '"><span class="u-ava sm">' + avatarMini(u) + '</span>' +
                 '<span class="u-pick-id"><b>' + esc(u.name) + '</b><small>' + esc(dateFmt(u.seen)) + '</small>' + badge + '</span></button></div>';
@@ -297,15 +346,72 @@
                 var now = Date.now(), d1 = 86400000, d7 = 7 * d1;
                 function cnt(f) { return users.filter(f).length; }
                 var tiles = [["Toplam üye", users.length], ["Son 24 saat aktif", cnt(function (u) { return u.seen && now - u.seen < d1; })], ["Son 7 gün aktif", cnt(function (u) { return u.seen && now - u.seen < d7; })], ["Bu hafta katılan", cnt(function (u) { return u.joined && now - u.joined < d7; })]];
-                ov.innerHTML = tiles.map(function (t) { return '<div class="stat-tile"><b>' + t[1] + '</b><span>' + t[0] + '</span></div>'; }).join("") + '<div class="stat-tile"><b id="ovDaily">…</b><span>Bugün günlük gönderim</span></div>';
+                ov.innerHTML = tiles.map(function (t) { return '<div class="stat-tile"><b>' + t[1] + '</b><span>' + t[0] + '</span></div>'; }).join("") + '<div class="stat-tile"><b id="ovDaily">…</b><span>Bugün günlük gönderim</span></div><div class="stat-tile"><b id="ovPush">…</b><span>Bildirim abonesi (cihaz)</span></div>';
+                countPushSubs().then(function (n) { var e = $id("ovPush"); if (e) e.textContent = n; });
                 window.Leaderboard.fetchDay(dayNumOf(todayStr()), 300).then(function (rows) { var e = $id("ovDaily"); if (e) e.textContent = rows.length; }, function () {});
             }
-            renderChart();
+            renderChart(); renderActive();
         }, function (e) {
             var code = e && e.message;
             var hint = (code === "403" || code === 403) ? ' — Firestore kurallarını Firebase Console’dan yayımladığından ve bu hesabın yönetici (pikapikachuyt0@gmail.com, Google) olduğundan emin ol.' : '';
             box.innerHTML = '<p class="a-note">Kullanıcılar yüklenemedi (' + esc(code) + ')' + hint + '</p>';
         });
+    }
+
+    /* ---------- dışa aktarma ---------- */
+    function download(name, text, type) {
+        var a = document.createElement("a"), url = URL.createObjectURL(new Blob([text], { type: type }));
+        a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    }
+    function csvCell(v) { v = v == null ? "" : String(v); return /[",;\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+    function toCsv(rows) { return "\ufeff" + rows.map(function (r) { return r.map(csvCell).join(";"); }).join("\r\n"); }   // Excel için BOM + ;
+    function isoDate(ms) { return ms ? new Date(ms).toISOString().replace("T", " ").slice(0, 16) : ""; }
+    function exportUsers(kind) {
+        if (!_users.length) { alert("Önce kullanıcılar yüklensin."); return; }
+        var btn = $id(kind === "csv" ? "uCsv" : "uJson"); if (btn) btn.disabled = true;
+        Promise.all(_users.map(function (u) { return fetchMeta(u.uid).then(function (m) { return m || {}; }); })).then(function (metas) {
+            if (btn) btn.disabled = false;
+            var stamp = todayStr();
+            if (kind === "json") {
+                var data = _users.map(function (u, i) { var m = metas[i]; return { uid: u.uid, name: u.name, email: m.email || "", provider: m.provider || "", role: u.role || "uye", joined: isoDate(u.joined), seen: isoDate(u.seen), device: m.dev || "", bio: u.bio, stats: u.stats }; });
+                download("rubikacademy-kullanicilar-" + stamp + ".json", JSON.stringify(data, null, 2), "application/json");
+            } else {
+                var rows = [["Ad", "E-posta", "UID", "Rol", "Giriş türü", "Üyelik", "Son görülme", "Bilinen", "Öğrenilen", "Trainer çözüm", "Günlük katılım", "Günlük en iyi (sn)", "Cihaz"]];
+                _users.forEach(function (u, i) { var m = metas[i], st = u.stats || {}; rows.push([u.name, m.email || "", u.uid, roleName(u.role), provLabel(m.provider), isoDate(u.joined), isoDate(u.seen), st.known || 0, st.learning || 0, st.solves || 0, st.daily || 0, st.best ? (st.best / 1000).toFixed(2) : "", m.dev || ""]); });
+                download("rubikacademy-kullanicilar-" + stamp + ".csv", toCsv(rows), "text/csv;charset=utf-8");
+            }
+        }, function () { if (btn) btn.disabled = false; alert("Dışa aktarılamadı."); });
+    }
+    function exportDaily() {
+        var ds = $id("aDate").value || todayStr();
+        window.Leaderboard.fetchDay(dayNumOf(ds), 300).then(function (rows) {
+            var out = [["Sıra", "Ad", "Süre", "Ceza", "UID"]];
+            rows.forEach(function (x, i) { out.push([i + 1, x.name, label(x), x.pen || "", x.uid]); });
+            download("gunluk-siralama-" + ds + ".csv", toCsv(out), "text/csv;charset=utf-8");
+        }, function () { alert("Sıralama alınamadı."); });
+    }
+
+    /* ---------- en aktif kullanıcılar ---------- */
+    var _actSort = "score";
+    function actScore(u) { var st = u.stats || {}; return (st.solves || 0) + (st.daily || 0) * 10 + (st.known || 0) * 2; }
+    function renderActive() {
+        var box = $id("aActive"); if (!box) return;
+        if (!_users.length) { box.innerHTML = '<p class="a-note">Kullanıcı yok.</p>'; return; }
+        var key = { score: actScore, solves: function (u) { return (u.stats || {}).solves || 0; }, daily: function (u) { return (u.stats || {}).daily || 0; }, known: function (u) { return (u.stats || {}).known || 0; }, seen: function (u) { return u.seen || 0; } }[_actSort];
+        var list = _users.slice().sort(function (a, b) { return key(b) - key(a); }).slice(0, 25);
+        var cols = [["score", "Puan"], ["solves", "Trainer"], ["daily", "Günlük"], ["known", "Bilinen"], ["seen", "Son görülme"]];
+        box.innerHTML = '<div class="act-wrap"><table class="act-tbl"><thead><tr><th>#</th><th>Kullanıcı</th>' +
+            cols.map(function (c) { return '<th><button type="button" data-sort="' + c[0] + '" class="' + (c[0] === _actSort ? "on" : "") + '">' + c[1] + (c[0] === _actSort ? " ▼" : "") + '</button></th>'; }).join("") + '</tr></thead><tbody>' +
+            list.map(function (u, i) {
+                var st = u.stats || {};
+                return '<tr><td>' + (i + 1) + '</td><td class="act-nm">' + esc(u.name) + '</td><td>' + actScore(u) + '</td><td>' + (st.solves || 0) + '</td><td>' + (st.daily || 0) + '</td><td>' + (st.known || 0) + '</td><td class="act-dt">' + esc(dateFmt(u.seen)) + '</td></tr>';
+            }).join("") + '</tbody></table></div><p class="a-note">Puan = trainer çözüm + günlük katılım×10 + bilinen case×2. Başlığa tıklayıp sırala.</p>';
+        Array.prototype.forEach.call(box.querySelectorAll("[data-sort]"), function (b) { b.addEventListener("click", function () { _actSort = b.getAttribute("data-sort"); renderActive(); }); });
+    }
+    function countPushSubs() {
+        return authed(docsBase() + "/pushsubs?pageSize=300&mask.fieldPaths=uid", { method: "GET" })
+            .then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) { return (d.documents || []).length; }, function () { return 0; });
     }
 
     /* ---------- duyuru geçmişi ---------- */
@@ -315,7 +421,8 @@
         window.Account.listBroadcasts().then(function (list) {
             if (!list.length) { box.innerHTML = '<p class="a-note">Henüz duyuru yok.</p>'; return; }
             box.innerHTML = list.map(function (b) {
-                return '<div class="bc-row" data-id="' + esc(b.id) + '"><div class="bc-main"><p>' + esc(b.text) + '</p><small>' + esc(dateFmt(b.ts)) + '</small></div>' +
+                var planned = b.at && b.at > Date.now();
+                return '<div class="bc-row" data-id="' + esc(b.id) + '"><div class="bc-main"><p>' + esc(b.text) + '</p><small>' + (planned ? '⏰ Planlı: ' + esc(dateFmt(b.at)) : esc(dateFmt(b.at || b.ts)) + (b.pushed ? ' · 📱 telefona gitti' : '')) + '</small></div>' +
                     '<button class="a-btn danger sm" data-del="' + esc(b.id) + '">Sil</button></div>';
             }).join("");
             Array.prototype.forEach.call(box.querySelectorAll("[data-del]"), function (btn) {
@@ -400,33 +507,40 @@
             '<div class="a-ctrl" style="flex-direction:column;align-items:stretch">' +
             '<textarea id="bcText" maxlength="500" rows="2" placeholder="Bildirim metni…" style="width:100%;box-sizing:border-box;padding:11px 12px;border-radius:12px;border:var(--card-bw) solid var(--ink);background:var(--surface);color:var(--text);font:600 14.5px Inter,sans-serif"></textarea>' +
             '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><select id="bcTarget"><option value="all">📢 Herkese (duyuru)</option></select>' +
-            '<button class="a-btn main" id="bcSend">Gönder</button><span class="a-msg" id="bcMsg" style="margin:0"></span></div></div></div>' +
+            '<label class="bc-at">⏰ Planla <input type="datetime-local" id="bcAt"></label>' +
+            '<button class="a-btn main" id="bcSend">Gönder</button><span class="a-msg" id="bcMsg" style="margin:0"></span></div>' +
+            '<p class="a-note">Zaman boş bırakılırsa hemen gider. Telefon/arka plan bildirimi birkaç dakika içinde ulaşır.</p></div></div>' +
             '<div class="box"><h2>📜 Duyuru geçmişi <button class="a-btn sm" id="bcReload" style="float:right">↻</button></h2><div id="aBcList"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>👥 Kullanıcılar <span class="a-sub" id="aUsersCount" style="margin:0"></span></h2>' +
-            '<div class="a-ctrl"><input id="uSearch" placeholder="Ada göre ara…" style="flex:1;min-width:140px"><select id="uFilter"><option value="all">Tümü</option><option value="a1">Son 24 saat aktif</option><option value="a7">Son 7 gün aktif</option><option value="pasif">30 günden eski</option></select><button class="a-btn" id="aUsersLoad">↻ Yenile</button></div>' +
+            '<div class="a-ctrl"><input id="uSearch" placeholder="Ada göre ara…" style="flex:1;min-width:140px"><select id="uFilter"><option value="all">Tümü</option><option value="a1">Son 24 saat aktif</option><option value="a7">Son 7 gün aktif</option><option value="pasif">30 günden eski</option></select><button class="a-btn" id="aUsersLoad">↻ Yenile</button><button class="a-btn" id="uCsv">⬇ CSV</button><button class="a-btn" id="uJson">⬇ JSON</button></div>' +
             '<div class="bulk-bar" id="uBulk" hidden><b id="uSelCount">0</b> seçili · <select id="uBulkRole"><option value="">Rol ata…</option><option value="uye">Üye</option><option value="gelistirici">Geliştirici</option><option value="tester">Tester</option></select> <button class="a-btn sm" id="uBulkRoleGo">Uygula</button> <button class="a-btn sm" id="uBulkNotify">Bildirim gönder</button><span class="a-msg" id="uBulkMsg" style="margin:0"></span></div>' +
             '<div id="aUsersList"></div></div>' +
+            '<div class="box"><h2>🏅 En aktif kullanıcılar</h2><div id="aActive"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🖥️ Cihaz &amp; tarayıcı dağılımı</h2><p class="a-note">Her üyenin cihaz bilgisini çeker (biraz sürebilir).</p><button class="a-btn main" id="aDevLoad">Hesapla</button><div id="aDevBox" style="margin-top:10px"></div></div>' +
             '<div class="box"><h2>🛠️ Bakım modu</h2><p class="a-note">Açıkken site, sen hariç herkese “Bakımdayız” sayfası gösterir.</p><div id="aMaintBox"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🏆 Günlük sıralama moderasyonu</h2>' +
-            '<div class="a-ctrl"><input type="date" id="aDate" value="' + todayStr() + '"><button class="a-btn main" id="aDailyLoad">Getir</button></div>' +
+            '<div class="a-ctrl"><input type="date" id="aDate" value="' + todayStr() + '"><button class="a-btn main" id="aDailyLoad">Getir</button><button class="a-btn" id="aDailyCsv">⬇ CSV</button></div>' +
             '<p class="a-note">Yanlış bir süreyi sil; o kullanıcı o gün için yeniden gönderebilir.</p>' +
             '<div class="a-msg" id="aDailyMsg"></div><div id="aDailyList" class="a-list"></div></div>';
         $id("aDailyLoad").addEventListener("click", renderDaily);
         $id("aUsersLoad").addEventListener("click", renderUsers);
+        $id("uCsv").addEventListener("click", function () { exportUsers("csv"); });
+        $id("uJson").addEventListener("click", function () { exportUsers("json"); });
+        $id("aDailyCsv").addEventListener("click", exportDaily);
         $id("uSearch").addEventListener("input", applyUserFilter);
         $id("uFilter").addEventListener("change", applyUserFilter);
         $id("bcReload").addEventListener("click", renderBroadcasts);
         $id("aDevLoad").addEventListener("click", renderDevices);
         bindBulk(); renderBroadcasts(); renderMaintenance();
         $id("bcSend").addEventListener("click", function () {
-            var text = $id("bcText").value.trim(), to = $id("bcTarget").value;
+            var text = $id("bcText").value.trim(), to = $id("bcTarget").value, atv = $id("bcAt").value, at = atv ? new Date(atv).getTime() : 0;
+            if (at && at < Date.now() - 60000) { msg($id("bcMsg"), "Planlanan zaman geçmişte.", "bad"); return; }
             if (text.length < 2) { msg($id("bcMsg"), "Mesaj yaz.", "bad"); return; }
             $id("bcSend").disabled = true; msg($id("bcMsg"), "Gönderiliyor…");
-            var p = (to === "all") ? window.Account.sendBroadcast(text) : window.Account.sendNotif(to, text);
+            var p = (to === "all") ? window.Account.sendBroadcast(text, at) : window.Account.sendNotif(to, text, at);
             p.then(function (ok) {
                 $id("bcSend").disabled = false;
-                if (ok) { msg($id("bcMsg"), "Gönderildi ✓", "ok"); $id("bcText").value = ""; renderBroadcasts(); }
+                if (ok) { msg($id("bcMsg"), at > Date.now() ? "Planlandı ✓ (" + dateFmt(at) + ")" : "Gönderildi ✓", "ok"); $id("bcText").value = ""; $id("bcAt").value = ""; renderBroadcasts(); }
                 else msg($id("bcMsg"), "Gönderilemedi (kuralları yayımladın mı?)", "bad");
             }, function () { $id("bcSend").disabled = false; msg($id("bcMsg"), "Gönderilemedi.", "bad"); });
         });

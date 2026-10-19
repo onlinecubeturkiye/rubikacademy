@@ -3,7 +3,7 @@
    - CSS/JS/JSON/görseller: önbellekten hemen ver, arka planda güncelle
    - Algoritma sayfaları ve antrenör kurulumda önceden indirilir (çevrimdışı açılsın diye)
    Sürüm (VERSION) değişince eski önbellek silinir. */
-var VERSION = "ra-20261122";
+var VERSION = "ra-20261123";
 var PRECACHE = [
     "/",
     "/icerikler.html",
@@ -32,42 +32,42 @@ var PRECACHE = [
     "/icerikler/algoritmalar/2look-pll.html",
     "/icerikler/algoritmalar/antrenor.html",
     "/icerikler/algoritmalar/yazdir.html",
-    "/icerikler/algoritmalar/tanima-pll.json?v=20261122",
-    "/js/cross-solver.js?v=20261122",
-    "/js/recog-trainer.js?v=20261122",
-    "/styles/common.css?v=20261122",
-    "/js/i18n.js?v=20261122",
-    "/js/common.js?v=20261122",
-    "/js/custom-algs.js?v=20261122",
+    "/icerikler/algoritmalar/tanima-pll.json?v=20261123",
+    "/js/cross-solver.js?v=20261123",
+    "/js/recog-trainer.js?v=20261123",
+    "/styles/common.css?v=20261123",
+    "/js/i18n.js?v=20261123",
+    "/js/common.js?v=20261123",
+    "/js/custom-algs.js?v=20261123",
     "/darkmode.js",
     "/icerikler/algoritmalar/ll.js",
     "/icerikler/algoritmalar/cllSvg.js",
     "/icerikler/algoritmalar/ortegaSvg.js",
     "/icerikler/algoritmalar/ortegaOllSvg.js",
-    "/icerikler/algoritmalar/antrenor-bt.js?v=20261122",
+    "/icerikler/algoritmalar/antrenor-bt.js?v=20261123",
     "/icons/icon-192.png",
     "/icons/favicon-48.png",
     "/manifest.webmanifest",
     "/icerikler/algoritmalar/oll-pll.json",
-    "/icerikler/algoritmalar/oll-pll.json?v=20261122",
+    "/icerikler/algoritmalar/oll-pll.json?v=20261123",
     "/icerikler/algoritmalar/coll.json",
-    "/icerikler/algoritmalar/coll.json?v=20261122",
+    "/icerikler/algoritmalar/coll.json?v=20261123",
     "/icerikler/algoritmalar/wv.json",
-    "/icerikler/algoritmalar/wv.json?v=20261122",
+    "/icerikler/algoritmalar/wv.json?v=20261123",
     "/icerikler/algoritmalar/cll.json",
-    "/icerikler/algoritmalar/cll.json?v=20261122",
+    "/icerikler/algoritmalar/cll.json?v=20261123",
     "/icerikler/algoritmalar/ortega-oll.json",
-    "/icerikler/algoritmalar/ortega-oll.json?v=20261122",
+    "/icerikler/algoritmalar/ortega-oll.json?v=20261123",
     "/icerikler/algoritmalar/ortega-pbl.json",
-    "/icerikler/algoritmalar/ortega-pbl.json?v=20261122",
+    "/icerikler/algoritmalar/ortega-pbl.json?v=20261123",
     "/icerikler/algoritmalar/eg.json",
-    "/icerikler/algoritmalar/eg.json?v=20261122",
-    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20261122",
-    "/icerikler/algoritmalar/4x4.json?v=20261122",
-    "/icerikler/algoritmalar/5x5.json?v=20261122",
-    "/icerikler/algoritmalar/pyraminx.json?v=20261122",
+    "/icerikler/algoritmalar/eg.json?v=20261123",
+    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20261123",
+    "/icerikler/algoritmalar/4x4.json?v=20261123",
+    "/icerikler/algoritmalar/5x5.json?v=20261123",
+    "/icerikler/algoritmalar/pyraminx.json?v=20261123",
     "/icerikler/algoritmalar/roux.json",
-    "/icerikler/algoritmalar/skewb.json?v=20261122"
+    "/icerikler/algoritmalar/skewb.json?v=20261123"
 ];
 
 self.addEventListener("install", function (event) {
@@ -135,5 +135,29 @@ self.addEventListener("fetch", function (event) {
         });
         if (hit) { net.catch(function () {}); return hit; }
         return net.catch(function () { return fromCache(req); });
+    }));
+});
+
+/* ---------- Web Push: arka planda bildirim ---------- */
+self.addEventListener("push", function (event) {
+    var d = {};
+    try { d = event.data ? event.data.json() : {}; } catch (e) { d = { body: event.data ? event.data.text() : "" }; }
+    var title = d.title || "Rubik Academy", body = d.body || "", tag = d.tag || "ra", url = d.url || "/";
+    event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (list) {
+        // Site o an önündeyse sistem bildirimi yerine site içi bildirim göster
+        var front = list.filter(function (c) { return c.focused; })[0];
+        if (front) { front.postMessage({ type: "ra-push", body: body, tag: tag }); return; }
+        return self.registration.showNotification(title, { body: body, tag: tag, icon: "/icons/icon-192.png", badge: "/icons/favicon-48.png", data: { url: url } });
+    }));
+});
+
+// Bildirime tıklayınca siteyi (ana sayfa) aç; açık sekme varsa onu öne getir
+self.addEventListener("notificationclick", function (event) {
+    event.notification.close();
+    var url = new URL((event.notification.data && event.notification.data.url) || "/", self.location.origin).href;
+    event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (list) {
+        var c = list.filter(function (x) { return new URL(x.url).origin === self.location.origin; })[0];
+        if (c) return c.focus().then(function (w) { return (w || c).navigate ? (w || c).navigate(url).catch(function () {}) : null; });
+        return self.clients.openWindow(url);
     }));
 });

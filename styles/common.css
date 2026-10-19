@@ -1095,3 +1095,14 @@ html[dir="rtl"] .acc-mi { text-align: right; }
 .ra-maint-box h1 { font-size: 30px; font-weight: 900; color: var(--text, #fff); margin: 10px 0 8px; }
 .ra-maint-box p { color: var(--text-soft, #9aa0a6); font-size: 15px; line-height: 1.6; }
 .ra-maint-a { display: inline-block; margin-top: 16px; padding: 10px 16px; border-radius: 12px; border: var(--card-bw, 2.5px) solid var(--card-border, #17171f); background: var(--surface, #fff); color: var(--text, #17171f); font-weight: 800; text-decoration: none; box-shadow: var(--shadow-sm); }
+
+/* Bildirim izni bannerı */
+.ra-pushask { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 9998; width: min(460px, calc(100% - 32px)); display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 16px; background: var(--surface, #fff); color: var(--text, #111); border: var(--card-bw, 2px) solid var(--ink, #111); box-shadow: 0 10px 30px rgba(0,0,0,.18); font-family: Inter, sans-serif; animation: raPushIn .35s ease; }
+@keyframes raPushIn { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.ra-pushask-ic { font-size: 24px; }
+.ra-pushask-tx { flex: 1; min-width: 0; }
+.ra-pushask-tx b { display: block; font-size: 14.5px; font-weight: 850; }
+.ra-pushask-tx span { display: block; font-size: 12.5px; color: var(--text-soft, #555); line-height: 1.35; }
+.ra-pushask button { border-radius: 10px; padding: 8px 12px; font: 800 13px Inter, sans-serif; cursor: pointer; border: var(--card-bw, 2px) solid var(--ink, #111); }
+.ra-pushask-ok { background: var(--cube-yellow, #ffd21f); color: #111; }
+.ra-pushask-no { background: transparent; color: var(--text-soft, #555); border-color: var(--border, #ccc) !important; }
