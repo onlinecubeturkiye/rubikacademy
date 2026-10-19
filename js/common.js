@@ -123,6 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.documentElement.classList.toggle("dark-mode", isDark);
     document.body.classList.toggle("dark-mode", isDark);
     if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
+    raApplySkin(raSkin());
     if (cvdTheme()) applyCvd(cvdTheme());
     else if (holdSwap()) raRecolor();
     raInitSettings();
@@ -132,12 +133,12 @@ document.addEventListener("DOMContentLoaded", function () {
    AYARLAR MENÜSÜ (⚙) — tema, dil, renk körlüğü tek yerde
 ========================================= */
 var SETTINGS_TXT = {
-    tr: { set: "Ayarlar", theme: "Tema", dark: "Karanlık", light: "Açık", lang: "Dil", cvd: "Renk körlüğü", cvd_off: "Kapalı (normal)", cvd_pro: "Protanopi", cvd_deu: "Döteranopi", cvd_rg: "Kırmızı-Yeşil", cvd_tri: "Tritanopi (mavi-sarı)" },
-    en: { set: "Settings", theme: "Theme", dark: "Dark", light: "Light", lang: "Language", cvd: "Color blindness", cvd_off: "Off (normal)", cvd_pro: "Protanopia", cvd_deu: "Deuteranopia", cvd_rg: "Red-Green", cvd_tri: "Tritanopia (blue-yellow)" },
-    fr: { set: "Paramètres", theme: "Thème", dark: "Sombre", light: "Clair", lang: "Langue", cvd: "Daltonisme", cvd_off: "Désactivé (normal)", cvd_pro: "Protanopie", cvd_deu: "Deutéranopie", cvd_rg: "Rouge-Vert", cvd_tri: "Tritanopie (bleu-jaune)" },
-    ru: { set: "Настройки", theme: "Тема", dark: "Тёмная", light: "Светлая", lang: "Язык", cvd: "Дальтонизм", cvd_off: "Выкл (обычный)", cvd_pro: "Протанопия", cvd_deu: "Дейтеранопия", cvd_rg: "Красно-зелёный", cvd_tri: "Тританопия (сине-жёлтый)" },
-    de: { set: "Einstellungen", theme: "Thema", dark: "Dunkel", light: "Hell", lang: "Sprache", cvd: "Farbenblindheit", cvd_off: "Aus (normal)", cvd_pro: "Protanopie", cvd_deu: "Deuteranopie", cvd_rg: "Rot-Grün", cvd_tri: "Tritanopie (Blau-Gelb)" },
-    ar: { set: "الإعدادات", theme: "السمة", dark: "داكن", light: "فاتح", lang: "اللغة", cvd: "عمى الألوان", cvd_off: "إيقاف (عادي)", cvd_pro: "بروتانوبيا", cvd_deu: "ديوترانوبيا", cvd_rg: "أحمر-أخضر", cvd_tri: "تريتانوبيا (أزرق-أصفر)" }
+    tr: { set: "Ayarlar", theme: "Tema", dark: "Karanlık", light: "Açık", lang: "Dil", cvd: "Renk körlüğü", cvd_off: "Kapalı (normal)", cvd_pro: "Protanopi", cvd_deu: "Döteranopi", cvd_rg: "Kırmızı-Yeşil", cvd_tri: "Tritanopi (mavi-sarı)" , skin: "Tema stili", skin_standart: "Standart", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Gün Batımı" },
+    en: { set: "Settings", theme: "Theme", dark: "Dark", light: "Light", lang: "Language", cvd: "Color blindness", cvd_off: "Off (normal)", cvd_pro: "Protanopia", cvd_deu: "Deuteranopia", cvd_rg: "Red-Green", cvd_tri: "Tritanopia (blue-yellow)" , skin: "Theme style", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Sunset" },
+    fr: { set: "Paramètres", theme: "Thème", dark: "Sombre", light: "Clair", lang: "Langue", cvd: "Daltonisme", cvd_off: "Désactivé (normal)", cvd_pro: "Protanopie", cvd_deu: "Deutéranopie", cvd_rg: "Rouge-Vert", cvd_tri: "Tritanopie (bleu-jaune)" , skin: "Style du thème", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Néon", skin_gunbatimi: "Coucher de soleil" },
+    ru: { set: "Настройки", theme: "Тема", dark: "Тёмная", light: "Светлая", lang: "Язык", cvd: "Дальтонизм", cvd_off: "Выкл (обычный)", cvd_pro: "Протанопия", cvd_deu: "Дейтеранопия", cvd_rg: "Красно-зелёный", cvd_tri: "Тританопия (сине-жёлтый)" , skin: "Стиль темы", skin_standart: "Стандартный", skin_rubik: "Rubik's Cube", skin_neon: "Неон", skin_gunbatimi: "Закат" },
+    de: { set: "Einstellungen", theme: "Thema", dark: "Dunkel", light: "Hell", lang: "Sprache", cvd: "Farbenblindheit", cvd_off: "Aus (normal)", cvd_pro: "Protanopie", cvd_deu: "Deuteranopie", cvd_rg: "Rot-Grün", cvd_tri: "Tritanopie (Blau-Gelb)" , skin: "Designstil", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Sonnenuntergang" },
+    ar: { set: "الإعدادات", theme: "السمة", dark: "داكن", light: "فاتح", lang: "اللغة", cvd: "عمى الألوان", cvd_off: "إيقاف (عادي)", cvd_pro: "بروتانوبيا", cvd_deu: "ديوترانوبيا", cvd_rg: "أحمر-أخضر", cvd_tri: "تريتانوبيا (أزرق-أصفر)" , skin: "نمط السمة", skin_standart: "قياسي", skin_rubik: "Rubik's Cube", skin_neon: "نيون", skin_gunbatimi: "غروب الشمس" }
 };
 function raSetLang() { try { return localStorage.getItem("site-lang") || "tr"; } catch (e) { return "tr"; } }
 function raEsc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
@@ -149,6 +150,30 @@ function raSetTheme(mode) {
     var btn = document.getElementById("darkModeBtn"); if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
     renderSettingsMenu();
 }
+/* Tema stili (renk paleti + yazı tipi): localStorage "site-skin" */
+var RA_SKINS = [
+    ["standart", ["#f7f8fc", "#6c5ce7", "#ec4899", "#12141f"]],
+    ["rubik", ["#fff8ec", "#ffd21f", "#1d5bff", "#17171f"]],
+    ["neon", ["#05060b", "#22d3ee", "#d946ef", "#e8f6ff"]],
+    ["gunbatimi", ["#fdf6f0", "#e8573a", "#f5a524", "#2a1712"]]
+];
+var RA_SKIN_FONTS = { rubik: "Rubik:wght@500;600;700;800;900", neon: "Space+Grotesk:wght@500;600;700", gunbatimi: "Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900" };
+function raSkin() { try { return localStorage.getItem("site-skin") || "standart"; } catch (e) { return "standart"; } }
+function raApplySkin(k) {
+    var d = document.documentElement;
+    if (!k || k === "standart") d.removeAttribute("data-skin"); else d.setAttribute("data-skin", k);
+    var f = RA_SKIN_FONTS[k];
+    if (f && !document.getElementById("raSkinFont-" + k)) {
+        var l = document.createElement("link"); l.rel = "stylesheet"; l.id = "raSkinFont-" + k;
+        l.href = "https://fonts.googleapis.com/css2?family=" + f + "&display=swap";
+        document.head.appendChild(l);
+    }
+}
+function raSetSkin(k, target) {
+    try { localStorage.setItem("site-skin", k); } catch (e) {}
+    raApplySkin(k);
+    renderSettingsMenu(target);
+}
 function renderSettingsMenu(target) {
     var menu = target || document.getElementById("raSetMenu"); if (!menu) return;
     var L = SETTINGS_TXT[raSetLang()] || SETTINGS_TXT.tr;
@@ -158,6 +183,12 @@ function renderSettingsMenu(target) {
     var html = '<div class="set-grp"><div class="set-h">' + raEsc(L.theme) + '</div>' +
         '<button class="set-opt" data-theme="dark"' + cur(th !== "light") + '>🌙 ' + raEsc(L.dark) + '</button>' +
         '<button class="set-opt" data-theme="light"' + cur(th === "light") + '>☀️ ' + raEsc(L.light) + '</button></div>';
+    var sk = raSkin();
+    html += '<div class="set-grp"><div class="set-h">' + raEsc(L.skin || "Tema stili") + '</div>';
+    RA_SKINS.forEach(function (o) {
+        html += '<button class="set-opt" data-skin="' + o[0] + '"' + cur(o[0] === sk) + '><span class="skin-sw" aria-hidden="true">' + o[1].map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("") + '</span>' + raEsc(L["skin_" + o[0]] || o[0]) + '</button>';
+    });
+    html += '</div>';
     var codes = Object.keys(langs);
     if (codes.length) {
         html += '<div class="set-grp"><div class="set-h">' + raEsc(L.lang) + '</div>';
@@ -170,6 +201,7 @@ function renderSettingsMenu(target) {
     html += '</div>';
     menu.innerHTML = html;
     Array.prototype.forEach.call(menu.querySelectorAll("[data-theme]"), function (b) { b.onclick = function () { raSetTheme(b.getAttribute("data-theme")); }; });
+    Array.prototype.forEach.call(menu.querySelectorAll("button[data-skin]"), function (b) { b.onclick = function () { raSetSkin(b.getAttribute("data-skin"), target); }; });
     Array.prototype.forEach.call(menu.querySelectorAll("[data-lang]"), function (b) { b.onclick = function () { selectLanguage(b.getAttribute("data-lang")); }; });
     Array.prototype.forEach.call(menu.querySelectorAll("[data-cvd]"), function (b) { b.onclick = function () { applyCvd(b.getAttribute("data-cvd")); renderSettingsMenu(target); }; });
 }

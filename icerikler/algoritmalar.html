@@ -23,17 +23,18 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#0b0d14">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261135">
+<link rel="stylesheet" href="/styles/common.css?v=20261136">
+<script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar">
 <meta name="description" content="Rubik Academy - 3x3, 2x2 ve daha fazlası için OLL, PLL, COLL, WV, Ortega, CLL ve EG algoritmalarını, her biri kendi diyagramıyla adım adım öğren.">
 <meta property="og:title" content="Rubik Academy · Algoritmalar · Algorithms">
 <meta property="og:description" content="Tüm küpler için algoritmaları diyagramlarıyla öğren: 3x3, 2x2 ve yakında daha fazlası.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar">
-<meta property="og:image" content="https://rubikacademy.fun/og/algoritmalar.png?v=20261135">
+<meta property="og:image" content="https://rubikacademy.fun/og/algoritmalar.png?v=20261136">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/algoritmalar.png?v=20261135">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/algoritmalar.png?v=20261136">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -323,7 +324,8 @@ html.dark-mode .tr-green .tr-icon { border-color: rgba(53,196,107,.5); color: #4
 .tr-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .tr-text strong { font-family: var(--font-display); font-size: 17px; font-weight: 800; line-height: 1.2; }
 .tr-text span { font-size: 13px; color: var(--text-soft); line-height: 1.45; }
-.tr-go { flex-shrink: 0; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: var(--ui-accent); border: var(--card-bw) solid var(--ink); color: var(--ui-accent-text); font-weight: 900; font-size: 16px; }
+.tr-go { flex-shrink: 0; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: var(--ui-accent); border: var(--card-bw) solid var(--ink); color: var(--ui-accent-text); line-height: 0; }
+.tr-go svg { display: block; }
 html[dir="rtl"] .tr-go { transform: scaleX(-1); }
 @media (max-width: 1000px) { .trainers { grid-template-columns: 1fr; gap: 12px; } }
 @media (max-width: 520px) { .tr-card { padding: 12px; gap: 12px; } .tr-icon { width: 50px; height: 50px; } .tr-icon svg { width: 34px; height: 34px; } .tr-text strong { font-size: 16px; } .tr-text span { font-size: 12.5px; } }
@@ -489,17 +491,17 @@ html[dir="rtl"] .tr-go { transform: scaleX(-1); }
     <a href="/icerikler/algoritmalar/antrenor?tool=alg" class="tr-card tr-red">
         <span class="tr-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#fff" stroke="#17171f" stroke-width="3"/><circle cx="24" cy="24" r="12" fill="#f0383a" stroke="#17171f" stroke-width="3"/><circle cx="24" cy="24" r="5" fill="#fff" stroke="#17171f" stroke-width="2.5"/><path d="M24 24 L40 8" stroke="#17171f" stroke-width="3.5" stroke-linecap="round"/><path d="M36 6 L42 6 L42 12" fill="none" stroke="#17171f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="tr-text"><strong data-i18n="trainer_title">Algoritma Antrenörü</strong><span data-i18n="trainer_p">Öğrendiğin case'leri karıştırma ve süreyle çalış; zorlandıkların daha sık gelsin.</span></span>
-        <span class="tr-go" aria-hidden="true">→</span>
+        <span class="tr-go" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
     <a href="/icerikler/algoritmalar/antrenor?tool=recog" class="tr-card tr-blue">
         <span class="tr-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5 L42 14 L24 23 L6 14 Z" fill="#ffd21f" stroke="#17171f" stroke-width="2.5" stroke-linejoin="round"/><path d="M6 14 L24 23 L24 44 L6 35 Z" fill="#2ecc71" stroke="#17171f" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 23 L42 14 L42 35 L24 44 Z" fill="#ff7a1a" stroke="#17171f" stroke-width="2.5" stroke-linejoin="round"/><path d="M12 17 L12 38 M18 20 L18 41 M30 20 L30 41 M36 17 L36 38" stroke="#17171f" stroke-width="1.6"/><path d="M6 21 L24 30 L42 21 M6 28 L24 37 L42 28" fill="none" stroke="#17171f" stroke-width="1.6"/></svg></span>
         <span class="tr-text"><strong data-i18n="recog_title">OLL ve PLL Tanıma</strong><span data-i18n="recog_p">3x3 küpe bakıp hangi OLL ya da PLL olduğunu bul; hızın ve doğruluğun ölçülsün.</span></span>
-        <span class="tr-go" aria-hidden="true">→</span>
+        <span class="tr-go" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
     <a href="/icerikler/algoritmalar/antrenor?set=cross" class="tr-card tr-green">
         <span class="tr-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="4" width="13" height="13" rx="2.5" fill="#4b515c" stroke="#17171f" stroke-width="2.2"/><rect x="18" y="4" width="13" height="13" rx="2.5" fill="#ffffff" stroke="#17171f" stroke-width="2.2"/><rect x="32" y="4" width="13" height="13" rx="2.5" fill="#4b515c" stroke="#17171f" stroke-width="2.2"/><rect x="4" y="18" width="13" height="13" rx="2.5" fill="#ffffff" stroke="#17171f" stroke-width="2.2"/><rect x="18" y="18" width="13" height="13" rx="2.5" fill="#ffffff" stroke="#17171f" stroke-width="2.2"/><rect x="32" y="18" width="13" height="13" rx="2.5" fill="#ffffff" stroke="#17171f" stroke-width="2.2"/><rect x="4" y="32" width="13" height="13" rx="2.5" fill="#4b515c" stroke="#17171f" stroke-width="2.2"/><rect x="18" y="32" width="13" height="13" rx="2.5" fill="#ffffff" stroke="#17171f" stroke-width="2.2"/><rect x="32" y="32" width="13" height="13" rx="2.5" fill="#4b515c" stroke="#17171f" stroke-width="2.2"/></svg></span>
         <span class="tr-text"><strong data-i18n="cross_title">Cross Antrenörü</strong><span data-i18n="cross_p">15 saniyede beyaz artıyı planla, en kısa çözümle karşılaştır. Bluetooth küp destekli.</span></span>
-        <span class="tr-go" aria-hidden="true">→</span>
+        <span class="tr-go" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
 </section>
 
@@ -885,10 +887,10 @@ html[dir="rtl"] .tr-go { transform: scaleX(-1); }
 })();
 </script>
 <script>var PAGE_ID = "algoritmalar";</script>
-<script src="/js/i18n.js?v=20261135"></script>
-<script src="/js/common.js?v=20261135"></script>
-<script src="/js/firebase-config.js?v=20261135"></script>
-<script src="/js/account.js?v=20261135"></script>
+<script src="/js/i18n.js?v=20261136"></script>
+<script src="/js/common.js?v=20261136"></script>
+<script src="/js/firebase-config.js?v=20261136"></script>
+<script src="/js/account.js?v=20261136"></script>
 
 
 
