@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261130";
+    var V = "20261131";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -368,10 +368,13 @@
         if (!user || syncing) return Promise.resolve();
         syncing = true;
         var meta = loadMeta();
-        if (meta.uid !== user.uid) meta = { uid: user.uid, h: {}, t: {} }; // bu cihazda bu hesapla ilk senkron
+        var firstSync = meta.uid !== user.uid;
+        if (firstSync) meta = { uid: user.uid, h: {}, t: {} }; // bu cihazda bu hesapla ilk senkron
         meta.h = meta.h || {}; meta.t = meta.t || {};
         var applied = 0;
         return pull().then(function (cloud) {
+            if (firstSync) { if (cloud["wipe-v1"]) lsSet("ra-wipe-seen", String(+cloud["wipe-v1"].v || cloud["wipe-v1"].t)); }
+            else if (applyRemoteWipe(cloud)) { meta = { uid: user.uid, h: {}, t: {} }; applied++; }
             var keys = {}, up = [];
             localKeys().forEach(function (k) { keys[k] = 1; });
             Object.keys(cloud).forEach(function (k) { if (synced(k)) keys[k] = 1; });
@@ -432,32 +435,92 @@
         });
     }
     // Hesabı sil: buluttaki kayıtlar, sıralama girdileri ve hesap
+    /* ---------- veri silme ---------- */
+    var LOCAL_DATA_RE = /^algo-progress-|^algo-set-|^recog-|^trainer-|^roadmap-|^daily-results-v1|^daily-sent-v1|^custom-algs-v1/;
+    function wipeLocal() {
+        var del = [];
+        try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && LOCAL_DATA_RE.test(k)) del.push(k); } } catch (e) {}
+        del.forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+        return del.length;
+    }
+    function sentDays() {
+        var sent = parse(lsGet("daily-sent-v1")) || {}, out = [];
+        Object.keys(sent).forEach(function (d) { var p = d.split("-"); if (p.length === 3) out.push(Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000)); });
+        return out;
+    }
+    function commit(writes) {
+        if (!writes.length) return Promise.resolve();
+        var chunks = []; for (var i = 0; i < writes.length; i += 400) chunks.push(writes.slice(i, i + 400));
+        return chunks.reduce(function (p, w) {
+            return p.then(function () { return token(); }).then(function (tk) {
+                return fetch(base() + ":commit", { method: "POST", headers: { "Authorization": "Bearer " + tk, "Content-Type": "application/json" }, body: JSON.stringify({ writes: w }) })
+                    .then(function (r) { if (!r.ok) throw new Error("commit " + r.status); });
+            });
+        }, Promise.resolve());
+    }
+    // Bir alt koleksiyondaki tüm belge yolları (sayfalı)
+    function listPaths(path) {
+        var out = [];
+        function page(tok) {
+            return api(path + "?pageSize=300&mask.fieldPaths=zz" + (tok ? "&pageToken=" + encodeURIComponent(tok) : ""), { method: "GET" })
+                .then(function (r) { return r.ok ? r.json() : {}; })
+                .then(function (d) { (d.documents || []).forEach(function (x) { out.push(x.name); }); return d.nextPageToken ? page(d.nextPageToken) : out; });
+        }
+        return page("");
+    }
+    // Tüm ilerleme verisini sil: bu cihaz + bulut + sıralama girdileri. Diğer cihazlar da "wipe-v1" işaretini görünce siler.
+    function wipeAllData() {
+        var days = sentDays();
+        var n = wipeLocal();
+        if (!user) return Promise.resolve(n);
+        var uid = user.uid, now = Date.now();
+        return pull().then(function (cloud) {
+            var writes = Object.keys(cloud).filter(function (k) { return k !== "wipe-v1"; }).map(function (k) { return { delete: docName("users/" + uid + "/kv/" + encodeURIComponent(k)) }; });
+            days.forEach(function (dn) { writes.push({ delete: docName("days/" + dn + "/times/" + uid) }); });
+            writes.push({ update: { name: docName("users/" + uid + "/kv/wipe-v1"), fields: { v: { stringValue: String(now) }, t: { integerValue: String(now) } } } });
+            return commit(writes);
+        }).then(function () {
+            lsSet("ra-wipe-seen", String(now));
+            saveMeta({ uid: uid, h: {}, t: {} });
+            return Promise.all([writeProfile(), writeMeta()]);
+        }).then(function () { return n; });
+    }
+    // Başka cihazda "verileri sil" yapıldıysa bu cihazdakini de temizle (eski veri geri gönderilmesin)
+    function applyRemoteWipe(cloud) {
+        var w = cloud["wipe-v1"]; if (!w) return false;
+        var at = +w.v || w.t; if (!(at > +(lsGet("ra-wipe-seen") || 0))) return false;
+        wipeLocal(); lsSet("ra-wipe-seen", String(at));
+        return true;
+    }
+    // Hesabı sil: bulutta ne varsa (profil, ilerleme, ziyaretler, oturumlar, bildirimler, sıralama, bildirim aboneliği) ve Firebase hesabı
     function deleteAccount() {
         var uid = user && user.uid;
         if (!uid) return Promise.reject(new Error("signed-out"));
-        return pull().then(function (cloud) {
-            var writes = Object.keys(cloud).map(function (k) { return { delete: docName("users/" + uid + "/kv/" + encodeURIComponent(k)) }; });
-            var sent = parse(lsGet("daily-sent-v1")) || {};
-            Object.keys(sent).forEach(function (d) {
-                var p = d.split("-"); if (p.length !== 3) return;
-                var dn = Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000);
-                writes.push({ delete: docName("days/" + dn + "/times/" + uid) });
-            });
-            if (!writes.length) return;
-            return token().then(function (tk) {
-                return fetch(base() + ":commit", { method: "POST", headers: { "Authorization": "Bearer " + tk, "Content-Type": "application/json" }, body: JSON.stringify({ writes: writes }) });
-            });
-        }).then(function () { return loadSDK(); }).then(function (m) {
-            return m.deleteUser(auth.currentUser).catch(function (err) {
-                // Uzun süredir girişliyse Google/şifre ile yeniden doğrulama ister
-                if (!err || !/requires-recent-login/.test(err.code || "")) throw err;
-                var u = auth.currentUser, isG = u.providerData.some(function (p) { return p.providerId === "google.com"; });
-                if (isG) return m.reauthenticateWithPopup(u, new m.GoogleAuthProvider()).then(function () { return m.deleteUser(auth.currentUser); });
-                var pw = window.prompt(t("pass"));
-                if (!pw) throw err;
-                return m.reauthenticateWithCredential(u, m.EmailAuthProvider.credential(u.email, pw)).then(function () { return m.deleteUser(auth.currentUser); });
-            });
-        }).then(function () { lsSet(META_KEY, null); lsSet(SIGNED_KEY, null); });
+        var days = sentDays();
+        return loadSDK().then(function (m) {
+            // Uzun süredir girişliyse önce yeniden doğrula (veriler silinip hesap kalmasın)
+            var u = auth.currentUser, last = Date.parse((u.metadata && u.metadata.lastSignInTime) || "") || 0;
+            if (Date.now() - last < 4 * 60000) return m;
+            var isG = u.providerData.some(function (p) { return p.providerId === "google.com"; });
+            if (isG) return m.reauthenticateWithPopup(u, new m.GoogleAuthProvider()).then(function () { return m; });
+            var pw = window.prompt(t("pass")); if (!pw) throw new Error("reauth-cancelled");
+            return m.reauthenticateWithCredential(u, m.EmailAuthProvider.credential(u.email, pw)).then(function () { return m; });
+        }).then(function (m) {
+            return Promise.all(["kv", "visits", "sessions", "notifications", "meta"].map(function (c) { return listPaths("/users/" + uid + "/" + c); }))
+                .then(function (lists) {
+                    var writes = [].concat.apply([], lists).map(function (name) { return { delete: name }; });
+                    days.forEach(function (dn) { writes.push({ delete: docName("days/" + dn + "/times/" + uid) }); });
+                    writes.push({ delete: docName("users/" + uid) });
+                    return commit(writes);
+                })
+                .then(function () { return api("/roles/" + uid, { method: "DELETE" }).catch(function () {}); })
+                .then(function () { return dropPushSub(); })
+                .then(function () { return m.deleteUser(auth.currentUser); });
+        }).then(function () {
+            wipeLocal();
+            ["ra-profile-v1", "ra-push-saved", "ra-wipe-seen", "ra-login-ts"].forEach(function (k) { lsSet(k, null); });
+            lsSet(META_KEY, null); lsSet(SIGNED_KEY, null);
+        });
     }
 
     /* ---------- herkese açık profil dokümanı + ziyaret kaydı ---------- */
@@ -671,6 +734,15 @@
             return p.then(function (r) { if (r.ok) lsSet("ra-push-saved", key); return r.ok; });
         }).catch(function () { return false; });
     }
+    // Hesap silinirken bu cihazın bildirim aboneliğini de kaldır
+    function dropPushSub() {
+        if (!pushSupported()) return Promise.resolve();
+        return navigator.serviceWorker.ready.then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (sub) {
+            if (!sub) return;
+            return subId(sub.endpoint).then(function (id) { return api("/pushsubs/" + id, { method: "DELETE" }).catch(function () {}); })
+                .then(function () { return sub.unsubscribe().catch(function () {}); });
+        }).catch(function () {});
+    }
     function ensurePush() {
         if (!enabled || !pushSupported() || Notification.permission !== "granted") return Promise.resolve(false);
         return navigator.serviceWorker.ready.then(function (reg) {
@@ -761,6 +833,13 @@
         signOut: signOut,
         setName: setName,
         deleteAccount: deleteAccount,
+        wipeAllData: wipeAllData,
+        // Geçmiş bir günün sıralama girdisini sil (bugünkü silinemez: ikinci deneme açığı olmasın)
+        deleteDailyEntry: function (dateStr) {
+            if (!user) return Promise.resolve(false);
+            var p = dateStr.split("-"), dn = Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000);
+            return api("/days/" + dn + "/times/" + user.uid, { method: "DELETE" }).then(function (r) { return r.ok; }, function () { return false; });
+        },
         syncNow: function () { return pushChanged(false); },
         load: loadSDK,
         isPending: function () { return lsGet(SIGNED_KEY) === "1" && !sdkP; },
