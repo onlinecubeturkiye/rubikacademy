@@ -8,7 +8,7 @@
    Küp modeli: cubejs (Cube) — küpün kendi çerçevesi (beyaz üst, yeşil önde).
 ========================================================= */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261137";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261138";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -161,7 +161,8 @@
         st.pll = t;
         var r = buildResult(t);
         lastResult = r;
-        saveHist(r);
+        var inDuel = !!(duel && tab === "duel");
+        if (!inDuel) saveHist(r);
         renderStages(st); renderResult(r); renderHist(); renderHint();
         publishDone(Math.round(t));
     }
@@ -349,7 +350,8 @@
     function createDuel() {
         if (!signedIn()) { Account.openLogin && Account.openLogin(); return; }
         var c = code5(), u = Account.user(), s = genScramble();
-        var fields = { host: u.uid, hName: myName(), guest: "", gName: "", round: 1, scr: s, hT: -1, gT: -1, hSt: "bekliyor", gSt: "", hW: 0, gW: 0, sc: 0 };
+        var fm = +(document.querySelector('input[name="akFmt"]:checked') || {}).value || 5;
+        var fields = { host: u.uid, hName: myName(), guest: "", gName: "", round: 1, scr: s, hT: -1, gT: -1, hSt: "bekliyor", gSt: "", hW: 0, gW: 0, sc: 0, fmt: fm, hL: "", gL: "" };
         var body = {}; Object.keys(fields).forEach(function (k) { body[k] = val(fields[k]); }); body.ts = { timestampValue: new Date().toISOString() };
         duelMsg("Oda oluşturuluyor…");
         api("/duels?documentId=" + c, { method: "POST", body: JSON.stringify({ fields: body }) }).then(function (r) {
@@ -416,12 +418,94 @@
         var d = duel.doc || {}, mine = duel.me === "h" ? d.hT : d.gT;
         if (mine >= 0 && d.round === duel.round) return; // bu turda zaten gönderdi
         var f = {}; f[duel.me + "T"] = ms; f[duel.me + "St"] = "bitti"; lastPub = "bitti";
+        var L = listOf(duel.me === "h" ? d.hL : d.gL);
+        if (L.length >= (d.fmt || 5)) return; // maç bitti, fazla çözüm sayılmaz
+        L.push(ms);
+        f[duel.me + "L"] = L.join(",");
         patch(f).then(poll);
     }
     function nextRound() {
         if (!duel || duel.me !== "h" || !duel.doc) return;
         var o = duel.doc; lastPub = "";
+        if (matchOver(o)) { // rövanş: aynı formatla baştan
+            patch({ round: o.round + 1, scr: genScramble(), hT: -1, gT: -1, hSt: "bekliyor", gSt: o.guest ? "bekliyor" : "", hW: 0, gW: 0, hL: "", gL: "", sc: 0 }).then(function () { duel.base = o.round; poll(); });
+            return;
+        }
         patch({ round: o.round + 1, scr: genScramble(), hT: -1, gT: -1, hSt: "bekliyor", gSt: o.guest ? "bekliyor" : "" }).then(poll);
+    }
+    /* ---------- maç formatı ve sonuçlar ---------- */
+    function listOf(str) { return String(str || "").split(",").filter(Boolean).map(Number); }
+    function fmtName(n) { return n === 3 ? "mo3" : n === 12 ? "ao12" : "ao5"; }
+    function avgOf(arr, n) {
+        if (arr.length < n) return null;
+        var a = arr.slice(0, n);
+        if (n === 3) return a.reduce(function (x, y) { return x + y; }, 0) / 3;
+        var s = a.slice().sort(function (x, y) { return x - y; }).slice(1, -1);
+        return s.reduce(function (x, y) { return x + y; }, 0) / s.length;
+    }
+    function matchOver(o) { var n = o.fmt || 5; return !!o.guest && listOf(o.hL).length >= n && listOf(o.gL).length >= n; }
+    function matchData(o) {
+        var n = o.fmt || 5, hl = listOf(o.hL).slice(0, n), gl = listOf(o.gL).slice(0, n);
+        var ha = avgOf(hl, n), ga = avgOf(gl, n);
+        var win = ha == null || ga == null ? "" : (ha < ga ? "h" : ga < ha ? "g" : "");
+        return { n: n, f: fmtName(n), hl: hl, gl: gl, ha: ha, ga: ga, win: win, hw: o.hW, gw: o.gW };
+    }
+    function shareText(o, m) {
+        var line = function (name, l, a) { return name + ": " + fmt(a) + " " + m.f + " (" + l.map(fmt).join(", ") + ")"; };
+        var w = m.win === "h" ? o.hName : m.win === "g" ? o.gName : "";
+        return "⚔️ Rubik Academy düellosu (" + m.f + ")\n" + line(o.hName, m.hl, m.ha) + "\n" + line(o.gName, m.gl, m.ga) + "\n" +
+            (w ? "🏆 Kazanan: " + w : "🤝 Berabere") + " · Tur skoru " + m.hw + "-" + m.gw + "\nrubikacademy.fun/icerikler/akilli-kup";
+    }
+    function shareImage(o, m) {
+        var W = 1080, H = 1080, c = document.createElement("canvas"); c.width = W; c.height = H;
+        var x = c.getContext("2d"), cs = getComputedStyle(document.body);
+        var acc = (cs.getPropertyValue("--ui-accent") || "#6c5ce7").trim();
+        var g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#0b0d14"); g.addColorStop(1, "#1d1838");
+        x.fillStyle = g; x.fillRect(0, 0, W, H);
+        x.textAlign = "center"; x.fillStyle = "#a4aabe"; x.font = "700 34px Inter, sans-serif";
+        x.fillText("RUBIK ACADEMY · DÜELLO · " + m.f.toUpperCase(), W / 2, 110);
+        function player(cx, name, l, a, won) {
+            x.fillStyle = won ? acc : "#1a1e2c"; roundRect(x, cx - 230, 190, 460, 560, 36); x.fill();
+            x.fillStyle = won ? "#ffffff" : "#eef0f7"; x.font = "800 44px Inter, sans-serif"; x.fillText(clip(name, 16), cx, 280);
+            x.font = "900 96px 'JetBrains Mono', monospace"; x.fillText(fmt(a), cx, 410);
+            x.font = "700 30px Inter, sans-serif"; x.fillStyle = won ? "rgba(255,255,255,.85)" : "#a4aabe"; x.fillText(m.f, cx, 455);
+            x.font = "600 28px 'JetBrains Mono', monospace";
+            l.forEach(function (t, i) { x.fillText(fmt(t), cx + (i % 2 ? 100 : -100), 520 + Math.floor(i / 2) * 40); });
+            if (won) { x.font = "900 40px Inter, sans-serif"; x.fillStyle = "#fff"; x.fillText("🏆 KAZANAN", cx, 720); }
+        }
+        player(290, o.hName, m.hl, m.ha, m.win === "h");
+        player(790, o.gName, m.gl, m.ga, m.win === "g");
+        x.fillStyle = "#eef0f7"; x.font = "900 54px Inter, sans-serif"; x.fillText("VS", W / 2, 470);
+        x.font = "800 40px Inter, sans-serif"; x.fillText("Tur skoru " + m.hw + " - " + m.gw, W / 2, 860);
+        x.fillStyle = "#a4aabe"; x.font = "700 30px Inter, sans-serif"; x.fillText("rubikacademy.fun/icerikler/akilli-kup", W / 2, 990);
+        return new Promise(function (res) { c.toBlob(res, "image/png"); });
+    }
+    function clip(s, n) { s = String(s || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+    function roundRect(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
+    function renderFinal(o) {
+        var m = matchData(o), meH = duel.me === "h", box = $("akFinal");
+        var col = function (name, l, a, won, mine) {
+            return '<div class="ak-fin-p' + (won ? " win" : "") + '"><div class="ak-pl-n">' + esc(name) + (mine ? " <small>(sen)</small>" : "") + '</div>' +
+                '<div class="ak-fin-a">' + fmt(a) + '</div><div class="ak-fin-f">' + m.f + '</div>' +
+                '<div class="ak-fin-l">' + l.map(function (t) { return '<span>' + fmt(t) + '</span>'; }).join("") + '</div>' + (won ? '<div class="ak-fin-w">🏆 Kazanan</div>' : "") + '</div>';
+        };
+        box.hidden = false;
+        box.innerHTML = '<h3>🏁 Maç bitti · ' + m.f + '</h3><div class="ak-fin">' + col(o.hName, m.hl, m.ha, m.win === "h", meH) + col(o.gName, m.gl, m.ga, m.win === "g", !meH) + '</div>' +
+            '<p class="ak-fin-s">' + (m.win ? "" : "🤝 Berabere · ") + 'Tur skoru ' + m.hw + ' - ' + m.gw + '</p>' +
+            '<div class="ak-fin-b"><button type="button" class="btn primary" id="akShareImg">🖼️ Görsel olarak paylaş</button><button type="button" class="btn" id="akShareTxt">📝 Metin olarak paylaş</button></div><div class="ak-msg" id="akShareMsg"></div>';
+        $("akShareTxt").onclick = function () {
+            var t = shareText(o, m);
+            if (navigator.share) navigator.share({ text: t }).catch(function () {});
+            else if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { $("akShareMsg").textContent = "Metin kopyalandı ✓"; });
+            else prompt("Sonuç:", t);
+        };
+        $("akShareImg").onclick = function () {
+            shareImage(o, m).then(function (blob) {
+                var file = new File([blob], "rubikacademy-duello.png", { type: "image/png" });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], text: shareText(o, m) }).catch(function () {});
+                else { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); $("akShareMsg").textContent = "Görsel indirildi ✓"; }
+            });
+        };
     }
     function renderRoom(o) {
         $("akCode").textContent = duel.code;
@@ -434,11 +518,14 @@
         }
         var a = card(o.hName, o.hW, o.hT, o.hSt, meH, false), b = card(o.gName, o.gW, o.gT, o.gSt, !meH, !o.guest);
         $("akPlayers").innerHTML = a + '<div class="ak-vs">VS</div>' + b;
-        $("akRound").textContent = "Tur " + o.round;
+        var n = o.fmt || 5, done = Math.min(listOf(o.hL).length, listOf(o.gL).length), over = matchOver(o);
+        $("akRound").textContent = fmtName(n) + " · Tur " + Math.min(done + (over ? 0 : 1), n) + " / " + n;
         var both = o.hT >= 0 && o.gT >= 0;
         $("akNext").hidden = !meH; $("akNext").disabled = !o.guest || !both;
-        $("akNext").textContent = both ? "Sonraki tur →" : "Tur sürüyor…";
-        $("akRoomHint").textContent = !o.guest ? "Rakibin katılınca aynı karıştırmayı çözeceksiniz." : (both ? (meH ? "Sonraki turu başlatabilirsin." : "Ev sahibi sonraki turu başlatacak.") : "Karıştırmayı uygula ve çöz. Rakibinin durumu canlı görünür.");
+        $("akNext").textContent = over ? "🔁 Rövanş" : both ? "Sonraki tur →" : "Tur sürüyor…";
+        var fk = [o.hL, o.gL, o.hW, o.gW, o.round].join("|");
+        if (over) { if (duel.shown !== fk) { duel.shown = fk; renderFinal(o); } } else { duel.shown = ""; $("akFinal").hidden = true; }
+        $("akRoomHint").textContent = over ? (meH ? "Maç bitti. Rövanş başlatabilirsin." : "Maç bitti.") : !o.guest ? "Rakibin katılınca aynı karıştırmayı çözeceksiniz." : (both ? (meH ? "Sonraki turu başlatabilirsin." : "Ev sahibi sonraki turu başlatacak.") : "Karıştırmayı uygula ve çöz. Rakibinin durumu canlı görünür.");
     }
     function duelMsg(t, bad) { var m = $("akDuelMsg"); m.innerHTML = t || ""; m.className = "ak-msg" + (bad ? " bad" : ""); }
 
@@ -485,6 +572,6 @@
         $("akLoginNote").hidden = signedIn();
         $("akLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
     }
-    window.AkilliKup = { setScramble: setScramble }; // test/geliştirme için
+    window.AkilliKup = { setScramble: setScramble, shareImage: shareImage, matchData: matchData }; // test/geliştirme için
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

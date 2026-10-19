@@ -27,10 +27,10 @@
 <meta property="og:description" content="Çözümünü aşama aşama analiz et, arkadaşınla canlı düello yap.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/akilli-kup">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261137">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261138">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261137">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261138">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261137">
+<link rel="stylesheet" href="/styles/common.css?v=20261138">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -141,6 +141,26 @@
 .ak-room-foot p { font-size: 13.5px; color: var(--text-soft); font-weight: 600; }
 .ak-login { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--tint-blue); font-size: 13.5px; color: var(--text); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
+.ak-fmt { display: flex; gap: 8px; margin-bottom: 12px; }
+.ak-fmt label { flex: 1; cursor: pointer; }
+.ak-fmt input { position: absolute; opacity: 0; pointer-events: none; }
+.ak-fmt span { display: block; text-align: center; padding: 9px 6px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); font: 900 16px "JetBrains Mono", monospace; color: var(--text); }
+.ak-fmt small { display: block; font: 700 11px Inter, sans-serif; color: var(--text-soft); margin-top: 2px; }
+.ak-fmt input:checked + span { background: var(--ui-accent); color: var(--ui-accent-text); border-color: transparent; }
+.ak-fmt input:checked + span small { color: inherit; opacity: .85; }
+.ak-final { margin-top: 16px; padding: 18px; border-radius: 18px; background: var(--ui-accent-soft); text-align: center; }
+.ak-final h3 { color: var(--text); font-size: 19px; margin-bottom: 12px; }
+.ak-fin { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ak-fin-p { background: var(--surface); border-radius: 16px; padding: 14px; border: 2px solid transparent; }
+.ak-fin-p.win { border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
+.ak-fin-a { font: 900 34px "JetBrains Mono", monospace; color: var(--text); margin-top: 4px; }
+.ak-fin-f { font-size: 12px; font-weight: 800; color: var(--text-soft); }
+.ak-fin-l { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 8px; }
+.ak-fin-l span { font: 700 12.5px "JetBrains Mono", monospace; padding: 3px 7px; border-radius: 8px; background: var(--surface-soft); color: var(--text-soft); }
+.ak-fin-w { margin-top: 8px; font-weight: 900; color: #16a34a; }
+.ak-fin-s { margin: 12px 0; font-weight: 800; color: var(--text); }
+.ak-fin-b { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
 /* MAC penceresi */
 .ak-modal { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 16px; }
 .ak-modal.show { display: flex; }
@@ -225,7 +245,7 @@
     <div id="akLobby">
         <h2>⚔️ Canlı düello</h2>
         <div class="ak-lobby">
-            <div><h3>Oda oluştur</h3><p>Bir oda aç, kodu ya da bağlantıyı arkadaşına gönder. İkiniz de aynı karıştırmayı çözersiniz; kim hızlıysa turu alır.</p><button type="button" class="btn primary" id="akCreate">➕ Oda oluştur</button></div>
+            <div><h3>Oda oluştur</h3><p>Bir oda aç, kodu ya da bağlantıyı arkadaşına gönder. İkiniz de aynı karıştırmayı çözersiniz; kim hızlıysa turu alır.</p><div class="ak-fmt" role="radiogroup" aria-label="Maç formatı"><label><input type="radio" name="akFmt" value="3"><span>mo3<small>3 çözüm</small></span></label><label><input type="radio" name="akFmt" value="5" checked><span>ao5<small>5 çözüm</small></span></label><label><input type="radio" name="akFmt" value="12"><span>ao12<small>12 çözüm</small></span></label></div><button type="button" class="btn primary" id="akCreate">➕ Oda oluştur</button></div>
             <div><h3>Odaya katıl</h3><p>Arkadaşının paylaştığı 5 haneli kodu yaz.</p><div class="ak-join"><input id="akJoinIn" maxlength="5" placeholder="KOD" autocomplete="off"><button type="button" class="btn primary" id="akJoin">Katıl</button></div></div>
         </div>
         <div class="ak-login" id="akLoginNote" hidden>🔒 Düello için giriş yapman gerekiyor. <button type="button" class="btn sm" id="akLoginBtn">Giriş yap</button></div>
@@ -237,6 +257,7 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="ak-pill" id="akRound">Tur 1</span><button type="button" class="btn sm" id="akCopy">🔗 Bağlantıyı kopyala</button><button type="button" class="btn sm" id="akLeave">Odadan çık</button></div>
         </div>
         <div class="ak-players" id="akPlayers"></div>
+        <div class="ak-final" id="akFinal" hidden></div>
         <div class="ak-room-foot"><p id="akRoomHint"></p><button type="button" class="btn primary" id="akNext" hidden>Sonraki tur →</button></div>
     </div>
 </section>
@@ -282,11 +303,11 @@
 </footer>
 
 <script>var PAGE_ID = "akilli_kup";</script>
-<script src="/js/i18n.js?v=20261137"></script>
-<script src="/js/common.js?v=20261137"></script>
-<script src="/js/firebase-config.js?v=20261137"></script>
-<script src="/js/account.js?v=20261137"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261137"></script>
-<script src="/js/akilli-kup.js?v=20261137"></script>
+<script src="/js/i18n.js?v=20261138"></script>
+<script src="/js/common.js?v=20261138"></script>
+<script src="/js/firebase-config.js?v=20261138"></script>
+<script src="/js/account.js?v=20261138"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261138"></script>
+<script src="/js/akilli-kup.js?v=20261138"></script>
 </body>
 </html>
