@@ -8,7 +8,7 @@
    Küp modeli: cubejs (Cube) — küpün kendi çerçevesi (beyaz üst, yeşil önde).
 ========================================================= */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261138";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261139";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -418,9 +418,10 @@
         var d = duel.doc || {}, mine = duel.me === "h" ? d.hT : d.gT;
         if (mine >= 0 && d.round === duel.round) return; // bu turda zaten gönderdi
         var f = {}; f[duel.me + "T"] = ms; f[duel.me + "St"] = "bitti"; lastPub = "bitti";
-        var L = listOf(duel.me === "h" ? d.hL : d.gL);
-        if (L.length >= (d.fmt || 5)) return; // maç bitti, fazla çözüm sayılmaz
-        L.push(ms);
+        var L = listOf(duel.me === "h" ? d.hL : d.gL), ri = Math.max(1, d.round || 1) - 1;
+        if (ri >= (d.fmt || 5)) return; // maç bitti, fazla çözüm sayılmaz
+        L = L.slice(0, ri); while (L.length < ri) L.push(0); L[ri] = ms; // her tur kendi yerine
+        L = L.map(function (x) { return x || ms; });
         f[duel.me + "L"] = L.join(",");
         patch(f).then(poll);
     }
@@ -428,7 +429,8 @@
         if (!duel || duel.me !== "h" || !duel.doc) return;
         var o = duel.doc; lastPub = "";
         if (matchOver(o)) { // rövanş: aynı formatla baştan
-            patch({ round: o.round + 1, scr: genScramble(), hT: -1, gT: -1, hSt: "bekliyor", gSt: o.guest ? "bekliyor" : "", hW: 0, gW: 0, hL: "", gL: "", sc: 0 }).then(function () { duel.base = o.round; poll(); });
+            closeFinal();
+            patch({ round: 1, scr: genScramble(), hT: -1, gT: -1, hSt: "bekliyor", gSt: o.guest ? "bekliyor" : "", hW: 0, gW: 0, hL: "", gL: "", sc: 0 }).then(poll);
             return;
         }
         patch({ round: o.round + 1, scr: genScramble(), hT: -1, gT: -1, hSt: "bekliyor", gSt: o.guest ? "bekliyor" : "" }).then(poll);
@@ -443,7 +445,8 @@
         var s = a.slice().sort(function (x, y) { return x - y; }).slice(1, -1);
         return s.reduce(function (x, y) { return x + y; }, 0) / s.length;
     }
-    function matchOver(o) { var n = o.fmt || 5; return !!o.guest && listOf(o.hL).length >= n && listOf(o.gL).length >= n; }
+    // Maç bitti: son turda (tur = format sayısı) iki süre de geldi
+    function matchOver(o) { var n = o.fmt || 5; return !!o.guest && o.hT >= 0 && o.gT >= 0 && (o.round || 1) >= n; }
     function matchData(o) {
         var n = o.fmt || 5, hl = listOf(o.hL).slice(0, n), gl = listOf(o.gL).slice(0, n);
         var ha = avgOf(hl, n), ga = avgOf(gl, n);
@@ -483,16 +486,20 @@
     function clip(s, n) { s = String(s || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
     function roundRect(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
     function renderFinal(o) {
-        var m = matchData(o), meH = duel.me === "h", box = $("akFinal");
+        var m = matchData(o), meH = duel.me === "h", box = $("akFinalBox");
         var col = function (name, l, a, won, mine) {
             return '<div class="ak-fin-p' + (won ? " win" : "") + '"><div class="ak-pl-n">' + esc(name) + (mine ? " <small>(sen)</small>" : "") + '</div>' +
                 '<div class="ak-fin-a">' + fmt(a) + '</div><div class="ak-fin-f">' + m.f + '</div>' +
                 '<div class="ak-fin-l">' + l.map(function (t) { return '<span>' + fmt(t) + '</span>'; }).join("") + '</div>' + (won ? '<div class="ak-fin-w">🏆 Kazanan</div>' : "") + '</div>';
         };
-        box.hidden = false;
-        box.innerHTML = '<h3>🏁 Maç bitti · ' + m.f + '</h3><div class="ak-fin">' + col(o.hName, m.hl, m.ha, m.win === "h", meH) + col(o.gName, m.gl, m.ga, m.win === "g", !meH) + '</div>' +
+        $("akFinal").classList.add("show");
+        box.innerHTML = '<button type="button" class="ak-x" id="akFinClose" aria-label="Kapat">✕</button><h3>🏁 Maç bitti · ' + m.f + '</h3>' +
+            '<p class="ak-fin-k">' + (m.win ? '🏆 Kazanan: <b>' + esc(m.win === "h" ? o.hName : o.gName) + '</b>' : '🤝 Berabere') + '</p><div class="ak-fin">' + col(o.hName, m.hl, m.ha, m.win === "h", meH) + col(o.gName, m.gl, m.ga, m.win === "g", !meH) + '</div>' +
             '<p class="ak-fin-s">' + (m.win ? "" : "🤝 Berabere · ") + 'Tur skoru ' + m.hw + ' - ' + m.gw + '</p>' +
-            '<div class="ak-fin-b"><button type="button" class="btn primary" id="akShareImg">🖼️ Görsel olarak paylaş</button><button type="button" class="btn" id="akShareTxt">📝 Metin olarak paylaş</button></div><div class="ak-msg" id="akShareMsg"></div>';
+            '<div class="ak-fin-b"><button type="button" class="btn primary" id="akShareImg">🖼️ Görsel olarak paylaş</button><button type="button" class="btn" id="akShareTxt">📝 Metin olarak paylaş</button></div>' +
+            '<div class="ak-fin-b" style="margin-top:8px">' + (meH ? '<button type="button" class="btn" id="akRematch">🔁 Rövanş</button>' : '') + '<button type="button" class="btn" id="akFinClose2">Kapat</button></div><div class="ak-msg" id="akShareMsg"></div>';
+        $("akFinClose").onclick = $("akFinClose2").onclick = closeFinal;
+        if ($("akRematch")) $("akRematch").onclick = nextRound;
         $("akShareTxt").onclick = function () {
             var t = shareText(o, m);
             if (navigator.share) navigator.share({ text: t }).catch(function () {});
@@ -507,6 +514,7 @@
             });
         };
     }
+    function closeFinal() { $("akFinal").classList.remove("show"); }
     function renderRoom(o) {
         $("akCode").textContent = duel.code;
         var meH = duel.me === "h";
@@ -518,13 +526,14 @@
         }
         var a = card(o.hName, o.hW, o.hT, o.hSt, meH, false), b = card(o.gName, o.gW, o.gT, o.gSt, !meH, !o.guest);
         $("akPlayers").innerHTML = a + '<div class="ak-vs">VS</div>' + b;
-        var n = o.fmt || 5, done = Math.min(listOf(o.hL).length, listOf(o.gL).length), over = matchOver(o);
-        $("akRound").textContent = fmtName(n) + " · Tur " + Math.min(done + (over ? 0 : 1), n) + " / " + n;
+        var n = o.fmt || 5, over = matchOver(o);
+        $("akRound").textContent = fmtName(n) + " · Tur " + Math.min(o.round || 1, n) + " / " + n;
         var both = o.hT >= 0 && o.gT >= 0;
         $("akNext").hidden = !meH; $("akNext").disabled = !o.guest || !both;
         $("akNext").textContent = over ? "🔁 Rövanş" : both ? "Sonraki tur →" : "Tur sürüyor…";
         var fk = [o.hL, o.gL, o.hW, o.gW, o.round].join("|");
-        if (over) { if (duel.shown !== fk) { duel.shown = fk; renderFinal(o); } } else { duel.shown = ""; $("akFinal").hidden = true; }
+        if (over) { if (duel.shown !== fk) { duel.shown = fk; renderFinal(o); } } else { duel.shown = ""; closeFinal(); }
+        $("akShowFin").hidden = !over;
         $("akRoomHint").textContent = over ? (meH ? "Maç bitti. Rövanş başlatabilirsin." : "Maç bitti.") : !o.guest ? "Rakibin katılınca aynı karıştırmayı çözeceksiniz." : (both ? (meH ? "Sonraki turu başlatabilirsin." : "Ev sahibi sonraki turu başlatacak.") : "Karıştırmayı uygula ve çöz. Rakibinin durumu canlı görünür.");
     }
     function duelMsg(t, bad) { var m = $("akDuelMsg"); m.innerHTML = t || ""; m.className = "ak-msg" + (bad ? " bad" : ""); }
@@ -555,6 +564,8 @@
         $("akJoinIn").onkeydown = function (e) { if (e.key === "Enter") joinDuel($("akJoinIn").value); };
         $("akLeave").onclick = leaveDuel;
         $("akNext").onclick = nextRound;
+        $("akShowFin").onclick = function () { if (duel && duel.doc) renderFinal(duel.doc); };
+        $("akFinal").onclick = function (e) { if (e.target === $("akFinal")) closeFinal(); };
         $("akCopy").onclick = function () {
             var link = location.origin + "/icerikler/akilli-kup?duel=" + (duel && duel.code);
             var done = function () { $("akCopy").textContent = "Kopyalandı ✓"; setTimeout(function () { $("akCopy").textContent = "🔗 Bağlantıyı kopyala"; }, 1500); };
