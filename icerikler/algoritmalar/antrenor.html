@@ -27,10 +27,10 @@
 <meta property="og:description" content="Karıştırmayı uygula, case'i tanı, süreni ölç. Zorlandığın case'ler daha sık gelir.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/antrenor">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261127">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261128">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261127">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261128">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261127">
+<link rel="stylesheet" href="/styles/common.css?v=20261128">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -602,6 +602,16 @@ details.case-group > summary { cursor: pointer; list-style: none; }
 details.case-group > summary::-webkit-details-marker { display: none; }
 details.case-group > summary::before { content: "▸"; color: var(--text-soft); margin-right: 2px; transition: transform .2s; display: inline-block; }
 details.case-group[open] > summary::before { transform: rotate(90deg); }
+.cvd-open + .cvd-open { margin-left: 6px; }
+.pref-row { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid var(--border); border-radius: 12px; margin: 10px 0; cursor: pointer; background: var(--surface); }
+.pref-row input { width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; cursor: pointer; }
+.pref-row b { display: block; font-size: 14.5px; color: var(--text); }
+.pref-row small { display: block; font-size: 12.5px; color: var(--text-soft); line-height: 1.4; margin-top: 2px; }
+.manual-time { display: none; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.manual-on .manual-time { display: flex; }
+.mode-card .manual-time { display: none !important; }
+.manual-time input { width: 140px; padding: 10px 12px; border-radius: 12px; border: var(--card-bw) solid var(--card-border); background: var(--surface); color: var(--text); font: 800 18px "JetBrains Mono", monospace; text-align: center; }
+.manual-err { width: 100%; text-align: center; color: #dc2626; font-size: 12.5px; font-weight: 700; min-height: 1px; }
 </style>
 
 <!-- Google tag (gtag.js) -->
@@ -659,6 +669,7 @@ details.case-group[open] > summary::before { transform: rotate(90deg); }
     <button type="button" class="tool-tab" data-tool="recog" role="tab" data-i18n="tool_recog">👁 Tanıma</button>
 </div>
 <button type="button" class="cvd-open" id="cvdOpen" title="Renk şeması ve tutuş" aria-label="Renk şeması ve tutuş">🎨</button>
+<button type="button" class="cvd-open" id="prefOpen" title="Antrenör ayarları" aria-label="Antrenör ayarları">⚙️</button>
 </div>
 
 <div id="toolRecog" data-i18n-scope="tanima" data-hold-skip hidden>
@@ -749,6 +760,11 @@ details.case-group[open] > summary::before { transform: rotate(90deg); }
         <div class="timer" id="timer" dir="ltr">0.00</div>
         <div class="timer-hint" id="timerHint"></div>
     </div>
+    <form class="manual-time" id="manualForm" autocomplete="off">
+        <input type="text" id="manualInput" inputmode="decimal" placeholder="12.34" aria-label="Süre" dir="ltr">
+        <button type="submit" class="btn-sm btn-bt" data-i18n="manual_save">Kaydet</button>
+        <span class="manual-err" id="manualErr"></span>
+    </form>
 
     <div class="reveal-box" id="revealBox">
         <div class="reveal-diagram" id="revealDiagram" dir="ltr"></div>
@@ -807,6 +823,15 @@ details.case-group[open] > summary::before { transform: rotate(90deg); }
     </div>
 </div>
 
+<div class="bt-modal" id="prefModal" role="dialog" aria-modal="true" aria-labelledby="prefTitle">
+    <div class="bt-dialog">
+        <h3 id="prefTitle" data-i18n="pref_title">⚙️ Antrenör ayarları</h3>
+        <label class="pref-row"><input type="checkbox" id="prefReveal"> <span><b data-i18n="pref_reveal">Çözümden sonra algoritmayı göster</b><small data-i18n="pref_reveal_d">Kapalıyken case adı, algoritma ve Bildim/Zorlandım çıkmaz; süre kaydedilir ve sıradaki karıştırma gelir.</small></span></label>
+        <label class="pref-row"><input type="checkbox" id="prefManual"> <span><b data-i18n="pref_manual">Süreyi elle gir</b><small data-i18n="pref_manual_d">Kendi zamanlayıcınla ölçtüğün süreyi yazarsın (ör. 12.34 veya 1:05.20).</small></span></label>
+        <div class="bt-dialog-actions"><button class="btn-sm btn-bt" id="prefOk" type="button" data-i18n="pref_ok">Tamam</button></div>
+    </div>
+</div>
+
 <div class="bt-modal" id="btPick" role="dialog" aria-modal="true" aria-labelledby="btPickTitle">
     <div class="bt-dialog">
         <h3 id="btPickTitle"></h3>
@@ -844,24 +869,24 @@ details.case-group[open] > summary::before { transform: rotate(90deg); }
     <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
 </footer>
 
-<script src="/icerikler/algoritmalar/mgSvg.js?v=20261127"></script>
-<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261127"></script>
+<script src="/icerikler/algoritmalar/mgSvg.js?v=20261128"></script>
+<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261128"></script>
 <script src="/icerikler/algoritmalar/ll.js"></script>
 <script src="/icerikler/algoritmalar/cllSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261127"></script>
-<script src="/js/common.js?v=20261127"></script>
-<script src="/js/firebase-config.js?v=20261127"></script>
-<script src="/js/account.js?v=20261127"></script>
+<script src="/js/i18n.js?v=20261128"></script>
+<script src="/js/common.js?v=20261128"></script>
+<script src="/js/firebase-config.js?v=20261128"></script>
+<script src="/js/account.js?v=20261128"></script>
 
 
-<script src="/js/custom-algs.js?v=20261127"></script>
-<script src="/js/cross-solver.js?v=20261127"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261127"></script>
-<script src="/js/recog-trainer.js?v=20261127"></script>
+<script src="/js/custom-algs.js?v=20261128"></script>
+<script src="/js/cross-solver.js?v=20261128"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261128"></script>
+<script src="/js/recog-trainer.js?v=20261128"></script>
 
 <script>
 /* ============================================================
@@ -1098,7 +1123,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json", "xcross.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261127").then(function (r) {
+        return fetch(BASE + f + "?v=20261128").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
@@ -1340,11 +1365,31 @@ function startTimer() {
     tick();
 }
 
-function stopTimer() {
-    if (state !== "running") return;
-    lastTime = performance.now() - startTime;
-    stopRaf();
+var PREF_KEY = "trainer-prefs-v1";
+function prefs() { var p = load(PREF_KEY, {}); return { reveal: p.reveal !== false, manual: !!p.manual }; }
+function applyPrefs() { document.getElementById("trainerBox").classList.toggle("manual-on", prefs().manual); }
+// Süre elle girildiğinde: "12.34", "12,34", "1:05.20" → ms (geçersizse null)
+function parseTime(str) {
+    str = String(str || "").trim().replace(",", ".");
+    var m = str.match(/^(?:(\d{1,2}):)?(\d{1,3}(?:\.\d{1,3})?)$/);
+    if (!m) return null;
+    var sec = (m[1] ? +m[1] * 60 : 0) + parseFloat(m[2]);
+    if (m[1] && parseFloat(m[2]) >= 60) return null;
+    if (!(sec >= 0.2 && sec <= 3600)) return null;
+    return Math.round(sec * 1000);
+}
+function stopTimer(manualMs) {
+    if (manualMs != null) { if (!curCase || state === "done") return; if (state === "running") stopRaf(); lastTime = manualMs; }
+    else { if (state !== "running") return; lastTime = performance.now() - startTime; stopRaf(); }
     state = "done";
+    if (!prefs().reveal) {
+        // Algoritma/değerlendirme gösterilmez: süreyi kaydet, ekranda bırak, sıradaki karıştırmaya geç
+        var shown = lastTime;
+        grade(false);
+        document.getElementById("timer").textContent = fmt(shown);
+        document.getElementById("timerHint").textContent = T("hint_saved_next");
+        return;
+    }
     document.getElementById("timer").textContent = fmt(lastTime);
     document.getElementById("timerArea").classList.remove("running");
     document.getElementById("timerHint").textContent = T(mode === "card" ? (current.gen ? "hint_card_done_cross" : "hint_card_done") : "hint_done");
@@ -1468,6 +1513,29 @@ timerArea.addEventListener("touchstart", function (e) {
 }, { passive: false });
 
 document.getElementById("btnGood").addEventListener("click", function () { grade(false); });
+document.getElementById("manualForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var inp = document.getElementById("manualInput"), err = document.getElementById("manualErr"), ms = parseTime(inp.value);
+    if (ms == null) { err.textContent = T("manual_bad"); inp.focus(); return; }
+    if (state === "done") { err.textContent = T("manual_grade_first"); return; }
+    err.textContent = ""; inp.value = "";
+    stopTimer(ms);
+});
+(function () {
+    var m = document.getElementById("prefModal");
+    function open() { var p = prefs(); document.getElementById("prefReveal").checked = p.reveal; document.getElementById("prefManual").checked = p.manual; m.classList.add("show"); }
+    function close() { m.classList.remove("show"); }
+    document.getElementById("prefOpen").addEventListener("click", open);
+    document.getElementById("prefOk").addEventListener("click", close);
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    ["prefReveal", "prefManual"].forEach(function (id) {
+        document.getElementById(id).addEventListener("change", function () {
+            save(PREF_KEY, { reveal: document.getElementById("prefReveal").checked, manual: document.getElementById("prefManual").checked });
+            applyPrefs();
+        });
+    });
+    applyPrefs();
+})();
 document.getElementById("btnHard").addEventListener("click", function () { grade(true); });
 document.getElementById("btnSkip").addEventListener("click", function () { lastKey = curCase ? curCase.key : null; nextCase(); this.blur(); });
 document.getElementById("btnReset").addEventListener("click", function () {
