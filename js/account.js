@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261123";
+    var V = "20261124";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -464,7 +464,7 @@
     var ADMIN_EMAIL = "pikapikachuyt0@gmail.com";
     function isAdmin() { return !!(user && user.email === ADMIN_EMAIL && user.providerData && user.providerData.some(function (p) { return p.providerId === "google.com"; })); }
     var PROF_KEY = "ra-profile-v1"; // yerel profil tercihleri: { name, bio, joined }
-    var STAT_SETS = [["oll", 57], ["pll", 21], ["2look-2lo", 10], ["2look-2lp", 6], ["f2l", 41], ["coll", 42], ["wv", 27], ["cll", 42], ["eg1", 42], ["eg2", 42], ["ortega-oll", 7], ["ortega-pbl", 5], ["roux-cmll", 42]];
+    var STAT_SETS = [["oll", 57], ["pll", 21], ["2look-2lo", 10], ["2look-2lp", 6], ["f2l", 41], ["coll", 42], ["wv", 27], ["cll", 42], ["eg1", 42], ["eg2", 42], ["ortega-oll", 7], ["ortega-pbl", 5], ["roux-cmll", 42], ["zbll", 472], ["megaminx-oll", 19], ["megaminx-pll", 18], ["square1-shape", 89], ["square1-co", 7], ["square1-eo", 7], ["square1-cp", 35], ["square1-ep", 16]];
     function computeStats() {
         var known = 0, learning = 0, sets = {};
         STAT_SETS.forEach(function (s) {

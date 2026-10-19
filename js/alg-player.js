@@ -5,14 +5,14 @@
    yüklenir ve case 3B küpte adım adım oynatılır. Sarı üstte, yeşil önde.
 ========================================================= */
 (function () {
-    var V = "20261123";
+    var V = "20261124";
     var PUZ = {
         oll: "3x3x3", pll: "3x3x3", twolook_algos: "3x3x3", coll: "3x3x3", wv: "3x3x3", roux_algos: "3x3x3",
         cll: "2x2x2", eg1: "2x2x2", eg2: "2x2x2", "ortega-oll": "2x2x2", "ortega-pbl": "2x2x2",
-        alg4: "4x4x4", alg5: "5x5x5", bld: "3x3x3", oh_algos: "3x3x3"
+        alg4: "4x4x4", alg5: "5x5x5", bld: "3x3x3", oh_algos: "3x3x3", zbll: "3x3x3", megaminx_algos: "megaminx", sq1_algos: "square1"
     };
     // Küpün başlangıç yönü: site sarı üstte çalışır; göz bağlı (3BLD) standart olarak beyaz üstte
-    var SETUP = { bld: "" };
+    var SETUP = { bld: "", megaminx_algos: "", sq1_algos: "" };
     var TXT = {
         tr: { btn: "İzle", title: "Algoritmayı izle", close: "Kapat", load: "Yükleniyor…", err: "Oynatıcı yüklenemedi.", hint: "Oynat, durdur veya adım adım ilerle. Küpü sürükleyerek döndürebilirsin." },
         en: { btn: "Watch", title: "Watch the algorithm", close: "Close", load: "Loading…", err: "The player could not be loaded.", hint: "Play, pause or step through. Drag the cube to rotate it." },
@@ -32,7 +32,12 @@
         return lib;
     }
     // Site notasyonundaki parantezler, ’ gibi işaretler ve "↔" temizlenir
-    function clean(a) { return String(a).replace(/[’‘`´]/g, "'").replace(/[↔+]/g, " ").replace(/\s+/g, " ").trim(); }
+    function clean(a) {
+        a = String(a).replace(/[’‘`´]/g, "'").replace(/[↔+]/g, " ");
+        // Square-1: cubing.js "(1, 0) / (3, 3) /" biçimini ister
+        if (puzzle === "square1") a = a.replace(/\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)/g, " ($1, $2) ").replace(/\//g, " / ");
+        return a.replace(/\s+/g, " ").trim();
+    }
 
     var modal = null, player = null;
     function close() {
