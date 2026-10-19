@@ -71,12 +71,31 @@
     }
 
     /* ---------- günlük moderasyon ---------- */
+    // Son 14 günün gönderim sayıları: hangi günde kayıt olduğu bir bakışta görünsün
+    function renderDayChips() {
+        var host = $id("aDayChips"); if (!host) return;
+        var days = [];
+        for (var i = 0; i < 14; i++) { var d = new Date(); d.setDate(d.getDate() - i); days.push(d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate())); }
+        host.innerHTML = days.map(function (ds) { return '<button type="button" class="day-chip" data-ds="' + ds + '">' + ds.slice(8) + "." + ds.slice(5, 7) + ' <b>…</b></button>'; }).join("");
+        days.forEach(function (ds) {
+            window.Leaderboard.fetchDay(dayNumOf(ds), 300).then(function (rows) {
+                var b = host.querySelector('[data-ds="' + ds + '"]'); if (!b) return;
+                b.querySelector("b").textContent = rows.length; b.classList.toggle("has", rows.length > 0);
+            }, function () { var b = host.querySelector('[data-ds="' + ds + '"] b'); if (b) b.textContent = "!"; });
+        });
+        markDayChip();
+    }
+    function markDayChip() {
+        var cur = $id("aDate").value || todayStr();
+        Array.prototype.forEach.call(document.querySelectorAll("#aDayChips .day-chip"), function (b) { b.classList.toggle("on", b.getAttribute("data-ds") === cur); });
+    }
     function renderDaily() {
-        var day = dayNumOf($id("aDate").value || todayStr());
+        var ds = $id("aDate").value || todayStr(), day = dayNumOf(ds);
+        markDayChip();
         var box = $id("aDailyList"); box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
         window.Leaderboard.fetchDay(day, 300).then(function (rows) {
-            if (!rows.length) { box.innerHTML = '<p class="a-note">Bu gün için gönderim yok.</p>'; return; }
-            box.innerHTML = rows.map(function (x, i) {
+            if (!rows.length) { box.innerHTML = '<p class="a-note">' + esc(ds) + ' (gün no ' + day + ') için gönderim yok.</p>'; return; }
+            box.innerHTML = '<p class="a-note">' + esc(ds) + ' · ' + rows.length + ' gönderim</p>' + rows.map(function (x, i) {
                 return '<div class="a-row" data-uid="' + esc(x.uid) + '"><span class="rk">' + (i + 1) + '</span>' +
                     '<span class="nm">' + esc(x.name) + '</span>' +
                     '<span class="tm" dir="ltr">' + esc(label(x)) + '</span>' +
@@ -93,7 +112,7 @@
                     }, function () { btn.disabled = false; msg($id("aDailyMsg"), "Silinemedi.", "bad"); });
                 });
             });
-        }, function () { box.innerHTML = '<p class="a-note">Sıralama yüklenemedi.</p>'; });
+        }, function (e) { box.innerHTML = '<p class="a-note">Sıralama yüklenemedi (' + esc(e && e.message) + ').</p>'; });
     }
 
     /* ---------- kullanıcılar ---------- */
@@ -519,10 +538,13 @@
             '<div class="box"><h2>🖥️ Cihaz &amp; tarayıcı dağılımı</h2><p class="a-note">Her üyenin cihaz bilgisini çeker (biraz sürebilir).</p><button class="a-btn main" id="aDevLoad">Hesapla</button><div id="aDevBox" style="margin-top:10px"></div></div>' +
             '<div class="box"><h2>🛠️ Bakım modu</h2><p class="a-note">Açıkken site, sen hariç herkese “Bakımdayız” sayfası gösterir.</p><div id="aMaintBox"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🏆 Günlük sıralama moderasyonu</h2>' +
-            '<div class="a-ctrl"><input type="date" id="aDate" value="' + todayStr() + '"><button class="a-btn main" id="aDailyLoad">Getir</button><button class="a-btn" id="aDailyCsv">⬇ CSV</button></div>' +
+            '<div class="a-ctrl"><input type="date" id="aDate" value="' + todayStr() + '"><button class="a-btn main" id="aDailyLoad">↻ Yenile</button><button class="a-btn" id="aDailyCsv">⬇ CSV</button></div>' +
+            '<div class="day-chips" id="aDayChips"></div>' +
             '<p class="a-note">Yanlış bir süreyi sil; o kullanıcı o gün için yeniden gönderebilir.</p>' +
             '<div class="a-msg" id="aDailyMsg"></div><div id="aDailyList" class="a-list"></div></div>';
-        $id("aDailyLoad").addEventListener("click", renderDaily);
+        $id("aDailyLoad").addEventListener("click", function () { renderDaily(); renderDayChips(); });
+        $id("aDate").addEventListener("change", renderDaily);
+        $id("aDayChips").addEventListener("click", function (e) { var b = e.target.closest(".day-chip"); if (!b) return; $id("aDate").value = b.getAttribute("data-ds"); renderDaily(); });
         $id("aUsersLoad").addEventListener("click", renderUsers);
         $id("uCsv").addEventListener("click", function () { exportUsers("csv"); });
         $id("uJson").addEventListener("click", function () { exportUsers("json"); });
@@ -544,7 +566,7 @@
                 else msg($id("bcMsg"), "Gönderilemedi (kuralları yayımladın mı?)", "bad");
             }, function () { $id("bcSend").disabled = false; msg($id("bcMsg"), "Gönderilemedi.", "bad"); });
         });
-        renderDaily();
+        renderDaily(); renderDayChips();
         renderUsers();   // kullanıcılar ve tüm verileri otomatik gelsin
     }
     function renderGate(kind) {
