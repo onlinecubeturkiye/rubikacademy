@@ -19,7 +19,7 @@
 <link rel="icon" href="/icons/favicon-48.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#ffd21f">
+<meta name="theme-color" content="#0b0d14">
 
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/antrenor">
 <meta name="description" content="Rubik Academy algoritma antrenörü: OLL, PLL, COLL, WV, CLL ve Ortega case'lerini karıştırma ve süreyle çalış, zorlandığın case'ler daha sık gelsin.">
@@ -27,10 +27,10 @@
 <meta property="og:description" content="Karıştırmayı uygula, case'i tanı, süreni ölç. Zorlandığın case'ler daha sık gelir.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/antrenor">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261134">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261135">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261134">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261135">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261134">
+<link rel="stylesheet" href="/styles/common.css?v=20261135">
 
 <style>
 .wrap { max-width: 1100px; margin: 0 auto; }
@@ -83,7 +83,7 @@
     border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm);
     font: 800 16px Inter, sans-serif; transition: transform .12s, box-shadow .12s;
 }
-.puzzle-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.puzzle-btn:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
 .pz-label { font-size: 11px; font-weight: 900; letter-spacing: .6px; text-transform: uppercase; color: var(--text-soft); }
 .pz-arrow { font-size: 13px; transition: transform .15s; }
 .puzzle-btn[aria-expanded="true"] .pz-arrow { transform: rotate(180deg); }
@@ -100,7 +100,7 @@
 .pz-item b { font-size: 15px; font-weight: 900; }
 .pz-item span { font-size: 12px; font-weight: 600; color: var(--text-soft); }
 .pz-item:hover { background: var(--surface-soft); }
-.pz-item.active { background: var(--cube-yellow); color: #17171f; }
+.pz-item.active { background: var(--ui-accent); color: var(--ui-accent-text); }
 .pz-item.active span { color: #17171f; opacity: .75; }
 .set-tab {
     border: var(--card-bw) solid var(--card-border);
@@ -118,8 +118,8 @@
 .tab-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .tab-row-l { min-width: 84px; font-size: 11.5px; font-weight: 900; letter-spacing: .4px; text-transform: uppercase; color: var(--text-soft); }
 @media (max-width: 600px) { .tab-row-l { min-width: 100%; } }
-.set-tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
-.set-tab.active { background: var(--cube-yellow); color: #17171f; }
+.set-tab:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
+.set-tab.active { background: var(--ui-accent); color: var(--ui-accent-text); }
 .set-tab.active small { color: #17171f; opacity: .7; }
 
 /* CASE SEÇİMİ */
@@ -245,7 +245,7 @@
     background: transparent;
     cursor: pointer;
 }
-.mode-btn.active { background: var(--cube-yellow); color: #17171f; box-shadow: var(--shadow-sm); }
+.mode-btn.active { background: var(--ui-accent); color: var(--ui-accent-text); box-shadow: var(--shadow-sm); }
 .card-diagram { display: none; justify-content: center; margin-bottom: 14px; }
 .mode-card .card-diagram { display: flex; }
 .card-diagram svg { width: 150px; height: 150px; }
@@ -278,12 +278,12 @@
 .bt-bar.on.warn .bt-icon { background: var(--cube-red); }
 .bt-moves { display: block; margin-top: 3px; font: 700 12.5px "JetBrains Mono", monospace; color: var(--text); }
 .bt-moves:empty { display: none; }
-.bt-bar.on .bt-icon { background: var(--cube-green); border-color: var(--ink); }
+.bt-bar.on .bt-icon { background: var(--cube-green); border-color: var(--ui-accent); }
 .bt-text { flex: 1 1 200px; min-width: 0; }
 .bt-text b { display: block; font-size: 13.5px; color: var(--text); }
 .bt-text span { display: block; font-size: 12px; font-weight: 600; color: var(--text-soft); line-height: 1.4; }
 .bt-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.btn-bt { background: var(--cube-blue) !important; color: #fff !important; border-color: var(--ink) !important; }
+.btn-bt { background: var(--cube-blue) !important; color: #fff !important; border-color: var(--ui-accent) !important; }
 .btn-bt:disabled { opacity: .5; cursor: default; }
 .bt-modal {
     position: fixed; inset: 0; z-index: 1000; display: none;
@@ -319,7 +319,7 @@ html[dir="rtl"] .bt-way ol { padding-left: 0; padding-right: 20px; }
     border-radius: 14px; border: var(--card-bw) solid var(--ink); background: var(--surface-soft); color: var(--text);
     font: 800 15px "Inter", sans-serif; box-shadow: var(--shadow-sm); transition: transform .12s, box-shadow .12s;
 }
-.bt-cube:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.bt-cube:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
 .bt-cube .bt-icon { width: 34px; height: 34px; font-size: 17px; }
 .bt-cube small { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-soft); }
 .bt-cube .go { margin-left: auto; color: var(--cube-blue); font-size: 13px; }
@@ -384,8 +384,8 @@ html[dir="rtl"] .bt-cube { text-align: right; } html[dir="rtl"] .bt-cube .go { m
     transition: transform .12s, box-shadow .12s;
     color: #17171f;
 }
-.btn-big:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
-.btn-big:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn-big:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
+.btn-big:active { transform: translate(2px, 2px); box-shadow: var(--shadow-sm); }
 .btn-good { background: var(--cube-green); color: #fff; }
 .btn-hard { background: var(--cube-red); color: #fff; }
 .btn-skip { background: var(--surface); color: var(--text); }
@@ -475,7 +475,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 /* ARAÇ SEKMELERİ: Algoritma / Tanıma (OLL, PLL) */
 .tool-tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 0 auto 22px; }
 .tool-tab { padding: 10px 18px; border-radius: 14px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 15px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
-.tool-tab.active { background: var(--cube-yellow); color: #17171f; }
+.tool-tab.active { background: var(--ui-accent); color: var(--ui-accent-text); }
 .tool-intro { text-align: center; color: var(--text-soft); font-size: 14.5px; max-width: 660px; margin: 0 auto 16px; }
 .rc-grid .box { margin-bottom: 0; }
 .chip-known { font-size: 9px; line-height: 1; }
@@ -487,7 +487,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 .tool-tabs { display: flex; width: max-content; max-width: 100%; margin: 0 auto 20px; gap: 4px; padding: 4px; border-radius: 16px;
     border: var(--card-bw) solid var(--card-border); background: var(--surface-soft); flex-wrap: nowrap; }
 .tool-tab { border: 0; box-shadow: none; background: transparent; color: var(--text-soft); padding: 9px 18px; border-radius: 12px; font: 800 14px Inter, sans-serif; white-space: nowrap; }
-.tool-tab.active { background: var(--cube-yellow); color: #17171f; box-shadow: var(--shadow-sm); }
+.tool-tab.active { background: var(--ui-accent); color: var(--ui-accent-text); box-shadow: var(--shadow-sm); }
 .setup-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
 .setup-top .puzzle-pick { margin: 0; }
 .setup-top .set-tabs { margin: 0; }
@@ -559,11 +559,11 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 .rc-reveal svg { width: 70px; height: 70px; }
 .rc-reveal b { font-size: 16px; }
 .rc-reveal code { display: block; font: 700 12.5px "JetBrains Mono", monospace; color: var(--primary); margin-top: 3px; }
-.rc-next { padding: 9px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--cube-yellow); color: #17171f; font: 900 14px Inter, sans-serif; cursor: pointer; }
+.rc-next { padding: 9px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--ui-accent); color: var(--ui-accent-text); font: 900 14px Inter, sans-serif; cursor: pointer; }
 .rc-answers { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; width: 100%; margin-top: 6px; }
-.rc-ans { padding: 10px 6px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 15px Inter, sans-serif; cursor: pointer; box-shadow: 2px 2px 0 var(--ink); transition: transform .08s; }
+.rc-ans { padding: 10px 6px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 15px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform .08s; }
 .rc-ans:hover { background: var(--surface-soft); }
-.rc-ans:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
+.rc-ans:active { transform: translate(1px, 1px); box-shadow: var(--shadow-sm); }
 .rc-ans.right { background: var(--cube-green); color: #fff; }
 .rc-ans.wrong { background: var(--cube-red); color: #fff; }
 .rc-ans:disabled { cursor: default; }
@@ -579,8 +579,8 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 .rc-help { font-size: 13px; color: var(--text-soft); text-align: center; margin-top: 4px; }
 @media (max-width: 900px) { .rc-grid { grid-template-columns: 1fr; } }
 .rc-modes { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 0 0 10px; }
-.rc-mode { padding: 7px 16px; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 14px Inter, sans-serif; cursor: pointer; box-shadow: 2px 2px 0 var(--ink); }
-.rc-mode.active { background: var(--cube-yellow); color: #17171f; }
+.rc-mode { padding: 7px 16px; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 900 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
+.rc-mode.active { background: var(--ui-accent); color: var(--ui-accent-text); }
 .rc-answers.thumbs { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); max-height: 430px; overflow-y: auto; padding: 2px 4px 4px 2px; }
 .rc-sub { grid-column: 1 / -1; font: 800 12px Inter, sans-serif; color: var(--text-soft); letter-spacing: .02em; margin-top: 6px; }
 .rc-thumb { padding: 5px 3px 3px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
@@ -871,24 +871,24 @@ details.case-group[open] > summary::before { transform: rotate(90deg); }
     <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
 </footer>
 
-<script src="/icerikler/algoritmalar/mgSvg.js?v=20261134"></script>
-<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261134"></script>
+<script src="/icerikler/algoritmalar/mgSvg.js?v=20261135"></script>
+<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261135"></script>
 <script src="/icerikler/algoritmalar/ll.js"></script>
 <script src="/icerikler/algoritmalar/cllSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261134"></script>
-<script src="/js/common.js?v=20261134"></script>
-<script src="/js/firebase-config.js?v=20261134"></script>
-<script src="/js/account.js?v=20261134"></script>
+<script src="/js/i18n.js?v=20261135"></script>
+<script src="/js/common.js?v=20261135"></script>
+<script src="/js/firebase-config.js?v=20261135"></script>
+<script src="/js/account.js?v=20261135"></script>
 
 
-<script src="/js/custom-algs.js?v=20261134"></script>
-<script src="/js/cross-solver.js?v=20261134"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261134"></script>
-<script src="/js/recog-trainer.js?v=20261134"></script>
+<script src="/js/custom-algs.js?v=20261135"></script>
+<script src="/js/cross-solver.js?v=20261135"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261135"></script>
+<script src="/js/recog-trainer.js?v=20261135"></script>
 
 <script>
 /* ============================================================
@@ -1125,7 +1125,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json", "xcross.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261134").then(function (r) {
+        return fetch(BASE + f + "?v=20261135").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });

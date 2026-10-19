@@ -1,5 +1,5 @@
 /* Küp çözücü web worker'ı: cubejs (MIT, Kociemba iki aşamalı algoritma). Tablolar ilk istekte bir kez hazırlanır. */
-importScripts("/js/vendor/cubejs/cube.js?v=20261134", "/js/vendor/cubejs/solve.js?v=20261134");
+importScripts("/js/vendor/cubejs/cube.js?v=20261135", "/js/vendor/cubejs/solve.js?v=20261135");
 var ready = false;
 self.onmessage = function (e) {
     var d = e.data || {};

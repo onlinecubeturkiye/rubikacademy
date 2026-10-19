@@ -19,7 +19,7 @@
 <link rel="icon" href="/icons/favicon-48.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#ffd21f">
+<meta name="theme-color" content="#0b0d14">
 
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/yol-haritasi">
 <meta name="description" content="Rubik küpte adım adım öğrenme yolu: başlangıçtan OLL, PLL, COLL ve 2x2, Pyraminx, Skewb setlerine. İlerlemen otomatik takip edilir.">
@@ -27,10 +27,10 @@
 <meta property="og:description" content="Başlangıçtan ileri setlere adım adım küp öğrenme yolu.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/yol-haritasi">
-<meta property="og:image" content="https://rubikacademy.fun/og/yol-haritasi.png?v=20261134">
+<meta property="og:image" content="https://rubikacademy.fun/og/yol-haritasi.png?v=20261135">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/yol-haritasi.png?v=20261134">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/yol-haritasi.png?v=20261135">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261134">
+<link rel="stylesheet" href="/styles/common.css?v=20261135">
 
 <style>
 .yol-head { margin: 6px 0 18px; }
@@ -48,7 +48,7 @@
 .yol-head p { color: var(--text-soft); font-size: 15.5px; max-width: 720px; }
 .tracks { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
 .track-btn { padding: 9px 15px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); }
-.track-btn.active { background: var(--cube-yellow); color: #17171f; }
+.track-btn.active { background: var(--ui-accent); color: var(--ui-accent-text); }
 .track-btn small { margin-inline-start: 6px; font-weight: 800; color: var(--text-soft); }
 .track-btn.active small { color: #17171f; opacity: .7; }
 .overall { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 16px; border-radius: 16px; border: var(--card-bw) solid var(--ink); background: var(--surface); margin-bottom: 22px; max-width: 860px; }
@@ -63,14 +63,14 @@
 .step-num { position: relative; z-index: 1; flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font: 900 17px Inter, sans-serif;
     border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); }
 .step.done .step-num { background: var(--cube-green); color: #fff; }
-.step.next .step-num { background: var(--cube-yellow); color: #17171f; }
+.step.next .step-num { background: var(--ui-accent); color: var(--ui-accent-text); }
 .step-card { flex: 1; min-width: 0; padding: 14px 16px; border-radius: 18px; border: var(--card-bw) solid var(--border); background: var(--surface); }
-.step.next .step-card { border-color: var(--ink); box-shadow: var(--shadow-sm); }
+.step.next .step-card { border-color: var(--ui-accent); box-shadow: var(--shadow-sm); }
 .step.done .step-card { opacity: .8; }
 .step-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .step-top h3 { font-size: 17px; font-weight: 900; color: var(--text); }
 .tag { font-size: 10.5px; font-weight: 900; letter-spacing: .5px; padding: 3px 8px; border-radius: 8px; }
-.tag-next { background: var(--cube-yellow); color: #17171f; }
+.tag-next { background: var(--ui-accent); color: var(--ui-accent-text); }
 .tag-done { background: var(--tint-green); color: #15803d; }
 .dark-mode .tag-done { color: #4ade80; }
 .step-card p { font-size: 13.5px; color: var(--text-soft); margin: 4px 0 10px; line-height: 1.5; }
@@ -78,7 +78,7 @@
 .step-foot .bar { width: 180px; max-width: 100%; }
 .step-count { font-size: 12.5px; font-weight: 800; color: var(--text-soft); }
 .step-go { margin-inline-start: auto; padding: 7px 13px; border-radius: 10px; border: 1.5px solid var(--ink); background: var(--surface); color: var(--text); font-weight: 900; font-size: 13px; text-decoration: none; }
-.step.next .step-go { background: var(--cube-yellow); color: #17171f; }
+.step.next .step-go { background: var(--ui-accent); color: var(--ui-accent-text); }
 .step-mark { padding: 7px 12px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface-soft); color: var(--text); font: 800 12.5px Inter, sans-serif; cursor: pointer; }
 .step.done .step-mark { border-color: var(--cube-green); }
 .yol-how { max-width: 860px; font-size: 13px; color: var(--text-soft); margin-top: 8px; }
@@ -149,10 +149,10 @@
 </footer>
 
 <script>var PAGE_ID = "yol";</script>
-<script src="/js/i18n.js?v=20261134"></script>
-<script src="/js/common.js?v=20261134"></script>
-<script src="/js/firebase-config.js?v=20261134"></script>
-<script src="/js/account.js?v=20261134"></script>
+<script src="/js/i18n.js?v=20261135"></script>
+<script src="/js/common.js?v=20261135"></script>
+<script src="/js/firebase-config.js?v=20261135"></script>
+<script src="/js/account.js?v=20261135"></script>
 
 
 <script>
