@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261144";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261145";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -112,6 +112,7 @@
         else if (tab === "comp" && comp) h = compHint();
         else h = conn ? "" : "🔗 Başlamak için akıllı küpünü bağla.";
         $("akHint").innerHTML = h;
+        var sv = $("akSolve"); if (sv) sv.hidden = tab === "comp" && !(comp && comp.doc);
     }
 
     /* ---------- hamle geldi ---------- */
@@ -675,7 +676,7 @@
         clearInterval(compPollT);
         if (comp && comp.doc && comp.doc.st === "lobby") api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
         comp = null; closeFinal();
-        try { history.replaceState(null, "", location.pathname + "?tab=ev"); } catch (e) {}
+        try { history.replaceState(null, "", location.pathname); } catch (e) {}
         $("cLobby").hidden = false; $("cRoom").hidden = true; $("cType").hidden = true; $("akPad").hidden = true;
         setScramble("");
     }
@@ -809,7 +810,7 @@
         var d = comp.doc;
         return "🏠 " + d.name + " · " + (r.f ? "Final" : "Tur " + r.n) + " (3x3 Ao5)\n" + r.rows.map(function (x, i) {
             return (i + 1) + ". " + x.n + " — " + (x.a == null ? "-" : fmt(x.a)) + "  (" + x.t.map(fmt).join(", ") + ")";
-        }).join("\n") + "\nrubikacademy.fun/icerikler/akilli-kup?tab=ev";
+        }).join("\n") + "\nrubikacademy.fun/icerikler/ev-yarismasi";
     }
     function shareImageR(r) {
         var d = comp.doc, W = 1080, rowH = 74, H = 330 + r.rows.length * rowH + 90;
@@ -920,7 +921,7 @@
         $("cTypeDnf").onclick = function () { typeSave("dnf"); };
         $("cTypeIn").onkeydown = function (e) { if (e.key === "Enter") typeSave(""); };
         $("cCopy").onclick = function () {
-            var link = location.origin + "/icerikler/akilli-kup?ev=" + (comp && comp.code);
+            var link = location.origin + "/icerikler/ev-yarismasi?ev=" + (comp && comp.code);
             var done = function () { $("cCopy").textContent = "Kopyalandı ✓"; setTimeout(function () { $("cCopy").textContent = "🔗 Davet bağlantısı"; }, 1500); };
             if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () {}); else prompt("Bağlantı:", link);
         };
@@ -968,9 +969,11 @@
             var done = function () { $("akCopy").textContent = "Kopyalandı ✓"; setTimeout(function () { $("akCopy").textContent = "🔗 Bağlantıyı kopyala"; }, 1500); };
             if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () {}); else prompt("Bağlantı:", link);
         };
+        var qs = new URLSearchParams(location.search), ev = qs.get("ev"), EV_PAGE = window.AK_PAGE === "ev";
+        // Ev yarışması ayrı sayfada: eski bağlantılar oraya gitsin
+        if (!EV_PAGE && (ev || qs.get("tab") === "ev")) { location.replace("/icerikler/ev-yarismasi" + (ev ? "?ev=" + encodeURIComponent(ev) : "")); return; }
         renderStages(null); renderHist(); initComp();
-        var qs = new URLSearchParams(location.search), ev = qs.get("ev");
-        if (ev || qs.get("tab") === "ev") {
+        if (EV_PAGE) {
             setTab("comp");
             if (ev) {
                 var tryEv = function () { if (signedIn() && !comp) joinComp(ev); };
@@ -984,7 +987,7 @@
             var tryJoin = function () { if (signedIn()) joinDuel(q); else duelMsg("Düelloya katılmak için giriş yap.", 1); };
             if (window.Account && Account.onChange) Account.onChange(function (u) { if (u && !duel) joinDuel(q); });
             setTimeout(tryJoin, 1200);
-        } else if (!(ev || qs.get("tab") === "ev")) setTab("analysis");
+        } else if (!EV_PAGE) setTab("analysis");
         if (window.Account && Account.onChange) Account.onChange(function () { $("akLoginNote").hidden = signedIn(); $("cLoginNote").hidden = signedIn(); initCompRole(); });
         $("akLoginNote").hidden = signedIn();
         $("akLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
