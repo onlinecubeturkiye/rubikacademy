@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261143";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261144";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -621,9 +621,7 @@
         if (!eligible(comp.uid)) return "Bu turda yoksun (bir sonraki tura kalmadın).";
         var n = myTimes().length;
         if (n >= 5) return "✅ 5 çözümün tamam. Diğerleri bekleniyor…";
-        if (comp.mode === "bt") return conn ? "" : "🔗 Akıllı küp modundasın: yukarıdan küpünü bağla.";
-        if (comp.mode === "timer") return "⏱️ Boşluk tuşunu ya da aşağıdaki alanı <b>basılı tut</b>, bırakınca süre başlar. (" + (n + 1) + ". çözüm)";
-        return "⌨️ Süreni aşağıya yaz ve kaydet. (" + (n + 1) + ". çözüm)";
+        return "⌨️ Karıştırmayı uygula, kendi timer'ınla çöz ve süreni aşağıya yaz. (" + (n + 1) + ". çözüm)";
     }
     function parseTime(str) {
         str = String(str || "").trim().toUpperCase().replace(",", ".");
@@ -664,7 +662,7 @@
             comp.players = parsePlayers(res[1]);
             var mine = myP();
             if (!mine && comp.players.length >= comp.doc.cap) throw new Error("Yarışma dolu (" + comp.doc.cap + " kişi)");
-            comp.mode = mine ? mine.mode : (conn ? "bt" : "timer");
+            comp.mode = "manual"; // yarışmada süre yalnızca elle yazılır
             return mine ? null : mePatch({ name: myName(), mode: comp.mode, t: "", rnd: 0 }).then(function (r) { if (!r.ok) throw new Error(r.status); });
         }).then(function () {
             try { history.replaceState(null, "", "?ev=" + code); } catch (e) {}
@@ -694,7 +692,7 @@
             var prev = comp.doc || {}, d = parseDoc(res[0]);
             comp.doc = d; comp.players = parsePlayers(res[1]);
             if (!myP() && prev.host) { cMsg("Yarışmadan çıkarıldın.", 1); leaveComp(); return; }
-            var mp = myP(); if (mp && mp.mode && !comp.modeLocked) comp.mode = mp.mode;
+            comp.mode = "manual";
             // tur ya da durum değişti: sıradaki karıştırmayı göster
             if (prev.round !== d.round || prev.st !== d.st) { comp.local = null; comp.orig = {}; nextScramble(true); }
             if (isHost() && d.st === "run") autoEnd();
@@ -741,7 +739,7 @@
     }
     /* --- klavye / dokunma süresi (yalnız yarışmada "timer" modu) --- */
     var holdT = 0;
-    function manualOn() { return tab === "comp" && comp && comp.mode === "timer" && (compCanSolve() || phase === "solving"); }
+    function manualOn() { return false; } // yarışmada timer kapalı: süre yalnızca elle yazılır
     function manualDown() {
         if (!manualOn()) return;
         if (phase === "solving") { manualStop(); return; }
@@ -943,6 +941,7 @@
         $("akDuel").hidden = t !== "duel"; $("akComp").hidden = t !== "comp"; $("akAnalysisExtra").hidden = t !== "analysis";
         $("akNew").hidden = t !== "analysis";
         $("akPad").hidden = true; $("cType").hidden = true;
+        $("akConnBox").hidden = t === "comp"; // yarışmada akıllı küp kullanılmıyor
         if (t === "duel" && duel && duel.doc) setScramble(duel.doc.scr);
         else if (t === "analysis") setScramble(genScramble());
         else if (t === "comp") { if (comp && comp.doc) nextScramble(true); else setScramble(""); }

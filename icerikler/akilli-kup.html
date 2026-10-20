@@ -27,10 +27,10 @@
 <meta property="og:description" content="Çözümünü aşama aşama analiz et, arkadaşınla canlı düello yap.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/akilli-kup">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261143">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261144">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261143">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261144">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261143">
+<link rel="stylesheet" href="/styles/common.css?v=20261144">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -282,7 +282,7 @@
     <p>Bluetooth akıllı küpünü bağla: her çözümünü <b>Cross, F2L, OLL ve PLL</b> olarak aşama aşama analiz et, ya da arkadaşlarınla <b>ev yarışması</b> düzenle.</p>
 </section>
 
-<section class="box">
+<section class="box" id="akConnBox">
     <div class="ak-conn">
         <div class="ak-conn-ic" aria-hidden="true">🧊</div>
         <div class="ak-conn-tx"><b>Akıllı küp</b><span class="ak-pill" id="akConnState">Bağlı değil</span><span id="akBatt"></span></div>
@@ -321,7 +321,7 @@
 <section class="box" id="akComp" hidden>
     <div id="cLobby">
         <h2>🏠 Ev yarışması</h2>
-        <p class="ak-req">8 ya da 16 kişilik <b>3x3</b> yarışması. Her tur 5 çözüm (<b>Ao5</b>); tur bitince sıralama çıkar, sonra yeni tur ya da final. Süreni <b>akıllı küple</b>, <b>timer</b> ile ya da <b>elle yazarak</b> girebilirsin.</p>
+        <p class="ak-req">8 ya da 16 kişilik <b>3x3</b> yarışması. Her tur 5 çözüm (<b>Ao5</b>); tur bitince sıralama çıkar, sonra yeni tur ya da final. Herkes kendi timer'ıyla çözer ve süresini <b>elle yazar</b> (+2 ve DNF seçilebilir).</p>
         <div class="ak-lobby">
             <div id="cCreateBox"><h3>Yarışma oluştur</h3>
                 <p id="cOrgNote">🔒 Yalnızca <b>organizatör</b> rolündeki kişiler yarışma kurabilir.</p>
@@ -338,7 +338,6 @@
             <div><small>EV YARIŞMASI · <span id="cCode" class="mono">-----</span></small><h2 id="cTitle" style="margin:2px 0 0">-</h2></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="ak-pill" id="cRound">Lobi</span><button type="button" class="btn sm" id="cCopy">🔗 Davet bağlantısı</button><button type="button" class="btn sm" id="cLeave">Çık</button></div>
         </div>
-        <div class="c-mode"><span>Süre girişi:</span><button type="button" data-m="bt">🧊 Akıllı küp</button><button type="button" data-m="timer">⏱️ Timer</button><button type="button" data-m="manual">⌨️ Elle yaz</button></div>
         <div class="c-mine" id="cMine"></div>
         <div class="c-table" id="cTable"></div>
         <div class="c-org" id="cOrg" hidden><b id="cOrgWho">👑 Oda sahibi:</b><button type="button" class="btn primary sm" id="cStart">▶ Turu başlat</button><button type="button" class="btn sm" id="cEnd">⏹ Turu şimdi bitir</button></div>
@@ -399,11 +398,11 @@
 </footer>
 
 <script>var PAGE_ID = "akilli_kup";</script>
-<script src="/js/i18n.js?v=20261143"></script>
-<script src="/js/common.js?v=20261143"></script>
-<script src="/js/firebase-config.js?v=20261143"></script>
-<script src="/js/account.js?v=20261143"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261143"></script>
-<script src="/js/akilli-kup.js?v=20261143"></script>
+<script src="/js/i18n.js?v=20261144"></script>
+<script src="/js/common.js?v=20261144"></script>
+<script src="/js/firebase-config.js?v=20261144"></script>
+<script src="/js/account.js?v=20261144"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261144"></script>
+<script src="/js/akilli-kup.js?v=20261144"></script>
 </body>
 </html>
