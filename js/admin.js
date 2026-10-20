@@ -520,11 +520,11 @@
             .then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) { return (d.documents || []).length; }, function () { return 0; });
     }
 
-    /* ---------- düello odaları ---------- */
-    function listDuels() {
+    /* ---------- ev yarışmaları (comps/{kod}, comps/{kod}/p/{uid}) ---------- */
+    function listComps() {
         var out = [];
         function page(tok) {
-            return authed(docsBase() + "/duels?pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : ""), { method: "GET" })
+            return authed(docsBase() + "/comps?pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : ""), { method: "GET" })
                 .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
                 .then(function (d) {
                     (d.documents || []).forEach(function (x) {
@@ -537,49 +537,83 @@
         }
         return page("");
     }
-    function duelTimes(str) { return String(str || "").split(",").filter(Boolean).map(function (x) { return +x >= 99999999 ? "DNF" : fmt(+x); }); }
-    function renderDuels() {
-        var box = $id("aDuelList"); if (!box) return;
+    function compPlayers(code) {
+        return authed(docsBase() + "/comps/" + code + "/p?pageSize=50", { method: "GET" })
+            .then(function (r) { return r.ok ? r.json() : {}; })
+            .then(function (d) { return (d.documents || []).map(function (x) { var f = x.fields || {}; return { uid: x.name.split("/").pop(), name: gv(f, "name"), t: gv(f, "t"), rnd: gv(f, "rnd") }; }); });
+    }
+    function tFmt(x) { return +x >= 99999999 ? "DNF" : fmt(+x); }
+    function deleteComp(code) {
+        return compPlayers(code).then(function (ps) {
+            return Promise.all(ps.map(function (p) { return delDoc("/comps/" + code + "/p/" + p.uid); }));
+        }).then(function () { return delDoc("/comps/" + code); });
+    }
+    function renderComps() {
+        var box = $id("aCompList"); if (!box) return;
         box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
-        listDuels().then(function (list) {
+        listComps().then(function (list) {
             list.sort(function (a, b) { return b.updated - a.updated; });
-            $id("aDuelCount").textContent = list.length + " oda";
-            if (!list.length) { box.innerHTML = '<p class="a-note">Henüz düello odası yok.</p>'; return; }
+            $id("aCompCount").textContent = list.length + " yarışma";
+            if (!list.length) { box.innerHTML = '<p class="a-note">Henüz ev yarışması yok.</p>'; return; }
             box.innerHTML = list.map(function (o) {
-                var n = o.fmt || 5, f = n === 3 ? "mo3" : n === 12 ? "ao12" : "ao5";
-                var over = o.guest && o.hT >= 0 && o.gT >= 0 && (o.round || 1) >= n;
-                var stt = !o.guest ? "⏳ Rakip bekliyor" : over ? "🏁 Bitti" : "▶ Sürüyor · tur " + (o.round || 1) + "/" + n;
-                return '<details class="duel-row"><summary><b class="mono">' + esc(o.code) + '</b><span>' + esc(o.hName || "?") + ' <b>' + (o.hW || 0) + ' - ' + (o.gW || 0) + '</b> ' + esc(o.gName || "—") + '</span><span class="a-note">' + f + ' · ' + stt + ' · ' + esc(dateFmt(o.updated)) + '</span></summary>' +
+                var ev = o.ev === "222" ? "2x2" : "3x3";
+                var stt = o.st === "lobby" ? "⏳ Lobi" : o.st === "run" ? "▶ " + (o.fin ? "Final" : "Tur " + o.round) + " sürüyor" : (o.fin ? "🏆 Final bitti" : "🏁 Tur " + o.round + " bitti");
+                var R = []; try { R = JSON.parse(o.R || "[]"); } catch (e) {}
+                var hist = R.map(function (r) {
+                    return '<div class="cr"><b>' + (r.f ? "🏆 Final" : "Tur " + r.n) + '</b>' + (r.rows || []).map(function (x, i) {
+                        return '<div class="cr-row"><span>' + (i + 1) + '. ' + esc(x.n) + '</span><b class="mono">' + (x.a == null ? "-" : tFmt(x.a)) + '</b><span class="mono small">' + (x.t || []).map(tFmt).join(", ") + '</span></div>';
+                    }).join("") + '</div>';
+                }).join("");
+                return '<details class="duel-row" data-code="' + esc(o.code) + '"><summary><b class="mono">' + esc(o.code) + '</b><span><b>' + esc(o.name || "-") + '</b> · ' + ev + ' · ' + (o.cap || "?") + ' kişilik</span><span class="a-note">' + stt + ' · ' + esc(o.hName || "?") + ' · ' + esc(dateFmt(o.updated)) + '</span></summary>' +
                     '<div class="duel-body"><div class="info-grid">' +
-                    infoRow("Ev sahibi", esc(o.hName || "?") + ' <span class="mono small">' + esc(o.host || "") + '</span>') +
-                    infoRow("Rakip", o.guest ? esc(o.gName || "?") + ' <span class="mono small">' + esc(o.guest) + '</span>' : "—") +
-                    infoRow("Format", f + " · tur " + (o.round || 1)) +
-                    infoRow(esc(o.hName || "Ev sahibi") + " süreleri", esc(duelTimes(o.hL).join(", ") || "—")) +
-                    infoRow(esc(o.gName || "Rakip") + " süreleri", esc(duelTimes(o.gL).join(", ") || "—")) +
-                    infoRow("Durum", esc((o.hSt || "-") + " / " + (o.gSt || "-"))) +
-                    infoRow("Karıştırma", '<span class="mono small">' + esc(o.scr || "") + '</span>') +
+                    infoRow("Oda sahibi", esc(o.hName || "?") + ' <span class="mono small">' + esc(o.host || "") + '</span>') +
+                    infoRow("Moderatörler", esc(o.mods || "—")) +
+                    infoRow("Küp / kapasite", ev + " · " + (o.cap || "?") + " kişi") +
+                    infoRow("Durum", stt) +
                     infoRow("Oluşturulma", esc(dateFmt(o.created))) + '</div>' +
-                    '<div class="a-ctrl" style="margin-top:8px"><a class="a-btn sm" href="/icerikler/akilli-kup?duel=' + esc(o.code) + '" target="_blank" rel="noopener">👁 Odayı aç</a>' +
-                    (o.host ? '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.host) + '" target="_blank" rel="noopener">👤 Ev sahibi</a>' : '') +
-                    (o.guest ? '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.guest) + '" target="_blank" rel="noopener">👤 Rakip</a>' : '') +
-                    '<button class="a-btn danger sm" data-dd="' + esc(o.code) + '">🗑️ Odayı sil</button></div></div></details>';
+                    '<h4>Yarışmacılar</h4><div class="c-ps a-note">Açınca yüklenir…</div>' +
+                    (hist ? '<h4>Tur sonuçları</h4>' + hist : '') +
+                    '<div class="a-ctrl" style="margin-top:8px"><a class="a-btn sm" href="/icerikler/ev-yarismasi?ev=' + esc(o.code) + '" target="_blank" rel="noopener">👁 Yarışmayı aç</a>' +
+                    (o.host ? '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.host) + '" target="_blank" rel="noopener">👤 Oda sahibi</a>' : '') +
+                    '<button class="a-btn danger sm" data-cd="' + esc(o.code) + '">🗑️ Yarışmayı sil</button></div></div></details>';
             }).join("");
-            Array.prototype.forEach.call(box.querySelectorAll("[data-dd]"), function (b) {
-                b.addEventListener("click", function () {
-                    if (!confirm(b.getAttribute("data-dd") + " odası silinsin mi?")) return;
-                    b.disabled = true;
-                    delDoc("/duels/" + b.getAttribute("data-dd")).then(function (ok) { if (ok) renderDuels(); else { b.disabled = false; alert("Silinemedi (kuralları yayımladın mı?)"); } });
+            Array.prototype.forEach.call(box.querySelectorAll("details[data-code]"), function (d) {
+                d.addEventListener("toggle", function () {
+                    if (!d.open || d.dataset.loaded) return; d.dataset.loaded = "1";
+                    var code = d.getAttribute("data-code"), el = d.querySelector(".c-ps");
+                    compPlayers(code).then(function (ps) {
+                        if (!ps.length) { el.textContent = "Yarışmacı yok."; return; }
+                        el.classList.remove("a-note");
+                        el.innerHTML = ps.map(function (p) {
+                            return '<div class="cr-row"><span>' + esc(p.name || "?") + '</span><span class="mono small">' + String(p.t || "").split(",").filter(Boolean).map(tFmt).join(", ") + '</span>' +
+                                '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(p.uid) + '" target="_blank" rel="noopener">👤</a>' +
+                                '<button class="a-btn danger sm" data-cp="' + esc(code) + '|' + esc(p.uid) + '">Çıkar</button></div>';
+                        }).join("");
+                        Array.prototype.forEach.call(el.querySelectorAll("[data-cp]"), function (b) {
+                            b.addEventListener("click", function () {
+                                var x = b.getAttribute("data-cp").split("|"); if (!confirm("Bu yarışmacı çıkarılsın mı?")) return;
+                                b.disabled = true; delDoc("/comps/" + x[0] + "/p/" + x[1]).then(function (ok) { if (ok) b.closest(".cr-row").remove(); else { b.disabled = false; alert("Çıkarılamadı."); } });
+                            });
+                        });
+                    }, function () { el.textContent = "Yüklenemedi."; });
                 });
             });
-        }, function (e) { box.innerHTML = '<p class="a-note">Odalar yüklenemedi (' + esc(e && e.message) + ') — kuralları yayımladın mı?</p>'; });
+            Array.prototype.forEach.call(box.querySelectorAll("[data-cd]"), function (b) {
+                b.addEventListener("click", function () {
+                    if (!confirm(b.getAttribute("data-cd") + " yarışması ve tüm yarışmacı kayıtları silinsin mi?")) return;
+                    b.disabled = true;
+                    deleteComp(b.getAttribute("data-cd")).then(function (ok) { if (ok) renderComps(); else { b.disabled = false; alert("Silinemedi (kuralları yayımladın mı?)"); } });
+                });
+            });
+        }, function (e) { box.innerHTML = '<p class="a-note">Yarışmalar yüklenemedi (' + esc(e && e.message) + ') — kuralları yayımladın mı?</p>'; });
     }
-    function cleanOldDuels() {
-        if (!confirm("1 günden eski tüm düello odaları silinsin mi?")) return;
-        var lim = Date.now() - 86400000;
-        listDuels().then(function (list) {
+    function cleanOldComps() {
+        if (!confirm("3 günden eski tüm ev yarışmaları silinsin mi?")) return;
+        var lim = Date.now() - 3 * 86400000;
+        listComps().then(function (list) {
             var old = list.filter(function (o) { return o.updated < lim; });
-            return Promise.all(old.map(function (o) { return delDoc("/duels/" + o.code); })).then(function () { msg($id("aDuelMsg"), old.length + " eski oda silindi ✓", "ok"); renderDuels(); });
-        }, function () { msg($id("aDuelMsg"), "Silinemedi.", "bad"); });
+            return Promise.all(old.map(function (o) { return deleteComp(o.code); })).then(function () { msg($id("aCompMsg"), old.length + " eski yarışma silindi ✓", "ok"); renderComps(); });
+        }, function () { msg($id("aCompMsg"), "Silinemedi.", "bad"); });
     }
 
     /* ---------- duyuru geçmişi ---------- */
@@ -685,9 +719,9 @@
             '<div id="aUsersList"></div></div>' +
             '<div class="box"><h2>🏅 En aktif kullanıcılar</h2><div id="aActive"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🖥️ Cihaz &amp; tarayıcı dağılımı</h2><p class="a-note">Her üyenin cihaz bilgisini çeker (biraz sürebilir).</p><button class="a-btn main" id="aDevLoad">Hesapla</button><div id="aDevBox" style="margin-top:10px"></div></div>' +
-            '<div class="box"><h2>⚔️ Düello odaları <span class="a-sub" id="aDuelCount" style="margin:0"></span></h2>' +
-            '<div class="a-ctrl"><button class="a-btn main" id="aDuelLoad">↻ Yenile</button><button class="a-btn danger" id="aDuelClean">🧹 1 günden eskileri sil</button></div>' +
-            '<div class="a-msg" id="aDuelMsg"></div><div id="aDuelList" class="a-list"></div></div>' +
+            '<div class="box"><h2>🏠 Ev yarışmaları <span class="a-sub" id="aCompCount" style="margin:0"></span></h2>' +
+            '<div class="a-ctrl"><button class="a-btn main" id="aCompLoad">↻ Yenile</button><button class="a-btn danger" id="aCompClean">🧹 3 günden eskileri sil</button></div>' +
+            '<div class="a-msg" id="aCompMsg"></div><div id="aCompList" class="a-list"></div></div>' +
             '<div class="box"><h2>🛠️ Bakım modu</h2><p class="a-note">Açıkken site, sen hariç herkese “Bakımdayız” sayfası gösterir.</p><div id="aMaintBox"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🏆 Günlük sıralama moderasyonu</h2>' +
             '<div class="a-ctrl"><input type="date" id="aDate" value="' + todayStr() + '"><button class="a-btn main" id="aDailyLoad">↻ Yenile</button><button class="a-btn" id="aDailyCsv">⬇ CSV</button></div>' +
@@ -701,8 +735,8 @@
         $id("uCsv").addEventListener("click", function () { exportUsers("csv"); });
         $id("uJson").addEventListener("click", function () { exportUsers("json"); });
         $id("aDailyCsv").addEventListener("click", exportDaily);
-        $id("aDuelLoad").addEventListener("click", renderDuels);
-        $id("aDuelClean").addEventListener("click", cleanOldDuels);
+        $id("aCompLoad").addEventListener("click", renderComps);
+        $id("aCompClean").addEventListener("click", cleanOldComps);
         $id("uSearch").addEventListener("input", applyUserFilter);
         $id("uFilter").addEventListener("change", applyUserFilter);
         $id("bcReload").addEventListener("click", renderBroadcasts);
@@ -720,7 +754,7 @@
                 else msg($id("bcMsg"), "Gönderilemedi (kuralları yayımladın mı?)", "bad");
             }, function () { $id("bcSend").disabled = false; msg($id("bcMsg"), "Gönderilemedi.", "bad"); });
         });
-        renderDaily(); renderDayChips(); renderDuels();
+        renderDaily(); renderDayChips(); renderComps();
         renderUsers();   // kullanıcılar ve tüm verileri otomatik gelsin
     }
     function renderGate(kind) {
