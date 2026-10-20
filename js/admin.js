@@ -639,6 +639,47 @@
         }, function () { box.innerHTML = '<p class="a-note">Duyurular yüklenemedi.</p>'; });
     }
 
+    /* ---------- hesapsız ziyaretçiler (anon/{id}) ---------- */
+    function listAnon() {
+        var out = [];
+        function page(tok) {
+            return authed(docsBase() + "/anon?pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : ""), { method: "GET" })
+                .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+                .then(function (d) {
+                    (d.documents || []).forEach(function (x) { var f = x.fields || {}; out.push({ f: +gv(f, "f") || 0, l: +gv(f, "l") || 0, d: +gv(f, "d") || 0, s: +gv(f, "s") || 0, p: gv(f, "p") || "/", dev: gv(f, "dev") || "?" }); });
+                    return d.nextPageToken && out.length < 30000 ? page(d.nextPageToken) : out;
+                });
+        }
+        return page();
+    }
+    function renderAnon() {
+        var box = $id("aAnon"), more = $id("aAnonMore"); if (!box) return;
+        listAnon().then(function (list) {
+            var now = Date.now(), D = 86400000;
+            function cnt(f) { return list.filter(f).length; }
+            var sess = list.reduce(function (a, x) { return a + x.s; }, 0);
+            var tiles = [["Son 24 saat", cnt(function (x) { return now - x.l < D; })], ["Son 7 gün", cnt(function (x) { return now - x.l < 7 * D; })], ["Son 30 gün", cnt(function (x) { return now - x.l < 30 * D; })],
+                ["Toplam cihaz", list.length], ["Bugün ilk kez gelen", cnt(function (x) { return now - x.f < D; })], ["Toplam ziyaret (oturum)", sess], ["Geri dönen (2+ gün)", cnt(function (x) { return x.d >= 2; })]];
+            box.innerHTML = tiles.map(function (t) { return '<div class="stat-tile"><b>' + t[1] + '</b><span>' + t[0] + '</span></div>'; }).join("");
+            // son 14 gün: o gün son görülen cihazlar
+            var bars = [];
+            for (var i = 13; i >= 0; i--) {
+                var day = new Date(now - i * D); day.setHours(0, 0, 0, 0); var a = day.getTime(), b = a + D;
+                bars.push({ n: cnt(function (x) { return x.l >= a && x.l < b; }), d: ("0" + day.getDate()).slice(-2) + "." + ("0" + (day.getMonth() + 1)).slice(-2) });
+            }
+            var max = Math.max(1, Math.max.apply(null, bars.map(function (x) { return x.n; })));
+            var week = list.filter(function (x) { return now - x.l < 7 * D; });
+            function top(key) {
+                var m = {}; week.forEach(function (x) { m[x[key]] = (m[x[key]] || 0) + 1; });
+                return Object.keys(m).sort(function (a, b) { return m[b] - m[a]; }).slice(0, 8).map(function (k) { return '<li><span>' + esc(k) + '</span><b>' + m[k] + '</b></li>'; }).join("") || '<li class="a-note">Veri yok</li>';
+            }
+            more.innerHTML = '<h4 style="margin-top:14px">Son görülme günü (son 14 gün)</h4><div class="chart-bars">' + bars.map(function (x) {
+                var h = Math.round(x.n / max * 100);
+                return '<div class="cb" title="' + x.d + ': ' + x.n + ' cihaz"><span class="cb-v">' + (x.n || "") + '</span><span class="cb-bar" style="height:' + Math.max(h, x.n ? 6 : 2) + '%"></span><span class="cb-x">' + x.d + '</span></div>';
+            }).join("") + '</div>' +
+                '<div class="anon-two"><div><h4>Son girdiği sayfa (7 gün)</h4><ul class="anon-top">' + top("p") + '</ul></div><div><h4>Cihaz (7 gün)</h4><ul class="anon-top">' + top("dev") + '</ul></div></div>';
+        }, function (e) { box.innerHTML = '<p class="a-note">Yüklenemedi (' + esc(e && e.message) + ') — kuralları yayımladın mı?</p>'; });
+    }
     /* ---------- cihaz & tarayıcı dağılımı ---------- */
     function renderDevices() {
         var box = $id("aDevBox"), btn = $id("aDevLoad");
@@ -704,6 +745,7 @@
             '<h1 class="a-h1">Yönetim paneli</h1><p class="a-sub">Yalnızca sen görüyorsun.</p>' +
             '<div class="box"><h2>📊 Genel bakış</h2><div id="aOverview" class="stat-tiles"><p class="a-note">Yükleniyor…</p></div>' +
             '<h4 style="margin-top:14px">Aktiflik (son görülmeye göre)</h4><div id="aChart"></div></div>' +
+            '<div class="box"><h2>👤 Hesapsız ziyaretçiler</h2><p class="a-note">Giriş yapmadan siteyi kullanan cihazlar (her cihaz bir kez sayılır, oturum başına güncellenir).</p><div id="aAnon" class="stat-tiles"><p class="a-note">Yükleniyor…</p></div><div id="aAnonMore"></div></div>' +
             '<div class="box"><h2>🔔 Bildirim gönder</h2>' +
             '<p class="a-note">Yazdığın mesaj seçtiğin kişiye (ya da herkese) bildirim olarak gider. Bildirime izin veren kullanıcılarda telefon/sistem bildirimi; herkeste site içi bildirim olarak düşer.</p>' +
             '<div class="a-ctrl" style="flex-direction:column;align-items:stretch">' +
@@ -741,7 +783,7 @@
         $id("uFilter").addEventListener("change", applyUserFilter);
         $id("bcReload").addEventListener("click", renderBroadcasts);
         $id("aDevLoad").addEventListener("click", renderDevices);
-        bindBulk(); renderBroadcasts(); renderMaintenance();
+        bindBulk(); renderBroadcasts(); renderMaintenance(); renderAnon();
         $id("bcSend").addEventListener("click", function () {
             var text = $id("bcText").value.trim(), to = $id("bcTarget").value, atv = $id("bcAt").value, at = atv ? new Date(atv).getTime() : 0;
             if (at && at < Date.now() - 60000) { msg($id("bcMsg"), "Planlanan zaman geçmişte.", "bad"); return; }

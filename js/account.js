@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261152";
+    var V = "20261153";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -686,6 +686,21 @@
         var br = /Edg/.test(ua) ? "Edge" : /OPR|Opera/.test(ua) ? "Opera" : /SamsungBrowser/.test(ua) ? "Samsung" : /Chrome/.test(ua) ? "Chrome" : /Firefox/.test(ua) ? "Firefox" : /Safari/.test(ua) ? "Safari" : "Tarayıcı";
         return br + " · " + os;
     }
+    // Hesapsız ziyaretçi sayımı: giriş yapmamış her cihaz oturum başına bir kez anon/{id} yazar (yalnız admin okur)
+    function logAnon() {
+        if (!enabled || user || lsGet(SIGNED_KEY) === "1" || navigator.webdriver) return;
+        try { if (sessionStorage.getItem("ra-anon-s")) return; sessionStorage.setItem("ra-anon-s", "1"); } catch (e) { return; }
+        var vid = lsGet("ra-viewer-id");
+        if (!vid || !/^v[a-z0-9]{6,20}$/.test(vid)) { vid = "v" + Math.random().toString(36).slice(2, 14); lsSet("ra-viewer-id", vid); }
+        var st = parse(lsGet("ra-anon-v1")); if (!isObj(st)) st = {};
+        var now = Date.now(), day = new Date().toDateString();
+        st.f = st.f || now; st.s = (st.s || 0) + 1;
+        if (st.day !== day) { st.day = day; st.d = (st.d || 0) + 1; }
+        lsSet("ra-anon-v1", JSON.stringify(st));
+        var I = function (n) { return { integerValue: String(n) }; };
+        var fields = { f: I(st.f), l: I(now), d: I(st.d), s: I(st.s), p: { stringValue: String(location.pathname || "/").slice(0, 120) }, dev: { stringValue: deviceStr().slice(0, 40) } };
+        fetch(pubUrl("/anon/" + vid), { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields: fields }) }).catch(function () {});
+    }
     function logSession() {
         if (!user) return;
         try { if (sessionStorage.getItem("ra-sess-logged")) { return; } sessionStorage.setItem("ra-sess-logged", "1"); } catch (e) {}
@@ -886,6 +901,7 @@
         document.addEventListener("account-synced", function () { setTimeout(showNotes, 400); });
         // Bakım modu kontrolü (admin oturumu çözülsün diye kısa gecikme) + giriş/çıkışta yeniden
         setTimeout(checkMaintenance, 2200);
+        setTimeout(logAnon, 3500);
         // Bildirim izni: verilmişse aboneliği tazele, verilmemişse sor
         setTimeout(function () { ensurePush(); askPushBanner(); }, 4000);
         document.addEventListener("account-change", function () { checkMaintenance(); });
