@@ -544,8 +544,8 @@
     }
     function tFmt(x) { return +x >= 99999999 ? "DNF" : fmt(+x); }
     function deleteComp(code) {
-        return compPlayers(code).then(function (ps) {
-            return Promise.all(ps.map(function (p) { return delDoc("/comps/" + code + "/p/" + p.uid); }));
+        return Promise.all([compPlayers(code), listDocNames("/comps/" + code + "/w")]).then(function (res) {
+            return Promise.all(res[0].map(function (p) { return delDoc("/comps/" + code + "/p/" + p.uid); }).concat(res[1].map(delDoc)));
         }).then(function () { return delDoc("/comps/" + code); });
     }
     function renderComps() {
