@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261155";
+    var V = "20261156";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -74,12 +74,21 @@
     var enabled = !!(cfg.apiKey && cfg.projectId && cfg.authDomain);
 
     /* ---------- SDK ---------- */
-    var fb = null, auth = null, sdkP = null, user = null, listeners = [];
+    var fb = null, auth = null, sdkP = null, user = null, listeners = [], fbApp = null, fsP = null;
+    // Firestore SDK (yalnız canlı dinleme gereken sayfalarda yüklenir; auth ile aynı uygulamayı paylaşır)
+    function firestore() {
+        if (fsP) return fsP;
+        fsP = loadSDK().then(function () { return import("/js/vendor/firebase/firebase-firestore.js?v=" + V); }).then(function (fs) {
+            return { fs: fs, db: fs.getFirestore(fbApp) };
+        });
+        fsP.catch(function () { fsP = null; });
+        return fsP;
+    }
     function loadSDK() {
         if (sdkP) return sdkP;
         sdkP = import("/js/vendor/firebase/firebase-auth.js?v=" + V).then(function (m) {
             fb = m;
-            var app = m.initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, projectId: cfg.projectId, appId: cfg.appId });
+            var app = fbApp = m.initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, projectId: cfg.projectId, appId: cfg.appId });
             auth = m.getAuth(app);
             if (cfg.emulator && cfg.emulator.auth) m.connectAuthEmulator(auth, cfg.emulator.auth, { disableWarnings: true });
             try { auth.languageCode = lang(); } catch (e) {}
@@ -413,8 +422,19 @@
         var ch = localKeys().filter(function (k) { return hash(lsGet(k)) !== meta.h[k]; });
         return push(ch, meta, keepalive).catch(function () {});
     }
+    // Firestore kotasını korumak için: aynı işi kısa sürede tekrar yapma (sayfa geçişlerinde)
+    function every(key, ms) {
+        var k = "ra-thr-" + key + (user ? "-" + user.uid : ""), last = +(lsGet(k) || 0);
+        if (Date.now() - last < ms) return false;
+        lsSet(k, String(Date.now())); return true;
+    }
     function startSync() {
-        fullSync();
+        // tam senkron (tüm kayıtları buluttan çekme) 5 dakikada bir; arada yalnız değişenler gönderilir
+        var meta = loadMeta();
+        if (meta.uid === user.uid && !every("sync", 5 * 60000)) {
+            synced1 = true;
+            try { document.dispatchEvent(new CustomEvent("account-synced", { detail: { applied: 0, quick: true } })); } catch (e) {}
+        } else fullSync();
         clearInterval(pushTimer);
         pushTimer = setInterval(function () { pushChanged(false); }, 20000);
     }
@@ -598,7 +618,7 @@
         var mask = "?" + ["email", "provider", "name", "theme", "cvd", "skin", "lang", "seen", "dev", "marks"].map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
         return api("/users/" + user.uid + "/meta/self" + mask, { method: "PATCH", body: JSON.stringify({ fields: fields }) }).catch(function () {});
     }
-    document.addEventListener("account-synced", function () { writeProfile(); writeMeta(); logVisit(); });
+    document.addEventListener("account-synced", function () { if (every("prof", 10 * 60000)) { writeProfile(); writeMeta(); } logVisit(); });
 
     /* ---------- sosyal: takip, beğeni, bildirim ---------- */
     function pubUrl(path) { return base() + path + (path.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey); }
@@ -621,8 +641,8 @@
     // Bildirim oku (yeni broadcast + kendi okunmamış bildirimlerim)
     function fetchNotes() {
         var out = [], seenB = 0; try { seenB = +(lsGet("ra-bcast-seen") || 0); } catch (e) {}
-        var pB = pubList("/broadcasts").then(function (docs) { docs.forEach(function (d) { var f = d.fields || {}, ts = effTs(f), txt = (f.text && f.text.stringValue) || ""; if (ts > seenB && ts <= Date.now() && txt) out.push({ id: "b:" + ts, text: txt, ts: ts }); }); });
-        var pN = user ? api("/users/" + user.uid + "/notifications?pageSize=50", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        var pB = !every("bcast", 5 * 60000) ? Promise.resolve() : pubList("/broadcasts").then(function (docs) { docs.forEach(function (d) { var f = d.fields || {}, ts = effTs(f), txt = (f.text && f.text.stringValue) || ""; if (ts > seenB && ts <= Date.now() && txt) out.push({ id: "b:" + ts, text: txt, ts: ts }); }); });
+        var pN = user && every("notes", 5 * 60000) ? api("/users/" + user.uid + "/notifications?pageSize=50", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var seen = {}; try { (JSON.parse(lsGet("ra-note-seen")) || []).forEach(function (x) { seen[x] = 1; }); } catch (e) {}
             ((d && d.documents) || []).forEach(function (x) { var id = x.name.split("/").pop(), f = x.fields || {}, txt = (f.text && f.text.stringValue) || "", ts = effTs(f); if (!seen[id] && txt && ts <= Date.now()) out.push({ id: "n:" + id, text: txt, ts: ts }); });
         }).catch(function () {}) : Promise.resolve();
@@ -722,7 +742,7 @@
             .then(function (r) { lsSet("ra-login-ts", String(Date.now())); try { sessionStorage.setItem("ra-sess-logged", "1"); } catch (e) {} return r.ok; });
     }
     function checkLogoutAll() {
-        if (!user) return;
+        if (!user || !every("logoutall", 5 * 60000)) return;
         api("/users/" + user.uid + "/sessions/control", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var before = d && d.fields && d.fields.before && +d.fields.before.integerValue;
             var mine = +(lsGet("ra-login-ts") || 0);
@@ -815,7 +835,7 @@
 
     /* ---------- askıya alınmış hesap ---------- */
     function checkSuspended() {
-        if (!user || isAdmin()) return;
+        if (!user || isAdmin() || !every("susp", 5 * 60000)) return;
         window.Account.getRole(user.uid).then(function (r) {
             if (r === "silindi") { removedByAdmin(); return; }
             if (r !== "askida") return;
@@ -827,7 +847,9 @@
     // Bakım modu: açıksa admin olmayan herkese tam ekran "bakımda" göster
     function checkMaintenance() {
         if (!enabled) return;
-        getConfig().then(function (c) {
+        var cached = null; try { cached = JSON.parse(lsGet("ra-cfg-cache") || "null"); } catch (e) {}
+        var pc = cached && Date.now() - cached.at < 2 * 60000 ? Promise.resolve(cached.c) : getConfig().then(function (c) { lsSet("ra-cfg-cache", JSON.stringify({ at: Date.now(), c: c })); return c; });
+        pc.then(function (c) {
             var o = document.getElementById("raMaint");
             if (!c.maintenance || isAdmin()) { if (o) o.remove(); return; }
             if (o) return;
@@ -886,7 +908,7 @@
         listBroadcasts: listBroadcasts, deleteBroadcast: deleteBroadcast, getConfig: getConfig, setMaintenance: setMaintenance,
         notifyPermission: enablePush, enablePush: enablePush, pushSupported: pushSupported,
         isPasswordUser: isPasswordUser, emailVerified: emailVerified, verifyEmail: verifyEmail, changePassword: changePassword,
-        listSessions: listSessions, logoutOthers: logoutOthers, sessId: sessId
+        listSessions: listSessions, logoutOthers: logoutOthers, sessId: sessId, firestore: firestore
     };
 
     function init() {
