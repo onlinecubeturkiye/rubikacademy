@@ -27,10 +27,10 @@
 <meta property="og:description" content="Çözümünü aşama aşama analiz et, arkadaşınla canlı düello yap.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/akilli-kup">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261142">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261143">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261142">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261143">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261142">
+<link rel="stylesheet" href="/styles/common.css?v=20261143">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -199,6 +199,8 @@
 .c-table tr.out td { color: var(--text-soft); opacity: .6; }
 .mono { font-family: "JetBrains Mono", monospace; } .small { font-size: 12px; color: var(--text-soft); }
 .c-kick { border: 0; background: none; color: #dc2626; font-weight: 900; cursor: pointer; }
+.c-act { white-space: nowrap; text-align: end; }
+.c-mini { border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 800 11.5px Inter, sans-serif; padding: 3px 6px; border-radius: 8px; cursor: pointer; margin-inline-end: 4px; }
 .c-org { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: var(--tint-orange); font-size: 13.5px; color: var(--text); }
 .c-res { max-height: 50vh; overflow: auto; text-align: start; margin: 10px 0 12px; }
 .c-res tr.win td { background: rgba(34,197,94,.15); }
@@ -339,7 +341,7 @@
         <div class="c-mode"><span>Süre girişi:</span><button type="button" data-m="bt">🧊 Akıllı küp</button><button type="button" data-m="timer">⏱️ Timer</button><button type="button" data-m="manual">⌨️ Elle yaz</button></div>
         <div class="c-mine" id="cMine"></div>
         <div class="c-table" id="cTable"></div>
-        <div class="c-org" id="cOrg" hidden><b>👑 Organizatör:</b><button type="button" class="btn primary sm" id="cStart">▶ Turu başlat</button><button type="button" class="btn sm" id="cEnd">⏹ Turu şimdi bitir</button></div>
+        <div class="c-org" id="cOrg" hidden><b id="cOrgWho">👑 Oda sahibi:</b><button type="button" class="btn primary sm" id="cStart">▶ Turu başlat</button><button type="button" class="btn sm" id="cEnd">⏹ Turu şimdi bitir</button></div>
         <div class="ak-room-foot"><p id="cHint"></p><button type="button" class="btn" id="cShowRes" hidden>🏁 Sonuçlar</button></div>
     </div>
 </section>
@@ -397,11 +399,11 @@
 </footer>
 
 <script>var PAGE_ID = "akilli_kup";</script>
-<script src="/js/i18n.js?v=20261142"></script>
-<script src="/js/common.js?v=20261142"></script>
-<script src="/js/firebase-config.js?v=20261142"></script>
-<script src="/js/account.js?v=20261142"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261142"></script>
-<script src="/js/akilli-kup.js?v=20261142"></script>
+<script src="/js/i18n.js?v=20261143"></script>
+<script src="/js/common.js?v=20261143"></script>
+<script src="/js/firebase-config.js?v=20261143"></script>
+<script src="/js/account.js?v=20261143"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261143"></script>
+<script src="/js/akilli-kup.js?v=20261143"></script>
 </body>
 </html>
