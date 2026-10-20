@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261150";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261151";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -1019,7 +1019,7 @@
         $("cTable").innerHTML = rows.length ? '<table class="c-grid-t"><thead><tr><th class="c-rl">#</th>' + headCells + '</tr></thead><tbody>' +
             line("SIRA", "c-rank", function (r) { return r.a == null ? "-" : (rows.indexOf(r) + 1) + "."; }) +
             line("AO5", "c-avg", function (r) { return '<b class="' + (bestAo != null && r.a === bestAo ? "best" : "") + '">' + (r.a == null ? "-" : fmt(r.a)) + "</b>"; }) +
-            [0, 1, 2, 3, 4].map(function (i) {
+            [0, 1, 2, 3, 4].filter(function (i) { return i <= cur || rows.some(function (r) { return r.t[i] != null; }); }).map(function (i) {
                 return line(String(i + 1), i === cur ? "cur" : "", function (r) {
                     var x = r.t[i]; if (x == null) return i === cur ? '<span class="c-wait">…</span>' : "-";
                     return '<span class="' + (x >= DNF ? "dnf" : bestOf[i] === x ? "best" : "") + '">' + fmt(x) + "</span>";
