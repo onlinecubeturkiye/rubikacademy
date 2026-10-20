@@ -438,6 +438,8 @@
         listUsers().then(function (users) {
             _users = users;
             $id("aUsersCount").textContent = users.length + " kullanıcı";
+            // ana sayfadaki üye sayısını güncelle (değiştiyse)
+            if (window.Account.getConfig && window.Account.setMemberCount) window.Account.getConfig().then(function (c) { if (c.members !== users.length) window.Account.setMemberCount(users.length); });
             if (!users.length) { box.innerHTML = '<p class="a-note">Henüz kayıtlı kullanıcı yok.</p>'; return; }
             box.innerHTML = '<div class="u-split"><div class="u-picker" id="uPicker"></div><div class="u-detailwrap" id="uDetail"><p class="a-note">Soldan bir kullanıcı seç; tüm verisi burada görünür.</p></div></div>';
             renderPicker();

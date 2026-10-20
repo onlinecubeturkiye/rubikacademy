@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261156";
+    var V = "20261157";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -636,7 +636,9 @@
     function listBroadcasts() { return pubList("/broadcasts").then(function (docs) { return docs.map(function (d) { var f = d.fields || {}; return { id: d.name.split("/").pop(), text: (f.text && f.text.stringValue) || "", ts: Date.parse((f.ts && f.ts.timestampValue) || "") || 0, at: Date.parse((f.at && f.at.timestampValue) || "") || 0, pushed: !!(f.pushed && f.pushed.booleanValue) }; }).sort(function (a, b) { return (b.at || b.ts) - (a.at || a.ts); }); }); }
     function deleteBroadcast(id) { if (!isAdmin()) return Promise.resolve(false); return api("/broadcasts/" + id, { method: "DELETE" }).then(function (r) { return r.ok; }); }
     // Bakım modu (config/site): herkes okur, admin yazar
-    function getConfig() { return fetch(pubUrl("/config/site")).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { var f = (d && d.fields) || {}; return { maintenance: !!(f.maintenance && f.maintenance.booleanValue), msg: (f.msg && f.msg.stringValue) || "" }; }).catch(function () { return { maintenance: false, msg: "" }; }); }
+    function getConfig() { return fetch(pubUrl("/config/site")).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { var f = (d && d.fields) || {}; return { maintenance: !!(f.maintenance && f.maintenance.booleanValue), msg: (f.msg && f.msg.stringValue) || "", members: +((f.members && f.members.integerValue) || 0) }; }).catch(function () { return { maintenance: false, msg: "" }; }); }
+    // Ana sayfadaki üye sayısı (herkese açık config/site.members; admin paneli günceller)
+    function setMemberCount(n) { if (!isAdmin()) return Promise.resolve(false); return api("/config/site?updateMask.fieldPaths=members", { method: "PATCH", body: JSON.stringify({ fields: { members: { integerValue: String(n) } } }) }).then(function (r) { return r.ok; }, function () { return false; }); }
     function setMaintenance(on, msg) { if (!isAdmin()) return Promise.resolve(false); return api("/config/site?updateMask.fieldPaths=maintenance&updateMask.fieldPaths=msg", { method: "PATCH", body: JSON.stringify({ fields: { maintenance: { booleanValue: !!on }, msg: { stringValue: String(msg || "").slice(0, 300) } } }) }).then(function (r) { return r.ok; }); }
     // Bildirim oku (yeni broadcast + kendi okunmamış bildirimlerim)
     function fetchNotes() {
@@ -905,7 +907,7 @@
         load: loadSDK,
         isPending: function () { return lsGet(SIGNED_KEY) === "1" && !sdkP; },
         sendNotif: sendNotif, sendBroadcast: sendBroadcast, showNotes: showNotes,
-        listBroadcasts: listBroadcasts, deleteBroadcast: deleteBroadcast, getConfig: getConfig, setMaintenance: setMaintenance,
+        listBroadcasts: listBroadcasts, deleteBroadcast: deleteBroadcast, getConfig: getConfig, setMaintenance: setMaintenance, setMemberCount: setMemberCount,
         notifyPermission: enablePush, enablePush: enablePush, pushSupported: pushSupported,
         isPasswordUser: isPasswordUser, emailVerified: emailVerified, verifyEmail: verifyEmail, changePassword: changePassword,
         listSessions: listSessions, logoutOthers: logoutOthers, sessId: sessId, firestore: firestore
