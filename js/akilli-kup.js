@@ -938,7 +938,7 @@
             chatLoad();
         }, function () { inp.value = x; err.textContent = "Mesaj gönderilemedi."; });
     }
-    function chatUi() { var ok = signedIn(); $("cChatForm").hidden = !ok; $("cChatLogin").hidden = ok; }
+    function chatUi() { if (!$("cChatForm")) return; var ok = signedIn(); $("cChatForm").hidden = !ok; $("cChatLogin").hidden = ok; }
     function modeIcon(m) { return m === "bt" ? "🧊" : m === "manual" ? "⌨️" : "⏱️"; }
     function shareTextR(r) {
         var d = comp.doc;
@@ -1089,7 +1089,7 @@
         $("cOrgWho").textContent = owner ? "👑 Oda sahibi:" : "🛡️ Moderatör:";
         $("cStart").hidden = d.st !== "lobby"; $("cStart").disabled = comp.players.length < 2;
         $("cEnd").hidden = d.st !== "run";
-        $("cFinish").hidden = !(d.st === "end" && !d.fin);
+        if ($("cFinish")) $("cFinish").hidden = !(d.st === "end" && !d.fin);
         $("cShowRes").hidden = !hist().length;
         $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? "Yarışmacılar katılınca turu başlat (en az 2 kişi)." : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes 5 çözümü bitirince tur kendiliğinden biter." : (d.fin ? "Final bitti." : "Tur bitti.");
         renderModeUi();
@@ -1132,9 +1132,11 @@
         $("cJoinIn").onkeydown = function (e) { if (e.key === "Enter") joinComp($("cJoinIn").value); };
         $("cLeave").onclick = function () { if (confirm("Yarışmadan çıkılsın mı?")) leaveComp(); };
         $("cStart").onclick = function () { startRound(false, 0); };
-        $("cFinish").onclick = finishComp;
-        $("cChatForm").onsubmit = function (e) { e.preventDefault(); chatSend(); };
-        $("cChatLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
+        if ($("cFinish")) $("cFinish").onclick = finishComp;
+        if ($("cChatForm")) {
+            $("cChatForm").onsubmit = function (e) { e.preventDefault(); chatSend(); };
+            $("cChatLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
+        }
         $("cEnd").onclick = function () { if (confirm("Tur şimdi bitirilsin mi? Eksik çözümü olanların Ao5'i olmaz.")) endRound(); };
         $("cShowRes").onclick = function () { var h = hist(); if (h.length) showRoundResults(h[h.length - 1]); };
         Array.prototype.forEach.call(document.querySelectorAll(".c-mode button"), function (b) { b.onclick = function () { setMode(b.getAttribute("data-m")); }; });
