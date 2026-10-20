@@ -33,6 +33,7 @@ function toggleDarkMode() {
     var isDark = document.documentElement.classList.toggle("dark-mode");
     document.body.classList.toggle("dark-mode", isDark);
     try { localStorage.setItem("theme", isDark ? "dark" : "light"); } catch (e) {}
+    raSavePrefs();
     var btn = document.getElementById("darkModeBtn");
     if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
 }
@@ -89,6 +90,7 @@ function cvdRecolor(root) {
 var cvdObserver = null;
 function applyCvd(theme) {
     try { if (theme) localStorage.setItem("cvd-theme", theme); else localStorage.removeItem("cvd-theme"); } catch (e) {}
+    raSavePrefs();
     document.documentElement.setAttribute("data-cvd", theme || "");
     cvdRecolor(document.body);
     // Sonradan çizilen diyagramlar (antrenör, algoritma sayfaları) da çevrilsin
@@ -147,9 +149,35 @@ function raSetTheme(mode) {
     document.documentElement.classList.toggle("dark-mode", isDark);
     document.body.classList.toggle("dark-mode", isDark);
     try { localStorage.setItem("theme", isDark ? "dark" : "light"); } catch (e) {}
+    raSavePrefs();
     var btn = document.getElementById("darkModeBtn"); if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
     renderSettingsMenu();
 }
+/* Görünüm tercihleri hesaba bağlı: tema, tema stili ve renk körlüğü paleti tek kayıtta ("site-prefs-v1")
+   tutulur ve hesapla senkronlanır; cihazlar arasında en son yapılan seçim geçerli olur. */
+function raSavePrefs() {
+    try {
+        var g = function (k) { return localStorage.getItem(k) || ""; };
+        localStorage.setItem("site-prefs-v1", JSON.stringify({ skin: g("site-skin") || "standart", theme: g("theme") || "dark", cvd: g("cvd-theme"), t: Date.now() }));
+    } catch (e) {}
+}
+/* Buluttan gelen tercihleri uygula (account.js senkronu çağırır) */
+function raApplyPrefs(json) {
+    try {
+        var p = JSON.parse(json || "null"); if (!p) return;
+        if (p.skin) localStorage.setItem("site-skin", p.skin);
+        if (p.theme) localStorage.setItem("theme", p.theme);
+        if (p.cvd) localStorage.setItem("cvd-theme", p.cvd); else localStorage.removeItem("cvd-theme");
+    } catch (e) {}
+}
+// Eski cihazlar: tercih kaydı yoksa mevcut seçimden oluştur (t: 0 → buluttaki kayıt önceliklidir)
+(function () {
+    try {
+        if (localStorage.getItem("site-prefs-v1")) return;
+        var s = localStorage.getItem("site-skin"), th = localStorage.getItem("theme"), c = localStorage.getItem("cvd-theme");
+        if (s || th || c) localStorage.setItem("site-prefs-v1", JSON.stringify({ skin: s || "standart", theme: th || "dark", cvd: c || "", t: 0 }));
+    } catch (e) {}
+})();
 /* Tema stili (renk paleti + yazı tipi): localStorage "site-skin" */
 var RA_SKINS = [
     ["standart", ["#f7f8fc", "#6c5ce7", "#ec4899", "#12141f"]],
@@ -171,6 +199,7 @@ function raApplySkin(k) {
 }
 function raSetSkin(k, target) {
     try { localStorage.setItem("site-skin", k); } catch (e) {}
+    raSavePrefs();
     raApplySkin(k);
     renderSettingsMenu(target);
 }
