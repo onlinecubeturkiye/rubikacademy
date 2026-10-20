@@ -27,10 +27,10 @@
 <meta property="og:description" content="Çözümünü aşama aşama analiz et, arkadaşınla canlı düello yap.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/akilli-kup">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261141">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261142">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261141">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261142">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261141">
+<link rel="stylesheet" href="/styles/common.css?v=20261142">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -178,6 +178,43 @@
 .ak-req { font-size: 14px; color: var(--text-soft); margin: -4px 0 12px; }
 .ak-req b { color: var(--text); }
 
+/* ev yarışması */
+.c-in { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 600 14px Inter, sans-serif; margin-bottom: 10px; }
+#cCreateBox.locked .c-in, #cCreateBox.locked .ak-fmt { opacity: .5; pointer-events: none; }
+.c-mode { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 4px 0 12px; }
+.c-mode span { font-size: 13px; font-weight: 800; color: var(--text-soft); }
+.c-mode button { border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 800 13px Inter, sans-serif; padding: 7px 12px; border-radius: 999px; cursor: pointer; }
+.c-mode button.on { background: var(--ui-accent); color: var(--ui-accent-text); border-color: transparent; }
+.c-mine { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; min-height: 8px; }
+.c-lbl { font-size: 13px; font-weight: 800; color: var(--text-soft); margin-inline-end: 4px; }
+.c-chip { min-width: 62px; text-align: center; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-soft); color: var(--text); font: 800 14px "JetBrains Mono", monospace; cursor: pointer; }
+.c-chip.empty { color: var(--text-soft); opacity: .6; cursor: default; }
+.c-chip.dnf { color: #dc2626; }
+.c-ao { margin-inline-start: 6px; font-size: 13px; font-weight: 800; color: var(--text-soft); } .c-ao b { font: 900 17px "JetBrains Mono", monospace; color: var(--text); }
+.c-table { overflow-x: auto; }
+.c-table table, .c-res table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.c-table th, .c-res th { text-align: start; font-size: 12px; color: var(--text-soft); font-weight: 800; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+.c-table td, .c-res td { padding: 8px; border-bottom: 1px solid var(--border); color: var(--text); font-weight: 700; }
+.c-table tr.me td { background: var(--ui-accent-soft); }
+.c-table tr.out td { color: var(--text-soft); opacity: .6; }
+.mono { font-family: "JetBrains Mono", monospace; } .small { font-size: 12px; color: var(--text-soft); }
+.c-kick { border: 0; background: none; color: #dc2626; font-weight: 900; cursor: pointer; }
+.c-org { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: var(--tint-orange); font-size: 13.5px; color: var(--text); }
+.c-res { max-height: 50vh; overflow: auto; text-align: start; margin: 10px 0 12px; }
+.c-res tr.win td { background: rgba(34,197,94,.15); }
+.c-next { margin: 12px 0 4px; padding: 10px; border-radius: 14px; background: var(--surface-soft); }
+.c-next label { display: block; font-size: 13px; font-weight: 800; color: var(--text-soft); margin-bottom: 8px; }
+.c-next select { margin-inline-start: 6px; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 700; }
+.c-type { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 14px 0 10px; }
+.c-type input { flex: 1; min-width: 160px; max-width: 260px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-soft); color: var(--text); font: 800 18px "JetBrains Mono", monospace; text-align: center; }
+.c-type .ak-msg { flex-basis: 100%; text-align: center; }
+.ak-pad { display: block; width: 100%; margin: 14px 0 12px; padding: 18px 12px; border-radius: 16px; border: 2px dashed var(--border); background: var(--surface-soft); color: var(--text-soft); font: 600 15px Inter, sans-serif; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.ak-pad b { color: var(--text); } .ak-pad small { display: block; font-size: 12px; margin-top: 4px; }
+.ak-mini.nobt .ak-stages { display: none; }
+.ak-mini.hold .ak-time { color: #22c55e; }
+.ak-mini.hold .ak-x, .ak-mini.hold .ak-mini-dnf { display: none; }
+.ak-modal > .ak-final { max-width: 640px; }
+
 /* MAC penceresi */
 .ak-modal { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 16px; }
 .ak-modal.show { display: flex; }
@@ -240,7 +277,7 @@
 <section class="intro">
     <div class="badge"><i></i><span>BLUETOOTH</span></div>
     <h1>Akıllı <span>Küp</span></h1>
-    <p>Bluetooth akıllı küpünü bağla: her çözümünü <b>Cross, F2L, OLL ve PLL</b> olarak aşama aşama analiz et, ya da bir arkadaşınla <b>canlı düello</b> yap.</p>
+    <p>Bluetooth akıllı küpünü bağla: her çözümünü <b>Cross, F2L, OLL ve PLL</b> olarak aşama aşama analiz et, ya da arkadaşlarınla <b>ev yarışması</b> düzenle.</p>
 </section>
 
 <section class="box">
@@ -255,7 +292,7 @@
 
 <div class="ak-tabs" role="tablist">
     <button type="button" class="ak-tab on" data-tab="analysis">📊 Çözüm analizi</button>
-    <button type="button" class="ak-tab" data-tab="duel">⚔️ Canlı düello</button>
+    <button type="button" class="ak-tab" data-tab="comp">🏠 Ev yarışması</button>
 </div>
 
 <section class="box" id="akDuel" hidden>
@@ -279,9 +316,39 @@
     </div>
 </section>
 
+<section class="box" id="akComp" hidden>
+    <div id="cLobby">
+        <h2>🏠 Ev yarışması</h2>
+        <p class="ak-req">8 ya da 16 kişilik <b>3x3</b> yarışması. Her tur 5 çözüm (<b>Ao5</b>); tur bitince sıralama çıkar, sonra yeni tur ya da final. Süreni <b>akıllı küple</b>, <b>timer</b> ile ya da <b>elle yazarak</b> girebilirsin.</p>
+        <div class="ak-lobby">
+            <div id="cCreateBox"><h3>Yarışma oluştur</h3>
+                <p id="cOrgNote">🔒 Yalnızca <b>organizatör</b> rolündeki kişiler yarışma kurabilir.</p>
+                <input id="cName" class="c-in" maxlength="40" placeholder="Yarışma adı (ör. Cumartesi ev yarışması)">
+                <div class="ak-fmt" role="radiogroup" aria-label="Kişi sayısı"><label><input type="radio" name="cCap" value="8" checked><span>8<small>kişi</small></span></label><label><input type="radio" name="cCap" value="16"><span>16<small>kişi</small></span></label><label><input type="radio" disabled><span>3x3<small>etkinlik</small></span></label></div>
+                <button type="button" class="btn primary" id="cCreate">➕ Yarışma oluştur</button></div>
+            <div><h3>Yarışmaya katıl</h3><p>Organizatörün paylaştığı 5 haneli kodu yaz.</p><div class="ak-join"><input id="cJoinIn" maxlength="5" placeholder="KOD" autocomplete="off"><button type="button" class="btn primary" id="cJoin">Katıl</button></div></div>
+        </div>
+        <div class="ak-login" id="cLoginNote" hidden>🔒 Yarışmaya katılmak için giriş yapman gerekiyor.</div>
+        <div class="ak-msg" id="cMsg"></div>
+    </div>
+    <div id="cRoom" hidden>
+        <div class="ak-room-top">
+            <div><small>EV YARIŞMASI · <span id="cCode" class="mono">-----</span></small><h2 id="cTitle" style="margin:2px 0 0">-</h2></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="ak-pill" id="cRound">Lobi</span><button type="button" class="btn sm" id="cCopy">🔗 Davet bağlantısı</button><button type="button" class="btn sm" id="cLeave">Çık</button></div>
+        </div>
+        <div class="c-mode"><span>Süre girişi:</span><button type="button" data-m="bt">🧊 Akıllı küp</button><button type="button" data-m="timer">⏱️ Timer</button><button type="button" data-m="manual">⌨️ Elle yaz</button></div>
+        <div class="c-mine" id="cMine"></div>
+        <div class="c-table" id="cTable"></div>
+        <div class="c-org" id="cOrg" hidden><b>👑 Organizatör:</b><button type="button" class="btn primary sm" id="cStart">▶ Turu başlat</button><button type="button" class="btn sm" id="cEnd">⏹ Turu şimdi bitir</button></div>
+        <div class="ak-room-foot"><p id="cHint"></p><button type="button" class="btn" id="cShowRes" hidden>🏁 Sonuçlar</button></div>
+    </div>
+</section>
+
 <section class="box ak-solve">
     <div class="ak-scr" id="akScr" dir="ltr"></div>
     <div class="ak-hint" id="akHint"></div>
+    <button type="button" class="ak-pad" id="akPad" hidden>⏱️ <b>Basılı tut</b>, bırakınca süre başlar <small>(ya da boşluk tuşu · durdurmak için dokun / bir tuşa bas)</small></button>
+    <div class="c-type" id="cType" hidden><input id="cTypeIn" inputmode="decimal" placeholder="ör. 12.34 ya da 1:05.20" dir="ltr" autocomplete="off"><button type="button" class="btn primary" id="cTypeOk">Kaydet</button><button type="button" class="btn" id="cTypeP2">+2 ile kaydet</button><button type="button" class="btn" id="cTypeDnf">DNF</button><div class="ak-msg bad" id="cTypeErr"></div></div>
     <div class="ak-last" id="akLast" hidden><span>Son çözüm</span><b id="akLastT" dir="ltr">-</b><small id="akLastWhy"></small><button type="button" class="btn sm" id="akDnf">DNF</button></div>
     <div class="ak-actions">
         <button type="button" class="btn" id="akNew">🔀 Yeni karıştırma</button>
@@ -330,11 +397,11 @@
 </footer>
 
 <script>var PAGE_ID = "akilli_kup";</script>
-<script src="/js/i18n.js?v=20261141"></script>
-<script src="/js/common.js?v=20261141"></script>
-<script src="/js/firebase-config.js?v=20261141"></script>
-<script src="/js/account.js?v=20261141"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261141"></script>
-<script src="/js/akilli-kup.js?v=20261141"></script>
+<script src="/js/i18n.js?v=20261142"></script>
+<script src="/js/common.js?v=20261142"></script>
+<script src="/js/firebase-config.js?v=20261142"></script>
+<script src="/js/account.js?v=20261142"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261142"></script>
+<script src="/js/akilli-kup.js?v=20261142"></script>
 </body>
 </html>
