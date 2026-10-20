@@ -162,16 +162,23 @@ service cloud.firestore {
 
     // Ev yarışması (/icerikler/ev-yarismasi): 8-16 kişi, 3x3 ya da 2x2, turlar Ao5. Yalnız organizatör (ya da admin) kurar.
     match /comps/{code} {
+      // Şimdilik yalnız tester / organizatör / geliştirici (ve admin) kullanır
+      function beta() {
+        return request.auth != null && (isAdmin()
+          || (exists(/databases/$(database)/documents/roles/$(request.auth.uid))
+              && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['tester', 'organizator', 'gelistirici']));
+      }
+      function compDoc() { return get(/databases/$(database)/documents/comps/$(code)).data; }
       function org() {
         return request.auth != null && (isAdmin()
           || (exists(/databases/$(database)/documents/roles/$(request.auth.uid))
               && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == 'organizator'));
       }
-      function ck() { return ['host', 'hName', 'name', 'cap', 'ev', 'round', 'fin', 'st', 'scr', 'adv', 'R', 'ts', 'mods']; }
+      function ck() { return ['host', 'hName', 'name', 'cap', 'ev', 'round', 'fin', 'st', 'scr', 'adv', 'R', 'ts', 'mods', 'ban']; }
       // Moderatör: oda sahibinin atadığı kişiler (mods = virgülle uid listesi)
       function isModOf(d) { return request.auth != null && ('mods' in d) && d.mods.split(',').hasAny([request.auth.uid]); }
       function chgC() { return request.resource.data.diff(resource.data).affectedKeys(); }
-      allow get, list: if true;          // canlı izleme: herkes okuyabilir
+      allow get, list: if beta();
       allow create: if org() && code.matches('^[A-Z0-9]{5}$')
         && request.resource.data.keys().hasOnly(ck())
         && request.resource.data.host == request.auth.uid
@@ -185,6 +192,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(ck())
         && request.resource.data.host is string && request.resource.data.host.size() > 0
         && (!('mods' in request.resource.data) || request.resource.data.mods.size() <= 600)
+        && (!('ban' in request.resource.data) || request.resource.data.ban.size() <= 1500)
         && request.resource.data.cap is int && request.resource.data.cap >= 8 && request.resource.data.cap <= 16
         && request.resource.data.R is string && request.resource.data.R.size() <= 200000
         && request.resource.data.scr is string && request.resource.data.scr.size() <= 1500;
@@ -192,21 +200,24 @@ service cloud.firestore {
 
       // Yarışmacılar: herkes kendi kaydını yazar; oda sahibi ya da moderatör çıkarabilir
       match /p/{uid} {
-        allow read: if true;
-        allow create, update: if request.auth != null && request.auth.uid == uid
+        allow read: if beta();
+        // kendisi yazar (çıkarılmadıysa); oda sahibi / moderatör / admin süre dolunca DNF yazabilir
+        allow create, update: if beta()
+          && ((request.auth.uid == uid && !compDoc().get('ban', '').split(',').hasAny([uid]))
+              || (resource != null && (isAdmin() || compDoc().host == request.auth.uid || isModOf(compDoc()))
+                  && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['t', 'rnd', 'ts'])))
           && request.resource.data.keys().hasOnly(['name', 'mode', 't', 'rnd', 'ts'])
           && request.resource.data.name is string && request.resource.data.name.size() <= 24
           && request.resource.data.mode in ['bt', 'timer', 'manual']
           && request.resource.data.t is string && request.resource.data.t.size() <= 120;
         allow delete: if request.auth != null && (request.auth.uid == uid || isAdmin()
-          || get(/databases/$(database)/documents/comps/$(code)).data.host == request.auth.uid
-          || isModOf(get(/databases/$(database)/documents/comps/$(code)).data));
+          || compDoc().host == request.auth.uid || isModOf(compDoc()));
       }
 
       // Mini sohbet: giriş yapan herkes yazar; yazan, oda sahibi, moderatör ya da admin siler
       match /m/{mid} {
-        allow read: if true;
-        allow create: if request.auth != null && mid.matches('^[a-z0-9]{6,24}$')
+        allow read: if beta();
+        allow create: if beta() && mid.matches('^[a-z0-9]{6,24}$')
           && request.resource.data.keys().hasOnly(['u', 'n', 'x', 'ts'])
           && request.resource.data.u == request.auth.uid
           && request.resource.data.n is string && request.resource.data.n.size() <= 24
@@ -221,8 +232,8 @@ service cloud.firestore {
 
       // Canlı izleyiciler: her sayfa 20 sn'de bir kendi kaydının zamanını yazar ("X kişi izliyor")
       match /w/{vid} {
-        allow read: if true;
-        allow create, update: if vid.matches('^[A-Za-z0-9_-]{6,40}$')
+        allow read: if beta();
+        allow create, update: if beta() && vid.matches('^[A-Za-z0-9_-]{6,40}$')
           && request.resource.data.keys().hasOnly(['ts'])
           && request.resource.data.ts is timestamp
           && request.resource.data.ts > request.time - duration.value(120, 's')
