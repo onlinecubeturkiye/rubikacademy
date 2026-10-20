@@ -17,10 +17,10 @@
 <meta property="og:description" content="Rubik küp çözmeyi adım adım öğren! Başlangıçtan profesyonel seviyeye kadar en iyi eğitimler.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/">
-<meta property="og:image" content="https://rubikacademy.fun/og/site.png?v=20261156">
+<meta property="og:image" content="https://rubikacademy.fun/og/site.png?v=20261157">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/site.png?v=20261156">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/site.png?v=20261157">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,514 +28,126 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <!-- ORTAK STİLLER (tüm sitede aynı) -->
-<link rel="stylesheet" href="/styles/common.css?v=20261156">
+<link rel="stylesheet" href="/styles/common.css?v=20261157">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <!-- BU SAYFAYA ÖZEL STİLLER -->
 <style>
+/* ===== Ana sayfa (2026 yenileme) ===== */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 16px 26px; border-radius: 14px; font-size: 15px; font-weight: 800; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
+.btn-primary { color: var(--ui-accent-text); background: var(--ui-accent); border: var(--card-bw) solid var(--ink); box-shadow: var(--shadow); }
+.btn-primary:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-hover); background: var(--btn-hover-bg); }
+.btn-primary:active { transform: translate(3px, 3px); box-shadow: var(--shadow-sm); }
+.btn-secondary { color: var(--text); background: var(--surface); border: var(--card-bw) solid var(--card-border); box-shadow: var(--shadow); }
+.btn-secondary:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-hover); }
+.h-wrap { max-width: 1180px; margin: 0 auto; padding: 0 22px; }
+section.h-sec { padding: 64px 0; }
+.h-head { text-align: center; max-width: 640px; margin: 0 auto 34px; }
+.h-head .h-kicker { display: inline-block; font: 800 12px Inter, sans-serif; letter-spacing: 1.6px; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; }
+.h-head h2 { font-size: clamp(26px, 4vw, 40px); line-height: 1.15; color: var(--text); margin: 0 0 10px; letter-spacing: -.5px; }
+.h-head p { color: var(--text-soft); font-size: 16px; line-height: 1.6; margin: 0; }
 
-/* =========================================
-   ANA GİRİŞ (HERO)
-   Ortak .hero kutu stilini (common.css) burada sıfırlıyoruz:
-   ana sayfada hero tam genişlik, çerçevesiz.
-========================================= */
-.hero {
-    min-height: calc(100vh - 75px);
-    max-width: none;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    padding: 70px 7%;
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    overflow: visible;
-    overflow-x: hidden;
+/* --- giriş --- */
+.h-hero { position: relative; overflow: hidden; min-height: calc(100vh - 75px); display: flex; align-items: center; padding: 40px 0 60px; }
+.h-hero .h-wrap { position: relative; z-index: 2; width: 100%; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 30px; align-items: center; }
+.h-hero h1 { font-size: clamp(40px, 6.4vw, 76px); line-height: 1.02; letter-spacing: -2px; margin: 18px 0 18px; color: var(--text); font-weight: 900; }
+.h-hero h1 .gradient-text { position: relative; }
+.h-hero p.h-lead { font-size: clamp(16px, 1.6vw, 19px); color: var(--text-soft); line-height: 1.65; max-width: 540px; margin: 0 0 28px; }
+.h-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.h-btns .btn { padding: 15px 24px; font-size: 15.5px; white-space: nowrap; }
+.h-glow { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(600px 400px at 78% 45%, color-mix(in srgb, var(--ui-accent) 28%, transparent), transparent 70%), radial-gradient(500px 360px at 10% 90%, color-mix(in srgb, var(--primary) 16%, transparent), transparent 70%); }
+/* 3D küp sahnesi */
+.hc-stage { position: relative; display: flex; align-items: center; justify-content: center; min-height: 440px; padding-bottom: 50px; }
+.hc-scene { --s: 74px; --h: calc(var(--s) * .5); perspective: 1100px; width: calc(var(--s) * 3); height: calc(var(--s) * 3); display: grid; place-items: center; }
+.hc-spin { transform-style: preserve-3d; animation: hcSpin 38s linear infinite; }
+.hc-cube { position: relative; width: var(--s); height: var(--s); transform-style: preserve-3d; }
+.hc-piece { position: absolute; inset: 0; transform-style: preserve-3d; }
+.hc-f { position: absolute; inset: 0; background: #0d0f15; border-radius: 9px; backface-visibility: hidden; }
+.hc-f.st::after { content: ""; position: absolute; inset: 5px; border-radius: 7px; background: var(--c); box-shadow: inset 0 -4px 0 rgba(0,0,0,.14), inset 0 3px 0 rgba(255,255,255,.28); }
+@keyframes hcSpin { from { transform: rotateX(-26deg) rotateY(-30deg); } to { transform: rotateX(-26deg) rotateY(330deg); } }
+.hc-shadow { position: absolute; bottom: 18px; left: 50%; width: 260px; height: 40px; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(0,0,0,.35), transparent); filter: blur(6px); }
+.hc-label { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font: 800 13px "JetBrains Mono", monospace; color: var(--text-soft); background: var(--surface); border: 1px solid var(--border); padding: 6px 14px; border-radius: 999px; white-space: nowrap; min-width: 120px; text-align: center; }
+.hc-label.scr { color: var(--primary); }
+@media (prefers-reduced-motion: reduce) { .hc-spin { animation: none; transform: rotateX(-26deg) rotateY(-36deg); } }
+/* kişisel özet */
+.h-me { margin-top: 26px; padding: 16px; border-radius: 18px; background: color-mix(in srgb, var(--surface) 82%, transparent); border: 1px solid var(--border); backdrop-filter: blur(8px); max-width: 560px; }
+.h-me[hidden] { display: none; }
+.h-me-hi { font: 800 16px Inter, sans-serif; color: var(--text); margin-bottom: 10px; }
+.h-me-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.h-chip { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 13px; background: var(--surface-soft); text-decoration: none; color: var(--text); transition: transform .2s; min-width: 0; }
+.h-chip:hover { transform: translateY(-2px); }
+.h-chip b { font: 900 20px Inter, sans-serif; }
+.h-chip span { font-size: 12px; color: var(--text-soft); line-height: 1.35; }
+.h-chip.todo { background: var(--ui-accent-soft); }
+.h-chip.ok b { color: #16a34a; }
+.h-me-cont { display: block; margin-top: 10px; font-size: 13.5px; color: var(--text-soft); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.h-me-cont b { color: var(--primary); }
+
+/* --- istatistik --- */
+.h-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+.h-stat { text-align: center; padding: 26px 16px; border-radius: 22px; background: var(--surface); border: 1px solid var(--border); }
+.h-stat[hidden] { display: none; }
+.h-stat b { display: block; font: 900 clamp(34px, 5vw, 48px) Inter, sans-serif; letter-spacing: -1px; color: var(--text); }
+.h-stat span { color: var(--text-soft); font-size: 14.5px; font-weight: 600; }
+.h-stat i { font-style: normal; font-size: 26px; display: block; margin-bottom: 4px; }
+
+/* --- özellikler --- */
+.h-feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.h-feat { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 24px; border-radius: 22px; background: var(--surface); border: 1px solid var(--border); text-decoration: none; color: var(--text); transition: transform .25s, box-shadow .25s, border-color .25s; overflow: hidden; }
+.h-feat:hover { transform: translateY(-4px); border-color: var(--ui-accent); box-shadow: 0 18px 40px -22px var(--ui-accent); }
+.h-feat .h-ic { width: 52px; height: 52px; border-radius: 15px; display: grid; place-items: center; font-size: 26px; background: var(--surface-soft); margin-bottom: 4px; }
+.h-feat h3 { font-size: 19px; margin: 0; color: var(--text); }
+.h-feat p { margin: 0; color: var(--text-soft); font-size: 14.5px; line-height: 1.6; flex: 1; }
+.h-feat .h-go { font: 800 13.5px Inter, sans-serif; color: var(--primary); }
+.h-tag { position: absolute; top: 18px; right: 18px; font: 800 10.5px Inter, sans-serif; letter-spacing: .8px; padding: 4px 9px; border-radius: 999px; background: var(--ui-accent); color: var(--ui-accent-text, #fff); }
+.h-tag.test { background: var(--surface-soft); color: var(--text-soft); }
+
+/* --- öğrenme yolu --- */
+.h-path { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; counter-reset: st; }
+.h-step { position: relative; padding: 22px 20px; border-radius: 20px; background: var(--surface-soft); text-decoration: none; color: var(--text); transition: transform .25s; }
+.h-step:hover { transform: translateY(-3px); }
+.h-step .h-n { font: 900 13px "JetBrains Mono", monospace; color: var(--primary); letter-spacing: 1px; }
+.h-step h3 { font-size: 17.5px; margin: 8px 0 6px; }
+.h-step p { margin: 0; font-size: 14px; color: var(--text-soft); line-height: 1.55; }
+.h-more { text-align: center; margin-top: 22px; }
+.h-more a { font: 800 15px Inter, sans-serif; color: var(--primary); text-decoration: none; }
+
+/* --- sosyal + iletişim --- */
+.h-social { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.h-soc { display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-radius: 18px; background: var(--surface); border: 1px solid var(--border); text-decoration: none; color: var(--text); transition: transform .2s, border-color .2s; }
+.h-soc:hover { transform: translateY(-3px); border-color: var(--ui-accent); }
+.h-soc .h-sic { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; font-size: 20px; color: #fff; flex-shrink: 0; }
+.h-soc h3 { margin: 0; font-size: 16px; }
+.h-soc p { margin: 2px 0 0; font-size: 13px; color: var(--text-soft); }
+.h-contact { margin-top: 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 24px 26px; border-radius: 22px; background: linear-gradient(135deg, var(--ui-accent-soft), var(--surface-soft)); }
+.h-contact h3 { margin: 0 0 4px; font-size: 20px; color: var(--text); }
+.h-contact p { margin: 0; color: var(--text-soft); font-size: 14.5px; }
+.h-contact a.btn { white-space: nowrap; }
+
+@media (max-width: 900px) {
+    .h-hero { min-height: 0; padding: 26px 0 40px; }
+    .h-hero .h-wrap { grid-template-columns: minmax(0, 1fr); }
+    .hc-stage { order: -1; min-height: 300px; }
+    .hc-scene { --s: 56px; }
+    .h-feats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .h-path { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .h-social { grid-template-columns: minmax(0, 1fr); }
 }
-
-.hero::before { display: none; }
-
-.hero-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: auto;
-    display: grid;
-    grid-template-columns: 1.1fr .9fr;
-    gap: 70px;
-    align-items: center;
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    padding: 8px 15px;
-    border-radius: 50px;
-    background: var(--surface);
-    border: var(--card-bw) solid var(--card-border);
-    box-shadow: var(--shadow-sm);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0;
-    margin-bottom: 26px;
-}
-
-.badge::before {
-    content: "";
-    width: 9px;
-    height: 9px;
-    border-radius: 2px;
-    background: var(--cube-green);
-}
-
-.hero h1 {
-    font-size: clamp(46px, 6vw, 80px);
-    line-height: 1.02;
-    letter-spacing: -2.5px;
-    font-weight: 900;
-    color: var(--text);
-    margin-bottom: 25px;
-}
-
-.hero h1 span { color: var(--text); }
-.hero h1 span:last-child { color: var(--primary); }
-
-/* "öğren." — sarı vurgu kalemi */
-.gradient-text {
-    position: relative;
-    display: inline-block;
-    color: var(--text);
-    background: linear-gradient(90deg, var(--ui-accent) 0%, #ec4899 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    padding-bottom: .06em;
-}
-
-.hero p {
-    max-width: 600px;
-    color: var(--text-soft);
-    font-size: 18px;
-    line-height: 1.75;
-    margin-bottom: 35px;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px 26px;
-    border-radius: 14px;
-    font-size: 15px;
-    font-weight: 800;
-    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-}
-
-.btn-primary {
-    color: var(--ui-accent-text);
-    background: var(--ui-accent);
-    border: var(--card-bw) solid var(--ink);
-    box-shadow: var(--shadow);
-}
-
-.btn-primary:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: var(--shadow-hover);
-    background: var(--btn-hover-bg);
-}
-
-.btn-primary:active {
-    transform: translate(3px, 3px);
-    box-shadow: var(--shadow-sm);
-}
-
-.hero-btns { display: flex; flex-wrap: wrap; gap: 14px; }
-
-.btn-secondary {
-    color: var(--text);
-    background: var(--surface);
-    border: var(--card-bw) solid var(--card-border);
-    box-shadow: var(--shadow);
-}
-
-.btn-secondary:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: var(--shadow-hover);
-}
-
-.card-go {
-    display: inline-block;
-    margin-top: 14px;
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--primary);
-}
-
-a.card, a.learning-card { display: block; color: inherit; }
-
-/* KOÇLUK ÇAĞRISI */
-.coach-section { padding-top: 0; }
-.coach-box {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    padding: 34px 36px;
-    border-radius: 26px;
-    background: var(--ui-accent);
-    border: var(--card-bw) solid var(--ink);
-    box-shadow: var(--shadow);
-    color: var(--ui-accent-text);
-}
-.coach-tag {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 8px;
-    background: #17171f;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: 1.5px;
-    margin-bottom: 12px;
-}
-.coach-box h2 { font-size: clamp(26px, 3vw, 36px); font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; color: #17171f; }
-.coach-box p { font-size: 15px; line-height: 1.6; color: #3b3b48; max-width: 560px; }
-.coach-btn { background: #fff; flex-shrink: 0; }
-.coach-btn:hover { background: #fff; }
-
-/* KÜP */
-.cube-area {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-
-/* Küpün arkasındaki renkli "çıkartma" kareleri */
-.cube-area::before,
-.cube-area::after {
-    content: "";
-    position: absolute;
-    width: 90px;
-    height: 90px;
-    border-radius: 18px;
-    border: var(--card-bw) solid var(--ink);
-    z-index: -1;
-}
-
-.cube-area::before {
-    background: var(--cube-red);
-    top: -10px;
-    right: 8%;
-    transform: rotate(14deg);
-}
-
-.cube-area::after {
-    background: var(--cube-blue);
-    bottom: -14px;
-    left: 8%;
-    width: 70px;
-    height: 70px;
-    transform: rotate(-10deg);
-}
-
-.cube {
-    width: 290px;
-    height: 290px;
-    padding: 13px;
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    grid-template-rows: repeat(3,1fr);
-    gap: 8px;
-    border-radius: 30px;
-    background: #17171f;
-    border: var(--card-bw) solid #17171f;
-    transform: rotate(-7deg);
-    box-shadow: 12px 12px 0 rgba(23,23,31,.18);
-    animation: cubeFloat 5s ease-in-out infinite;
-}
-
-html.dark-mode .cube { box-shadow: 12px 12px 0 rgba(0,0,0,.45); }
-
-.cube div {
-    border-radius: 9px;
-    background: var(--cube-white);
-    box-shadow: inset 0 -5px 0 rgba(0,0,0,.12);
-}
-
-.cube div:nth-child(2), .cube div:nth-child(8) { background: var(--cube-red); }
-.cube div:nth-child(4), .cube div:nth-child(6) { background: var(--cube-green); }
-.cube div:nth-child(5) { background: #1d5bff; }
-.cube div:nth-child(1), .cube div:nth-child(9) { background: var(--cube-yellow); }
-.cube div:nth-child(3) { background: var(--cube-orange); }
-
-@keyframes cubeFloat {
-    0%, 100% { transform: rotate(-7deg) translateY(0); }
-    50% { transform: rotate(-4deg) translateY(-15px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .cube { animation: none; }
-}
-
-/* =========================================
-   BÖLÜMLER (genel)
-========================================= */
-section {
-    padding: 95px 7%;
-    background: transparent;
-}
-
-.section-container {
-    max-width: 1200px;
-    margin: auto;
-}
-
-.section-heading {
-    text-align: center;
-    max-width: 700px;
-    margin: 0 auto 55px;
-}
-
-.section-heading span {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 9px;
-    background: var(--ui-accent);
-    border: var(--card-bw) solid var(--ink);
-    color: var(--ui-accent-text);
-    font-size: 12px;
-    font-weight: 900;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-}
-
-.section-heading h2 {
-    font-size: clamp(32px,4vw,50px);
-    line-height: 1.08;
-    letter-spacing: -1.5px;
-    font-weight: 800;
-    color: var(--text);
-    margin: 16px 0 12px;
-}
-
-.section-heading p {
-    color: var(--text-soft);
-    line-height: 1.7;
-}
-
-/* Küp renkleri sırası: kartlar sırayla bu renkleri alır */
-.cards > :nth-child(1),
-.learning-grid > :nth-child(1),
-.social-grid > :nth-child(1) { --accent: var(--cube-red); --accent-tint: var(--tint-red); }
-.cards > :nth-child(2),
-.learning-grid > :nth-child(2),
-.social-grid > :nth-child(2) { --accent: var(--cube-blue); --accent-tint: var(--tint-blue); }
-.cards > :nth-child(3),
-.learning-grid > :nth-child(3),
-.social-grid > :nth-child(3) { --accent: var(--cube-green); --accent-tint: var(--tint-green); }
-.learning-grid > :nth-child(4) { --accent: var(--cube-orange); --accent-tint: var(--tint-orange); }
-
-/* AKADEMİ KARTLARI */
-.cards {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 26px;
-}
-
-.card {
-    padding: 30px;
-    border-radius: 22px;
-    background: var(--surface);
-    border: var(--card-bw) solid var(--card-border);
-    box-shadow: var(--shadow);
-    transition: transform .2s ease, box-shadow .2s ease, opacity .7s ease;
-}
-
-.card:hover {
-    transform: translate(-3px, -3px);
-    box-shadow: var(--shadow-hover);
-}
-
-.card-icon {
-    width: 58px;
-    height: 58px;
-    display: grid;
-    place-items: center;
-    border-radius: 16px;
-    background: var(--accent-tint, var(--primary-light));
-    border: var(--card-bw) solid var(--card-border);
-    font-size: 26px;
-    margin-bottom: 20px;
-}
-
-.card h3 {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--text);
-    margin-bottom: 10px;
-}
-
-.card p {
-    color: var(--text-soft);
-    font-size: 14px;
-    line-height: 1.7;
-}
-
-/* EĞİTİM BÖLÜMÜ */
-.learning-section { background: transparent; }
-
-.learning-grid {
-    display: grid;
-    grid-template-columns: repeat(2,1fr);
-    gap: 26px;
-}
-
-.learning-card {
-    position: relative;
-    padding: 32px 34px 32px 40px;
-    border-radius: 22px;
-    background: var(--surface);
-    border: var(--card-bw) solid var(--card-border);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    transition: transform .2s ease, box-shadow .2s ease, opacity .7s ease;
-}
-
-/* Sol kenarda renk şeridi */
-.learning-card::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 10px;
-    background: var(--accent, var(--primary));
-    border-right: var(--card-bw) solid var(--card-border);
-}
-
-.learning-card:hover {
-    transform: translate(-3px, -3px);
-    box-shadow: var(--shadow-hover);
-}
-
-.learning-number {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 8px;
-    background: var(--accent-tint, var(--primary-light));
-    color: var(--text);
-    font-size: 12px;
-    font-weight: 900;
-    letter-spacing: 1px;
-    margin-bottom: 14px;
-}
-
-.learning-card h3 { font-size: 25px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
-.learning-card p { color: var(--text-soft); font-size: 14px; line-height: 1.7; }
-
-/* SOSYAL MEDYA */
-.social-grid {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 26px;
-}
-
-.social-card {
-    padding: 26px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    border-radius: 20px;
-    background: var(--surface);
-    border: var(--card-bw) solid var(--card-border);
-    box-shadow: var(--shadow);
-    transition: transform .2s ease, box-shadow .2s ease, opacity .7s ease;
-}
-
-.social-card:hover {
-    transform: translate(-3px, -3px);
-    box-shadow: var(--shadow-hover);
-}
-
-.social-card:active {
-    transform: translate(3px, 3px);
-    box-shadow: var(--shadow-sm);
-}
-
-.social-icon {
-    width: 56px;
-    height: 56px;
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    border-radius: 15px;
-    background: var(--accent, var(--primary));
-    border: var(--card-bw) solid var(--ink);
-    color: white;
-    font-size: 23px;
-}
-
-.social-card h3 { font-size: 18px; font-weight: 800; color: var(--text); }
-.social-card p { color: var(--text-soft); font-size: 13px; margin-top: 3px; }
-
-/* İLETİŞİM */
-.contact { text-align: center; background: transparent; }
-
-.contact-box {
-    max-width: 800px;
-    margin: auto;
-    padding: 55px 30px;
-    border-radius: 26px;
-    background: var(--cube-blue);
-    border: var(--card-bw) solid var(--ink);
-    box-shadow: var(--shadow);
-    color: #fff;
-}
-
-.contact-box h2 { font-size: 42px; font-weight: 800; letter-spacing: -1px; color: #fff; margin-bottom: 15px; }
-.contact-box p { color: rgba(255,255,255,.85); margin-bottom: 26px; }
-
-.email {
-    display: inline-block;
-    padding: 14px 20px;
-    border-radius: 13px;
-    background: var(--ui-accent);
-    color: var(--ui-accent-text);
-    font-weight: 800;
-    border: var(--card-bw) solid var(--ink);
-    box-shadow: var(--shadow);
-    word-break: break-all;
-    transition: transform .15s ease, box-shadow .15s ease;
-}
-
-.email:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: var(--shadow-hover);
-}
-
-/* MOBİL */
-@media(max-width:900px) {
-    .hero { padding: 55px 6% 70px; min-height: auto; }
-    .hero-container { grid-template-columns: 1fr; text-align: center; gap: 55px; }
-    .hero p { margin-left: auto; margin-right: auto; }
-    .cube { width: 230px; height: 230px; }
-    .cards { grid-template-columns: 1fr; }
-    .learning-grid { grid-template-columns: 1fr; }
-    .social-grid { grid-template-columns: 1fr; }
-    .hero-btns { justify-content: center; }
-    .coach-box { flex-direction: column; text-align: center; padding: 28px 22px; }
-    .coach-box p { margin: 0 auto; }
-}
-
-@media(max-width:500px) {
-    .hero h1 { font-size: 44px; letter-spacing: -1.5px; }
-    section { padding: 70px 5%; }
-    .contact-box { padding: 42px 20px; }
-    .contact-box h2 { font-size: 32px; }
-    .email { font-size: 13px; }
+@media (max-width: 560px) {
+    section.h-sec { padding: 44px 0; }
+    .h-hero h1 { letter-spacing: -1px; }
+    .hc-stage { min-height: 250px; }
+    .hc-scene { --s: 46px; }
+    .h-feats, .h-path { grid-template-columns: minmax(0, 1fr); }
+    .h-me-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .h-me-row .h-chip:last-child { grid-column: 1 / -1; }
+    .h-btns .btn { flex: 1; justify-content: center; text-align: center; padding: 14px 12px; font-size: 14.5px; }
+    .hc-stage { min-height: 290px; }
+    .h-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .h-stat { padding: 16px 6px; border-radius: 16px; }
+    .h-stat b { font-size: 26px; letter-spacing: -.5px; }
+    .h-stat span { font-size: 12px; }
+    .h-stat i { font-size: 20px; }
 }
 </style>
 
@@ -626,160 +238,95 @@ section {
 
 
 <!-- GİRİŞ -->
-<section class="hero">
-    <div class="hero-container">
-
-        <div class="hero-content reveal">
-            <div class="badge" data-i18n="badge">Speedcubing'e Hoş Geldin</div>
+<section class="h-hero">
+    <div class="h-glow" aria-hidden="true"></div>
+    <div class="h-wrap">
+        <div class="h-hero-text">
+            <div class="badge"><i></i><span data-i18n="badge">Speedcubing'e hoş geldin</span></div>
             <h1>
-                <span data-i18n="heroTitle1">Rubik Küpü</span>
-                <span class="gradient-text" data-i18n="heroTitleGradient">öğren.</span>
-                <br>
-                <span data-i18n="heroTitle2">Hızını geliştir.</span>
+                <span data-i18n="heroTitle1">Küpü çöz.</span><br>
+                <span class="gradient-text" data-i18n="heroTitleGradient">Hızlan.</span><br>
+                <span data-i18n="heroTitle2">Rekorunu kır.</span>
             </h1>
-            <p data-i18n="heroP">
-                Rubik Academy, Rubik küp çözmeyi öğrenmek ve çözüm sürelerini geliştirmek isteyenler için hazırlanmış modern ve sistemli bir eğitim platformudur.
-            </p>
-            <div class="hero-btns">
-                <a href="/icerikler/baslangic" class="btn btn-primary" data-i18n="heroBtn">Öğrenmeye Başla →</a>
-                <a href="/icerikler/algoritmalar/antrenor" class="btn btn-secondary" data-i18n="heroBtn2">🎯 Antrenörü Dene</a>
+            <p class="h-lead" data-i18n="heroP">İlk çözümünden ZBLL'e kadar her şey burada: adım adım rehberler, 1.400'den fazla algoritma, antrenörler ve her gün yeni bir karıştırma. Hadi başlayalım!</p>
+            <div class="h-btns">
+                <a href="/icerikler/baslangic" class="btn btn-primary" data-i18n="heroBtn">Hemen başla →</a>
+                <a href="/icerikler/gunluk" class="btn btn-secondary" data-i18n="heroBtn2">📅 Günün karıştırması</a>
             </div>
+            <div class="h-me" id="hMe" hidden></div>
         </div>
-
-        <div class="cube-area reveal">
-            <div class="cube">
-                <div></div><div></div><div></div>
-                <div></div><div></div><div></div>
-                <div></div><div></div><div></div>
-            </div>
-        </div>
-
-    </div>
-</section>
-
-
-<!-- AKADEMİ -->
-<section id="academy">
-    <div class="section-container">
-
-        <div class="section-heading reveal">
-            <span data-i18n="academySpan">Rubik Academy</span>
-            <h2 data-i18n="academyH2">Küp çözmeyi sistemli şekilde öğren.</h2>
-            <p data-i18n="academyP">Temelden başlayıp speedcubing seviyesine kadar ilerleyebileceğin içerikler.</p>
-        </div>
-
-        <div class="cards">
-            <a href="/icerikler/baslangic" class="card reveal">
-                <div class="card-icon">🧩</div>
-                <h3 data-i18n="card1Title">Sıfırdan Başla</h3>
-                <p data-i18n="card1P">Hiç bilmiyorsan 3x3'ü 7 adımda ve sadece 6 algoritmayla çözmeyi öğren.</p>
-                <span class="card-go" data-i18n="cardGo">Keşfet →</span>
-            </a>
-            <a href="/icerikler/algoritmalar" class="card reveal">
-                <div class="card-icon">⚡</div>
-                <h3 data-i18n="card2Title">Algoritmalar</h3>
-                <p data-i18n="card2P">OLL, PLL, COLL, Winter Variation, CLL ve EG: diyagramlarıyla ve alternatifleriyle.</p>
-                <span class="card-go" data-i18n="cardGo">Keşfet →</span>
-            </a>
-            <a href="/icerikler/algoritmalar/antrenor" class="card reveal">
-                <div class="card-icon">🎯</div>
-                <h3 data-i18n="card3Title">Algoritma Antrenörü</h3>
-                <p data-i18n="card3P">Karıştırmayı uygula, süreni ölç; zorlandığın case'ler daha sık gelsin.</p>
-                <span class="card-go" data-i18n="cardGo">Keşfet →</span>
-            </a>
-        </div>
-
-    </div>
-</section>
-
-
-<!-- EĞİTİM -->
-<section class="learning-section">
-    <div class="section-container">
-
-        <div class="section-heading reveal">
-            <span data-i18n="learningSpan">Eğitim</span>
-            <h2 data-i18n="learningH2">Adım adım ilerle.</h2>
-            <p data-i18n="learningP">Rubik küp öğrenme sürecini kolay ve anlaşılır hale getir.</p>
-        </div>
-
-        <div class="learning-grid">
-            <a href="/icerikler/baslangic#tanit" class="learning-card reveal">
-                <div class="learning-number" data-i18n="l1num">01 — BAŞLANGIÇ</div>
-                <h3 data-i18n="l1title">Küpü Tanı</h3>
-                <p data-i18n="l1p">Rubik küpün yapısını, yüzlerini, merkez parçalarını, köşe ve kenar parçalarını öğren.</p>
-            </a>
-            <a href="/icerikler/baslangic" class="learning-card reveal">
-                <div class="learning-number" data-i18n="l2num">02 — TEMEL</div>
-                <h3 data-i18n="l2title">İlk Çözümünü Yap</h3>
-                <p data-i18n="l2p">Temel hareketleri öğrenerek Rubik küpünü baştan sona çözmeyi öğren.</p>
-            </a>
-            <a href="/icerikler/algoritmalar" class="learning-card reveal">
-                <div class="learning-number" data-i18n="l3num">03 — GELİŞİM</div>
-                <h3 data-i18n="l3title">Algoritmaları Öğren</h3>
-                <p data-i18n="l3p">Çözüm süreni azaltmak için gerekli algoritmaları çalışmaya başla.</p>
-            </a>
-            <a href="/icerikler/algoritmalar/antrenor" class="learning-card reveal">
-                <div class="learning-number" data-i18n="l4num">04 — SPEEDCUBING</div>
-                <h3 data-i18n="l4title">Hızını Geliştir</h3>
-                <p data-i18n="l4p">Farklı teknikleri kullan, pratik yap ve kendi en iyi dereceni oluşturmaya çalış.</p>
-            </a>
-        </div>
-
-    </div>
-</section>
-
-
-<!-- KOÇLUK -->
-<section class="coach-section">
-    <div class="section-container">
-        <div class="coach-box reveal">
-            <div class="coach-text">
-                <span class="coach-tag" data-i18n="coachSpan">BİREBİR KOÇLUK</span>
-                <h2 data-i18n="coachH2">Uzman koçlarla birebir çalış.</h2>
-                <p data-i18n="coachP">2×2, 3×3, 3×3 tek el, Skewb ve Megaminx için kendi seviyene özel birebir dersler. 50 TL'den başlayan fiyatlarla.</p>
-            </div>
-            <a href="/icerikler/kocluklar" class="btn btn-primary coach-btn" data-i18n="coachBtn">Koçlukları İncele →</a>
+        <div class="hc-stage" aria-hidden="true">
+            <div class="hc-shadow"></div>
+            <div class="hc-scene"><div class="hc-spin"><div class="hc-cube" id="hcCube"></div></div></div>
+            <div class="hc-label"><span id="hcLabel">Rubik Academy</span></div>
         </div>
     </div>
 </section>
 
-<!-- SOSYAL MEDYA -->
-<section>
-    <div class="section-container">
-
-        <div class="section-heading reveal">
-            <span data-i18n="socialSpan">Sosyal Medya</span>
-            <h2 data-i18n="socialH2">Rubik Academy'yi takip et.</h2>
-            <p data-i18n="socialP">Yeni içerikleri ve speedcubing paylaşımlarını kaçırma.</p>
+<!-- İSTATİSTİK -->
+<section class="h-sec" style="padding-top:10px">
+    <div class="h-wrap">
+        <div class="h-stats reveal">
+            <div class="h-stat"><i>⚡</i><b id="stAlg">1.400+</b><span data-i18n="statAlg">algoritma</span></div>
+            <div class="h-stat"><i>🧊</i><b id="stCubes">8</b><span data-i18n="statCubes">küp türü</span></div>
+            <div class="h-stat" id="stMemWrap" hidden><i>👥</i><b id="stMem">0</b><span data-i18n="statMembers">üye</span></div>
         </div>
-
-        <div class="social-grid">
-            <a href="https://www.youtube.com/@rubikacademyy" target="_blank" rel="noopener noreferrer" class="social-card reveal">
-                <div class="social-icon">▶</div>
-                <div><h3>YouTube</h3><p>@rubikacademyy</p></div>
-            </a>
-            <a href="https://www.instagram.com/rubikacademyy" target="_blank" rel="noopener noreferrer" class="social-card reveal">
-                <div class="social-icon">◎</div>
-                <div><h3>Instagram</h3><p>@rubikacademyy</p></div>
-            </a>
-            <a href="https://www.tiktok.com/@rubikacademyy" target="_blank" rel="noopener noreferrer" class="social-card reveal">
-                <div class="social-icon">♪</div>
-                <div><h3>TikTok</h3><p>@rubikacademyy</p></div>
-            </a>
-        </div>
-
     </div>
 </section>
 
+<!-- ÖZELLİKLER -->
+<section class="h-sec">
+    <div class="h-wrap">
+        <div class="h-head reveal">
+            <span class="h-kicker" data-i18n="featSpan">Neler var?</span>
+            <h2 data-i18n="featH2">Küp çözmenin her hali burada.</h2>
+            <p data-i18n="featP">Öğren, antrenman yap, yarış. Hepsi ücretsiz, hepsi tarayıcında.</p>
+        </div>
+        <div class="h-feats">
+            <a href="/icerikler/gunluk" class="h-feat reveal"><div class="h-ic">📅</div><h3 data-i18n="f1t">Günün Karıştırması</h3><p data-i18n="f1p">Her gün herkes aynı karıştırmayı çözer. Süreni gir, sıralamada yerini al.</p><span class="h-go" data-i18n="cardGo">Keşfet →</span></a>
+            <a href="/icerikler/algoritmalar/antrenor" class="h-feat reveal"><div class="h-ic">🎯</div><h3 data-i18n="f2t">Algoritma Antrenörü</h3><p data-i18n="f2p">OLL'den ZBLL'e kadar çalış; zorlandığın vakalar daha sık karşına çıksın.</p><span class="h-go" data-i18n="cardGo">Keşfet →</span></a>
+            <a href="/icerikler/akilli-kup" class="h-feat reveal"><span class="h-tag" data-i18n="newTag">YENİ</span><div class="h-ic">🧊</div><h3 data-i18n="f3t">Akıllı Küp</h3><p data-i18n="f3p">Bluetooth küpünü bağla; Cross, F2L, OLL ve PLL sürelerini tek tek gör.</p><span class="h-go" data-i18n="cardGo">Keşfet →</span></a>
+            <a href="/icerikler/ev-yarismasi" class="h-feat reveal"><span class="h-tag test" data-i18n="testTag">TEST</span><div class="h-ic">🏠</div><h3 data-i18n="f4t">Ev Yarışması</h3><p data-i18n="f4p">Canlı yayında 8-16 kişilik yarışmalar: aynı karıştırma, canlı sıralama, final turu.</p><span class="h-go" data-i18n="cardGo">Keşfet →</span></a>
+            <a href="/icerikler/sanal-kup" class="h-feat reveal"><div class="h-ic">🕹️</div><h3 data-i18n="f5t">Sanal 3D Küp</h3><p data-i18n="f5p">Küpün yanında değil mi? Klavyeyle ya da dokunarak tarayıcında çöz.</p><span class="h-go" data-i18n="cardGo">Keşfet →</span></a>
+            <a href="/icerikler/cozucu" class="h-feat reveal"><div class="h-ic">🧩</div><h3 data-i18n="f6t">Küp Çözücü</h3><p data-i18n="f6p">Renkleri gir ya da kamerayla tara; küpünün çözümünü adım adım göster.</p><span class="h-go" data-i18n="cardGo">Keşfet →</span></a>
+        </div>
+    </div>
+</section>
 
-<!-- İLETİŞİM -->
-<section class="contact">
-    <div class="section-container">
-        <div class="contact-box reveal">
-            <h2 data-i18n="contactH2">Bir sorunuz mu var?</h2>
-            <p data-i18n="contactP">Sorularınız, önerileriniz veya iş birlikleri için bizimle iletişime geçebilirsiniz.</p>
-            <a href="mailto:muhammederenyalcin@gmail.com" class="email">✉ muhammederenyalcin@gmail.com</a>
+<!-- ÖĞRENME YOLU -->
+<section class="h-sec">
+    <div class="h-wrap">
+        <div class="h-head reveal">
+            <span class="h-kicker" data-i18n="learnSpan">Öğrenme yolu</span>
+            <h2 data-i18n="learnH2">Sıfırdan speedcubing'e, 4 adımda.</h2>
+            <p data-i18n="learnP">Nereden başlayacağını bilmiyor musun? Bu yolu takip et.</p>
+        </div>
+        <div class="h-path">
+            <a href="/icerikler/baslangic#tanit" class="h-step reveal"><div class="h-n">01</div><h3 data-i18n="l1title">Küpü tanı</h3><p data-i18n="l1p">Merkezler, köşeler, kenarlar ve notasyon: R, U, F ne demek?</p></a>
+            <a href="/icerikler/baslangic" class="h-step reveal"><div class="h-n">02</div><h3 data-i18n="l2title">İlk çözümünü yap</h3><p data-i18n="l2p">7 adım ve 6 algoritmayla küpü baştan sona çöz.</p></a>
+            <a href="/icerikler/algoritmalar" class="h-step reveal"><div class="h-n">03</div><h3 data-i18n="l3title">Algoritmaları öğren</h3><p data-i18n="l3p">2-Look OLL/PLL ile başla, F2L ve tam OLL/PLL'e geç.</p></a>
+            <a href="/icerikler/algoritmalar/antrenor" class="h-step reveal"><div class="h-n">04</div><h3 data-i18n="l4title">Hızını geliştir</h3><p data-i18n="l4p">Antrenörle tekrar et, günün karıştırmasıyla kendini ölç.</p></a>
+        </div>
+        <div class="h-more"><a href="/icerikler/yol-haritasi" data-i18n="learnMap">🗺️ Detaylı yol haritasını gör →</a></div>
+    </div>
+</section>
+
+<!-- SOSYAL + İLETİŞİM -->
+<section class="h-sec">
+    <div class="h-wrap">
+        <div class="h-head reveal">
+            <span class="h-kicker" data-i18n="socialSpan">Bizi takip et</span>
+            <h2 data-i18n="socialH2">Topluluğa katıl!</h2>
+            <p data-i18n="socialP">Yeni içerikler, ipuçları ve yarışma yayınları için takipte kal.</p>
+        </div>
+        <div class="h-social">
+            <a href="https://www.youtube.com/@rubikacademyy" target="_blank" rel="noopener noreferrer" class="h-soc reveal"><div class="h-sic" style="background:#ff0033">▶</div><div><h3>YouTube</h3><p>@rubikacademyy</p></div></a>
+            <a href="https://www.instagram.com/rubikacademyy" target="_blank" rel="noopener noreferrer" class="h-soc reveal"><div class="h-sic" style="background:linear-gradient(45deg,#f9a825,#e1306c,#833ab4)">◎</div><div><h3>Instagram</h3><p>@rubikacademyy</p></div></a>
+            <a href="https://www.tiktok.com/@rubikacademyy" target="_blank" rel="noopener noreferrer" class="h-soc reveal"><div class="h-sic" style="background:#111">♪</div><div><h3>TikTok</h3><p>@rubikacademyy</p></div></a>
+        </div>
+        <div class="h-contact reveal">
+            <div><h3 data-i18n="contactH2">Bir sorun mu var?</h3><p data-i18n="contactP">Soru, öneri ya da iş birliği için yaz, en kısa sürede dönelim.</p></div>
+            <a href="mailto:muhammederenyalcin@gmail.com" class="btn btn-primary">✉ muhammederenyalcin@gmail.com</a>
         </div>
     </div>
 </section>
@@ -793,10 +340,11 @@ section {
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "index";</script>
-<script src="/js/i18n.js?v=20261156"></script>
-<script src="/js/common.js?v=20261156"></script>
-<script src="/js/firebase-config.js?v=20261156"></script>
-<script src="/js/account.js?v=20261156"></script>
+<script src="/js/i18n.js?v=20261157"></script>
+<script src="/js/common.js?v=20261157"></script>
+<script src="/js/firebase-config.js?v=20261157"></script>
+<script src="/js/account.js?v=20261157"></script>
+<script src="/js/home.js?v=20261157"></script>
 
 
 

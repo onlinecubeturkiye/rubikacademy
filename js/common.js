@@ -382,6 +382,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+/* Ana sayfadaki "Kaldığın yerden devam et" için son gezilen içerik sayfası */
+(function () {
+    try {
+        var p = location.pathname.replace(/\.html$/, "").replace(/\/$/, "");
+        if (!p || !/^\/icerikler\//.test(p) || /\/(admin|profil)$/.test(p)) return;
+        var h = document.querySelector("h1"), t = (h && h.textContent.trim()) || document.title.split(/\s[·|–-]\s/)[0];
+        localStorage.setItem("ra-last-page", JSON.stringify({ p: p, t: String(t).replace(/\s+/g, " ").slice(0, 60) }));
+    } catch (e) {}
+})();
+
 /* Çevrimdışı kullanım ve "ana ekrana ekle" için service worker */
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
