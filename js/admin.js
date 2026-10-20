@@ -520,6 +520,68 @@
             .then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) { return (d.documents || []).length; }, function () { return 0; });
     }
 
+    /* ---------- düello odaları ---------- */
+    function listDuels() {
+        var out = [];
+        function page(tok) {
+            return authed(docsBase() + "/duels?pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : ""), { method: "GET" })
+                .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+                .then(function (d) {
+                    (d.documents || []).forEach(function (x) {
+                        var f = x.fields || {}, o = { code: x.name.split("/").pop(), updated: Date.parse(x.updateTime) || 0, created: Date.parse(x.createTime) || 0 };
+                        Object.keys(f).forEach(function (k) { o[k] = gv(f, k); });
+                        out.push(o);
+                    });
+                    return d.nextPageToken ? page(d.nextPageToken) : out;
+                });
+        }
+        return page("");
+    }
+    function duelTimes(str) { return String(str || "").split(",").filter(Boolean).map(function (x) { return +x >= 99999999 ? "DNF" : fmt(+x); }); }
+    function renderDuels() {
+        var box = $id("aDuelList"); if (!box) return;
+        box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
+        listDuels().then(function (list) {
+            list.sort(function (a, b) { return b.updated - a.updated; });
+            $id("aDuelCount").textContent = list.length + " oda";
+            if (!list.length) { box.innerHTML = '<p class="a-note">Henüz düello odası yok.</p>'; return; }
+            box.innerHTML = list.map(function (o) {
+                var n = o.fmt || 5, f = n === 3 ? "mo3" : n === 12 ? "ao12" : "ao5";
+                var over = o.guest && o.hT >= 0 && o.gT >= 0 && (o.round || 1) >= n;
+                var stt = !o.guest ? "⏳ Rakip bekliyor" : over ? "🏁 Bitti" : "▶ Sürüyor · tur " + (o.round || 1) + "/" + n;
+                return '<details class="duel-row"><summary><b class="mono">' + esc(o.code) + '</b><span>' + esc(o.hName || "?") + ' <b>' + (o.hW || 0) + ' - ' + (o.gW || 0) + '</b> ' + esc(o.gName || "—") + '</span><span class="a-note">' + f + ' · ' + stt + ' · ' + esc(dateFmt(o.updated)) + '</span></summary>' +
+                    '<div class="duel-body"><div class="info-grid">' +
+                    infoRow("Ev sahibi", esc(o.hName || "?") + ' <span class="mono small">' + esc(o.host || "") + '</span>') +
+                    infoRow("Rakip", o.guest ? esc(o.gName || "?") + ' <span class="mono small">' + esc(o.guest) + '</span>' : "—") +
+                    infoRow("Format", f + " · tur " + (o.round || 1)) +
+                    infoRow(esc(o.hName || "Ev sahibi") + " süreleri", esc(duelTimes(o.hL).join(", ") || "—")) +
+                    infoRow(esc(o.gName || "Rakip") + " süreleri", esc(duelTimes(o.gL).join(", ") || "—")) +
+                    infoRow("Durum", esc((o.hSt || "-") + " / " + (o.gSt || "-"))) +
+                    infoRow("Karıştırma", '<span class="mono small">' + esc(o.scr || "") + '</span>') +
+                    infoRow("Oluşturulma", esc(dateFmt(o.created))) + '</div>' +
+                    '<div class="a-ctrl" style="margin-top:8px"><a class="a-btn sm" href="/icerikler/akilli-kup?duel=' + esc(o.code) + '" target="_blank" rel="noopener">👁 Odayı aç</a>' +
+                    (o.host ? '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.host) + '" target="_blank" rel="noopener">👤 Ev sahibi</a>' : '') +
+                    (o.guest ? '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.guest) + '" target="_blank" rel="noopener">👤 Rakip</a>' : '') +
+                    '<button class="a-btn danger sm" data-dd="' + esc(o.code) + '">🗑️ Odayı sil</button></div></div></details>';
+            }).join("");
+            Array.prototype.forEach.call(box.querySelectorAll("[data-dd]"), function (b) {
+                b.addEventListener("click", function () {
+                    if (!confirm(b.getAttribute("data-dd") + " odası silinsin mi?")) return;
+                    b.disabled = true;
+                    delDoc("/duels/" + b.getAttribute("data-dd")).then(function (ok) { if (ok) renderDuels(); else { b.disabled = false; alert("Silinemedi (kuralları yayımladın mı?)"); } });
+                });
+            });
+        }, function (e) { box.innerHTML = '<p class="a-note">Odalar yüklenemedi (' + esc(e && e.message) + ') — kuralları yayımladın mı?</p>'; });
+    }
+    function cleanOldDuels() {
+        if (!confirm("1 günden eski tüm düello odaları silinsin mi?")) return;
+        var lim = Date.now() - 86400000;
+        listDuels().then(function (list) {
+            var old = list.filter(function (o) { return o.updated < lim; });
+            return Promise.all(old.map(function (o) { return delDoc("/duels/" + o.code); })).then(function () { msg($id("aDuelMsg"), old.length + " eski oda silindi ✓", "ok"); renderDuels(); });
+        }, function () { msg($id("aDuelMsg"), "Silinemedi.", "bad"); });
+    }
+
     /* ---------- duyuru geçmişi ---------- */
     function renderBroadcasts() {
         var box = $id("aBcList"); if (!box) return;
@@ -623,6 +685,9 @@
             '<div id="aUsersList"></div></div>' +
             '<div class="box"><h2>🏅 En aktif kullanıcılar</h2><div id="aActive"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🖥️ Cihaz &amp; tarayıcı dağılımı</h2><p class="a-note">Her üyenin cihaz bilgisini çeker (biraz sürebilir).</p><button class="a-btn main" id="aDevLoad">Hesapla</button><div id="aDevBox" style="margin-top:10px"></div></div>' +
+            '<div class="box"><h2>⚔️ Düello odaları <span class="a-sub" id="aDuelCount" style="margin:0"></span></h2>' +
+            '<div class="a-ctrl"><button class="a-btn main" id="aDuelLoad">↻ Yenile</button><button class="a-btn danger" id="aDuelClean">🧹 1 günden eskileri sil</button></div>' +
+            '<div class="a-msg" id="aDuelMsg"></div><div id="aDuelList" class="a-list"></div></div>' +
             '<div class="box"><h2>🛠️ Bakım modu</h2><p class="a-note">Açıkken site, sen hariç herkese “Bakımdayız” sayfası gösterir.</p><div id="aMaintBox"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🏆 Günlük sıralama moderasyonu</h2>' +
             '<div class="a-ctrl"><input type="date" id="aDate" value="' + todayStr() + '"><button class="a-btn main" id="aDailyLoad">↻ Yenile</button><button class="a-btn" id="aDailyCsv">⬇ CSV</button></div>' +
@@ -636,6 +701,8 @@
         $id("uCsv").addEventListener("click", function () { exportUsers("csv"); });
         $id("uJson").addEventListener("click", function () { exportUsers("json"); });
         $id("aDailyCsv").addEventListener("click", exportDaily);
+        $id("aDuelLoad").addEventListener("click", renderDuels);
+        $id("aDuelClean").addEventListener("click", cleanOldDuels);
         $id("uSearch").addEventListener("input", applyUserFilter);
         $id("uFilter").addEventListener("change", applyUserFilter);
         $id("bcReload").addEventListener("click", renderBroadcasts);
@@ -653,7 +720,7 @@
                 else msg($id("bcMsg"), "Gönderilemedi (kuralları yayımladın mı?)", "bad");
             }, function () { $id("bcSend").disabled = false; msg($id("bcMsg"), "Gönderilemedi.", "bad"); });
         });
-        renderDaily(); renderDayChips();
+        renderDaily(); renderDayChips(); renderDuels();
         renderUsers();   // kullanıcılar ve tüm verileri otomatik gelsin
     }
     function renderGate(kind) {

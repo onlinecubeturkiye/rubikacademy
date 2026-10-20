@@ -11,7 +11,7 @@
      (gunluk.js) aynı global'leri sağlayarak bu modülü kullanır.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261139";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261140";
     var MAC_KEY = "trainer-bt-mac-v1";
     // Karıştırma ve ipucu kutuları (günün karıştırması sayfası kendi kimliklerini verir)
     var SCR_ID = (window.BT_IDS && BT_IDS.scramble) || "scramble", HINT_ID = (window.BT_IDS && BT_IDS.hint) || "timerHint";
@@ -164,6 +164,20 @@
         return true;
     }
     function crossDone(model) { return faceCrossDone(model, -1) || faceCrossDone(model, 1); }
+    /* X-Cross: artı + o artının yanındaki en az bir F2L yuvası (orta kenar + köşe) çözülü */
+    function stOk(model, i) { var s = STK[i]; return model[i] === model[INDEX[key(s.n, s.n)]]; }
+    function slotDone(model, fy, x, z) {
+        for (var i = 0; i < STK.length; i++) {
+            var p = STK[i].p;
+            if (p[0] === x && p[2] === z && (p[1] === 0 || p[1] === fy) && !stOk(model, i)) return false;
+        }
+        return true;
+    }
+    function faceXcrossDone(model, fy) {
+        if (!faceCrossDone(model, fy)) return false;
+        return [[1, 1], [1, -1], [-1, 1], [-1, -1]].some(function (c) { return slotDone(model, fy, c[0], c[1]); });
+    }
+    function xcrossDone(model) { return faceXcrossDone(model, -1) || faceXcrossDone(model, 1); }
     function isRouxBlock(s) { return s.p[0] !== 0 && s.p[1] < 1; }
     function isLseOnUD(s) { return s.p[0] === 0 && s.p[2] !== 0 ? s.n[1] !== 0 : (s.p[2] === 0 && s.p[1] === 1 && s.p[0] !== 0 && s.n[1] === 1); }
     /* Roux: iki blok + üst köşeler (AUF hariç) yerinde; M katmanı kayık olabilir.
@@ -279,6 +293,7 @@
         if (id === "coll") return matches(model, isF2L) && matches(model, isTopFace) && upToAUF(model, isTopCorner);
         if (id === "pll") return upToAUF(model, function () { return true; });
         if (id === "cross") return crossDone(model);
+        if (id === "xcross") return xcrossDone(model);
         if (id === "f2l") return matches(model, isF2L);
         // 2-Look: alt kümeye göre adımın bittiği an
         var sub = (typeof curCase !== "undefined" && curCase) ? curCase.subset : "";

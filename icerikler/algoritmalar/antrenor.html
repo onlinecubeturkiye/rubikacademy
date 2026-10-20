@@ -27,10 +27,10 @@
 <meta property="og:description" content="Karıştırmayı uygula, case'i tanı, süreni ölç. Zorlandığın case'ler daha sık gelir.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/antrenor">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261139">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261140">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261139">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261140">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261139">
+<link rel="stylesheet" href="/styles/common.css?v=20261140">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -872,24 +872,24 @@ details.case-group[open] > summary::before { transform: rotate(90deg); }
     <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
 </footer>
 
-<script src="/icerikler/algoritmalar/mgSvg.js?v=20261139"></script>
-<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261139"></script>
+<script src="/icerikler/algoritmalar/mgSvg.js?v=20261140"></script>
+<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261140"></script>
 <script src="/icerikler/algoritmalar/ll.js"></script>
 <script src="/icerikler/algoritmalar/cllSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaOllSvg.js"></script>
 
 <script>var PAGE_ID = "antrenor";</script>
-<script src="/js/i18n.js?v=20261139"></script>
-<script src="/js/common.js?v=20261139"></script>
-<script src="/js/firebase-config.js?v=20261139"></script>
-<script src="/js/account.js?v=20261139"></script>
+<script src="/js/i18n.js?v=20261140"></script>
+<script src="/js/common.js?v=20261140"></script>
+<script src="/js/firebase-config.js?v=20261140"></script>
+<script src="/js/account.js?v=20261140"></script>
 
 
-<script src="/js/custom-algs.js?v=20261139"></script>
-<script src="/js/cross-solver.js?v=20261139"></script>
-<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261139"></script>
-<script src="/js/recog-trainer.js?v=20261139"></script>
+<script src="/js/custom-algs.js?v=20261140"></script>
+<script src="/js/cross-solver.js?v=20261140"></script>
+<script src="/icerikler/algoritmalar/antrenor-bt.js?v=20261140"></script>
+<script src="/js/recog-trainer.js?v=20261140"></script>
 
 <script>
 /* ============================================================
@@ -905,7 +905,7 @@ var BASE = "/icerikler/algoritmalar/";
    ("name" = sadece case adı, "subset" = "altgrup::ad") */
 var SETS = [
     { id: "cross", grp: "a",      label: "Cross",      gen: "cross", progress: "algo-progress-cross", keyFmt: "name", page: "", puzzle: "cfop", cube: "3x3", draw: crossDraw },
-    { id: "xcross", grp: "a",     label: "X-Cross",    gen: "xcross", noBT: true, progress: "algo-progress-xcross", keyFmt: "name", page: "", puzzle: "cfop", cube: "3x3", draw: xcrossDraw },
+    { id: "xcross", grp: "a",     label: "X-Cross",    gen: "xcross", progress: "algo-progress-xcross", keyFmt: "name", page: "", puzzle: "cfop", cube: "3x3", draw: xcrossDraw },
     { id: "f2l", grp: "a",        label: "F2L", file: "f2l.json", multi: "f2l", progress: "algo-progress-f2l", keyFmt: "name", page: "f2l", puzzle: "cfop", cube: "3x3", draw: polyDraw },
     { id: "2look-2lo", grp: "a",  label: "2-Look OLL", file: "2look.json", multi: "2lo", progress: "algo-progress-2look-2lo", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
     { id: "2look-2lp", grp: "a",  label: "2-Look PLL", file: "2look.json", multi: "2lp", progress: "algo-progress-2look-2lp", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
@@ -1126,7 +1126,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json", "xcross.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261139").then(function (r) {
+        return fetch(BASE + f + "?v=20261140").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });

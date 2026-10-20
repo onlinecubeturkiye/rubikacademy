@@ -8,7 +8,8 @@
    Küp modeli: cubejs (Cube) — küpün kendi çerçevesi (beyaz üst, yeşil önde).
 ========================================================= */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261139";
+    var DNF = 99999999;
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261140";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -82,7 +83,7 @@
         prog = 0; dev = [];
         phase = conn ? "scrambling" : "idle";
         if (conn && cube) syncProgress();
-        stopTick(); $("akTime").textContent = "0.00";
+        stopTick(); $("akTime").textContent = "0.00"; miniHide(); last = null; renderLast();
         renderStages(null);
         renderScramble(); renderHint();
     }
@@ -108,7 +109,7 @@
         else if (phase === "solving") h = "Çözülüyor…";
         else if (phase === "done") h = tab === "duel" ? "Bitti! Sonucun rakibine gönderildi." : "Bitti! Yeni karıştırma için butona bas.";
         else if (phase === "holding") h = "Bırakınca süre başlar…";
-        else h = conn ? "" : "Akıllı küp bağlı değil: <b>boşluk tuşunu</b> (ya da süre kutusunu) basılı tut, bırakınca süre başlar.";
+        else h = conn ? "" : "Akıllı küp bağlı değil: <b>boşluk tuşunu</b> ya da aşağıdaki alanı basılı tut, bırakınca süre başlar.";
         $("akHint").innerHTML = h;
     }
 
@@ -139,7 +140,7 @@
     function startSolve() {
         phase = "solving"; t0 = now(); moves = [];
         st = { face: null, cross: null, pairs: [null, null, null, null], oll: null, pll: null, crossIdx: 0, pairIdx: [0, 0, 0, 0], ollIdx: 0 };
-        startTick(); renderHint(); renderStages(st); publish("çözüyor");
+        startTick(); renderHint(); renderStages(st); publish("çözüyor"); miniShow("run");
     }
     function stageCheck() {
         var t = now() - t0, n = moves.length;
@@ -164,6 +165,7 @@
         var inDuel = !!(duel && tab === "duel");
         if (!inDuel) saveHist(r);
         renderStages(st); renderResult(r); renderHist(); renderHint();
+        setLast(Math.round(t), false); miniShow("done");
         publishDone(Math.round(t));
     }
     function buildResult(total) {
@@ -181,6 +183,39 @@
         }
         var all = simplify(moves.map(function (x) { return x.m; }));
         return { t: Math.round(total), ts: Date.now(), scr: scr, face: st.face, segs: segs.map(function (s) { return { n: s.n, t: Math.round(s.t), k: s.mv.length, mv: s.mv.join(" ") }; }), moves: all.length };
+    }
+    /* ---------- mini süre ekranı (çözüm sırasında ortada) ---------- */
+    var miniT = 0;
+    function miniShow(state) {
+        var m = $("akMini"); clearTimeout(miniT);
+        m.className = "ak-mini show " + (state || "") + (conn ? "" : " nobt");
+        if (state === "done") miniT = setTimeout(miniHide, 2600);
+    }
+    function miniHide() { clearTimeout(miniT); $("akMini").className = "ak-mini"; }
+    /* ---------- son çözüm + DNF ---------- */
+    var last = null; // { ms, dnf, ctx: "a"|"d", ts }
+    function setLast(ms, dnf, why) {
+        last = { ms: ms, dnf: !!dnf, ctx: duel && tab === "duel" ? "d" : "a", ts: Date.now() };
+        renderLast(why);
+    }
+    function renderLast(why) {
+        var b = $("akLast");
+        if (!last) { b.hidden = true; return; }
+        b.hidden = false;
+        $("akLastT").textContent = last.dnf ? "DNF" + (last.ms < DNF ? " (" + fmt(last.ms) + ")" : "") : fmt(last.ms);
+        $("akLastWhy").textContent = why || "";
+        $("akDnf").textContent = last.dnf ? "↩︎ DNF'yi kaldır" : "DNF";
+        $("akDnf").hidden = last.ms >= DNF; // bağlantı kopması: geri alınamaz
+        $("akMiniDnf").textContent = $("akDnf").textContent; $("akMiniDnf").hidden = $("akDnf").hidden;
+        $("akTime").textContent = last.dnf ? "DNF" : fmt(last.ms);
+    }
+    function toggleDnf() {
+        if (!last || last.ms >= DNF) return;
+        last.dnf = !last.dnf;
+        if (last.ctx === "a") {
+            var h = loadHist(); if (h[0] && Math.abs(h[0].ts - last.ts) < 5000) { h[0].dnf = last.dnf; try { localStorage.setItem(HIST_KEY, JSON.stringify(h)); } catch (e) {} renderHist(); }
+        } else setMyTime(last.dnf ? DNF : last.ms);
+        renderLast();
     }
     function startTick() { stopTick(); tick = setInterval(function () { $("akTime").textContent = fmt(now() - t0); }, 37); }
     function stopTick() { clearInterval(tick); tick = 0; }
@@ -222,7 +257,7 @@
         if (!h.length) { box.innerHTML = '<p class="ak-empty">Henüz analiz edilmiş çözüm yok. Akıllı küpünü bağla ve bir çözüm yap.</p>'; return; }
         var last = h.slice(0, 12), withSegs = last.filter(function (r) { return r.segs && r.segs.length === 7; });
         var avg = function (arr) { return arr.length ? arr.reduce(function (a, b) { return a + b; }, 0) / arr.length : null; };
-        var mean = avg(last.map(function (r) { return r.t; }));
+        var mean = avg(last.filter(function (r) { return !r.dnf; }).map(function (r) { return r.t; }));
         var segAvg = withSegs.length ? ["Cross", "F2L", "OLL", "PLL"].map(function (n, i) {
             var v = avg(withSegs.map(function (r) { return i === 0 ? r.segs[0].t : i === 1 ? r.segs[1].t + r.segs[2].t + r.segs[3].t + r.segs[4].t : i === 2 ? r.segs[5].t : r.segs[6].t; }));
             return '<div><b>' + fmt(v) + '</b><span>' + n + ' ort.</span></div>';
@@ -230,7 +265,7 @@
         box.innerHTML = '<div class="ak-sum">' + '<div><b>' + fmt(mean) + '</b><span>Son ' + last.length + ' ort.</span></div>' + segAvg + '</div>' +
             '<ul class="ak-list">' + h.slice(0, 10).map(function (r, i) {
                 var d = new Date(r.ts);
-                return '<li><button type="button" data-h="' + i + '"><b>' + fmt(r.t) + '</b><span>' + r.moves + ' hamle · ' + d.toLocaleDateString("tr-TR") + " " + d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) + '</span></button></li>';
+                return '<li><button type="button" data-h="' + i + '"><b>' + (r.dnf ? "DNF" + (r.t < DNF ? " (" + fmt(r.t) + ")" : "") : fmt(r.t)) + '</b><span>' + r.moves + ' hamle · ' + d.toLocaleDateString("tr-TR") + " " + d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) + '</span></button></li>';
             }).join("") + '</ul><button type="button" class="ak-link" id="akHistClear">Geçmişi temizle</button>';
         Array.prototype.forEach.call(box.querySelectorAll("[data-h]"), function (b) { b.onclick = function () { renderResult(loadHist()[+b.getAttribute("data-h")]); $("akResult").scrollIntoView({ behavior: "smooth", block: "start" }); }; });
         $("akHistClear").onclick = function () { if (confirm("Analiz geçmişi silinsin mi?")) { try { localStorage.removeItem(HIST_KEY); } catch (e) {} renderHist(); } };
@@ -241,16 +276,16 @@
     function manualDown() {
         if (conn) return;
         if (phase === "solving") { manualStop(); return; }
-        if (phase === "idle" || phase === "done") { phase = "holding"; holdT = now(); $("akTime").classList.add("hold"); renderHint(); }
+        if (phase === "idle" || phase === "done") { phase = "holding"; holdT = now(); $("akTime").textContent = fmt(0); $("akTime").classList.add("hold"); miniShow("hold"); renderHint(); }
     }
     function manualUp() {
         if (conn || phase !== "holding") return;
         $("akTime").classList.remove("hold");
-        if (now() - holdT < 300) { phase = "idle"; renderHint(); return; }
-        phase = "solving"; t0 = now(); moves = []; st = null; startTick(); renderHint(); publish("çözüyor");
+        if (now() - holdT < 300) { phase = "idle"; miniHide(); renderHint(); return; }
+        phase = "solving"; t0 = now(); moves = []; st = null; startTick(); renderHint(); publish("çözüyor"); miniShow("run");
     }
     function manualStop() {
-        var t = now() - t0; stopTick(); phase = "done"; $("akTime").textContent = fmt(t); renderHint(); publishDone(Math.round(t));
+        var t = now() - t0; stopTick(); phase = "done"; setLast(Math.round(t), false); miniShow("done"); renderHint(); publishDone(Math.round(t));
     }
     document.addEventListener("keydown", function (e) {
         if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
@@ -306,7 +341,7 @@
             if (!c.capabilities || c.capabilities.facelets) c.sendCommand({ type: "REQUEST_FACELETS" }).catch(function () {});
             try { c.sendCommand({ type: "REQUEST_BATTERY" }).catch(function () {}); } catch (e) {}
             setConn("Bağlı: " + (c.deviceName || "akıllı küp"), "ok");
-            $("akConnect").hidden = true; $("akDisc").hidden = false; $("akConnect").disabled = false; $("akReset").hidden = false;
+            $("akConnect").hidden = true; $("akDisc").hidden = false; $("akConnect").disabled = false; $("akReset").hidden = false; $("akPad").hidden = true;
             if (phase !== "solving") { phase = "scrambling"; syncProgress(); }
             renderScramble(); renderHint();
         }).catch(function (err) {
@@ -319,8 +354,14 @@
     function dropConn() {
         if (sub) { try { sub.unsubscribe(); } catch (e) {} }
         sub = null; conn = null; modelKnown = false;
-        if (phase !== "solving") phase = "idle";
-        setConn("Bağlı değil", ""); $("akConnect").hidden = false; $("akDisc").hidden = true; $("akReset").hidden = true; $("akBatt").textContent = "";
+        if (phase === "solving") { // çözüm sırasında bağlantı koptu: DNF
+            var t = now() - t0; stopTick(); phase = "done";
+            if (!(duel && tab === "duel")) { var r = buildResult(t); r.dnf = true; r.t = DNF; saveHist(r); renderHist(); }
+            setLast(DNF, true, "Bağlantı koptu"); miniShow("done");
+            publishDone(DNF);
+        }
+        if (phase !== "done") phase = "idle";
+        setConn("Bağlı değil", ""); $("akConnect").hidden = false; $("akDisc").hidden = true; $("akReset").hidden = true; $("akPad").hidden = false; $("akBatt").textContent = "";
         renderScramble(); renderHint();
     }
     function disconnect() { var c = conn; dropConn(); if (c) c.disconnect().catch(function () {}); }
@@ -393,10 +434,10 @@
             var o = parseDoc(d); duel.doc = o;
             if (o.round !== duel.round) { duel.round = o.round; if (tab === "duel") setScramble(o.scr); }
             // Ev sahibi: iki süre de geldiyse turu puanla
-            if (duel.me === "h" && o.hT >= 0 && o.gT >= 0 && o.sc !== o.round && o.guest) {
-                var hw = o.hW, gw = o.gW;
-                if (o.hT < o.gT) hw++; else if (o.gT < o.hT) gw++;
-                patch({ hW: hw, gW: gw, sc: o.round });
+            if (duel.me === "h" && o.guest) {
+                var hl = listOf(o.hL), gl = listOf(o.gL), hw = 0, gw = 0;
+                for (var i = 0; i < Math.min(hl.length, gl.length); i++) { if (hl[i] < gl[i]) hw++; else if (gl[i] < hl[i]) gw++; }
+                if (hw !== o.hW || gw !== o.gW) patch({ hW: hw, gW: gw, sc: o.round });
             }
             renderRoom(o);
         }).catch(function () {});
@@ -425,6 +466,13 @@
         f[duel.me + "L"] = L.join(",");
         patch(f).then(poll);
     }
+    function setMyTime(ms) {
+        if (!duel || !duel.doc) return;
+        var d = duel.doc, ri = Math.max(1, d.round || 1) - 1, L = listOf(duel.me === "h" ? d.hL : d.gL);
+        if (ri >= (d.fmt || 5) || L.length <= ri) return;
+        L[ri] = ms; var f = {}; f[duel.me + "T"] = ms; f[duel.me + "L"] = L.join(",");
+        patch(f).then(poll);
+    }
     function nextRound() {
         if (!duel || duel.me !== "h" || !duel.doc) return;
         var o = duel.doc; lastPub = "";
@@ -441,9 +489,9 @@
     function avgOf(arr, n) {
         if (arr.length < n) return null;
         var a = arr.slice(0, n);
-        if (n === 3) return a.reduce(function (x, y) { return x + y; }, 0) / 3;
-        var s = a.slice().sort(function (x, y) { return x - y; }).slice(1, -1);
-        return s.reduce(function (x, y) { return x + y; }, 0) / s.length;
+        if (n !== 3) a = a.slice().sort(function (x, y) { return x - y; }).slice(1, -1); // en iyi ve en kötü atılır (DNF en kötüdür)
+        if (a.some(function (x) { return x >= DNF; })) return DNF;
+        return a.reduce(function (x, y) { return x + y; }, 0) / a.length;
     }
     // Maç bitti: son turda (tur = format sayısı) iki süre de geldi
     function matchOver(o) { var n = o.fmt || 5; return !!o.guest && o.hT >= 0 && o.gT >= 0 && (o.round || 1) >= n; }
@@ -554,10 +602,15 @@
         $("akDisc").onclick = disconnect;
         $("akReset").onclick = resetModel;
         $("akNew").onclick = function () { setScramble(genScramble()); };
-        $("akTime").addEventListener("touchstart", function (e) { e.preventDefault(); manualDown(); }, { passive: false });
-        $("akTime").addEventListener("touchend", function (e) { e.preventDefault(); manualUp(); }, { passive: false });
-        $("akTime").addEventListener("mousedown", manualDown);
-        $("akTime").addEventListener("mouseup", manualUp);
+        function inBtn(e) { var b = e.target.closest("button"); return b && b.id !== "akPad"; }
+        ["akPad", "akMini"].forEach(function (id) {
+            $(id).addEventListener("touchstart", function (e) { if (inBtn(e)) return; e.preventDefault(); manualDown(); }, { passive: false });
+            $(id).addEventListener("touchend", function (e) { if (inBtn(e)) return; e.preventDefault(); manualUp(); }, { passive: false });
+            $(id).addEventListener("mousedown", function (e) { if (!inBtn(e)) manualDown(); });
+            $(id).addEventListener("mouseup", function (e) { if (!inBtn(e)) manualUp(); });
+        });
+        $("akDnf").onclick = toggleDnf; $("akMiniDnf").onclick = toggleDnf;
+        $("akMiniX").onclick = miniHide;
         Array.prototype.forEach.call(document.querySelectorAll(".ak-tab"), function (b) { b.onclick = function () { setTab(b.getAttribute("data-tab")); }; });
         $("akCreate").onclick = createDuel;
         $("akJoin").onclick = function () { joinDuel($("akJoinIn").value); };
