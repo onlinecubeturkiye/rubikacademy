@@ -1,6 +1,6 @@
 /* =========================================================
    ANA SAYFA (home.js)
-   - Giriş bölümündeki 3D küp: kendini karıştırıp adım adım çözer (CSS 3D, kütüphanesiz)
+   - Giriş bölümünde günün karıştırması kartı (karıştırma, görsel, bugün kaç kişi çözdü)
    - Giriş yapan kişiye üstte kişisel özet
    - Site istatistikleri (sayaç animasyonu; üye sayısı admin panelinin config/site'a yazdığı değerden)
 ========================================================= */
@@ -13,102 +13,66 @@
     function json(k) { try { return JSON.parse(ls(k) || "null"); } catch (e) { return null; } }
     var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    /* ---------- 3D küp ---------- */
-    // CSS koordinatları: x sağ, y aşağı, z izleyiciye doğru. U = -y
-    var AX = { U: [0, -1, 0], D: [0, 1, 0], R: [1, 0, 0], L: [-1, 0, 0], F: [0, 0, 1], B: [0, 0, -1] };
-    var COL = { U: "#f5f6f8", D: "#ffd400", R: "#e8262c", L: "#ff7a00", F: "#14a84a", B: "#1e63e9" };
-    var FACES = [["F", "translateZ(var(--h))"], ["B", "rotateY(180deg) translateZ(var(--h))"], ["R", "rotateY(90deg) translateZ(var(--h))"],
-        ["L", "rotateY(-90deg) translateZ(var(--h))"], ["U", "rotateX(90deg) translateZ(var(--h))"], ["D", "rotateX(-90deg) translateZ(var(--h))"]];
-    function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
-    // Eksen etrafında dönme matrisi (Rodrigues; CSS rotate3d ile aynı yön)
-    function rotM(a, deg) {
-        var t = deg * Math.PI / 180, c = Math.cos(t), s = Math.sin(t), C = 1 - c, x = a[0], y = a[1], z = a[2];
-        return [[c + x * x * C, x * y * C - z * s, x * z * C + y * s], [y * x * C + z * s, c + y * y * C, y * z * C - x * s], [z * x * C - y * s, z * y * C + x * s, c + z * z * C]];
+    /* ---------- günün karıştırması kartı (gunluk.js ile aynı üretim: herkes aynı karıştırmayı görür) ---------- */
+    var COLOR = { U: "#eef2f3", R: "#d12d28", F: "#179e4f", D: "#f6c719", L: "#ff7a1a", B: "#2c6fe6" };
+    var NET = [["U", 1, 0], ["L", 0, 1], ["F", 1, 1], ["R", 2, 1], ["B", 3, 1], ["D", 1, 2]];
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    function today() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+    function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+    function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+    function scramble(day) {
+        var r = rng(hash("rubikacademy:333:" + day)), sfx = ["", "'", "2"], out = [], faces = "URFDLB", last = -1, prev = -1;
+        while (out.length < 20) {
+            var f = Math.floor(r() * 6);
+            if (f === last || (f % 3 === last % 3 && f % 3 === prev % 3)) continue;
+            out.push(faces[f] + sfx[Math.floor(r() * 3)]); prev = last; last = f;
+        }
+        return out.join(" ");
     }
-    function mulV(m, v) { return [0, 1, 2].map(function (i) { return Math.round(m[i][0] * v[0] + m[i][1] * v[1] + m[i][2] * v[2]); }); }
-    function mulM(a, b) { return [0, 1, 2].map(function (i) { return [0, 1, 2].map(function (j) { return Math.round(a[i][0] * b[0][j] + a[i][1] * b[1][j] + a[i][2] * b[2][j]); }); }); }
-
-    function Cube(host) {
-        var scene = host.closest(".hc-scene"), S = 60; // bir parçanın boyu (px), CSS --s'den
-        function unit() { S = parseFloat(getComputedStyle(scene).getPropertyValue("--s")) || 60; }
-        unit();
-        var pieces = [];
-        host.innerHTML = "";
-        for (var x = -1; x <= 1; x++) for (var y = -1; y <= 1; y++) for (var z = -1; z <= 1; z++) {
-            if (!x && !y && !z) continue;
-            var el = document.createElement("div"); el.className = "hc-piece";
-            var p0 = [x, y, z];
-            FACES.forEach(function (f) {
-                var fe = document.createElement("i"); fe.className = "hc-f"; fe.style.transform = f[1];
-                if (dot(p0, AX[f[0]]) === 1) { fe.className += " st"; fe.style.setProperty("--c", COL[f[0]]); }
-                el.appendChild(fe);
-            });
-            host.appendChild(el);
-            pieces.push({ el: el, p: p0.slice(), m: [[1, 0, 0], [0, 1, 0], [0, 0, 1]] });
-        }
-        function base(pc) {
-            var m = pc.m;
-            return "matrix3d(" + [m[0][0], m[1][0], m[2][0], 0, m[0][1], m[1][1], m[2][1], 0, m[0][2], m[1][2], m[2][2], 0].join(",") +
-                "," + S * pc.p[0] + "," + S * pc.p[1] + "," + S * pc.p[2] + ",1)";
-        }
-        function draw(layer, axis, deg) {
-            pieces.forEach(function (pc) {
-                var b = base(pc);
-                pc.el.style.transform = layer && layer.indexOf(pc) >= 0 ? "rotate3d(" + axis.join(",") + "," + deg + "deg) " + b : b;
-            });
-        }
-        draw();
-        window.addEventListener("resize", function () { var o = S; unit(); if (o !== S) draw(); });
-        // Hamle: yüze bakınca saat yönü = eksen etrafında -90° (CSS'de y aşağı olduğundan işaret ters)
-        function turn(mv, ms) {
-            var f = mv.charAt(0), q = mv.indexOf("2") > 0 ? 2 : mv.indexOf("'") > 0 ? -1 : 1, a = AX[f];
-            var layer = pieces.filter(function (pc) { return dot(pc.p, a) === 1; }), total = -90 * q;
-            return new Promise(function (res) {
-                var t0 = null;
-                function step(ts) {
-                    if (t0 == null) t0 = ts;
-                    var k = Math.min(1, (ts - t0) / ms), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-                    draw(layer, a, total * e);
-                    if (k < 1) requestAnimationFrame(step);
-                    else {
-                        var R = rotM(a, total);
-                        layer.forEach(function (pc) { pc.p = mulV(R, pc.p); pc.m = mulM(R, pc.m); });
-                        draw(); res();
-                    }
-                }
-                requestAnimationFrame(step);
-            });
-        }
-        return { turn: turn };
+    function netHtml(alg) {
+        if (typeof Cube === "undefined") return "";
+        var c = new Cube(); c.move(alg);
+        var st = c.asString();
+        return NET.map(function (n) {
+            var fi = "URFDLB".indexOf(n[0]), h = '<div class="dn-f" style="grid-column:' + (n[1] + 1) + ';grid-row:' + (n[2] + 1) + '">';
+            for (var i = 0; i < 9; i++) h += '<i style="background:' + COLOR[st[fi * 9 + i]] + '"></i>';
+            return h + "</div>";
+        }).join("");
     }
-    function inv(m) { return m.indexOf("2") > 0 ? m : m.indexOf("'") > 0 ? m.charAt(0) : m + "'"; }
-    function randomScramble(n) {
-        var F = "URFDLB", opp = { U: "D", D: "U", R: "L", L: "R", F: "B", B: "F" }, out = [], last = "", prev = "";
-        while (out.length < n) {
-            var f = F.charAt(Math.floor(Math.random() * 6));
-            if (f === last || (f === opp[last] && prev === f)) continue;
-            out.push(f + ["", "'", "2"][Math.floor(Math.random() * 3)]); prev = last; last = f;
-        }
-        return out;
+    function fmtT(r) {
+        if (!r) return "";
+        if (r.pen === "dnf") return "DNF";
+        var ms = r.t + (r.pen === "+2" ? 2000 : 0), s = ms / 1000;
+        var txt = s < 60 ? s.toFixed(2) : Math.floor(s / 60) + ":" + (s % 60).toFixed(2).padStart(5, "0");
+        return txt + (r.pen === "+2" ? "+" : "");
     }
-    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-    function startCube() {
-        var host = $("hcCube"); if (!host || !host.animate && !window.requestAnimationFrame) return;
-        var cube = Cube(host);
-        if (reduce) return;
-        var visible = true, label = $("hcLabel");
-        if ("IntersectionObserver" in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(host);
-        function idle() { return new Promise(function (r) { (function chk() { if (visible && !document.hidden) r(); else setTimeout(chk, 500); })(); }); }
-        function setLabel(t) { if (label) label.textContent = t; }
-        function run(list, ms) { return list.reduce(function (p, mv) { return p.then(idle).then(function () { setLabel(mv); return cube.turn(mv, ms); }); }, Promise.resolve()); }
-        (function loop() {
-            var sc = randomScramble(18);
-            wait(1200).then(function () { if (label) label.parentNode.classList.add("scr"); return run(sc, 110); })
-                .then(function () { setLabel(T("cubeSolving", "Çözülüyor…")); if (label) label.parentNode.classList.remove("scr"); return wait(700); })
-                .then(function () { return run(sc.slice().reverse().map(inv), 300); })
-                .then(function () { setLabel("✓ " + T("cubeSolved", "Çözüldü!")); return wait(2600); })
-                .then(loop);
-        })();
+    // Bugün kaç kişi gönderdi: tek okumalık sayım sorgusu, 5 dk önbellek
+    function solvedCount() {
+        var cfg = window.RA_FIREBASE || {}; if (!cfg.apiKey) return Promise.resolve(null);
+        var d = new Date(), day = String(Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000));
+        var c = json("ra-daily-count"); if (c && c.day === day && Date.now() - c.at < 5 * 60000) return Promise.resolve(c.n);
+        var url = "https://firestore.googleapis.com/v1/projects/" + cfg.projectId + "/databases/(default)/documents/days/" + day + ":runAggregationQuery?key=" + encodeURIComponent(cfg.apiKey);
+        var body = { structuredAggregationQuery: { structuredQuery: { from: [{ collectionId: "times" }] }, aggregations: [{ alias: "n", count: {} }] } };
+        return fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.ok ? r.json() : null; }).then(function (a) {
+            var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n; if (!x) return null;
+            var n = +x.integerValue; try { localStorage.setItem("ra-daily-count", JSON.stringify({ day: day, n: n, at: Date.now() })); } catch (e) {}
+            return n;
+        }, function () { return null; });
+    }
+    function renderDaily() {
+        var box = $("hDaily"); if (!box) return;
+        var day = today(), sc = scramble(day), res = (json("daily-results-v1") || {})[day + ":333"];
+        var dt = new Date(); var dateTxt = dt.toLocaleDateString(lang() === "ar" ? "ar" : lang(), { day: "numeric", month: "long" });
+        box.innerHTML = '<div class="hd-top"><span class="hd-kick">📅 ' + esc(T("dailyTitle", "Günün karıştırması")) + '</span><span class="hd-date">' + esc(dateTxt) + '</span></div>' +
+            '<div class="hd-net" aria-hidden="true">' + netHtml(sc) + '</div>' +
+            '<div class="hd-scr" dir="ltr">' + esc(sc) + '</div>' +
+            '<div class="hd-foot"><span class="hd-count" id="hdCount"></span>' +
+            (res ? '<span class="hd-mine">✓ ' + esc(T("dailyYours", "Senin süren")) + ': <b>' + esc(fmtT(res)) + '</b></span><a class="btn btn-secondary hd-btn" href="/icerikler/gunluk">' + esc(T("dailyBoard", "Sıralamayı gör →")) + '</a>'
+                 : '<a class="btn btn-primary hd-btn" href="/icerikler/gunluk">' + esc(T("dailyGo", "Hemen çöz →")) + '</a>') + '</div>';
+        solvedCount().then(function (n) {
+            var e = $("hdCount"); if (!e || n == null) return;
+            e.textContent = n ? "👥 " + T("dailyCount", "{n} kişi bugün çözdü").replace("{n}", n) : "🚀 " + T("dailyFirst", "İlk çözen sen ol!");
+        });
     }
 
     /* ---------- kişisel özet (giriş yapan) ---------- */
@@ -165,16 +129,20 @@
         var tries = 0;
         (function read() {
             var c = json("ra-cfg-cache"), m = c && c.c && c.c.members;
-            if (m) { $("stMemWrap").hidden = false; countUp($("stMem"), m, "+"); return; }
+            if (m) {
+                // üye sayısı biliniyorsa "6 dil" kutusunun yerine geçer
+                $("stMemIc").textContent = "👥"; var l = $("stMemL"); l.setAttribute("data-i18n", "statMembers"); l.textContent = T("statMembers", "üye");
+                countUp($("stMem"), m, "+"); return;
+            }
             if (++tries < 6) setTimeout(read, 1000);
         })();
     }
 
     function init() {
-        startCube(); stats(); renderMe();
+        renderDaily(); stats(); renderMe();
         if (window.Account && Account.onChange) Account.onChange(function () { renderMe(); });
         document.addEventListener("account-synced", renderMe);
-        document.addEventListener("site-lang-change", renderMe);
+        document.addEventListener("site-lang-change", function () { renderMe(); renderDaily(); });
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

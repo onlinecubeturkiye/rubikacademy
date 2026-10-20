@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261158";
+    var V = "20261159";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -309,7 +309,7 @@
 
     /* ---------- senkron ---------- */
     var SYNC_PREFIX = ["algo-progress-", "algo-set-", "recog-"];
-    var SYNC_KEYS = ["custom-algs-v1", "trainer-stats-v1", "roadmap-done-v1", "roadmap-track-v1", "daily-results-v1", "daily-sent-v1"];
+    var SYNC_KEYS = ["site-prefs-v1", "custom-algs-v1", "trainer-stats-v1", "roadmap-done-v1", "roadmap-track-v1", "daily-results-v1", "daily-sent-v1"];
     function synced(k) { return SYNC_KEYS.indexOf(k) >= 0 || SYNC_PREFIX.some(function (p) { return k.indexOf(p) === 0; }); }
     function localKeys() { var out = []; try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && synced(k)) out.push(k); } } catch (e) {} return out; }
     function hash(s) { var h = 2166136261; s = String(s); for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36) + ":" + s.length; }
@@ -338,6 +338,7 @@
             return JSON.stringify(o);
         }
         if (k.indexOf("recog-") === 0) return ((a.n || 0) >= (b.n || 0)) ? loc : cl;
+        if (k === "site-prefs-v1") return (b.t || 0) >= (a.t || 0) ? cl : loc; // en son seçilen tema geçerli
         // diğerleri: birleşim, çakışmada bu cihaz
         for (x in b) o[x] = b[x];
         for (x in a) o[x] = a[x];
@@ -384,7 +385,7 @@
         return pull().then(function (cloud) {
             if (firstSync) { if (cloud["wipe-v1"]) lsSet("ra-wipe-seen", String(+cloud["wipe-v1"].v || cloud["wipe-v1"].t)); }
             else if (applyRemoteWipe(cloud)) { meta = { uid: user.uid, h: {}, t: {} }; applied++; }
-            var keys = {}, up = [];
+            var keys = {}, up = [], prefs0 = lsGet("site-prefs-v1");
             localKeys().forEach(function (k) { keys[k] = 1; });
             Object.keys(cloud).forEach(function (k) { if (synced(k)) keys[k] = 1; });
             Object.keys(keys).forEach(function (k) {
@@ -402,6 +403,8 @@
                 up.push(k);
             });
             saveMeta(meta);
+            // tema tercihleri buluttan değiştiyse uygula (sayfa yenilenince yeni tema açılır)
+            if (lsGet("site-prefs-v1") !== prefs0 && window.raApplyPrefs) raApplyPrefs(lsGet("site-prefs-v1"));
             return push(up, meta);
         }).then(function () {
             syncing = false;
