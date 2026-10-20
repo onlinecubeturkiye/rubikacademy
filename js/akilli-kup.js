@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261154";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261155";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -630,6 +630,14 @@
     function modList() { return String((comp && comp.doc && comp.doc.mods) || "").split(",").filter(Boolean); }
     function isMod(uid) { return modList().indexOf(uid) >= 0; }
     function isHost() { return isOwner() || !!(comp && isMod(comp.uid)); }
+    function kickPlayer(uid) {
+        if (!confirm("Bu yarışmacı çıkarılsın mı? Bu yarışmaya tekrar katılamaz.")) return;
+        var bl = String(comp.doc.ban || "").split(",").filter(Boolean); if (bl.indexOf(uid) < 0) bl.push(uid);
+        compPatch({ ban: bl.join(",") }).then(function () { return api(cPath("/p/" + uid), { method: "DELETE" }); }).then(function (r) {
+            if (r && !r.ok) alert("Çıkarılamadı (" + r.status + "). Firebase kurallarını yayımladın mı?");
+            if (comp) comp.tableHtml = ""; compPoll();
+        }, function () { alert("Çıkarılamadı."); });
+    }
     function toggleMod(uid) {
         var l = modList(), i = l.indexOf(uid);
         if (i >= 0) l.splice(i, 1); else l.push(uid);
@@ -640,6 +648,38 @@
         var l = modList().filter(function (x) { return x !== uid; });
         if (l.indexOf(comp.doc.host) < 0) l.push(comp.doc.host);
         compPatch({ host: uid, hName: String(name || "").slice(0, 24), mods: l.join(",") }).then(compPoll);
+    }
+    function banned(uid) { return String((comp && comp.doc && comp.doc.ban) || "").split(",").indexOf(uid) >= 0; }
+    var betaOk = false, betaP = Promise.resolve(false); // şimdilik yalnız tester / organizatör / geliştirici (ve admin)
+    var SLOT_MS = window.__evSlotMs || 90000; // 1:30 içinde süre girilmezse DNF
+    // Sıradaki çözümün açıldığı an (bu cihazın gördüğü): k -> zaman
+    function slotStart(k) { comp.slot = comp.slot || {}; var key = comp.doc.round + ":" + k; if (!comp.slot[key]) comp.slot[key] = Date.now(); return comp.slot[key]; }
+    function slotLeft() { var si = syncInfo(); if (!comp.doc || comp.doc.st !== "run" || si.min >= 5) return null; return SLOT_MS - (Date.now() - slotStart(si.min)); }
+    function onlineOf(uid) { var t = comp.seen && comp.seen[uid]; return t == null ? true : Date.now() - t < 60000; }
+    // Süre dolunca: yarışmacı kendine DNF yazar; oda sahibi/moderatör gelmeyenlere (arka planda kalan, düşen) DNF yazar
+    function checkTimeout() {
+        if (!comp || !comp.doc || comp.doc.st !== "run") return;
+        var si = syncInfo(), k = si.min; if (k >= 5) return;
+        var waited = Date.now() - slotStart(k);
+        if (!comp.watch && myP() && eligible(comp.uid) && myTimes().length === k && comp.editIdx == null && waited > SLOT_MS) {
+            $("cTypeIn") && ($("cTypeIn").value = "");
+            compDone(DNF); cMsg("");
+            return;
+        }
+        if (isHost() && waited > SLOT_MS + 6000 && !comp.dnfBusy) {
+            var late = comp.players.filter(function (p) { return p.uid !== comp.uid && eligible(p.uid) && timesOf(p).length === k; });
+            if (!late.length) return;
+            comp.dnfBusy = true;
+            Promise.all(late.map(function (p) {
+                return apiAny(cPath("/p/" + p.uid), { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (x) {
+                    if (!x) return;
+                    var cur = parseDoc(x), t = cur.rnd === comp.doc.round ? listOf(cur.t) : [];
+                    if (t.length !== k) return; // bu arada kendisi girmiş
+                    t.push(DNF);
+                    return api(cPath("/p/" + p.uid) + "?updateMask.fieldPaths=t&updateMask.fieldPaths=rnd&updateMask.fieldPaths=ts", { method: "PATCH", body: JSON.stringify({ fields: { t: val(t.join(",")), rnd: val(comp.doc.round), ts: { timestampValue: new Date().toISOString() } } }) });
+                });
+            })).then(function () { comp && (comp.dnfBusy = false); compPoll(); }, function () { comp && (comp.dnfBusy = false); });
+        }
     }
     function scrList() { return String((comp && comp.doc && comp.doc.scr) || "").split("|").filter(Boolean); }
     function eligible(uid) { var a = String((comp.doc && comp.doc.adv) || ""); return !a || a.split(",").indexOf(uid) >= 0; }
@@ -703,10 +743,12 @@
             }).catch(function (e) { cMsg("Oluşturulamadı (" + esc(e.message) + "). Kurallar yayımlandı mı?", 1); });
         });
     }
-    function joinComp(code, watch) {
+    function joinComp(code, watch, watch_retry) {
         code = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
         if (code.length !== 5) { cMsg("Yarışma kodu 5 karakter olmalı.", 1); return; }
-        if (!watch && !signedIn()) { Account.openLogin && Account.openLogin(); return; }
+        if (!signedIn()) { if (!watch) Account.openLogin && Account.openLogin(); else cMsg("Yarışmaları izlemek için giriş yap.", 1); if (watch) return; return; }
+        if (!betaOk && !watch_retry) { betaP.then(function () { joinComp(code, watch, true); }); return; }
+        if (!betaOk) { cMsg("🔒 Ev yarışması şu an yalnızca tester, organizatör ve geliştiricilere açık.", 1); return; }
         cMsg(watch ? "Yarışma açılıyor…" : "Bağlanılıyor…");
         var uid = signedIn() ? Account.user().uid : viewerId();
         comp = { code: code, uid: uid, doc: null, players: [], mode: "manual", orig: {}, shownR: -1, local: null, watch: !!watch };
@@ -717,8 +759,9 @@
             comp.doc = parseDoc(res[0]);
             comp.players = parsePlayers(res[1]);
             var mine = myP();
-            if (mine) comp.watch = false; // zaten yarışmacıysa izleyici değil
+            if (mine && !watch) comp.watch = false; // "İzle" denirse kayıtlı olsa da izleyici olarak açılır
             if (comp.watch) return null;
+            if (banned(uid)) throw new Error("Bu yarışmadan çıkarıldın.");
             if (!mine && comp.players.length >= comp.doc.cap) throw new Error("Yarışma dolu (" + comp.doc.cap + " kişi)");
             if (!mine && comp.doc.st === "run") throw new Error("Tur sürüyor; tur bitince katılabilirsin. Şimdilik 👁 İzle ile takip edebilirsin.");
             comp.mode = "manual"; // yarışmada süre yalnızca elle yazılır
@@ -731,11 +774,12 @@
             comp.chat = []; comp.chatKey = null; chatUi(); compPoll(); heartbeat();
             clearInterval(compPollT); compPollT = setInterval(function () { if (document.visibilityState === "visible") compPoll(); }, comp.watch ? 2500 : 1500);
             clearInterval(hbT); hbT = setInterval(function () { if (document.visibilityState === "visible") heartbeat(); }, HB_MS);
+            clearInterval(comp.cdT); comp.cdT = setInterval(function () { if (comp && comp.doc && comp.doc.st === "run") { renderNow(); checkTimeout(); } }, 1000);
         }).catch(function (e) { comp = null; cMsg(esc(e.message), 1); });
     }
     function leaveComp() {
-        clearInterval(compPollT); clearInterval(hbT);
-        if (comp && !comp.watch && comp.doc && comp.doc.st === "lobby") api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
+        clearInterval(compPollT); clearInterval(hbT); if (comp) clearInterval(comp.cdT);
+        if (comp && !comp.watch && myP()) api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
         comp = null; closeFinal(); document.body.classList.remove("c-in-room");
         try { history.replaceState(null, "", location.pathname); } catch (e) {}
         $("cLobby").hidden = false; $("cRoom").hidden = true; $("cType").hidden = true; $("akPad").hidden = true;
@@ -753,10 +797,17 @@
             if (!comp) return;
             var prev = comp.doc || {}, d = parseDoc(res[0]);
             comp.doc = d; comp.players = parsePlayers(res[1]);
-            if (!comp.watch && !myP() && prev.host) { cMsg("Yarışmadan çıkarıldın.", 1); leaveComp(); return; }
+            if (!comp.watch && (!myP() || banned(comp.uid)) && prev.host) { comp.watch = true; leaveComp(); cMsg("Yarışmadan çıkarıldın.", 1); return; }
+            // sunucuda daha fazla süre varsa (ör. süre dolunca yazılan DNF) yerel kopyayı bırak
+            var mp = myP(); if (comp.local && mp && timesOf(mp).length >= comp.local.t.length) comp.local = null;
             if (!comp.wT || Date.now() - comp.wT > 6000) {
                 comp.wT = Date.now();
                 var ex = {}; comp.players.forEach(function (p) { ex[p.uid] = 1; });
+                apiAny(cPath("/w?pageSize=300"), { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (wd) {
+                    if (!comp) return; comp.seen = {};
+                    (wd.documents || []).forEach(function (x) { comp.seen[x.name.split("/").pop()] = Date.parse(((x.fields || {}).ts || {}).timestampValue || "") || 0; });
+                    comp.players.forEach(function (p) { if (comp.seen[p.uid] == null) comp.seen[p.uid] = 0; });
+                }, function () {});
                 countWatchers(comp.code, ex).then(function (n) { if (comp) { comp.watchers = n; var w = $("cWatch"); if (w) w.textContent = "👁 " + n + " kişi izliyor"; } });
             }
             comp.pn = (comp.pn || 0) + 1;
@@ -765,6 +816,7 @@
             // tur ya da durum değişti: sıradaki karıştırmayı göster
             if (prev.round !== d.round || prev.st !== d.st) { comp.local = null; comp.orig = {}; comp.editIdx = null; nextScramble(true); }
             if (isHost() && d.st === "run") autoEnd();
+            checkTimeout();
             if (d.st === "end" && comp.shownR !== d.round + ":" + d.fin) { comp.shownR = d.round + ":" + d.fin; showRoundResults(lastRound()); }
             renderComp();
         }).catch(function () {});
@@ -1026,6 +1078,8 @@
         else if (n >= 5) { head = roundLabel(d) + " · 5 çözüm tamam"; h = '<div class="c-now-h">✅ 5 çözümün tamam</div><p class="c-now-p">Tur, herkes bitirince kendiliğinden biter.</p>' + bar(5); }
         else if (n > si.min) { head = roundLabel(d) + " · " + (n + 1) + ". çözüm birazdan"; h = '<div class="c-now-h">✅ ' + n + '. çözüm kaydedildi</div><p class="c-now-p">Herkes bitirince ' + (n + 1) + '. karıştırma gelecek.</p>' + bar(n); }
         else { show = n; head = roundLabel(d) + " · Çözüm " + (n + 1) + " / 5"; h = '<div class="c-now-h">Çözüm <b>' + (n + 1) + '</b> / 5</div><p class="c-now-tip">Kendi timer\'ınla çöz, süreni yaz: <b>1943</b> = 19.43</p>'; }
+        var left = slotLeft();
+        if (left != null && d.st === "run") { var sec = Math.max(0, Math.ceil(left / 1000)); h += '<p class="c-cd' + (sec <= 20 ? " warn" : "") + '">⏱ ' + Math.floor(sec / 60) + ':' + ("0" + sec % 60).slice(-2) + (sec ? ' içinde girilmeyen süre <b>DNF</b> olur' : ' · süre doldu, DNF yazılıyor') + '</p>'; }
         box.innerHTML = h;
         var c = $("cEditCancel"); if (c) c.onclick = function () { comp.editIdx = null; renderComp(); };
         // üst: büyük karıştırma + görsel
@@ -1066,10 +1120,11 @@
             var badge = r.uid === d.host ? ' <span title="Oda sahibi">👑</span>' : isMod(r.uid) ? ' <span title="Moderatör">🛡️</span>' : '';
             var acts = host ? '<div class="c-acts">' + (owner && r.uid !== d.host ? '<button type="button" class="c-mini" data-mod="' + esc(r.uid) + '" title="' + (isMod(r.uid) ? "Moderatörlüğü al" : "Moderatör yap") + '">' + (isMod(r.uid) ? "🛡️−" : "🛡️+") + '</button><button type="button" class="c-mini" data-tr="' + esc(r.uid) + '" data-n="' + esc(r.n) + '" title="Odayı devret">👑→</button>' : '') +
                 (r.uid !== comp.uid && r.uid !== d.host ? '<button type="button" class="c-mini kick" data-k="' + esc(r.uid) + '" title="Çıkar">✕</button>' : '') + '</div>' : '';
-            return '<th class="' + (r.uid === comp.uid ? "me" : "") + '"><div class="c-pn">' + esc(r.n) + badge + '</div>' + acts + '</th>';
+            var off = r.uid !== comp.uid && !onlineOf(r.uid) ? ' <span class="c-off" title="Bağlantısı yok / uygulama arka planda">📴</span>' : '';
+            return '<th class="' + (r.uid === comp.uid ? "me" : "") + '"><div class="c-pn">' + esc(r.n) + badge + off + '</div>' + acts + '</th>';
         }).join("");
         var line = function (label, cls, fn) { return '<tr class="' + cls + '"><td class="c-rl">' + label + '</td>' + rows.map(function (r) { return '<td class="' + (r.uid === comp.uid ? "me" : "") + '">' + fn(r) + '</td>'; }).join("") + '</tr>'; };
-        $("cTable").innerHTML = rows.length ? '<table class="c-grid-t"><thead><tr><th class="c-rl">#</th>' + headCells + '</tr></thead><tbody>' +
+        var tHtml = rows.length ? '<table class="c-grid-t"><thead><tr><th class="c-rl">#</th>' + headCells + '</tr></thead><tbody>' +
             line("SIRA", "c-rank", function (r) { return r.a == null ? "-" : (rows.indexOf(r) + 1) + "."; }) +
             line("AO5", "c-avg", function (r) { return '<b class="' + (bestAo != null && r.a === bestAo ? "best" : "") + '">' + (r.a == null ? "-" : fmt(r.a)) + "</b>"; }) +
             [0, 1, 2, 3, 4].filter(function (i) { return i <= cur || rows.some(function (r) { return r.t[i] != null; }); }).map(function (i) {
@@ -1078,12 +1133,20 @@
                     return '<span class="' + (x >= DNF ? "dnf" : bestOf[i] === x ? "best" : "") + '">' + fmt(x) + "</span>";
                 });
             }).join("") + '</tbody></table>' : '<p class="c-now-p">Henüz yarışmacı yok.</p>';
+        // tablo değişmediyse yeniden çizme (yoksa butona basarken buton yenilenip tıklama kayboluyor)
+        if (comp.tableHtml !== tHtml) { comp.tableHtml = tHtml; $("cTable").innerHTML = tHtml; bindTable(); }
         $("cOut").textContent = out.length ? "Elenenler: " + out.map(function (p) { return p.name; }).join(", ") : "";
+        renderComp2();
+    }
+    function bindTable() {
         Array.prototype.forEach.call($("cTable").querySelectorAll("[data-mod]"), function (b) { b.onclick = function () { toggleMod(b.getAttribute("data-mod")); }; });
         Array.prototype.forEach.call($("cTable").querySelectorAll("[data-tr]"), function (b) { b.onclick = function () { transferTo(b.getAttribute("data-tr"), b.getAttribute("data-n")); }; });
         Array.prototype.forEach.call($("cTable").querySelectorAll("[data-k]"), function (b) {
-            b.onclick = function () { if (confirm("Bu yarışmacı çıkarılsın mı?")) api(cPath("/p/" + b.getAttribute("data-k")), { method: "DELETE" }).then(compPoll); };
+            b.onclick = function () { kickPlayer(b.getAttribute("data-k")); };
         });
+    }
+    function renderComp2() {
+        var d = comp.doc, host = isHost(), owner = isOwner();
         // organizatör / moderatör kontrolleri
         renderNow();
         $("cOrg").hidden = !host || (d.st === "end" && !!d.fin);
@@ -1099,6 +1162,7 @@
     var liveT = 0;
     function loadLive() {
         var box = $("cLive"); if (!box) return;
+        if (!betaOk) { $("cLiveWrap").hidden = true; if ($("cOpenWrap")) $("cOpenWrap").hidden = true; return; }
         apiAny("/comps?pageSize=100", { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
             var now = Date.now();
             var all = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; });
@@ -1140,7 +1204,21 @@
             Array.prototype.forEach.call(box.querySelectorAll("[data-join]"), function (b) { b.onclick = function () { $("cJoinIn").value = b.getAttribute("data-join"); joinComp(b.getAttribute("data-join")); }; });
         });
     }
-    function initCompRole() { isOrgUser().then(function (ok) { $("cCreateBox").classList.toggle("locked", !ok); $("cCreate").disabled = !ok; $("cOrgNote").hidden = ok; }); }
+    function initCompRole() {
+        isOrgUser().then(function (ok) { $("cCreateBox").classList.toggle("locked", !ok); $("cCreate").disabled = !ok; $("cOrgNote").hidden = ok; });
+        // Şimdilik yalnız tester / organizatör / geliştirici (ve admin) kullanabilir
+        var pend = window.Account && Account.isPending && Account.isPending();
+        var p = !signedIn() ? Promise.resolve(false) : (Account.isAdmin && Account.isAdmin()) ? Promise.resolve(true)
+            : Account.getRole(Account.user().uid).then(function (r) { return ["tester", "organizator", "gelistirici"].indexOf(r) >= 0; }, function () { return false; });
+        betaP = p.then(function (ok) {
+            var was = betaOk; betaOk = ok;
+            document.body.classList.toggle("c-locked", !ok && !pend);
+            if ($("cBeta")) $("cBeta").innerHTML = signedIn() ? "🔒 Ev yarışması şu an <b>test aşamasında</b>: yalnızca <b>tester</b>, <b>organizatör</b> ve <b>geliştirici</b> rolündekiler kullanabilir. Yakında herkese açılacak!" : '🔒 Ev yarışması şu an <b>test aşamasında</b>. Rolün varsa <button type="button" class="c-linkbtn" id="cBetaLogin">giriş yap</button>.';
+            if ($("cBetaLogin")) $("cBetaLogin").onclick = function () { Account.openLogin && Account.openLogin(); };
+            if (ok && !was && !comp) loadLive();
+            return ok;
+        });
+    }
     function initComp() {
         initCompRole();
         loadLive(); clearInterval(liveT); liveT = setInterval(function () { if (!comp && document.visibilityState === "visible") loadLive(); }, 15000);
@@ -1150,7 +1228,10 @@
         $("cJoinIn").onkeydown = function (e) { if (e.key === "Enter") joinComp($("cJoinIn").value); };
         if ($("cLoginNote")) $("cLoginNote").hidden = signedIn() || !!(window.Account && Account.isPending && Account.isPending());
         if ($("cLoginBtn")) $("cLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
-        $("cLeave").onclick = function () { if (confirm("Yarışmadan çıkılsın mı?")) leaveComp(); };
+        $("cLeave").onclick = function () {
+            var playing = comp && !comp.watch && myP() && comp.doc && comp.doc.st !== "lobby";
+            if (confirm(playing ? "Yarışmadan çıkılsın mı? Kaydın silinir; bu turdaki sürelerin sayılmaz (geçmiş turların sonuçları kalır)." : "Yarışmadan çıkılsın mı?")) leaveComp();
+        };
         $("cStart").onclick = function () { startRound(false, 0); };
         if ($("cFinish")) $("cFinish").onclick = finishComp;
         if ($("cChatForm")) {
@@ -1220,7 +1301,12 @@
         renderStages(null); renderHist(); initComp();
         if (EV_PAGE) {
             setTab("comp");
-            var iz = qs.get("izle"); if (iz) setTimeout(function () { if (!comp) joinComp(iz, true); }, 600);
+            var iz = qs.get("izle");
+            if (iz) {
+                var tryIz = function () { if (signedIn() && !comp) joinComp(iz, true); };
+                if (window.Account && Account.onChange) Account.onChange(function (u) { if (u) tryIz(); });
+                setTimeout(function () { if (!comp) { if (signedIn()) tryIz(); else if (!(Account.isPending && Account.isPending())) cMsg("Yarışmayı izlemek için giriş yap.", 1); } }, 1500);
+            }
             if (ev) {
                 if ($("cJoinIn")) $("cJoinIn").value = String(ev).toUpperCase().slice(0, 5);
                 var tryEv = function () { if (signedIn() && !comp) joinComp(ev); };
@@ -1239,6 +1325,6 @@
         $("akLoginNote").hidden = signedIn();
         $("akLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
     }
-    window.AkilliKup = { setScramble: setScramble, shareImage: shareImage, matchData: matchData, comp: function () { return comp; } }; // test/geliştirme için
+    window.AkilliKup = { setScramble: setScramble, shareImage: shareImage, matchData: matchData, comp: function () { return comp; }, refreshRole: function () { initCompRole(); return betaP; } }; // test/geliştirme için
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
