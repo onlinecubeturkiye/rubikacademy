@@ -27,10 +27,10 @@
 <meta property="og:description" content="Mert Sağdınç yayınlarındaki ev yarışmaları için: kodla katıl, 5 çözüm yaz, sıralamayı paylaş.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/ev-yarismasi">
-<meta property="og:image" content="https://rubikacademy.fun/og/gunluk.png?v=20261148">
+<meta property="og:image" content="https://rubikacademy.fun/og/gunluk.png?v=20261149">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/gunluk.png?v=20261148">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/gunluk.png?v=20261149">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261148">
+<link rel="stylesheet" href="/styles/common.css?v=20261149">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -186,6 +186,80 @@
 .c-cap { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font: 800 13px Inter, sans-serif; color: var(--text-soft); }
 .c-cap input { flex: 1; accent-color: var(--ui-accent); }
 #cCreateBox.locked .c-cap { opacity: .5; pointer-events: none; }
+/* ZKT odası tarzı: üstte büyük karıştırma + görsel, altında yarışmacı sütunları; süre girişi yanda */
+.c-room { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "scr" "side" "res"; gap: 12px; }
+@media (min-width: 900px) { .c-room { grid-template-columns: minmax(0, 1fr) 300px; grid-template-areas: "scr side" "res side"; align-items: start; } .c-side { position: sticky; top: 86px; } }
+.c-scrcard { grid-area: scr; display: flex; align-items: center; gap: 16px; background: linear-gradient(160deg, var(--ui-accent-soft), var(--surface-soft)); }
+.c-scr-l { flex: 1; min-width: 0; text-align: center; }
+.c-scr-head { font: 800 13px Inter, sans-serif; color: var(--text-soft); letter-spacing: .3px; margin-bottom: 8px; text-transform: uppercase; }
+.c-scrbig { font: 800 clamp(18px, 2.4vw, 28px)/1.55 "JetBrains Mono", monospace; color: var(--text); word-spacing: 4px; }
+.c-scrbig span { white-space: nowrap; }
+.c-scr-wait { font: 700 15px Inter, sans-serif; color: var(--text-soft); white-space: normal !important; }
+.c-net:empty { display: none; }
+.c-netg { display: grid; grid-template-columns: repeat(4, 34px); grid-template-rows: repeat(3, 34px); gap: 3px; flex-shrink: 0; }
+.c-netf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5px; padding: 1.5px; background: #14171c; border-radius: 4px; }
+.c-netg.two .c-netf { grid-template-columns: repeat(2, 1fr); }
+.c-netf i { border-radius: 2px; display: block; }
+@media (max-width: 600px) { .c-scrcard { flex-direction: column; } .c-netg { grid-template-columns: repeat(4, 28px); grid-template-rows: repeat(3, 28px); } }
+.c-side { grid-area: side; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; }
+.c-rescard { grid-area: res; padding: 0; overflow: hidden; }
+.c-rescard .c-table { overflow-x: auto; }
+.c-out { padding: 8px 14px 12px; }
+.c-out:empty { display: none; }
+table.c-grid-t { width: 100%; border-collapse: collapse; font-size: 14px; }
+.c-grid-t th, .c-grid-t td { padding: 10px 8px; text-align: center; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.c-grid-t thead th { background: var(--surface); color: var(--primary); font: 800 12.5px Inter, sans-serif; letter-spacing: .3px; vertical-align: top; }
+.c-grid-t th.me, .c-grid-t td.me { background: var(--ui-accent-soft); }
+.c-grid-t .c-rl { position: sticky; left: 0; z-index: 1; background: var(--surface); color: var(--text-soft); font: 800 12px Inter, sans-serif; text-align: start; width: 52px; }
+.c-pn { max-width: 120px; overflow: hidden; text-overflow: ellipsis; margin: 0 auto; }
+.c-acts { display: flex; justify-content: center; gap: 3px; margin-top: 6px; }
+.c-mini.kick { color: #dc2626; }
+.c-grid-t td { font: 700 14px "JetBrains Mono", monospace; color: var(--text); }
+.c-grid-t tr.c-rank td { color: var(--text-soft); font-size: 12.5px; }
+.c-grid-t tr.c-avg td b { font-size: 15px; }
+.c-grid-t tr.cur td { background: rgba(108, 92, 231, .10); }
+.c-grid-t tr.cur td.c-rl { color: var(--primary); }
+.c-grid-t .best { color: #16a34a; font-weight: 900; }
+.c-grid-t .dnf { color: #dc2626; }
+.c-wait { color: var(--text-soft); animation: cBlink 1.2s infinite; }
+@keyframes cBlink { 50% { opacity: .3; } }
+/* yarışma odası düzeni: telefonda üst-alt, geniş ekranda sol (süre) - sağ (sıralama) */
+body.c-in-room .intro, body.c-in-room .ev-how { display: none; }
+body.c-in-room .nav-bar { margin-bottom: 10px; }
+.c-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+@media (min-width: 820px) { .c-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: start; } .c-left { position: sticky; top: 86px; } }
+.c-left, .c-right { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; }
+.c-card { background: var(--surface-soft); border-radius: 18px; padding: 16px; }
+.c-card:empty { display: none; }
+.c-card-h { font-weight: 850; color: var(--text); margin-bottom: 8px; }
+.c-now-card { background: linear-gradient(160deg, var(--ui-accent-soft), var(--surface-soft)); }
+.c-now-h { font: 800 15px Inter, sans-serif; color: var(--text-soft); margin-bottom: 8px; }
+.c-now-h b { font-size: 22px; color: var(--text); }
+.c-now-p { color: var(--text-soft); font-size: 14px; line-height: 1.6; }
+.c-now-p b { color: var(--text); }
+.c-now-tip { color: var(--text-soft); font-size: 12.5px; margin-top: 8px; } .c-now-tip b { color: var(--text); }
+.c-now-scr { font: 800 clamp(16px, 2.6vw, 20px)/1.7 "JetBrains Mono", monospace; color: var(--text); word-spacing: 2px; background: var(--surface); border-radius: 14px; padding: 12px 14px; }
+.c-now-scr span { white-space: nowrap; }
+.c-prog { height: 8px; border-radius: 999px; background: var(--surface); overflow: hidden; margin-top: 12px; }
+.c-prog i { display: block; height: 100%; background: var(--ui-accent); border-radius: 999px; transition: width .4s; }
+.c-prog-t { display: block; margin-top: 6px; font-size: 12.5px; font-weight: 700; color: var(--text-soft); }
+.c-linkbtn { border: 0; background: none; color: var(--primary); font: 800 13px Inter, sans-serif; cursor: pointer; padding: 0; }
+.c-type { margin-top: 12px; }
+.c-type-row { display: flex; gap: 8px; }
+.c-type-row input { flex: 1; min-width: 0; padding: 12px 14px; border-radius: 14px; border: 2px solid var(--border); background: var(--surface); color: var(--text); font: 900 24px "JetBrains Mono", monospace; text-align: center; }
+.c-type-row input:focus { outline: none; border-color: var(--ui-accent); }
+.c-type-row .btn { padding: 12px 18px; font-size: 15px; }
+.c-type-row2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.c-type-help { font-size: 12px; font-weight: 700; color: var(--text-soft); margin-inline-start: auto; }
+#cTypeErr { text-align: center; min-height: 18px; margin-top: 6px; }
+#cTypeErr.ok { color: #16a34a; font: 800 15px "JetBrains Mono", monospace; }
+.c-mine-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.c-chips { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.c-chip { min-width: 0; }
+.c-chip.edit { border-color: var(--ui-accent); box-shadow: 0 0 0 2px var(--ui-accent-soft); }
+.c-mine .c-ao { margin: 10px 0 0; }
+.c-right .c-table td, .c-right .c-table th { padding: 7px 6px; }
+@media (max-width: 600px) { .c-col-t { display: none; } .c-act .c-mini { padding: 3px 4px; } .c-card { padding: 14px 12px; } }
 .c-livewrap { margin-bottom: 14px; }
 .c-livewrap h3 { font-size: 16px; color: var(--text); margin-bottom: 8px; }
 .c-live { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--surface-soft); margin-bottom: 8px; }
@@ -309,7 +383,7 @@
     <ol>
         <li><b>Giriş yap</b> ve yayında paylaşılan <b>5 haneli kodu</b> aşağıya yaz.</li>
         <li>Organizatör turu başlatınca karıştırma ekranda belirir: küpünü <b>beyaz üstte, yeşil önde</b> tutarak uygula.</li>
-        <li>Kendi timer'ınla çöz, süreni yaz ve <b>Kaydet</b>'e bas (gerekirse <b>+2</b> ya da <b>DNF</b>). 5 çözüm yap.</li>
+        <li>Kendi timer'ınla çöz, süreni <b>noktasız</b> yaz (1943 = 19.43) ve <b>Kaydet</b>'e bas. Herkes bitirince sıradaki karıştırma gelir; 5 çözüm yapılır. Son süreni düzeltebilirsin.</li>
         <li>Herkes bitirince sıralama çıkar; yayında birlikte bakın, görsel ya da metin olarak paylaşın. 🏆</li>
     </ol>
 </section>
@@ -376,11 +450,27 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="ak-pill live" id="cWatch">👁 0 kişi izliyor</span><span class="ak-pill" id="cRound">Lobi</span><button type="button" class="btn sm" id="cCopy">🔗 Davet bağlantısı</button><button type="button" class="btn sm" id="cLeave">Çık</button></div>
         </div>
         <div class="c-watch-badge" id="cWatchBadge" hidden>👁 <b>İzleyici modu</b> · yarışmayı canlı izliyorsun. Katılmak için kodla gir.</div>
-        <div class="c-scrs" id="cScrs" hidden></div>
-        <div class="c-mine" id="cMine"></div>
-        <div class="c-table" id="cTable"></div>
-        <div class="c-org" id="cOrg" hidden><b id="cOrgWho">👑 Oda sahibi:</b><button type="button" class="btn primary sm" id="cStart">▶ Turu başlat</button><button type="button" class="btn sm" id="cEnd">⏹ Turu şimdi bitir</button></div>
-        <div class="ak-room-foot"><p id="cHint"></p><button type="button" class="btn" id="cShowRes" hidden>🏁 Sonuçlar</button></div>
+        <div class="c-room">
+            <div class="c-card c-scrcard">
+                <div class="c-scr-l"><div class="c-scr-head" id="cScrHead"></div><div class="c-scrbig" id="cScrBig" dir="ltr"></div></div>
+                <div class="c-net" id="cNet"></div>
+            </div>
+            <div class="c-side">
+                <div class="c-card c-now-card">
+                    <div class="c-now" id="cNow"></div>
+                    <div class="c-type" id="cType" hidden>
+                        <div class="c-type-row"><input id="cTypeIn" size="6" inputmode="numeric" pattern="[0-9]*" placeholder="Süre" dir="ltr" autocomplete="off" enterkeyhint="done"><button type="button" class="btn primary" id="cTypeOk">Kaydet</button></div>
+                        <div class="c-type-row2"><button type="button" class="btn sm" id="cTypeP2">+2 ile kaydet</button><button type="button" class="btn sm" id="cTypeDnf">DNF</button><span class="c-type-help">1943 = 19.43 · 10234 = 1:02.34</span></div>
+                        <div class="ak-msg" id="cTypeErr"></div>
+                    </div>
+                </div>
+                <div class="c-card c-mine" id="cMine"></div>
+                <div class="c-card c-scrs" id="cScrs" hidden></div>
+                <div class="c-org" id="cOrg" hidden><b id="cOrgWho">👑 Oda sahibi:</b><button type="button" class="btn primary sm" id="cStart">▶ Turu başlat</button><button type="button" class="btn sm" id="cEnd">⏹ Turu şimdi bitir</button></div>
+                <div class="ak-room-foot"><p id="cHint"></p><button type="button" class="btn" id="cShowRes" hidden>🏁 Sonuçlar</button></div>
+            </div>
+            <div class="c-card c-rescard"><div class="c-table" id="cTable"></div><div class="small c-out" id="cOut"></div></div>
+        </div>
     </div>
 </section>
 
@@ -388,7 +478,6 @@
     <div class="ak-scr" id="akScr" dir="ltr"></div>
     <div class="ak-hint" id="akHint"></div>
     <button type="button" class="ak-pad" id="akPad" hidden>⏱️ <b>Basılı tut</b>, bırakınca süre başlar <small>(ya da boşluk tuşu · durdurmak için dokun / bir tuşa bas)</small></button>
-    <div class="c-type" id="cType" hidden><input id="cTypeIn" inputmode="decimal" placeholder="ör. 12.34 ya da 1:05.20" dir="ltr" autocomplete="off"><button type="button" class="btn primary" id="cTypeOk">Kaydet</button><button type="button" class="btn" id="cTypeP2">+2 ile kaydet</button><button type="button" class="btn" id="cTypeDnf">DNF</button><div class="ak-msg bad" id="cTypeErr"></div></div>
     <div class="ak-last" id="akLast" hidden><span>Son çözüm</span><b id="akLastT" dir="ltr">-</b><small id="akLastWhy"></small><button type="button" class="btn sm" id="akDnf">DNF</button></div>
     <div class="ak-actions">
         <button type="button" class="btn" id="akNew">🔀 Yeni karıştırma</button>
@@ -437,12 +526,12 @@
 </footer>
 
 <script>var PAGE_ID = "ev_yarismasi";</script>
-<script src="/js/i18n.js?v=20261148"></script>
-<script src="/js/common.js?v=20261148"></script>
-<script src="/js/firebase-config.js?v=20261148"></script>
-<script src="/js/account.js?v=20261148"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261148"></script>
+<script src="/js/i18n.js?v=20261149"></script>
+<script src="/js/common.js?v=20261149"></script>
+<script src="/js/firebase-config.js?v=20261149"></script>
+<script src="/js/account.js?v=20261149"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261149"></script>
 <script>window.AK_PAGE = "ev";</script>
-<script src="/js/akilli-kup.js?v=20261148"></script>
+<script src="/js/akilli-kup.js?v=20261149"></script>
 </body>
 </html>

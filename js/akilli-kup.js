@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261148";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261149";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -118,7 +118,7 @@
         else if (tab === "comp" && comp) h = compHint();
         else h = conn ? "" : "🔗 Başlamak için akıllı küpünü bağla.";
         $("akHint").innerHTML = h;
-        var sv = $("akSolve"); if (sv) sv.hidden = tab === "comp" && (!(comp && comp.doc) || comp.watch);
+        var sv = $("akSolve"); if (sv) sv.hidden = tab === "comp"; // yarışmada süre girişi oda içinde
     }
 
     /* ---------- hamle geldi ---------- */
@@ -646,7 +646,18 @@
     function timesOf(p) { return p && p.rnd === comp.doc.round ? listOf(p.t) : []; }
     function myP() { return (comp && comp.players || []).filter(function (p) { return p.uid === comp.uid; })[0]; }
     function myTimes() { return comp ? (comp.local && comp.local.rnd === comp.doc.round ? comp.local.t.slice() : timesOf(myP())) : []; }
-    function compCanSolve() { return !!(comp && !comp.watch && comp.doc && comp.doc.st === "run" && myP() && eligible(comp.uid) && myTimes().length < 5); }
+    // Herkes aynı anda: k. çözüme, tur içindeki herkes k-1 çözümü bitirince geçilir
+    function syncInfo() {
+        var rows = (comp.players || []).filter(function (p) { return eligible(p.uid); });
+        var counts = rows.map(function (p) { return p.uid === comp.uid && !comp.watch ? myTimes().length : timesOf(p).length; });
+        return { min: counts.length ? Math.min.apply(null, counts) : 0, counts: counts, total: rows.length };
+    }
+    function doneCount(k) { return syncInfo().counts.filter(function (c) { return c >= k; }).length; }
+    function compCanSolve() {
+        if (!(comp && !comp.watch && comp.doc && comp.doc.st === "run" && myP() && eligible(comp.uid))) return false;
+        var n = myTimes().length;
+        return n < 5 && n <= syncInfo().min;
+    }
     function evName(e) { return e === "222" ? "2x2" : "3x3"; }
     function roundLabel(d) { return d.fin ? "🏆 Final" : "Tur " + (d.round || 1); }
     function compHint() {
@@ -658,13 +669,22 @@
         if (n >= 5) return "✅ 5 çözümün tamam. Diğerleri bekleniyor…";
         return "⌨️ Karıştırmayı uygula, kendi timer'ınla çöz ve süreni aşağıya yaz. (" + (n + 1) + ". çözüm)";
     }
+    // Süre girişi: noktasız rakamlar da olur — son iki hane salise: 192 = 1.92, 1943 = 19.43, 10234 = 1:02.34
     function parseTime(str) {
         str = String(str || "").trim().toUpperCase().replace(",", ".");
         if (str === "DNF") return DNF;
-        var m = str.match(/^(?:(\d+):)?(\d+(?:\.\d{1,3})?)$/);
-        if (!m) return null;
-        var ms = Math.round(((+m[1] || 0) * 60 + parseFloat(m[2])) * 1000);
-        return ms >= 500 && ms < 3600000 ? ms : null;
+        var ms;
+        if (/^\d+$/.test(str)) {
+            if (str.length > 7) return null;
+            var cs = +str.slice(-2), rest = str.slice(0, -2) || "0", sec = +rest.slice(-2) || 0, min = +rest.slice(0, -2) || 0;
+            if (min > 0 && sec >= 60) return null;
+            ms = ((min * 60 + sec) * 100 + cs) * 10;
+        } else {
+            var m = str.match(/^(?:(\d+):)?(\d+(?:\.\d{1,3})?)$/);
+            if (!m) return null;
+            ms = Math.round(((+m[1] || 0) * 60 + parseFloat(m[2])) * 1000);
+        }
+        return ms >= 300 && ms < 3600000 ? ms : null;
     }
 
     /* --- kur / katıl / çık --- */
@@ -705,6 +725,8 @@
         }).then(function () {
             try { history.replaceState(null, "", (comp.watch ? "?izle=" : "?ev=") + code); } catch (e) {}
             $("cLobby").hidden = true; $("cRoom").hidden = false; cMsg("");
+            document.body.classList.add("c-in-room");
+            try { $("akComp").scrollIntoView({ block: "start" }); } catch (e) {}
             compPoll(); heartbeat();
             clearInterval(compPollT); compPollT = setInterval(function () { if (document.visibilityState === "visible") compPoll(); }, comp.watch ? 2500 : 1500);
             clearInterval(hbT); hbT = setInterval(function () { if (document.visibilityState === "visible") heartbeat(); }, HB_MS);
@@ -713,7 +735,7 @@
     function leaveComp() {
         clearInterval(compPollT); clearInterval(hbT);
         if (comp && !comp.watch && comp.doc && comp.doc.st === "lobby") api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
-        comp = null; closeFinal();
+        comp = null; closeFinal(); document.body.classList.remove("c-in-room");
         try { history.replaceState(null, "", location.pathname); } catch (e) {}
         $("cLobby").hidden = false; $("cRoom").hidden = true; $("cType").hidden = true; $("akPad").hidden = true;
         setScramble(""); loadLive();
@@ -738,7 +760,7 @@
             }
             comp.mode = "manual";
             // tur ya da durum değişti: sıradaki karıştırmayı göster
-            if (prev.round !== d.round || prev.st !== d.st) { comp.local = null; comp.orig = {}; nextScramble(true); }
+            if (prev.round !== d.round || prev.st !== d.st) { comp.local = null; comp.orig = {}; comp.editIdx = null; nextScramble(true); }
             if (isHost() && d.st === "run") autoEnd();
             if (d.st === "end" && comp.shownR !== d.round + ":" + d.fin) { comp.shownR = d.round + ":" + d.fin; showRoundResults(lastRound()); }
             renderComp();
@@ -758,7 +780,6 @@
         comp.local = { rnd: comp.doc.round, t: t };
         mePatch({ name: myName(), mode: comp.mode, t: t.join(","), rnd: comp.doc.round }).then(compPoll);
         renderComp();
-        setTimeout(function () { if (comp && phase !== "solving") nextScramble(false); renderHint(); }, comp.mode === "bt" ? 2700 : 1600);
     }
     function compSetDnf(i, on) {
         var t = myTimes(); if (i < 0 || i >= t.length) return;
@@ -778,7 +799,8 @@
         if (!comp) return;
         var can = compCanSolve();
         $("akPad").hidden = !(tab === "comp" && comp.mode === "timer" && can);
-        $("cType").hidden = !(tab === "comp" && comp.mode === "manual" && can);
+        $("cType").hidden = !(tab === "comp" && (can || comp.editIdx != null));
+        var ok = $("cTypeOk"); if (ok) ok.textContent = comp.editIdx != null ? "Düzenlemeyi kaydet" : "Kaydet";
         renderHint();
     }
     /* --- klavye / dokunma süresi (yalnız yarışmada "timer" modu) --- */
@@ -807,10 +829,29 @@
     document.addEventListener("keyup", function (e) { if (e.code === "Space" && phase === "holding") { e.preventDefault(); manualUp(); } });
     function typeSave(pen) {
         var ms = pen === "dnf" ? DNF : parseTime($("cTypeIn").value);
-        if (ms == null) { $("cTypeErr").textContent = "Geçerli bir süre yaz (ör. 12.34 ya da 1:05.20)."; return; }
+        if (ms == null) { $("cTypeErr").className = "ak-msg bad"; $("cTypeErr").textContent = "Süreyi rakamla yaz: 1943 = 19.43 · 10234 = 1:02.34"; $("cTypeIn").focus(); return; }
         if (pen === "+2" && ms < DNF) ms += 2000;
         $("cTypeErr").textContent = ""; $("cTypeIn").value = "";
-        setLast(ms, ms >= DNF); compDone(ms);
+        if (comp && comp.editIdx != null) { compEdit(comp.editIdx, ms); return; }
+        compDone(ms);
+    }
+    function compEdit(i, ms) {
+        var t = myTimes(); if (i < 0 || i >= t.length) return;
+        t[i] = ms; comp.orig[i] = ms; comp.editIdx = null;
+        comp.local = { rnd: comp.doc.round, t: t };
+        mePatch({ t: t.join(","), rnd: comp.doc.round }).then(compPoll);
+        renderComp();
+    }
+    function startEdit() {
+        var n = myTimes().length; if (!n || comp.doc.st !== "run") return;
+        comp.editIdx = n - 1; $("cTypeIn").value = ""; renderComp(); setTimeout(function () { $("cTypeIn").focus(); }, 30);
+    }
+    function typePreview() {
+        var v = $("cTypeIn").value.trim(), e = $("cTypeErr");
+        if (!v) { e.textContent = ""; return; }
+        var ms = parseTime(v);
+        e.className = "ak-msg" + (ms == null ? " bad" : " ok");
+        e.textContent = ms == null ? "Geçersiz süre" : "= " + fmt(ms);
     }
     /* --- sonuçlar --- */
     function rankRows() {
@@ -908,6 +949,38 @@
         if ($("cNextR")) $("cNextR").onclick = function () { startRound(false, +$("cAdv").value); };
         if ($("cFinalR")) $("cFinalR").onclick = function () { startRound(true, +$("cAdv").value); };
     }
+    // Karıştırılmış küpün açılımı (beyaz üst, yeşil ön). 2x2: aynı R U F hamleleri 3x3 modelinde, yalnız köşeler.
+    var NET_COL = { U: "#f4f4f4", R: "#e3262c", F: "#16a34a", D: "#f6c719", L: "#ff7a1a", B: "#2c6fe6" };
+    var NET_POS = [["U", 1, 0], ["L", 0, 1], ["F", 1, 1], ["R", 2, 1], ["B", 3, 1], ["D", 1, 2]];
+    function netHtml(sc, is2) {
+        if (!sc || typeof Cube === "undefined") return "";
+        var c = new Cube(); try { c.move(sc); } catch (e) { return ""; }
+        var st = c.asString(), idx = is2 ? [0, 2, 6, 8] : [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        return '<div class="c-netg' + (is2 ? " two" : "") + '">' + NET_POS.map(function (n) {
+            var fi = "URFDLB".indexOf(n[0]);
+            return '<div class="c-netf" style="grid-column:' + (n[1] + 1) + ';grid-row:' + (n[2] + 1) + '">' + idx.map(function (i) { return '<i style="background:' + NET_COL[st[fi * 9 + i]] + '"></i>'; }).join("") + '</div>';
+        }).join("") + '</div>';
+    }
+    function renderNow() {
+        var box = $("cNow"); if (!box) return;
+        var d = comp.doc, list = scrList(), si = syncInfo(), n = myTimes().length, h = "", show = -1, head = "";
+        var bar = function (k) { var c = doneCount(k); return '<div class="c-prog"><i style="width:' + (si.total ? Math.round(c / si.total * 100) : 0) + '%"></i></div><small class="c-prog-t">' + c + ' / ' + si.total + ' kişi ' + k + '. çözümü bitirdi</small>'; };
+        var player = !comp.watch && myP() && eligible(comp.uid);
+        if (d.st === "lobby" || !d.st) { head = "⏳ Hazırlık"; h = '<p class="c-now-p">Organizatör turu başlatınca karıştırma yukarıda görünecek.</p>'; }
+        else if (d.st === "end") { head = "🏁 " + roundLabel(d) + " bitti"; h = '<p class="c-now-p">' + (d.fin ? "Yarışma bitti, sonuçlara bak! 🏆" : "Organizatör yeni turu başlatacak.") + '</p>'; }
+        else if (!player) { show = Math.min(si.min, 4); head = roundLabel(d) + " · " + (si.min + 1 > 5 ? "bitti" : (si.min + 1) + ". çözüm"); h = comp.watch ? '<p class="c-now-p">👁 Canlı izliyorsun.</p>' + (si.min < 5 ? bar(si.min + 1) : "") : '<p class="c-now-p">Bu turda yoksun; tabloyu izleyebilirsin.</p>'; }
+        else if (comp.editIdx != null) { show = Math.min(n, 4); head = roundLabel(d) + " · " + (n + 1 > 5 ? 5 : n + 1) + ". çözüm"; h = '<div class="c-now-h">✏️ ' + (comp.editIdx + 1) + '. çözümü düzenle</div><p class="c-now-p">Şu an: <b>' + fmt(myTimes()[comp.editIdx]) + '</b> · <button type="button" class="c-linkbtn" id="cEditCancel">Vazgeç</button></p>'; }
+        else if (n >= 5) { head = roundLabel(d) + " · 5 çözüm tamam"; h = '<div class="c-now-h">✅ 5 çözümün tamam</div><p class="c-now-p">Tur, herkes bitirince kendiliğinden biter.</p>' + bar(5); }
+        else if (n > si.min) { head = roundLabel(d) + " · " + (n + 1) + ". çözüm birazdan"; h = '<div class="c-now-h">✅ ' + n + '. çözüm kaydedildi</div><p class="c-now-p">Herkes bitirince ' + (n + 1) + '. karıştırma gelecek.</p>' + bar(n); }
+        else { show = n; head = roundLabel(d) + " · Çözüm " + (n + 1) + " / 5"; h = '<div class="c-now-h">Çözüm <b>' + (n + 1) + '</b> / 5</div><p class="c-now-tip">Kendi timer\'ınla çöz, süreni yaz: <b>1943</b> = 19.43</p>'; }
+        box.innerHTML = h;
+        var c = $("cEditCancel"); if (c) c.onclick = function () { comp.editIdx = null; renderComp(); };
+        // üst: büyük karıştırma + görsel
+        var sc = show >= 0 ? list[show] : "";
+        $("cScrHead").textContent = head;
+        $("cScrBig").innerHTML = sc ? sc.split(" ").map(function (m) { return "<span>" + esc(m) + "</span>"; }).join(" ") : '<span class="c-scr-wait">' + (d.st === "run" ? "⏳ Sıradaki karıştırma, herkes bitirince gelecek" : "—") + '</span>';
+        $("cNet").innerHTML = sc ? netHtml(sc, d.ev === "222") : "";
+    }
     function renderComp() {
         if (!comp || !comp.doc) return;
         var d = comp.doc, host = isHost(), owner = isOwner();
@@ -918,34 +991,48 @@
         $("cWatchBadge").hidden = !comp.watch;
         if (comp.watch) {
             var sl = scrList();
-            $("cScrs").hidden = !(d.st === "run" && sl.length);
+            $("cScrs").hidden = true;
             $("cScrs").innerHTML = '<b>' + roundLabel(d) + ' karıştırmaları</b>' + sl.map(function (x, i) { return '<div><span>' + (i + 1) + '.</span><code dir="ltr">' + esc(x) + '</code></div>'; }).join("");
         } else $("cScrs").hidden = true;
         // kendi süreleri
         var t = comp.watch ? [] : myTimes();
-        $("cMine").innerHTML = !comp.watch && d.st === "run" && eligible(comp.uid) ? '<span class="c-lbl">Sürelerin</span>' + [0, 1, 2, 3, 4].map(function (i) {
+        $("cMine").innerHTML = !comp.watch && d.st === "run" && myP() && eligible(comp.uid) ? '<div class="c-mine-h"><span class="c-lbl">Sürelerin</span>' + (t.length && comp.editIdx == null ? '<button type="button" class="c-linkbtn" id="cEditLast">✏️ Son süreyi düzenle</button>' : '') + '</div><div class="c-chips">' + [0, 1, 2, 3, 4].map(function (i) {
             if (i >= t.length) return '<span class="c-chip empty">' + (i + 1) + '</span>';
-            return '<button type="button" class="c-chip' + (t[i] >= DNF ? " dnf" : "") + '" data-ci="' + i + '" title="DNF yap / kaldır">' + fmt(t[i]) + '</button>';
-        }).join("") + (t.length >= 5 ? '<span class="c-ao">Ao5 <b>' + fmt(avgOf(t, 5)) + '</b></span>' : "") : "";
+            return '<button type="button" class="c-chip' + (t[i] >= DNF ? " dnf" : "") + (i === comp.editIdx ? " edit" : "") + '" data-ci="' + i + '" title="DNF yap / kaldır">' + fmt(t[i]) + '</button>';
+        }).join("") + '</div>' + (t.length >= 5 ? '<div class="c-ao">Ao5 <b>' + fmt(avgOf(t, 5)) + '</b></div>' : "") : "";
+        if ($("cEditLast")) $("cEditLast").onclick = startEdit;
         Array.prototype.forEach.call($("cMine").querySelectorAll("[data-ci]"), function (b) {
             b.onclick = function () { var i = +b.getAttribute("data-ci"), on = myTimes()[i] < DNF; if (on && !confirm((i + 1) + ". çözüm DNF yapılsın mı?")) return; compSetDnf(i, on); };
         });
-        // tablo
+        // tablo: her yarışmacı bir sütun; satırlar Sıra, Ao5, 1-5. çözüm
         var rows = rankRows(), out = comp.players.filter(function (p) { return !eligible(p.uid); });
-        $("cTable").innerHTML = '<table><thead><tr><th>#</th><th>Yarışmacı</th><th>Çözüm</th><th>Süreler</th><th>Ao5</th>' + (host ? '<th></th>' : '') + '</tr></thead><tbody>' +
-            rows.map(function (r, i) {
-                return '<tr' + (r.uid === comp.uid ? ' class="me"' : '') + '><td>' + (i + 1) + '</td><td>' + modeIcon(r.m) + ' ' + esc(r.n) + (r.uid === d.host ? ' <small title="Oda sahibi">👑</small>' : isMod(r.uid) ? ' <small title="Moderatör">🛡️</small>' : '') + '</td><td>' + r.t.length + '/5</td><td class="mono small">' + r.t.map(fmt).join(", ") + '</td><td class="mono"><b>' + (r.a == null ? "-" : fmt(r.a)) + '</b></td>' +
-                    (host ? '<td class="c-act">' + (owner && r.uid !== d.host ? '<button type="button" class="c-mini" data-mod="' + esc(r.uid) + '" title="' + (isMod(r.uid) ? "Moderatörlüğü al" : "Moderatör yap") + '">' + (isMod(r.uid) ? "🛡️−" : "🛡️+") + '</button><button type="button" class="c-mini" data-tr="' + esc(r.uid) + '" data-n="' + esc(r.n) + '" title="Odayı devret">👑→</button>' : '') +
-                        (r.uid !== comp.uid && r.uid !== d.host ? '<button type="button" class="c-kick" data-k="' + esc(r.uid) + '" title="Çıkar">✕</button>' : '') + '</td>' : '') + '</tr>';
-            }).join("") +
-            out.map(function (p) { return '<tr class="out"><td>–</td><td>' + esc(p.name) + '</td><td colspan="' + (host ? 4 : 3) + '">elendi</td></tr>'; }).join("") +
-            '</tbody></table>';
+        var si2 = syncInfo(), cur = d.st === "run" ? si2.min : -1;
+        var bestOf = [0, 1, 2, 3, 4].map(function (i) { var v = rows.map(function (r) { return r.t[i]; }).filter(function (x) { return x != null && x < DNF; }); return v.length > 1 ? Math.min.apply(null, v) : null; });
+        var bestAo = (function () { var v = rows.map(function (r) { return r.a; }).filter(function (x) { return x != null && x < DNF; }); return v.length > 1 ? Math.min.apply(null, v) : null; })();
+        var headCells = rows.map(function (r) {
+            var badge = r.uid === d.host ? ' <span title="Oda sahibi">👑</span>' : isMod(r.uid) ? ' <span title="Moderatör">🛡️</span>' : '';
+            var acts = host ? '<div class="c-acts">' + (owner && r.uid !== d.host ? '<button type="button" class="c-mini" data-mod="' + esc(r.uid) + '" title="' + (isMod(r.uid) ? "Moderatörlüğü al" : "Moderatör yap") + '">' + (isMod(r.uid) ? "🛡️−" : "🛡️+") + '</button><button type="button" class="c-mini" data-tr="' + esc(r.uid) + '" data-n="' + esc(r.n) + '" title="Odayı devret">👑→</button>' : '') +
+                (r.uid !== comp.uid && r.uid !== d.host ? '<button type="button" class="c-mini kick" data-k="' + esc(r.uid) + '" title="Çıkar">✕</button>' : '') + '</div>' : '';
+            return '<th class="' + (r.uid === comp.uid ? "me" : "") + '"><div class="c-pn">' + esc(r.n) + badge + '</div>' + acts + '</th>';
+        }).join("");
+        var line = function (label, cls, fn) { return '<tr class="' + cls + '"><td class="c-rl">' + label + '</td>' + rows.map(function (r) { return '<td class="' + (r.uid === comp.uid ? "me" : "") + '">' + fn(r) + '</td>'; }).join("") + '</tr>'; };
+        $("cTable").innerHTML = rows.length ? '<table class="c-grid-t"><thead><tr><th class="c-rl">#</th>' + headCells + '</tr></thead><tbody>' +
+            line("SIRA", "c-rank", function (r) { return r.a == null ? "-" : (rows.indexOf(r) + 1) + "."; }) +
+            line("AO5", "c-avg", function (r) { return '<b class="' + (bestAo != null && r.a === bestAo ? "best" : "") + '">' + (r.a == null ? "-" : fmt(r.a)) + "</b>"; }) +
+            [0, 1, 2, 3, 4].map(function (i) {
+                return line(String(i + 1), i === cur ? "cur" : "", function (r) {
+                    var x = r.t[i]; if (x == null) return i === cur ? '<span class="c-wait">…</span>' : "-";
+                    return '<span class="' + (x >= DNF ? "dnf" : bestOf[i] === x ? "best" : "") + '">' + fmt(x) + "</span>";
+                });
+            }).join("") + '</tbody></table>' : '<p class="c-now-p">Henüz yarışmacı yok.</p>';
+        $("cOut").textContent = out.length ? "Elenenler: " + out.map(function (p) { return p.name; }).join(", ") : "";
         Array.prototype.forEach.call($("cTable").querySelectorAll("[data-mod]"), function (b) { b.onclick = function () { toggleMod(b.getAttribute("data-mod")); }; });
         Array.prototype.forEach.call($("cTable").querySelectorAll("[data-tr]"), function (b) { b.onclick = function () { transferTo(b.getAttribute("data-tr"), b.getAttribute("data-n")); }; });
         Array.prototype.forEach.call($("cTable").querySelectorAll("[data-k]"), function (b) {
             b.onclick = function () { if (confirm("Bu yarışmacı çıkarılsın mı?")) api(cPath("/p/" + b.getAttribute("data-k")), { method: "DELETE" }).then(compPoll); };
         });
         // organizatör / moderatör kontrolleri
+        renderNow();
         $("cOrg").hidden = !host;
         $("cOrgWho").textContent = owner ? "👑 Oda sahibi:" : "🛡️ Moderatör:";
         $("cStart").hidden = d.st !== "lobby"; $("cStart").disabled = comp.players.length < 2;
@@ -998,6 +1085,7 @@
         $("cTypeP2").onclick = function () { typeSave("+2"); };
         $("cTypeDnf").onclick = function () { typeSave("dnf"); };
         $("cTypeIn").onkeydown = function (e) { if (e.key === "Enter") typeSave(""); };
+        $("cTypeIn").oninput = typePreview;
         $("cCopy").onclick = function () {
             var link = location.origin + "/icerikler/ev-yarismasi?" + (comp && comp.watch ? "izle=" : "ev=") + (comp && comp.code);
             var done = function () { $("cCopy").textContent = "Kopyalandı ✓"; setTimeout(function () { $("cCopy").textContent = "🔗 Davet bağlantısı"; }, 1500); };
