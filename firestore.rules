@@ -203,6 +203,22 @@ service cloud.firestore {
           || isModOf(get(/databases/$(database)/documents/comps/$(code)).data));
       }
 
+      // Mini sohbet: giriş yapan herkes yazar; yazan, oda sahibi, moderatör ya da admin siler
+      match /m/{mid} {
+        allow read: if true;
+        allow create: if request.auth != null && mid.matches('^[a-z0-9]{6,24}$')
+          && request.resource.data.keys().hasOnly(['u', 'n', 'x', 'ts'])
+          && request.resource.data.u == request.auth.uid
+          && request.resource.data.n is string && request.resource.data.n.size() <= 24
+          && request.resource.data.x is string && request.resource.data.x.size() > 0 && request.resource.data.x.size() <= 200
+          && request.resource.data.ts is timestamp
+          && request.resource.data.ts > request.time - duration.value(120, 's')
+          && request.resource.data.ts < request.time + duration.value(120, 's');
+        allow delete: if request.auth != null && (request.auth.uid == resource.data.u || isAdmin()
+          || get(/databases/$(database)/documents/comps/$(code)).data.host == request.auth.uid
+          || isModOf(get(/databases/$(database)/documents/comps/$(code)).data));
+      }
+
       // Canlı izleyiciler: her sayfa 20 sn'de bir kendi kaydının zamanını yazar ("X kişi izliyor")
       match /w/{vid} {
         allow read: if true;
