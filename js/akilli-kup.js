@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261155";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261156";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -603,20 +603,11 @@
         catch (e) { return "v" + Math.random().toString(36).slice(2, 14); }
     }
     // Canlı izleyici sayısı: herkes 20 sn'de bir comps/{kod}/w/{id} yazar; son 45 sn'de yazanlar sayılır
-    var HB_MS = 20000, FRESH_MS = 45000, hbT = 0;
+    var HB_MS = 30000, FRESH_MS = 75000, hbT = 0;
     function heartbeat() {
         if (!comp) return;
         var body = { fields: { ts: { timestampValue: new Date().toISOString() } } };
         apiAny(cPath("/w/" + viewerId()) + "?updateMask.fieldPaths=ts", { method: "PATCH", body: JSON.stringify(body) }).catch(function () {});
-    }
-    function countWatchers(code, exclude) {
-        return apiAny("/comps/" + code + "/w?pageSize=300", { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
-            var now = Date.now(), ex = exclude || {};
-            return (d.documents || []).filter(function (x) {
-                var id = x.name.split("/").pop(), t = Date.parse(((x.fields || {}).ts || {}).timestampValue || "") || 0;
-                return !ex[id] && now - t < FRESH_MS;
-            }).length;
-        }, function () { return 0; });
     }
     function compPatch(fields) { return api(cPath() + "?" + cMask(fields), { method: "PATCH", body: JSON.stringify({ fields: cBody(fields) }) }); }
     function mePatch(fields) { return api(cPath("/p/" + comp.uid) + "?" + cMask(fields), { method: "PATCH", body: JSON.stringify({ fields: cBody(fields) }) }); }
@@ -655,7 +646,7 @@
     // Sıradaki çözümün açıldığı an (bu cihazın gördüğü): k -> zaman
     function slotStart(k) { comp.slot = comp.slot || {}; var key = comp.doc.round + ":" + k; if (!comp.slot[key]) comp.slot[key] = Date.now(); return comp.slot[key]; }
     function slotLeft() { var si = syncInfo(); if (!comp.doc || comp.doc.st !== "run" || si.min >= 5) return null; return SLOT_MS - (Date.now() - slotStart(si.min)); }
-    function onlineOf(uid) { var t = comp.seen && comp.seen[uid]; return t == null ? true : Date.now() - t < 60000; }
+    function onlineOf(uid) { var t = comp.seen && comp.seen[uid]; return t == null ? true : Date.now() - t < FRESH_MS; }
     // Süre dolunca: yarışmacı kendine DNF yazar; oda sahibi/moderatör gelmeyenlere (arka planda kalan, düşen) DNF yazar
     function checkTimeout() {
         if (!comp || !comp.doc || comp.doc.st !== "run") return;
@@ -772,13 +763,13 @@
             document.body.classList.add("c-in-room");
             try { $("akComp").scrollIntoView({ block: "start" }); } catch (e) {}
             comp.chat = []; comp.chatKey = null; chatUi(); compPoll(); heartbeat();
-            clearInterval(compPollT); compPollT = setInterval(function () { if (document.visibilityState === "visible") compPoll(); }, comp.watch ? 2500 : 1500);
+            startPoll(); liveStart();
             clearInterval(hbT); hbT = setInterval(function () { if (document.visibilityState === "visible") heartbeat(); }, HB_MS);
             clearInterval(comp.cdT); comp.cdT = setInterval(function () { if (comp && comp.doc && comp.doc.st === "run") { renderNow(); checkTimeout(); } }, 1000);
         }).catch(function (e) { comp = null; cMsg(esc(e.message), 1); });
     }
     function leaveComp() {
-        clearInterval(compPollT); clearInterval(hbT); if (comp) clearInterval(comp.cdT);
+        clearInterval(compPollT); clearInterval(hbT); if (comp) { clearInterval(comp.cdT); if (comp.liveStop) comp.liveStop(); }
         if (comp && !comp.watch && myP()) api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
         comp = null; closeFinal(); document.body.classList.remove("c-in-room");
         try { history.replaceState(null, "", location.pathname); } catch (e) {}
@@ -788,30 +779,40 @@
     function parsePlayers(d) {
         return ((d && d.documents) || []).map(function (x) { var o = parseDoc(x); o.uid = x.name.split("/").pop(); return o; });
     }
+    // Canlı dinleme varsa yalnız ondan gelen veri kullanılır; yoksa REST ile yavaş yoklama (yedek)
     function compPoll() {
         if (!comp) return;
+        if (comp.live) { applyComp(comp.doc, comp.players); return; }
         Promise.all([apiAny(cPath(), { method: "GET" }), apiAny(cPath("/p?pageSize=50"), { method: "GET" })]).then(function (rs) {
             if (!rs[0].ok) throw new Error(rs[0].status);
             return Promise.all([rs[0].json(), rs[1].ok ? rs[1].json() : {}]);
         }).then(function (res) {
-            if (!comp) return;
-            var prev = comp.doc || {}, d = parseDoc(res[0]);
-            comp.doc = d; comp.players = parsePlayers(res[1]);
+            if (!comp || comp.live) return;
+            applyComp(parseDoc(res[0]), parsePlayers(res[1]));
+        }).catch(function () {});
+    }
+    function applyComp(d, players) {
+            if (!comp || !d) return;
+            var prev = comp.prevDoc || {};
+            comp.prevDoc = d; comp.doc = d; comp.players = players || [];
             if (!comp.watch && (!myP() || banned(comp.uid)) && prev.host) { comp.watch = true; leaveComp(); cMsg("Yarışmadan çıkarıldın.", 1); return; }
             // sunucuda daha fazla süre varsa (ör. süre dolunca yazılan DNF) yerel kopyayı bırak
             var mp = myP(); if (comp.local && mp && timesOf(mp).length >= comp.local.t.length) comp.local = null;
-            if (!comp.wT || Date.now() - comp.wT > 6000) {
+            // izleyici sayısı (ucuz sayım sorgusu) ve oda yöneticisi için bağlantı durumu: 30 sn'de bir
+            if (!comp.wT || Date.now() - comp.wT > 30000) {
                 comp.wT = Date.now();
-                var ex = {}; comp.players.forEach(function (p) { ex[p.uid] = 1; });
-                apiAny(cPath("/w?pageSize=300"), { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (wd) {
+                countFresh(comp.code).then(function (n) {
+                    if (!comp) return; n = Math.max(0, n - comp.players.length);
+                    comp.watchers = n; var w = $("cWatch"); if (w) w.textContent = "👁 " + n + " kişi izliyor";
+                });
+                if (isHost()) apiAny(cPath("/w?pageSize=60"), { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (wd) {
                     if (!comp) return; comp.seen = {};
                     (wd.documents || []).forEach(function (x) { comp.seen[x.name.split("/").pop()] = Date.parse(((x.fields || {}).ts || {}).timestampValue || "") || 0; });
                     comp.players.forEach(function (p) { if (comp.seen[p.uid] == null) comp.seen[p.uid] = 0; });
+                    comp.tableHtml = ""; renderComp();
                 }, function () {});
-                countWatchers(comp.code, ex).then(function (n) { if (comp) { comp.watchers = n; var w = $("cWatch"); if (w) w.textContent = "👁 " + n + " kişi izliyor"; } });
             }
-            comp.pn = (comp.pn || 0) + 1;
-            if (comp.pn % 2 === 1) chatLoad(); else renderChat();
+            if (!comp.live) { comp.pn = (comp.pn || 0) + 1; if (comp.pn % 2 === 1) chatLoad(); else renderChat(); }
             comp.mode = "manual";
             // tur ya da durum değişti: sıradaki karıştırmayı göster
             if (prev.round !== d.round || prev.st !== d.st) { comp.local = null; comp.orig = {}; comp.editIdx = null; nextScramble(true); }
@@ -819,7 +820,53 @@
             checkTimeout();
             if (d.st === "end" && comp.shownR !== d.round + ":" + d.fin) { comp.shownR = d.round + ":" + d.fin; showRoundResults(lastRound()); }
             renderComp();
-        }).catch(function () {});
+    }
+    /* --- canlı dinleme (Firestore SDK): yalnız değişen belgeler okunur --- */
+    function snapObj(s) {
+        var o = {}, x = s.data() || {};
+        Object.keys(x).forEach(function (k) { var v = x[k]; o[k] = v && typeof v.toDate === "function" ? v.toDate().toISOString() : v; });
+        return o;
+    }
+    function liveStart() {
+        if (!comp || !(window.Account && Account.firestore)) return;
+        var code = comp.code;
+        Account.firestore().then(function (F) {
+            if (!comp || comp.code !== code) return;
+            var fs = F.fs, db = F.db, got = { d: null, p: null }, subs = [];
+            var stop = function () { subs.forEach(function (u) { try { u(); } catch (e) {} }); };
+            var fail = function () { stop(); if (comp && comp.code === code) { comp.live = null; startPoll(); } };
+            var push = function () { if (comp && comp.code === code && got.d && got.p) { comp.live = stop; applyComp(got.d, got.p); } };
+            subs.push(fs.onSnapshot(fs.doc(db, "comps", code), function (snap) {
+                if (!snap.exists()) { if (comp && comp.code === code) { stop(); comp.live = null; leaveComp(); cMsg("Yarışma silindi.", 1); } return; }
+                got.d = snapObj(snap); push();
+            }, fail));
+            subs.push(fs.onSnapshot(fs.collection(db, "comps", code, "p"), function (qs) {
+                got.p = qs.docs.map(function (x) { var o = snapObj(x); o.uid = x.id; return o; }); push();
+            }, fail));
+            subs.push(fs.onSnapshot(fs.query(fs.collection(db, "comps", code, "m"), fs.orderBy("ts", "desc"), fs.limit(40)), function (qs) {
+                if (!comp || comp.code !== code) return;
+                comp.chat = qs.docs.map(function (x) { var o = snapObj(x); o.id = x.id; return o; }).reverse(); renderChat();
+            }, function () {}));
+            comp.liveStop = stop;
+        }, function () {});
+    }
+    function startPoll() {
+        clearInterval(compPollT);
+        compPollT = setInterval(function () { if (document.visibilityState === "visible") compPoll(); }, comp && comp.watch ? 6000 : 4000);
+    }
+    // Son 75 sn'de kalp atışı yazan (açık) cihaz sayısı — tek okuma sayılan sayım sorgusu
+    function countFresh(code) {
+        var body = { structuredAggregationQuery: { structuredQuery: { from: [{ collectionId: "w" }], where: { fieldFilter: { field: { fieldPath: "ts" }, op: "GREATER_THAN", value: { timestampValue: new Date(Date.now() - FRESH_MS).toISOString() } } } }, aggregations: [{ alias: "n", count: {} }] } };
+        return apiAny("/comps/" + code + ":runAggregationQuery", { method: "POST", body: JSON.stringify(body) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
+            var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n; return x ? +x.integerValue : 0;
+        }, function () { return 0; });
+    }
+    function countDocs(path) {
+        var parts = path.split("/"), coll = parts.pop(), parent = parts.join("/");
+        var body = { structuredAggregationQuery: { structuredQuery: { from: [{ collectionId: coll }] }, aggregations: [{ alias: "n", count: {} }] } };
+        return apiAny(parent + ":runAggregationQuery", { method: "POST", body: JSON.stringify(body) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
+            var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n; return x ? +x.integerValue : 0;
+        }, function () { return 0; });
     }
     function nextScramble(force) {
         if (!comp) return;
@@ -954,7 +1001,7 @@
     }
     /* --- mini sohbet: comps/{kod}/m/{id} = {u, n, x, ts} --- */
     function chatLoad() {
-        if (!comp) return;
+        if (!comp || comp.live) return;
         apiAny(cPath("/m?pageSize=40&orderBy=ts%20desc"), { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             if (!comp || !d) return;
             comp.chat = (d.documents || []).map(function (x) { var o = parseDoc(x); o.id = x.name.split("/").pop(); return o; }).reverse();
@@ -1163,7 +1210,10 @@
     function loadLive() {
         var box = $("cLive"); if (!box) return;
         if (!betaOk) { $("cLiveWrap").hidden = true; if ($("cOpenWrap")) $("cOpenWrap").hidden = true; return; }
-        apiAny("/comps?pageSize=100", { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+        // son güncellenen 15 yarışma (tümünü listelemek pahalı)
+        var q = { structuredQuery: { from: [{ collectionId: "comps" }], orderBy: [{ field: { fieldPath: "ts" }, direction: "DESCENDING" }], limit: 15 } };
+        apiAny(":runQuery", { method: "POST", body: JSON.stringify(q) }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (arr) {
+            var d = { documents: (arr || []).filter(function (x) { return x.document; }).map(function (x) { return x.document; }) };
             var now = Date.now();
             var all = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; });
             renderOpen(all.filter(function (o) { return (o.st === "lobby" || (o.st === "end" && !o.fin)) && now - o.up < 6 * 3600000; }).sort(function (a, b) { return b.up - a.up; }).slice(0, 10));
@@ -1174,11 +1224,7 @@
             $("cLiveWrap").hidden = !list.length;
             if (!list.length) return;
             return Promise.all(list.map(function (o) {
-                return apiAny("/comps/" + o.code + "/p?pageSize=50&mask.fieldPaths=name", { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }, function () { return {}; }).then(function (x) {
-                    var ex = {}; (x.documents || []).forEach(function (dd) { ex[dd.name.split("/").pop()] = 1; });
-                    o.n = (x.documents || []).length;
-                    return countWatchers(o.code, ex).then(function (w) { o.w = w; return o; });
-                });
+                return Promise.all([countDocs("/comps/" + o.code + "/p"), countFresh(o.code)]).then(function (c) { o.n = c[0]; o.w = Math.max(0, c[1] - c[0]); return o; });
             })).then(function (rows) {
                 box.innerHTML = rows.map(function (o) {
                     var stt = o.st === "lobby" ? "Lobi" : o.st === "run" ? roundLabel(o) + " sürüyor" : roundLabel(o) + " bitti";
@@ -1194,7 +1240,7 @@
         var wrap = $("cOpenWrap"), box = $("cOpen"); if (!box) return;
         wrap.hidden = !list.length; if (!list.length) { box.innerHTML = ""; return; }
         Promise.all(list.map(function (o) {
-            return apiAny("/comps/" + o.code + "/p?pageSize=50&mask.fieldPaths=name", { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }, function () { return {}; }).then(function (x) { o.n = (x.documents || []).length; return o; });
+            return countDocs("/comps/" + o.code + "/p").then(function (n) { o.n = n; return o; });
         })).then(function (rows) {
             box.innerHTML = rows.map(function (o) {
                 var full = o.n >= o.cap;
@@ -1221,7 +1267,7 @@
     }
     function initComp() {
         initCompRole();
-        loadLive(); clearInterval(liveT); liveT = setInterval(function () { if (!comp && document.visibilityState === "visible") loadLive(); }, 15000);
+        loadLive(); clearInterval(liveT); liveT = setInterval(function () { if (!comp && document.visibilityState === "visible") loadLive(); }, 60000);
         $("cCreate").onclick = createComp;
         if ($("cCapR")) $("cCapR").oninput = function () { $("cCapV").textContent = this.value; };
         $("cJoin").onclick = function () { joinComp($("cJoinIn").value); };

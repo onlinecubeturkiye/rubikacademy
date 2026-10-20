@@ -459,7 +459,7 @@
             renderChart(); renderActive();
         }, function (e) {
             var code = e && e.message;
-            var hint = (code === "403" || code === 403) ? ' — Firestore kurallarını Firebase Console’dan yayımladığından ve bu hesabın yönetici (pikapikachuyt0@gmail.com, Google) olduğundan emin ol.' : '';
+            var hint = (code === "429" || code === 429) ? ' — Firebase günlük ücretsiz okuma kotası doldu. Kota her gün saat 10:00 civarı (TR) sıfırlanır; Firebase Console → Usage kısmından kullanımı görebilirsin.' : (code === "403" || code === 403) ? ' — Firestore kurallarını Firebase Console’dan yayımladığından ve bu hesabın yönetici (pikapikachuyt0@gmail.com, Google) olduğundan emin ol.' : '';
             box.innerHTML = '<p class="a-note">Kullanıcılar yüklenemedi (' + esc(code) + ')' + hint + '</p>';
         });
     }
