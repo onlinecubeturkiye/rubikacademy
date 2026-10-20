@@ -657,6 +657,8 @@
     function renderAnon() {
         var box = $id("aAnon"), more = $id("aAnonMore"); if (!box) return;
         listAnon().then(function (list) {
+            // ana sayfadaki kullanıcı sayısı için hesapsız cihaz sayısını da güncelle
+            if (window.Account.getConfig && window.Account.setMemberCount) window.Account.getConfig().then(function (c) { if (c.visitors !== list.length) window.Account.setMemberCount(list.length, "visitors"); });
             var now = Date.now(), D = 86400000;
             function cnt(f) { return list.filter(f).length; }
             var sess = list.reduce(function (a, x) { return a + x.s; }, 0);
