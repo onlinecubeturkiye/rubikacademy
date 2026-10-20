@@ -129,6 +129,7 @@ var SITE_I18N = {
 
         index: {
             tr: {
+                statUsers: "kullanıcı",
                 statLangs: "dil",
                 dailyTitle: "Günün karıştırması",
                 dailyYours: "Senin süren",
@@ -192,6 +193,7 @@ var SITE_I18N = {
                 footer: "© 2026 Rubik Academy. Tüm hakları saklıdır."
             },
             en: {
+                statUsers: "users",
                 statLangs: "languages",
                 dailyTitle: "Daily scramble",
                 dailyYours: "Your time",
@@ -255,6 +257,7 @@ var SITE_I18N = {
                 footer: "© 2026 Rubik Academy. All rights reserved."
             },
             fr: {
+                statUsers: "utilisateurs",
                 statLangs: "langues",
                 dailyTitle: "Mélange du jour",
                 dailyYours: "Ton temps",
@@ -318,6 +321,7 @@ var SITE_I18N = {
                 footer: "© 2026 Rubik Academy. Tous droits réservés."
             },
             ru: {
+                statUsers: "пользователей",
                 statLangs: "языков",
                 dailyTitle: "Скрамбл дня",
                 dailyYours: "Твоё время",
@@ -381,6 +385,7 @@ var SITE_I18N = {
                 footer: "© 2026 Rubik Academy. Все права защищены."
             },
             de: {
+                statUsers: "Nutzer",
                 statLangs: "Sprachen",
                 dailyTitle: "Tages-Scramble",
                 dailyYours: "Deine Zeit",
@@ -444,6 +449,7 @@ var SITE_I18N = {
                 footer: "© 2026 Rubik Academy. Alle Rechte vorbehalten."
             },
             ar: {
+                statUsers: "مستخدم",
                 statLangs: "لغات",
                 dailyTitle: "خلطة اليوم",
                 dailyYours: "وقتك",
