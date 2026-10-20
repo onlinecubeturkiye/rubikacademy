@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261153";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261154";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -720,6 +720,7 @@
             if (mine) comp.watch = false; // zaten yarışmacıysa izleyici değil
             if (comp.watch) return null;
             if (!mine && comp.players.length >= comp.doc.cap) throw new Error("Yarışma dolu (" + comp.doc.cap + " kişi)");
+            if (!mine && comp.doc.st === "run") throw new Error("Tur sürüyor; tur bitince katılabilirsin. Şimdilik 👁 İzle ile takip edebilirsin.");
             comp.mode = "manual"; // yarışmada süre yalnızca elle yazılır
             return mine ? null : mePatch({ name: myName(), mode: comp.mode, t: "", rnd: 0 }).then(function (r) { if (!r.ok) throw new Error(r.status); });
         }).then(function () {
@@ -1100,6 +1101,8 @@
         var box = $("cLive"); if (!box) return;
         apiAny("/comps?pageSize=100", { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
             var now = Date.now();
+            var all = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; });
+            renderOpen(all.filter(function (o) { return (o.st === "lobby" || (o.st === "end" && !o.fin)) && now - o.up < 6 * 3600000; }).sort(function (a, b) { return b.up - a.up; }).slice(0, 10));
             var list = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; })
                 // başlatılmamış (lobi) yarışmalar listede görünmez
                 .filter(function (o) { return o.st && o.st !== "lobby" && now - o.up < 6 * 3600000 && !(o.st === "end" && o.fin && now - o.up > 1800000); })
@@ -1122,6 +1125,21 @@
             });
         }).catch(function () { $("cLiveWrap").hidden = true; });
     }
+    // Katılmaya açık yarışmalar (lobi ya da tur arası)
+    function renderOpen(list) {
+        var wrap = $("cOpenWrap"), box = $("cOpen"); if (!box) return;
+        wrap.hidden = !list.length; if (!list.length) { box.innerHTML = ""; return; }
+        Promise.all(list.map(function (o) {
+            return apiAny("/comps/" + o.code + "/p?pageSize=50&mask.fieldPaths=name", { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }, function () { return {}; }).then(function (x) { o.n = (x.documents || []).length; return o; });
+        })).then(function (rows) {
+            box.innerHTML = rows.map(function (o) {
+                var full = o.n >= o.cap;
+                return '<div class="c-live"><span class="c-dot on"></span><div class="c-live-tx"><b>' + esc(o.name || "Ev yarışması") + '</b><small>' + evName(o.ev) + ' · ' + (o.st === "lobby" ? "Başlamayı bekliyor" : roundLabel(o) + " bitti, yeni tur bekleniyor") + ' · 👤 ' + o.n + '/' + o.cap + ' · ' + esc(o.hName || "") + '</small></div>' +
+                    (full ? '<span class="ak-pill">Dolu</span>' : '<button type="button" class="btn primary sm" data-join="' + esc(o.code) + '">Katıl</button>') + '</div>';
+            }).join("");
+            Array.prototype.forEach.call(box.querySelectorAll("[data-join]"), function (b) { b.onclick = function () { $("cJoinIn").value = b.getAttribute("data-join"); joinComp(b.getAttribute("data-join")); }; });
+        });
+    }
     function initCompRole() { isOrgUser().then(function (ok) { $("cCreateBox").classList.toggle("locked", !ok); $("cCreate").disabled = !ok; $("cOrgNote").hidden = ok; }); }
     function initComp() {
         initCompRole();
@@ -1130,6 +1148,8 @@
         if ($("cCapR")) $("cCapR").oninput = function () { $("cCapV").textContent = this.value; };
         $("cJoin").onclick = function () { joinComp($("cJoinIn").value); };
         $("cJoinIn").onkeydown = function (e) { if (e.key === "Enter") joinComp($("cJoinIn").value); };
+        if ($("cLoginNote")) $("cLoginNote").hidden = signedIn() || !!(window.Account && Account.isPending && Account.isPending());
+        if ($("cLoginBtn")) $("cLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
         $("cLeave").onclick = function () { if (confirm("Yarışmadan çıkılsın mı?")) leaveComp(); };
         $("cStart").onclick = function () { startRound(false, 0); };
         if ($("cFinish")) $("cFinish").onclick = finishComp;
@@ -1202,6 +1222,7 @@
             setTab("comp");
             var iz = qs.get("izle"); if (iz) setTimeout(function () { if (!comp) joinComp(iz, true); }, 600);
             if (ev) {
+                if ($("cJoinIn")) $("cJoinIn").value = String(ev).toUpperCase().slice(0, 5);
                 var tryEv = function () { if (signedIn() && !comp) joinComp(ev); };
                 if (window.Account && Account.onChange) Account.onChange(function (u) { if (u) tryEv(); else cMsg("Yarışmaya katılmak için giriş yap.", 1); });
                 setTimeout(tryEv, 1200);
