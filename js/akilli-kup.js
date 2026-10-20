@@ -4,12 +4,12 @@
    - Çözüm analizi: karıştırma takibi, ilk hamlede süre, CFOP aşamaları
      (Cross, F2L 1-4, OLL, PLL) süre / hamle / TPS, öneri, geçmiş
    - Canlı düello: iki kişi aynı karıştırma, Firestore "duels/{kod}" ile
-     (1 sn'de bir yoklama). Akıllı küp yoksa klavye/dokunma süresi.
+     (1 sn'de bir yoklama). Yalnızca akıllı küple.
    Küp modeli: cubejs (Cube) — küpün kendi çerçevesi (beyaz üst, yeşil önde).
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261140";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261141";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -70,7 +70,7 @@
     var conn = null, sub = null, connecting = false, lastDevice = null, modelKnown = false;
     var tab = "analysis";
     var scr = "", scrMoves = [], prefix = [], prog = 0, dev = [];
-    var phase = "idle";              // idle | scrambling | ready | solving | done | holding (klavye)
+    var phase = "idle";              // idle | scrambling | ready | solving | done
     var t0 = 0, tick = 0, moves = [], st = null, lastResult = null;
     var duel = null;                 // { code, doc, me: "h"|"g" }
 
@@ -108,8 +108,7 @@
         } else if (phase === "ready") h = "✅ Karıştırma tamam. <b>İlk hamlende süre başlar.</b>";
         else if (phase === "solving") h = "Çözülüyor…";
         else if (phase === "done") h = tab === "duel" ? "Bitti! Sonucun rakibine gönderildi." : "Bitti! Yeni karıştırma için butona bas.";
-        else if (phase === "holding") h = "Bırakınca süre başlar…";
-        else h = conn ? "" : "Akıllı küp bağlı değil: <b>boşluk tuşunu</b> ya da aşağıdaki alanı basılı tut, bırakınca süre başlar.";
+        else h = conn ? "" : "🔗 Başlamak için akıllı küpünü bağla.";
         $("akHint").innerHTML = h;
     }
 
@@ -188,7 +187,7 @@
     var miniT = 0;
     function miniShow(state) {
         var m = $("akMini"); clearTimeout(miniT);
-        m.className = "ak-mini show " + (state || "") + (conn ? "" : " nobt");
+        m.className = "ak-mini show " + (state || "");
         if (state === "done") miniT = setTimeout(miniHide, 2600);
     }
     function miniHide() { clearTimeout(miniT); $("akMini").className = "ak-mini"; }
@@ -271,28 +270,6 @@
         $("akHistClear").onclick = function () { if (confirm("Analiz geçmişi silinsin mi?")) { try { localStorage.removeItem(HIST_KEY); } catch (e) {} renderHist(); } };
     }
 
-    /* ---------- klavye / dokunma süresi (akıllı küp yokken) ---------- */
-    var holdT = 0;
-    function manualDown() {
-        if (conn) return;
-        if (phase === "solving") { manualStop(); return; }
-        if (phase === "idle" || phase === "done") { phase = "holding"; holdT = now(); $("akTime").textContent = fmt(0); $("akTime").classList.add("hold"); miniShow("hold"); renderHint(); }
-    }
-    function manualUp() {
-        if (conn || phase !== "holding") return;
-        $("akTime").classList.remove("hold");
-        if (now() - holdT < 300) { phase = "idle"; miniHide(); renderHint(); return; }
-        phase = "solving"; t0 = now(); moves = []; st = null; startTick(); renderHint(); publish("çözüyor"); miniShow("run");
-    }
-    function manualStop() {
-        var t = now() - t0; stopTick(); phase = "done"; setLast(Math.round(t), false); miniShow("done"); renderHint(); publishDone(Math.round(t));
-    }
-    document.addEventListener("keydown", function (e) {
-        if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
-        if (e.code === "Space") { e.preventDefault(); if (!e.repeat) manualDown(); }
-        else if (phase === "solving" && !conn) { e.preventDefault(); manualStop(); }
-    });
-    document.addEventListener("keyup", function (e) { if (e.code === "Space") { e.preventDefault(); manualUp(); } });
 
     /* ---------- Bluetooth bağlantısı ---------- */
     function supported() { return !!(navigator.bluetooth && navigator.bluetooth.requestDevice); }
@@ -341,7 +318,9 @@
             if (!c.capabilities || c.capabilities.facelets) c.sendCommand({ type: "REQUEST_FACELETS" }).catch(function () {});
             try { c.sendCommand({ type: "REQUEST_BATTERY" }).catch(function () {}); } catch (e) {}
             setConn("Bağlı: " + (c.deviceName || "akıllı küp"), "ok");
-            $("akConnect").hidden = true; $("akDisc").hidden = false; $("akConnect").disabled = false; $("akReset").hidden = false; $("akPad").hidden = true;
+            var dq = new URLSearchParams(location.search).get("duel"); // bağlantıyla gelen düello daveti
+            if (dq && !duel && signedIn()) setTimeout(function () { joinDuel(dq); }, 300);
+            $("akConnect").hidden = true; $("akDisc").hidden = false; $("akConnect").disabled = false; $("akReset").hidden = false;
             if (phase !== "solving") { phase = "scrambling"; syncProgress(); }
             renderScramble(); renderHint();
         }).catch(function (err) {
@@ -361,7 +340,7 @@
             publishDone(DNF);
         }
         if (phase !== "done") phase = "idle";
-        setConn("Bağlı değil", ""); $("akConnect").hidden = false; $("akDisc").hidden = true; $("akReset").hidden = true; $("akPad").hidden = false; $("akBatt").textContent = "";
+        setConn("Bağlı değil", ""); $("akConnect").hidden = false; $("akDisc").hidden = true; $("akReset").hidden = true; $("akBatt").textContent = "";
         renderScramble(); renderHint();
     }
     function disconnect() { var c = conn; dropConn(); if (c) c.disconnect().catch(function () {}); }
@@ -388,8 +367,10 @@
     function myName() { var u = window.Account && Account.user && Account.user(); return String((u && (u.displayName || (u.email || "").split("@")[0])) || "Oyuncu").slice(0, 24); }
     function code5() { var a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = ""; for (var i = 0; i < 5; i++) s += a[Math.floor(Math.random() * a.length)]; return s; }
     function signedIn() { return !!(window.Account && Account.user && Account.user()); }
+    function needCube() { if (conn) return false; duelMsg("⚔️ Düello yalnızca akıllı küple oynanır. Önce yukarıdan <b>küpünü bağla</b>.", 1); return true; }
     function createDuel() {
         if (!signedIn()) { Account.openLogin && Account.openLogin(); return; }
+        if (needCube()) return;
         var c = code5(), u = Account.user(), s = genScramble();
         var fm = +(document.querySelector('input[name="akFmt"]:checked') || {}).value || 5;
         var fields = { host: u.uid, hName: myName(), guest: "", gName: "", round: 1, scr: s, hT: -1, gT: -1, hSt: "bekliyor", gSt: "", hW: 0, gW: 0, sc: 0, fmt: fm, hL: "", gL: "" };
@@ -404,6 +385,7 @@
         c = String(c || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
         if (c.length !== 5) { duelMsg("Oda kodu 5 karakter olmalı.", 1); return; }
         if (!signedIn()) { Account.openLogin && Account.openLogin(); return; }
+        if (needCube()) return;
         duelMsg("Odaya bağlanılıyor…");
         api("/duels/" + c, { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status === 404 ? "Oda bulunamadı" : r.status); return r.json(); }).then(function (d) {
             var o = parseDoc(d), uid = Account.user().uid;
@@ -602,13 +584,6 @@
         $("akDisc").onclick = disconnect;
         $("akReset").onclick = resetModel;
         $("akNew").onclick = function () { setScramble(genScramble()); };
-        function inBtn(e) { var b = e.target.closest("button"); return b && b.id !== "akPad"; }
-        ["akPad", "akMini"].forEach(function (id) {
-            $(id).addEventListener("touchstart", function (e) { if (inBtn(e)) return; e.preventDefault(); manualDown(); }, { passive: false });
-            $(id).addEventListener("touchend", function (e) { if (inBtn(e)) return; e.preventDefault(); manualUp(); }, { passive: false });
-            $(id).addEventListener("mousedown", function (e) { if (!inBtn(e)) manualDown(); });
-            $(id).addEventListener("mouseup", function (e) { if (!inBtn(e)) manualUp(); });
-        });
         $("akDnf").onclick = toggleDnf; $("akMiniDnf").onclick = toggleDnf;
         $("akMiniX").onclick = miniHide;
         Array.prototype.forEach.call(document.querySelectorAll(".ak-tab"), function (b) { b.onclick = function () { setTab(b.getAttribute("data-tab")); }; });

@@ -27,10 +27,10 @@
 <meta property="og:description" content="Çözümünü aşama aşama analiz et, arkadaşınla canlı düello yap.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/akilli-kup">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261140">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261141">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261140">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261141">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261140">
+<link rel="stylesheet" href="/styles/common.css?v=20261141">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -84,8 +84,6 @@
 .ak-hint { min-height: 24px; font-size: 14.5px; font-weight: 600; color: var(--text-soft); }
 .ak-hint b { color: var(--text); }
 .ak-time { font: 900 clamp(56px, 14vw, 88px)/1 "JetBrains Mono", monospace; color: var(--text); margin: 6px auto 14px; user-select: none; -webkit-user-select: none; transition: color .15s; }
-.ak-pad { display: block; width: 100%; margin: 14px 0 12px; padding: 18px 12px; border-radius: 16px; border: 2px dashed var(--border); background: var(--surface-soft); color: var(--text-soft); font: 600 15px Inter, sans-serif; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
-.ak-pad b { color: var(--text); } .ak-pad small { display: block; font-size: 12px; margin-top: 4px; }
 .ak-last { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
 .ak-last span { font-size: 13px; font-weight: 800; color: var(--text-soft); }
 .ak-last b { font: 900 26px "JetBrains Mono", monospace; color: var(--text); }
@@ -95,10 +93,8 @@
 .ak-mini.show { opacity: 1; pointer-events: auto; background: rgba(0,0,0,.35); }
 .ak-mini-box { position: relative; min-width: min(420px, 90vw); padding: 26px 22px 18px; border-radius: 26px; background: var(--surface); border: var(--card-bw) solid var(--card-border); box-shadow: var(--shadow-hover); text-align: center; transform: scale(.92); transition: transform .2s; touch-action: none; }
 .ak-mini.show .ak-mini-box { transform: none; }
-.ak-mini.hold .ak-time { color: #22c55e; }
-.ak-mini.run .ak-mini-dnf, .ak-mini.hold .ak-mini-dnf, .ak-mini.run .ak-x, .ak-mini.hold .ak-x { display: none; }
+.ak-mini.run .ak-mini-dnf, .ak-mini.run .ak-x { display: none; }
 .ak-mini-dnf[hidden] { display: none; }
-.ak-mini.nobt .ak-stages { display: none; }
 
 .ak-stages { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 14px; }
 .ak-st { font-size: 12.5px; font-weight: 800; padding: 6px 11px; border-radius: 999px; background: var(--surface-soft); color: var(--text-soft); border: 1px solid var(--border); transition: .2s; }
@@ -179,6 +175,9 @@
 .ak-fin-s { margin: 12px 0; font-weight: 800; color: var(--text); }
 .ak-fin-b { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 
+.ak-req { font-size: 14px; color: var(--text-soft); margin: -4px 0 12px; }
+.ak-req b { color: var(--text); }
+
 /* MAC penceresi */
 .ak-modal { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 16px; }
 .ak-modal.show { display: flex; }
@@ -251,7 +250,7 @@
         <button type="button" class="btn primary" id="akConnect">🔗 Küpü bağla</button>
         <button type="button" class="btn" id="akDisc" hidden>Bağlantıyı kes</button>
     </div>
-    <div class="ak-nobt" id="akNoBt" hidden>Bu tarayıcı Bluetooth desteklemiyor. Akıllı küp için <b>Chrome</b> ya da <b>Edge</b> kullan (Android, Windows, Mac). Düelloya klavye/dokunma süresiyle yine katılabilirsin.</div>
+    <div class="ak-nobt" id="akNoBt" hidden>Bu tarayıcı Bluetooth desteklemiyor. Akıllı küp için <b>Chrome</b> ya da <b>Edge</b> kullan (Android, Windows, Mac).</div>
 </section>
 
 <div class="ak-tabs" role="tablist">
@@ -262,6 +261,7 @@
 <section class="box" id="akDuel" hidden>
     <div id="akLobby">
         <h2>⚔️ Canlı düello</h2>
+        <p class="ak-req">🧊 Düello yalnızca <b>Bluetooth akıllı küple</b> oynanır: önce yukarıdan küpünü bağla.</p>
         <div class="ak-lobby">
             <div><h3>Oda oluştur</h3><p>Bir oda aç, kodu ya da bağlantıyı arkadaşına gönder. İkiniz de aynı karıştırmayı çözersiniz; kim hızlıysa turu alır.</p><div class="ak-fmt" role="radiogroup" aria-label="Maç formatı"><label><input type="radio" name="akFmt" value="3"><span>mo3<small>3 çözüm</small></span></label><label><input type="radio" name="akFmt" value="5" checked><span>ao5<small>5 çözüm</small></span></label><label><input type="radio" name="akFmt" value="12"><span>ao12<small>12 çözüm</small></span></label></div><button type="button" class="btn primary" id="akCreate">➕ Oda oluştur</button></div>
             <div><h3>Odaya katıl</h3><p>Arkadaşının paylaştığı 5 haneli kodu yaz.</p><div class="ak-join"><input id="akJoinIn" maxlength="5" placeholder="KOD" autocomplete="off"><button type="button" class="btn primary" id="akJoin">Katıl</button></div></div>
@@ -282,7 +282,6 @@
 <section class="box ak-solve">
     <div class="ak-scr" id="akScr" dir="ltr"></div>
     <div class="ak-hint" id="akHint"></div>
-    <button type="button" class="ak-pad" id="akPad">⏱️ <b>Basılı tut</b>, bırakınca süre başlar <small>(ya da boşluk tuşu)</small></button>
     <div class="ak-last" id="akLast" hidden><span>Son çözüm</span><b id="akLastT" dir="ltr">-</b><small id="akLastWhy"></small><button type="button" class="btn sm" id="akDnf">DNF</button></div>
     <div class="ak-actions">
         <button type="button" class="btn" id="akNew">🔀 Yeni karıştırma</button>
@@ -331,11 +330,11 @@
 </footer>
 
 <script>var PAGE_ID = "akilli_kup";</script>
-<script src="/js/i18n.js?v=20261140"></script>
-<script src="/js/common.js?v=20261140"></script>
-<script src="/js/firebase-config.js?v=20261140"></script>
-<script src="/js/account.js?v=20261140"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261140"></script>
-<script src="/js/akilli-kup.js?v=20261140"></script>
+<script src="/js/i18n.js?v=20261141"></script>
+<script src="/js/common.js?v=20261141"></script>
+<script src="/js/firebase-config.js?v=20261141"></script>
+<script src="/js/account.js?v=20261141"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261141"></script>
+<script src="/js/akilli-kup.js?v=20261141"></script>
 </body>
 </html>
