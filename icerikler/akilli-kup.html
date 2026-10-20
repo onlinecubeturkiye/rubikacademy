@@ -27,10 +27,10 @@
 <meta property="og:description" content="Çözümünü aşama aşama analiz et, arkadaşınla canlı düello yap.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/akilli-kup">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261139">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261140">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261139">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261140">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261139">
+<link rel="stylesheet" href="/styles/common.css?v=20261140">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -83,8 +83,23 @@
 .ak-scr span.cur { background: var(--ui-accent); color: var(--ui-accent-text); }
 .ak-hint { min-height: 24px; font-size: 14.5px; font-weight: 600; color: var(--text-soft); }
 .ak-hint b { color: var(--text); }
-.ak-time { font: 900 clamp(64px, 12vw, 112px)/1 "JetBrains Mono", monospace; color: var(--text); margin: 16px auto 14px; padding: 18px 10px; border-radius: 20px; background: var(--surface-soft); user-select: none; -webkit-user-select: none; cursor: pointer; touch-action: none; transition: color .15s; }
-.ak-time.hold { color: #22c55e; }
+.ak-time { font: 900 clamp(56px, 14vw, 88px)/1 "JetBrains Mono", monospace; color: var(--text); margin: 6px auto 14px; user-select: none; -webkit-user-select: none; transition: color .15s; }
+.ak-pad { display: block; width: 100%; margin: 14px 0 12px; padding: 18px 12px; border-radius: 16px; border: 2px dashed var(--border); background: var(--surface-soft); color: var(--text-soft); font: 600 15px Inter, sans-serif; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.ak-pad b { color: var(--text); } .ak-pad small { display: block; font-size: 12px; margin-top: 4px; }
+.ak-last { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+.ak-last span { font-size: 13px; font-weight: 800; color: var(--text-soft); }
+.ak-last b { font: 900 26px "JetBrains Mono", monospace; color: var(--text); }
+.ak-last small { font-size: 12.5px; font-weight: 800; color: #dc2626; }
+/* mini süre ekranı */
+.ak-mini { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 1900; opacity: 0; transition: opacity .2s; }
+.ak-mini.show { opacity: 1; pointer-events: auto; background: rgba(0,0,0,.35); }
+.ak-mini-box { position: relative; min-width: min(420px, 90vw); padding: 26px 22px 18px; border-radius: 26px; background: var(--surface); border: var(--card-bw) solid var(--card-border); box-shadow: var(--shadow-hover); text-align: center; transform: scale(.92); transition: transform .2s; touch-action: none; }
+.ak-mini.show .ak-mini-box { transform: none; }
+.ak-mini.hold .ak-time { color: #22c55e; }
+.ak-mini.run .ak-mini-dnf, .ak-mini.hold .ak-mini-dnf, .ak-mini.run .ak-x, .ak-mini.hold .ak-x { display: none; }
+.ak-mini-dnf[hidden] { display: none; }
+.ak-mini.nobt .ak-stages { display: none; }
+
 .ak-stages { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 14px; }
 .ak-st { font-size: 12.5px; font-weight: 800; padding: 6px 11px; border-radius: 999px; background: var(--surface-soft); color: var(--text-soft); border: 1px solid var(--border); transition: .2s; }
 .ak-st.on { background: var(--c); color: #fff; border-color: transparent; box-shadow: 0 4px 14px -4px var(--c); }
@@ -267,8 +282,8 @@
 <section class="box ak-solve">
     <div class="ak-scr" id="akScr" dir="ltr"></div>
     <div class="ak-hint" id="akHint"></div>
-    <div class="ak-time" id="akTime" dir="ltr">0.00</div>
-    <div class="ak-stages" id="akStages"></div>
+    <button type="button" class="ak-pad" id="akPad">⏱️ <b>Basılı tut</b>, bırakınca süre başlar <small>(ya da boşluk tuşu)</small></button>
+    <div class="ak-last" id="akLast" hidden><span>Son çözüm</span><b id="akLastT" dir="ltr">-</b><small id="akLastWhy"></small><button type="button" class="btn sm" id="akDnf">DNF</button></div>
     <div class="ak-actions">
         <button type="button" class="btn" id="akNew">🔀 Yeni karıştırma</button>
         <button type="button" class="btn" id="akReset" hidden title="Küp durumunu bildiremiyorsa: küpü çözülmüş hale getirip bas">✅ Küpüm çözülmüş</button>
@@ -285,6 +300,15 @@
         <h2>Nasıl çalışır?</h2>
         <p style="color:var(--text-soft);line-height:1.7;font-size:15px">Küp her hamleni bildirir; site küpün durumunu takip eder. Karıştırmayı <b>beyaz üstte, yeşil önde</b> tutarak uygula; yanlış hamle yaparsan geri alman gereken hamleler gösterilir. Karıştırma bitince <b>ilk hamlende süre başlar</b>, küp çözülünce durur. Çözüm sırasında cross'un, her F2L çiftinin, OLL'nin ve PLL'nin bittiği an otomatik algılanır; her aşamanın süresi, hamle sayısı ve hızı (TPS) çıkarılır. Cross hangi renkte olursa olsun çalışır.</p>
     </section>
+</div>
+
+<div class="ak-mini" id="akMini" aria-live="polite">
+    <div class="ak-mini-box">
+        <button type="button" class="ak-x" id="akMiniX" aria-label="Kapat">✕</button>
+        <div class="ak-time" id="akTime" dir="ltr">0.00</div>
+        <div class="ak-stages" id="akStages"></div>
+        <button type="button" class="btn sm ak-mini-dnf" id="akMiniDnf">DNF</button>
+    </div>
 </div>
 
 <div class="ak-modal" id="akFinal" role="dialog" aria-modal="true"><div class="ak-final" id="akFinalBox"></div></div>
@@ -307,11 +331,11 @@
 </footer>
 
 <script>var PAGE_ID = "akilli_kup";</script>
-<script src="/js/i18n.js?v=20261139"></script>
-<script src="/js/common.js?v=20261139"></script>
-<script src="/js/firebase-config.js?v=20261139"></script>
-<script src="/js/account.js?v=20261139"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261139"></script>
-<script src="/js/akilli-kup.js?v=20261139"></script>
+<script src="/js/i18n.js?v=20261140"></script>
+<script src="/js/common.js?v=20261140"></script>
+<script src="/js/firebase-config.js?v=20261140"></script>
+<script src="/js/account.js?v=20261140"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261140"></script>
+<script src="/js/akilli-kup.js?v=20261140"></script>
 </body>
 </html>

@@ -134,7 +134,7 @@ service cloud.firestore {
       function dk() { return ['host', 'hName', 'guest', 'gName', 'round', 'scr', 'hT', 'gT', 'hSt', 'gSt', 'hW', 'gW', 'sc', 'ts', 'fmt', 'hL', 'gL']; }
       function chg() { return request.resource.data.diff(resource.data).affectedKeys(); }
       allow get: if request.auth != null;
-      allow list: if false;
+      allow list: if isAdmin();          // admin paneli oda geçmişi
       allow create: if request.auth != null && code.matches('^[A-Z0-9]{5}$')
         && request.resource.data.keys().hasOnly(dk())
         && request.resource.data.host == request.auth.uid && request.resource.data.guest == ''
