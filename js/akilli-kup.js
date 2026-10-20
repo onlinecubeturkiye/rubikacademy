@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261145";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261146";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -43,6 +43,12 @@
     function solved(c) { return c.asString() === SOLVED_STR; }
     var SOLVED_STR = null;
 
+    // 2x2: R U F ile rastgele 10 hamle (aynı yüz art arda gelmez)
+    function genScramble222() {
+        var sfx = ["", "'", "2"], out = [], last = -1, n = 10;
+        while (out.length < n) { var f = Math.floor(Math.random() * 3); if (f === last) continue; out.push("RUF"[f] + sfx[Math.floor(Math.random() * 3)]); last = f; }
+        return out.join(" ");
+    }
     function genScramble() {
         var sfx = ["", "'", "2"], out = [], last = -1, prev = -1;
         while (out.length < 20) {
@@ -576,7 +582,7 @@
 
     /* =========================================================
        EV YARIŞMASI — comps/{kod} + comps/{kod}/p/{uid}
-       8/16 kişi, 3x3, her tur 5 çözüm (Ao5). Organizatör turları yönetir.
+       8-16 kişi, 3x3 ya da 2x2, her tur 5 çözüm (Ao5). Organizatör turları yönetir.
        Süre girişi: akıllı küp (bt), timer (boşluk/dokunma), elle yazma.
     ========================================================= */
     var comp = null; // { code, doc, players, mode, uid, round, orig, shownR }
@@ -614,6 +620,7 @@
     function myP() { return (comp && comp.players || []).filter(function (p) { return p.uid === comp.uid; })[0]; }
     function myTimes() { return comp ? (comp.local && comp.local.rnd === comp.doc.round ? comp.local.t.slice() : timesOf(myP())) : []; }
     function compCanSolve() { return !!(comp && comp.doc && comp.doc.st === "run" && eligible(comp.uid) && myTimes().length < 5); }
+    function evName(e) { return e === "222" ? "2x2" : "3x3"; }
     function roundLabel(d) { return d.fin ? "🏆 Final" : "Tur " + (d.round || 1); }
     function compHint() {
         var d = comp.doc || {};
@@ -638,9 +645,10 @@
         if (!signedIn()) { Account.openLogin && Account.openLogin(); return; }
         isOrgUser().then(function (ok) {
             if (!ok) { cMsg("Yalnızca <b>organizatör</b> rolündeki kişiler yarışma kurabilir.", 1); return; }
-            var c = code5(), u = Account.user(), cap = +(document.querySelector('input[name="cCap"]:checked') || {}).value || 8;
+            var c = code5(), u = Account.user(), cap = Math.max(8, Math.min(16, +($("cCapR") && $("cCapR").value) || 8));
+            var evc = (document.querySelector('input[name="cEv"]:checked') || {}).value === "222" ? "222" : "333";
             var name = ($("cName").value || "").trim().slice(0, 40) || (myName() + " ev yarışması");
-            var f = { host: u.uid, hName: myName(), name: name, cap: cap, ev: "333", round: 0, fin: 0, st: "lobby", scr: "", adv: "", R: "[]", mods: "" };
+            var f = { host: u.uid, hName: myName(), name: name, cap: cap, ev: evc, round: 0, fin: 0, st: "lobby", scr: "", adv: "", R: "[]", mods: "" };
             cMsg("Oluşturuluyor…");
             api("/comps?documentId=" + c, { method: "POST", body: JSON.stringify({ fields: cBody(f) }) }).then(function (r) {
                 if (!r.ok) throw new Error(r.status);
@@ -801,14 +809,14 @@
         var d = comp.doc, adv = "";
         var lr = lastRound();
         if (topN && lr) adv = lr.rows.filter(function (r) { return r.a != null && r.a < DNF; }).slice(0, topN).map(function (r) { return r.u; }).join(",");
-        var s = []; for (var i = 0; i < 5; i++) s.push(genScramble());
+        var s = []; for (var i = 0; i < 5; i++) s.push(d.ev === "222" ? genScramble222() : genScramble());
         closeFinal();
         compPatch({ round: (d.round || 0) + 1, st: "run", scr: s.join("|"), fin: fin ? 1 : 0, adv: adv }).then(compPoll);
     }
     function modeIcon(m) { return m === "bt" ? "🧊" : m === "manual" ? "⌨️" : "⏱️"; }
     function shareTextR(r) {
         var d = comp.doc;
-        return "🏠 " + d.name + " · " + (r.f ? "Final" : "Tur " + r.n) + " (3x3 Ao5)\n" + r.rows.map(function (x, i) {
+        return "🏠 " + d.name + " · " + (r.f ? "Final" : "Tur " + r.n) + " (" + evName(d.ev) + " Ao5)\n" + r.rows.map(function (x, i) {
             return (i + 1) + ". " + x.n + " — " + (x.a == null ? "-" : fmt(x.a)) + "  (" + x.t.map(fmt).join(", ") + ")";
         }).join("\n") + "\nrubikacademy.fun/icerikler/ev-yarismasi";
     }
@@ -819,7 +827,7 @@
         var g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#0b0d14"); g.addColorStop(1, "#1d1838"); x.fillStyle = g; x.fillRect(0, 0, W, H);
         x.textAlign = "center"; x.fillStyle = "#a4aabe"; x.font = "700 32px Inter, sans-serif"; x.fillText("RUBIK ACADEMY · EV YARIŞMASI", W / 2, 90);
         x.fillStyle = "#eef0f7"; x.font = "900 56px Inter, sans-serif"; x.fillText(clip(d.name, 28), W / 2, 170);
-        x.fillStyle = acc; x.font = "800 38px Inter, sans-serif"; x.fillText((r.f ? "🏆 Final" : "Tur " + r.n) + " · 3x3 Ao5", W / 2, 230);
+        x.fillStyle = acc; x.font = "800 38px Inter, sans-serif"; x.fillText((r.f ? "🏆 Final" : "Tur " + r.n) + " · " + evName(d.ev) + " Ao5", W / 2, 230);
         r.rows.forEach(function (row, i) {
             var y = 290 + i * rowH;
             x.fillStyle = i === 0 ? acc : i % 2 ? "#141826" : "#1a1e2c"; roundRect(x, 60, y, W - 120, rowH - 10, 18); x.fill();
@@ -870,7 +878,7 @@
         var d = comp.doc, host = isHost(), owner = isOwner();
         $("cTitle").textContent = d.name || "Ev yarışması";
         $("cCode").textContent = comp.code;
-        $("cRound").textContent = d.st === "lobby" ? "Lobi · " + comp.players.length + "/" + d.cap + " kişi" : roundLabel(d) + " · " + (d.st === "end" ? "bitti" : "sürüyor") + " · " + comp.players.length + "/" + d.cap;
+        $("cRound").textContent = evName(d.ev) + " · " + (d.st === "lobby" ? "Lobi · " + comp.players.length + "/" + d.cap + " kişi" : roundLabel(d) + " · " + (d.st === "end" ? "bitti" : "sürüyor") + " · " + comp.players.length + "/" + d.cap);
         Array.prototype.forEach.call(document.querySelectorAll(".c-mode button"), function (b) { b.classList.toggle("on", b.getAttribute("data-m") === comp.mode); b.disabled = phase === "solving"; });
         // kendi süreleri
         var t = myTimes();
@@ -909,6 +917,7 @@
     function initComp() {
         initCompRole();
         $("cCreate").onclick = createComp;
+        if ($("cCapR")) $("cCapR").oninput = function () { $("cCapV").textContent = this.value; };
         $("cJoin").onclick = function () { joinComp($("cJoinIn").value); };
         $("cJoinIn").onkeydown = function (e) { if (e.key === "Enter") joinComp($("cJoinIn").value); };
         $("cLeave").onclick = function () { if (confirm("Yarışmadan çıkılsın mı?")) leaveComp(); };

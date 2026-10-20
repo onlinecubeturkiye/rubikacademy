@@ -160,7 +160,7 @@ service cloud.firestore {
       allow delete: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin());
     }
 
-    // Ev yarışması (akıllı küp sayfası): 8/16 kişi, 3x3, turlar Ao5. Yalnız organizatör (ya da admin) kurar.
+    // Ev yarışması (/icerikler/ev-yarismasi): 8-16 kişi, 3x3 ya da 2x2, turlar Ao5. Yalnız organizatör (ya da admin) kurar.
     match /comps/{code} {
       function org() {
         return request.auth != null && (isAdmin()
@@ -176,7 +176,8 @@ service cloud.firestore {
       allow create: if org() && code.matches('^[A-Z0-9]{5}$')
         && request.resource.data.keys().hasOnly(ck())
         && request.resource.data.host == request.auth.uid
-        && request.resource.data.cap in [8, 16]
+        && request.resource.data.cap is int && request.resource.data.cap >= 8 && request.resource.data.cap <= 16
+        && request.resource.data.ev in ['333', '222']
         && request.resource.data.name is string && request.resource.data.name.size() <= 40;
       // Sahip/admin her şeyi değiştirir (devretme ve moderatör atama dahil); moderatör yalnız tur alanlarını
       allow update: if request.auth != null
@@ -185,7 +186,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(ck())
         && request.resource.data.host is string && request.resource.data.host.size() > 0
         && (!('mods' in request.resource.data) || request.resource.data.mods.size() <= 600)
-        && request.resource.data.cap in [8, 16]
+        && request.resource.data.cap is int && request.resource.data.cap >= 8 && request.resource.data.cap <= 16
         && request.resource.data.R is string && request.resource.data.R.size() <= 200000
         && request.resource.data.scr is string && request.resource.data.scr.size() <= 1500;
       allow delete: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin());
