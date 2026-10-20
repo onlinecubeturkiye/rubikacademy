@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261149";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261150";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -1048,7 +1048,8 @@
         apiAny("/comps?pageSize=100", { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
             var now = Date.now();
             var list = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; })
-                .filter(function (o) { return now - o.up < 6 * 3600000 && !(o.st === "end" && o.fin && now - o.up > 1800000); })
+                // başlatılmamış (lobi) yarışmalar listede görünmez
+                .filter(function (o) { return o.st && o.st !== "lobby" && now - o.up < 6 * 3600000 && !(o.st === "end" && o.fin && now - o.up > 1800000); })
                 .sort(function (a, b) { return b.up - a.up; }).slice(0, 10);
             $("cLiveWrap").hidden = !list.length;
             if (!list.length) return;
