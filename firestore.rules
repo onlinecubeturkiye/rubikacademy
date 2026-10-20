@@ -167,7 +167,10 @@ service cloud.firestore {
           || (exists(/databases/$(database)/documents/roles/$(request.auth.uid))
               && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == 'organizator'));
       }
-      function ck() { return ['host', 'hName', 'name', 'cap', 'ev', 'round', 'fin', 'st', 'scr', 'adv', 'R', 'ts']; }
+      function ck() { return ['host', 'hName', 'name', 'cap', 'ev', 'round', 'fin', 'st', 'scr', 'adv', 'R', 'ts', 'mods']; }
+      // Moderatör: oda sahibinin atadığı kişiler (mods = virgülle uid listesi)
+      function isModOf(d) { return request.auth != null && ('mods' in d) && d.mods.split(',').hasAny([request.auth.uid]); }
+      function chgC() { return request.resource.data.diff(resource.data).affectedKeys(); }
       allow get: if request.auth != null;
       allow list: if isAdmin();
       allow create: if org() && code.matches('^[A-Z0-9]{5}$')
@@ -175,15 +178,19 @@ service cloud.firestore {
         && request.resource.data.host == request.auth.uid
         && request.resource.data.cap in [8, 16]
         && request.resource.data.name is string && request.resource.data.name.size() <= 40;
-      allow update: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin())
+      // Sahip/admin her şeyi değiştirir (devretme ve moderatör atama dahil); moderatör yalnız tur alanlarını
+      allow update: if request.auth != null
+        && (request.auth.uid == resource.data.host || isAdmin()
+            || (isModOf(resource.data) && !chgC().hasAny(['host', 'hName', 'mods', 'cap', 'name'])))
         && request.resource.data.keys().hasOnly(ck())
-        && request.resource.data.host == resource.data.host
+        && request.resource.data.host is string && request.resource.data.host.size() > 0
+        && (!('mods' in request.resource.data) || request.resource.data.mods.size() <= 600)
         && request.resource.data.cap in [8, 16]
         && request.resource.data.R is string && request.resource.data.R.size() <= 200000
         && request.resource.data.scr is string && request.resource.data.scr.size() <= 1500;
       allow delete: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin());
 
-      // Yarışmacılar: herkes kendi kaydını yazar; organizatör çıkarabilir
+      // Yarışmacılar: herkes kendi kaydını yazar; oda sahibi ya da moderatör çıkarabilir
       match /p/{uid} {
         allow read: if request.auth != null;
         allow create, update: if request.auth != null && request.auth.uid == uid
@@ -192,7 +199,8 @@ service cloud.firestore {
           && request.resource.data.mode in ['bt', 'timer', 'manual']
           && request.resource.data.t is string && request.resource.data.t.size() <= 120;
         allow delete: if request.auth != null && (request.auth.uid == uid || isAdmin()
-          || get(/databases/$(database)/documents/comps/$(code)).data.host == request.auth.uid);
+          || get(/databases/$(database)/documents/comps/$(code)).data.host == request.auth.uid
+          || isModOf(get(/databases/$(database)/documents/comps/$(code)).data));
       }
     }
 

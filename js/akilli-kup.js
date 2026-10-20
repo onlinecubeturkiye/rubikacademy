@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261142";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261143";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -591,7 +591,22 @@
         if (Account.isAdmin && Account.isAdmin()) return Promise.resolve(true);
         return Account.getRole(Account.user().uid).then(function (r) { return r === "organizator"; });
     }
-    function isHost() { return !!(comp && comp.doc && (comp.doc.host === comp.uid || (Account.isAdmin && Account.isAdmin()))); }
+    // Oda sahibi (ya da admin): moderatör atar, odayı devreder. Moderatör: turları yönetir, yarışmacı çıkarır.
+    function isOwner() { return !!(comp && comp.doc && (comp.doc.host === comp.uid || (Account.isAdmin && Account.isAdmin()))); }
+    function modList() { return String((comp && comp.doc && comp.doc.mods) || "").split(",").filter(Boolean); }
+    function isMod(uid) { return modList().indexOf(uid) >= 0; }
+    function isHost() { return isOwner() || !!(comp && isMod(comp.uid)); }
+    function toggleMod(uid) {
+        var l = modList(), i = l.indexOf(uid);
+        if (i >= 0) l.splice(i, 1); else l.push(uid);
+        compPatch({ mods: l.join(",") }).then(compPoll);
+    }
+    function transferTo(uid, name) {
+        if (!confirm("Oda " + name + " kişisine devredilsin mi? Sen moderatör olarak kalırsın.")) return;
+        var l = modList().filter(function (x) { return x !== uid; });
+        if (l.indexOf(comp.doc.host) < 0) l.push(comp.doc.host);
+        compPatch({ host: uid, hName: String(name || "").slice(0, 24), mods: l.join(",") }).then(compPoll);
+    }
     function scrList() { return String((comp && comp.doc && comp.doc.scr) || "").split("|").filter(Boolean); }
     function eligible(uid) { var a = String((comp.doc && comp.doc.adv) || ""); return !a || a.split(",").indexOf(uid) >= 0; }
     function timesOf(p) { return p && p.rnd === comp.doc.round ? listOf(p.t) : []; }
@@ -626,7 +641,7 @@
             if (!ok) { cMsg("Yalnızca <b>organizatör</b> rolündeki kişiler yarışma kurabilir.", 1); return; }
             var c = code5(), u = Account.user(), cap = +(document.querySelector('input[name="cCap"]:checked') || {}).value || 8;
             var name = ($("cName").value || "").trim().slice(0, 40) || (myName() + " ev yarışması");
-            var f = { host: u.uid, hName: myName(), name: name, cap: cap, ev: "333", round: 0, fin: 0, st: "lobby", scr: "", adv: "", R: "[]" };
+            var f = { host: u.uid, hName: myName(), name: name, cap: cap, ev: "333", round: 0, fin: 0, st: "lobby", scr: "", adv: "", R: "[]", mods: "" };
             cMsg("Oluşturuluyor…");
             api("/comps?documentId=" + c, { method: "POST", body: JSON.stringify({ fields: cBody(f) }) }).then(function (r) {
                 if (!r.ok) throw new Error(r.status);
@@ -853,7 +868,7 @@
     }
     function renderComp() {
         if (!comp || !comp.doc) return;
-        var d = comp.doc, host = isHost();
+        var d = comp.doc, host = isHost(), owner = isOwner();
         $("cTitle").textContent = d.name || "Ev yarışması";
         $("cCode").textContent = comp.code;
         $("cRound").textContent = d.st === "lobby" ? "Lobi · " + comp.players.length + "/" + d.cap + " kişi" : roundLabel(d) + " · " + (d.st === "end" ? "bitti" : "sürüyor") + " · " + comp.players.length + "/" + d.cap;
@@ -871,16 +886,20 @@
         var rows = rankRows(), out = comp.players.filter(function (p) { return !eligible(p.uid); });
         $("cTable").innerHTML = '<table><thead><tr><th>#</th><th>Yarışmacı</th><th>Çözüm</th><th>Süreler</th><th>Ao5</th>' + (host ? '<th></th>' : '') + '</tr></thead><tbody>' +
             rows.map(function (r, i) {
-                return '<tr' + (r.uid === comp.uid ? ' class="me"' : '') + '><td>' + (i + 1) + '</td><td>' + modeIcon(r.m) + ' ' + esc(r.n) + (r.uid === d.host ? ' <small>👑</small>' : '') + '</td><td>' + r.t.length + '/5</td><td class="mono small">' + r.t.map(fmt).join(", ") + '</td><td class="mono"><b>' + (r.a == null ? "-" : fmt(r.a)) + '</b></td>' +
-                    (host ? '<td>' + (r.uid !== comp.uid ? '<button type="button" class="c-kick" data-k="' + esc(r.uid) + '" title="Çıkar">✕</button>' : '') + '</td>' : '') + '</tr>';
+                return '<tr' + (r.uid === comp.uid ? ' class="me"' : '') + '><td>' + (i + 1) + '</td><td>' + modeIcon(r.m) + ' ' + esc(r.n) + (r.uid === d.host ? ' <small title="Oda sahibi">👑</small>' : isMod(r.uid) ? ' <small title="Moderatör">🛡️</small>' : '') + '</td><td>' + r.t.length + '/5</td><td class="mono small">' + r.t.map(fmt).join(", ") + '</td><td class="mono"><b>' + (r.a == null ? "-" : fmt(r.a)) + '</b></td>' +
+                    (host ? '<td class="c-act">' + (owner && r.uid !== d.host ? '<button type="button" class="c-mini" data-mod="' + esc(r.uid) + '" title="' + (isMod(r.uid) ? "Moderatörlüğü al" : "Moderatör yap") + '">' + (isMod(r.uid) ? "🛡️−" : "🛡️+") + '</button><button type="button" class="c-mini" data-tr="' + esc(r.uid) + '" data-n="' + esc(r.n) + '" title="Odayı devret">👑→</button>' : '') +
+                        (r.uid !== comp.uid && r.uid !== d.host ? '<button type="button" class="c-kick" data-k="' + esc(r.uid) + '" title="Çıkar">✕</button>' : '') + '</td>' : '') + '</tr>';
             }).join("") +
             out.map(function (p) { return '<tr class="out"><td>–</td><td>' + esc(p.name) + '</td><td colspan="' + (host ? 4 : 3) + '">elendi</td></tr>'; }).join("") +
             '</tbody></table>';
+        Array.prototype.forEach.call($("cTable").querySelectorAll("[data-mod]"), function (b) { b.onclick = function () { toggleMod(b.getAttribute("data-mod")); }; });
+        Array.prototype.forEach.call($("cTable").querySelectorAll("[data-tr]"), function (b) { b.onclick = function () { transferTo(b.getAttribute("data-tr"), b.getAttribute("data-n")); }; });
         Array.prototype.forEach.call($("cTable").querySelectorAll("[data-k]"), function (b) {
             b.onclick = function () { if (confirm("Bu yarışmacı çıkarılsın mı?")) api(cPath("/p/" + b.getAttribute("data-k")), { method: "DELETE" }).then(compPoll); };
         });
-        // organizatör kontrolleri
+        // organizatör / moderatör kontrolleri
         $("cOrg").hidden = !host;
+        $("cOrgWho").textContent = owner ? "👑 Oda sahibi:" : "🛡️ Moderatör:";
         $("cStart").hidden = d.st !== "lobby"; $("cStart").disabled = comp.players.length < 2;
         $("cEnd").hidden = d.st !== "run";
         $("cShowRes").hidden = !hist().length;
