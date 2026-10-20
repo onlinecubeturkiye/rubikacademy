@@ -2,7 +2,7 @@
    küp simülasyonuyla üretilmiş farklı görünümler (AUF, küp döndürme) var; 3B görünümden case seçilir. */
 (function () {
     var started = false;
-    var V = "20261160";
+    var V = "20261161";
     var MODES = {
         pll: { file: "tanima-pll.json", key: "recog-pll-v1", set: "pll", thumbs: false },
         oll: { file: "tanima-oll.json", key: "recog-oll-v1", set: "oll", thumbs: true, draw: function (c, s) { return llSvg(c.pattern, "oll", s); } }
