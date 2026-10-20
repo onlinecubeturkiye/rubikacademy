@@ -27,10 +27,10 @@
 <meta property="og:description" content="Başlangıçtan ileri setlere adım adım küp öğrenme yolu.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/yol-haritasi">
-<meta property="og:image" content="https://rubikacademy.fun/og/yol-haritasi.png?v=20261157">
+<meta property="og:image" content="https://rubikacademy.fun/og/yol-haritasi.png?v=20261158">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/yol-haritasi.png?v=20261157">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/yol-haritasi.png?v=20261158">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261157">
+<link rel="stylesheet" href="/styles/common.css?v=20261158">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -84,6 +84,14 @@
 .step.done .step-mark { border-color: var(--cube-green); }
 .yol-how { max-width: 860px; font-size: 13px; color: var(--text-soft); margin-top: 8px; }
 .yol-done-msg { max-width: 860px; padding: 14px 16px; border-radius: 16px; background: var(--tint-green); font-weight: 900; color: var(--text); margin-bottom: 18px; }
+/* ortalanmış düzen */
+.yol-head { text-align: center; }
+.yol-head p { margin-left: auto; margin-right: auto; }
+.tracks { justify-content: center; }
+.overall, .steps, .yol-how, .yol-done-msg { margin-left: auto; margin-right: auto; }
+.yol-how { text-align: center; }
+.track-sec { display: block; width: 100%; text-align: center; font: 800 11px Inter, sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-soft); margin: 4px 0 -2px; }
+@media (max-width: 600px) { .tracks { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; margin-left: -16px; margin-right: -16px; padding: 2px 16px 8px; scrollbar-width: none; } .tracks::-webkit-scrollbar { display: none; } .track-btn { flex: none; } }
 @media (max-width: 600px) { .yol-head h1 { font-size: 34px; } .step-num { width: 40px; height: 40px; font-size: 15px; } .steps::before { inset-inline-start: 18px; } .step { gap: 10px; } }
 </style>
 
@@ -150,10 +158,10 @@
 </footer>
 
 <script>var PAGE_ID = "yol";</script>
-<script src="/js/i18n.js?v=20261157"></script>
-<script src="/js/common.js?v=20261157"></script>
-<script src="/js/firebase-config.js?v=20261157"></script>
-<script src="/js/account.js?v=20261157"></script>
+<script src="/js/i18n.js?v=20261158"></script>
+<script src="/js/common.js?v=20261158"></script>
+<script src="/js/firebase-config.js?v=20261158"></script>
+<script src="/js/account.js?v=20261158"></script>
 
 
 <script>
@@ -170,8 +178,18 @@
             { id: "tlp", key: "algo-progress-2look-2lp", total: 6, href: A + "2look-pll" },
             { id: "pll", key: "algo-progress-pll", total: 21, href: A + "pll" },
             { id: "oll", key: "algo-progress-oll", total: 57, href: A + "oll" },
+            { id: "f2la", key: "algo-progress-f2l", total: 41, href: A + "antrenor?set=f2l" },
+            { id: "daily", manual: true, href: "/icerikler/gunluk" } ] },
+        { id: "adv", steps: [
+            { id: "xc", manual: true, href: A + "antrenor?set=xcross" },
             { id: "wv", key: "algo-progress-wv", total: 27, href: A + "wv" },
-            { id: "coll", key: "algo-progress-coll", total: 42, href: A + "coll" } ] },
+            { id: "coll", key: "algo-progress-coll", total: 42, href: A + "coll" },
+            { id: "zbll", key: "algo-progress-zbll", total: 472, href: A + "zbll" },
+            { id: "smart", manual: true, href: "/icerikler/akilli-kup" } ] },
+        { id: "oh", steps: [
+            { id: "oholl", key: "algo-progress-oh-oll", total: 57, href: A + "tek-el#oll" },
+            { id: "ohpll", key: "algo-progress-oh-pll", total: 21, href: A + "tek-el#pll" },
+            { id: "ohcmll", key: "algo-progress-oh-cmll", total: 42, href: A + "tek-el#cmll" } ] },
         { id: "roux", steps: [
             { id: "cmll", key: "algo-progress-roux-cmll", total: 42, href: A + "roux#cmll" },
             { id: "eo", key: "algo-progress-roux-eo", total: 11, href: A + "roux#eo" } ] },
@@ -190,7 +208,21 @@
             { id: "ska", key: "algo-progress-skewb-advanced", total: 136, href: A + "skewb#advanced" } ] },
         { id: "big", steps: [
             { id: "p4", key: "algo-progress-4x4-parity", total: 2, href: A + "4x4#parity" },
-            { id: "p5", key: "algo-progress-5x5-parity", total: 1, href: A + "5x5#parity" } ] }
+            { id: "p5", key: "algo-progress-5x5-parity", total: 1, href: A + "5x5#parity" } ] },
+        { id: "mega", steps: [
+            { id: "mgo", key: "algo-progress-megaminx-oll", total: 19, href: A + "megaminx#oll" },
+            { id: "mgp", key: "algo-progress-megaminx-pll", total: 18, href: A + "megaminx#pll" } ] },
+        { id: "sq1", steps: [
+            { id: "sqs", key: "algo-progress-square1-shape", total: 89, href: A + "square1#shape" },
+            { id: "sqco", key: "algo-progress-square1-co", total: 7, href: A + "square1#co" },
+            { id: "sqeo", key: "algo-progress-square1-eo", total: 7, href: A + "square1#eo" },
+            { id: "sqcp", key: "algo-progress-square1-cp", total: 35, href: A + "square1#cp" },
+            { id: "sqep", key: "algo-progress-square1-ep", total: 16, href: A + "square1#ep" } ] },
+        { id: "bld", steps: [
+            { id: "bldm", manual: true, href: A + "3bld" },
+            { id: "blde", manual: true, href: A + "3bld#edges" },
+            { id: "bldc", manual: true, href: A + "3bld#corners" },
+            { id: "bldp", manual: true, href: A + "3bld" } ] }
     ];
     var DONE_KEY = "roadmap-done-v1", TRACK_KEY = "roadmap-track-v1";
     function lang() { return localStorage.getItem("site-lang") || "tr"; }
