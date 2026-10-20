@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261151";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261152";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -727,7 +727,7 @@
             $("cLobby").hidden = true; $("cRoom").hidden = false; cMsg("");
             document.body.classList.add("c-in-room");
             try { $("akComp").scrollIntoView({ block: "start" }); } catch (e) {}
-            compPoll(); heartbeat();
+            comp.chat = []; comp.chatKey = null; chatUi(); compPoll(); heartbeat();
             clearInterval(compPollT); compPollT = setInterval(function () { if (document.visibilityState === "visible") compPoll(); }, comp.watch ? 2500 : 1500);
             clearInterval(hbT); hbT = setInterval(function () { if (document.visibilityState === "visible") heartbeat(); }, HB_MS);
         }).catch(function (e) { comp = null; cMsg(esc(e.message), 1); });
@@ -758,6 +758,8 @@
                 var ex = {}; comp.players.forEach(function (p) { ex[p.uid] = 1; });
                 countWatchers(comp.code, ex).then(function (n) { if (comp) { comp.watchers = n; var w = $("cWatch"); if (w) w.textContent = "👁 " + n + " kişi izliyor"; } });
             }
+            comp.pn = (comp.pn || 0) + 1;
+            if (comp.pn % 2 === 1) chatLoad(); else renderChat();
             comp.mode = "manual";
             // tur ya da durum değişti: sıradaki karıştırmayı göster
             if (prev.round !== d.round || prev.st !== d.st) { comp.local = null; comp.orig = {}; comp.editIdx = null; nextScramble(true); }
@@ -889,6 +891,54 @@
         closeFinal();
         compPatch({ round: (d.round || 0) + 1, st: "run", scr: s.join("|"), fin: fin ? 1 : 0, adv: adv }).then(compPoll);
     }
+    // Final turu yapmadan bitir: son tur final sayılır, birincisi şampiyon olur
+    function finishComp() {
+        if (!isHost() || !comp.doc || comp.doc.st !== "end" || comp.doc.fin) return;
+        if (!confirm("Yarışma burada bitirilsin mi? Son turun birincisi şampiyon olur.")) return;
+        var h = hist(); if (h.length) h[h.length - 1].f = 1;
+        closeFinal();
+        compPatch({ fin: 1, R: JSON.stringify(h) }).then(compPoll);
+    }
+    /* --- mini sohbet: comps/{kod}/m/{id} = {u, n, x, ts} --- */
+    function chatLoad() {
+        if (!comp) return;
+        apiAny(cPath("/m?pageSize=40&orderBy=ts%20desc"), { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            if (!comp || !d) return;
+            comp.chat = (d.documents || []).map(function (x) { var o = parseDoc(x); o.id = x.name.split("/").pop(); return o; }).reverse();
+            renderChat();
+        }).catch(function () {});
+    }
+    function renderChat() {
+        var box = $("cChatList"); if (!box || !comp) return;
+        var list = comp.chat || [], host = isHost(), key = list.map(function (m) { return m.id; }).join(",") + "|" + host;
+        if (comp.chatKey === key) return;
+        comp.chatKey = key;
+        var atEnd = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+        box.innerHTML = list.length ? list.map(function (m) {
+            var me = m.u === comp.uid, badge = comp.doc && m.u === comp.doc.host ? "👑 " : isMod(m.u) ? "🛡️ " : "";
+            return '<div class="c-cm' + (me ? " me" : "") + '"><b>' + badge + esc(m.n) + '</b> ' + esc(m.x) +
+                (host || me ? '<button type="button" class="c-cdel" data-mid="' + esc(m.id) + '" title="Sil">✕</button>' : '') + '</div>';
+        }).join("") : '<p class="c-chat-empty">Henüz mesaj yok. İlk mesajı sen yaz 👋</p>';
+        if (atEnd || !comp.chatSeen) box.scrollTop = box.scrollHeight;
+        comp.chatSeen = true;
+        Array.prototype.forEach.call(box.querySelectorAll("[data-mid]"), function (b) {
+            b.onclick = function () { api(cPath("/m/" + b.getAttribute("data-mid")), { method: "DELETE" }).then(function () { comp && (comp.chatKey = ""); chatLoad(); }); };
+        });
+    }
+    function chatSend() {
+        var inp = $("cChatIn"), x = inp.value.trim().slice(0, 200), err = $("cChatErr");
+        if (!x || !comp || !signedIn()) return;
+        var now = Date.now();
+        if (comp.chatT && now - comp.chatT < 1500) { err.textContent = "Biraz yavaş 🙂"; return; }
+        comp.chatT = now; inp.value = ""; err.textContent = "";
+        var id = now.toString(36) + Math.random().toString(36).slice(2, 7);
+        var body = { fields: { u: val(Account.user().uid), n: val(myName()), x: val(x), ts: { timestampValue: new Date().toISOString() } } };
+        api(cPath("/m") + "?documentId=" + id, { method: "POST", body: JSON.stringify(body) }).then(function (r) {
+            if (!r.ok) { inp.value = x; err.textContent = "Mesaj gönderilemedi."; }
+            chatLoad();
+        }, function () { inp.value = x; err.textContent = "Mesaj gönderilemedi."; });
+    }
+    function chatUi() { if (!$("cChatForm")) return; var ok = signedIn(); $("cChatForm").hidden = !ok; $("cChatLogin").hidden = ok; }
     function modeIcon(m) { return m === "bt" ? "🧊" : m === "manual" ? "⌨️" : "⏱️"; }
     function shareTextR(r) {
         var d = comp.doc;
@@ -929,7 +979,8 @@
             '</tbody></table></div>' +
             '<div class="ak-fin-b"><button type="button" class="btn primary" id="cShareImg">🖼️ Görsel paylaş</button><button type="button" class="btn" id="cShareTxt">📝 Metin paylaş</button></div>' +
             (host && latest && !r.f ? '<div class="c-next"><label>Sonraki tura geçenler <select id="cAdv"><option value="0">Herkes</option><option value="8">İlk 8</option><option value="4">İlk 4</option><option value="2">İlk 2</option></select></label>' +
-                '<div class="ak-fin-b"><button type="button" class="btn" id="cNextR">▶ Yeni tur başlat</button><button type="button" class="btn primary" id="cFinalR">🏆 Final turu başlat</button></div></div>' : "") +
+                '<div class="ak-fin-b"><button type="button" class="btn" id="cNextR">▶ Yeni tur başlat</button><button type="button" class="btn primary" id="cFinalR">🏆 Final turu başlat</button></div>' +
+                '<div class="ak-fin-b" style="margin-top:6px"><button type="button" class="btn" id="cFinishR">🏁 Final olmadan yarışmayı bitir</button></div></div>' : "") +
             (latest && r.f ? '<p class="ak-fin-s">Yarışma bitti 🎉</p>' : "") +
             '<div class="ak-fin-b" style="margin-top:8px"><button type="button" class="btn" id="akFinClose2">Kapat</button></div><div class="ak-msg" id="akShareMsg"></div>';
         $("akFinClose").onclick = $("akFinClose2").onclick = closeFinal;
@@ -948,6 +999,7 @@
         };
         if ($("cNextR")) $("cNextR").onclick = function () { startRound(false, +$("cAdv").value); };
         if ($("cFinalR")) $("cFinalR").onclick = function () { startRound(true, +$("cAdv").value); };
+        if ($("cFinishR")) $("cFinishR").onclick = finishComp;
     }
     // Karıştırılmış küpün açılımı (beyaz üst, yeşil ön). 2x2: aynı R U F hamleleri 3x3 modelinde, yalnız köşeler.
     var NET_COL = { U: "#f4f4f4", R: "#e3262c", F: "#16a34a", D: "#f6c719", L: "#ff7a1a", B: "#2c6fe6" };
@@ -1033,10 +1085,11 @@
         });
         // organizatör / moderatör kontrolleri
         renderNow();
-        $("cOrg").hidden = !host;
+        $("cOrg").hidden = !host || (d.st === "end" && !!d.fin);
         $("cOrgWho").textContent = owner ? "👑 Oda sahibi:" : "🛡️ Moderatör:";
         $("cStart").hidden = d.st !== "lobby"; $("cStart").disabled = comp.players.length < 2;
         $("cEnd").hidden = d.st !== "run";
+        if ($("cFinish")) $("cFinish").hidden = !(d.st === "end" && !d.fin);
         $("cShowRes").hidden = !hist().length;
         $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? "Yarışmacılar katılınca turu başlat (en az 2 kişi)." : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes 5 çözümü bitirince tur kendiliğinden biter." : (d.fin ? "Final bitti." : "Tur bitti.");
         renderModeUi();
@@ -1079,6 +1132,11 @@
         $("cJoinIn").onkeydown = function (e) { if (e.key === "Enter") joinComp($("cJoinIn").value); };
         $("cLeave").onclick = function () { if (confirm("Yarışmadan çıkılsın mı?")) leaveComp(); };
         $("cStart").onclick = function () { startRound(false, 0); };
+        if ($("cFinish")) $("cFinish").onclick = finishComp;
+        if ($("cChatForm")) {
+            $("cChatForm").onsubmit = function (e) { e.preventDefault(); chatSend(); };
+            $("cChatLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
+        }
         $("cEnd").onclick = function () { if (confirm("Tur şimdi bitirilsin mi? Eksik çözümü olanların Ao5'i olmaz.")) endRound(); };
         $("cShowRes").onclick = function () { var h = hist(); if (h.length) showRoundResults(h[h.length - 1]); };
         Array.prototype.forEach.call(document.querySelectorAll(".c-mode button"), function (b) { b.onclick = function () { setMode(b.getAttribute("data-m")); }; });
@@ -1156,7 +1214,7 @@
             if (window.Account && Account.onChange) Account.onChange(function (u) { if (u && !duel) joinDuel(q); });
             setTimeout(tryJoin, 1200);
         } else if (!EV_PAGE) setTab("analysis");
-        if (window.Account && Account.onChange) Account.onChange(function () { $("akLoginNote").hidden = signedIn(); $("cLoginNote").hidden = signedIn(); initCompRole(); });
+        if (window.Account && Account.onChange) Account.onChange(function () { $("akLoginNote").hidden = signedIn(); $("cLoginNote").hidden = signedIn(); initCompRole(); if (comp) chatUi(); });
         $("akLoginNote").hidden = signedIn();
         $("akLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
     }
