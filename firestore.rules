@@ -116,7 +116,7 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isAdmin()
         && request.resource.data.keys().hasOnly(['role'])
-        && request.resource.data.role in ['uye', 'gelistirici', 'tester', 'askida', 'silindi'];
+        && request.resource.data.role in ['uye', 'gelistirici', 'tester', 'organizator', 'askida', 'silindi'];
       // Hesabını silen üye kendi rol kaydını da siler (askıya alınmış / silinmişse silemez)
       allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid && !(resource.data.role in ['askida', 'silindi']));
     }
@@ -158,6 +158,42 @@ service cloud.firestore {
         && (!('hL' in request.resource.data) || request.resource.data.hL.size() <= 200)
         && (!('gL' in request.resource.data) || request.resource.data.gL.size() <= 200);
       allow delete: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin());
+    }
+
+    // Ev yarışması (akıllı küp sayfası): 8/16 kişi, 3x3, turlar Ao5. Yalnız organizatör (ya da admin) kurar.
+    match /comps/{code} {
+      function org() {
+        return request.auth != null && (isAdmin()
+          || (exists(/databases/$(database)/documents/roles/$(request.auth.uid))
+              && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == 'organizator'));
+      }
+      function ck() { return ['host', 'hName', 'name', 'cap', 'ev', 'round', 'fin', 'st', 'scr', 'adv', 'R', 'ts']; }
+      allow get: if request.auth != null;
+      allow list: if isAdmin();
+      allow create: if org() && code.matches('^[A-Z0-9]{5}$')
+        && request.resource.data.keys().hasOnly(ck())
+        && request.resource.data.host == request.auth.uid
+        && request.resource.data.cap in [8, 16]
+        && request.resource.data.name is string && request.resource.data.name.size() <= 40;
+      allow update: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin())
+        && request.resource.data.keys().hasOnly(ck())
+        && request.resource.data.host == resource.data.host
+        && request.resource.data.cap in [8, 16]
+        && request.resource.data.R is string && request.resource.data.R.size() <= 200000
+        && request.resource.data.scr is string && request.resource.data.scr.size() <= 1500;
+      allow delete: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin());
+
+      // Yarışmacılar: herkes kendi kaydını yazar; organizatör çıkarabilir
+      match /p/{uid} {
+        allow read: if request.auth != null;
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['name', 'mode', 't', 'rnd', 'ts'])
+          && request.resource.data.name is string && request.resource.data.name.size() <= 24
+          && request.resource.data.mode in ['bt', 'timer', 'manual']
+          && request.resource.data.t is string && request.resource.data.t.size() <= 120;
+        allow delete: if request.auth != null && (request.auth.uid == uid || isAdmin()
+          || get(/databases/$(database)/documents/comps/$(code)).data.host == request.auth.uid);
+      }
     }
 
     // Site ayarı (bakım modu): herkes okur, yalnız admin yazar
