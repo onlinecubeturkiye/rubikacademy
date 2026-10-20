@@ -27,10 +27,10 @@
 <meta property="og:description" content="Çözümünü aşama aşama analiz et, arkadaşınla canlı düello yap.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/akilli-kup">
-<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261147">
+<meta property="og:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261148">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261147">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/antrenor.png?v=20261148">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261147">
+<link rel="stylesheet" href="/styles/common.css?v=20261148">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -186,6 +186,19 @@
 .c-cap { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font: 800 13px Inter, sans-serif; color: var(--text-soft); }
 .c-cap input { flex: 1; accent-color: var(--ui-accent); }
 #cCreateBox.locked .c-cap { opacity: .5; pointer-events: none; }
+.c-livewrap { margin-bottom: 14px; }
+.c-livewrap h3 { font-size: 16px; color: var(--text); margin-bottom: 8px; }
+.c-live { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--surface-soft); margin-bottom: 8px; }
+.c-live-tx { flex: 1; min-width: 0; } .c-live-tx b { display: block; color: var(--text); font-size: 15px; } .c-live-tx small { color: var(--text-soft); font-size: 12.5px; font-weight: 700; }
+.c-dot { width: 10px; height: 10px; border-radius: 50%; background: #9ca3af; flex-shrink: 0; }
+.c-dot.on { background: #ef4444; box-shadow: 0 0 0 0 rgba(239,68,68,.6); animation: cPulse 1.6s infinite; }
+@keyframes cPulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,.55); } 70% { box-shadow: 0 0 0 9px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+.ak-pill.live { color: var(--text); }
+.ak-pill.live::before { background: #ef4444; }
+.c-watch-badge { margin-bottom: 12px; padding: 10px 12px; border-radius: 12px; background: var(--tint-blue); font-size: 13.5px; color: var(--text); }
+.c-scrs { margin-bottom: 12px; padding: 12px; border-radius: 14px; background: var(--surface-soft); font-size: 13.5px; }
+.c-scrs > b { display: block; margin-bottom: 6px; color: var(--text); }
+.c-scrs div { display: flex; gap: 8px; padding: 3px 0; color: var(--text-soft); } .c-scrs code { font: 700 13.5px "JetBrains Mono", monospace; color: var(--text); }
 .c-mode { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 4px 0 12px; }
 .c-mode span { font-size: 13px; font-weight: 800; color: var(--text-soft); }
 .c-mode button { border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 800 13px Inter, sans-serif; padding: 7px 12px; border-radius: 999px; cursor: pointer; }
@@ -326,6 +339,7 @@
     <div id="cLobby">
         <h2>🏠 Ev yarışması</h2>
         <p class="ak-req">8-16 kişilik <b>3x3</b> ya da <b>2x2</b> yarışması. Her tur 5 çözüm (<b>Ao5</b>); tur bitince sıralama çıkar, sonra yeni tur ya da final. Herkes kendi timer'ıyla çözer ve süresini <b>elle yazar</b> (+2 ve DNF seçilebilir).</p>
+        <div class="c-livewrap" id="cLiveWrap" hidden><h3>🔴 Şu an canlı</h3><div id="cLive"></div></div>
         <div class="ak-lobby">
             <div id="cCreateBox"><h3>Yarışma oluştur</h3>
                 <p id="cOrgNote">🔒 Yalnızca <b>organizatör</b> rolündeki kişiler yarışma kurabilir.</p>
@@ -344,8 +358,10 @@
     <div id="cRoom" hidden>
         <div class="ak-room-top">
             <div><small>EV YARIŞMASI · <span id="cCode" class="mono">-----</span></small><h2 id="cTitle" style="margin:2px 0 0">-</h2></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="ak-pill" id="cRound">Lobi</span><button type="button" class="btn sm" id="cCopy">🔗 Davet bağlantısı</button><button type="button" class="btn sm" id="cLeave">Çık</button></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="ak-pill live" id="cWatch">👁 0 kişi izliyor</span><span class="ak-pill" id="cRound">Lobi</span><button type="button" class="btn sm" id="cCopy">🔗 Davet bağlantısı</button><button type="button" class="btn sm" id="cLeave">Çık</button></div>
         </div>
+        <div class="c-watch-badge" id="cWatchBadge" hidden>👁 <b>İzleyici modu</b> · yarışmayı canlı izliyorsun. Katılmak için kodla gir.</div>
+        <div class="c-scrs" id="cScrs" hidden></div>
         <div class="c-mine" id="cMine"></div>
         <div class="c-table" id="cTable"></div>
         <div class="c-org" id="cOrg" hidden><b id="cOrgWho">👑 Oda sahibi:</b><button type="button" class="btn primary sm" id="cStart">▶ Turu başlat</button><button type="button" class="btn sm" id="cEnd">⏹ Turu şimdi bitir</button></div>
@@ -406,11 +422,11 @@
 </footer>
 
 <script>var PAGE_ID = "akilli_kup";</script>
-<script src="/js/i18n.js?v=20261147"></script>
-<script src="/js/common.js?v=20261147"></script>
-<script src="/js/firebase-config.js?v=20261147"></script>
-<script src="/js/account.js?v=20261147"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261147"></script>
-<script src="/js/akilli-kup.js?v=20261147"></script>
+<script src="/js/i18n.js?v=20261148"></script>
+<script src="/js/common.js?v=20261148"></script>
+<script src="/js/firebase-config.js?v=20261148"></script>
+<script src="/js/account.js?v=20261148"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261148"></script>
+<script src="/js/akilli-kup.js?v=20261148"></script>
 </body>
 </html>

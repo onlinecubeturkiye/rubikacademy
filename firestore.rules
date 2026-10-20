@@ -171,8 +171,7 @@ service cloud.firestore {
       // Moderatör: oda sahibinin atadığı kişiler (mods = virgülle uid listesi)
       function isModOf(d) { return request.auth != null && ('mods' in d) && d.mods.split(',').hasAny([request.auth.uid]); }
       function chgC() { return request.resource.data.diff(resource.data).affectedKeys(); }
-      allow get: if request.auth != null;
-      allow list: if isAdmin();
+      allow get, list: if true;          // canlı izleme: herkes okuyabilir
       allow create: if org() && code.matches('^[A-Z0-9]{5}$')
         && request.resource.data.keys().hasOnly(ck())
         && request.resource.data.host == request.auth.uid
@@ -193,7 +192,7 @@ service cloud.firestore {
 
       // Yarışmacılar: herkes kendi kaydını yazar; oda sahibi ya da moderatör çıkarabilir
       match /p/{uid} {
-        allow read: if request.auth != null;
+        allow read: if true;
         allow create, update: if request.auth != null && request.auth.uid == uid
           && request.resource.data.keys().hasOnly(['name', 'mode', 't', 'rnd', 'ts'])
           && request.resource.data.name is string && request.resource.data.name.size() <= 24
@@ -202,6 +201,18 @@ service cloud.firestore {
         allow delete: if request.auth != null && (request.auth.uid == uid || isAdmin()
           || get(/databases/$(database)/documents/comps/$(code)).data.host == request.auth.uid
           || isModOf(get(/databases/$(database)/documents/comps/$(code)).data));
+      }
+
+      // Canlı izleyiciler: her sayfa 20 sn'de bir kendi kaydının zamanını yazar ("X kişi izliyor")
+      match /w/{vid} {
+        allow read: if true;
+        allow create, update: if vid.matches('^[A-Za-z0-9_-]{6,40}$')
+          && request.resource.data.keys().hasOnly(['ts'])
+          && request.resource.data.ts is timestamp
+          && request.resource.data.ts > request.time - duration.value(120, 's')
+          && request.resource.data.ts < request.time + duration.value(120, 's');
+        allow delete: if isAdmin() || (request.auth != null && (request.auth.uid == vid
+          || get(/databases/$(database)/documents/comps/$(code)).data.host == request.auth.uid));
       }
     }
 

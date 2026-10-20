@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261147";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261148";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -118,7 +118,7 @@
         else if (tab === "comp" && comp) h = compHint();
         else h = conn ? "" : "🔗 Başlamak için akıllı küpünü bağla.";
         $("akHint").innerHTML = h;
-        var sv = $("akSolve"); if (sv) sv.hidden = tab === "comp" && !(comp && comp.doc);
+        var sv = $("akSolve"); if (sv) sv.hidden = tab === "comp" && (!(comp && comp.doc) || comp.watch);
     }
 
     /* ---------- hamle geldi ---------- */
@@ -591,6 +591,33 @@
     function cMsg(t, bad) { var m = $("cMsg"); m.innerHTML = t || ""; m.className = "ak-msg" + (bad ? " bad" : ""); }
     function cBody(fields) { var b = {}; Object.keys(fields).forEach(function (k) { b[k] = val(fields[k]); }); b.ts = { timestampValue: new Date().toISOString() }; return b; }
     function cMask(fields) { return Object.keys(fields).concat(["ts"]).map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&"); }
+    // Giriş yapmamış izleyici de okuyabilsin (kurallar comps okumayı herkese açar)
+    function apiAny(path, opts) {
+        if (signedIn()) return api(path, opts);
+        opts = opts || {}; opts.headers = { "Content-Type": "application/json" };
+        return fetch(docsBase() + path + (path.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey), opts);
+    }
+    function viewerId() {
+        if (signedIn()) return Account.user().uid;
+        try { var v = localStorage.getItem("ra-viewer-id"); if (!v) { v = "v" + Math.random().toString(36).slice(2, 14); localStorage.setItem("ra-viewer-id", v); } return v; }
+        catch (e) { return "v" + Math.random().toString(36).slice(2, 14); }
+    }
+    // Canlı izleyici sayısı: herkes 20 sn'de bir comps/{kod}/w/{id} yazar; son 45 sn'de yazanlar sayılır
+    var HB_MS = 20000, FRESH_MS = 45000, hbT = 0;
+    function heartbeat() {
+        if (!comp) return;
+        var body = { fields: { ts: { timestampValue: new Date().toISOString() } } };
+        apiAny(cPath("/w/" + viewerId()) + "?updateMask.fieldPaths=ts", { method: "PATCH", body: JSON.stringify(body) }).catch(function () {});
+    }
+    function countWatchers(code, exclude) {
+        return apiAny("/comps/" + code + "/w?pageSize=300", { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+            var now = Date.now(), ex = exclude || {};
+            return (d.documents || []).filter(function (x) {
+                var id = x.name.split("/").pop(), t = Date.parse(((x.fields || {}).ts || {}).timestampValue || "") || 0;
+                return !ex[id] && now - t < FRESH_MS;
+            }).length;
+        }, function () { return 0; });
+    }
     function compPatch(fields) { return api(cPath() + "?" + cMask(fields), { method: "PATCH", body: JSON.stringify({ fields: cBody(fields) }) }); }
     function mePatch(fields) { return api(cPath("/p/" + comp.uid) + "?" + cMask(fields), { method: "PATCH", body: JSON.stringify({ fields: cBody(fields) }) }); }
     function isOrgUser() {
@@ -619,7 +646,7 @@
     function timesOf(p) { return p && p.rnd === comp.doc.round ? listOf(p.t) : []; }
     function myP() { return (comp && comp.players || []).filter(function (p) { return p.uid === comp.uid; })[0]; }
     function myTimes() { return comp ? (comp.local && comp.local.rnd === comp.doc.round ? comp.local.t.slice() : timesOf(myP())) : []; }
-    function compCanSolve() { return !!(comp && comp.doc && comp.doc.st === "run" && eligible(comp.uid) && myTimes().length < 5); }
+    function compCanSolve() { return !!(comp && !comp.watch && comp.doc && comp.doc.st === "run" && myP() && eligible(comp.uid) && myTimes().length < 5); }
     function evName(e) { return e === "222" ? "2x2" : "3x3"; }
     function roundLabel(d) { return d.fin ? "🏆 Final" : "Tur " + (d.round || 1); }
     function compHint() {
@@ -656,51 +683,59 @@
             }).catch(function (e) { cMsg("Oluşturulamadı (" + esc(e.message) + "). Kurallar yayımlandı mı?", 1); });
         });
     }
-    function joinComp(code) {
+    function joinComp(code, watch) {
         code = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
         if (code.length !== 5) { cMsg("Yarışma kodu 5 karakter olmalı.", 1); return; }
-        if (!signedIn()) { Account.openLogin && Account.openLogin(); return; }
-        cMsg("Bağlanılıyor…");
-        var uid = Account.user().uid;
-        comp = { code: code, uid: uid, doc: null, players: [], mode: "bt", orig: {}, shownR: -1, local: null };
-        Promise.all([api(cPath(), { method: "GET" }), api(cPath("/p?pageSize=50"), { method: "GET" })]).then(function (rs) {
+        if (!watch && !signedIn()) { Account.openLogin && Account.openLogin(); return; }
+        cMsg(watch ? "Yarışma açılıyor…" : "Bağlanılıyor…");
+        var uid = signedIn() ? Account.user().uid : viewerId();
+        comp = { code: code, uid: uid, doc: null, players: [], mode: "manual", orig: {}, shownR: -1, local: null, watch: !!watch };
+        Promise.all([apiAny(cPath(), { method: "GET" }), apiAny(cPath("/p?pageSize=50"), { method: "GET" })]).then(function (rs) {
             if (!rs[0].ok) throw new Error(rs[0].status === 404 ? "Yarışma bulunamadı" : rs[0].status);
             return Promise.all([rs[0].json(), rs[1].ok ? rs[1].json() : {}]);
         }).then(function (res) {
             comp.doc = parseDoc(res[0]);
             comp.players = parsePlayers(res[1]);
             var mine = myP();
+            if (mine) comp.watch = false; // zaten yarışmacıysa izleyici değil
+            if (comp.watch) return null;
             if (!mine && comp.players.length >= comp.doc.cap) throw new Error("Yarışma dolu (" + comp.doc.cap + " kişi)");
             comp.mode = "manual"; // yarışmada süre yalnızca elle yazılır
             return mine ? null : mePatch({ name: myName(), mode: comp.mode, t: "", rnd: 0 }).then(function (r) { if (!r.ok) throw new Error(r.status); });
         }).then(function () {
-            try { history.replaceState(null, "", "?ev=" + code); } catch (e) {}
+            try { history.replaceState(null, "", (comp.watch ? "?izle=" : "?ev=") + code); } catch (e) {}
             $("cLobby").hidden = true; $("cRoom").hidden = false; cMsg("");
-            compPoll();
-            clearInterval(compPollT); compPollT = setInterval(function () { if (document.visibilityState === "visible") compPoll(); }, 1500);
+            compPoll(); heartbeat();
+            clearInterval(compPollT); compPollT = setInterval(function () { if (document.visibilityState === "visible") compPoll(); }, comp.watch ? 2500 : 1500);
+            clearInterval(hbT); hbT = setInterval(function () { if (document.visibilityState === "visible") heartbeat(); }, HB_MS);
         }).catch(function (e) { comp = null; cMsg(esc(e.message), 1); });
     }
     function leaveComp() {
-        clearInterval(compPollT);
-        if (comp && comp.doc && comp.doc.st === "lobby") api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
+        clearInterval(compPollT); clearInterval(hbT);
+        if (comp && !comp.watch && comp.doc && comp.doc.st === "lobby") api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
         comp = null; closeFinal();
         try { history.replaceState(null, "", location.pathname); } catch (e) {}
         $("cLobby").hidden = false; $("cRoom").hidden = true; $("cType").hidden = true; $("akPad").hidden = true;
-        setScramble("");
+        setScramble(""); loadLive();
     }
     function parsePlayers(d) {
         return ((d && d.documents) || []).map(function (x) { var o = parseDoc(x); o.uid = x.name.split("/").pop(); return o; });
     }
     function compPoll() {
         if (!comp) return;
-        Promise.all([api(cPath(), { method: "GET" }), api(cPath("/p?pageSize=50"), { method: "GET" })]).then(function (rs) {
+        Promise.all([apiAny(cPath(), { method: "GET" }), apiAny(cPath("/p?pageSize=50"), { method: "GET" })]).then(function (rs) {
             if (!rs[0].ok) throw new Error(rs[0].status);
             return Promise.all([rs[0].json(), rs[1].ok ? rs[1].json() : {}]);
         }).then(function (res) {
             if (!comp) return;
             var prev = comp.doc || {}, d = parseDoc(res[0]);
             comp.doc = d; comp.players = parsePlayers(res[1]);
-            if (!myP() && prev.host) { cMsg("Yarışmadan çıkarıldın.", 1); leaveComp(); return; }
+            if (!comp.watch && !myP() && prev.host) { cMsg("Yarışmadan çıkarıldın.", 1); leaveComp(); return; }
+            if (!comp.wT || Date.now() - comp.wT > 6000) {
+                comp.wT = Date.now();
+                var ex = {}; comp.players.forEach(function (p) { ex[p.uid] = 1; });
+                countWatchers(comp.code, ex).then(function (n) { if (comp) { comp.watchers = n; var w = $("cWatch"); if (w) w.textContent = "👁 " + n + " kişi izliyor"; } });
+            }
             comp.mode = "manual";
             // tur ya da durum değişti: sıradaki karıştırmayı göster
             if (prev.round !== d.round || prev.st !== d.st) { comp.local = null; comp.orig = {}; nextScramble(true); }
@@ -880,9 +915,15 @@
         $("cCode").textContent = comp.code;
         $("cRound").textContent = evName(d.ev) + " · " + (d.st === "lobby" ? "Lobi · " + comp.players.length + "/" + d.cap + " kişi" : roundLabel(d) + " · " + (d.st === "end" ? "bitti" : "sürüyor") + " · " + comp.players.length + "/" + d.cap);
         Array.prototype.forEach.call(document.querySelectorAll(".c-mode button"), function (b) { b.classList.toggle("on", b.getAttribute("data-m") === comp.mode); b.disabled = phase === "solving"; });
+        $("cWatchBadge").hidden = !comp.watch;
+        if (comp.watch) {
+            var sl = scrList();
+            $("cScrs").hidden = !(d.st === "run" && sl.length);
+            $("cScrs").innerHTML = '<b>' + roundLabel(d) + ' karıştırmaları</b>' + sl.map(function (x, i) { return '<div><span>' + (i + 1) + '.</span><code dir="ltr">' + esc(x) + '</code></div>'; }).join("");
+        } else $("cScrs").hidden = true;
         // kendi süreleri
-        var t = myTimes();
-        $("cMine").innerHTML = d.st === "run" && eligible(comp.uid) ? '<span class="c-lbl">Sürelerin</span>' + [0, 1, 2, 3, 4].map(function (i) {
+        var t = comp.watch ? [] : myTimes();
+        $("cMine").innerHTML = !comp.watch && d.st === "run" && eligible(comp.uid) ? '<span class="c-lbl">Sürelerin</span>' + [0, 1, 2, 3, 4].map(function (i) {
             if (i >= t.length) return '<span class="c-chip empty">' + (i + 1) + '</span>';
             return '<button type="button" class="c-chip' + (t[i] >= DNF ? " dnf" : "") + '" data-ci="' + i + '" title="DNF yap / kaldır">' + fmt(t[i]) + '</button>';
         }).join("") + (t.length >= 5 ? '<span class="c-ao">Ao5 <b>' + fmt(avgOf(t, 5)) + '</b></span>' : "") : "";
@@ -910,12 +951,40 @@
         $("cStart").hidden = d.st !== "lobby"; $("cStart").disabled = comp.players.length < 2;
         $("cEnd").hidden = d.st !== "run";
         $("cShowRes").hidden = !hist().length;
-        $("cHint").textContent = d.st === "lobby" ? (host ? "Yarışmacılar katılınca turu başlat (en az 2 kişi)." : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes 5 çözümü bitirince tur kendiliğinden biter." : (d.fin ? "Final bitti." : "Tur bitti.");
+        $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? "Yarışmacılar katılınca turu başlat (en az 2 kişi)." : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes 5 çözümü bitirince tur kendiliğinden biter." : (d.fin ? "Final bitti." : "Tur bitti.");
         renderModeUi();
+    }
+    /* --- şu an canlı yarışmalar (izle) --- */
+    var liveT = 0;
+    function loadLive() {
+        var box = $("cLive"); if (!box) return;
+        apiAny("/comps?pageSize=100", { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+            var now = Date.now();
+            var list = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; })
+                .filter(function (o) { return now - o.up < 6 * 3600000 && !(o.st === "end" && o.fin && now - o.up > 1800000); })
+                .sort(function (a, b) { return b.up - a.up; }).slice(0, 10);
+            $("cLiveWrap").hidden = !list.length;
+            if (!list.length) return;
+            return Promise.all(list.map(function (o) {
+                return apiAny("/comps/" + o.code + "/p?pageSize=50&mask.fieldPaths=name", { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }, function () { return {}; }).then(function (x) {
+                    var ex = {}; (x.documents || []).forEach(function (dd) { ex[dd.name.split("/").pop()] = 1; });
+                    o.n = (x.documents || []).length;
+                    return countWatchers(o.code, ex).then(function (w) { o.w = w; return o; });
+                });
+            })).then(function (rows) {
+                box.innerHTML = rows.map(function (o) {
+                    var stt = o.st === "lobby" ? "Lobi" : o.st === "run" ? roundLabel(o) + " sürüyor" : roundLabel(o) + " bitti";
+                    return '<div class="c-live"><span class="c-dot' + (o.st === "run" ? " on" : "") + '"></span><div class="c-live-tx"><b>' + esc(o.name || "Ev yarışması") + '</b><small>' + evName(o.ev) + ' · ' + stt + ' · 👤 ' + o.n + '/' + o.cap + ' · 👁 ' + o.w + ' izliyor · ' + esc(o.hName || "") + '</small></div>' +
+                        '<button type="button" class="btn sm" data-watch="' + esc(o.code) + '">👁 İzle</button></div>';
+                }).join("");
+                Array.prototype.forEach.call(box.querySelectorAll("[data-watch]"), function (b) { b.onclick = function () { joinComp(b.getAttribute("data-watch"), true); }; });
+            });
+        }).catch(function () { $("cLiveWrap").hidden = true; });
     }
     function initCompRole() { isOrgUser().then(function (ok) { $("cCreateBox").classList.toggle("locked", !ok); $("cCreate").disabled = !ok; $("cOrgNote").hidden = ok; }); }
     function initComp() {
         initCompRole();
+        loadLive(); clearInterval(liveT); liveT = setInterval(function () { if (!comp && document.visibilityState === "visible") loadLive(); }, 15000);
         $("cCreate").onclick = createComp;
         if ($("cCapR")) $("cCapR").oninput = function () { $("cCapV").textContent = this.value; };
         $("cJoin").onclick = function () { joinComp($("cJoinIn").value); };
@@ -930,7 +999,7 @@
         $("cTypeDnf").onclick = function () { typeSave("dnf"); };
         $("cTypeIn").onkeydown = function (e) { if (e.key === "Enter") typeSave(""); };
         $("cCopy").onclick = function () {
-            var link = location.origin + "/icerikler/ev-yarismasi?ev=" + (comp && comp.code);
+            var link = location.origin + "/icerikler/ev-yarismasi?" + (comp && comp.watch ? "izle=" : "ev=") + (comp && comp.code);
             var done = function () { $("cCopy").textContent = "Kopyalandı ✓"; setTimeout(function () { $("cCopy").textContent = "🔗 Davet bağlantısı"; }, 1500); };
             if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () {}); else prompt("Bağlantı:", link);
         };
@@ -984,6 +1053,7 @@
         renderStages(null); renderHist(); initComp();
         if (EV_PAGE) {
             setTab("comp");
+            var iz = qs.get("izle"); if (iz) setTimeout(function () { if (!comp) joinComp(iz, true); }, 600);
             if (ev) {
                 var tryEv = function () { if (signedIn() && !comp) joinComp(ev); };
                 if (window.Account && Account.onChange) Account.onChange(function (u) { if (u) tryEv(); else cMsg("Yarışmaya katılmak için giriş yap.", 1); });
