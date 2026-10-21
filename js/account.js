@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261164";
+    var V = "20261165";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -74,7 +74,13 @@
     var enabled = !!(cfg.apiKey && cfg.projectId && cfg.authDomain);
 
     /* ---------- SDK ---------- */
-    var fb = null, auth = null, sdkP = null, user = null, listeners = [], fbApp = null, fsP = null;
+    var fb = null, auth = null, sdkP = null, user = null, listeners = [], fbApp = null, fsP = null, authResolved = false;
+    // Giriş sorunu: sebebini ekranda göster (telefonda konsol olmadığı için) ve "Giriş" butonuna dön
+    function authErr(msg) {
+        try { console.error(msg); } catch (e) {}
+        lsSet(SIGNED_KEY, null); renderNav();
+        setTimeout(function () { try { showToast("⚠️ " + msg + " Sayfayı yenile ya da tekrar giriş yap."); } catch (e) {} }, 300);
+    }
     // Firestore SDK (yalnız canlı dinleme gereken sayfalarda yüklenir; auth ile aynı uygulamayı paylaşır)
     function firestore() {
         if (fsP) return fsP;
@@ -86,14 +92,19 @@
     }
     function loadSDK() {
         if (sdkP) return sdkP;
-        sdkP = import("/js/vendor/firebase/firebase-auth.js?v=" + V).then(function (m) {
+        // Yükleme bir kez başarısız olursa (bozuk önbellek, kesik bağlantı) önbelleği atlayarak bir kez daha dene
+        var imp = import("/js/vendor/firebase/firebase-auth.js?v=" + V).catch(function (e) {
+            console.warn("Firebase giriş modülü yüklenemedi, tekrar deneniyor:", e);
+            return import("/js/vendor/firebase/firebase-auth.js?v=" + V + "&r=" + Date.now());
+        });
+        sdkP = imp.then(function (m) {
             fb = m;
             var app = fbApp = m.initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, projectId: cfg.projectId, appId: cfg.appId });
             auth = m.getAuth(app);
             if (cfg.emulator && cfg.emulator.auth) m.connectAuthEmulator(auth, cfg.emulator.auth, { disableWarnings: true });
             try { auth.languageCode = lang(); } catch (e) {}
             m.onAuthStateChanged(auth, function (u) {
-                user = u;
+                user = u; authResolved = true;
                 lsSet(SIGNED_KEY, u ? "1" : null);
                 renderNav();
                 if (u) { closeModal(); startSync(); logSession(); checkLogoutAll(); checkSuspended(); ensurePush(); } else { stopSync(); setTimeout(checkRemovedSignedOut, 1500); }
@@ -102,7 +113,14 @@
             });
             return m;
         });
-        sdkP.catch(function () { sdkP = null; });
+        sdkP.catch(function (e) {
+            sdkP = null;
+            authErr("Giriş sistemi yüklenemedi: " + ((e && (e.message || e.code)) || e));
+        });
+        // Giriş 12 sn içinde geri yüklenemezse kullanıcıyı "giriş bekleniyor" durumunda bırakma
+        setTimeout(function () {
+            if (!user && lsGet(SIGNED_KEY) === "1" && !authResolved) authErr("Oturum geri yüklenemedi (zaman aşımı).");
+        }, 12000);
         return sdkP;
     }
 
