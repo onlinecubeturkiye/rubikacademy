@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261175";
+    var V = "20261176";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -155,7 +155,7 @@
             navMenu = document.createElement("div"); navMenu.className = "acc-menu"; navMenu.id = "accMenu"; navMenu.setAttribute("role", "menu");
             navWrap.appendChild(navBtn); navWrap.appendChild(navMenu);
             var lang0 = document.getElementById("langSwitcher");
-            right.insertBefore(navWrap, lang0 || right.firstChild);
+            right.insertBefore(navWrap, lang0 || null);
             navBtn.addEventListener("click", function (e) {
                 e.preventDefault();
                 if (user || lsGet(SIGNED_KEY) === "1") navWrap.classList.toggle("open");

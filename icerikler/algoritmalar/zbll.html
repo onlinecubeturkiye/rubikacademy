@@ -27,10 +27,10 @@
 <meta property="og:description" content="Kenarlar yönlüyken son katmanın tamamını tek algoritmada çözen 472 ZBLL case'i, diyagramlar ve alternatiflerle.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/zbll">
-<meta property="og:image" content="https://rubikacademy.fun/og/zbll.png?v=20261175">
+<meta property="og:image" content="https://rubikacademy.fun/og/zbll.png?v=20261176">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/zbll.png?v=20261175">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/zbll.png?v=20261176">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261175">
+<link rel="stylesheet" href="/styles/common.css?v=20261176">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -264,6 +264,7 @@ html.dark-mode .case-card.state-known .case-status { color: #4ade80; }
 .oc-tab.active small { color: #3b3b46; }
 .z-tools { max-width: 1250px; margin: 0 auto 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .z-tools input { flex: 1; min-width: 180px; padding: 10px 14px; border-radius: 12px; border: var(--card-bw) solid var(--card-border); background: var(--surface); color: var(--text); font: 600 14px "Inter", sans-serif; }
+@media (max-width: 520px) { .z-tools input { flex-basis: 100%; } }
 .z-tools button { border: var(--card-bw) solid var(--ink); border-radius: 12px; padding: 9px 13px; background: var(--surface); color: var(--text); font: 800 13px "Inter", sans-serif; cursor: pointer; }
 details.coll-grp { margin-bottom: 18px; border: var(--card-bw) solid var(--card-border); border-radius: 20px; background: var(--surface-soft, var(--surface)); padding: 12px 16px; }
 details.coll-grp > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 17px; color: var(--text); }
@@ -369,14 +370,14 @@ Kenarlar yönlüyken (üstte artı varken) son katmanın tamamını tek algoritm
 
 <!-- ÇEVİRİLER: /js/i18n.js içinde (PAGE_ID ile eşleşir). common.js'den ÖNCE yüklenmeli -->
 <script>var PAGE_ID = "zbll";</script>
-<script src="/js/i18n.js?v=20261175"></script>
-<script src="/js/common.js?v=20261175"></script>
-<script src="/js/firebase-config.js?v=20261175"></script>
-<script src="/js/account.js?v=20261175"></script>
+<script src="/js/i18n.js?v=20261176"></script>
+<script src="/js/common.js?v=20261176"></script>
+<script src="/js/firebase-config.js?v=20261176"></script>
+<script src="/js/account.js?v=20261176"></script>
 
 
-<script src="/js/custom-algs.js?v=20261175"></script>
-<script src="/js/alg-player.js?v=20261175"></script>
+<script src="/js/custom-algs.js?v=20261176"></script>
+<script src="/js/alg-player.js?v=20261176"></script>
 
 <script>
 /* ============================================================
@@ -507,7 +508,7 @@ function render() {
     refreshProgressLabels();
 }
 
-fetch("/icerikler/algoritmalar/zbll.json?v=20261175")
+fetch("/icerikler/algoritmalar/zbll.json?v=20261176")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data.zbll;
