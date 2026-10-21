@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261162";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261163";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -738,7 +738,10 @@
         var sub = function (c) { return api("/comps/" + code + "/" + c + "?pageSize=100&mask.fieldPaths=zz", { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
             return Promise.all((d.documents || []).map(function (x) { return del("/comps/" + code + "/" + c + "/" + x.name.split("/").pop()); }));
         }, function () {}); };
-        return Promise.all([sub("p"), sub("w"), sub("m")]).then(function () { return api("/comps/" + code, { method: "DELETE" }); }).then(function (r) { return r && r.ok; });
+        return Promise.all([sub("p"), sub("w"), sub("m")]).then(function () { return api("/comps/" + code, { method: "DELETE" }); }).then(function (r) {
+            if (!r || !r.ok) { alert("Oda kapatılamadı" + (r ? " (" + r.status + ")" : "") + ". " + (r && r.status === 403 ? "Firebase kurallarının son halini yayımladığından emin ol." : r && r.status === 429 ? "Firebase günlük kotası dolmuş; yarın tekrar dene." : "Tekrar dene.")); return false; }
+            return true;
+        }, function () { alert("Oda kapatılamadı: bağlantı hatası."); return false; });
     }
     // Sayfa açılınca: açık odam varsa "Odana dön" kutusu
     function showResume() {
@@ -759,7 +762,8 @@
                 $("cResumeGo").onclick = function () { joinComp(o.code, !!o.watch && !host); };
                 if ($("cResumeClose")) $("cResumeClose").onclick = function () {
                     if (!confirm("“" + (o.name || o.code) + "” odası kapatılsın mı? Oda ve içindeki kayıtlar silinir.")) return;
-                    this.disabled = true; closeRoom(o.code).then(function () { forgetRoom(); box.hidden = true; loadLive(); showResume(); });
+                    var btn = this; btn.disabled = true; btn.textContent = "Kapatılıyor…";
+                    closeRoom(o.code).then(function (ok) { if (ok) { forgetRoom(); box.hidden = true; } else { btn.disabled = false; btn.textContent = "🗑 Odayı kapat"; } loadLive(); if (ok) showResume(); });
                 };
             });
         });
