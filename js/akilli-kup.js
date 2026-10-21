@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261164";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261165";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -745,7 +745,7 @@
         if (!signedIn()) return Promise.resolve([]);
         var q = { structuredQuery: { from: [{ collectionId: "comps" }], where: { fieldFilter: { field: { fieldPath: "host" }, op: "EQUAL", value: { stringValue: Account.user().uid } } }, limit: 10 } };
         return api(":runQuery", { method: "POST", body: JSON.stringify(q) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (arr) {
-            return (arr || []).filter(function (x) { return x.document; }).map(function (x) { var o = parseDoc(x.document); o.code = x.document.name.split("/").pop(); o.up = x.document.updateTime; return o; })
+            return (Array.isArray(arr) ? arr : []).filter(function (x) { return x.document; }).map(function (x) { var o = parseDoc(x.document); o.code = x.document.name.split("/").pop(); o.up = x.document.updateTime; return o; })
                 .filter(activeComp).sort(function (a, b) { return (Date.parse(b.up) || 0) - (Date.parse(a.up) || 0); });
         }, function () { return []; });
     }
