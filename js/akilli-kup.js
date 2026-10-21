@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261161";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261162";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -719,10 +719,67 @@
     }
 
     /* --- kur / katıl / çık --- */
+    /* --- açık odamı bul / odaya dön / odayı kapat --- */
+    var ROOM_KEY = "ra-ev-room";
+    function rememberRoom(code, watch) { try { localStorage.setItem(ROOM_KEY, JSON.stringify({ c: code, w: !!watch, u: comp && comp.uid })); } catch (e) {} }
+    function forgetRoom() { try { localStorage.removeItem(ROOM_KEY); } catch (e) {} }
+    function activeComp(o) { var up = Date.parse(o.up || "") || 0; return o.st && !(o.st === "end" && o.fin) && Date.now() - up < 12 * 3600000; }
+    // Bu kişinin kurduğu, bitmemiş odalar (en yenisi önce)
+    function myHostedRooms() {
+        if (!signedIn()) return Promise.resolve([]);
+        var q = { structuredQuery: { from: [{ collectionId: "comps" }], where: { fieldFilter: { field: { fieldPath: "host" }, op: "EQUAL", value: { stringValue: Account.user().uid } } }, limit: 10 } };
+        return api(":runQuery", { method: "POST", body: JSON.stringify(q) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (arr) {
+            return (arr || []).filter(function (x) { return x.document; }).map(function (x) { var o = parseDoc(x.document); o.code = x.document.name.split("/").pop(); o.up = x.document.updateTime; return o; })
+                .filter(activeComp).sort(function (a, b) { return (Date.parse(b.up) || 0) - (Date.parse(a.up) || 0); });
+        }, function () { return []; });
+    }
+    function closeRoom(code) {
+        var del = function (path) { return api(path, { method: "DELETE" }).catch(function () {}); };
+        var sub = function (c) { return api("/comps/" + code + "/" + c + "?pageSize=100&mask.fieldPaths=zz", { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+            return Promise.all((d.documents || []).map(function (x) { return del("/comps/" + code + "/" + c + "/" + x.name.split("/").pop()); }));
+        }, function () {}); };
+        return Promise.all([sub("p"), sub("w"), sub("m")]).then(function () { return api("/comps/" + code, { method: "DELETE" }); }).then(function (r) { return r && r.ok; });
+    }
+    // Sayfa açılınca: açık odam varsa "Odana dön" kutusu
+    function showResume() {
+        var box = $("cResume"); if (!box || comp || !signedIn()) { if (box) box.hidden = true; return; }
+        var st = null; try { st = JSON.parse(localStorage.getItem(ROOM_KEY) || "null"); } catch (e) {}
+        myHostedRooms().then(function (rooms) {
+            var pr = rooms[0] ? Promise.resolve(rooms[0]) : !st || !st.c ? Promise.resolve(null)
+                : apiAny("/comps/" + st.c, { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+                    if (!d) { forgetRoom(); return null; }
+                    var o = parseDoc(d); o.code = st.c; o.up = d.updateTime; o.watch = st.w; return activeComp(o) ? o : (forgetRoom(), null);
+                }, function () { return null; });
+            return pr.then(function (o) {
+                if (!o || comp) { box.hidden = true; return; }
+                var host = o.host === Account.user().uid;
+                box.innerHTML = '<div class="c-res-tx">🔁 <b>' + (host ? "Açık bir odan var" : "Bir odadaydın") + '</b><span>' + esc(o.name || "Ev yarışması") + ' · ' + esc(o.code) + (o.st === "lobby" ? " · başlamayı bekliyor" : o.st === "run" ? " · " + roundLabel(o) + " sürüyor" : "") + '</span></div>' +
+                    '<div class="c-res-b"><button type="button" class="btn primary" id="cResumeGo">Odana dön →</button>' + (host ? '<button type="button" class="btn sm" id="cResumeClose">🗑 Odayı kapat</button>' : '') + '</div>';
+                box.hidden = false;
+                $("cResumeGo").onclick = function () { joinComp(o.code, !!o.watch && !host); };
+                if ($("cResumeClose")) $("cResumeClose").onclick = function () {
+                    if (!confirm("“" + (o.name || o.code) + "” odası kapatılsın mı? Oda ve içindeki kayıtlar silinir.")) return;
+                    this.disabled = true; closeRoom(o.code).then(function () { forgetRoom(); box.hidden = true; loadLive(); showResume(); });
+                };
+            });
+        });
+    }
     function createComp() {
         if (!signedIn()) { Account.openLogin && Account.openLogin(); return; }
         isOrgUser().then(function (ok) {
             if (!ok) { cMsg("Yalnızca <b>organizatör</b> rolündeki kişiler yarışma kurabilir.", 1); return; }
+            cMsg("Kontrol ediliyor…");
+            return myHostedRooms().then(function (rooms) {
+                if (rooms.length) {
+                    cMsg("Zaten açık bir odan var: <b>" + esc(rooms[0].name || rooms[0].code) + "</b>. Önce ona dön ya da kapat.", 1);
+                    showResume(); try { $("cJoinCard").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
+                    return;
+                }
+                createCompNow();
+            });
+        });
+    }
+    function createCompNow() {
             var c = code5(), u = Account.user(), cap = Math.max(8, Math.min(16, +($("cCapR") && $("cCapR").value) || 8));
             var evc = (document.querySelector('input[name="cEv"]:checked') || {}).value === "222" ? "222" : "333";
             var name = ($("cName").value || "").trim().slice(0, 40) || (myName() + " ev yarışması");
@@ -732,7 +789,6 @@
                 if (!r.ok) throw new Error(r.status);
                 joinComp(c);
             }).catch(function (e) { cMsg("Oluşturulamadı (" + esc(e.message) + "). Kurallar yayımlandı mı?", 1); });
-        });
     }
     function joinComp(code, watch, watch_retry) {
         code = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -759,6 +815,7 @@
             return mine ? null : mePatch({ name: myName(), mode: comp.mode, t: "", rnd: 0 }).then(function (r) { if (!r.ok) throw new Error(r.status); });
         }).then(function () {
             try { history.replaceState(null, "", (comp.watch ? "?izle=" : "?ev=") + code); } catch (e) {}
+            rememberRoom(code, comp.watch); if ($("cResume")) $("cResume").hidden = true;
             $("cLobby").hidden = true; $("cRoom").hidden = false; cMsg("");
             document.body.classList.add("c-in-room");
             try { $("akComp").scrollIntoView({ block: "start" }); } catch (e) {}
@@ -771,10 +828,10 @@
     function leaveComp() {
         clearInterval(compPollT); clearInterval(hbT); if (comp) { clearInterval(comp.cdT); if (comp.liveStop) comp.liveStop(); }
         if (comp && !comp.watch && myP()) api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
-        comp = null; closeFinal(); document.body.classList.remove("c-in-room");
+        comp = null; closeFinal(); document.body.classList.remove("c-in-room"); forgetRoom();
         try { history.replaceState(null, "", location.pathname); } catch (e) {}
         $("cLobby").hidden = false; $("cRoom").hidden = true; $("cType").hidden = true; $("akPad").hidden = true;
-        setScramble(""); loadLive();
+        setScramble(""); loadLive(); setTimeout(showResume, 300);
     }
     function parsePlayers(d) {
         return ((d && d.documents) || []).map(function (x) { var o = parseDoc(x); o.uid = x.name.split("/").pop(); return o; });
@@ -1201,6 +1258,7 @@
         $("cStart").hidden = d.st !== "lobby"; $("cStart").disabled = comp.players.length < 2;
         $("cEnd").hidden = d.st !== "run";
         if ($("cFinish")) $("cFinish").hidden = !(d.st === "end" && !d.fin);
+        if ($("cCloseRoom")) { $("cCloseRoom").hidden = !owner; $("cCloseRoom").disabled = false; }
         $("cShowRes").hidden = !hist().length;
         $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? "Yarışmacılar katılınca turu başlat (en az 2 kişi)." : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes 5 çözümü bitirince tur kendiliğinden biter." : (d.fin ? "Final bitti." : "Tur bitti.");
         renderModeUi();
@@ -1242,12 +1300,21 @@
         Promise.all(list.map(function (o) {
             return countDocs("/comps/" + o.code + "/p").then(function (n) { o.n = n; return o; });
         })).then(function (rows) {
+            // başkalarının 1 saattir boş bekleyen odaları gösterilmez
+            rows = rows.filter(function (o) { return (signedIn() && o.host === Account.user().uid) || o.n > 0 || Date.now() - o.up < 3600000; });
+            wrap.hidden = !rows.length;
             box.innerHTML = rows.map(function (o) {
-                var full = o.n >= o.cap;
+                var full = o.n >= o.cap, mine = signedIn() && o.host === Account.user().uid;
+                if (mine) return '<div class="c-live"><span class="c-dot on"></span><div class="c-live-tx"><b>' + esc(o.name || "Ev yarışması") + ' <small>(senin odan)</small></b><small>' + evName(o.ev) + ' · ' + esc(o.code) + ' · 👤 ' + o.n + '/' + o.cap + '</small></div>' +
+                    '<button type="button" class="btn primary sm" data-join="' + esc(o.code) + '">Dön</button><button type="button" class="btn sm" data-close="' + esc(o.code) + '" title="Odayı kapat">🗑</button></div>';
                 return '<div class="c-live"><span class="c-dot on"></span><div class="c-live-tx"><b>' + esc(o.name || "Ev yarışması") + '</b><small>' + evName(o.ev) + ' · ' + (o.st === "lobby" ? "Başlamayı bekliyor" : roundLabel(o) + " bitti, yeni tur bekleniyor") + ' · 👤 ' + o.n + '/' + o.cap + ' · ' + esc(o.hName || "") + '</small></div>' +
                     (full ? '<span class="ak-pill">Dolu</span>' : '<button type="button" class="btn primary sm" data-join="' + esc(o.code) + '">Katıl</button>') + '</div>';
             }).join("");
             Array.prototype.forEach.call(box.querySelectorAll("[data-join]"), function (b) { b.onclick = function () { $("cJoinIn").value = b.getAttribute("data-join"); joinComp(b.getAttribute("data-join")); }; });
+            Array.prototype.forEach.call(box.querySelectorAll("[data-close]"), function (b) { b.onclick = function () {
+                if (!confirm("Bu oda kapatılsın mı? Oda ve içindeki kayıtlar silinir.")) return;
+                b.disabled = true; closeRoom(b.getAttribute("data-close")).then(function () { loadLive(); showResume(); });
+            }; });
         });
     }
     function initCompRole() {
@@ -1280,6 +1347,11 @@
         };
         $("cStart").onclick = function () { startRound(false, 0); };
         if ($("cFinish")) $("cFinish").onclick = finishComp;
+        if ($("cCloseRoom")) $("cCloseRoom").onclick = function () {
+            if (!comp || !isOwner() || !confirm("Oda kapatılsın mı? Oda ve içindeki kayıtlar silinir, herkes odadan çıkar.")) return;
+            var code = comp.code; this.disabled = true;
+            closeRoom(code).then(function () { if (comp && comp.code === code) { comp.watch = true; leaveComp(); } cMsg("Oda kapatıldı."); });
+        };
         if ($("cChatForm")) {
             $("cChatForm").onsubmit = function (e) { e.preventDefault(); chatSend(); };
             $("cChatLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
@@ -1352,6 +1424,11 @@
                 var tryIz = function () { if (signedIn() && !comp) joinComp(iz, true); };
                 if (window.Account && Account.onChange) Account.onChange(function (u) { if (u) tryIz(); });
                 setTimeout(function () { if (!comp) { if (signedIn()) tryIz(); else if (!(Account.isPending && Account.isPending())) cMsg("Yarışmayı izlemek için giriş yap.", 1); } }, 1500);
+            }
+            if (!ev && !iz) {
+                // açık odam varsa "Odana dön"; ?ev yoksa da sayfa yenilenince odaya geri dönülebilsin
+                if (window.Account && Account.onChange) Account.onChange(function (u) { if (u) betaP.then(function (ok) { if (ok) showResume(); }); });
+                setTimeout(function () { if (signedIn()) betaP.then(function (ok) { if (ok) showResume(); }); }, 1500);
             }
             if (ev) {
                 if ($("cJoinIn")) $("cJoinIn").value = String(ev).toUpperCase().slice(0, 5);
