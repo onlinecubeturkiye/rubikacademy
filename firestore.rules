@@ -205,8 +205,9 @@ service cloud.firestore {
         allow create, update: if beta()
           && ((request.auth.uid == uid && !compDoc().get('ban', '').split(',').hasAny([uid]))
               || (resource != null && (isAdmin() || compDoc().host == request.auth.uid || isModOf(compDoc()))
-                  && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['t', 'rnd', 'ts'])))
-          && request.resource.data.keys().hasOnly(['name', 'mode', 't', 'rnd', 'ts'])
+                  && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['t', 'tt', 'rnd', 'ts'])))
+          && request.resource.data.keys().hasOnly(['name', 'mode', 't', 'tt', 'rnd', 'ts'])
+          && (!('tt' in request.resource.data) || (request.resource.data.tt is string && request.resource.data.tt.size() <= 200))
           && request.resource.data.name is string && request.resource.data.name.size() <= 24
           && request.resource.data.mode in ['bt', 'timer', 'manual']
           && request.resource.data.t is string && request.resource.data.t.size() <= 120;
@@ -214,10 +215,12 @@ service cloud.firestore {
           || compDoc().host == request.auth.uid || isModOf(compDoc()));
       }
 
-      // Mini sohbet: giriş yapan herkes yazar; yazan, oda sahibi, moderatör ya da admin siler
+      // Mini sohbet: yalnız yarışmacılar, oda sahibi ve moderatörler yazar (izleyiciler yazamaz)
       match /m/{mid} {
         allow read: if beta();
         allow create: if beta() && mid.matches('^[a-z0-9]{6,24}$')
+          && (isAdmin() || compDoc().host == request.auth.uid || isModOf(compDoc())
+              || exists(/databases/$(database)/documents/comps/$(code)/p/$(request.auth.uid)))
           && request.resource.data.keys().hasOnly(['u', 'n', 'x', 'ts'])
           && request.resource.data.u == request.auth.uid
           && request.resource.data.n is string && request.resource.data.n.size() <= 24
