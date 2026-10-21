@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261170";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261171";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -745,7 +745,7 @@
 
     /* --- kur / katıl / çık --- */
     /* --- açık odamı bul / odaya dön / odayı kapat --- */
-    var ROOM_KEY = "ra-ev-room";
+    var ROOM_KEY = "ra-ev-room", closedRooms = {};
     function rememberRoom(code, watch) { try { localStorage.setItem(ROOM_KEY, JSON.stringify({ c: code, w: !!watch, u: comp && comp.uid })); } catch (e) {} }
     function forgetRoom() { try { localStorage.removeItem(ROOM_KEY); } catch (e) {} }
     function activeComp(o) { var up = Date.parse(o.up || "") || 0; return o.st && !(o.st === "end" && o.fin) && Date.now() - up < 12 * 3600000; }
@@ -755,7 +755,7 @@
         var q = { structuredQuery: { from: [{ collectionId: "comps" }], where: { fieldFilter: { field: { fieldPath: "host" }, op: "EQUAL", value: { stringValue: Account.user().uid } } }, limit: 10 } };
         return api(":runQuery", { method: "POST", body: JSON.stringify(q) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (arr) {
             return (Array.isArray(arr) ? arr : []).filter(function (x) { return x.document; }).map(function (x) { var o = parseDoc(x.document); o.code = x.document.name.split("/").pop(); o.up = x.document.updateTime; return o; })
-                .filter(activeComp).sort(function (a, b) { return (Date.parse(b.up) || 0) - (Date.parse(a.up) || 0); });
+                .filter(function (o) { return activeComp(o) && !closedRooms[o.code]; }).sort(function (a, b) { return (Date.parse(b.up) || 0) - (Date.parse(a.up) || 0); });
         }, function () { return []; });
     }
     function closeRoom(code) {
@@ -779,7 +779,7 @@
                     var o = parseDoc(d); o.code = st.c; o.up = d.updateTime; o.watch = st.w; return activeComp(o) ? o : (forgetRoom(), null);
                 }, function () { return null; });
             return pr.then(function (o) {
-                if (!o || comp) { box.hidden = true; return; }
+                if (!o || comp || closedRooms[o.code]) { box.hidden = true; return; }
                 var host = o.host === Account.user().uid;
                 box.innerHTML = '<div class="c-res-tx">🔁 <b>' + (host ? "Açık bir odan var" : "Bir odadaydın") + '</b><span>' + esc(o.name || "Ev yarışması") + ' · ' + esc(o.code) + (o.st === "lobby" ? " · başlamayı bekliyor" : o.st === "prep" ? " · " + roundLabel(o) + " hazırlığı" : o.st === "run" ? " · " + roundLabel(o) + " sürüyor" : "") + '</span></div>' +
                     '<div class="c-res-b"><button type="button" class="btn primary" id="cResumeGo">Odana dön →</button>' + (host ? '<button type="button" class="btn sm" id="cResumeClose">🗑 Odayı kapat</button>' : '') + '</div>';
@@ -794,7 +794,7 @@
                 if ($("cResumeClose")) $("cResumeClose").onclick = function () {
                     if (!confirm("“" + (o.name || o.code) + "” odası kapatılsın mı? Oda ve içindeki kayıtlar silinir.")) return;
                     var btn = this; btn.disabled = true; btn.textContent = "Kapatılıyor…";
-                    closeRoom(o.code).then(function (ok) { if (ok) { forgetRoom(); box.hidden = true; } else { btn.disabled = false; btn.textContent = "🗑 Odayı kapat"; } loadLive(); if (ok) showResume(); });
+                    closeRoom(o.code).then(function (ok) { if (ok) { closedRooms[o.code] = 1; forgetRoom(); box.hidden = true; } else { btn.disabled = false; btn.textContent = "🗑 Odayı kapat"; } loadLive(); if (ok) showResume(); });
                 };
             });
         });
@@ -890,6 +890,7 @@
             if (!comp || !d) return;
             var prev = comp.prevDoc || {};
             comp.prevDoc = d; comp.doc = d; comp.players = players || [];
+            if (comp.closing) return;
             if (!comp.watch && (!myP() || banned(comp.uid)) && prev.host) { var bn = banned(comp.uid); leaveComp(!bn); cMsg(bn ? "Yarışmadan çıkarıldın." : "Bağlantın koptuğu (sayfa kapandı ya da arka plana alındı) için odadan çıkarıldın. Bir sonraki turun hazırlık süresinde <b>Odana dön</b> ile geri dönebilirsin.", 1); return; }
             // sunucuda daha fazla süre varsa (ör. süre dolunca yazılan DNF) yerel kopyayı bırak
             var mp = myP(); if (comp.local && mp && timesOf(mp).length >= comp.local.t.length) comp.local = null;
@@ -946,7 +947,7 @@
             var fail = function () { stop(); if (comp && comp.code === code) { comp.live = null; startPoll(); } };
             var push = function () { if (comp && comp.code === code && got.d && got.p) { comp.live = stop; applyComp(got.d, got.p); } };
             subs.push(fs.onSnapshot(fs.doc(db, "comps", code), function (snap) {
-                if (!snap.exists()) { if (comp && comp.code === code) { stop(); comp.live = null; leaveComp(); cMsg("Yarışma silindi.", 1); } return; }
+                if (!snap.exists()) { if (comp && comp.code === code && !comp.closing) { stop(); comp.live = null; leaveComp(); cMsg("Yarışma silindi.", 1); } return; }
                 got.d = snapObj(snap); push();
             }, fail));
             subs.push(fs.onSnapshot(fs.collection(db, "comps", code, "p"), function (qs) {
@@ -1355,7 +1356,7 @@
             var d = { documents: (arr || []).filter(function (x) { return x.document; }).map(function (x) { return x.document; }) };
             var now = Date.now();
             var all = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; });
-            renderOpen(all.filter(function (o) { return (o.st === "lobby" || o.st === "prep" || (o.st === "end" && !o.fin)) && now - o.up < 6 * 3600000; }).sort(function (a, b) { return b.up - a.up; }).slice(0, 10));
+            renderOpen(all.filter(function (o) { return !closedRooms[o.code] && (o.st === "lobby" || o.st === "prep" || (o.st === "end" && !o.fin)) && now - o.up < 6 * 3600000; }).sort(function (a, b) { return b.up - a.up; }).slice(0, 10));
             var list = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; })
                 // başlatılmamış (lobi) yarışmalar listede görünmez
                 .filter(function (o) { return o.st && o.st !== "lobby" && now - o.up < 6 * 3600000 && !(o.st === "end" && o.fin); })
@@ -1394,7 +1395,8 @@
             Array.prototype.forEach.call(box.querySelectorAll("[data-join]"), function (b) { b.onclick = function () { $("cJoinIn").value = b.getAttribute("data-join"); joinComp(b.getAttribute("data-join")); }; });
             Array.prototype.forEach.call(box.querySelectorAll("[data-close]"), function (b) { b.onclick = function () {
                 if (!confirm("Bu oda kapatılsın mı? Oda ve içindeki kayıtlar silinir.")) return;
-                b.disabled = true; closeRoom(b.getAttribute("data-close")).then(function () { loadLive(); showResume(); });
+                var cc = b.getAttribute("data-close"); b.disabled = true;
+                closeRoom(cc).then(function (ok) { if (ok) { closedRooms[cc] = 1; forgetRoom(); } loadLive(); showResume(); });
             }; });
         });
     }
@@ -1448,8 +1450,14 @@
         if ($("cFinish")) $("cFinish").onclick = finishComp;
         if ($("cCloseRoom")) $("cCloseRoom").onclick = function () {
             if (!comp || !isOwner() || !confirm("Oda kapatılsın mı? Oda ve içindeki kayıtlar silinir, herkes odadan çıkar.")) return;
-            var code = comp.code; this.disabled = true;
-            closeRoom(code).then(function () { if (comp && comp.code === code) { comp.watch = true; leaveComp(); } cMsg("Oda kapatıldı."); });
+            var code = comp.code; this.disabled = true; comp.closing = true;
+            closeRoom(code).then(function (ok) {
+                if (!ok) { if (comp) comp.closing = false; $("cCloseRoom").disabled = false; return; }
+                closedRooms[code] = 1;
+                if (comp && comp.code === code) { comp.watch = true; leaveComp(); }
+                forgetRoom(); if ($("cResume")) $("cResume").hidden = true;
+                cMsg("Oda kapatıldı.");
+            });
         };
         if ($("cChatForm")) {
             $("cChatForm").onsubmit = function (e) { e.preventDefault(); chatSend(); };
