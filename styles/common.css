@@ -633,6 +633,8 @@ html.dark-mode .hero::before {
     max-width: 590px;
 }
 
+.badge i { flex-shrink: 0; }
+@media (max-width: 420px) { .badge { letter-spacing: .8px; } }
 .badge {
     display: inline-flex;
     align-items: center;
@@ -825,7 +827,7 @@ html.dark-mode .card-visual::before {
     color: var(--text-soft);
     font-size: 13.5px;
     line-height: 1.65;
-    min-height: 64px;
+    min-height: calc(3 * 1.65em); /* 3 satır: butonlar yan yana kartlarda aynı hizada */
     margin-bottom: 20px;
 }
 
@@ -886,7 +888,7 @@ html.dark-mode .card-visual::before {
 }
 
 /* Algoritma sayfalarındaki "Yazdır / PDF" bağlantısı */
-.print-row { display: flex; justify-content: flex-end; max-width: 1100px; margin: -6px auto 14px; }
+.print-row { display: flex; justify-content: flex-end; margin: -6px auto 14px; }
 .print-link {
     display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 12px;
     border: var(--card-bw, 2px) solid var(--ink); background: var(--surface); color: var(--text);
@@ -1055,7 +1057,7 @@ html[dir="rtl"] .set-opt { text-align: right; }
 .set-opt:hover { background: var(--surface-soft, #f3f4f6); }
 .set-opt[aria-current="true"] { background: var(--ui-accent-soft, rgba(108,92,231,.14)); outline: 2px solid var(--ui-accent); }
 .set-opt.cvd { font-weight: 700; }
-.set-opt.cvd span { flex: 1; min-width: 0; }
+.set-opt.cvd > span:not(.cvd-sw) { flex: 1; min-width: 0; }
 @media (max-width: 560px) { .ra-set-menu { width: min(250px, calc(100vw - 32px)); } }
 
 /* =========================================
@@ -1080,7 +1082,7 @@ html[dir="rtl"] .acc-mi { text-align: right; }
 .acc-mi.danger:hover { background: var(--tint-red, rgba(209,45,40,.12)); }
 
 /* Footer "Ayarlar" bağlantısı */
-.foot-set { display: inline-block; margin-top: 10px; color: var(--text-soft, #9aa0a6); font: 700 13px Inter, sans-serif; text-decoration: none; opacity: .85; }
+.foot-set { display: inline-block; margin-top: 10px; margin-inline-start: 6px; color: var(--text-soft, #9aa0a6); font: 700 13px Inter, sans-serif; text-decoration: none; opacity: .85; }
 .foot-set:hover { opacity: 1; text-decoration: underline; }
 
 /* =========================================
@@ -1252,3 +1254,4 @@ html[data-skin="gunbatimi"] .bg-glow::after { background: #f5b14c; }
 /* Ayarlar: tema stili önizleme kutuları */
 .skin-sw { display: inline-flex; gap: 3px; margin-inline-end: 4px; }
 .skin-sw i { width: 14px; height: 14px; border-radius: 4px; display: block; border: 1px solid rgba(0, 0, 0, .12); }
+html.dark-mode .skin-sw i { border-color: rgba(255, 255, 255, .22); }
