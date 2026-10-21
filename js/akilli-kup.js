@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261166";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261167";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -603,7 +603,7 @@
         catch (e) { return "v" + Math.random().toString(36).slice(2, 14); }
     }
     // Canlı izleyici sayısı: herkes 20 sn'de bir comps/{kod}/w/{id} yazar; son 45 sn'de yazanlar sayılır
-    var HB_MS = 20000, FRESH_MS = 75000, hbT = 0;
+    var HB_MS = 20000, FRESH_MS = 45000, hbT = 0;
     // Sayfaya geri dönünce hemen "buradayım" de ve güncelle (arka planda uzun kalan odadan çıkarılır)
     document.addEventListener("visibilitychange", function () { if (comp && document.visibilityState === "visible") { heartbeat(); compPoll(); } });
     // Sayfa/Chrome kapanırken kalp atışı kaydını sil: oda sahibi bunu görünce ~15 sn içinde odadan çıkarır.
@@ -835,12 +835,23 @@
             comp.doc = parseDoc(res[0]);
             comp.players = parsePlayers(res[1]);
             var mine = myP();
-            if (mine && !watch) comp.watch = false; // "İzle" denirse kayıtlı olsa da izleyici olarak açılır
+            // Kaydı duran (bağlantısı kopmuş) yarışmacı "İzle" dese bile yarışmacı olarak geri döner
+            if (mine) comp.watch = false;
             if (comp.watch) return null;
             if (banned(uid)) throw new Error("Bu yarışmadan çıkarıldın.");
             if (!mine && comp.players.length >= comp.doc.cap) throw new Error("Yarışma dolu (" + comp.doc.cap + " kişi)");
-            if (!mine && comp.doc.st === "run") throw new Error("Tur sürüyor; tur bitince katılabilirsin. Şimdilik 👁 İzle ile takip edebilirsin.");
             comp.mode = "manual"; // yarışmada süre yalnızca elle yazılır
+            if (!mine && comp.doc.st === "run") {
+                // Tur sürerken yalnız bu odada daha önce olan (çıkan / bağlantısı kopan) geri dönebilir;
+                // kaçırdığı çözümler DNF sayılır ki diğerleri beklemesin
+                var st0 = null; try { st0 = JSON.parse(localStorage.getItem(ROOM_KEY) || "null"); } catch (e) {}
+                if (!(st0 && st0.c === code && st0.u === uid)) throw new Error("Tur sürüyor; tur bitince katılabilirsin. Şimdilik 👁 İzle ile takip edebilirsin.");
+                var others = comp.players.filter(function (p) { return eligible(p.uid); }).map(function (p) { return timesOf(p).length; });
+                var k = others.length ? Math.min.apply(null, others) : 0, t = [], tt = [];
+                for (var i = 0; i < k; i++) { t.push(DNF); tt.push(Date.now()); }
+                comp.local = { rnd: comp.doc.round, t: t, tt: tt };
+                return mePatch({ name: myName(), mode: comp.mode, t: t.join(","), tt: tt.join(","), rnd: comp.doc.round }).then(function (r) { if (!r.ok) throw new Error(r.status); });
+            }
             return mine ? null : mePatch({ name: myName(), mode: comp.mode, t: "", rnd: 0 }).then(function (r) { if (!r.ok) throw new Error(r.status); });
         }).then(function () {
             try { history.replaceState(null, "", (comp.watch ? "?izle=" : "?ev=") + code); } catch (e) {}
@@ -854,10 +865,12 @@
             clearInterval(comp.cdT); comp.cdT = setInterval(function () { if (comp && comp.doc && comp.doc.st === "run") { renderNow(); checkTimeout(); } }, 1000);
         }).catch(function (e) { comp = null; cMsg(esc(e.message), 1); });
     }
-    function leaveComp() {
+    function leaveComp(keep) {
         clearInterval(compPollT); clearInterval(hbT); if (comp) { clearInterval(comp.cdT); if (comp.liveStop) comp.liveStop(); }
         if (comp && !comp.watch && myP()) api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
-        comp = null; closeFinal(); document.body.classList.remove("c-in-room"); forgetRoom();
+        // keep: yarışmacı kendi çıktıysa ya da bağlantısı koptuysa "Odana dön" ile geri gelebilsin
+        var was = comp && !comp.watch;
+        comp = null; closeFinal(); document.body.classList.remove("c-in-room"); if (!(keep && was)) forgetRoom();
         try { history.replaceState(null, "", location.pathname); } catch (e) {}
         $("cLobby").hidden = false; $("cRoom").hidden = true; $("cType").hidden = true; $("akPad").hidden = true;
         setScramble(""); loadLive(); setTimeout(showResume, 300);
@@ -881,7 +894,7 @@
             if (!comp || !d) return;
             var prev = comp.prevDoc || {};
             comp.prevDoc = d; comp.doc = d; comp.players = players || [];
-            if (!comp.watch && (!myP() || banned(comp.uid)) && prev.host) { var bn = banned(comp.uid); comp.watch = true; leaveComp(); cMsg(bn ? "Yarışmadan çıkarıldın." : "Bağlantın koptuğu (sayfa kapandı ya da arka plana alındı) için odadan çıkarıldın. Tur bitince tekrar katılabilirsin.", 1); return; }
+            if (!comp.watch && (!myP() || banned(comp.uid)) && prev.host) { var bn = banned(comp.uid); leaveComp(!bn); cMsg(bn ? "Yarışmadan çıkarıldın." : "Bağlantın koptuğu (sayfa kapandı ya da arka plana alındı) için odadan çıkarıldın. Aşağıdaki <b>Odana dön</b> ile geri dönebilirsin; kaçırdığın çözümler DNF sayılır.", 1); return; }
             // sunucuda daha fazla süre varsa (ör. süre dolunca yazılan DNF) yerel kopyayı bırak
             var mp = myP(); if (comp.local && mp && timesOf(mp).length >= comp.local.t.length) comp.local = null;
             // izleyici sayısı (ucuz sayım sorgusu) ve oda yöneticisi için bağlantı durumu: 30 sn'de bir
@@ -1394,7 +1407,7 @@
         if ($("cLoginBtn")) $("cLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
         $("cLeave").onclick = function () {
             var playing = comp && !comp.watch && myP() && comp.doc && comp.doc.st !== "lobby";
-            if (confirm(playing ? "Yarışmadan çıkılsın mı? Kaydın silinir; bu turdaki sürelerin sayılmaz (geçmiş turların sonuçları kalır)." : "Yarışmadan çıkılsın mı?")) leaveComp();
+            if (confirm(playing ? "Yarışmadan çıkılsın mı? Bu turdaki sürelerin sayılmaz; istersen “Odana dön” ile geri gelebilirsin (kaçırdığın çözümler DNF sayılır)." : "Yarışmadan çıkılsın mı?")) leaveComp(true);
         };
         $("cStart").onclick = function () { startRound(false, 0); };
         if ($("cFinish")) $("cFinish").onclick = finishComp;
