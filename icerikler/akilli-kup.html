@@ -27,10 +27,10 @@
 <meta property="og:description" content="Bluetooth akıllı küple çözümünü Cross, F2L, OLL ve PLL olarak aşama aşama analiz et.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/akilli-kup">
-<meta property="og:image" content="https://rubikacademy.fun/og/akilli-kup.png?v=20261173">
+<meta property="og:image" content="https://rubikacademy.fun/og/akilli-kup.png?v=20261174">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/akilli-kup.png?v=20261173">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/akilli-kup.png?v=20261174">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261173">
+<link rel="stylesheet" href="/styles/common.css?v=20261174">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -125,7 +125,7 @@
 .ak-link { border: 0; background: none; color: var(--text-soft); font: 700 12.5px Inter, sans-serif; text-decoration: underline; cursor: pointer; margin-top: 10px; }
 .ak-empty { color: var(--text-soft); font-size: 14px; }
 
-/* düello */
+/* oyuncu kartları ve sonuç penceresi */
 .ak-lobby { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
 .ak-lobby > div { min-width: 0; }
 .ak-lobby > div { background: var(--surface-soft); border-radius: 16px; padding: 16px; }
@@ -250,7 +250,6 @@
     .ak-pl-w { font-size: 32px; } .ak-scr { font-size: 15px; }
     .ak-tab { padding: 9px 12px; font-size: 13.5px; }
 }
-.intro p a { color: var(--ui-accent, #6c5ce7); font-weight: 700; text-decoration: none; }
 </style>
 
 <!-- Google tag (gtag.js) -->
@@ -298,7 +297,7 @@
 <section class="intro">
     <div class="badge"><i></i><span>BLUETOOTH</span></div>
     <h1>Çözüm <span>Analizi</span></h1>
-    <p>Bluetooth akıllı küpünü bağla: her çözümünü <b>Cross, F2L, OLL ve PLL</b> olarak aşama aşama analiz et. Her aşamanın süresi, hamle sayısı ve hızı (TPS) çıkar. Arkadaşınla yarışmak için <a href="/icerikler/duello">⚔️ Düello</a> sayfasına geç.</p>
+    <p>Bluetooth akıllı küpünü bağla: her çözümünü <b>Cross, F2L, OLL ve PLL</b> olarak aşama aşama analiz et. Her aşamanın süresi, hamle sayısı ve hızı (TPS) çıkar.</p>
 </section>
 
 <section class="box" id="akConnBox">
@@ -314,27 +313,6 @@
 <div class="ak-tabs" role="tablist" hidden>
     <button type="button" class="ak-tab on" data-tab="analysis">📊 Çözüm analizi</button>
 </div>
-
-<section class="box" id="akDuel" hidden>
-    <div id="akLobby">
-        <h2>⚔️ Canlı düello</h2>
-        <p class="ak-req">🧊 Düello yalnızca <b>Bluetooth akıllı küple</b> oynanır: önce yukarıdan küpünü bağla.</p>
-        <div class="ak-lobby">
-            <div><h3>Oda oluştur</h3><p>Bir oda aç, kodu ya da bağlantıyı arkadaşına gönder. İkiniz de aynı karıştırmayı çözersiniz; kim hızlıysa turu alır.</p><div class="ak-fmt" role="radiogroup" aria-label="Maç formatı"><label><input type="radio" name="akFmt" value="3"><span>mo3<small>3 çözüm</small></span></label><label><input type="radio" name="akFmt" value="5" checked><span>ao5<small>5 çözüm</small></span></label><label><input type="radio" name="akFmt" value="12"><span>ao12<small>12 çözüm</small></span></label></div><button type="button" class="btn primary" id="akCreate">➕ Oda oluştur</button></div>
-            <div><h3>Odaya katıl</h3><p>Arkadaşının paylaştığı 5 haneli kodu yaz.</p><div class="ak-join"><input id="akJoinIn" maxlength="5" placeholder="KOD" autocomplete="off"><button type="button" class="btn primary" id="akJoin">Katıl</button></div></div>
-        </div>
-        <div class="ak-login" id="akLoginNote" hidden>🔒 Düello için giriş yapman gerekiyor. <button type="button" class="btn sm" id="akLoginBtn">Giriş yap</button></div>
-        <div class="ak-msg" id="akDuelMsg"></div>
-    </div>
-    <div id="akRoom" hidden>
-        <div class="ak-room-top">
-            <div><small>ODA KODU</small><span class="ak-code" id="akCode">-----</span></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="ak-pill" id="akRound">Tur 1</span><button type="button" class="btn sm" id="akCopy">🔗 Bağlantıyı kopyala</button><button type="button" class="btn sm" id="akLeave">Odadan çık</button></div>
-        </div>
-        <div class="ak-players" id="akPlayers"></div>
-        <div class="ak-room-foot"><p id="akRoomHint"></p><button type="button" class="btn" id="akShowFin" hidden>🏁 Sonuçlar</button><button type="button" class="btn primary" id="akNext" hidden>Sonraki tur →</button></div>
-    </div>
-</section>
 
 <section class="box" id="akComp" hidden>
     <div id="cLobby">
@@ -423,11 +401,11 @@
 </footer>
 
 <script>var PAGE_ID = "akilli_kup";</script>
-<script src="/js/i18n.js?v=20261173"></script>
-<script src="/js/common.js?v=20261173"></script>
-<script src="/js/firebase-config.js?v=20261173"></script>
-<script src="/js/account.js?v=20261173"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261173"></script>
-<script src="/js/akilli-kup.js?v=20261173"></script>
+<script src="/js/i18n.js?v=20261174"></script>
+<script src="/js/common.js?v=20261174"></script>
+<script src="/js/firebase-config.js?v=20261174"></script>
+<script src="/js/account.js?v=20261174"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261174"></script>
+<script src="/js/akilli-kup.js?v=20261174"></script>
 </body>
 </html>
