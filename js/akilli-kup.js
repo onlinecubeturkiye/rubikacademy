@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261172";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261173";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -498,7 +498,7 @@
         var line = function (name, l, a) { return name + ": " + fmt(a) + " " + m.f + " (" + l.map(fmt).join(", ") + ")"; };
         var w = m.win === "h" ? o.hName : m.win === "g" ? o.gName : "";
         return "⚔️ Rubik Academy düellosu (" + m.f + ")\n" + line(o.hName, m.hl, m.ha) + "\n" + line(o.gName, m.gl, m.ga) + "\n" +
-            (w ? "🏆 Kazanan: " + w : "🤝 Berabere") + " · Tur skoru " + m.hw + "-" + m.gw + "\nrubikacademy.fun/icerikler/akilli-kup";
+            (w ? "🏆 Kazanan: " + w : "🤝 Berabere") + " · Tur skoru " + m.hw + "-" + m.gw + "\nrubikacademy.fun/icerikler/duello";
     }
     function shareImage(o, m) {
         return loadLogo().then(function (logo) {
@@ -524,7 +524,7 @@
             x.textAlign = "center"; x.fillStyle = "#0b0d14"; x.beginPath(); x.arc(W / 2, 460, 54, 0, 7); x.fill();
             x.fillStyle = bar; x.font = "900 46px Inter, sans-serif"; x.fillText("VS", W / 2, 476);
             x.fillStyle = "#eef0f7"; x.font = "800 42px Inter, sans-serif"; x.fillText(m.win ? "Tur skoru " + m.hw + " - " + m.gw : "🤝 Berabere · " + m.hw + " - " + m.gw, W / 2, 870);
-            x.fillStyle = "#a4aabe"; x.font = "700 28px Inter, sans-serif"; x.fillText("rubikacademy.fun/icerikler/akilli-kup", W / 2, 1010);
+            x.fillStyle = "#a4aabe"; x.font = "700 28px Inter, sans-serif"; x.fillText("rubikacademy.fun/icerikler/duello", W / 2, 1010);
             return new Promise(function (res) { c.toBlob(res, "image/png"); });
         });
     }
@@ -1566,11 +1566,11 @@
         $("akShowFin").onclick = function () { if (duel && duel.doc) renderFinal(duel.doc); };
         $("akFinal").onclick = function (e) { if (e.target === $("akFinal")) closeFinal(); };
         $("akCopy").onclick = function () {
-            var link = location.origin + "/icerikler/akilli-kup?duel=" + (duel && duel.code);
+            var link = location.origin + "/icerikler/duello?duel=" + (duel && duel.code);
             var done = function () { $("akCopy").textContent = "Kopyalandı ✓"; setTimeout(function () { $("akCopy").textContent = "🔗 Bağlantıyı kopyala"; }, 1500); };
             if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () {}); else prompt("Bağlantı:", link);
         };
-        var qs = new URLSearchParams(location.search), ev = qs.get("ev"), EV_PAGE = window.AK_PAGE === "ev";
+        var qs = new URLSearchParams(location.search), ev = qs.get("ev"), EV_PAGE = window.AK_PAGE === "ev", DUEL_PAGE = window.AK_PAGE === "duel";
         // Ev yarışması ayrı sayfada: eski bağlantılar oraya gitsin
         if (!EV_PAGE && (ev || qs.get("tab") === "ev")) { location.replace("/icerikler/ev-yarismasi" + (ev ? "?ev=" + encodeURIComponent(ev) : "")); return; }
         renderStages(null); renderHist(); initComp();
@@ -1595,12 +1595,15 @@
             }
         }
         var q = qs.get("duel");
+        // Düello ayrı sayfada: eski ?duel= bağlantıları oraya gitsin
+        if (q && !DUEL_PAGE) { location.replace("/icerikler/duello?duel=" + encodeURIComponent(q)); return; }
+        if (DUEL_PAGE && !q) setTab("duel");
         if (q) {
             setTab("duel");
             var tryJoin = function () { if (signedIn()) joinDuel(q); else duelMsg("Düelloya katılmak için giriş yap.", 1); };
             if (window.Account && Account.onChange) Account.onChange(function (u) { if (u && !duel) joinDuel(q); });
             setTimeout(tryJoin, 1200);
-        } else if (!EV_PAGE) setTab("analysis");
+        } else if (!EV_PAGE && !DUEL_PAGE) setTab("analysis");
         if (window.Account && Account.onChange) Account.onChange(function () { $("akLoginNote").hidden = signedIn(); $("cLoginNote").hidden = signedIn(); initCompRole(); if (comp) chatUi(); });
         $("akLoginNote").hidden = signedIn();
         $("akLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
