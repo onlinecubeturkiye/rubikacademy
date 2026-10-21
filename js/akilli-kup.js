@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261165";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261166";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -606,8 +606,17 @@
     var HB_MS = 20000, FRESH_MS = 75000, hbT = 0;
     // Sayfaya geri dönünce hemen "buradayım" de ve güncelle (arka planda uzun kalan odadan çıkarılır)
     document.addEventListener("visibilitychange", function () { if (comp && document.visibilityState === "visible") { heartbeat(); compPoll(); } });
+    // Sayfa/Chrome kapanırken kalp atışı kaydını sil: oda sahibi bunu görünce ~15 sn içinde odadan çıkarır.
+    // (Yenilemede kayıt 1-2 sn içinde geri yazıldığı için yenileyen kişi atılmaz.)
+    window.addEventListener("pagehide", function () {
+        if (!comp || !comp.tok) return;
+        try {
+            fetch(docsBase() + cPath("/w/" + viewerId()) + "?key=" + encodeURIComponent(cfg.apiKey), { method: "DELETE", keepalive: true, headers: { "Authorization": "Bearer " + comp.tok } });
+        } catch (e) {}
+    });
     function heartbeat() {
         if (!comp) return;
+        if (signedIn() && Account.token) Account.token().then(function (t) { if (comp) comp.tok = t; }, function () {});
         var body = { fields: { ts: { timestampValue: new Date().toISOString() } } };
         apiAny(cPath("/w/" + viewerId()) + "?updateMask.fieldPaths=ts", { method: "PATCH", body: JSON.stringify(body) }).catch(function () {});
     }
@@ -876,7 +885,7 @@
             // sunucuda daha fazla süre varsa (ör. süre dolunca yazılan DNF) yerel kopyayı bırak
             var mp = myP(); if (comp.local && mp && timesOf(mp).length >= comp.local.t.length) comp.local = null;
             // izleyici sayısı (ucuz sayım sorgusu) ve oda yöneticisi için bağlantı durumu: 30 sn'de bir
-            if (!comp.wT || Date.now() - comp.wT > 20000) {
+            if (!comp.wT || Date.now() - comp.wT > 15000) {
                 comp.wT = Date.now();
                 countFresh(comp.code).then(function (n) {
                     if (!comp) return; n = Math.max(0, n - comp.players.length);
@@ -886,11 +895,17 @@
                     if (!comp) return; comp.seen = {};
                     (wd.documents || []).forEach(function (x) { comp.seen[x.name.split("/").pop()] = Date.parse(((x.fields || {}).ts || {}).timestampValue || "") || 0; });
                     comp.players.forEach(function (p) { if (comp.seen[p.uid] == null) comp.seen[p.uid] = 0; });
-                    // tarayıcıyı kapatan / arka plana alan (kalp atışı 75 sn'den eski) yarışmacı odadan çıkarılır
+                    // Odadan otomatik çıkarma:
+                    //  - Chrome'u / sekmeyi kapatan: kalp atışı kaydı silinir → 15 sn içinde geri gelmezse çıkarılır
+                    //  - arka plana alan ya da bağlantısı kopan: kalp atışı 75 sn'den eskiyse çıkarılır
+                    comp.ever = comp.ever || {}; comp.gone = comp.gone || {};
                     if (isOwner() || isHost()) comp.players.forEach(function (p) {
-                        var t = comp.seen[p.uid];
-                        if (p.uid !== comp.uid && p.uid !== comp.doc.host && t > 0 && Date.now() - t > FRESH_MS)
-                            api(cPath("/p/" + p.uid), { method: "DELETE" }).catch(function () {});
+                        if (p.uid === comp.uid || p.uid === comp.doc.host) return;
+                        var t = comp.seen[p.uid], now = Date.now(), kick = false;
+                        if (t > 0) { comp.ever[p.uid] = 1; delete comp.gone[p.uid]; kick = now - t > FRESH_MS; }
+                        else if (comp.ever[p.uid]) { if (!comp.gone[p.uid]) comp.gone[p.uid] = now; else kick = now - comp.gone[p.uid] > 15000; }
+                        else if (p.ts && now - (Date.parse(p.ts) || now) > 180000) kick = true; // hiç kaydı yok ve 3 dk'dır ses yok
+                        if (kick) { delete comp.gone[p.uid]; delete comp.ever[p.uid]; api(cPath("/p/" + p.uid), { method: "DELETE" }).catch(function () {}); }
                     });
                     comp.tableHtml = ""; renderComp();
                 }, function () {});
