@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261163";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261164";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -603,7 +603,9 @@
         catch (e) { return "v" + Math.random().toString(36).slice(2, 14); }
     }
     // Canlı izleyici sayısı: herkes 20 sn'de bir comps/{kod}/w/{id} yazar; son 45 sn'de yazanlar sayılır
-    var HB_MS = 30000, FRESH_MS = 75000, hbT = 0;
+    var HB_MS = 20000, FRESH_MS = 75000, hbT = 0;
+    // Sayfaya geri dönünce hemen "buradayım" de ve güncelle (arka planda uzun kalan odadan çıkarılır)
+    document.addEventListener("visibilitychange", function () { if (comp && document.visibilityState === "visible") { heartbeat(); compPoll(); } });
     function heartbeat() {
         if (!comp) return;
         var body = { fields: { ts: { timestampValue: new Date().toISOString() } } };
@@ -643,15 +645,24 @@
     function banned(uid) { return String((comp && comp.doc && comp.doc.ban) || "").split(",").indexOf(uid) >= 0; }
     var betaOk = false, betaP = Promise.resolve(false); // şimdilik yalnız tester / organizatör / geliştirici (ve admin)
     var SLOT_MS = window.__evSlotMs || 90000; // 1:30 içinde süre girilmezse DNF
-    // Sıradaki çözümün açıldığı an (bu cihazın gördüğü): k -> zaman
-    function slotStart(k) { comp.slot = comp.slot || {}; var key = comp.doc.round + ":" + k; if (!comp.slot[key]) comp.slot[key] = Date.now(); return comp.slot[key]; }
-    function slotLeft() { var si = syncInfo(); if (!comp.doc || comp.doc.st !== "run" || si.min >= 5) return null; return SLOT_MS - (Date.now() - slotStart(si.min)); }
+    // k. çözümde ilk süreyi gönderen kişinin gönderim anı; kimse göndermediyse null (sayaç başlamaz)
+    function slotStart(k) {
+        var first = null;
+        (comp.players || []).forEach(function (p) {
+            if (!eligible(p.uid)) return;
+            var tt = p.uid === comp.uid && !comp.watch ? myTT() : ttOf(p), n = p.uid === comp.uid && !comp.watch ? myTimes().length : timesOf(p).length;
+            if (n > k && tt[k] > 0 && (first == null || tt[k] < first)) first = tt[k];
+        });
+        return first;
+    }
+    function slotLeft() { var si = syncInfo(); if (!comp.doc || comp.doc.st !== "run" || si.min >= 5) return null; var st = slotStart(si.min); return st == null ? null : SLOT_MS - (Date.now() - st); }
     function onlineOf(uid) { var t = comp.seen && comp.seen[uid]; return t == null ? true : Date.now() - t < FRESH_MS; }
     // Süre dolunca: yarışmacı kendine DNF yazar; oda sahibi/moderatör gelmeyenlere (arka planda kalan, düşen) DNF yazar
     function checkTimeout() {
         if (!comp || !comp.doc || comp.doc.st !== "run") return;
         var si = syncInfo(), k = si.min; if (k >= 5) return;
-        var waited = Date.now() - slotStart(k);
+        var st0 = slotStart(k); if (st0 == null) return;
+        var waited = Date.now() - st0;
         if (!comp.watch && myP() && eligible(comp.uid) && myTimes().length === k && comp.editIdx == null && waited > SLOT_MS) {
             $("cTypeIn") && ($("cTypeIn").value = "");
             compDone(DNF); cMsg("");
@@ -666,8 +677,10 @@
                     if (!x) return;
                     var cur = parseDoc(x), t = cur.rnd === comp.doc.round ? listOf(cur.t) : [];
                     if (t.length !== k) return; // bu arada kendisi girmiş
-                    t.push(DNF);
-                    return api(cPath("/p/" + p.uid) + "?updateMask.fieldPaths=t&updateMask.fieldPaths=rnd&updateMask.fieldPaths=ts", { method: "PATCH", body: JSON.stringify({ fields: { t: val(t.join(",")), rnd: val(comp.doc.round), ts: { timestampValue: new Date().toISOString() } } }) });
+                    var tt = cur.rnd === comp.doc.round ? String(cur.tt || "").split(",").filter(Boolean) : [];
+                    while (tt.length < k) tt.push("0");
+                    t.push(DNF); tt = tt.slice(0, k); tt.push(String(Date.now()));
+                    return api(cPath("/p/" + p.uid) + "?updateMask.fieldPaths=t&updateMask.fieldPaths=tt&updateMask.fieldPaths=rnd&updateMask.fieldPaths=ts", { method: "PATCH", body: JSON.stringify({ fields: { t: val(t.join(",")), tt: val(tt.join(",")), rnd: val(comp.doc.round), ts: { timestampValue: new Date().toISOString() } } }) });
                 });
             })).then(function () { comp && (comp.dnfBusy = false); compPoll(); }, function () { comp && (comp.dnfBusy = false); });
         }
@@ -677,6 +690,9 @@
     function timesOf(p) { return p && p.rnd === comp.doc.round ? listOf(p.t) : []; }
     function myP() { return (comp && comp.players || []).filter(function (p) { return p.uid === comp.uid; })[0]; }
     function myTimes() { return comp ? (comp.local && comp.local.rnd === comp.doc.round ? comp.local.t.slice() : timesOf(myP())) : []; }
+    // Her çözümün gönderildiği an (ms), t ile aynı sırada; geri sayım bundan hesaplanır (sayfa yenilense de korunur)
+    function ttOf(p) { return p && p.rnd === comp.doc.round ? String(p.tt || "").split(",").filter(Boolean).map(Number) : []; }
+    function myTT() { return comp ? (comp.local && comp.local.rnd === comp.doc.round && comp.local.tt ? comp.local.tt.slice() : ttOf(myP())) : []; }
     // Herkes aynı anda: k. çözüme, tur içindeki herkes k-1 çözümü bitirince geçilir
     function syncInfo() {
         var rows = (comp.players || []).filter(function (p) { return eligible(p.uid); });
@@ -823,7 +839,7 @@
             $("cLobby").hidden = true; $("cRoom").hidden = false; cMsg("");
             document.body.classList.add("c-in-room");
             try { $("akComp").scrollIntoView({ block: "start" }); } catch (e) {}
-            comp.chat = []; comp.chatKey = null; chatUi(); compPoll(); heartbeat();
+            comp.chat = []; comp.chatKey = null; chatUi(); compPoll(); heartbeat(); chatLoad(true);
             startPoll(); liveStart();
             clearInterval(hbT); hbT = setInterval(function () { if (document.visibilityState === "visible") heartbeat(); }, HB_MS);
             clearInterval(comp.cdT); comp.cdT = setInterval(function () { if (comp && comp.doc && comp.doc.st === "run") { renderNow(); checkTimeout(); } }, 1000);
@@ -856,11 +872,11 @@
             if (!comp || !d) return;
             var prev = comp.prevDoc || {};
             comp.prevDoc = d; comp.doc = d; comp.players = players || [];
-            if (!comp.watch && (!myP() || banned(comp.uid)) && prev.host) { comp.watch = true; leaveComp(); cMsg("Yarışmadan çıkarıldın.", 1); return; }
+            if (!comp.watch && (!myP() || banned(comp.uid)) && prev.host) { var bn = banned(comp.uid); comp.watch = true; leaveComp(); cMsg(bn ? "Yarışmadan çıkarıldın." : "Bağlantın koptuğu (sayfa kapandı ya da arka plana alındı) için odadan çıkarıldın. Tur bitince tekrar katılabilirsin.", 1); return; }
             // sunucuda daha fazla süre varsa (ör. süre dolunca yazılan DNF) yerel kopyayı bırak
             var mp = myP(); if (comp.local && mp && timesOf(mp).length >= comp.local.t.length) comp.local = null;
             // izleyici sayısı (ucuz sayım sorgusu) ve oda yöneticisi için bağlantı durumu: 30 sn'de bir
-            if (!comp.wT || Date.now() - comp.wT > 30000) {
+            if (!comp.wT || Date.now() - comp.wT > 20000) {
                 comp.wT = Date.now();
                 countFresh(comp.code).then(function (n) {
                     if (!comp) return; n = Math.max(0, n - comp.players.length);
@@ -870,10 +886,17 @@
                     if (!comp) return; comp.seen = {};
                     (wd.documents || []).forEach(function (x) { comp.seen[x.name.split("/").pop()] = Date.parse(((x.fields || {}).ts || {}).timestampValue || "") || 0; });
                     comp.players.forEach(function (p) { if (comp.seen[p.uid] == null) comp.seen[p.uid] = 0; });
+                    // tarayıcıyı kapatan / arka plana alan (kalp atışı 75 sn'den eski) yarışmacı odadan çıkarılır
+                    if (isOwner() || isHost()) comp.players.forEach(function (p) {
+                        var t = comp.seen[p.uid];
+                        if (p.uid !== comp.uid && p.uid !== comp.doc.host && t > 0 && Date.now() - t > FRESH_MS)
+                            api(cPath("/p/" + p.uid), { method: "DELETE" }).catch(function () {});
+                    });
                     comp.tableHtml = ""; renderComp();
                 }, function () {});
             }
-            if (!comp.live) { comp.pn = (comp.pn || 0) + 1; if (comp.pn % 2 === 1) chatLoad(); else renderChat(); }
+            if (!comp.live || comp.chatPoll) { comp.pn = (comp.pn || 0) + 1; if (comp.pn % 2 === 1) chatLoad(); else renderChat(); }
+            chatUi();
             comp.mode = "manual";
             // tur ya da durum değişti: sıradaki karıştırmayı göster
             if (prev.round !== d.round || prev.st !== d.st) { comp.local = null; comp.orig = {}; comp.editIdx = null; nextScramble(true); }
@@ -907,7 +930,7 @@
             subs.push(fs.onSnapshot(fs.query(fs.collection(db, "comps", code, "m"), fs.orderBy("ts", "desc"), fs.limit(40)), function (qs) {
                 if (!comp || comp.code !== code) return;
                 comp.chat = qs.docs.map(function (x) { var o = snapObj(x); o.id = x.id; return o; }).reverse(); renderChat();
-            }, function () {}));
+            }, function () { if (comp && comp.code === code) { comp.chatPoll = true; chatLoad(true); } }));
             comp.liveStop = stop;
         }, function () {});
     }
@@ -939,16 +962,18 @@
     /* --- süre kaydı --- */
     function compDone(ms) {
         if (tab !== "comp" || !comp || !compCanSolve()) return;
-        var t = myTimes(); t.push(ms); comp.orig[t.length - 1] = ms;
-        comp.local = { rnd: comp.doc.round, t: t };
-        mePatch({ name: myName(), mode: comp.mode, t: t.join(","), rnd: comp.doc.round }).then(compPoll);
+        var t = myTimes(), tt = myTT().slice(0, t.length); t.push(ms); comp.orig[t.length - 1] = ms;
+        while (tt.length < t.length - 1) tt.push(0);
+        tt.push(Date.now());
+        comp.local = { rnd: comp.doc.round, t: t, tt: tt };
+        mePatch({ name: myName(), mode: comp.mode, t: t.join(","), tt: tt.join(","), rnd: comp.doc.round }).then(compPoll);
         renderComp();
     }
     function compSetDnf(i, on) {
         var t = myTimes(); if (i < 0 || i >= t.length) return;
         if (on) { if (t[i] < DNF) comp.orig[i] = t[i]; t[i] = DNF; }
         else if (comp.orig[i]) t[i] = comp.orig[i]; else return;
-        comp.local = { rnd: comp.doc.round, t: t };
+        comp.local = { rnd: comp.doc.round, t: t, tt: myTT() };
         mePatch({ t: t.join(","), rnd: comp.doc.round }).then(compPoll);
         renderComp();
     }
@@ -1001,7 +1026,7 @@
     function compEdit(i, ms) {
         var t = myTimes(); if (i < 0 || i >= t.length) return;
         t[i] = ms; comp.orig[i] = ms; comp.editIdx = null;
-        comp.local = { rnd: comp.doc.round, t: t };
+        comp.local = { rnd: comp.doc.round, t: t, tt: myTT() };
         mePatch({ t: t.join(","), rnd: comp.doc.round }).then(compPoll);
         renderComp();
     }
@@ -1061,8 +1086,8 @@
         compPatch({ fin: 1, R: JSON.stringify(h) }).then(compPoll);
     }
     /* --- mini sohbet: comps/{kod}/m/{id} = {u, n, x, ts} --- */
-    function chatLoad() {
-        if (!comp || comp.live) return;
+    function chatLoad(force) {
+        if (!comp || (comp.live && !comp.chatPoll && !force)) return;
         apiAny(cPath("/m?pageSize=40&orderBy=ts%20desc"), { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             if (!comp || !d) return;
             comp.chat = (d.documents || []).map(function (x) { var o = parseDoc(x); o.id = x.name.split("/").pop(); return o; }).reverse();
@@ -1099,7 +1124,13 @@
             chatLoad();
         }, function () { inp.value = x; err.textContent = "Mesaj gönderilemedi."; });
     }
-    function chatUi() { if (!$("cChatForm")) return; var ok = signedIn(); $("cChatForm").hidden = !ok; $("cChatLogin").hidden = ok; }
+    function chatUi() {
+        if (!$("cChatForm")) return;
+        var ok = signedIn() && !!comp && (!comp.watch || isHost());
+        $("cChatForm").hidden = !ok; $("cChatLogin").hidden = ok;
+        $("cChatLogin").innerHTML = !signedIn() ? 'Yazmak için <button type="button" class="c-linkbtn" id="cChatLoginBtn">giriş yap</button>.' : "👁 İzleyiciler sohbete yazamaz; yalnızca yarışmacılar yazabilir.";
+        if ($("cChatLoginBtn")) $("cChatLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
+    }
     function modeIcon(m) { return m === "bt" ? "🧊" : m === "manual" ? "⌨️" : "⏱️"; }
     function shareTextR(r) {
         var d = comp.doc;
@@ -1108,7 +1139,7 @@
         }).join("\n") + "\nrubikacademy.fun/icerikler/ev-yarismasi";
     }
     function shareImageR(r) {
-        var d = comp.doc, W = 1080, rowH = 74, H = 330 + r.rows.length * rowH + 90;
+        var d = comp.doc, W = 1080, rowH = 104, H = 330 + r.rows.length * rowH + 90;
         var c = document.createElement("canvas"); c.width = W; c.height = H;
         var x = c.getContext("2d"), acc = (getComputedStyle(document.body).getPropertyValue("--ui-accent") || "#6c5ce7").trim();
         var g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#0b0d14"); g.addColorStop(1, "#1d1838"); x.fillStyle = g; x.fillRect(0, 0, W, H);
@@ -1119,11 +1150,11 @@
             var y = 290 + i * rowH;
             x.fillStyle = i === 0 ? acc : i % 2 ? "#141826" : "#1a1e2c"; roundRect(x, 60, y, W - 120, rowH - 10, 18); x.fill();
             x.textAlign = "left"; x.fillStyle = i === 0 ? "#fff" : "#eef0f7";
-            x.font = "900 34px Inter, sans-serif"; x.fillText((i + 1) + ".", 90, y + 46);
-            x.font = "800 32px Inter, sans-serif"; x.fillText(clip(row.n, 18), 160, y + 46);
-            x.textAlign = "right"; x.font = "900 36px 'JetBrains Mono', monospace"; x.fillText(row.a == null ? "-" : fmt(row.a), W - 90, y + 47);
-            x.font = "600 20px 'JetBrains Mono', monospace"; x.fillStyle = i === 0 ? "rgba(255,255,255,.85)" : "#a4aabe";
-            x.fillText(row.t.map(fmt).join("  "), W - 290, y + 44);
+            x.font = "900 34px Inter, sans-serif"; x.fillText((i + 1) + ".", 90, y + 50);
+            x.font = "800 32px Inter, sans-serif"; x.fillText(clip(row.n, 26), 160, y + 44);
+            x.font = "600 21px 'JetBrains Mono', monospace"; x.fillStyle = i === 0 ? "rgba(255,255,255,.85)" : "#a4aabe";
+            x.fillText(row.t.map(fmt).join("   "), 160, y + 78);
+            x.textAlign = "right"; x.fillStyle = i === 0 ? "#fff" : "#eef0f7"; x.font = "900 40px 'JetBrains Mono', monospace"; x.fillText(row.a == null ? "-" : fmt(row.a), W - 90, y + 60);
         });
         x.textAlign = "center"; x.fillStyle = "#a4aabe"; x.font = "700 28px Inter, sans-serif"; x.fillText("rubikacademy.fun", W / 2, H - 40);
         return new Promise(function (res) { c.toBlob(res, "image/png"); });
@@ -1187,7 +1218,8 @@
         else if (n > si.min) { head = roundLabel(d) + " · " + (n + 1) + ". çözüm birazdan"; h = '<div class="c-now-h">✅ ' + n + '. çözüm kaydedildi</div><p class="c-now-p">Herkes bitirince ' + (n + 1) + '. karıştırma gelecek.</p>' + bar(n); }
         else { show = n; head = roundLabel(d) + " · Çözüm " + (n + 1) + " / 5"; h = '<div class="c-now-h">Çözüm <b>' + (n + 1) + '</b> / 5</div><p class="c-now-tip">Kendi timer\'ınla çöz, süreni yaz: <b>1943</b> = 19.43</p>'; }
         var left = slotLeft();
-        if (left != null && d.st === "run") { var sec = Math.max(0, Math.ceil(left / 1000)); h += '<p class="c-cd' + (sec <= 20 ? " warn" : "") + '">⏱ ' + Math.floor(sec / 60) + ':' + ("0" + sec % 60).slice(-2) + (sec ? ' içinde girilmeyen süre <b>DNF</b> olur' : ' · süre doldu, DNF yazılıyor') + '</p>'; }
+        if (left == null && d.st === "run" && player && si.min < 5) h += '<p class="c-cd">⏱ İlk kişi süresini girince <b>1:30</b> geri sayım başlar.</p>';
+        if (left != null && d.st === "run" && player) { var sec = Math.max(0, Math.ceil(left / 1000)); h += '<p class="c-cd' + (sec <= 20 ? " warn" : "") + '">⏱ ' + Math.floor(sec / 60) + ':' + ("0" + sec % 60).slice(-2) + (sec ? ' içinde girilmeyen süre <b>DNF</b> olur' : ' · süre doldu, DNF yazılıyor') + '</p>'; }
         box.innerHTML = h;
         var c = $("cEditCancel"); if (c) c.onclick = function () { comp.editIdx = null; renderComp(); };
         // üst: büyük karıştırma + görsel
@@ -1281,7 +1313,7 @@
             renderOpen(all.filter(function (o) { return (o.st === "lobby" || (o.st === "end" && !o.fin)) && now - o.up < 6 * 3600000; }).sort(function (a, b) { return b.up - a.up; }).slice(0, 10));
             var list = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; })
                 // başlatılmamış (lobi) yarışmalar listede görünmez
-                .filter(function (o) { return o.st && o.st !== "lobby" && now - o.up < 6 * 3600000 && !(o.st === "end" && o.fin && now - o.up > 1800000); })
+                .filter(function (o) { return o.st && o.st !== "lobby" && now - o.up < 6 * 3600000 && !(o.st === "end" && o.fin); })
                 .sort(function (a, b) { return b.up - a.up; }).slice(0, 10);
             $("cLiveWrap").hidden = !list.length;
             if (!list.length) return;
