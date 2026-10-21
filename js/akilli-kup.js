@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261167";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261168";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -781,10 +781,16 @@
             return pr.then(function (o) {
                 if (!o || comp) { box.hidden = true; return; }
                 var host = o.host === Account.user().uid;
-                box.innerHTML = '<div class="c-res-tx">🔁 <b>' + (host ? "Açık bir odan var" : "Bir odadaydın") + '</b><span>' + esc(o.name || "Ev yarışması") + ' · ' + esc(o.code) + (o.st === "lobby" ? " · başlamayı bekliyor" : o.st === "run" ? " · " + roundLabel(o) + " sürüyor" : "") + '</span></div>' +
+                box.innerHTML = '<div class="c-res-tx">🔁 <b>' + (host ? "Açık bir odan var" : "Bir odadaydın") + '</b><span>' + esc(o.name || "Ev yarışması") + ' · ' + esc(o.code) + (o.st === "lobby" ? " · başlamayı bekliyor" : o.st === "prep" ? " · " + roundLabel(o) + " hazırlığı" : o.st === "run" ? " · " + roundLabel(o) + " sürüyor" : "") + '</span></div>' +
                     '<div class="c-res-b"><button type="button" class="btn primary" id="cResumeGo">Odana dön →</button>' + (host ? '<button type="button" class="btn sm" id="cResumeClose">🗑 Odayı kapat</button>' : '') + '</div>';
                 box.hidden = false;
                 $("cResumeGo").onclick = function () { joinComp(o.code, !!o.watch && !host); };
+                if (!host && o.st === "run") apiAny("/comps/" + o.code + "/p/" + Account.user().uid, { method: "GET" }).then(function (r) {
+                    if (r.ok) return;
+                    var g = $("cResumeGo"); if (!g) return;
+                    g.textContent = "👁 İzle"; g.onclick = function () { joinComp(o.code, true); };
+                    var sp = box.querySelector(".c-res-tx span"); if (sp) sp.textContent += " · tur bitince hazırlıkta geri dönebilirsin";
+                }, function () {});
                 if ($("cResumeClose")) $("cResumeClose").onclick = function () {
                     if (!confirm("“" + (o.name || o.code) + "” odası kapatılsın mı? Oda ve içindeki kayıtlar silinir.")) return;
                     var btn = this; btn.disabled = true; btn.textContent = "Kapatılıyor…";
@@ -841,17 +847,7 @@
             if (banned(uid)) throw new Error("Bu yarışmadan çıkarıldın.");
             if (!mine && comp.players.length >= comp.doc.cap) throw new Error("Yarışma dolu (" + comp.doc.cap + " kişi)");
             comp.mode = "manual"; // yarışmada süre yalnızca elle yazılır
-            if (!mine && comp.doc.st === "run") {
-                // Tur sürerken yalnız bu odada daha önce olan (çıkan / bağlantısı kopan) geri dönebilir;
-                // kaçırdığı çözümler DNF sayılır ki diğerleri beklemesin
-                var st0 = null; try { st0 = JSON.parse(localStorage.getItem(ROOM_KEY) || "null"); } catch (e) {}
-                if (!(st0 && st0.c === code && st0.u === uid)) throw new Error("Tur sürüyor; tur bitince katılabilirsin. Şimdilik 👁 İzle ile takip edebilirsin.");
-                var others = comp.players.filter(function (p) { return eligible(p.uid); }).map(function (p) { return timesOf(p).length; });
-                var k = others.length ? Math.min.apply(null, others) : 0, t = [], tt = [];
-                for (var i = 0; i < k; i++) { t.push(DNF); tt.push(Date.now()); }
-                comp.local = { rnd: comp.doc.round, t: t, tt: tt };
-                return mePatch({ name: myName(), mode: comp.mode, t: t.join(","), tt: tt.join(","), rnd: comp.doc.round }).then(function (r) { if (!r.ok) throw new Error(r.status); });
-            }
+            if (!mine && comp.doc.st === "run") throw new Error("Tur sürüyor: 1-5. çözümler sırasında katılım kapalı. Bir sonraki turun hazırlık süresinde girebilirsin; şimdilik 👁 İzle ile takip edebilirsin.");
             return mine ? null : mePatch({ name: myName(), mode: comp.mode, t: "", rnd: 0 }).then(function (r) { if (!r.ok) throw new Error(r.status); });
         }).then(function () {
             try { history.replaceState(null, "", (comp.watch ? "?izle=" : "?ev=") + code); } catch (e) {}
@@ -862,7 +858,7 @@
             comp.chat = []; comp.chatKey = null; chatUi(); compPoll(); heartbeat(); chatLoad(true);
             startPoll(); liveStart();
             clearInterval(hbT); hbT = setInterval(function () { if (document.visibilityState === "visible") heartbeat(); }, HB_MS);
-            clearInterval(comp.cdT); comp.cdT = setInterval(function () { if (comp && comp.doc && comp.doc.st === "run") { renderNow(); checkTimeout(); } }, 1000);
+            clearInterval(comp.cdT); comp.cdT = setInterval(function () { if (comp && comp.doc && comp.doc.st === "run") { renderNow(); checkTimeout(); } else if (comp && comp.doc && comp.doc.st === "prep") { renderNow(); checkPrep(); } }, 1000);
         }).catch(function (e) { comp = null; cMsg(esc(e.message), 1); });
     }
     function leaveComp(keep) {
@@ -894,7 +890,7 @@
             if (!comp || !d) return;
             var prev = comp.prevDoc || {};
             comp.prevDoc = d; comp.doc = d; comp.players = players || [];
-            if (!comp.watch && (!myP() || banned(comp.uid)) && prev.host) { var bn = banned(comp.uid); leaveComp(!bn); cMsg(bn ? "Yarışmadan çıkarıldın." : "Bağlantın koptuğu (sayfa kapandı ya da arka plana alındı) için odadan çıkarıldın. Aşağıdaki <b>Odana dön</b> ile geri dönebilirsin; kaçırdığın çözümler DNF sayılır.", 1); return; }
+            if (!comp.watch && (!myP() || banned(comp.uid)) && prev.host) { var bn = banned(comp.uid); leaveComp(!bn); cMsg(bn ? "Yarışmadan çıkarıldın." : "Bağlantın koptuğu (sayfa kapandı ya da arka plana alındı) için odadan çıkarıldın. Bir sonraki turun hazırlık süresinde <b>Odana dön</b> ile geri dönebilirsin.", 1); return; }
             // sunucuda daha fazla süre varsa (ör. süre dolunca yazılan DNF) yerel kopyayı bırak
             var mp = myP(); if (comp.local && mp && timesOf(mp).length >= comp.local.t.length) comp.local = null;
             // izleyici sayısı (ucuz sayım sorgusu) ve oda yöneticisi için bağlantı durumu: 30 sn'de bir
@@ -929,6 +925,7 @@
             // tur ya da durum değişti: sıradaki karıştırmayı göster
             if (prev.round !== d.round || prev.st !== d.st) { comp.local = null; comp.orig = {}; comp.editIdx = null; nextScramble(true); }
             if (isHost() && d.st === "run") autoEnd();
+            checkPrep();
             checkTimeout();
             if (d.st === "end" && comp.shownR !== d.round + ":" + d.fin) { comp.shownR = d.round + ":" + d.fin; showRoundResults(lastRound()); }
             renderComp();
@@ -1103,7 +1100,18 @@
         if (topN && lr) adv = lr.rows.filter(function (r) { return r.a != null && r.a < DNF; }).slice(0, topN).map(function (r) { return r.u; }).join(",");
         var s = []; for (var i = 0; i < 5; i++) s.push(d.ev === "222" ? genScramble222() : genScramble());
         closeFinal();
-        compPatch({ round: (d.round || 0) + 1, st: "run", scr: s.join("|"), fin: fin ? 1 : 0, adv: adv }).then(compPoll);
+        // İlk tur lobiden hemen başlar; sonraki turlardan önce 2 dk hazırlık (bu sürede odaya katılım açık)
+        var prep = d.st !== "lobby";
+        compPatch({ round: (d.round || 0) + 1, st: prep ? "prep" : "run", pa: prep ? Date.now() + PREP_MS : 0, scr: s.join("|"), fin: fin ? 1 : 0, adv: adv }).then(compPoll);
+    }
+    var PREP_MS = window.__evPrepMs || 120000;
+    function prepLeft() { return comp && comp.doc && comp.doc.st === "prep" ? Math.max(0, (comp.doc.pa || 0) - Date.now()) : null; }
+    // Hazırlık bitince (ya da "Hemen başlat" ile) oda sahibi / moderatör turu başlatır
+    function checkPrep(force) {
+        if (!comp || !comp.doc || comp.doc.st !== "prep" || !isHost() || comp.prepBusy) return;
+        if (!force && prepLeft() > 0) return;
+        comp.prepBusy = true;
+        compPatch({ st: "run", pa: 0 }).then(function () { comp && (comp.prepBusy = false); compPoll(); }, function () { comp && (comp.prepBusy = false); });
     }
     // Final turu yapmadan bitir: son tur final sayılır, birincisi şampiyon olur
     function finishComp() {
@@ -1239,6 +1247,12 @@
         var bar = function (k) { var c = doneCount(k); return '<div class="c-prog"><i style="width:' + (si.total ? Math.round(c / si.total * 100) : 0) + '%"></i></div><small class="c-prog-t">' + c + ' / ' + si.total + ' kişi ' + k + '. çözümü bitirdi</small>'; };
         var player = !comp.watch && myP() && eligible(comp.uid);
         if (d.st === "lobby" || !d.st) { head = "⏳ Hazırlık"; h = '<p class="c-now-p">Organizatör turu başlatınca karıştırma yukarıda görünecek.</p>'; }
+        else if (d.st === "prep") {
+            var pl = Math.ceil((prepLeft() || 0) / 1000), mm = Math.floor(pl / 60) + ":" + ("0" + pl % 60).slice(-2);
+            head = "⏳ " + roundLabel(d) + " · hazırlık";
+            h = '<div class="c-now-h">' + roundLabel(d) + ' <b>' + mm + '</b> sonra başlıyor</div><p class="c-now-p">Hazırlık süresi: odaya katılım şu an açık. Tur başlayınca (1-5. çözümler) kimse katılamaz.</p>' +
+                (isHost() ? '<button type="button" class="btn primary sm" id="cGoNow" style="margin-top:10px">▶ Hemen başlat</button>' : '');
+        }
         else if (d.st === "end") { head = "🏁 " + roundLabel(d) + " bitti"; h = '<p class="c-now-p">' + (d.fin ? "Yarışma bitti, sonuçlara bak! 🏆" : "Organizatör yeni turu başlatacak.") + '</p>'; }
         else if (!player) { show = Math.min(si.min, 4); head = roundLabel(d) + " · " + (si.min + 1 > 5 ? "bitti" : (si.min + 1) + ". çözüm"); h = comp.watch ? '<p class="c-now-p">👁 Canlı izliyorsun.</p>' + (si.min < 5 ? bar(si.min + 1) : "") : '<p class="c-now-p">Bu turda yoksun; tabloyu izleyebilirsin.</p>'; }
         else if (comp.editIdx != null) { show = Math.min(n, 4); head = roundLabel(d) + " · " + (n + 1 > 5 ? 5 : n + 1) + ". çözüm"; h = '<div class="c-now-h">✏️ ' + (comp.editIdx + 1) + '. çözümü düzenle</div><p class="c-now-p">Şu an: <b>' + fmt(myTimes()[comp.editIdx]) + '</b> · <button type="button" class="c-linkbtn" id="cEditCancel">Vazgeç</button></p>'; }
@@ -1249,6 +1263,7 @@
         if (left == null && d.st === "run" && player && si.min < 5) h += '<p class="c-cd">⏱ İlk kişi süresini girince <b>1:30</b> geri sayım başlar.</p>';
         if (left != null && d.st === "run" && player) { var sec = Math.max(0, Math.ceil(left / 1000)); h += '<p class="c-cd' + (sec <= 20 ? " warn" : "") + '">⏱ ' + Math.floor(sec / 60) + ':' + ("0" + sec % 60).slice(-2) + (sec ? ' içinde girilmeyen süre <b>DNF</b> olur' : ' · süre doldu, DNF yazılıyor') + '</p>'; }
         box.innerHTML = h;
+        if ($("cGoNow")) $("cGoNow").onclick = function () { this.disabled = true; checkPrep(true); };
         var c = $("cEditCancel"); if (c) c.onclick = function () { comp.editIdx = null; renderComp(); };
         // üst: büyük karıştırma + görsel
         var sc = show >= 0 ? list[show] : "";
@@ -1324,7 +1339,7 @@
         if ($("cFinish")) $("cFinish").hidden = !(d.st === "end" && !d.fin);
         if ($("cCloseRoom")) { $("cCloseRoom").hidden = !owner; $("cCloseRoom").disabled = false; }
         $("cShowRes").hidden = !hist().length;
-        $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? "Yarışmacılar katılınca turu başlat (en az 2 kişi)." : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes 5 çözümü bitirince tur kendiliğinden biter." : (d.fin ? "Final bitti." : "Tur bitti.");
+        $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? "Yarışmacılar katılınca turu başlat (en az 2 kişi)." : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes 5 çözümü bitirince tur kendiliğinden biter." : d.st === "prep" ? "Hazırlık: yeni katılımcılar şimdi girebilir." : (d.fin ? "Final bitti." : "Tur bitti.");
         renderModeUi();
     }
     /* --- şu an canlı yarışmalar (izle) --- */
@@ -1338,7 +1353,7 @@
             var d = { documents: (arr || []).filter(function (x) { return x.document; }).map(function (x) { return x.document; }) };
             var now = Date.now();
             var all = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; });
-            renderOpen(all.filter(function (o) { return (o.st === "lobby" || (o.st === "end" && !o.fin)) && now - o.up < 6 * 3600000; }).sort(function (a, b) { return b.up - a.up; }).slice(0, 10));
+            renderOpen(all.filter(function (o) { return (o.st === "lobby" || o.st === "prep" || (o.st === "end" && !o.fin)) && now - o.up < 6 * 3600000; }).sort(function (a, b) { return b.up - a.up; }).slice(0, 10));
             var list = (d.documents || []).map(function (x) { var o = parseDoc(x); o.code = x.name.split("/").pop(); o.up = Date.parse(x.updateTime) || 0; return o; })
                 // başlatılmamış (lobi) yarışmalar listede görünmez
                 .filter(function (o) { return o.st && o.st !== "lobby" && now - o.up < 6 * 3600000 && !(o.st === "end" && o.fin); })
@@ -1371,7 +1386,7 @@
                 var full = o.n >= o.cap, mine = signedIn() && o.host === Account.user().uid;
                 if (mine) return '<div class="c-live"><span class="c-dot on"></span><div class="c-live-tx"><b>' + esc(o.name || "Ev yarışması") + ' <small>(senin odan)</small></b><small>' + evName(o.ev) + ' · ' + esc(o.code) + ' · 👤 ' + o.n + '/' + o.cap + '</small></div>' +
                     '<button type="button" class="btn primary sm" data-join="' + esc(o.code) + '">Dön</button><button type="button" class="btn sm" data-close="' + esc(o.code) + '" title="Odayı kapat">🗑</button></div>';
-                return '<div class="c-live"><span class="c-dot on"></span><div class="c-live-tx"><b>' + esc(o.name || "Ev yarışması") + '</b><small>' + evName(o.ev) + ' · ' + (o.st === "lobby" ? "Başlamayı bekliyor" : roundLabel(o) + " bitti, yeni tur bekleniyor") + ' · 👤 ' + o.n + '/' + o.cap + ' · ' + esc(o.hName || "") + '</small></div>' +
+                return '<div class="c-live"><span class="c-dot on"></span><div class="c-live-tx"><b>' + esc(o.name || "Ev yarışması") + '</b><small>' + evName(o.ev) + ' · ' + (o.st === "lobby" ? "Başlamayı bekliyor" : o.st === "prep" ? roundLabel(o) + " hazırlığı · katılım açık" : roundLabel(o) + " bitti, yeni tur bekleniyor") + ' · 👤 ' + o.n + '/' + o.cap + ' · ' + esc(o.hName || "") + '</small></div>' +
                     (full ? '<span class="ak-pill">Dolu</span>' : '<button type="button" class="btn primary sm" data-join="' + esc(o.code) + '">Katıl</button>') + '</div>';
             }).join("");
             Array.prototype.forEach.call(box.querySelectorAll("[data-join]"), function (b) { b.onclick = function () { $("cJoinIn").value = b.getAttribute("data-join"); joinComp(b.getAttribute("data-join")); }; });
@@ -1407,7 +1422,7 @@
         if ($("cLoginBtn")) $("cLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
         $("cLeave").onclick = function () {
             var playing = comp && !comp.watch && myP() && comp.doc && comp.doc.st !== "lobby";
-            if (confirm(playing ? "Yarışmadan çıkılsın mı? Bu turdaki sürelerin sayılmaz; istersen “Odana dön” ile geri gelebilirsin (kaçırdığın çözümler DNF sayılır)." : "Yarışmadan çıkılsın mı?")) leaveComp(true);
+            if (confirm(playing ? "Yarışmadan çıkılsın mı? Bu turdaki sürelerin sayılmaz; bir sonraki turun hazırlık süresinde geri dönebilirsin." : "Yarışmadan çıkılsın mı?")) leaveComp(true);
         };
         $("cStart").onclick = function () { startRound(false, 0); };
         if ($("cFinish")) $("cFinish").onclick = finishComp;
