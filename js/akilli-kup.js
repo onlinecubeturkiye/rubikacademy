@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261171";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261172";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -501,28 +501,32 @@
             (w ? "🏆 Kazanan: " + w : "🤝 Berabere") + " · Tur skoru " + m.hw + "-" + m.gw + "\nrubikacademy.fun/icerikler/akilli-kup";
     }
     function shareImage(o, m) {
-        var W = 1080, H = 1080, c = document.createElement("canvas"); c.width = W; c.height = H;
-        var x = c.getContext("2d"), cs = getComputedStyle(document.body);
-        var acc = (cs.getPropertyValue("--ui-accent") || "#6c5ce7").trim();
-        var g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#0b0d14"); g.addColorStop(1, "#1d1838");
-        x.fillStyle = g; x.fillRect(0, 0, W, H);
-        x.textAlign = "center"; x.fillStyle = "#a4aabe"; x.font = "700 34px Inter, sans-serif";
-        x.fillText("RUBIK ACADEMY · DÜELLO · " + m.f.toUpperCase(), W / 2, 110);
-        function player(cx, name, l, a, won) {
-            x.fillStyle = won ? acc : "#1a1e2c"; roundRect(x, cx - 230, 190, 460, 560, 36); x.fill();
-            x.fillStyle = won ? "#ffffff" : "#eef0f7"; x.font = "800 44px Inter, sans-serif"; x.fillText(clip(name, 16), cx, 280);
-            x.font = "900 96px 'JetBrains Mono', monospace"; x.fillText(fmt(a), cx, 410);
-            x.font = "700 30px Inter, sans-serif"; x.fillStyle = won ? "rgba(255,255,255,.85)" : "#a4aabe"; x.fillText(m.f, cx, 455);
-            x.font = "600 28px 'JetBrains Mono', monospace";
-            l.forEach(function (t, i) { x.fillText(fmt(t), cx + (i % 2 ? 100 : -100), 520 + Math.floor(i / 2) * 40); });
-            if (won) { x.font = "900 40px Inter, sans-serif"; x.fillStyle = "#fff"; x.fillText("🏆 KAZANAN", cx, 720); }
-        }
-        player(290, o.hName, m.hl, m.ha, m.win === "h");
-        player(790, o.gName, m.gl, m.ga, m.win === "g");
-        x.fillStyle = "#eef0f7"; x.font = "900 54px Inter, sans-serif"; x.fillText("VS", W / 2, 470);
-        x.font = "800 40px Inter, sans-serif"; x.fillText("Tur skoru " + m.hw + " - " + m.gw, W / 2, 860);
-        x.fillStyle = "#a4aabe"; x.font = "700 30px Inter, sans-serif"; x.fillText("rubikacademy.fun/icerikler/akilli-kup", W / 2, 990);
-        return new Promise(function (res) { c.toBlob(res, "image/png"); });
+        return loadLogo().then(function (logo) {
+            var W = 1080, H = 1080, c = document.createElement("canvas"); c.width = W; c.height = H;
+            var x = c.getContext("2d"), acc = (getComputedStyle(document.body).getPropertyValue("--ui-accent") || "#6c5ce7").trim();
+            if (!/^#[0-9a-f]{6}$/i.test(acc)) acc = "#6c5ce7";
+            var bar = shareBg(x, W, H, acc);
+            shareHead(x, W, logo, "⚔️ DÜELLO · " + m.f.toUpperCase());
+            function player(cx, name, l, a, won) {
+                if (won) { var wg = x.createLinearGradient(cx - 230, 190, cx + 230, 750); wg.addColorStop(0, acc); wg.addColorStop(1, "#a03a8a"); x.fillStyle = wg; }
+                else x.fillStyle = "rgba(255,255,255,.07)";
+                roundRect(x, cx - 230, 190, 460, 580, 36); x.fill();
+                x.textAlign = "center"; x.fillStyle = "#fff";
+                x.fillText(fitText(x, name, 400, "800", 44, 24), cx, 290);
+                x.fillText(fitText(x, fmt(a), 400, "900", 96, 48, "'JetBrains Mono', monospace"), cx, 420);
+                x.font = "700 30px Inter, sans-serif"; x.fillStyle = won ? "rgba(255,255,255,.85)" : "#a4aabe"; x.fillText(m.f, cx, 465);
+                x.font = "600 28px 'JetBrains Mono', monospace";
+                l.forEach(function (t, i) { x.fillText(fmt(t), cx + (i % 2 ? 100 : -100), 530 + Math.floor(i / 2) * 42); });
+                if (won) { x.font = "900 40px Inter, sans-serif"; x.fillStyle = "#fff"; x.fillText("🏆 KAZANAN", cx, 730); }
+            }
+            player(290, o.hName, m.hl, m.ha, m.win === "h");
+            player(790, o.gName, m.gl, m.ga, m.win === "g");
+            x.textAlign = "center"; x.fillStyle = "#0b0d14"; x.beginPath(); x.arc(W / 2, 460, 54, 0, 7); x.fill();
+            x.fillStyle = bar; x.font = "900 46px Inter, sans-serif"; x.fillText("VS", W / 2, 476);
+            x.fillStyle = "#eef0f7"; x.font = "800 42px Inter, sans-serif"; x.fillText(m.win ? "Tur skoru " + m.hw + " - " + m.gw : "🤝 Berabere · " + m.hw + " - " + m.gw, W / 2, 870);
+            x.fillStyle = "#a4aabe"; x.font = "700 28px Inter, sans-serif"; x.fillText("rubikacademy.fun/icerikler/akilli-kup", W / 2, 1010);
+            return new Promise(function (res) { c.toBlob(res, "image/png"); });
+        });
     }
     function clip(s, n) { s = String(s || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
     function roundRect(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
@@ -1175,26 +1179,72 @@
             return (i + 1) + ". " + x.n + " — " + (x.a == null ? "-" : fmt(x.a)) + "  (" + x.t.map(fmt).join(", ") + ")";
         }).join("\n") + "\nrubikacademy.fun/icerikler/ev-yarismasi";
     }
-    function shareImageR(r) {
-        var d = comp.doc, W = 1080, rowH = 104, H = 330 + r.rows.length * rowH + 90;
-        var c = document.createElement("canvas"); c.width = W; c.height = H;
-        var x = c.getContext("2d"), acc = (getComputedStyle(document.body).getPropertyValue("--ui-accent") || "#6c5ce7").trim();
-        var g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#0b0d14"); g.addColorStop(1, "#1d1838"); x.fillStyle = g; x.fillRect(0, 0, W, H);
-        x.textAlign = "center"; x.fillStyle = "#a4aabe"; x.font = "700 32px Inter, sans-serif"; x.fillText("RUBIK ACADEMY · EV YARIŞMASI", W / 2, 90);
-        x.fillStyle = "#eef0f7"; x.font = "900 56px Inter, sans-serif"; x.fillText(clip(d.name, 28), W / 2, 170);
-        x.fillStyle = acc; x.font = "800 38px Inter, sans-serif"; x.fillText((r.f ? "🏆 Final" : "Tur " + r.n) + " · " + evName(d.ev) + " Ao5", W / 2, 230);
-        r.rows.forEach(function (row, i) {
-            var y = 290 + i * rowH;
-            x.fillStyle = i === 0 ? acc : i % 2 ? "#141826" : "#1a1e2c"; roundRect(x, 60, y, W - 120, rowH - 10, 18); x.fill();
-            x.textAlign = "left"; x.fillStyle = i === 0 ? "#fff" : "#eef0f7";
-            x.font = "900 34px Inter, sans-serif"; x.fillText((i + 1) + ".", 90, y + 50);
-            x.font = "800 32px Inter, sans-serif"; x.fillText(clip(row.n, 26), 160, y + 44);
-            x.font = "600 21px 'JetBrains Mono', monospace"; x.fillStyle = i === 0 ? "rgba(255,255,255,.85)" : "#a4aabe";
-            x.fillText(row.t.map(fmt).join("   "), 160, y + 78);
-            x.textAlign = "right"; x.fillStyle = i === 0 ? "#fff" : "#eef0f7"; x.font = "900 40px 'JetBrains Mono', monospace"; x.fillText(row.a == null ? "-" : fmt(row.a), W - 90, y + 60);
+    var logoP = null;
+    function loadLogo() {
+        if (!logoP) logoP = new Promise(function (res) { var i = new Image(); i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = "/RubikAcademyLogo.png"; });
+        return logoP;
+    }
+    // Metni verilen genişliğe sığdırır: önce yazıyı küçültür, yetmezse sonunu "…" ile keser
+    function fitText(x, s, maxW, weight, size, minSize, fam) {
+        s = String(s || ""); fam = fam || "Inter, sans-serif";
+        for (var z = size; z >= minSize; z -= 2) { x.font = weight + " " + z + "px " + fam; if (x.measureText(s).width <= maxW) return s; }
+        while (s.length > 1 && x.measureText(s + "…").width > maxW) s = s.slice(0, -1);
+        return s + "…";
+    }
+    function shareBg(x, W, H, acc) {
+        x.fillStyle = "#0b0d14"; x.fillRect(0, 0, W, H);
+        [[W * 0.1, 80, 520, acc], [W * 0.95, H * 0.55, 560, "#e84393"], [W * 0.3, H, 480, acc]].forEach(function (b) {
+            var g = x.createRadialGradient(b[0], b[1], 0, b[0], b[1], b[2]); g.addColorStop(0, b[3] + "55"); g.addColorStop(1, b[3] + "00");
+            x.fillStyle = g; x.fillRect(0, 0, W, H);
         });
-        x.textAlign = "center"; x.fillStyle = "#a4aabe"; x.font = "700 28px Inter, sans-serif"; x.fillText("rubikacademy.fun", W / 2, H - 40);
-        return new Promise(function (res) { c.toBlob(res, "image/png"); });
+        var bar = x.createLinearGradient(0, 0, W, 0); bar.addColorStop(0, acc); bar.addColorStop(1, "#e84393");
+        x.fillStyle = bar; x.fillRect(0, H - 12, W, 12);
+        return bar;
+    }
+    function shareHead(x, W, logo, kicker) {
+        if (logo) { x.fillStyle = "#151826"; roundRect(x, 60, 52, 76, 76, 20); x.fill(); x.drawImage(logo, 69, 61, 58, 58); }
+        x.textAlign = "left"; x.fillStyle = "#eef0f7"; x.font = "800 36px Inter, sans-serif"; x.fillText("Rubik Academy", logo ? 156 : 60, 102);
+        x.font = "800 24px Inter, sans-serif"; var kw = x.measureText(kicker).width + 44;
+        x.fillStyle = "rgba(108,92,231,.22)"; roundRect(x, W - 60 - kw, 64, kw, 52, 26); x.fill();
+        x.strokeStyle = "rgba(162,155,254,.5)"; x.lineWidth = 2; x.stroke();
+        x.fillStyle = "#c9c3ff"; x.textAlign = "center"; x.fillText(kicker, W - 60 - kw / 2, 98);
+    }
+    function shareImageR(r) {
+        return loadLogo().then(function (logo) {
+            var d = comp.doc, W = 1080, rowH = 112, top = 360, H = Math.max(1080, top + r.rows.length * rowH + 130);
+            var c = document.createElement("canvas"); c.width = W; c.height = H;
+            var x = c.getContext("2d"), acc = (getComputedStyle(document.body).getPropertyValue("--ui-accent") || "#6c5ce7").trim();
+            if (!/^#[0-9a-f]{6}$/i.test(acc)) acc = "#6c5ce7";
+            var bar = shareBg(x, W, H, acc);
+            shareHead(x, W, logo, "🏠 EV YARIŞMASI");
+            x.textAlign = "left"; x.fillStyle = "#eef0f7";
+            x.fillText(fitText(x, d.name, W - 120, "900", 64, 40), 60, 220);
+            x.font = "800 34px Inter, sans-serif"; x.fillStyle = bar;
+            x.fillText((r.f ? "🏆 Final" : "Tur " + r.n) + " · " + evName(d.ev) + " · Ao5 · " + r.rows.length + " yarışmacı", 60, 280);
+            var medal = ["🥇", "🥈", "🥉"], aoW = 230;
+            r.rows.forEach(function (row, i) {
+                var y = top + i * rowH, win = i === 0;
+                if (win) { var wg = x.createLinearGradient(60, 0, W - 60, 0); wg.addColorStop(0, acc); wg.addColorStop(1, "#a03a8a"); x.fillStyle = wg; }
+                else x.fillStyle = i % 2 ? "rgba(255,255,255,.045)" : "rgba(255,255,255,.075)";
+                roundRect(x, 60, y, W - 120, rowH - 14, 22); x.fill();
+                var mid = y + (rowH - 14) / 2;
+                x.textAlign = "center";
+                if (i < 3) { x.fillStyle = "#fff"; x.font = "48px 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif"; x.fillText(medal[i], 116, mid + 17); }
+                else { x.fillStyle = "#a4aabe"; x.font = "900 36px Inter, sans-serif"; x.fillText(i + 1, 116, mid + 13); }
+                // Ao5 kutusu (sağ) — isim ve süreler bu kutuya asla taşmaz
+                var bx = W - 60 - 18 - aoW;
+                x.fillStyle = win ? "rgba(0,0,0,.22)" : "rgba(0,0,0,.28)"; roundRect(x, bx, y + 14, aoW, rowH - 42, 16); x.fill();
+                x.fillStyle = "#fff"; x.textAlign = "center";
+                x.fillText(fitText(x, row.a == null ? "DNF" : fmt(row.a), aoW - 24, "900", 42, 26, "'JetBrains Mono', monospace"), bx + aoW / 2, mid + 15);
+                var nx = 166, nw = bx - 24 - nx;
+                x.textAlign = "left"; x.fillStyle = win ? "#fff" : "#eef0f7";
+                x.fillText(fitText(x, row.n, nw, "800", 34, 22), nx, y + 46);
+                x.fillStyle = win ? "rgba(255,255,255,.85)" : "#a4aabe";
+                x.fillText(fitText(x, row.t.map(fmt).join("  ·  "), nw, "600", 22, 14, "'JetBrains Mono', monospace"), nx, y + 80);
+            });
+            x.textAlign = "center"; x.fillStyle = "#a4aabe"; x.font = "700 28px Inter, sans-serif"; x.fillText("rubikacademy.fun/icerikler/ev-yarismasi", W / 2, H - 50);
+            return new Promise(function (res) { c.toBlob(res, "image/png"); });
+        });
     }
     function showRoundResults(r) {
         if (!r) return;
