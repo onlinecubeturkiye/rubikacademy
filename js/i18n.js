@@ -6670,7 +6670,7 @@ zbll: {
 megaminx_algos: {
     tr: {
         back_btn: "← Geri Dön",
-        badge_text: "MEGAMINX · 2-LOOK OLL · 2-LOOK PLL · 37 CASE",
+        badge_text: "MEGAMINX · 2-LOOK OLL/PLL · 37 CASE",
         hero_title1: "Megaminx",
         hero_titleAccent: "Son Katman",
         hero_p: "F2L bittikten sonra son katmanı dört adımda çöz: önce kenarları, sonra köşeleri yönlendir (2-Look OLL), ardından köşeleri, en son kenarları yerine diz (2-Look PLL). Her algoritma megaminx simülasyonunda tek tek doğrulandı.",
@@ -6695,7 +6695,7 @@ megaminx_algos: {
     },
     en: {
         back_btn: "← Back",
-        badge_text: "MEGAMINX · 2-LOOK OLL · 2-LOOK PLL · 37 CASES",
+        badge_text: "MEGAMINX · 2-LOOK OLL/PLL · 37 CASES",
         hero_title1: "Megaminx",
         hero_titleAccent: "Last Layer",
         hero_p: "After F2L, solve the last layer in four steps: orient the edges, then the corners (2-Look OLL), then permute the corners and finally the edges (2-Look PLL). Every algorithm was verified one by one in a megaminx simulation.",
@@ -6720,7 +6720,7 @@ megaminx_algos: {
     },
     fr: {
         back_btn: "← Retour",
-        badge_text: "MEGAMINX · 2-LOOK OLL · 2-LOOK PLL · 37 CAS",
+        badge_text: "MEGAMINX · 2-LOOK OLL/PLL · 37 CAS",
         hero_title1: "Megaminx",
         hero_titleAccent: "Dernière couche",
         hero_p: "Après le F2L, résous la dernière couche en quatre étapes : oriente les arêtes puis les coins (2-Look OLL), puis permute les coins et enfin les arêtes (2-Look PLL). Chaque algorithme a été vérifié par simulation.",
@@ -6760,7 +6760,7 @@ megaminx_algos: {
     },
     de: {
         back_btn: "← Zurück",
-        badge_text: "MEGAMINX · 2-LOOK OLL · 2-LOOK PLL · 37 FÄLLE",
+        badge_text: "MEGAMINX · 2-LOOK OLL/PLL · 37 FÄLLE",
         hero_title1: "Megaminx",
         hero_titleAccent: "Letzte Ebene",
         hero_p: "Nach F2L löst du die letzte Ebene in vier Schritten: Kanten, dann Ecken orientieren (2-Look OLL), dann Ecken und zuletzt Kanten permutieren (2-Look PLL). Jeder Algorithmus wurde simuliert geprüft.",

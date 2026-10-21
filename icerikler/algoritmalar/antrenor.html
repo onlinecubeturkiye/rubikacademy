@@ -501,6 +501,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 .filter-row .case-toggle { margin: 0; font-size: 12.5px; }
 .trainer-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-bottom: 14px; }
 .trainer-top .mode-switch { margin: 0; }
+.trainer-top .bt-wrap { margin: 0; }
 .trainer-top .bt-bar { margin: 0; padding: 5px 6px 5px 8px; gap: 8px; border-radius: 14px; max-width: 100%; }
 .trainer-top .bt-bar:not(.on) .bt-text { flex: 0 1 auto; }
 .trainer-top .bt-bar.on, .trainer-top .bt-bar.has-msg { flex-basis: 100%; max-width: 620px; padding: 8px 10px; }
@@ -593,7 +594,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 #setTabs.grouped { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
 .set-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .set-row-label { font: 800 11px "Inter", sans-serif; letter-spacing: .6px; text-transform: uppercase; color: var(--text-soft); min-width: 74px; }
-.set-row-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.set-row-tabs { display: flex; flex-wrap: wrap; gap: 8px; flex: 1 1 0; min-width: 0; }
 /* case grupları */
 .case-group-title { display: flex; align-items: center; gap: 8px; }
 .case-group-title .cg-count { font: 700 11.5px "JetBrains Mono", monospace; color: var(--text-soft); }

@@ -886,7 +886,7 @@ html.dark-mode .card-visual::before {
 }
 
 /* Algoritma sayfalarındaki "Yazdır / PDF" bağlantısı */
-.print-row { display: flex; justify-content: flex-end; max-width: 1100px; margin: -6px auto 14px; }
+.print-row { display: flex; justify-content: flex-end; margin: -6px auto 14px; }
 .print-link {
     display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 12px;
     border: var(--card-bw, 2px) solid var(--ink); background: var(--surface); color: var(--text);

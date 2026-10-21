@@ -290,11 +290,12 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 .nota-move b { display: block; font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--text); }
 .nota-move small { font-size: 11px; font-weight: 700; color: var(--text-soft); }
 .nota-box p { font-size: 13.5px; color: var(--text-soft); line-height: 1.6; margin: 6px 0 0; }
-.case-diagram svg { width: 96px; height: 96px; }
-@media (max-width: 520px) { .nota-move { width: 74px; padding: 4px; } .nota-move small { font-size: 10px; } .set-tab { padding: 8px 12px; font-size: 14px; } }
+.case-diagram { width: 92px; height: 92px; }
+.case-diagram svg { width: 84px; height: 84px; }
+@media (max-width: 520px) { .nota-moves { gap: 6px; } .nota-move { width: 66px; padding: 4px; } .nota-move small { font-size: 10px; } .set-tab { padding: 8px 12px; font-size: 14px; } }
 /* Set seçimi Algoritmalar sayfasından yapılır; sayfa içinde başka sete geçiş yok */
 #setTabs { display: none; }
-.mg-nota { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 6px 0 12px; }
+.mg-nota { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 6px 0 12px; }
 .mg-nota > div { display: flex; gap: 10px; align-items: baseline; padding: 10px 12px; border-radius: 12px; background: var(--surface-soft, var(--surface)); border: 1px solid var(--border); font-size: 13.5px; color: var(--text-soft); }
 .mg-nota b { font: 800 16px 'JetBrains Mono', monospace; color: var(--text); min-width: 64px; white-space: nowrap; }
 #setTabs { display: flex !important; }
@@ -350,7 +351,7 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 <div class="hero-text">
 <div class="badge">
 <i></i>
-<span data-i18n="badge_text">MEGAMINX · 2-LOOK OLL · 2-LOOK PLL · 37 CASE</span>
+<span data-i18n="badge_text">MEGAMINX · 2-LOOK OLL/PLL · 37 CASE</span>
 </div>
 <h1><span data-i18n="hero_title1">Megaminx</span> <span data-i18n="hero_titleAccent">Son Katman</span></h1>
 <p data-i18n="hero_p">F2L bittikten sonra son katmanı dört adımda çöz: önce kenarları, sonra köşeleri yönlendir (2-Look OLL), ardından köşeleri, en son kenarları yerine diz (2-Look PLL). Her algoritma megaminx simülasyonunda tek tek doğrulandı.</p>
