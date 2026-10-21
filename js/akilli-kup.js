@@ -3,13 +3,12 @@
    - Bağlantı: smartcube-bluetooth (GAN vb.), "Bağlan"a basınca yüklenir
    - Çözüm analizi: karıştırma takibi, ilk hamlede süre, CFOP aşamaları
      (Cross, F2L 1-4, OLL, PLL) süre / hamle / TPS, öneri, geçmiş
-   - Canlı düello: iki kişi aynı karıştırma, Firestore "duels/{kod}" ile
      (1 sn'de bir yoklama). Yalnızca akıllı küple.
    Küp modeli: cubejs (Cube) — küpün kendi çerçevesi (beyaz üst, yeşil önde).
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261173";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261174";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -78,7 +77,6 @@
     var scr = "", scrMoves = [], prefix = [], prog = 0, dev = [];
     var phase = "idle";              // idle | scrambling | ready | solving | done
     var t0 = 0, tick = 0, moves = [], st = null, lastResult = null;
-    var duel = null;                 // { code, doc, me: "h"|"g" }
 
     /* ---------- karıştırma takibi ---------- */
     function setScramble(s) {
@@ -113,7 +111,7 @@
             else h = "Karıştırmayı uygula (" + prog + " / " + scrMoves.length + ")";
         } else if (phase === "ready") h = "✅ Karıştırma tamam. <b>İlk hamlende süre başlar.</b>";
         else if (phase === "solving") h = "Çözülüyor…";
-        else if (phase === "done") h = tab === "comp" ? "Kaydedildi ✓" : tab === "duel" ? "Bitti! Sonucun rakibine gönderildi." : "Bitti! Yeni karıştırma için butona bas.";
+        else if (phase === "done") h = tab === "comp" ? "Kaydedildi ✓" : "Bitti! Yeni karıştırma için butona bas.";
         else if (phase === "holding") h = "Bırakınca süre başlar…";
         else if (tab === "comp" && comp) h = compHint();
         else h = conn ? "" : "🔗 Başlamak için akıllı küpünü bağla.";
@@ -130,7 +128,7 @@
         if (phase === "scrambling") {
             var s = cube.asString(), k = prefix.lastIndexOf(s);
             if (k >= 0) { prog = k; dev = []; } else dev.push(m);
-            if (prog === scrMoves.length) { phase = "ready"; dev = []; publish("hazır"); }
+            if (prog === scrMoves.length) { phase = "ready"; dev = []; }
             renderScramble(); renderHint();
             return;
         }
@@ -149,7 +147,7 @@
     function startSolve() {
         phase = "solving"; t0 = now(); moves = [];
         st = { face: null, cross: null, pairs: [null, null, null, null], oll: null, pll: null, crossIdx: 0, pairIdx: [0, 0, 0, 0], ollIdx: 0 };
-        startTick(); renderHint(); renderStages(st); publish("çözüyor"); miniShow("run");
+        startTick(); renderHint(); renderStages(st); miniShow("run");
     }
     function stageCheck() {
         var t = now() - t0, n = moves.length;
@@ -161,7 +159,7 @@
             for (var k = 0; k < p; k++) if (st.pairs[k] == null) { st.pairs[k] = t; st.pairIdx[k] = n; }
             if (p === 4 && st.oll == null && faceUniform(cube, OPP[st.face])) { st.oll = t; st.ollIdx = n; }
         }
-        renderStages(st); publishStage();
+        renderStages(st);
     }
     function finishSolve() {
         var t = now() - t0;
@@ -171,11 +169,10 @@
         st.pll = t;
         var r = buildResult(t);
         lastResult = r;
-        var inDuel = !!(duel && tab === "duel") || tab === "comp";
-        if (!inDuel) saveHist(r);
+        if (tab !== "comp") saveHist(r);
         renderStages(st); renderResult(r); renderHist(); renderHint();
         setLast(Math.round(t), false); miniShow("done");
-        publishDone(Math.round(t)); compDone(Math.round(t));
+        compDone(Math.round(t));
     }
     function buildResult(total) {
         var segs = [];
@@ -204,7 +201,7 @@
     /* ---------- son çözüm + DNF ---------- */
     var last = null; // { ms, dnf, ctx: "a"|"d", ts }
     function setLast(ms, dnf, why) {
-        last = { ms: ms, dnf: !!dnf, ctx: tab === "comp" ? "c" : duel && tab === "duel" ? "d" : "a", ts: Date.now(), idx: comp ? myTimes().length : -1 };
+        last = { ms: ms, dnf: !!dnf, ctx: tab === "comp" ? "c" : "a", ts: Date.now(), idx: comp ? myTimes().length : -1 };
         renderLast(why);
     }
     function renderLast(why) {
@@ -224,7 +221,6 @@
         if (last.ctx === "a") {
             var h = loadHist(); if (h[0] && Math.abs(h[0].ts - last.ts) < 5000) { h[0].dnf = last.dnf; try { localStorage.setItem(HIST_KEY, JSON.stringify(h)); } catch (e) {} renderHist(); }
         } else if (last.ctx === "c") compSetDnf(last.idx, last.dnf);
-        else setMyTime(last.dnf ? DNF : last.ms);
         renderLast();
     }
     function startTick() { stopTick(); tick = setInterval(function () { $("akTime").textContent = fmt(now() - t0); }, 37); }
@@ -329,8 +325,6 @@
             if (!c.capabilities || c.capabilities.facelets) c.sendCommand({ type: "REQUEST_FACELETS" }).catch(function () {});
             try { c.sendCommand({ type: "REQUEST_BATTERY" }).catch(function () {}); } catch (e) {}
             setConn("Bağlı: " + (c.deviceName || "akıllı küp"), "ok");
-            var dq = new URLSearchParams(location.search).get("duel"); // bağlantıyla gelen düello daveti
-            if (dq && !duel && signedIn()) setTimeout(function () { joinDuel(dq); }, 300);
             $("akConnect").hidden = true; $("akDisc").hidden = false; $("akConnect").disabled = false; $("akReset").hidden = false;
             if (phase !== "solving") { phase = "scrambling"; syncProgress(); }
             renderScramble(); renderHint();
@@ -346,9 +340,9 @@
         sub = null; conn = null; modelKnown = false;
         if (phase === "solving") { // çözüm sırasında bağlantı koptu: DNF
             var t = now() - t0; stopTick(); phase = "done";
-            if (!(duel && tab === "duel") && tab !== "comp") { var r = buildResult(t); r.dnf = true; r.t = DNF; saveHist(r); renderHist(); }
+            if (tab !== "comp") { var r = buildResult(t); r.dnf = true; r.t = DNF; saveHist(r); renderHist(); }
             setLast(DNF, true, "Bağlantı koptu"); miniShow("done");
-            publishDone(DNF); compDone(DNF);
+            compDone(DNF);
         }
         if (phase !== "done") phase = "idle";
         setConn("Bağlı değil", ""); $("akConnect").hidden = false; $("akDisc").hidden = true; $("akReset").hidden = true; $("akBatt").textContent = "";
@@ -358,8 +352,8 @@
     // Kullanıcı "küpüm çözülmüş" derse modeli sıfırla (küp durumu bildiremiyorsa)
     function resetModel() { cube = new Cube(); modelKnown = true; if (phase !== "solving") { phase = "scrambling"; syncProgress(); } renderScramble(); renderHint(); }
 
-    /* ---------- düello (Firestore REST) ---------- */
-    var cfg = window.RA_FIREBASE || {}, pollT = 0;
+    /* ---------- Firestore REST ---------- */
+    var cfg = window.RA_FIREBASE || {};
     function docsBase() { return "https://firestore.googleapis.com/v1/projects/" + cfg.projectId + "/databases/(default)/documents"; }
     function api(path, opts) {
         return window.Account.token().then(function (tok) {
@@ -369,116 +363,11 @@
     }
     function val(v) { return typeof v === "number" ? { integerValue: String(v) } : { stringValue: String(v) }; }
     function parseDoc(d) { var o = {}, f = (d && d.fields) || {}; Object.keys(f).forEach(function (k) { var x = f[k]; o[k] = x.integerValue != null ? +x.integerValue : (x.stringValue != null ? x.stringValue : x.timestampValue); }); return o; }
-    function patch(fields) {
-        var body = {}, mask = Object.keys(fields).concat(["ts"]).map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
-        Object.keys(fields).forEach(function (k) { body[k] = val(fields[k]); });
-        body.ts = { timestampValue: new Date().toISOString() };
-        return api("/duels/" + duel.code + "?" + mask, { method: "PATCH", body: JSON.stringify({ fields: body }) });
-    }
     function myName() { var u = window.Account && Account.user && Account.user(); return String((u && (u.displayName || (u.email || "").split("@")[0])) || "Oyuncu").slice(0, 24); }
     function code5() { var a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = ""; for (var i = 0; i < 5; i++) s += a[Math.floor(Math.random() * a.length)]; return s; }
     function signedIn() { return !!(window.Account && Account.user && Account.user()); }
-    function needCube() { if (conn) return false; duelMsg("⚔️ Düello yalnızca akıllı küple oynanır. Önce yukarıdan <b>küpünü bağla</b>.", 1); return true; }
-    function createDuel() {
-        if (!signedIn()) { Account.openLogin && Account.openLogin(); return; }
-        if (needCube()) return;
-        var c = code5(), u = Account.user(), s = genScramble();
-        var fm = +(document.querySelector('input[name="akFmt"]:checked') || {}).value || 5;
-        var fields = { host: u.uid, hName: myName(), guest: "", gName: "", round: 1, scr: s, hT: -1, gT: -1, hSt: "bekliyor", gSt: "", hW: 0, gW: 0, sc: 0, fmt: fm, hL: "", gL: "" };
-        var body = {}; Object.keys(fields).forEach(function (k) { body[k] = val(fields[k]); }); body.ts = { timestampValue: new Date().toISOString() };
-        duelMsg("Oda oluşturuluyor…");
-        api("/duels?documentId=" + c, { method: "POST", body: JSON.stringify({ fields: body }) }).then(function (r) {
-            if (!r.ok) throw new Error(r.status);
-            enterDuel(c, "h");
-        }).catch(function (e) { duelMsg("Oda oluşturulamadı (" + esc(e.message) + "). Kurallar yayımlandı mı?", 1); });
-    }
-    function joinDuel(c) {
-        c = String(c || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-        if (c.length !== 5) { duelMsg("Oda kodu 5 karakter olmalı.", 1); return; }
-        if (!signedIn()) { Account.openLogin && Account.openLogin(); return; }
-        if (needCube()) return;
-        duelMsg("Odaya bağlanılıyor…");
-        api("/duels/" + c, { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status === 404 ? "Oda bulunamadı" : r.status); return r.json(); }).then(function (d) {
-            var o = parseDoc(d), uid = Account.user().uid;
-            if (o.host === uid) return enterDuel(c, "h");
-            if (o.guest === uid) return enterDuel(c, "g");
-            if (o.guest) throw new Error("Oda dolu");
-            duel = { code: c, me: "g", doc: o };
-            return patch({ guest: uid, gName: myName(), gSt: "bekliyor" }).then(function (r2) { if (!r2.ok) throw new Error(r2.status); enterDuel(c, "g"); });
-        }).catch(function (e) { duel = null; duelMsg(esc(e.message), 1); });
-    }
-    function enterDuel(c, me) {
-        duel = { code: c, me: me, doc: null, round: 0 };
-        try { history.replaceState(null, "", "?duel=" + c); } catch (e) {}
-        $("akLobby").hidden = true; $("akRoom").hidden = false; duelMsg("");
-        poll();
-        clearInterval(pollT); pollT = setInterval(function () { if (document.visibilityState === "visible") poll(); }, 1200);
-    }
-    function leaveDuel() {
-        clearInterval(pollT); duel = null;
-        try { history.replaceState(null, "", location.pathname); } catch (e) {}
-        $("akLobby").hidden = false; $("akRoom").hidden = true;
-        setScramble(genScramble());
-    }
-    function poll() {
-        if (!duel) return;
-        api("/duels/" + duel.code, { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
-            if (!duel) return;
-            var o = parseDoc(d); duel.doc = o;
-            if (o.round !== duel.round) { duel.round = o.round; if (tab === "duel") setScramble(o.scr); }
-            // Ev sahibi: iki süre de geldiyse turu puanla
-            if (duel.me === "h" && o.guest) {
-                var hl = listOf(o.hL), gl = listOf(o.gL), hw = 0, gw = 0;
-                for (var i = 0; i < Math.min(hl.length, gl.length); i++) { if (hl[i] < gl[i]) hw++; else if (gl[i] < hl[i]) gw++; }
-                if (hw !== o.hW || gw !== o.gW) patch({ hW: hw, gW: gw, sc: o.round });
-            }
-            renderRoom(o);
-        }).catch(function () {});
-    }
-    var lastPub = "";
-    function publish(stText) {
-        if (!duel || tab !== "duel") return;
-        var k = duel.me === "h" ? "hSt" : "gSt";
-        if (lastPub === stText) return; lastPub = stText;
-        var f = {}; f[k] = stText; patch(f);
-    }
-    function publishStage() {
-        if (!st) return;
-        var p = st.pairs.filter(function (x) { return x != null; }).length;
-        publish(st.oll != null ? "çözüyor · PLL" : p ? "çözüyor · F2L " + p + "/4" : st.cross != null ? "çözüyor · F2L" : "çözüyor · Cross");
-    }
-    function publishDone(ms) {
-        if (!duel || tab !== "duel") return;
-        var d = duel.doc || {}, mine = duel.me === "h" ? d.hT : d.gT;
-        if (mine >= 0 && d.round === duel.round) return; // bu turda zaten gönderdi
-        var f = {}; f[duel.me + "T"] = ms; f[duel.me + "St"] = "bitti"; lastPub = "bitti";
-        var L = listOf(duel.me === "h" ? d.hL : d.gL), ri = Math.max(1, d.round || 1) - 1;
-        if (ri >= (d.fmt || 5)) return; // maç bitti, fazla çözüm sayılmaz
-        L = L.slice(0, ri); while (L.length < ri) L.push(0); L[ri] = ms; // her tur kendi yerine
-        L = L.map(function (x) { return x || ms; });
-        f[duel.me + "L"] = L.join(",");
-        patch(f).then(poll);
-    }
-    function setMyTime(ms) {
-        if (!duel || !duel.doc) return;
-        var d = duel.doc, ri = Math.max(1, d.round || 1) - 1, L = listOf(duel.me === "h" ? d.hL : d.gL);
-        if (ri >= (d.fmt || 5) || L.length <= ri) return;
-        L[ri] = ms; var f = {}; f[duel.me + "T"] = ms; f[duel.me + "L"] = L.join(",");
-        patch(f).then(poll);
-    }
-    function nextRound() {
-        if (!duel || duel.me !== "h" || !duel.doc) return;
-        var o = duel.doc; lastPub = "";
-        if (matchOver(o)) { // rövanş: aynı formatla baştan
-            closeFinal();
-            patch({ round: 1, scr: genScramble(), hT: -1, gT: -1, hSt: "bekliyor", gSt: o.guest ? "bekliyor" : "", hW: 0, gW: 0, hL: "", gL: "", sc: 0 }).then(poll);
-            return;
-        }
-        patch({ round: o.round + 1, scr: genScramble(), hT: -1, gT: -1, hSt: "bekliyor", gSt: o.guest ? "bekliyor" : "" }).then(poll);
-    }
-    /* ---------- maç formatı ve sonuçlar ---------- */
+    /* ---------- ortalama ---------- */
     function listOf(str) { return String(str || "").split(",").filter(Boolean).map(Number); }
-    function fmtName(n) { return n === 3 ? "mo3" : n === 12 ? "ao12" : "ao5"; }
     function avgOf(arr, n) {
         if (arr.length < n) return null;
         var a = arr.slice(0, n);
@@ -486,104 +375,9 @@
         if (a.some(function (x) { return x >= DNF; })) return DNF;
         return a.reduce(function (x, y) { return x + y; }, 0) / a.length;
     }
-    // Maç bitti: son turda (tur = format sayısı) iki süre de geldi
-    function matchOver(o) { var n = o.fmt || 5; return !!o.guest && o.hT >= 0 && o.gT >= 0 && (o.round || 1) >= n; }
-    function matchData(o) {
-        var n = o.fmt || 5, hl = listOf(o.hL).slice(0, n), gl = listOf(o.gL).slice(0, n);
-        var ha = avgOf(hl, n), ga = avgOf(gl, n);
-        var win = ha == null || ga == null ? "" : (ha < ga ? "h" : ga < ha ? "g" : "");
-        return { n: n, f: fmtName(n), hl: hl, gl: gl, ha: ha, ga: ga, win: win, hw: o.hW, gw: o.gW };
-    }
-    function shareText(o, m) {
-        var line = function (name, l, a) { return name + ": " + fmt(a) + " " + m.f + " (" + l.map(fmt).join(", ") + ")"; };
-        var w = m.win === "h" ? o.hName : m.win === "g" ? o.gName : "";
-        return "⚔️ Rubik Academy düellosu (" + m.f + ")\n" + line(o.hName, m.hl, m.ha) + "\n" + line(o.gName, m.gl, m.ga) + "\n" +
-            (w ? "🏆 Kazanan: " + w : "🤝 Berabere") + " · Tur skoru " + m.hw + "-" + m.gw + "\nrubikacademy.fun/icerikler/duello";
-    }
-    function shareImage(o, m) {
-        return loadLogo().then(function (logo) {
-            var W = 1080, H = 1080, c = document.createElement("canvas"); c.width = W; c.height = H;
-            var x = c.getContext("2d"), acc = (getComputedStyle(document.body).getPropertyValue("--ui-accent") || "#6c5ce7").trim();
-            if (!/^#[0-9a-f]{6}$/i.test(acc)) acc = "#6c5ce7";
-            var bar = shareBg(x, W, H, acc);
-            shareHead(x, W, logo, "⚔️ DÜELLO · " + m.f.toUpperCase());
-            function player(cx, name, l, a, won) {
-                if (won) { var wg = x.createLinearGradient(cx - 230, 190, cx + 230, 750); wg.addColorStop(0, acc); wg.addColorStop(1, "#a03a8a"); x.fillStyle = wg; }
-                else x.fillStyle = "rgba(255,255,255,.07)";
-                roundRect(x, cx - 230, 190, 460, 580, 36); x.fill();
-                x.textAlign = "center"; x.fillStyle = "#fff";
-                x.fillText(fitText(x, name, 400, "800", 44, 24), cx, 290);
-                x.fillText(fitText(x, fmt(a), 400, "900", 96, 48, "'JetBrains Mono', monospace"), cx, 420);
-                x.font = "700 30px Inter, sans-serif"; x.fillStyle = won ? "rgba(255,255,255,.85)" : "#a4aabe"; x.fillText(m.f, cx, 465);
-                x.font = "600 28px 'JetBrains Mono', monospace";
-                l.forEach(function (t, i) { x.fillText(fmt(t), cx + (i % 2 ? 100 : -100), 530 + Math.floor(i / 2) * 42); });
-                if (won) { x.font = "900 40px Inter, sans-serif"; x.fillStyle = "#fff"; x.fillText("🏆 KAZANAN", cx, 730); }
-            }
-            player(290, o.hName, m.hl, m.ha, m.win === "h");
-            player(790, o.gName, m.gl, m.ga, m.win === "g");
-            x.textAlign = "center"; x.fillStyle = "#0b0d14"; x.beginPath(); x.arc(W / 2, 460, 54, 0, 7); x.fill();
-            x.fillStyle = bar; x.font = "900 46px Inter, sans-serif"; x.fillText("VS", W / 2, 476);
-            x.fillStyle = "#eef0f7"; x.font = "800 42px Inter, sans-serif"; x.fillText(m.win ? "Tur skoru " + m.hw + " - " + m.gw : "🤝 Berabere · " + m.hw + " - " + m.gw, W / 2, 870);
-            x.fillStyle = "#a4aabe"; x.font = "700 28px Inter, sans-serif"; x.fillText("rubikacademy.fun/icerikler/duello", W / 2, 1010);
-            return new Promise(function (res) { c.toBlob(res, "image/png"); });
-        });
-    }
     function clip(s, n) { s = String(s || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
     function roundRect(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
-    function renderFinal(o) {
-        var m = matchData(o), meH = duel.me === "h", box = $("akFinalBox");
-        var col = function (name, l, a, won, mine) {
-            return '<div class="ak-fin-p' + (won ? " win" : "") + '"><div class="ak-pl-n">' + esc(name) + (mine ? " <small>(sen)</small>" : "") + '</div>' +
-                '<div class="ak-fin-a">' + fmt(a) + '</div><div class="ak-fin-f">' + m.f + '</div>' +
-                '<div class="ak-fin-l">' + l.map(function (t) { return '<span>' + fmt(t) + '</span>'; }).join("") + '</div>' + (won ? '<div class="ak-fin-w">🏆 Kazanan</div>' : "") + '</div>';
-        };
-        $("akFinal").classList.add("show");
-        box.innerHTML = '<button type="button" class="ak-x" id="akFinClose" aria-label="Kapat">✕</button><h3>🏁 Maç bitti · ' + m.f + '</h3>' +
-            '<p class="ak-fin-k">' + (m.win ? '🏆 Kazanan: <b>' + esc(m.win === "h" ? o.hName : o.gName) + '</b>' : '🤝 Berabere') + '</p><div class="ak-fin">' + col(o.hName, m.hl, m.ha, m.win === "h", meH) + col(o.gName, m.gl, m.ga, m.win === "g", !meH) + '</div>' +
-            '<p class="ak-fin-s">' + (m.win ? "" : "🤝 Berabere · ") + 'Tur skoru ' + m.hw + ' - ' + m.gw + '</p>' +
-            '<div class="ak-fin-b"><button type="button" class="btn primary" id="akShareImg">🖼️ Görsel olarak paylaş</button><button type="button" class="btn" id="akShareTxt">📝 Metin olarak paylaş</button></div>' +
-            '<div class="ak-fin-b" style="margin-top:8px">' + (meH ? '<button type="button" class="btn" id="akRematch">🔁 Rövanş</button>' : '') + '<button type="button" class="btn" id="akFinClose2">Kapat</button></div><div class="ak-msg" id="akShareMsg"></div>';
-        $("akFinClose").onclick = $("akFinClose2").onclick = closeFinal;
-        if ($("akRematch")) $("akRematch").onclick = nextRound;
-        $("akShareTxt").onclick = function () {
-            var t = shareText(o, m);
-            if (navigator.share) navigator.share({ text: t }).catch(function () {});
-            else if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { $("akShareMsg").textContent = "Metin kopyalandı ✓"; });
-            else prompt("Sonuç:", t);
-        };
-        $("akShareImg").onclick = function () {
-            shareImage(o, m).then(function (blob) {
-                var file = new File([blob], "rubikacademy-duello.png", { type: "image/png" });
-                if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], text: shareText(o, m) }).catch(function () {});
-                else { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); $("akShareMsg").textContent = "Görsel indirildi ✓"; }
-            });
-        };
-    }
     function closeFinal() { $("akFinal").classList.remove("show"); }
-    function renderRoom(o) {
-        $("akCode").textContent = duel.code;
-        var meH = duel.me === "h";
-        function card(name, w, t, s, mine, empty) {
-            if (empty) return '<div class="ak-pl wait"><div class="ak-pl-n">Rakip bekleniyor…</div><div class="ak-pl-s">Oda kodunu ya da bağlantıyı paylaş</div></div>';
-            var win = o.hT >= 0 && o.gT >= 0 && ((mine ? (meH ? o.hT < o.gT : o.gT < o.hT) : (meH ? o.gT < o.hT : o.hT < o.gT)));
-            return '<div class="ak-pl' + (mine ? " me" : "") + (win ? " win" : "") + '"><div class="ak-pl-n">' + esc(name) + (mine ? " <small>(sen)</small>" : "") + '</div>' +
-                '<div class="ak-pl-w">' + w + '</div><div class="ak-pl-t">' + (t >= 0 ? fmt(t) : "—") + '</div><div class="ak-pl-s">' + esc(s || "") + (win ? " · 🏆 turu kazandı" : "") + '</div></div>';
-        }
-        var a = card(o.hName, o.hW, o.hT, o.hSt, meH, false), b = card(o.gName, o.gW, o.gT, o.gSt, !meH, !o.guest);
-        $("akPlayers").innerHTML = a + '<div class="ak-vs">VS</div>' + b;
-        var n = o.fmt || 5, over = matchOver(o);
-        $("akRound").textContent = fmtName(n) + " · Tur " + Math.min(o.round || 1, n) + " / " + n;
-        var both = o.hT >= 0 && o.gT >= 0;
-        $("akNext").hidden = !meH; $("akNext").disabled = !o.guest || !both;
-        $("akNext").textContent = over ? "🔁 Rövanş" : both ? "Sonraki tur →" : "Tur sürüyor…";
-        var fk = [o.hL, o.gL, o.hW, o.gW, o.round].join("|");
-        if (over) { if (duel.shown !== fk) { duel.shown = fk; renderFinal(o); } } else { duel.shown = ""; closeFinal(); }
-        $("akShowFin").hidden = !over;
-        $("akRoomHint").textContent = over ? (meH ? "Maç bitti. Rövanş başlatabilirsin." : "Maç bitti.") : !o.guest ? "Rakibin katılınca aynı karıştırmayı çözeceksiniz." : (both ? (meH ? "Sonraki turu başlatabilirsin." : "Ev sahibi sonraki turu başlatacak.") : "Karıştırmayı uygula ve çöz. Rakibinin durumu canlı görünür.");
-    }
-    function duelMsg(t, bad) { var m = $("akDuelMsg"); m.innerHTML = t || ""; m.className = "ak-msg" + (bad ? " bad" : ""); }
-
-
     /* =========================================================
        EV YARIŞMASI — comps/{kod} + comps/{kod}/p/{uid}
        8-16 kişi, 3x3 ya da 2x2, her tur 5 çözüm (Ao5). Organizatör turları yönetir.
@@ -1540,12 +1334,11 @@
     function setTab(t) {
         tab = t;
         Array.prototype.forEach.call(document.querySelectorAll(".ak-tab"), function (b) { b.classList.toggle("on", b.getAttribute("data-tab") === t); });
-        $("akDuel").hidden = t !== "duel"; $("akComp").hidden = t !== "comp"; $("akAnalysisExtra").hidden = t !== "analysis";
+        $("akComp").hidden = t !== "comp"; $("akAnalysisExtra").hidden = t !== "analysis";
         $("akNew").hidden = t !== "analysis";
         $("akPad").hidden = true; $("cType").hidden = true;
         $("akConnBox").hidden = t === "comp"; // yarışmada akıllı küp kullanılmıyor
-        if (t === "duel" && duel && duel.doc) setScramble(duel.doc.scr);
-        else if (t === "analysis") setScramble(genScramble());
+        if (t === "analysis") setScramble(genScramble());
         else if (t === "comp") { if (comp && comp.doc) nextScramble(true); else setScramble(""); }
     }
     function init() {
@@ -1558,19 +1351,8 @@
         $("akDnf").onclick = toggleDnf; $("akMiniDnf").onclick = toggleDnf;
         $("akMiniX").onclick = miniHide;
         Array.prototype.forEach.call(document.querySelectorAll(".ak-tab"), function (b) { b.onclick = function () { setTab(b.getAttribute("data-tab")); }; });
-        $("akCreate").onclick = createDuel;
-        $("akJoin").onclick = function () { joinDuel($("akJoinIn").value); };
-        $("akJoinIn").onkeydown = function (e) { if (e.key === "Enter") joinDuel($("akJoinIn").value); };
-        $("akLeave").onclick = leaveDuel;
-        $("akNext").onclick = nextRound;
-        $("akShowFin").onclick = function () { if (duel && duel.doc) renderFinal(duel.doc); };
         $("akFinal").onclick = function (e) { if (e.target === $("akFinal")) closeFinal(); };
-        $("akCopy").onclick = function () {
-            var link = location.origin + "/icerikler/duello?duel=" + (duel && duel.code);
-            var done = function () { $("akCopy").textContent = "Kopyalandı ✓"; setTimeout(function () { $("akCopy").textContent = "🔗 Bağlantıyı kopyala"; }, 1500); };
-            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () {}); else prompt("Bağlantı:", link);
-        };
-        var qs = new URLSearchParams(location.search), ev = qs.get("ev"), EV_PAGE = window.AK_PAGE === "ev", DUEL_PAGE = window.AK_PAGE === "duel";
+        var qs = new URLSearchParams(location.search), ev = qs.get("ev"), EV_PAGE = window.AK_PAGE === "ev";
         // Ev yarışması ayrı sayfada: eski bağlantılar oraya gitsin
         if (!EV_PAGE && (ev || qs.get("tab") === "ev")) { location.replace("/icerikler/ev-yarismasi" + (ev ? "?ev=" + encodeURIComponent(ev) : "")); return; }
         renderStages(null); renderHist(); initComp();
@@ -1594,20 +1376,9 @@
                 setTimeout(tryEv, 1200);
             }
         }
-        var q = qs.get("duel");
-        // Düello ayrı sayfada: eski ?duel= bağlantıları oraya gitsin
-        if (q && !DUEL_PAGE) { location.replace("/icerikler/duello?duel=" + encodeURIComponent(q)); return; }
-        if (DUEL_PAGE && !q) setTab("duel");
-        if (q) {
-            setTab("duel");
-            var tryJoin = function () { if (signedIn()) joinDuel(q); else duelMsg("Düelloya katılmak için giriş yap.", 1); };
-            if (window.Account && Account.onChange) Account.onChange(function (u) { if (u && !duel) joinDuel(q); });
-            setTimeout(tryJoin, 1200);
-        } else if (!EV_PAGE && !DUEL_PAGE) setTab("analysis");
-        if (window.Account && Account.onChange) Account.onChange(function () { $("akLoginNote").hidden = signedIn(); $("cLoginNote").hidden = signedIn(); initCompRole(); if (comp) chatUi(); });
-        $("akLoginNote").hidden = signedIn();
-        $("akLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
+        if (!EV_PAGE) setTab("analysis");
+        if (window.Account && Account.onChange) Account.onChange(function () { $("cLoginNote").hidden = signedIn(); initCompRole(); if (comp) chatUi(); });
     }
-    window.AkilliKup = { setScramble: setScramble, shareImage: shareImage, matchData: matchData, comp: function () { return comp; }, refreshRole: function () { initCompRole(); return betaP; } }; // test/geliştirme için
+    window.AkilliKup = { setScramble: setScramble, comp: function () { return comp; }, refreshRole: function () { initCompRole(); return betaP; } }; // test/geliştirme için
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

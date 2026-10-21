@@ -243,11 +243,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://rubikacademy.fun/icerikler/duello</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://rubikacademy.fun/icerikler/cozucu</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
