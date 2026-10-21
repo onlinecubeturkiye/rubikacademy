@@ -174,7 +174,7 @@ service cloud.firestore {
           || (exists(/databases/$(database)/documents/roles/$(request.auth.uid))
               && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == 'organizator'));
       }
-      function ck() { return ['host', 'hName', 'name', 'cap', 'ev', 'round', 'fin', 'st', 'scr', 'adv', 'R', 'ts', 'mods', 'ban']; }
+      function ck() { return ['host', 'hName', 'name', 'cap', 'ev', 'round', 'fin', 'st', 'scr', 'adv', 'R', 'ts', 'mods', 'ban', 'pa']; }
       // Moderatör: oda sahibinin atadığı kişiler (mods = virgülle uid listesi)
       function isModOf(d) { return request.auth != null && ('mods' in d) && d.mods.split(',').hasAny([request.auth.uid]); }
       function chgC() { return request.resource.data.diff(resource.data).affectedKeys(); }
