@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261168";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261169";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -1013,7 +1013,7 @@
         var can = compCanSolve();
         $("akPad").hidden = !(tab === "comp" && comp.mode === "timer" && can);
         $("cType").hidden = !(tab === "comp" && (can || comp.editIdx != null));
-        var ok = $("cTypeOk"); if (ok) ok.textContent = comp.editIdx != null ? "Düzenlemeyi kaydet" : "Kaydet";
+        var ok = $("cTypeOk"); if (ok) { ok.textContent = "✓"; ok.title = comp.editIdx != null ? "Düzenlemeyi kaydet" : "Kaydet"; }
         renderHint();
     }
     /* --- klavye / dokunma süresi (yalnız yarışmada "timer" modu) --- */
@@ -1255,13 +1255,13 @@
         }
         else if (d.st === "end") { head = "🏁 " + roundLabel(d) + " bitti"; h = '<p class="c-now-p">' + (d.fin ? "Yarışma bitti, sonuçlara bak! 🏆" : "Organizatör yeni turu başlatacak.") + '</p>'; }
         else if (!player) { show = Math.min(si.min, 4); head = roundLabel(d) + " · " + (si.min + 1 > 5 ? "bitti" : (si.min + 1) + ". çözüm"); h = comp.watch ? '<p class="c-now-p">👁 Canlı izliyorsun.</p>' + (si.min < 5 ? bar(si.min + 1) : "") : '<p class="c-now-p">Bu turda yoksun; tabloyu izleyebilirsin.</p>'; }
-        else if (comp.editIdx != null) { show = Math.min(n, 4); head = roundLabel(d) + " · " + (n + 1 > 5 ? 5 : n + 1) + ". çözüm"; h = '<div class="c-now-h">✏️ ' + (comp.editIdx + 1) + '. çözümü düzenle</div><p class="c-now-p">Şu an: <b>' + fmt(myTimes()[comp.editIdx]) + '</b> · <button type="button" class="c-linkbtn" id="cEditCancel">Vazgeç</button></p>'; }
-        else if (n >= 5) { head = roundLabel(d) + " · 5 çözüm tamam"; h = '<div class="c-now-h">✅ 5 çözümün tamam</div><p class="c-now-p">Tur, herkes bitirince kendiliğinden biter.</p>' + bar(5); }
-        else if (n > si.min) { head = roundLabel(d) + " · " + (n + 1) + ". çözüm birazdan"; h = '<div class="c-now-h">✅ ' + n + '. çözüm kaydedildi</div><p class="c-now-p">Herkes bitirince ' + (n + 1) + '. karıştırma gelecek.</p>' + bar(n); }
-        else { show = n; head = roundLabel(d) + " · Çözüm " + (n + 1) + " / 5"; h = '<div class="c-now-h">Çözüm <b>' + (n + 1) + '</b> / 5</div><p class="c-now-tip">Kendi timer\'ınla çöz, süreni yaz: <b>1943</b> = 19.43</p>'; }
+        else if (comp.editIdx != null) { show = Math.min(n, 4); head = roundLabel(d) + " · " + (n + 1 > 5 ? 5 : n + 1) + ". çözüm"; h = '<div class="c-st">✏️ ' + (comp.editIdx + 1) + '. çözümü düzenle · şu an <b>' + fmt(myTimes()[comp.editIdx]) + '</b> · <button type="button" class="c-linkbtn" id="cEditCancel">Vazgeç</button></div>'; }
+        else if (n >= 5) { head = roundLabel(d) + " · 5 çözüm tamam"; h = '<div class="c-st">✅ 5 çözümün tamam · diğerleri bekleniyor</div>' + bar(5); }
+        else if (n > si.min) { head = roundLabel(d) + " · " + (n + 1) + ". çözüm birazdan"; h = '<div class="c-st">✅ ' + n + '. çözüm kaydedildi · herkes bitirince ' + (n + 1) + '. karıştırma</div>' + bar(n); }
+        else { show = n; head = roundLabel(d) + " · Çözüm " + (n + 1) + " / 5"; h = ''; }
         var left = slotLeft();
-        if (left == null && d.st === "run" && player && si.min < 5) h += '<p class="c-cd">⏱ İlk kişi süresini girince <b>1:30</b> geri sayım başlar.</p>';
-        if (left != null && d.st === "run" && player) { var sec = Math.max(0, Math.ceil(left / 1000)); h += '<p class="c-cd' + (sec <= 20 ? " warn" : "") + '">⏱ ' + Math.floor(sec / 60) + ':' + ("0" + sec % 60).slice(-2) + (sec ? ' içinde girilmeyen süre <b>DNF</b> olur' : ' · süre doldu, DNF yazılıyor') + '</p>'; }
+        if (left == null && d.st === "run" && player && si.min < 5 && n <= si.min && comp.editIdx == null) h += '<div class="c-cd">⏱ İlk süre girilince 1:30 geri sayım başlar</div>';
+        if (left != null && d.st === "run" && player) { var sec = Math.max(0, Math.ceil(left / 1000)); h += '<div class="c-cd' + (sec <= 20 ? " warn" : "") + '">⏱ ' + Math.floor(sec / 60) + ':' + ("0" + sec % 60).slice(-2) + (sec ? ' · süre girmezsen <b>DNF</b>' : ' · süre doldu, DNF yazılıyor') + '</div>'; }
         box.innerHTML = h;
         if ($("cGoNow")) $("cGoNow").onclick = function () { this.disabled = true; checkPrep(true); };
         var c = $("cEditCancel"); if (c) c.onclick = function () { comp.editIdx = null; renderComp(); };
@@ -1313,7 +1313,8 @@
             [0, 1, 2, 3, 4].filter(function (i) { return i <= cur || rows.some(function (r) { return r.t[i] != null; }); }).map(function (i) {
                 return line(String(i + 1), i === cur ? "cur" : "", function (r) {
                     var x = r.t[i]; if (x == null) return i === cur ? '<span class="c-wait">…</span>' : "-";
-                    return '<span class="' + (x >= DNF ? "dnf" : bestOf[i] === x ? "best" : "") + '">' + fmt(x) + "</span>";
+                    var pen = r.uid === comp.uid && !comp.watch && d.st === "run" && i === r.t.length - 1 && comp.editIdx == null ? ' <button type="button" class="c-pen" data-edit="1" title="Son süreyi düzenle">✏️</button>' : "";
+                    return '<span class="' + (x >= DNF ? "dnf" : bestOf[i] === x ? "best" : "") + '">' + fmt(x) + "</span>" + pen;
                 });
             }).join("") + '</tbody></table>' : '<p class="c-now-p">Henüz yarışmacı yok.</p>';
         // tablo değişmediyse yeniden çizme (yoksa butona basarken buton yenilenip tıklama kayboluyor)
@@ -1322,6 +1323,7 @@
         renderComp2();
     }
     function bindTable() {
+        Array.prototype.forEach.call($("cTable").querySelectorAll("[data-edit]"), function (b) { b.onclick = function () { startEdit(); try { $("cTypeIn").focus(); } catch (e) {} }; });
         Array.prototype.forEach.call($("cTable").querySelectorAll("[data-mod]"), function (b) { b.onclick = function () { toggleMod(b.getAttribute("data-mod")); }; });
         Array.prototype.forEach.call($("cTable").querySelectorAll("[data-tr]"), function (b) { b.onclick = function () { transferTo(b.getAttribute("data-tr"), b.getAttribute("data-n")); }; });
         Array.prototype.forEach.call($("cTable").querySelectorAll("[data-k]"), function (b) {
