@@ -9,7 +9,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261169";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261170";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -1422,6 +1422,24 @@
         $("cJoinIn").onkeydown = function (e) { if (e.key === "Enter") joinComp($("cJoinIn").value); };
         if ($("cLoginNote")) $("cLoginNote").hidden = signedIn() || !!(window.Account && Account.isPending && Account.isPending());
         if ($("cLoginBtn")) $("cLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
+        // Yenile: sayfayı yenilemeden listeyi / odayı güncelle
+        var spin = function (b, txt) { b.classList.add("spin"); b.textContent = "🔄 Yenileniyor…"; setTimeout(function () { b.classList.remove("spin"); b.textContent = txt || "✓ Yenilendi"; setTimeout(function () { b.textContent = "🔄 Yenile"; }, 1500); }, 900); };
+        if ($("cRefresh")) $("cRefresh").onclick = function () {
+            spin(this); initCompRole(); betaP.then(function (ok) { if (ok && !comp) { loadLive(); showResume(); } });
+        };
+        if ($("cRoomRefresh")) $("cRoomRefresh").onclick = function () {
+            if (!comp) return; spin(this);
+            var c = comp;
+            Promise.all([apiAny(cPath(), { method: "GET" }), apiAny(cPath("/p?pageSize=50"), { method: "GET" })]).then(function (rs) {
+                if (!rs[0].ok) throw new Error(rs[0].status);
+                return Promise.all([rs[0].json(), rs[1].ok ? rs[1].json() : {}]);
+            }).then(function (res) {
+                if (comp !== c) return;
+                comp.tableHtml = ""; comp.chatKey = null; comp.wT = 0;
+                applyComp(parseDoc(res[0]), parsePlayers(res[1]));
+                chatLoad(true); heartbeat(); if (!comp.live) liveStart();
+            }).catch(function (e) { cMsg("Yenilenemedi (" + esc(e.message) + ").", 1); });
+        };
         $("cLeave").onclick = function () {
             var playing = comp && !comp.watch && myP() && comp.doc && comp.doc.st !== "lobby";
             if (confirm(playing ? "Yarışmadan çıkılsın mı? Bu turdaki sürelerin sayılmaz; bir sonraki turun hazırlık süresinde geri dönebilirsin." : "Yarışmadan çıkılsın mı?")) leaveComp(true);
