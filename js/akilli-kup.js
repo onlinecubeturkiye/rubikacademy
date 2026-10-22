@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261177";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261178";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -1063,11 +1063,15 @@
             else if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { $("akShareMsg").textContent = "Metin kopyalandı ✓"; });
             else prompt("Sonuçlar:", t);
         };
+        // Görsel pencere açılınca hazırlanır: tıklayınca beklemeden paylaşılır (tarayıcı paylaşım iznini kaybetmez).
+        // Yalnız dosya gönderilir: metin eklenirse WhatsApp vb. görseli atıp sadece metni paylaşıyor.
+        var imgP = shareImageR(r);
         $("cShareImg").onclick = function () {
-            shareImageR(r).then(function (blob) {
+            imgP.then(function (blob) {
                 var file = new File([blob], "ev-yarismasi-" + (r.f ? "final" : "tur" + r.n) + ".png", { type: "image/png" });
-                if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], text: shareTextR(r) }).catch(function () {});
-                else { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); $("akShareMsg").textContent = "Görsel indirildi ✓"; }
+                var save = function () { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); $("akShareMsg").textContent = "Görsel indirildi ✓"; };
+                if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] }).catch(function (e) { if (!e || e.name !== "AbortError") save(); });
+                else save();
             });
         };
         if ($("cNextR")) $("cNextR").onclick = function () { startRound(false, +$("cAdv").value); };
