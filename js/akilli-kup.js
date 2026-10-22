@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261176";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261177";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -423,7 +423,7 @@
     function isOrgUser() {
         if (!signedIn()) return Promise.resolve(false);
         if (Account.isAdmin && Account.isAdmin()) return Promise.resolve(true);
-        return Account.getRole(Account.user().uid).then(function (r) { return r === "organizator"; });
+        return Account.getRole(Account.user().uid).then(function (r) { return r === "organizator" || r === "gelistirici"; }, function () { return false; });
     }
     // Oda sahibi (ya da admin): moderatör atar, odayı devreder. Moderatör: turları yönetir, yarışmacı çıkarır.
     function isOwner() { return !!(comp && comp.doc && (comp.doc.host === comp.uid || (Account.isAdmin && Account.isAdmin()))); }
@@ -450,7 +450,7 @@
         compPatch({ host: uid, hName: String(name || "").slice(0, 24), mods: l.join(",") }).then(compPoll);
     }
     function banned(uid) { return String((comp && comp.doc && comp.doc.ban) || "").split(",").indexOf(uid) >= 0; }
-    var betaOk = false, betaP = Promise.resolve(false); // şimdilik yalnız tester / organizatör / geliştirici (ve admin)
+    var betaOk = true, betaP = Promise.resolve(true); // ev yarışması herkese açık (oda kurmak: organizatör / geliştirici)
     var SLOT_MS = window.__evSlotMs || 90000; // 1:30 içinde süre girilmezse DNF
     // k. çözümde ilk süreyi gönderen kişinin gönderim anı; kimse göndermediyse null (sayaç başlamaz)
     function slotStart(k) {
@@ -628,7 +628,7 @@
         if (code.length !== 5) { cMsg("Yarışma kodu 5 karakter olmalı.", 1); return; }
         if (!signedIn()) { if (!watch) Account.openLogin && Account.openLogin(); else cMsg("Yarışmaları izlemek için giriş yap.", 1); if (watch) return; return; }
         if (!betaOk && !watch_retry) { betaP.then(function () { joinComp(code, watch, true); }); return; }
-        if (!betaOk) { cMsg("🔒 Ev yarışması şu an yalnızca tester, organizatör ve geliştiricilere açık.", 1); return; }
+        if (!betaOk) { cMsg("Yarışmaya katılmak için giriş yap.", 1); return; }
         cMsg(watch ? "Yarışma açılıyor…" : "Bağlanılıyor…");
         var uid = signedIn() ? Account.user().uid : viewerId();
         comp = { code: code, uid: uid, doc: null, players: [], mode: "manual", orig: {}, shownR: -1, local: null, watch: !!watch };
@@ -1246,13 +1246,11 @@
     }
     function initCompRole() {
         isOrgUser().then(function (ok) { $("cCreateBox").classList.toggle("locked", !ok); $("cCreate").disabled = !ok; $("cOrgNote").hidden = ok; });
-        // Şimdilik yalnız tester / organizatör / geliştirici (ve admin) kullanabilir
-        var pend = window.Account && Account.isPending && Account.isPending();
-        var p = !signedIn() ? Promise.resolve(false) : (Account.isAdmin && Account.isAdmin()) ? Promise.resolve(true)
-            : Account.getRole(Account.user().uid).then(function (r) { return ["tester", "organizator", "gelistirici"].indexOf(r) >= 0; }, function () { return false; });
+        // Herkese açık: izlemek için giriş gerekmez, katılmak için giriş yeterli
+        var p = Promise.resolve(true);
         betaP = p.then(function (ok) {
             var was = betaOk; betaOk = ok;
-            document.body.classList.toggle("c-locked", !ok && !pend);
+            document.body.classList.remove("c-locked");
             if ($("cBeta")) $("cBeta").innerHTML = signedIn() ? "🔒 Ev yarışması şu an <b>test aşamasında</b>: yalnızca <b>tester</b>, <b>organizatör</b> ve <b>geliştirici</b> rolündekiler kullanabilir. Yakında herkese açılacak!" : '🔒 Ev yarışması şu an <b>test aşamasında</b>. Rolün varsa <button type="button" class="c-linkbtn" id="cBetaLogin">giriş yap</button>.';
             if ($("cBetaLogin")) $("cBetaLogin").onclick = function () { Account.openLogin && Account.openLogin(); };
             if (ok && !was && !comp) loadLive();
