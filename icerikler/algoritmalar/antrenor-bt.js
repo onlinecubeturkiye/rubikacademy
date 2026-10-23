@@ -11,7 +11,7 @@
      (gunluk.js) aynı global'leri sağlayarak bu modülü kullanır.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261178";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261179";
     var MAC_KEY = "trainer-bt-mac-v1";
     // Karıştırma ve ipucu kutuları (günün karıştırması sayfası kendi kimliklerini verir)
     var SCR_ID = (window.BT_IDS && BT_IDS.scramble) || "scramble", HINT_ID = (window.BT_IDS && BT_IDS.hint) || "timerHint";
@@ -370,7 +370,8 @@
         bt_tip_title: "Chrome listesini bir daha görmemek için (bir kez):",
         bt_tip_1: "Aşağıdaki adresi kopyala, Chrome'un adres çubuğuna yapıştır.",
         bt_tip_2: "\"Use the new permissions backend for Web Bluetooth\" ayarını Enabled yap, Chrome'u yeniden başlat.",
-        bt_tip_3: "Küpü bir kez daha \"Yeni küp ara\" ile eşle; sonra hep burada tek dokunuşla görünür.", bt_pick_go: "Bağlan →"
+        bt_tip_3: "Küpü bir kez daha \"Yeni küp ara\" ile eşle; sonra hep burada tek dokunuşla görünür.", bt_pick_go: "Bağlan →",
+        bt_auto_next: "Küpü tamamen çözünce sıradaki karıştırma otomatik gelir.", bt_auto_soon: "Sıradaki karıştırma geliyor…"
     };
     function txt(k) {
         var v = (typeof T === "function") ? T(k) : k;
@@ -531,6 +532,23 @@
     };
     window.btOnStateChange = function () { renderBar(); if (applies() && state === "done") phase = "done"; };
 
+    // Case bitti ve küp tamamen çözülü: sıradaki karıştırmaya otomatik geç (süre normal kaydedilir).
+    // Küp case biter bitmez çözülüyse (ör. PLL) "Zor" diyebilmek için kısa bir süre beklenir.
+    var autoT = 0;
+    function autoHint() {
+        if (state !== "done") return; // gösterim kapalıysa süre zaten kaydedilip sıradakine geçildi
+        var h = el(HINT_ID), solvedNow = !!readyFrame();
+        if (h) h.textContent = txt("hint_done") + " · " + txt(solvedNow ? "bt_auto_soon" : "bt_auto_next");
+        if (solvedNow) autoNext(1800);
+    }
+    function autoNext(delay) {
+        clearTimeout(autoT);
+        autoT = setTimeout(function () {
+            if (!applies() || state !== "done" || phase !== "done" || !readyFrame()) return;
+            if (typeof grade === "function") grade(false);
+        }, delay);
+    }
+
     function onMove(face, dir) {
         var f = mapF(FACES[face]);
         var d = dir === 0 ? 1 : 3;
@@ -538,6 +556,7 @@
         if (mCands) mCands.forEach(function (c) { c.model = turn(c.model, f, d); });
         if (crossSt && window.CrossSolver) crossSt = CrossSolver.apply(crossSt, fmtMove(f, d));
         if (!applies()) return;
+        if (phase === "done" && state === "done") { if (readyFrame()) { var h0 = el(HINT_ID); if (h0) h0.textContent = txt("bt_auto_soon"); autoNext(400); } return; }
         if (phase === "needSolve") {
             var fr = readyFrame();
             if (fr) { hold = fr; startScrambleTracking(); } else if (mOdd) renderScramble();
@@ -602,13 +621,13 @@
             stopInsp();
             window.btSolveCount = 1; lastSolveFace = f;
             startTimer();
-            if (caseDone(model)) { stopTimer(); phase = "done"; }
+            if (caseDone(model)) { stopTimer(); phase = "done"; autoHint(); }
             return;
         }
         if ((phase === "solving" || state === "running") && state === "running") {
             if (window.btSolveCount != null && f !== lastSolveFace) window.btSolveCount++;
             lastSolveFace = f;
-            if (caseDone(model)) { stopTimer(); phase = "done"; }
+            if (caseDone(model)) { stopTimer(); phase = "done"; autoHint(); }
         }
     }
 
