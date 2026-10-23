@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261178";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261179";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -79,7 +79,9 @@
     var t0 = 0, tick = 0, moves = [], st = null, lastResult = null;
 
     /* ---------- karıştırma takibi ---------- */
-    function setScramble(s) {
+    // keep: son çözümün süresi, aşamaları ve DNF düğmesi ekranda kalsın (bt ile otomatik yeni karıştırma)
+    var autoScr = false; // son karıştırma çözüm bitince otomatik geldi
+    function setScramble(s, keep) {
         scr = s; scrMoves = s.split(/\s+/).filter(Boolean);
         prefix = [];
         var c = new Cube(); prefix.push(c.asString());
@@ -87,8 +89,7 @@
         prog = 0; dev = [];
         phase = conn ? "scrambling" : "idle";
         if (conn && cube) syncProgress();
-        stopTick(); $("akTime").textContent = "0.00"; miniHide(); last = null; renderLast();
-        renderStages(null);
+        if (!keep) { stopTick(); $("akTime").textContent = "0.00"; miniHide(); last = null; renderLast(); renderStages(null); }
         renderScramble(); renderHint();
     }
     function syncProgress() {
@@ -112,6 +113,7 @@
         } else if (phase === "ready") h = "✅ Karıştırma tamam. <b>İlk hamlende süre başlar.</b>";
         else if (phase === "solving") h = "Çözülüyor…";
         else if (phase === "done") h = tab === "comp" ? "Kaydedildi ✓" : "Bitti! Yeni karıştırma için butona bas.";
+        if (phase === "scrambling" && autoScr && !prog && !dev.length) h = "✅ Bitti! Yeni karıştırma hazır, uygula.";
         else if (phase === "holding") h = "Bırakınca süre başlar…";
         else if (tab === "comp" && comp) h = compHint();
         else h = conn ? "" : "🔗 Başlamak için akıllı küpünü bağla.";
@@ -173,6 +175,8 @@
         renderStages(st); renderResult(r); renderHist(); renderHint();
         setLast(Math.round(t), false); miniShow("done");
         compDone(Math.round(t));
+        // Çözüm analizi: küp çözüldü, yeni karıştırmayı otomatik ver (sonuçlar ekranda kalır)
+        if (tab === "analysis" && conn) { autoScr = true; setScramble(genScramble(), true); }
     }
     function buildResult(total) {
         var segs = [];
@@ -1349,7 +1353,7 @@
         $("akConnect").onclick = connect;
         $("akDisc").onclick = disconnect;
         $("akReset").onclick = resetModel;
-        $("akNew").onclick = function () { setScramble(genScramble()); };
+        $("akNew").onclick = function () { autoScr = false; setScramble(genScramble()); };
         $("akDnf").onclick = toggleDnf; $("akMiniDnf").onclick = toggleDnf;
         $("akMiniX").onclick = miniHide;
         Array.prototype.forEach.call(document.querySelectorAll(".ak-tab"), function (b) { b.onclick = function () { setTab(b.getAttribute("data-tab")); }; });
