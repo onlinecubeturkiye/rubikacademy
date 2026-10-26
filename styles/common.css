@@ -1,3 +1,8 @@
+/* Tarayıcıya sitenin kendi koyu/açık teması olduğunu bildir: Samsung Internet / Chrome'un
+   "siteleri karanlık moda zorla" özelliği renkleri (küp renkleri dahil) kendi kafasına göre koyulaştırmasın */
+:root { color-scheme: light; }
+html.dark-mode { color-scheme: dark; }
+
 /* =========================================================
    RUBIK ACADEMY — ORTAK STİLLER (common.css)
    Tüm sayfalarda <head> içine şu şekilde eklenir:
