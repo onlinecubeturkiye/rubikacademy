@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261180";
+    var V = "20261181";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -927,6 +927,8 @@
         syncNow: function () { return pushChanged(false); },
         load: loadSDK,
         isPending: function () { return lsGet(SIGNED_KEY) === "1" && !sdkP; },
+        // Bu cihazda giriş yapılmış ama oturum henüz geri yüklenmedi (üye sayılır; kilit gösterilmez)
+        authPending: function () { return lsGet(SIGNED_KEY) === "1" && !authResolved; },
         sendNotif: sendNotif, sendBroadcast: sendBroadcast, showNotes: showNotes,
         listBroadcasts: listBroadcasts, deleteBroadcast: deleteBroadcast, getConfig: getConfig, setMaintenance: setMaintenance, setMemberCount: setMemberCount,
         notifyPermission: enablePush, enablePush: enablePush, pushSupported: pushSupported,
@@ -952,4 +954,91 @@
         document.addEventListener("account-change", function () { checkMaintenance(); });
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+})();
+
+/* =========================================================
+   ÜYELERE ÖZEL ÖZELLİKLER
+   - Sayfa kilidi: sayfa <script>window.RA_MEMBERS_ONLY = "Antrenör"</script> der; üyeliksiz ziyaretçi
+     sayfanın üstünde kapatılamayan "üyelere özel" kartı görür (giriş yapınca kalkar).
+   - Algoritma sayfaları: ilerleme işaretleri (karta tıklama, "Hepsini"), ✏️ Düzenle ve 🖨️ Yazdır
+     üyeliksiz tıklanınca giriş penceresi açılır. ▶ İzle herkese açık.
+========================================================= */
+(function () {
+    if (!window.Account) return;
+    var TX = {
+        tr: { t: "Üyelere özel", p: "{f} yalnızca üyelere açık. Ücretsiz üye ol ya da giriş yap; ilerlemen de tüm cihazlarına kaydedilsin.", go: "Giriş yap / Üye ol", home: "Ana sayfaya dön", later: "Vazgeç",
+              mark: "İlerleme işaretleri", edit: "Kendi algoritmanı yazmak", print: "Yazdır / PDF", train: "Antrenör", solver: "Küp çözücü", analysis: "Çözüm Analizi" },
+        en: { t: "Members only", p: "{f} is for members. Sign up for free or log in, and your progress is saved on all your devices.", go: "Log in / Sign up", home: "Back to home", later: "Not now",
+              mark: "Progress marks", edit: "Writing your own algorithm", print: "Print / PDF", train: "The trainer", solver: "The cube solver", analysis: "Solve analysis" }
+    };
+    function tx() { var l = "tr"; try { l = localStorage.getItem("site-lang") || "tr"; } catch (e) {} return TX[l] || (l === "tr" ? TX.tr : TX.en); }
+    function member() { return !!Account.user() || !!(Account.authPending && Account.authPending()); }
+    function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+    var css = document.createElement("style");
+    css.textContent =
+        ".ra-lock{position:fixed;inset:0;z-index:1050;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(8,9,14,.62);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}" +
+        ".ra-lock-box{max-width:400px;width:100%;background:var(--surface,#151826);border:1px solid var(--border,#2a2f42);border-radius:22px;padding:26px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45);font-family:Inter,sans-serif}" +
+        ".ra-lock-ic{font-size:40px;line-height:1;margin-bottom:10px}" +
+        ".ra-lock-box h2{margin:0 0 8px;font-size:21px;color:var(--text,#eef0f7)}" +
+        ".ra-lock-box p{margin:0 0 18px;font-size:14.5px;line-height:1.6;color:var(--text-soft,#a4aabe)}" +
+        ".ra-lock-b{display:flex;flex-direction:column;gap:8px}" +
+        ".ra-lock-b button,.ra-lock-b a{display:block;padding:12px 14px;border-radius:13px;font:800 14.5px Inter,sans-serif;cursor:pointer;text-decoration:none;border:1px solid var(--border,#2a2f42);background:var(--surface-soft,#1c2030);color:var(--text,#eef0f7)}" +
+        ".ra-lock-b .go{background:var(--ui-accent,#6c5ce7);border-color:transparent;color:var(--ui-accent-text,#fff)}" +
+        "html.ra-locked,html.ra-locked body{overflow:hidden}";
+    (document.head || document.documentElement).appendChild(css);
+
+    var box = null, pageLock = window.RA_MEMBERS_ONLY || "";
+    function show(feature, closable) {
+        hide();
+        var x = tx();
+        box = document.createElement("div"); box.className = "ra-lock"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true");
+        box.innerHTML = '<div class="ra-lock-box"><div class="ra-lock-ic">🔒</div><h2>' + esc(x.t) + '</h2><p>' + esc(x.p.replace("{f}", feature)) + '</p>' +
+            '<div class="ra-lock-b"><button type="button" class="go">' + esc(x.go) + '</button>' +
+            (closable ? '<button type="button" class="later">' + esc(x.later) + '</button>' : '<a href="/">' + esc(x.home) + '</a>') + '</div></div>';
+        box.querySelector(".go").onclick = function () { Account.openLogin && Account.openLogin(); };
+        if (closable) {
+            box.querySelector(".later").onclick = hide;
+            box.addEventListener("click", function (e) { if (e.target === box) hide(); });
+        } else document.documentElement.classList.add("ra-locked");
+        document.body.appendChild(box);
+    }
+    function hide() { if (box) { box.remove(); box = null; } document.documentElement.classList.remove("ra-locked"); }
+    function check() {
+        if (member()) { hide(); return; }
+        if (pageLock && !box) show(pageLock, false);
+    }
+    // Algoritma sayfalarındaki üyelik isteyen tıklamalar (sayfanın kendi dinleyicilerinden önce yakalanır)
+    var GATES = [[".alg-edit-btn", "edit"], ["#raMarkAll button", "mark"], [".case-card[data-case]", "mark"]];
+    // Üyelere özel sayfalara giden bağlantılar: sayfaya gitmeden önce kart gösterilir
+    var LOCKED = [[/\/algoritmalar\/yazdir/, "print"], [/\/algoritmalar\/antrenor/, "train"], [/\/icerikler\/cozucu/, "solver"], [/\/icerikler\/akilli-kup/, "analysis"]];
+    function gate(e) {
+        if (member() || pageLock) return;
+        var t = e.target; if (!t || !t.closest) return;
+        if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
+        if (t.closest(".acc-modal, .ra-lock")) return;
+        var a = t.closest("a[href]");
+        if (a) {
+            var h = a.getAttribute("href") || "";
+            for (var j = 0; j < LOCKED.length; j++) if (LOCKED[j][0].test(h)) { e.preventDefault(); e.stopPropagation(); show(tx()[LOCKED[j][1]], true); return; }
+            return;
+        }
+        if (t.closest(".alg-play-btn, .alg-player")) return;
+        for (var i = 0; i < GATES.length; i++) {
+            if (t.closest(GATES[i][0])) {
+                // karttaki algoritma metnini seçip kopyalamak serbest
+                if (GATES[i][1] === "mark" && window.getSelection && String(window.getSelection()).length) return;
+                e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+                show(tx()[GATES[i][1]], true);
+                return;
+            }
+        }
+    }
+    document.addEventListener("click", gate, true);
+    document.addEventListener("keydown", gate, true);
+    Account.onChange(function () { check(); });
+    function boot() { check(); }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+    // Oturum geri yüklenirken (isPending) bekleriz; sonuç gelmezse yine de kontrol et
+    setTimeout(check, 4000);
+    window.raMembersCheck = check;
 })();
