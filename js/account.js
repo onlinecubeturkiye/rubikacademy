@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261181";
+    var V = "20261182";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -106,6 +106,8 @@
             m.onAuthStateChanged(auth, function (u) {
                 user = u; authResolved = true;
                 lsSet(SIGNED_KEY, u ? "1" : null);
+                // Oturum yok (çıkış yapıldı ya da süresi doldu): cihazda kalan kişisel veriyi sil
+                if (!u && window.raPurgePrivate) raPurgePrivate();
                 renderNav();
                 if (u) { closeModal(); startSync(); logSession(); checkLogoutAll(); checkSuspended(); ensurePush(); } else { stopSync(); setTimeout(checkRemovedSignedOut, 1500); }
                 listeners.forEach(function (f) { try { f(u); } catch (e) {} });
@@ -327,7 +329,7 @@
 
     /* ---------- senkron ---------- */
     var SYNC_PREFIX = ["algo-progress-", "algo-set-", "recog-"];
-    var SYNC_KEYS = ["site-prefs-v1", "custom-algs-v1", "trainer-stats-v1", "roadmap-done-v1", "roadmap-track-v1", "daily-results-v1", "daily-sent-v1"];
+    var SYNC_KEYS = ["site-prefs-v1", "custom-algs-v1", "trainer-stats-v1", "roadmap-done-v1", "roadmap-track-v1", "daily-results-v1", "daily-sent-v1", "smart-solves-v1", "vcube-times-v1", "activity-days-v1", "daily-name-v1"];
     function synced(k) { return SYNC_KEYS.indexOf(k) >= 0 || SYNC_PREFIX.some(function (p) { return k.indexOf(p) === 0; }); }
     function localKeys() { var out = []; try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && synced(k)) out.push(k); } } catch (e) {} return out; }
     function hash(s) { var h = 2166136261; s = String(s); for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36) + ":" + s.length; }
@@ -467,6 +469,7 @@
     function signOut() {
         return pushChanged(false).then(function () { return loadSDK(); }).then(function (m) { return m.signOut(auth); }).then(function () {
             lsSet(META_KEY, null);
+            if (window.raPurgePrivate) raPurgePrivate(); // çıkış yapınca ilerleme, geçmiş vb. bu cihazda görünmesin
         });
     }
     function setName(name) {
