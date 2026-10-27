@@ -1,4 +1,34 @@
 /* =========================================================
+   KİŞİSEL VERİ YALNIZ HESAPTA (her şeyden önce çalışır)
+   - Algoritma ilerlemesi, antrenör geçmişi, yol haritası, çözüm geçmişleri, günlük sonuçlar,
+     kendi algoritmaların: giriş yapılmamışsa cihaza yazılmaz, yalnız sayfa açıkken bellekte durur
+     (yenileyince / çıkınca sıfırlanır). Giriş yapılınca hesapla senkronlanır.
+   - Hesaptan çıkınca ya da bu cihazda oturum yokken cihazda kalan kişisel veri silinir.
+   - Tema, dil, renk körlüğü, tutuş gibi tercihler herkes için saklanır.
+========================================================= */
+(function () {
+    var PRIV = /^(algo-progress-|algo-set-|recog-|roadmap-|trainer-stats-v1$|daily-results-v1$|daily-sent-v1$|daily-name-v1$|custom-algs-v1$|timer-solves-v1$|smart-solves-v1$|vcube-times-v1$|activity-days-v1$|ra-profile-v1$|ra-last-page$|ra-sync-meta-v1$)/;
+    var ls; try { ls = window.localStorage; if (!ls) return; } catch (e) { return; }
+    var S = Storage.prototype, oGet = S.getItem, oSet = S.setItem, oRem = S.removeItem, oKey = S.key;
+    function signed() { try { return oGet.call(ls, "ra-auth-v1") === "1"; } catch (e) { return false; } }
+    var mem = {};
+    function purge() {
+        var del = [];
+        try { for (var i = 0; i < ls.length; i++) { var k = oKey.call(ls, i); if (k && PRIV.test(k)) del.push(k); } } catch (e) {}
+        del.forEach(function (k) { try { oRem.call(ls, k); } catch (e) {} });
+        mem = {};
+        return del.length;
+    }
+    if (!signed()) purge();
+    function priv(st, k) { return st === ls && PRIV.test(String(k)) && !signed(); }
+    S.getItem = function (k) { if (priv(this, k)) return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; return oGet.call(this, k); };
+    S.setItem = function (k, v) { if (priv(this, k)) { mem[k] = String(v); return; } return oSet.call(this, k, v); };
+    S.removeItem = function (k) { if (priv(this, k)) { delete mem[k]; return; } return oRem.call(this, k); };
+    window.raPurgePrivate = purge;
+    window.raIsPrivateKey = function (k) { return PRIV.test(String(k)); };
+})();
+
+/* =========================================================
    RUBIK ACADEMY — ORTAK JS (common.js)
    Tüm sayfalarda şu sırayla eklenir:
 
