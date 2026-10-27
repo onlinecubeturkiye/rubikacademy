@@ -1,13 +1,6 @@
-/* Tarayıcıya sitenin kendi koyu/açık teması olduğunu bildir: Samsung Internet / Chrome'un
-   "siteleri karanlık moda zorla" özelliği renkleri (küp renkleri dahil) kendi kafasına göre koyulaştırmasın */
-:root { color-scheme: light; }
-html.dark-mode { color-scheme: dark; }
-/* Samsung Internet'in "Karanlık mod"u, siteyi ancak stil dosyasında prefers-color-scheme: dark kuralı
-   görürse "kendi koyu teması var" sayıp renklere dokunmuyor. Site zaten koyu temada açılıyor. */
-@media (prefers-color-scheme: dark) {
-    html.dark-mode { color-scheme: dark; }
-    html.dark-mode body { background-color: var(--background); }
-}
+/* Tarayıcının "siteleri karanlık moda zorla" özelliğini (Samsung Internet, Chrome) kapat: site kendi koyu
+   temasını kendisi çiziyor; "only light" = tarayıcı sayfayı asla kendisi karartmasın, küp renklerine dokunmasın. */
+:root { color-scheme: only light; }
 
 /* =========================================================
    RUBIK ACADEMY — ORTAK STİLLER (common.css)
