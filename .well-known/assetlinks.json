@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "fun.rubikacademy.app",
+      "sha256_cert_fingerprints": [
+        "73:DA:2E:94:BF:9E:EC:7E:18:FC:6B:8C:0B:7E:30:2E:45:CE:CE:71:16:11:F1:46:1C:44:98:DD:40:68:DA:29"
+      ]
+    }
+  }
+]

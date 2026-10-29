@@ -1,0 +1,42 @@
+# Android uygulaması (TWA) derlemesi: imzasız APK + AAB üretir ve "android-build" dalına koyar.
+# İmzalama, depo herkese açık olduğu için anahtar burada tutulmadan ayrıca yapılır.
+name: Android derlemesi
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["android/**", ".github/workflows/android.yml"]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "17" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "8.11.1" }
+      - name: Android SDK paketleri
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" > /dev/null
+      - name: Derle (APK + AAB)
+        run: gradle -p android --no-daemon assembleRelease bundleRelease
+      - name: Çıktıları topla
+        run: |
+          BT="$ANDROID_HOME/build-tools/36.0.0"
+          mkdir -p out
+          "$BT/zipalign" -f -p 4 android/app/build/outputs/apk/release/app-release-unsigned.apk out/rubikacademy-unsigned.apk
+          cp android/app/build/outputs/bundle/release/app-release.aab out/rubikacademy-unsigned.aab
+          cp "$BT/lib/apksigner.jar" out/apksigner.jar
+          ls -la out
+      - name: android-build dalına koy
+        run: |
+          cd out
+          git init -q -b android-build
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Android derlemesi ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" android-build
