@@ -1,0 +1,2 @@
+# GitHub Pages: .well-known klasörü yayınlansın (Android uygulamasının site doğrulaması: assetlinks.json)
+include: [".well-known"]
