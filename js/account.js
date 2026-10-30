@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261184";
+    var V = "20261185";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -329,7 +329,7 @@
 
     /* ---------- senkron ---------- */
     var SYNC_PREFIX = ["algo-progress-", "algo-set-", "recog-"];
-    var SYNC_KEYS = ["site-prefs-v1", "custom-algs-v1", "trainer-stats-v1", "roadmap-done-v1", "roadmap-track-v1", "daily-results-v1", "daily-sent-v1", "smart-solves-v1", "vcube-times-v1", "activity-days-v1", "daily-name-v1"];
+    var SYNC_KEYS = ["site-prefs-v1", "custom-algs-v1", "trainer-stats-v1", "roadmap-done-v1", "roadmap-track-v1", "daily-results-v1", "daily-sent-v1", "smart-solves-v1", "vcube-times-v1", "activity-days-v1", "daily-name-v1", "comp-stats-v1"];
     function synced(k) { return SYNC_KEYS.indexOf(k) >= 0 || SYNC_PREFIX.some(function (p) { return k.indexOf(p) === 0; }); }
     function localKeys() { var out = []; try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && synced(k)) out.push(k); } } catch (e) {} return out; }
     function hash(s) { var h = 2166136261; s = String(s); for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36) + ":" + s.length; }
@@ -358,6 +358,10 @@
             return JSON.stringify(o);
         }
         if (k.indexOf("recog-") === 0) return ((a.n || 0) >= (b.n || 0)) ? loc : cl;
+        if (k === "comp-stats-v1") { // odalar ve turlar: iki cihazdakinin birleşimi
+            o.rooms = Object.assign({}, b.rooms || {}, a.rooms || {}); o.r = Object.assign({}, b.r || {}, a.r || {});
+            return JSON.stringify(o);
+        }
         if (k === "site-prefs-v1") return (b.t || 0) >= (a.t || 0) ? cl : loc; // en son seçilen tema geçerli
         // diğerleri: birleşim, çakışmada bu cihaz
         for (x in b) o[x] = b[x];
@@ -588,7 +592,22 @@
             if (r && typeof r.t === "number") dlist.push({ d: d.split(":")[0], t: r.t, pen: r.pen || "" });
         }
         dlist.sort(function (a, b) { return a.d < b.d ? 1 : -1; });
-        return { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount, dlist: dlist.slice(0, 20) };
+        // Ev yarışması: oda/tur sayısı, şampiyonluk, küp başına en iyi tekil ve Ao5 / Ao12
+        var cs = parse(lsGet("comp-stats-v1")) || {}, comp = null;
+        if (isObj(cs) && isObj(cs.r)) {
+            comp = { rooms: Object.keys(cs.rooms || {}).length, rounds: 0, wins: 0, finals: 0, pb: {} };
+            for (var rk in cs.r) {
+                var e = cs.r[rk]; if (!isObj(e)) continue;
+                comp.rounds++;
+                if (e.f) { comp.finals++; if (e.rk === 1) comp.wins++; }
+                var pb = comp.pb[e.ev] || (comp.pb[e.ev] = {});
+                if (typeof e.s === "number" && (!pb.s || e.s < pb.s)) pb.s = e.s;
+                var ak = e.n === 12 ? "a12" : "a5";
+                if (typeof e.a === "number" && (!pb[ak] || e.a < pb[ak])) pb[ak] = e.a;
+            }
+            if (!comp.rounds && !comp.rooms) comp = null;
+        }
+        return { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount, dlist: dlist.slice(0, 20), comp: comp };
     }
     function localProfile() { var p = parse(lsGet(PROF_KEY)); return isObj(p) ? p : {}; }
     function writeProfile() {
