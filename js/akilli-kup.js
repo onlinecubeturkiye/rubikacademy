@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261195";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261196";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -280,7 +280,7 @@
                 return '<li><button type="button" data-h="' + i + '"><b>' + (r.dnf ? "DNF" + (r.t < DNF ? " (" + fmt(r.t) + ")" : "") : fmt(r.t)) + '</b><span>' + r.moves + ' hamle · ' + d.toLocaleDateString("tr-TR") + " " + d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) + '</span></button></li>';
             }).join("") + '</ul><button type="button" class="ak-link" id="akHistClear">Geçmişi temizle</button>';
         Array.prototype.forEach.call(box.querySelectorAll("[data-h]"), function (b) { b.onclick = function () { renderResult(loadHist()[+b.getAttribute("data-h")]); $("akResult").scrollIntoView({ behavior: "smooth", block: "start" }); }; });
-        $("akHistClear").onclick = function () { if (confirm("Analiz geçmişi silinsin mi?")) { try { localStorage.removeItem(HIST_KEY); } catch (e) {} renderHist(); } };
+        $("akHistClear").onclick = function () { ask("Analiz geçmişi silinsin mi?", "Sil", true).then(function (ok) { if (ok) { try { localStorage.removeItem(HIST_KEY); } catch (e) {} renderHist(); } }); };
     }
 
 
@@ -392,6 +392,41 @@
     var comp = null; // { code, doc, players, mode, uid, round, orig, shownR }
     var compPollT = 0;
     function cPath(x) { return "/comps/" + comp.code + (x || ""); }
+    // Site içi onay penceresi: tarayıcı "bu sayfanın başka iletişim kutusu açmasını engelle" deyince
+    // confirm() sessizce false döner ve düğmeler çalışmaz görünür; bu pencere hep çalışır.
+    var askBox = null;
+    function ask(msg, okTx, danger, noCancel) {
+        return new Promise(function (res) {
+            if (!askBox) {
+                askBox = document.createElement("div"); askBox.className = "ra-ask"; askBox.setAttribute("role", "dialog"); askBox.setAttribute("aria-modal", "true");
+                document.body.appendChild(askBox);
+            }
+            askBox.innerHTML = '<div class="ra-ask-b"><div class="ra-ask-h"><span class="ra-i ra-i-ra">' + (window.RAIcons ? RAIcons.svg("ra") : "") + '</span><b>Rubik Academy</b></div><p class="ra-ask-p"></p><div class="ra-ask-a">' +
+                (noCancel ? '' : '<button type="button" class="btn" data-a="0">Vazgeç</button>') + '<button type="button" class="btn primary' + (danger ? ' ra-danger' : '') + '" data-a="1"></button></div></div>';
+            askBox.querySelector(".ra-ask-p").innerHTML = msg;
+            askBox.querySelector('[data-a="1"]').textContent = okTx || "Tamam";
+            askBox.classList.add("open");
+            var kd = function (e) { if (e.key === "Escape") done(false); };
+            var done = function (v) { askBox.classList.remove("open"); askBox.onclick = null; document.removeEventListener("keydown", kd); res(v); };
+            document.addEventListener("keydown", kd);
+            askBox.onclick = function (e) { var b = e.target.closest("[data-a]"); if (b) done(b.getAttribute("data-a") === "1"); else if (e.target === askBox) done(false); };
+            setTimeout(function () { var o = askBox.querySelector('[data-a="1"]'); if (o) try { o.focus(); } catch (x) {} }, 30);
+        });
+    }
+    function say(msg) { return ask(msg, "Tamam", false, true); }
+    (function () {
+        var st = document.createElement("style");
+        st.textContent = ".ra-ask{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(10,12,18,.62);backdrop-filter:blur(3px)}" +
+            ".ra-ask.open{display:flex}" +
+            ".ra-ask-b{width:min(400px,100%);box-sizing:border-box;padding:18px 18px 16px;border-radius:20px;background:var(--surface);color:var(--text);border:var(--card-bw,2px) solid var(--card-border,var(--border));box-shadow:0 24px 60px rgba(0,0,0,.35);animation:raAsk .16s ease-out}" +
+            "@keyframes raAsk{from{transform:translateY(8px) scale(.97);opacity:0}}" +
+            ".ra-ask-h{display:flex;align-items:center;gap:2px;font:800 12px Inter,sans-serif;letter-spacing:.3px;color:var(--text-soft)}" +
+            ".ra-ask-h .ra-i{width:22px;height:22px}" +
+            ".ra-ask-p{margin:10px 0 16px;font:650 15.5px/1.5 Inter,sans-serif;color:var(--text)}" +
+            ".ra-ask-a{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}" +
+            ".ra-ask-a .btn.ra-danger{background:#dc2626;border-color:#dc2626;color:#fff}";
+        (document.head || document.documentElement).appendChild(st);
+    })();
     function cMsg(t, bad) { var m = $("cMsg"); m.innerHTML = t || ""; m.className = "ak-msg" + (bad ? " bad" : ""); }
     function cBody(fields) { var b = {}; Object.keys(fields).forEach(function (k) { b[k] = val(fields[k]); }); b.ts = { timestampValue: new Date().toISOString() }; return b; }
     function cMask(fields) { return Object.keys(fields).concat(["ts"]).map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&"); }
@@ -446,20 +481,29 @@
     function isMod(uid) { return modList().indexOf(uid) >= 0; }
     function isHost() { return isOwner() || !!(comp && isMod(comp.uid)); }
     function kickPlayer(uid) {
-        if (!confirm("Bu yarışmacı çıkarılsın mı? Bu yarışmaya tekrar katılamaz.")) return;
+        var p = (comp.players || []).filter(function (x) { return x.uid === uid; })[0];
+        ask("<b>" + esc(p ? p.name : "Bu yarışmacı") + "</b> odadan atılsın mı? Bu yarışmaya tekrar katılamaz.", "Odadan at", true).then(function (ok) { if (ok && comp) doKick(uid); });
+    }
+    function doKick(uid) {
         var bl = String(comp.doc.ban || "").split(",").filter(Boolean); if (bl.indexOf(uid) < 0) bl.push(uid);
         compPatch({ ban: bl.join(",") }).then(function () { return api(cPath("/p/" + uid), { method: "DELETE" }); }).then(function (r) {
-            if (r && !r.ok) alert("Çıkarılamadı (" + r.status + "). Firebase kurallarını yayımladın mı?");
+            if (r && !r.ok) say("Atılamadı (" + r.status + "). Firebase kurallarını yayımladın mı?");
             if (comp) comp.tableHtml = ""; compPoll();
-        }, function () { alert("Çıkarılamadı."); });
+        }, function () { say("Atılamadı: bağlantı hatası."); });
     }
     function toggleMod(uid) {
-        var l = modList(), i = l.indexOf(uid);
-        if (i >= 0) l.splice(i, 1); else l.push(uid);
-        compPatch({ mods: l.join(",") }).then(compPoll);
+        var l = modList(), i = l.indexOf(uid), p = (comp.players || []).filter(function (x) { return x.uid === uid; })[0], nm = esc(p ? p.name : "Bu kişi");
+        ask(i >= 0 ? "<b>" + nm + "</b> artık moderatör olmasın mı?" : "<b>" + nm + "</b> moderatör yapılsın mı? Turları başlatıp bitirebilir ve yarışmacıları odadan atabilir.", i >= 0 ? "Moderatörlüğü al" : "Moderatör yap").then(function (ok) {
+            if (!ok || !comp) return;
+            l = modList(); i = l.indexOf(uid);
+            if (i >= 0) l.splice(i, 1); else l.push(uid);
+            compPatch({ mods: l.join(",") }).then(function (r) { if (r && !r.ok) say("Değiştirilemedi (" + r.status + ")."); if (comp) comp.tableHtml = ""; compPoll(); });
+        });
     }
     function transferTo(uid, name) {
-        if (!confirm("Oda " + name + " kişisine devredilsin mi? Sen moderatör olarak kalırsın.")) return;
+        ask("Oda <b>" + esc(name) + "</b> kişisine devredilsin mi? Sen moderatör olarak kalırsın.", "Odayı devret").then(function (ok) { if (ok && comp) doTransfer(uid, name); });
+    }
+    function doTransfer(uid, name) {
         var l = modList().filter(function (x) { return x !== uid; });
         if (l.indexOf(comp.doc.host) < 0) l.push(comp.doc.host);
         compPatch({ host: uid, hName: String(name || "").slice(0, 24), mods: l.join(",") }).then(compPoll);
@@ -575,15 +619,21 @@
                 .filter(function (o) { return activeComp(o) && !closedRooms[o.code]; }).sort(function (a, b) { return (Date.parse(b.up) || 0) - (Date.parse(a.up) || 0); });
         }, function () { return []; });
     }
-    function closeRoom(code) {
+    // Boş odayı sil: sahibi değilsen kurallar yalnız uzun süredir değişmeyen odayı silmene izin verir
+    function closeEmpty(code) {
+        return api("/comps/" + code + "/p/" + (signedIn() ? Account.user().uid : "x"), { method: "DELETE" }).catch(function () {}).then(function () {
+            return api("/comps/" + code, { method: "DELETE" }).then(function (r) { return r.ok; }, function () { return false; });
+        });
+    }
+    function closeRoom(code, quiet) {
         var del = function (path) { return api(path, { method: "DELETE" }).catch(function () {}); };
         var sub = function (c) { return api("/comps/" + code + "/" + c + "?pageSize=100&mask.fieldPaths=zz", { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
             return Promise.all((d.documents || []).map(function (x) { return del("/comps/" + code + "/" + c + "/" + x.name.split("/").pop()); }));
         }, function () {}); };
         return Promise.all([sub("p"), sub("w"), sub("m")]).then(function () { return api("/comps/" + code, { method: "DELETE" }); }).then(function (r) {
-            if (!r || !r.ok) { alert("Oda kapatılamadı" + (r ? " (" + r.status + ")" : "") + ". " + (r && r.status === 403 ? "Firebase kurallarının son halini yayımladığından emin ol." : r && r.status === 429 ? "Firebase günlük kotası dolmuş; yarın tekrar dene." : "Tekrar dene.")); return false; }
+            if (!r || !r.ok) { if (quiet) return false; say("Oda kapatılamadı" + (r ? " (" + r.status + ")" : "") + ". " + (r && r.status === 403 ? "Firebase kurallarının son halini yayımladığından emin ol." : r && r.status === 429 ? "Firebase günlük kotası dolmuş; yarın tekrar dene." : "Tekrar dene.")); return false; }
             return true;
-        }, function () { alert("Oda kapatılamadı: bağlantı hatası."); return false; });
+        }, function () { if (!quiet) say("Oda kapatılamadı: bağlantı hatası."); return false; });
     }
     // Sayfa açılınca: açık odam varsa "Odana dön" kutusu
     function showResume() {
@@ -609,9 +659,12 @@
                     var sp = box.querySelector(".c-res-tx span"); if (sp) sp.textContent += " · tur bitince hazırlıkta geri dönebilirsin";
                 }, function () {});
                 if ($("cResumeClose")) $("cResumeClose").onclick = function () {
-                    if (!confirm("“" + (o.name || o.code) + "” odası kapatılsın mı? Oda ve içindeki kayıtlar silinir.")) return;
-                    var btn = this; btn.disabled = true; btn.textContent = "Kapatılıyor…";
-                    closeRoom(o.code).then(function (ok) { if (ok) { closedRooms[o.code] = 1; forgetRoom(); box.hidden = true; } else { btn.disabled = false; btn.textContent = "🗑 Odayı kapat"; } loadLive(); if (ok) showResume(); });
+                    var btn = this;
+                    ask("“" + esc(o.name || o.code) + "” odası kapatılsın mı? Oda ve içindeki kayıtlar silinir.", "Odayı kapat", true).then(function (go) {
+                        if (!go) return;
+                        btn.disabled = true; btn.textContent = "Kapatılıyor…";
+                        closeRoom(o.code).then(function (ok) { if (ok) { closedRooms[o.code] = 1; forgetRoom(); box.hidden = true; } else { btn.disabled = false; btn.textContent = "🗑 Odayı kapat"; } loadLive(); if (ok) showResume(); });
+                    });
                 };
             });
         });
@@ -681,7 +734,16 @@
     function leaveComp(keep) {
         if (mag.on) magToggle(false); mag.tried = false; // odadan çıkınca sensörleri kapat
         clearInterval(compPollT); clearInterval(hbT); if (comp) { clearInterval(comp.cdT); if (comp.liveStop) comp.liveStop(); }
-        if (comp && !comp.watch && myP()) api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
+        // Odadan çıkan son kişiysen oda kapanır (bitmemiş tur yüzünden boş oda açık kalmasın)
+        // (yerel liste eski olabilir: sunucudaki yarışmacı listesine bakılır)
+        if (comp && !comp.watch && !comp.closing && myP()) (function (lc, me, own) {
+            apiAny("/comps/" + lc + "/p?pageSize=50&mask.fieldPaths=zz", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }).then(function (pd) {
+                var others = pd ? (pd.documents || []).filter(function (x) { return x.name.split("/").pop() !== me; }).length : 1;
+                if (others) return api("/comps/" + lc + "/p/" + me, { method: "DELETE" }).catch(function () {});
+                closedRooms[lc] = 1; forgetRoom(); if ($("cResume")) $("cResume").hidden = true;
+                return own ? closeRoom(lc, true) : closeEmpty(lc);
+            }).then(function () { setTimeout(loadLive, 300); });
+        })(comp.code, comp.uid, isOwner());
         // keep: yarışmacı kendi çıktıysa ya da bağlantısı koptuysa "Odana dön" ile geri gelebilsin
         var was = comp && !comp.watch;
         comp = null; closeFinal(); document.body.classList.remove("c-in-room"); if (!(keep && was)) forgetRoom();
@@ -717,7 +779,7 @@
                 comp.wT = Date.now();
                 countFresh(comp.code).then(function (n) {
                     if (!comp) return; n = Math.max(0, n - comp.players.length);
-                    comp.watchers = n; var w = $("cWatch"); if (w) w.textContent = "👁 " + n + " kişi izliyor";
+                    comp.watchers = n; var w = $("cWatch"); if (w) w.innerHTML = ic("eye") + n + " kişi izliyor";
                 });
                 if (isHost()) apiAny(cPath("/w?pageSize=60"), { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (wd) {
                     if (!comp) return; comp.seen = {};
@@ -1034,7 +1096,10 @@
     // Final turu yapmadan bitir: son tur final sayılır, birincisi şampiyon olur
     function finishComp() {
         if (!isHost() || !comp.doc || comp.doc.st !== "end" || comp.doc.fin) return;
-        if (!confirm("Yarışma burada bitirilsin mi? Son turun birincisi şampiyon olur.")) return;
+        ask("Yarışma burada bitirilsin mi? Son turun birincisi şampiyon olur.", "Yarışmayı bitir").then(function (ok) { if (ok && comp) doFinish(); });
+    }
+    function doFinish() {
+        if (!isHost() || !comp.doc || comp.doc.st !== "end" || comp.doc.fin) return;
         var h = hist(); if (h.length) h[h.length - 1].f = 1;
         closeFinal();
         compPatch({ fin: 1, R: JSON.stringify(h) }).then(compPoll);
@@ -1056,7 +1121,7 @@
         var atEnd = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
         box.innerHTML = list.length ? list.map(function (m) {
             var me = m.u === comp.uid, badge = comp.doc && m.u === comp.doc.host ? "👑 " : isMod(m.u) ? "🛡️ " : "";
-            return '<div class="c-cm' + (me ? " me" : "") + '"><b>' + badge + esc(m.n) + '</b> ' + esc(m.x) +
+            return '<div class="c-cm' + (me ? " me" : "") + '"><b>' + badge + '<span class="c-cx">' + esc(m.n) + '</span></b> <span class="c-cx">' + esc(m.x) + '</span>' +
                 (host || me ? '<button type="button" class="c-cdel" data-mid="' + esc(m.id) + '" title="Sil">✕</button>' : '') + '</div>';
         }).join("") : '<p class="c-chat-empty">Henüz mesaj yok. İlk mesajı sen yaz 👋</p>';
         if (atEnd || !comp.chatSeen) box.scrollTop = box.scrollHeight;
@@ -1261,7 +1326,7 @@
         }).join("") + '</div>' + (t.length >= NS() ? '<div class="c-ao">Ao' + NS() + ' <b>' + fmt(avgOf(t, NS())) + '</b></div>' : "") : "";
         if ($("cEditLast")) $("cEditLast").onclick = startEdit;
         Array.prototype.forEach.call($("cMine").querySelectorAll("[data-ci]"), function (b) {
-            b.onclick = function () { var i = +b.getAttribute("data-ci"), on = myTimes()[i] < DNF; if (on && !confirm((i + 1) + ". çözüm DNF yapılsın mı?")) return; compSetDnf(i, on); };
+            b.onclick = function () { var i = +b.getAttribute("data-ci"), on = myTimes()[i] < DNF; if (!on) { compSetDnf(i, on); return; } ask((i + 1) + ". çözüm DNF yapılsın mı?", "DNF yap", true).then(function (ok) { if (ok && comp) compSetDnf(i, on); }); };
         });
         // tablo: her yarışmacı bir sütun; satırlar Sıra, Ao5, 1-5. çözüm
         var rows = rankRows(), out = comp.players.filter(function (p) { return !eligible(p.uid); });
@@ -1269,11 +1334,14 @@
         var bestOf = slotsArr().map(function (i) { var v = rows.map(function (r) { return r.t[i]; }).filter(function (x) { return x != null && x < DNF; }); return v.length > 1 ? Math.min.apply(null, v) : null; });
         var bestAo = (function () { var v = rows.map(function (r) { return r.a; }).filter(function (x) { return x != null && x < DNF; }); return v.length > 1 ? Math.min.apply(null, v) : null; })();
         var headCells = rows.map(function (r) {
-            var badge = r.uid === d.host ? ' <span title="Oda sahibi">👑</span>' : isMod(r.uid) ? ' <span title="Moderatör">🛡️</span>' : '';
-            var acts = host ? '<div class="c-acts">' + (owner && r.uid !== d.host ? '<button type="button" class="c-mini" data-mod="' + esc(r.uid) + '" title="' + (isMod(r.uid) ? "Moderatörlüğü al" : "Moderatör yap") + '">' + (isMod(r.uid) ? "🛡️−" : "🛡️+") + '</button><button type="button" class="c-mini" data-tr="' + esc(r.uid) + '" data-n="' + esc(r.n) + '" title="Odayı devret">👑→</button>' : '') +
-                (r.uid !== comp.uid && r.uid !== d.host ? '<button type="button" class="c-mini kick" data-k="' + esc(r.uid) + '" title="Çıkar">✕</button>' : '') + '</div>' : '';
-            var off = r.uid !== comp.uid && !onlineOf(r.uid) ? ' <span class="c-off" title="Bağlantısı yok / uygulama arka planda">📴</span>' : '';
-            return '<th class="' + (r.uid === comp.uid ? "me" : "") + '"><div class="c-pn">' + esc(r.n) + badge + off + '</div>' + acts + '</th>';
+            var badge = r.uid === d.host ? '<span class="c-role own" title="Oda sahibi">' + ic("owner") + 'Sahip</span>' : isMod(r.uid) ? '<span class="c-role mod" title="Moderatör">' + ic("mod") + 'Mod</span>' : '';
+            var mb = function (cls, attr, name, label) { return '<button type="button" class="c-ab ' + cls + '" ' + attr + ' title="' + label + '" aria-label="' + label + '">' + ic(name) + '</button>'; };
+            var acts = host ? (owner && r.uid !== d.host ? mb(isMod(r.uid) ? "mod on" : "mod", 'data-mod="' + esc(r.uid) + '"', isMod(r.uid) ? "modDel" : "modAdd", isMod(r.uid) ? "Moderatörlüğü al" : "Moderatör yap") +
+                    mb("own", 'data-tr="' + esc(r.uid) + '" data-n="' + esc(r.n) + '"', "transfer", "Odayı devret") : '') +
+                (r.uid !== comp.uid && r.uid !== d.host ? mb("kick", 'data-k="' + esc(r.uid) + '"', "kick", "Odadan at") : '') : '';
+            if (acts) acts = '<div class="c-acts">' + acts + '</div>';
+            var off = r.uid !== comp.uid && !onlineOf(r.uid) ? '<span class="c-off" title="Bağlantısı yok / uygulama arka planda">' + ic("offline") + '</span>' : '';
+            return '<th class="' + (r.uid === comp.uid ? "me" : "") + '"><div class="c-pn"><span class="c-cx">' + esc(r.n) + '</span>' + off + '</div>' + (badge ? '<div class="c-roles">' + badge + '</div>' : '') + acts + '</th>';
         }).join("");
         var line = function (label, cls, fn) { return '<tr class="' + cls + '"><td class="c-rl">' + label + '</td>' + rows.map(function (r) { return '<td class="' + (r.uid === comp.uid ? "me" : "") + '">' + fn(r) + '</td>'; }).join("") + '</tr>'; };
         var tHtml = rows.length ? '<table class="c-grid-t"><thead><tr><th class="c-rl">#</th>' + headCells + '</tr></thead><tbody>' +
@@ -1292,12 +1360,16 @@
         renderComp2();
         recordStats();
     }
+    function ic(n) { return '<span class="ra-i ra-i-' + n + '">' + (window.RAIcons ? RAIcons.svg(n) : "") + '</span>'; }
+    // Tablo düğmeleri tek bir dinleyiciyle (tablo yeniden çizilse de tıklama kaybolmaz)
     function bindTable() {
-        Array.prototype.forEach.call($("cTable").querySelectorAll("[data-edit]"), function (b) { b.onclick = function () { startEdit(); try { $("cTypeIn").focus(); } catch (e) {} }; });
-        Array.prototype.forEach.call($("cTable").querySelectorAll("[data-mod]"), function (b) { b.onclick = function () { toggleMod(b.getAttribute("data-mod")); }; });
-        Array.prototype.forEach.call($("cTable").querySelectorAll("[data-tr]"), function (b) { b.onclick = function () { transferTo(b.getAttribute("data-tr"), b.getAttribute("data-n")); }; });
-        Array.prototype.forEach.call($("cTable").querySelectorAll("[data-k]"), function (b) {
-            b.onclick = function () { kickPlayer(b.getAttribute("data-k")); };
+        var t = $("cTable"); if (!t || t.raBound) return; t.raBound = 1;
+        t.addEventListener("click", function (e) {
+            var b = e.target.closest && e.target.closest("button"); if (!b || !comp) return;
+            if (b.hasAttribute("data-edit")) { startEdit(); try { $("cTypeIn").focus(); } catch (x) {} }
+            else if (b.hasAttribute("data-mod")) { if (isOwner()) toggleMod(b.getAttribute("data-mod")); }
+            else if (b.hasAttribute("data-tr")) { if (isOwner()) transferTo(b.getAttribute("data-tr"), b.getAttribute("data-n")); }
+            else if (b.hasAttribute("data-k")) { if (isHost()) kickPlayer(b.getAttribute("data-k")); }
         });
     }
     function renderComp2() {
@@ -1305,7 +1377,8 @@
         // organizatör / moderatör kontrolleri
         renderNow();
         $("cOrg").hidden = !host || (d.st === "end" && !!d.fin);
-        $("cOrgWho").textContent = owner ? "👑 Oda sahibi:" : "🛡️ Moderatör:";
+        var who = owner ? '<span class="c-role own">' + ic("owner") + 'Oda sahibi</span>' : '<span class="c-role mod">' + ic("mod") + 'Moderatör</span>';
+        if ($("cOrgWho").innerHTML !== who) $("cOrgWho").innerHTML = who;
         $("cStart").hidden = d.st !== "lobby"; $("cStart").disabled = comp.players.length < minPlayers();
         $("cEnd").hidden = d.st !== "run";
         if ($("cFinish")) $("cFinish").hidden = !(d.st === "end" && !d.fin);
@@ -1335,6 +1408,8 @@
             return Promise.all(list.map(function (o) {
                 return Promise.all([countDocs("/comps/" + o.code + "/p"), countFresh(o.code)]).then(function (c) { o.n = c[0]; o.w = Math.max(0, c[1] - c[0]); return o; });
             })).then(function (rows) {
+                rows = rows.filter(function (o) { return o.n > 0; }); // kimsenin kalmadığı oda izlenecek yarışma değildir
+                $("cLiveWrap").hidden = !rows.length;
                 box.innerHTML = rows.map(function (o) {
                     var stt = o.st === "lobby" ? "Lobi" : o.st === "run" ? roundLabel(o) + " sürüyor" : roundLabel(o) + " bitti";
                     return '<div class="c-live"><span class="c-dot' + (o.st === "run" ? " on" : "") + '"></span><div class="c-live-tx"><b>' + esc(o.name || "Ev yarışması") + '</b><small>' + evName(o.ev) + ' · ' + stt + ' · 👤 ' + o.n + '/' + o.cap + ' · 👁 ' + o.w + ' izliyor · ' + esc(o.hName || "") + '</small></div>' +
@@ -1351,8 +1426,9 @@
         Promise.all(list.map(function (o) {
             return countDocs("/comps/" + o.code + "/p").then(function (n) { o.n = n; return o; });
         })).then(function (rows) {
-            // başkalarının 1 saattir boş bekleyen odaları gösterilmez
-            rows = rows.filter(function (o) { return (signedIn() && o.host === Account.user().uid) || o.n > 0 || Date.now() - o.up < 3600000; });
+            // Boş odalar listede görünmez; 16 dk'dır boş ve değişmeyen oda temizlenir (kimse kalmadıysa açık durmasın)
+            rows.forEach(function (o) { if (!o.n && signedIn() && Date.now() - o.up > 16 * 60000 && !closedRooms[o.code]) { closedRooms[o.code] = 1; (o.host === Account.user().uid ? closeRoom(o.code, true) : closeEmpty(o.code)); } });
+            rows = rows.filter(function (o) { return o.n > 0 || (signedIn() && o.host === Account.user().uid && !closedRooms[o.code]); });
             wrap.hidden = !rows.length;
             box.innerHTML = rows.map(function (o) {
                 var full = o.n >= o.cap, mine = signedIn() && o.host === Account.user().uid;
@@ -1363,9 +1439,11 @@
             }).join("");
             Array.prototype.forEach.call(box.querySelectorAll("[data-join]"), function (b) { b.onclick = function () { $("cJoinIn").value = b.getAttribute("data-join"); joinComp(b.getAttribute("data-join")); }; });
             Array.prototype.forEach.call(box.querySelectorAll("[data-close]"), function (b) { b.onclick = function () {
-                if (!confirm("Bu oda kapatılsın mı? Oda ve içindeki kayıtlar silinir.")) return;
-                var cc = b.getAttribute("data-close"); b.disabled = true;
-                closeRoom(cc).then(function (ok) { if (ok) { closedRooms[cc] = 1; forgetRoom(); } loadLive(); showResume(); });
+                ask("Bu oda kapatılsın mı? Oda ve içindeki kayıtlar silinir.", "Odayı kapat", true).then(function (go) {
+                    if (!go) return;
+                    var cc = b.getAttribute("data-close"); b.disabled = true;
+                    closeRoom(cc).then(function (ok) { if (ok) { closedRooms[cc] = 1; forgetRoom(); } loadLive(); showResume(); });
+                });
             }; });
         });
     }
@@ -1411,14 +1489,22 @@
             }).catch(function (e) { cMsg("Yenilenemedi (" + esc(e.message) + ").", 1); });
         };
         $("cLeave").onclick = function () {
-            var playing = comp && !comp.watch && myP() && comp.doc && comp.doc.st !== "lobby";
-            if (confirm(playing ? "Yarışmadan çıkılsın mı? Bu turdaki sürelerin sayılmaz; bir sonraki turun hazırlık süresinde geri dönebilirsin." : "Yarışmadan çıkılsın mı?")) leaveComp(true);
+            if (!comp) { leaveComp(); return; }
+            var playing = !comp.watch && myP() && comp.doc && comp.doc.st !== "lobby";
+            var alone = !comp.watch && myP() && comp.players.filter(function (p) { return p.uid !== comp.uid; }).length === 0;
+            var msg = comp.watch ? "İzlemeyi bırakıp odadan çıkılsın mı?" : alone && isOwner() ? "Odada senden başka kimse yok. Çıkarsan <b>oda kapanır</b>." : playing ? "Yarışmadan çıkılsın mı? Bu turdaki sürelerin sayılmaz; bir sonraki turun hazırlık süresinde geri dönebilirsin." : "Yarışmadan çıkılsın mı?";
+            var c0 = comp;
+            ask(msg, "Çık", !!(alone && isOwner())).then(function (ok) { if (ok && comp === c0) leaveComp(true); });
         };
         $("cStart").onclick = function () { startRound(false, 0); };
         if ($("cFinish")) $("cFinish").onclick = finishComp;
         if ($("cCloseRoom")) $("cCloseRoom").onclick = function () {
-            if (!comp || !isOwner() || !confirm("Oda kapatılsın mı? Oda ve içindeki kayıtlar silinir, herkes odadan çıkar.")) return;
-            var code = comp.code; this.disabled = true; comp.closing = true;
+            if (!comp || !isOwner()) return;
+            var btn = this, c0 = comp;
+            ask("Oda kapatılsın mı? Oda ve içindeki kayıtlar silinir, herkes odadan çıkar.", "Odayı kapat", true).then(function (go) { if (go && comp === c0) doCloseRoom(btn); });
+        };
+        function doCloseRoom(btn) {
+            var code = comp.code; btn.disabled = true; comp.closing = true;
             closeRoom(code).then(function (ok) {
                 if (!ok) { if (comp) comp.closing = false; $("cCloseRoom").disabled = false; return; }
                 closedRooms[code] = 1;
@@ -1426,12 +1512,12 @@
                 forgetRoom(); if ($("cResume")) $("cResume").hidden = true;
                 cMsg("Oda kapatıldı.");
             });
-        };
+        }
         if ($("cChatForm")) {
             $("cChatForm").onsubmit = function (e) { e.preventDefault(); chatSend(); };
             $("cChatLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
         }
-        $("cEnd").onclick = function () { if (confirm("Tur şimdi bitirilsin mi? Eksik çözümü olanların ortalaması olmaz.")) endRound(); };
+        $("cEnd").onclick = function () { var c0 = comp; ask("Tur şimdi bitirilsin mi? Eksik çözümü olanların ortalaması olmaz.", "Turu bitir").then(function (ok) { if (ok && comp && comp === c0) endRound(); }); };
         $("cShowRes").onclick = function () { var h = hist(); if (h.length) showRoundResults(h[h.length - 1]); };
         Array.prototype.forEach.call(document.querySelectorAll(".c-mode button"), function (b) { b.onclick = function () { setMode(b.getAttribute("data-m")); }; });
         $("cTypeOk").onclick = function () { typeSave(""); };
@@ -1503,6 +1589,8 @@
         if (!EV_PAGE) setTab("analysis");
         if (window.Account && Account.onChange) Account.onChange(function () { $("cLoginNote").hidden = signedIn(); initCompRole(); if (comp) chatUi(); });
     }
+    // Ev yarışması sayfasında emojiler yerine RA ikonları
+    if (window.RAIcons && $("akComp")) RAIcons.watch([$("cJoinCard"), $("akComp"), $("akFinal"), document.querySelector(".ev-how")]);
     window.AkilliKup = { setScramble: setScramble, comp: function () { return comp; }, refreshRole: function () { initCompRole(); return betaP; } }; // test/geliştirme için
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

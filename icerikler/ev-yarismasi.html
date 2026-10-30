@@ -28,10 +28,10 @@
 <meta property="og:description" content="Evden canlı küp yarışması: kodla katıl, 5 çözüm yaz, sıralamayı paylaş.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/ev-yarismasi">
-<meta property="og:image" content="https://rubikacademy.fun/og/ev-yarismasi.png?v=20261195">
+<meta property="og:image" content="https://rubikacademy.fun/og/ev-yarismasi.png?v=20261196">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/ev-yarismasi.png?v=20261195">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/ev-yarismasi.png?v=20261196">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,7 +39,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261195">
+<link rel="stylesheet" href="/styles/common.css?v=20261196">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -306,8 +306,28 @@ table.c-grid-t { width: 100%; border-collapse: collapse; font-size: 14px; }
 .c-grid-t th.me, .c-grid-t td.me { background: var(--ui-accent-soft); }
 .c-grid-t .c-rl { position: sticky; left: 0; z-index: 1; background: var(--surface); color: var(--text-soft); font: 800 12px Inter, sans-serif; text-align: start; width: 52px; }
 .c-pn { max-width: 120px; overflow: hidden; text-overflow: ellipsis; margin: 0 auto; }
-.c-acts { display: flex; justify-content: center; gap: 3px; margin-top: 6px; }
-.c-mini.kick { color: #dc2626; }
+.c-pn { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.c-pn .c-cx { overflow: hidden; text-overflow: ellipsis; }
+.c-off { color: #ef4444; display: inline-flex; }
+.c-off .ra-i { margin: 0; }
+.c-roles { display: flex; justify-content: center; margin-top: 4px; }
+.c-role { display: inline-flex; align-items: center; padding: 2px 8px 2px 3px; border-radius: 999px; font: 800 11px Inter, sans-serif; letter-spacing: .2px; }
+.c-role .ra-i { margin-inline-end: 3px; }
+.c-role.own { background: rgba(249, 115, 22, .14); color: #c2410c; }
+.c-role.mod { background: rgba(124, 58, 237, .14); color: #6d28d9; }
+.dark-mode .c-role.own { color: #fdba74; } .dark-mode .c-role.mod { color: #c4b5fd; }
+.c-acts { display: flex; justify-content: center; gap: 5px; margin-top: 7px; }
+.c-ab { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-soft); color: var(--text-soft); cursor: pointer; transition: transform .12s, background .15s, color .15s, border-color .15s; }
+.c-ab .ra-i { width: 17px; height: 17px; margin: 0; }
+.c-ab:hover { transform: translateY(-1px); }
+.c-ab:active { transform: scale(.94); }
+.c-ab.mod:hover, .c-ab.mod.on { color: #7c3aed; border-color: rgba(124, 58, 237, .5); background: rgba(124, 58, 237, .12); }
+.c-ab.own:hover { color: #ea580c; border-color: rgba(249, 115, 22, .5); background: rgba(249, 115, 22, .12); }
+.c-ab.kick { color: #dc2626; }
+.c-ab.kick:hover { border-color: rgba(220, 38, 38, .5); background: rgba(220, 38, 38, .12); }
+.dark-mode .c-ab.mod.on, .dark-mode .c-ab.mod:hover { color: #c4b5fd; } .dark-mode .c-ab.kick { color: #f87171; }
+.c-org #cOrgWho { display: inline-flex; }
+.c-org #cOrgWho .c-role { font-size: 12.5px; padding: 3px 10px 3px 4px; background: var(--surface); }
 .c-grid-t td { font: 700 14px "JetBrains Mono", monospace; color: var(--text); }
 .c-grid-t tr.c-rank td { color: var(--text-soft); font-size: 12.5px; }
 .c-grid-t tr.c-avg td b { font-size: 15px; }
@@ -550,7 +570,7 @@ body.c-in-room .nav-bar { margin-bottom: 10px; }
     <div id="cRoom" hidden>
         <div class="ak-room-top">
             <div><small>EV YARIŞMASI · <span id="cCode" class="mono">-----</span></small><h2 id="cTitle" style="margin:2px 0 0">-</h2></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="ak-pill live" id="cWatch">👁 0 kişi izliyor</span><span class="ak-pill" id="cRound">Lobi</span><button type="button" class="btn sm c-refresh" id="cRoomRefresh" title="Odayı yenile">🔄 Yenile</button><button type="button" class="btn sm" id="cCopy">🔗 Davet bağlantısı</button><button type="button" class="btn sm" id="cLeave">Çık</button></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="ak-pill live" id="cWatch">👁 0 kişi izliyor</span><span class="ak-pill" id="cRound">Lobi</span><button type="button" class="btn sm c-refresh" id="cRoomRefresh" title="Odayı yenile">🔄 Yenile</button><button type="button" class="btn sm" id="cCopy">🔗 Davet bağlantısı</button><button type="button" class="btn sm" id="cLeave">🚪 Çık</button></div>
         </div>
         <div class="c-watch-badge" id="cWatchBadge" hidden>👁 <b>İzleyici modu</b> · yarışmayı canlı izliyorsun. Katılmak için kodla gir.</div>
         <div class="c-room">
@@ -655,13 +675,14 @@ body.c-in-room .nav-bar { margin-bottom: 10px; }
 </footer>
 
 <script>var PAGE_ID = "ev_yarismasi";</script>
-<script src="/js/i18n.js?v=20261195"></script>
-<script src="/js/common.js?v=20261195"></script>
-<script src="/js/firebase-config.js?v=20261195"></script>
-<script src="/js/account.js?v=20261195"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261195"></script>
+<script src="/js/i18n.js?v=20261196"></script>
+<script src="/js/common.js?v=20261196"></script>
+<script src="/js/firebase-config.js?v=20261196"></script>
+<script src="/js/account.js?v=20261196"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261196"></script>
 <script>window.AK_PAGE = "ev";</script>
-<script src="/js/magnet-timer.js?v=20261195"></script>
-<script src="/js/akilli-kup.js?v=20261195"></script>
+<script src="/js/magnet-timer.js?v=20261196"></script>
+<script src="/js/ra-icons.js?v=20261196"></script>
+<script src="/js/akilli-kup.js?v=20261196"></script>
 </body>
 </html>
