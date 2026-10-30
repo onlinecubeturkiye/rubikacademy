@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261204";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261205";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -901,7 +901,7 @@
         $("cType").hidden = !(tab === "comp" && (can || comp.editIdx != null || mag.on));
         magBind();
         // mıknatıs seçiliyse odaya girince sensörü başlatmayı dene (iPhone dokunuş ister: kutuda "dokun" yazar)
-        if (inPref() === "magnet" && !mag.on && !mag.tried && !$("cType").hidden) { mag.tried = true; magToggle(true); }
+        if (inPref() === "magnet" && !mag.on && !mag.tried && !$("cType").hidden) { mag.tried = true; magToggle(true, true); }
         applyInput();
         var ok = $("cTypeOk"); if (ok) { ok.textContent = "✓"; ok.title = comp.editIdx != null ? "Düzenlemeyi kaydet" : "Kaydet"; }
         renderHint();
@@ -948,8 +948,12 @@
         magCubeUi();
         box.className = "c-mag-box " + cls;
         if (st === "off") {
-            $("cMagS").innerHTML = 'Sensör kapalı<br><button type="button" id="cMagGo">🧲 Sensörü başlat</button>';
-            $("cMagGo").onclick = function () { magToggle(true); applyInput(); };
+            var ios = window.MagnetTimer && MagnetTimer.needsTap();
+            $("cMagS").innerHTML = mag.err === "perm" ? (ios ? '<span class="c-mag-perm"><b>İzin verilmedi.</b> iPhone izin penceresini bu oturumda tekrar göstermiyor. Safari sekmesini kapatıp siteyi yeniden aç ve <b>İzin Ver</b>\'e dokun. Pencere hiç çıkmazsa: <b>Ayarlar › Safari › Gelişmiş › Web Sitesi Verileri</b>\'nden rubikacademy.fun\'u sil (eski iOS\'ta: Ayarlar › Safari › Hareket ve Yön Erişimi\'ni aç).</span>' : 'Sensör izni verilmedi. Tarayıcı ayarlarından hareket/yön iznine izin ver.') + '<br><button type="button" id="cMagGo">Tekrar dene</button>'
+                : mag.err === "nosensor" ? 'Bu cihaz ya da tarayıcı pusula sensörünü vermiyor. Telefonda Chrome (Android) ya da Safari (iPhone) kullan.<br><button type="button" id="cMagGo">Tekrar dene</button>'
+                : (ios ? 'iPhone\'da hareket ve yön sensörü için izin gerekiyor' : 'Sensör kapalı') + '<br><button type="button" id="cMagGo">🧲 ' + (ios ? "Sensöre izin ver" : "Sensörü başlat") + '</button>';
+            // izin isteği dokunuşun içinde, ilk iş olarak yapılmalı (iPhone)
+            $("cMagGo").onclick = function () { mag.err = ""; magToggle(true); applyInput(); };
         } else $("cMagS").textContent = cls === "wait" ? "Sıradaki karıştırmayı bekle" : (MAG_TXT[st] || "");
         if (st !== "running") cancelAnimationFrame(mag.raf);
     }
@@ -963,17 +967,19 @@
             setTimeout(function () { MagnetTimer.reset(); }, 1800);
         }
         else if (type === "error") {
+            mag.err = data;
+            if (data === "needtap" || data === "perm") return; // kutu "kapalı" olarak izin tuşuyla çizilir
             $("cMagS").textContent = data === "perm" ? "Sensör izni verilmedi. Tarayıcı ayarlarından hareket/yön iznine izin ver." : "Bu cihaz ya da tarayıcı pusula sensörünü vermiyor. Telefonda Chrome (Android) ya da Safari (iPhone) kullan.";
             $("cMagBox").className = "c-mag-box wait";
         }
     }
     // Süre giriş yöntemi: "manual" (elle) ya da "magnet" (mıknatıs timer); ⚙️ menüsünden seçilir, cihazda hatırlanır
     function inPref() { try { return localStorage.getItem("ra-ev-input") === "magnet" ? "magnet" : "manual"; } catch (e) { return "manual"; } }
-    function magToggle(on) {
+    function magToggle(on, quiet) {
         if (!window.MagnetTimer) return;
         if (on === mag.on) return;
         mag.on = on;
-        if (on) { MagnetTimer.start(magEvent).then(function (ok) { if (!ok) { mag.on = false; magPaint("off"); } }); barLoop(); }
+        if (on) { MagnetTimer.start(magEvent, quiet).then(function (ok) { if (!ok) { mag.on = false; magPaint("off"); } }); barLoop(); }
         else { MagnetTimer.stop(); cancelAnimationFrame(mag.raf); }
         // çözüm sırasında ekran kararmasın
         try {

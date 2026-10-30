@@ -136,6 +136,8 @@
         if (S.src === "compass") sample(h);
     }
 
+    // iPhone/iPad: hareket-yön sensörü izni yalnız bir dokunuşla istenebilir
+    var IOS_PERM = !!(window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function");
     function needPerm() {
         var ps = [];
         if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") ps.push(DeviceOrientationEvent.requestPermission().catch(function () { return "denied"; }));
@@ -155,18 +157,34 @@
         } catch (e) { return false; }
     }
 
+    function listen(on) {
+        var f = on ? "addEventListener" : "removeEventListener";
+        window[f]("deviceorientationabsolute", onOrient);
+        window[f]("deviceorientation", onOrient);
+        window[f]("devicemotion", onMotion);
+    }
     window.MagnetTimer = {
+        needsTap: function () { return IOS_PERM; },
         // Kullanıcı dokunuşuyla çağrılmalı (iOS izinleri için)
-        start: function (cb) {
+        // quiet: dokunuş olmadan (sayfa açılınca) dene; iPhone'da izin istenmez, daha önce verildiyse veri gelir,
+        // gelmezse "needtap" hatası verilir ve dokunuşla izin istenir
+        start: function (cb, quiet) {
             if (S.on) { S.cb = cb; emit("state", S.state); return Promise.resolve(true); }
             S.cb = cb; S.base = null; S.buf = []; S.state = "white"; S.src = ""; S.gotData = 0; S.firstAt = 0;
+            if (quiet && IOS_PERM) {
+                S.on = true; listen(true);
+                return new Promise(function (res) {
+                    setTimeout(function () {
+                        if (S.gotData) { emit("state", S.state); res(true); return; }
+                        S.on = false; listen(false); emit("error", "needtap"); res(false);
+                    }, 1500);
+                });
+            }
             return needPerm().then(function (ok) {
                 if (!ok) { emit("error", "perm"); return false; }
                 S.on = true;
                 startMagnetometer();
-                window.addEventListener("deviceorientationabsolute", onOrient);
-                window.addEventListener("deviceorientation", onOrient);
-                window.addEventListener("devicemotion", onMotion);
+                listen(true);
                 emit("state", "white");
                 setTimeout(function () { if (S.on && !S.gotData) emit("error", "nosensor"); }, 2500);
                 return true;
