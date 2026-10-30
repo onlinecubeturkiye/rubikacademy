@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261185";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261186";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -909,7 +909,7 @@
             if (i < 0) return;
             var row = r.rows[i], ok = (row.t || []).filter(function (x) { return x < DNF; });
             var k = comp.code + ":" + r.n, old = st.r[k] || {};
-            st.r[k] = { ev: d.ev === "222" ? "222" : "333", n: rS(r), s: ok.length ? Math.min.apply(null, ok) : null, a: row.a != null && row.a < DNF ? Math.round(row.a) : null, rk: i + 1, p: r.rows.length, f: r.f ? 1 : 0, ts: old.ts || Date.now() };
+            st.r[k] = { nm: String(d.name || "").slice(0, 40), ev: d.ev === "222" ? "222" : "333", n: rS(r), s: ok.length ? Math.min.apply(null, ok) : null, a: row.a != null && row.a < DNF ? Math.round(row.a) : null, rk: i + 1, p: r.rows.length, f: r.f ? 1 : 0, ts: old.ts || Date.now() };
             if (!st.rooms[comp.code]) st.rooms[comp.code] = st.r[k].ts;
         });
         var after = JSON.stringify(st);

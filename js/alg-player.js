@@ -5,7 +5,7 @@
    yüklenir ve case 3B küpte adım adım oynatılır. Sarı üstte, yeşil önde.
 ========================================================= */
 (function () {
-    var V = "20261185";
+    var V = "20261186";
     var PUZ = {
         oll: "3x3x3", pll: "3x3x3", twolook_algos: "3x3x3", coll: "3x3x3", wv: "3x3x3", roux_algos: "3x3x3",
         cll: "2x2x2", eg1: "2x2x2", eg2: "2x2x2", "ortega-oll": "2x2x2", "ortega-pbl": "2x2x2",

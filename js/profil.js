@@ -62,6 +62,14 @@
       var pb = c.pb[e[0]];
       return '<div class="p-pb-row"><b>' + e[1] + '</b><span>Tekil <i dir="ltr">' + fmt(pb.s) + '</i></span><span>Ao5 <i dir="ltr">' + fmt(pb.a5) + '</i></span><span>Ao12 <i dir="ltr">' + fmt(pb.a12) + '</i></span></div>';
     }).join("") + "</div>";
+    var list = c.list || [];
+    if (list.length) html += '<h3 class="p-sub">Yarışma geçmişi</h3><div class="p-clist">' + list.map(function (e) {
+      var dt = e.ts ? new Date(e.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" }) : "";
+      var place = e.rk ? (e.rk === 1 && e.f ? "🏆 1." : e.rk + ".") + (e.p ? " / " + e.p : "") : "-";
+      return '<div class="p-crow' + (e.f && e.rk === 1 ? " win" : "") + '">' +
+        '<div class="p-c1"><b>' + esc(e.nm || e.c) + '</b><small>' + esc(dt) + ' · ' + (e.ev === "222" ? "2x2" : "3x3") + ' · ' + (e.f ? "Final" : "Tur " + e.r) + '</small></div>' +
+        '<div class="p-c2"><span class="p-place">' + esc(place) + '</span><span>Ao' + (e.n || 5) + ' <i dir="ltr">' + fmt(e.a) + '</i></span><span>Tekil <i dir="ltr">' + fmt(e.s) + '</i></span></div></div>';
+    }).join("") + "</div>";
     return html;
   }
   function dailyGrid(st) {
