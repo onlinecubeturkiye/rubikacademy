@@ -125,6 +125,7 @@
         return box;
     }
     window.CustomAlgs.makeEditor = makeEditor;
+    window.CustomAlgs.refresh = render; // topluluk önerisi "Bunu kullan" sonrası kartı yenile
     window.CustomAlgs.label = function () { return "✏️ " + t("btn"); };
     window.CustomAlgs.t = t;
 
