@@ -128,6 +128,21 @@
         offline: line('<path d="M3 3l18 18"/><path d="M8.6 16.4a4.8 4.8 0 0 1 6.2-.5M5 12.8a10 10 0 0 1 4.6-2.5M19 12.8a10 10 0 0 0-2.4-1.7M2 9.2a14.5 14.5 0 0 1 4.4-2.7M22 9.2A14.5 14.5 0 0 0 12 5.5"/><circle cx="12" cy="19.6" r=".6" fill="currentColor"/>'),
         smile: line('<circle cx="12" cy="12" r="9.2"/><path d="M8.3 14.2a4.5 4.5 0 0 0 7.4 0"/><circle cx="9" cy="9.8" r=".9" fill="currentColor"/><circle cx="15" cy="9.8" r=".9" fill="currentColor"/>'),
         handshake: line('<path d="M2.5 11l4-4 4 1.5 3-1.5 4 1 4 3"/><path d="M6.5 7l-2 6.5 5 5c.8.8 2 .8 2.6 0M10 10.5l3 3c.8.8 2 .8 2.6 0l3.4-3.5"/><path d="M12.5 16l1.5 1.5M10.5 17.5l1.3 1.3"/>'),
+        /* --- yazı işaretleri (ok, tik, çarpı…) --- */
+        check: line('<path d="M4.5 12.5l5 5L19.5 7"/>'),
+        close: line('<path d="M6 6l12 12M18 6L6 18"/>'),
+        arrowL: line('<path d="M19.5 12H5M11 6l-6 6 6 6"/>'),
+        arrowR: line('<path d="M4.5 12H19M13 6l6 6-6 6"/>'),
+        swap: line('<path d="M3.5 12h17M8 7.5L3.5 12 8 16.5M16 7.5l4.5 4.5-4.5 4.5"/>'),
+        cross: line('<path d="M9 3.5h6v5.5h5.5v6H15v5.5H9V15H3.5V9H9z"/>'),
+        undo: line('<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>'),
+        reset: line('<path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v5h5"/>'),
+        mega: line('<path d="M12 2.8l9 6.5-3.4 10.6H6.4L3 9.3z"/><path d="M12 7.2l4.8 3.5-1.8 5.6H9l-1.8-5.6z"/><path d="M12 2.8v4.4M21 9.3l-4.2 1.4M17.6 19.9l-2.6-3.6M6.4 19.9L9 16.3M3 9.3l4.2 1.4"/>'),
+        sq1: line('<path d="M4 4h16v16H4z"/><path d="M4 12h16M12 4l-3 8 3 8M12 4l3 8-3 8"/>'),
+        chevD: line('<path d="M6 9.5l6 6 6-6"/>'),
+        chevU: line('<path d="M6 14.5l6-6 6 6"/>'),
+        ext: line('<path d="M14 4.5h5.5V10M19.5 4.5L11 13"/><path d="M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/>'),
+        insta: line('<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".9" fill="currentColor"/>'),
         modAdd: line('<path d="' + SH + '"/><path d="M12 9v6M9 12h6"/>'),
         modDel: line('<path d="' + SH + '"/><path d="M9 12h6"/>'),
         transfer: line('<path d="M4 14h11l1-7-3.5 2.6L9.5 5 6.6 9.6 3 7z" transform="translate(1 -1)"/><path d="M14 19h7M18.5 16.5 21 19l-2.5 2.5"/>'),
@@ -146,7 +161,10 @@
         "🎲": "dice", "🛒": "cart", "📄": "doc", "📜": "doc", "📝": "note", "📋": "clipboard", "🔍": "search", "🕐": "clock", "🕘": "clock",
         "⏰": "alarm", "🔄": "refresh", "🔁": "repeat", "🧲": "magnet", "💬": "chat", "📂": "folder", "🚪": "exit", "🔔": "bell", "▶": "play",
         "⏹": "stop", "🛠": "tools", "🎓": "cap", "🎟": "ticket", "👍": "thumb", "📢": "megaphone", "🕹": "gamepad", "💻": "laptop", "🖥": "monitor",
-        "🚧": "build", "👋": "hand", "📏": "ruler", "📶": "signal", "🔋": "battery", "🖼": "image", "🧹": "broom", "📴": "offline", "🙂": "smile", "🤝": "handshake"
+        "🚧": "build", "👋": "hand", "📏": "ruler", "📶": "signal", "🔋": "battery", "🖼": "image", "🧹": "broom", "📴": "offline", "🙂": "smile", "🤝": "handshake",
+        "✓": "check", "✔": "check", "✕": "close", "✗": "close", "✖": "close", "←": "arrowL", "→": "arrowR", "↔": "swap", "✚": "cross", "↻": "refresh",
+        "↩": "undo", "↶": "undo", "↺": "reset", "⬟": "mega", "◼": "sq1", "★": "star", "▾": "chevD", "▼": "chevD", "▴": "chevU", "▲": "chevU",
+        "✎": "pencil", "↗": "ext", "◎": "insta", "♪": "music"
     };
     var RE = new RegExp("(" + Object.keys(MAP).join("|") + ")\\uFE0F?", "g");
     function svg(n) { return I[n] || ""; }
@@ -164,8 +182,19 @@
         }
         return false;
     }
+    // <option> içine ikon konamaz: emoji kaldırılır, yazı kalır
+    function cleanSelect(sel) {
+        Array.prototype.forEach.call(sel.options || [], function (o) {
+            RE.lastIndex = 0; if (!RE.test(o.text)) return;
+            RE.lastIndex = 0; var t = o.text.replace(RE, "").replace(/^\s+/, "").replace(/\s{2,}/g, " ");
+            if (t) o.text = t;
+        });
+    }
     function paint(root) {
         if (!root || root.nodeType !== 1 || !document.createTreeWalker) return;
+        if (root.nodeName === "SELECT") { cleanSelect(root); return; }
+        if (root.nodeName === "OPTION" || root.nodeName === "OPTGROUP") { var ps = root.closest && root.closest("select"); if (ps) cleanSelect(ps); return; }
+        if (root.querySelectorAll) Array.prototype.forEach.call(root.querySelectorAll("select"), cleanSelect);
         var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), list = [], n;
         while ((n = w.nextNode())) { RE.lastIndex = 0; if (RE.test(n.nodeValue) && !skip(n)) list.push(n); }
         list.forEach(function (t) {
@@ -176,7 +205,9 @@
                 frag.appendChild(el(MAP[m[1]], m[0]));
                 last = m.index + m[0].length;
             }
-            var rest = s.slice(last); if (rest) frag.appendChild(document.createTextNode(rest.replace(/^ /, "")));
+            var rest = s.slice(last);
+            if (rest.trim()) frag.appendChild(document.createTextNode(rest.replace(/^ /, "")));
+            else if (!t.nextSibling && frag.lastChild && frag.lastChild.classList) frag.lastChild.classList.add("ra-end"); // yalnız ikon: sağ boşluk yok
             if (t.parentNode) t.parentNode.replaceChild(frag, t);
         });
     }
@@ -208,10 +239,11 @@
     var css = document.createElement("style");
     css.textContent =
         ".ra-i{position:relative;display:inline-flex;width:1.15em;height:1.15em;vertical-align:-.2em;margin-inline-end:.35em;flex:none}" +
-        ".ra-i:last-child{margin-inline-end:0}" +
+        ".ra-i.ra-end{margin-inline-end:0}" +
         ".ra-i svg{width:100%;height:100%;display:block}" +
         ".ra-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;opacity:0}" +
         ".ra-i-owner,.ra-i-mod,.ra-i-ra,.ra-i-trophy,.ra-i-party,.ra-i-gold,.ra-i-silver,.ra-i-bronze,.ra-i-medal{width:1.3em;height:1.3em;vertical-align:-.28em;filter:drop-shadow(0 1px 2px rgba(0,0,0,.22))}" +
+        ".ra-i-arrowL,.ra-i-arrowR,.ra-i-check,.ra-i-close,.ra-i-chevD,.ra-i-chevU,.ra-i-ext{width:1em;height:1em;vertical-align:-.14em}" +
         ".ra-i-dGreen,.ra-i-dYellow,.ra-i-dRed,.ra-i-dWhite{width:.95em;height:.95em;vertical-align:-.1em}" +
         "@media print{.ra-i svg{filter:none}}";
     (document.head || document.documentElement).appendChild(css);

@@ -11,7 +11,7 @@
      (gunluk.js) aynı global'leri sağlayarak bu modülü kullanır.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261202";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261203";
     var MAC_KEY = "trainer-bt-mac-v1";
     // Karıştırma ve ipucu kutuları (günün karıştırması sayfası kendi kimliklerini verir)
     var SCR_ID = (window.BT_IDS && BT_IDS.scramble) || "scramble", HINT_ID = (window.BT_IDS && BT_IDS.hint) || "timerHint";
