@@ -31,8 +31,19 @@
     }
     // Eşikler: pusula (derece) daha gürültülü ve yumuşatılmış geldiği için daha toleranslı
     // Ayar (sihirbazla ölçülen, küp yerindeyken sapma) varsa eşikler ona göre: "hazır" = ölçümün %35'i
-    var CAL_KEY = "ra-mag-cal-v1";
-    function cal() { try { var c = JSON.parse(localStorage.getItem(CAL_KEY) || "null"); return c && c.src === S.src && c.on > 0 ? c.on : 0; } catch (e) { return 0; } }
+    // Birden çok küp: { act: "XMan V3", list: { "XMan V3": { src, on, t } } }
+    var CAL_KEY = "ra-mag-cal-v2";
+    function calDb() {
+        var d = null;
+        try { d = JSON.parse(localStorage.getItem(CAL_KEY) || "null"); } catch (e) {}
+        if (!d || typeof d.list !== "object") {
+            d = { act: "", list: {} };
+            try { var o = JSON.parse(localStorage.getItem("ra-mag-cal-v1") || "null"); if (o && o.on > 0) { d.list["Küpüm"] = o; d.act = "Küpüm"; } } catch (e) {}
+        }
+        return d;
+    }
+    function calPut(d) { try { localStorage.setItem(CAL_KEY, JSON.stringify(d)); } catch (e) {} }
+    function cal() { var d = calDb(), c = d.list[d.act]; return c && c.src === S.src && c.on > 0 ? c.on : 0; }
     function thOn() { var c = cal(), d = S.src === "magnet" ? 40 : 14; return c ? Math.max(S.src === "magnet" ? 15 : 5, c * 0.35) : d; }    // küp var
     function thOff() { return thOn() * 0.5; }    // küp yok sayılır
     function thLift() { var c = cal(); return c ? Math.max(S.src === "magnet" ? 10 : 3, c * 0.18) : (S.src === "magnet" ? 25 : 6); }   // hazırken küp kalkıyor
@@ -173,8 +184,16 @@
         level: function () { return { v: S.base == null ? null : S.level || 0, th: thOn(), cal: cal(), stable: !!S.stable, src: S.src, ready: S.base != null }; },
         // Ayar sihirbazı: "base" = taban ölçülüyor (küp uzakta), "cube" = küp ölçülüyor; null = normal çalışma
         calMode: function (m) { S.calMode = m || null; if (m === "base") { S.base = null; S.buf = []; S.firstAt = 0; } if (!m) setState(S.level > thOn() ? "clear" : "white"); },
-        saveCal: function (on) { try { if (on) localStorage.setItem(CAL_KEY, JSON.stringify({ src: S.src, on: Math.round(on * 10) / 10, t: Date.now() })); else localStorage.removeItem(CAL_KEY); } catch (e) {} },
+        saveCal: function (on, name) {
+            name = String(name || "Küpüm").trim().slice(0, 30) || "Küpüm";
+            var d = calDb(); d.list[name] = { src: S.src, on: Math.round(on * 10) / 10, t: Date.now() }; d.act = name; calPut(d);
+        },
         hasCal: function () { return cal() > 0; },
+        // Kayıtlı küpler (bu sensör türünde ölçülmüş olanlar) ve seçili küp
+        cubes: function () { var d = calDb(); return Object.keys(d.list).filter(function (k) { return !S.src || d.list[k].src === S.src; }).sort(function (a, b) { return d.list[b].t - d.list[a].t; }); },
+        cube: function () { var d = calDb(); return d.list[d.act] && (!S.src || d.list[d.act].src === S.src) ? d.act : ""; },
+        useCube: function (n) { var d = calDb(); if (d.list[n]) { d.act = n; calPut(d); } },
+        delCube: function (n) { var d = calDb(); delete d.list[n]; if (d.act === n) d.act = Object.keys(d.list)[0] || ""; calPut(d); },
         elapsed: function () { return S.state === "running" ? now() - S.t0 : 0; },
         source: function () { return S.src; },
         // test için: sinyal/titreşim enjekte et
