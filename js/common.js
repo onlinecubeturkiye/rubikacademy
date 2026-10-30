@@ -6,6 +6,15 @@
    - Hesaptan çıkınca ya da bu cihazda oturum yokken cihazda kalan kişisel veri silinir.
    - Tema, dil, renk körlüğü, tutuş gibi tercihler herkes için saklanır.
 ========================================================= */
+// RA ikonları: sitedeki emojileri Rubik Academy'ye özel ikonlarla değiştirir (js/ra-icons.js)
+(function () {
+    try {
+        if (window.RAIcons || document.querySelector('script[src*="/js/ra-icons.js"]')) return;
+        var me = document.currentScript && document.currentScript.src || "", v = (/[?&]v=([^&]+)/.exec(me) || [])[1] || "";
+        var sc = document.createElement("script"); sc.src = "/js/ra-icons.js" + (v ? "?v=" + v : ""); sc.defer = true;
+        (document.head || document.documentElement).appendChild(sc);
+    } catch (e) {}
+})();
 (function () {
     var PRIV = /^(algo-progress-|algo-set-|recog-|roadmap-|trainer-stats-v1$|daily-results-v1$|daily-sent-v1$|daily-name-v1$|custom-algs-v1$|timer-solves-v1$|smart-solves-v1$|vcube-times-v1$|activity-days-v1$|comp-stats-v1$|lessons-v1$|ra-profile-v1$|ra-last-page$|ra-sync-meta-v1$)/;
     var ls; try { ls = window.localStorage; if (!ls) return; } catch (e) { return; }
