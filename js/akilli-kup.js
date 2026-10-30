@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261197";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261198";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -929,12 +929,13 @@
     document.addEventListener("keyup", function (e) { if (e.code === "Space" && phase === "holding") { e.preventDefault(); manualUp(); } });
     /* --- mıknatıs timer (ZKT tarzı): telefonun pusulası/manyetometresiyle --- */
     var mag = { on: false, raf: 0 };
-    var MAG_TXT = { white: "Küpü telefonun üstüne koy", orange: "Hazırlanıyor… küpü oynatma", green: "Hazır! Küpü kaldırınca süre başlar", running: "Çözülüyor… bitince küpü masaya bırak", done: "Kaydedildi ✓" };
+    var MAG_TXT = { white: "Küpü telefonun üstüne koy", orange: "Bekle… küpü oynatma (1 sn)", green: "Hazır! Küpü kaldırınca süre başlar", clear: "Küpü kaldır, karıştır ve tekrar telefona koy", running: "Çözülüyor… bitince küpü masaya bırak", done: "Kaydedildi ✓" };
     // (kutu yalnız durum gösterir; başlatma/durdurma mıknatıs ve titreşimle)
     function magPaint(st) {
         var box = $("cMagBox"); if (!box) return;
         var can = compCanSolve();
-        var cls = st === "off" ? "wait" : !can && st !== "running" && st !== "done" ? "wait" : st;
+        if (window.MagnetTimer && mag.on) { MagnetTimer.arm(can); st = MagnetTimer.state(); }
+        var cls = st === "off" ? "wait" : !can && st !== "running" && st !== "done" ? "wait" : st === "clear" ? "white" : st;
         box.className = "c-mag-box " + cls;
         if (st === "off") {
             $("cMagS").innerHTML = 'Sensör kapalı<br><button type="button" id="cMagGo">🧲 Sensörü başlat</button>';
@@ -944,8 +945,8 @@
     }
     function magTick() { $("cMagT").textContent = fmt(MagnetTimer.elapsed()); mag.raf = requestAnimationFrame(magTick); }
     function magEvent(type, data) {
-        if (type === "state") { magPaint(data); if (data === "white" || data === "orange" || data === "green") $("cMagT").textContent = fmt(0); }
-        else if (type === "start") { if (!compCanSolve()) { MagnetTimer.recalibrate(); return; } cancelAnimationFrame(mag.raf); magTick(); }
+        if (type === "state") { magPaint(data); if (data === "white" || data === "orange" || data === "green" || data === "clear") $("cMagT").textContent = fmt(0); }
+        else if (type === "start") { cancelAnimationFrame(mag.raf); magTick(); }
         else if (type === "stop") {
             cancelAnimationFrame(mag.raf); $("cMagT").textContent = fmt(data);
             if (compCanSolve()) { comp.mode = "timer"; compDone(data); }
