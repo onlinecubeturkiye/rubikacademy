@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261185";
+    var V = "20261186";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -595,7 +595,7 @@
         // Ev yarışması: oda/tur sayısı, şampiyonluk, küp başına en iyi tekil ve Ao5 / Ao12
         var cs = parse(lsGet("comp-stats-v1")) || {}, comp = null;
         if (isObj(cs) && isObj(cs.r)) {
-            comp = { rooms: Object.keys(cs.rooms || {}).length, rounds: 0, wins: 0, finals: 0, pb: {} };
+            comp = { rooms: Object.keys(cs.rooms || {}).length, rounds: 0, wins: 0, finals: 0, pb: {}, list: [] };
             for (var rk in cs.r) {
                 var e = cs.r[rk]; if (!isObj(e)) continue;
                 comp.rounds++;
@@ -604,7 +604,11 @@
                 if (typeof e.s === "number" && (!pb.s || e.s < pb.s)) pb.s = e.s;
                 var ak = e.n === 12 ? "a12" : "a5";
                 if (typeof e.a === "number" && (!pb[ak] || e.a < pb[ak])) pb[ak] = e.a;
+                comp.list.push({ c: rk.split(":")[0], r: +rk.split(":")[1] || 0, nm: e.nm || "", ev: e.ev, n: e.n || 5, s: e.s, a: e.a, rk: e.rk, p: e.p, f: e.f ? 1 : 0, ts: e.ts || 0 });
             }
+            // geçmiş listesi: en yeni 25 tur (profil verisi sınırı için kısa)
+            comp.list.sort(function (x, y) { return y.ts - x.ts; });
+            comp.list = comp.list.slice(0, 25);
             if (!comp.rounds && !comp.rooms) comp = null;
         }
         return { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount, dlist: dlist.slice(0, 20), comp: comp };
