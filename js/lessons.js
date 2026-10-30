@@ -5,7 +5,7 @@
    (kişisel veri: hesapla senkronlanır, hesapsızken sayfa yenilenince sıfırlanır).
 ========================================================= */
 (function () {
-    var KEY = "lessons-v1", V = "20261196";
+    var KEY = "lessons-v1", V = "20261197";
     var A = "/icerikler/algoritmalar/";
     // demo: { alg, setup: "z2" (sarı üst) | "" (beyaz üst), end: true = case başta görünür, sonda çözülür }
     var COURSE = [
