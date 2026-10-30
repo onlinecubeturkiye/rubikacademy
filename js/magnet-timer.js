@@ -12,12 +12,16 @@
 (function () {
     var S = {
         on: false, src: "", state: "white", base: null, buf: [], last: null, t0: 0, gotData: 0,
-        cb: null, mag: null, armedAt: 0, stopAt: 0
+        cb: null, mag: null, armedAt: 0, stopAt: 0, armed: true
     };
+    // Durumlar: white (küp yok) → orange (küp kondu) → green (hazır) → running → done
+    //   clear: küp telefonda ama yeni çözüm için önce kaldırılmalı (karıştırılmamış küp yanlışlıkla
+    //          yeşile geçip kaldırınca süre başlamasın). Küp kalkınca white olur.
+    //   armed=false: sıradaki karıştırma beklenirken yeşile geçilmez, süre başlamaz.
     var STABLE_MS = 700, MIN_SOLVE = 1200;
     function now() { return performance.now(); }
     function emit(type, data) { if (S.cb) try { S.cb(type, data); } catch (e) {} }
-    function setState(st) { if (S.state !== st) { S.state = st; emit("state", st); } }
+    function setState(st) { if (S.state !== st) { S.state = st; if (st === "orange") S.orangeAt = now(); emit("state", st); } }
 
     // Sinyal → taban çizgisinden uzaklık (µT ya da derece)
     function dist(v) {
@@ -50,13 +54,16 @@
             return;
         }
         var d = dist(v);
-        if (S.state === "white") {
+        if (S.state === "clear") {
+            if (d < thOff()) setState("white");
+        } else if (S.state === "white") {
             if (d > thOn()) setState("orange");
             else if (stable) S.base = median(S.buf); // ortam yavaşça değişirse takip et
         } else if (S.state === "orange") {
             if (d < thOff()) setState("white");
-            else if (stable) { S.ready = median(S.buf); setState("green"); }
+            else if (stable && S.armed && t - S.orangeAt > 1000) { S.ready = median(S.buf); setState("green"); }
         } else if (S.state === "green") {
+            if (!S.armed) { setState("clear"); return; }
             // Küp kalkınca sinyal hazır değerden tabana doğru belirgin şekilde döner (sensör gecikse bile ilk kıpırtıda başlar)
             var back = dist(S.ready) - d;
             if (d < thOff() || (back > thLift() && between(v, S.ready) > thLift())) { S.t0 = t; setState("running"); emit("start"); }
@@ -69,8 +76,8 @@
                 else if (t - S.backAt > 250) { var at = S.backAt; S.backAt = 0; finish(at); }
             } else S.backAt = 0;
         } else if (S.state === "done") {
-            if (d < thOff() && t - S.stopAt > 1500) setState("white");
-            else if (d > thOn() && stable && t - S.stopAt > 1500) { S.ready = median(S.buf); setState("green"); }
+            // bitişten sonra küp telefondaysa önce kaldırılmalı (doğrudan yeşile geçmez)
+            if (t - S.stopAt > 1500) setState(d < thOff() ? "white" : "clear");
         }
     }
     function finish(atT) {
@@ -150,7 +157,12 @@
         // Ekrana dokunarak durdurma (yedek)
         tapStop: function () { if (S.state === "running") finish(now()); },
         _motion: function (x, y, z, lin) { var v = { x: x, y: y, z: z }; onMotion(lin ? { acceleration: v } : { accelerationIncludingGravity: v }); },
-        reset: function () { if (S.state === "done") setState(S.base != null && S.last != null && dist(S.last) > thOn() ? "orange" : "white"); },
+        reset: function () { if (S.state === "done") setState(S.base != null && S.last != null && dist(S.last) > thOff() ? "clear" : "white"); },
+        // Çözüm yapılabilir mi? false iken yeşil/başlama yok; true olunca küp telefondaysa önce kaldırılmalı
+        arm: function (on) {
+            on = !!on; if (S.armed === on) return; S.armed = on;
+            if (S.state === "green" || (on && S.state === "orange")) setState("clear");
+        },
         recalibrate: function () { S.base = null; S.buf = []; S.firstAt = 0; setState("white"); },
         state: function () { return S.state; },
         elapsed: function () { return S.state === "running" ? now() - S.t0 : 0; },
