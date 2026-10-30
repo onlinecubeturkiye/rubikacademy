@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261192";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261193";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -670,7 +670,7 @@
         }).catch(function (e) { comp = null; cMsg(esc(e.message), 1); });
     }
     function leaveComp(keep) {
-        if (mag.on) magToggle(false); // odadan çıkınca sensörleri kapat
+        if (mag.on) magToggle(false); mag.tried = false; // odadan çıkınca sensörleri kapat
         clearInterval(compPollT); clearInterval(hbT); if (comp) { clearInterval(comp.cdT); if (comp.liveStop) comp.liveStop(); }
         if (comp && !comp.watch && myP()) api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
         // keep: yarışmacı kendi çıktıysa ya da bağlantısı koptuysa "Odana dön" ile geri gelebilsin
@@ -825,7 +825,10 @@
         var can = compCanSolve();
         $("akPad").hidden = !(tab === "comp" && comp.mode === "timer" && can);
         $("cType").hidden = !(tab === "comp" && (can || comp.editIdx != null || mag.on));
-        magBind(); if (mag.on && window.MagnetTimer) magPaint(MagnetTimer.state());
+        magBind();
+        // mıknatıs seçiliyse odaya girince sensörü başlatmayı dene (iPhone dokunuş ister: kutuda "dokun" yazar)
+        if (inPref() === "magnet" && !mag.on && !mag.tried && !$("cType").hidden) { mag.tried = true; magToggle(true); }
+        applyInput();
         var ok = $("cTypeOk"); if (ok) { ok.textContent = "✓"; ok.title = comp.editIdx != null ? "Düzenlemeyi kaydet" : "Kaydet"; }
         renderHint();
     }
@@ -859,9 +862,9 @@
     function magPaint(st) {
         var box = $("cMagBox"); if (!box) return;
         var can = compCanSolve();
-        var cls = !can && st !== "running" && st !== "done" ? "wait" : st;
+        var cls = st === "off" ? "wait" : !can && st !== "running" && st !== "done" ? "wait" : st;
         box.className = "c-mag-box " + cls;
-        $("cMagS").textContent = cls === "wait" ? "Sıradaki karıştırmayı bekle" : (MAG_TXT[st] || "");
+        $("cMagS").textContent = st === "off" ? "Mıknatıs timer'ı başlatmak için dokun" : cls === "wait" ? "Sıradaki karıştırmayı bekle" : (MAG_TXT[st] || "");
         if (st !== "running") cancelAnimationFrame(mag.raf);
     }
     function magTick() { $("cMagT").textContent = fmt(MagnetTimer.elapsed()); mag.raf = requestAnimationFrame(magTick); }
@@ -878,22 +881,45 @@
             $("cMagBox").className = "c-mag-box wait";
         }
     }
-    function magToggle(force) {
-        var on = force != null ? force : !mag.on;
+    // Süre giriş yöntemi: "manual" (elle) ya da "magnet" (mıknatıs timer); ⚙️ menüsünden seçilir, cihazda hatırlanır
+    function inPref() { try { return localStorage.getItem("ra-ev-input") === "magnet" ? "magnet" : "manual"; } catch (e) { return "manual"; } }
+    function magToggle(on) {
         if (!window.MagnetTimer) return;
-        mag.on = on; $("cMag").hidden = !on; $("cMagBtn").classList.toggle("on", on);
-        $("cMagBtn").textContent = on ? "⌨️ Elle girişe dön" : "🧲 Mıknatıs timer";
-        if (on) MagnetTimer.start(magEvent); else { MagnetTimer.stop(); cancelAnimationFrame(mag.raf); }
+        if (on === mag.on) return;
+        mag.on = on;
+        if (on) MagnetTimer.start(magEvent).then(function (ok) { if (!ok) { mag.on = false; magPaint("off"); } });
+        else { MagnetTimer.stop(); cancelAnimationFrame(mag.raf); }
         // çözüm sırasında ekran kararmasın
         try {
             if (on && navigator.wakeLock) navigator.wakeLock.request("screen").then(function (l) { mag.lock = l; }).catch(function () {});
             else if (!on && mag.lock) { mag.lock.release(); mag.lock = null; }
         } catch (e) {}
     }
+    // Hangi giriş görünür: mıknatıs seçiliyken süre kutusu gizli (son süreyi düzenlerken elle giriş görünür)
+    function applyInput() {
+        if (!$("cMag")) return;
+        var magMode = inPref() === "magnet" && !(comp && comp.editIdx != null);
+        $("cMag").hidden = !magMode; $("cManual").hidden = magMode;
+        Array.prototype.forEach.call(document.querySelectorAll("#cInMenu [data-in]"), function (b) { var on = b.getAttribute("data-in") === inPref(); b.classList.toggle("on", on); b.setAttribute("aria-checked", on ? "true" : "false"); });
+        if (!magMode && mag.on && inPref() !== "magnet") magToggle(false);
+        if (magMode) magPaint(mag.on ? MagnetTimer.state() : "off");
+    }
     function magBind() {
-        if (!$("cMagBtn") || $("cMagBtn").bound) return; $("cMagBtn").bound = 1;
-        $("cMagBtn").onclick = function () { magToggle(); };
-        $("cMagBox").onclick = function () { if (window.MagnetTimer) MagnetTimer.tapStop(); };
+        if (!$("cInBtn") || $("cInBtn").bound) return; $("cInBtn").bound = 1;
+        var menu = $("cInMenu");
+        $("cInBtn").onclick = function (e) { e.stopPropagation(); menu.hidden = !menu.hidden; this.setAttribute("aria-expanded", menu.hidden ? "false" : "true"); };
+        document.addEventListener("click", function (e) { if (!menu.hidden && !e.target.closest("#cInMenu")) { menu.hidden = true; $("cInBtn").setAttribute("aria-expanded", "false"); } });
+        Array.prototype.forEach.call(menu.querySelectorAll("[data-in]"), function (b) {
+            b.onclick = function () {
+                var v = b.getAttribute("data-in");
+                try { localStorage.setItem("ra-ev-input", v); } catch (e) {}
+                menu.hidden = true; $("cInBtn").setAttribute("aria-expanded", "false");
+                if (v === "magnet") magToggle(true); // dokunuşla başlat (iPhone izni)
+                applyInput();
+            };
+        });
+        // Kutuya dokun: kapalıysa sensörü başlat, çalışıyorsa süreyi durdur
+        $("cMagBox").onclick = function () { if (!window.MagnetTimer) return; if (!mag.on) { magToggle(true); applyInput(); } else MagnetTimer.tapStop(); };
         $("cMagCal").onclick = function () { if (window.MagnetTimer) MagnetTimer.recalibrate(); };
     }
     function typeSave(pen) {
