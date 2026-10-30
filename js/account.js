@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261190";
+    var V = "20261191";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -724,6 +724,20 @@
         if (ids.length && user) ids.forEach(function (id) { api("/users/" + user.uid + "/notifications/" + id + "?updateMask.fieldPaths=pushed", { method: "PATCH", body: JSON.stringify({ fields: { pushed: { booleanValue: true } } }) }).catch(function () {}); });
     }
     // Site içi banner + (izin varsa) sistem/telefon bildirimi
+    // Site içi akşam hatırlatması: üye, saat 18'i geçti, bugünkü karıştırmayı çözmedi → günde bir kez
+    function dailyNudge() {
+        if (!user || /\/gunluk/.test(location.pathname)) return;
+        var d = new Date(); if (d.getHours() < 18) return;
+        var p = function (x) { return (x < 10 ? "0" : "") + x; }, today = d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+        if (lsGet("ra-dnudge") === today) return;
+        var r = parse(lsGet("daily-results-v1")) || {};
+        if (Object.keys(r).some(function (k) { return k.split(":")[0] === today; })) return;
+        lsSet("ra-dnudge", today);
+        showToast("📅 Günün karıştırmasını henüz çözmedin. Bugünkü sıralamada yerini al!");
+        var t = document.querySelector("#raToasts .ra-toast:last-child .ra-toast-tx");
+        if (t) { t.style.cursor = "pointer"; t.onclick = function () { location.href = "/icerikler/gunluk"; }; }
+    }
+    document.addEventListener("account-synced", function () { setTimeout(dailyNudge, 2500); });
     function showToast(text) {
         var host = document.getElementById("raToasts");
         if (!host) { host = document.createElement("div"); host.id = "raToasts"; host.className = "ra-toasts"; (document.body || document.documentElement).appendChild(host); }
@@ -827,11 +841,11 @@
     }
     // Aboneliği pushsubs/{id} belgesine yaz (giriş yapılmışsa kullanıcıya bağlı)
     function saveSub(sub) {
-        var json = JSON.stringify(sub), uid = user ? user.uid : "", key = uid + "|" + sub.endpoint;
+        var json = JSON.stringify(sub), uid = user ? user.uid : "", rem = String(lsGet("ra-remind-v1") || "").slice(0, 20), key = uid + "|" + rem + "|" + sub.endpoint;
         if (lsGet("ra-push-saved") === key) return Promise.resolve(true);
         return subId(sub.endpoint).then(function (id) {
-            var body = JSON.stringify({ fields: { sub: { stringValue: json }, uid: { stringValue: uid }, ts: { timestampValue: new Date().toISOString() } } });
-            var path = "/pushsubs/" + id + "?updateMask.fieldPaths=sub&updateMask.fieldPaths=uid&updateMask.fieldPaths=ts";
+            var body = JSON.stringify({ fields: { sub: { stringValue: json }, uid: { stringValue: uid }, rem: { stringValue: rem }, ts: { timestampValue: new Date().toISOString() } } });
+            var path = "/pushsubs/" + id + "?updateMask.fieldPaths=sub&updateMask.fieldPaths=uid&updateMask.fieldPaths=rem&updateMask.fieldPaths=ts";
             var p = user ? api(path, { method: "PATCH", body: body }) : fetch(pubUrl(path), { method: "PATCH", headers: { "Content-Type": "application/json" }, body: body });
             return p.then(function (r) { if (r.ok) lsSet("ra-push-saved", key); return r.ok; });
         }).catch(function () { return false; });
@@ -976,6 +990,13 @@
         sendNotif: sendNotif, sendBroadcast: sendBroadcast, showNotes: showNotes,
         listBroadcasts: listBroadcasts, deleteBroadcast: deleteBroadcast, getConfig: getConfig, setMaintenance: setMaintenance, setMemberCount: setMemberCount,
         notifyPermission: enablePush, enablePush: enablePush, pushSupported: pushSupported,
+        // Hatırlatıcılar: "d" = günün karıştırması (akşam), "c" = yeni ev yarışması. Bildirim izni ister.
+        reminders: function () { return String(lsGet("ra-remind-v1") || "").split(",").filter(Boolean); },
+        setReminders: function (list) {
+            lsSet("ra-remind-v1", list.length ? list.join(",") : null);
+            if (!list.length) return ensurePush().then(function () { return "ok"; });
+            return enablePush().then(function (perm) { return perm === "granted" ? "ok" : perm; });
+        },
         isPasswordUser: isPasswordUser, emailVerified: emailVerified, verifyEmail: verifyEmail, changePassword: changePassword,
         listSessions: listSessions, logoutOthers: logoutOthers, sessId: sessId, firestore: firestore
     };
