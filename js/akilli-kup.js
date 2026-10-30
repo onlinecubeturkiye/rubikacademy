@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261191";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261192";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -670,6 +670,7 @@
         }).catch(function (e) { comp = null; cMsg(esc(e.message), 1); });
     }
     function leaveComp(keep) {
+        if (mag.on) magToggle(false); // odadan çıkınca sensörleri kapat
         clearInterval(compPollT); clearInterval(hbT); if (comp) { clearInterval(comp.cdT); if (comp.liveStop) comp.liveStop(); }
         if (comp && !comp.watch && myP()) api(cPath("/p/" + comp.uid), { method: "DELETE" }).catch(function () {});
         // keep: yarışmacı kendi çıktıysa ya da bağlantısı koptuysa "Odana dön" ile geri gelebilsin
@@ -823,7 +824,8 @@
         if (!comp) return;
         var can = compCanSolve();
         $("akPad").hidden = !(tab === "comp" && comp.mode === "timer" && can);
-        $("cType").hidden = !(tab === "comp" && (can || comp.editIdx != null));
+        $("cType").hidden = !(tab === "comp" && (can || comp.editIdx != null || mag.on));
+        magBind(); if (mag.on && window.MagnetTimer) magPaint(MagnetTimer.state());
         var ok = $("cTypeOk"); if (ok) { ok.textContent = "✓"; ok.title = comp.editIdx != null ? "Düzenlemeyi kaydet" : "Kaydet"; }
         renderHint();
     }
@@ -851,6 +853,49 @@
         else if (phase === "solving") { e.preventDefault(); manualStop(); }
     });
     document.addEventListener("keyup", function (e) { if (e.code === "Space" && phase === "holding") { e.preventDefault(); manualUp(); } });
+    /* --- mıknatıs timer (ZKT tarzı): telefonun pusulası/manyetometresiyle --- */
+    var mag = { on: false, raf: 0 };
+    var MAG_TXT = { white: "Küpü telefonun üstüne koy", orange: "Hazırlanıyor… küpü oynatma", green: "Hazır! Küpü kaldırınca süre başlar", running: "Çözülüyor… bitince küpü masaya bırak", done: "Kaydedildi ✓" };
+    function magPaint(st) {
+        var box = $("cMagBox"); if (!box) return;
+        var can = compCanSolve();
+        var cls = !can && st !== "running" && st !== "done" ? "wait" : st;
+        box.className = "c-mag-box " + cls;
+        $("cMagS").textContent = cls === "wait" ? "Sıradaki karıştırmayı bekle" : (MAG_TXT[st] || "");
+        if (st !== "running") cancelAnimationFrame(mag.raf);
+    }
+    function magTick() { $("cMagT").textContent = fmt(MagnetTimer.elapsed()); mag.raf = requestAnimationFrame(magTick); }
+    function magEvent(type, data) {
+        if (type === "state") { magPaint(data); if (data === "white" || data === "orange" || data === "green") $("cMagT").textContent = fmt(0); }
+        else if (type === "start") { if (!compCanSolve()) { MagnetTimer.recalibrate(); return; } cancelAnimationFrame(mag.raf); magTick(); }
+        else if (type === "stop") {
+            cancelAnimationFrame(mag.raf); $("cMagT").textContent = fmt(data);
+            if (compCanSolve()) { comp.mode = "timer"; compDone(data); }
+            setTimeout(function () { MagnetTimer.reset(); }, 1800);
+        }
+        else if (type === "error") {
+            $("cMagS").textContent = data === "perm" ? "Sensör izni verilmedi. Tarayıcı ayarlarından hareket/yön iznine izin ver." : "Bu cihaz ya da tarayıcı pusula sensörünü vermiyor. Telefonda Chrome (Android) ya da Safari (iPhone) kullan.";
+            $("cMagBox").className = "c-mag-box wait";
+        }
+    }
+    function magToggle(force) {
+        var on = force != null ? force : !mag.on;
+        if (!window.MagnetTimer) return;
+        mag.on = on; $("cMag").hidden = !on; $("cMagBtn").classList.toggle("on", on);
+        $("cMagBtn").textContent = on ? "⌨️ Elle girişe dön" : "🧲 Mıknatıs timer";
+        if (on) MagnetTimer.start(magEvent); else { MagnetTimer.stop(); cancelAnimationFrame(mag.raf); }
+        // çözüm sırasında ekran kararmasın
+        try {
+            if (on && navigator.wakeLock) navigator.wakeLock.request("screen").then(function (l) { mag.lock = l; }).catch(function () {});
+            else if (!on && mag.lock) { mag.lock.release(); mag.lock = null; }
+        } catch (e) {}
+    }
+    function magBind() {
+        if (!$("cMagBtn") || $("cMagBtn").bound) return; $("cMagBtn").bound = 1;
+        $("cMagBtn").onclick = function () { magToggle(); };
+        $("cMagBox").onclick = function () { if (window.MagnetTimer) MagnetTimer.tapStop(); };
+        $("cMagCal").onclick = function () { if (window.MagnetTimer) MagnetTimer.recalibrate(); };
+    }
     function typeSave(pen) {
         var ms = pen === "dnf" ? DNF : parseTime($("cTypeIn").value);
         if (ms == null) { $("cTypeErr").className = "ak-msg bad"; $("cTypeErr").textContent = "Süreyi rakamla yaz: 1943 = 19.43 · 10234 = 1:02.34"; $("cTypeIn").focus(); return; }
