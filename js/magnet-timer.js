@@ -30,9 +30,12 @@
         var d = Math.abs(v - S.base) % 360; return d > 180 ? 360 - d : d;
     }
     // Eşikler: pusula (derece) daha gürültülü ve yumuşatılmış geldiği için daha toleranslı
-    function thOn() { return S.src === "magnet" ? 40 : 14; }    // küp var
-    function thOff() { return S.src === "magnet" ? 20 : 7; }    // küp yok sayılır
-    function thLift() { return S.src === "magnet" ? 25 : 6; }   // hazırken küp kalkıyor
+    // Ayar (sihirbazla ölçülen, küp yerindeyken sapma) varsa eşikler ona göre: "hazır" = ölçümün %35'i
+    var CAL_KEY = "ra-mag-cal-v1";
+    function cal() { try { var c = JSON.parse(localStorage.getItem(CAL_KEY) || "null"); return c && c.src === S.src && c.on > 0 ? c.on : 0; } catch (e) { return 0; } }
+    function thOn() { var c = cal(), d = S.src === "magnet" ? 40 : 14; return c ? Math.max(S.src === "magnet" ? 15 : 5, c * 0.35) : d; }    // küp var
+    function thOff() { return thOn() * 0.5; }    // küp yok sayılır
+    function thLift() { var c = cal(); return c ? Math.max(S.src === "magnet" ? 10 : 3, c * 0.18) : (S.src === "magnet" ? 25 : 6); }   // hazırken küp kalkıyor
     function thStable() { return S.src === "magnet" ? 8 : 4; }  // sinyal sabit
     function spread(arr) {
         if (arr.length < 3) return Infinity;
@@ -53,7 +56,8 @@
             if ((stable && S.buf.length > 5) || t - S.firstAt > 1500) { S.base = median(S.buf); emit("calibrated"); }
             return;
         }
-        var d = dist(v);
+        var d = dist(v); S.level = d; S.stable = stable;
+        if (S.calMode) { if (stable && S.calMode === "base") S.base = median(S.buf); return; } // ayar sihirbazı: durum makinesi çalışmaz
         if (S.state === "clear") {
             if (d < thOff()) setState("white");
         } else if (S.state === "white") {
@@ -165,6 +169,12 @@
         },
         recalibrate: function () { S.base = null; S.buf = []; S.firstAt = 0; setState("white"); },
         state: function () { return S.state; },
+        // Bar için: tabandan anlık sapma, "hazır" eşiği ve ayar değeri
+        level: function () { return { v: S.base == null ? null : S.level || 0, th: thOn(), cal: cal(), stable: !!S.stable, src: S.src, ready: S.base != null }; },
+        // Ayar sihirbazı: "base" = taban ölçülüyor (küp uzakta), "cube" = küp ölçülüyor; null = normal çalışma
+        calMode: function (m) { S.calMode = m || null; if (m === "base") { S.base = null; S.buf = []; S.firstAt = 0; } if (!m) setState(S.level > thOn() ? "clear" : "white"); },
+        saveCal: function (on) { try { if (on) localStorage.setItem(CAL_KEY, JSON.stringify({ src: S.src, on: Math.round(on * 10) / 10, t: Date.now() })); else localStorage.removeItem(CAL_KEY); } catch (e) {} },
+        hasCal: function () { return cal() > 0; },
         elapsed: function () { return S.state === "running" ? now() - S.t0 : 0; },
         source: function () { return S.src; },
         // test için: sinyal/titreşim enjekte et
