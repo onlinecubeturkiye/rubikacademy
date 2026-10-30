@@ -9,10 +9,10 @@
 <meta property="og:description" content="Tema, dil, renk körlüğü paleti ve hesap ayarları.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/ayarlar">
-<meta property="og:image" content="https://rubikacademy.fun/og/ayarlar.png?v=20261190">
+<meta property="og:image" content="https://rubikacademy.fun/og/ayarlar.png?v=20261191">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/ayarlar.png?v=20261190">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/ayarlar.png?v=20261191">
 <meta name="twitter:card" content="summary_large_image">
 <script>window.RA_ACCOUNT_EAGER = true;</script>
 <title>Rubik Academy - Ayarlar</title>
@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20261190">
+<link rel="stylesheet" href="/styles/common.css?v=20261191">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 <style>
 .set-wrap { max-width: 540px; margin: 0 auto; }
@@ -40,6 +40,8 @@
 .srow:hover { background: var(--surface-soft); }
 .srow .ico { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
 .srow .go { margin-left: auto; color: var(--text-soft); }
+.srow .rsub { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-soft); }
+.srow .go.on { color: #16a34a; font-weight: 800; }
 html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-left: 0; margin-right: auto; }
 .srow.danger { color: var(--cube-red); }
 .srow + .srow { border-top: 1px solid var(--border); }
@@ -83,21 +85,23 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
 
 <div class="set-card"><h2 id="hData">Veriler &amp; Bildirimler</h2>
     <button type="button" class="srow" id="btnNotify"><span class="ico">🔔</span><span>Bildirimlere izin ver</span><span class="go" id="notifState">→</span></button>
+    <button type="button" class="srow" id="btnRemD"><span class="ico">📅</span><span>Hatırlat: Günün karıştırması<small class="rsub">Akşam 19:00'da, henüz çözmediysen</small></span><span class="go" id="remD">Kapalı</span></button>
+    <button type="button" class="srow" id="btnRemC"><span class="ico">🏠</span><span>Hatırlat: Yeni ev yarışması<small class="rsub">Bir organizatör oda açınca</small></span><span class="go" id="remC">Kapalı</span></button>
     <button type="button" class="srow" id="btnInstall" hidden><span class="ico">📲</span><span>Uygulama olarak yükle</span><span class="go">→</span></button>
     <button type="button" class="srow danger" id="btnReset"><span class="ico">🗑️</span><span>Tüm verilerimi sil</span></button>
     <div class="set-msg" id="dataMsg"></div>
 </div>
 
 <div class="set-card"><h2 id="hAbout">Hakkında</h2>
-    <div class="about">Rubik Academy · Sürüm <b id="verTxt">20261190</b><br>Türkiye'nin kapsamlı küp öğrenme platformu.</div>
+    <div class="about">Rubik Academy · Sürüm <b id="verTxt">20261191</b><br>Türkiye'nin kapsamlı küp öğrenme platformu.</div>
 </div>
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20261190"></script>
-<script src="/js/common.js?v=20261190"></script>
-<script src="/js/firebase-config.js?v=20261190"></script>
-<script src="/js/account.js?v=20261190"></script>
+<script src="/js/i18n.js?v=20261191"></script>
+<script src="/js/common.js?v=20261191"></script>
+<script src="/js/firebase-config.js?v=20261191"></script>
+<script src="/js/account.js?v=20261191"></script>
 <script>
 (function () {
     function $(id) { return document.getElementById(id); }
@@ -196,7 +200,24 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
         if (window.Account && Account.notifyPermission) Account.notifyPermission().then(notifState);
         else Notification.requestPermission().then(notifState);
     };
-    function start() { renderAppearance(); renderAccount(); notifState(); }
+    // Hatırlatıcılar (bildirim ister; gönderim GitHub Actions'taki göndericiden)
+    function remState() {
+        var r = window.Account && Account.reminders ? Account.reminders() : [];
+        [["d", "remD"], ["c", "remC"]].forEach(function (x) { var el = $(x[1]); if (!el) return; var on = r.indexOf(x[0]) >= 0; el.textContent = on ? "✓ Açık" : "Kapalı"; el.className = "go" + (on ? " on" : ""); });
+    }
+    function toggleRem(k) {
+        if (!window.Account || !Account.setReminders) return;
+        if (!("Notification" in window) || !(Account.pushSupported && Account.pushSupported())) { $("dataMsg").textContent = "Bu tarayıcı bildirimleri desteklemiyor."; return; }
+        var r = Account.reminders(), on = r.indexOf(k) < 0;
+        r = r.filter(function (x) { return x !== k; }); if (on) r.push(k);
+        Account.setReminders(r).then(function (res) {
+            if (res !== "ok") { Account.setReminders(r.filter(function (x) { return x !== k; })); $("dataMsg").textContent = "Hatırlatma için bildirim izni gerekiyor (tarayıcı ayarlarından izin ver)."; }
+            else $("dataMsg").textContent = on ? "Hatırlatıcı açıldı ✓" : "Hatırlatıcı kapatıldı.";
+            remState(); notifState();
+        });
+    }
+    if ($("btnRemD")) { $("btnRemD").onclick = function () { toggleRem("d"); }; $("btnRemC").onclick = function () { toggleRem("c"); }; }
+    function start() { renderAppearance(); renderAccount(); notifState(); remState(); }
     if (document.readyState !== "loading") start(); else document.addEventListener("DOMContentLoaded", start);
     document.addEventListener("site-lang-change", renderAppearance);
     if (window.Account && window.Account.onChange) window.Account.onChange(function () { renderAccount(); });

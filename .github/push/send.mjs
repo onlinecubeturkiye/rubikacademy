@@ -18,7 +18,7 @@ const ms = (t) => (t && t.toMillis ? t.toMillis() : 0);
 
 const subs = (await db.collection("pushsubs").get()).docs.map((d) => {
     let sub = null; try { sub = JSON.parse(d.get("sub") || "null"); } catch (e) {}
-    return { ref: d.ref, sub, uid: d.get("uid") || "" };
+    return { ref: d.ref, sub, uid: d.get("uid") || "", rem: d.get("rem") || "" };
 }).filter((s) => s.sub && s.sub.endpoint);
 console.log("abone:", subs.length);
 
@@ -57,4 +57,35 @@ for (const uid of Object.keys(byUid)) {
         console.log("bildirim", uid, d.id, "→", n);
     }
 }
+// Hatırlatıcılar (abonelikte rem: "d" = günün karıştırması, "c" = yeni ev yarışması)
+// Durum config/remind belgesinde tutulur: aynı hatırlatma iki kez gitmesin
+const remRef = db.collection("config").doc("remind");
+const rem = (await remRef.get()).data() || {};
+const tr = new Date(now + 3 * 3600e3); // Türkiye saati (UTC+3)
+const today = tr.toISOString().slice(0, 10);
+const wants = (k) => subs.filter((s) => String(s.rem || "").split(",").includes(k));
+// 1) Günün karıştırması: 19:00'dan sonra, bugün henüz çözmeyen üyelere
+if (tr.getUTCHours() >= 19 && rem.d !== today) {
+    const dn = String(Math.floor(Date.UTC(tr.getUTCFullYear(), tr.getUTCMonth(), tr.getUTCDate()) / 86400000));
+    const list = wants("d").filter((s) => s.uid), byU = {};
+    list.forEach((s) => { (byU[s.uid] = byU[s.uid] || []).push(s); });
+    let n = 0;
+    for (const uid of Object.keys(byU)) {
+        const done = (await db.collection("days").doc(dn).collection("times").doc(uid).get()).exists;
+        if (!done) n += await sendTo(byU[uid], { title: "Günün karıştırması 📅", body: "Bugünkü karıştırmayı henüz çözmedin. Sıralamada yerini al!", tag: "d:" + today, url: "/icerikler/gunluk" });
+    }
+    rem.d = today;
+    console.log("günlük hatırlatma →", n);
+}
+// 2) Yeni ev yarışması: son 2 saatte açılmış, lobide bekleyen odalar
+const seen = new Set(rem.c || []);
+const fresh = (await db.collection("comps").where("st", "==", "lobby").get()).docs
+    .filter((d) => !seen.has(d.id) && now - ms(d.get("ts")) < 2 * 3600e3);
+for (const d of fresh) {
+    const n = await sendTo(wants("c"), { title: "Yeni ev yarışması 🏠", body: (d.get("name") || "Ev yarışması") + " açıldı. Kod: " + d.id, tag: "c:" + d.id, url: "/icerikler/ev-yarismasi?ev=" + d.id });
+    seen.add(d.id);
+    console.log("ev yarışması", d.id, "→", n);
+}
+rem.c = Array.from(seen).slice(-60);
+await remRef.set(rem);
 console.log("bitti; silinen abonelik:", dead.size);

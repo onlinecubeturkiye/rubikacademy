@@ -284,7 +284,8 @@ service cloud.firestore {
       allow get, list: if isAdmin();
       allow delete: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
       allow create, update: if id.matches('^[a-f0-9]{32}$')
-        && request.resource.data.keys().hasOnly(['sub', 'uid', 'ts'])
+        && request.resource.data.keys().hasOnly(['sub', 'uid', 'rem', 'ts'])
+        && (!('rem' in request.resource.data) || (request.resource.data.rem is string && request.resource.data.rem.size() <= 20))
         && request.resource.data.sub is string && request.resource.data.sub.size() <= 2000
         && request.resource.data.uid is string
         && (request.resource.data.uid == '' || (request.auth != null && request.auth.uid == request.resource.data.uid))
