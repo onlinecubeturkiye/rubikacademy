@@ -7,7 +7,7 @@
    r = { t, scr, face, segs: [{ n, t, k, mv }] } (Çözüm Analizi geçmiş kaydı)
 ========================================================= */
 (function () {
-    var V = "20261203";
+    var V = "20261204";
     var NAMES = ["Cross", "F2L 1", "F2L 2", "F2L 3", "F2L 4", "OLL", "PLL"];
     var lib = null;
     function loadLib() {
