@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261198";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261199";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -963,7 +963,7 @@
         if (!window.MagnetTimer) return;
         if (on === mag.on) return;
         mag.on = on;
-        if (on) MagnetTimer.start(magEvent).then(function (ok) { if (!ok) { mag.on = false; magPaint("off"); } });
+        if (on) { MagnetTimer.start(magEvent).then(function (ok) { if (!ok) { mag.on = false; magPaint("off"); } }); barLoop(); }
         else { MagnetTimer.stop(); cancelAnimationFrame(mag.raf); }
         // çözüm sırasında ekran kararmasın
         try {
@@ -995,8 +995,111 @@
             };
         });
         // Süre yalnız mıknatıs/titreşimle başlar ve durur: kutuya dokunmak bir şey yapmaz
-        $("cMagCal").onclick = function () { if (window.MagnetTimer) MagnetTimer.recalibrate(); };
+        $("cMagCal").onclick = openCal;
+        if ($("cMagCalGo")) $("cMagCalGo").onclick = openCal;
     }
+    /* --- sinyal barı: küp telefona ne kadar yakın (tabandan sapma) + "hazır" eşiği --- */
+    var barT = 0;
+    function barLoop() {
+        clearInterval(barT);
+        barT = setInterval(function () {
+            if (!mag.on || !window.MagnetTimer || !$("cMag") || $("cMag").hidden) return;
+            var L = MagnetTimer.level(), f = $("cMagFill"), m = $("cMagMark");
+            if (!f) return;
+            var max = Math.max(L.cal * 1.4, L.th * 3, 1);
+            f.style.width = (L.v == null ? 0 : Math.min(100, L.v / max * 100)) + "%";
+            m.style.left = Math.min(100, L.th / max * 100) + "%";
+            if ($("cMagNoCal")) $("cMagNoCal").hidden = !L.src || MagnetTimer.hasCal() || mcOpen;
+        }, 80);
+    }
+    /* --- mıknatıs ayar sihirbazı (ZKT tarzı, 3 adım): taban → küp üstte → küp kalktı → kaydet --- */
+    var mcOpen = false, mcT = 0, mcCal = 0;
+    function mcUnit() { return MagnetTimer.source() === "magnet" ? " µT" : "°"; }
+    function mcCube(on) {
+        var c = ["#1a9c4a", "#c9a400", "#b3122b", "#1a9c4a", "#1a9c4a", "#d94f0a", "#ffffff", "#0b55c4", "#ffd500"];
+        return '<div class="mc-cube' + (on ? " on" : "") + '">' + c.map(function (x) { return '<span style="background:' + x + '"></span>'; }).join("") + '</div>';
+    }
+    function mcFrame(step, title, art, body) {
+        return '<div class="mc-top"><small>Adım ' + step + '/3</small><div class="mc-dots">' + [1, 2, 3].map(function (i) { return '<i class="' + (i <= step ? "on" : "") + '"></i>'; }).join("") + '</div><button type="button" class="c-ab" id="mcX" aria-label="Kapat" title="Kapat">✕</button></div>' +
+            '<h3 id="mcTitle">' + title + '</h3>' + (art ? '<div class="mc-art">' + art + '</div>' : '') + body;
+    }
+    function mcMeter() { return '<div class="mc-meter" id="mcMeter"><div class="c-mag-bar"><i id="mcFill"></i><b id="mcMark" hidden></b></div><span id="mcVal">0</span></div><div class="mc-st" id="mcSt"></div>'; }
+    function mcShow(html) {
+        $("mcBox").innerHTML = html; $("mcModal").classList.add("open"); mcOpen = true;
+        $("mcX").onclick = closeCal;
+    }
+    function closeCal() {
+        clearInterval(mcT); mcOpen = false; $("mcModal").classList.remove("open");
+        if (window.MagnetTimer) MagnetTimer.calMode(null);
+    }
+    function openCal() {
+        if (!window.MagnetTimer || !$("mcModal")) return;
+        if (!mag.on) { magToggle(true); applyInput(); }
+        clearInterval(mcT);
+        mcShow(mcFrame(1, "Telefonu masaya bırak", '<div class="mc-phone">0.00<em></em></div>' + mcCube(false),
+            '<p>Bu ayarla telefonunun küpündeki mıknatısları ne kadar güçlü algıladığını ölçüyoruz. Yaklaşık yarım dakika sürer.</p>' +
+            '<p><b>Ölçüm boyunca telefona dokunma.</b> Küpü de şimdilik telefondan uzak tut.</p>' +
+            '<div class="mc-tips"><b>Başlamadan önce</b>Mıknatıslı kılıf, MagSafe cüzdan ya da yüzük tutucu varsa çıkar. Kulaklık kutusu, akıllı saat ve hoparlörü telefondan uzaklaştır. Telefonu şarjdan çıkar.</div>' +
+            '<div class="mc-acts"><button type="button" class="btn primary" id="mcGo">Başla</button></div>'));
+        $("mcGo").onclick = mcStep1;
+    }
+    function mcLoop(fn) { clearInterval(mcT); var t0 = Date.now(); mcT = setInterval(function () { if (!mcOpen) { clearInterval(mcT); return; } fn(MagnetTimer.level(), Date.now() - t0); }, 100); }
+    function mcBar(v, max, ok) {
+        if (!$("mcFill")) return;
+        $("mcFill").style.width = Math.min(100, Math.max(0, v / max * 100)) + "%";
+        $("mcVal").textContent = Math.round(v); $("mcMeter").classList.toggle("ok", !!ok);
+    }
+    // 1) taban: küp uzakta, sinyal 2.5 sn sabit kalmalı
+    function mcStep1() {
+        MagnetTimer.calMode("base");
+        mcShow(mcFrame(1, "Telefonu masaya bırak", '<div class="mc-phone">0.00<em></em></div>' + mcCube(false), '<p>Ölçülüyor… telefona dokunma, küpü uzak tut.</p>' + mcMeter()));
+        var since = 0;
+        mcLoop(function (L, el) {
+            if (!L.src) { $("mcSt").textContent = el > 3000 ? "Sensör verisi gelmiyor. Telefonda Chrome ya da Safari kullan ve hareket iznine izin ver." : "Sensör bekleniyor…"; return; }
+            if (L.ready && L.stable) since = since || Date.now(); else since = 0;
+            var p = since ? (Date.now() - since) / 2500 : 0;
+            mcBar(p * 100, 100, p >= 1);
+            $("mcVal").textContent = Math.min(100, Math.round(p * 100)) + "%";
+            $("mcSt").textContent = !since && el > 6000 ? "Sinyal oynuyor: telefon kıpırdıyor ya da yakında mıknatıslı bir eşya var." : "";
+            if (p >= 1) mcStep2();
+        });
+    }
+    // 2) küp telefonun üstüne: sapma 1.5 sn sabit kalınca ölçülür
+    function mcStep2() {
+        MagnetTimer.calMode("cube");
+        mcShow(mcFrame(2, "Küpü telefonun üstüne koy", '<div class="mc-phone">0.00<em></em></div>' + mcCube(true), '<p>Küpü, çözüme başlamadan önce hep koyacağın yere (ekranın ortası) koy ve elini çek.</p>' + mcMeter()));
+        var since = 0, last = 0, min = MagnetTimer.source() === "magnet" ? 15 : 5;
+        mcLoop(function (L) {
+            var v = L.v || 0, max = Math.max(min * 6, v * 1.3, last * 1.3);
+            last = Math.max(last * 0.98, v);
+            mcBar(v, max, v > min && L.stable);
+            $("mcVal").textContent = Math.round(v) + mcUnit();
+            if (v > min && L.stable) since = since || Date.now(); else since = 0;
+            $("mcSt").textContent = v <= min ? "Küp algılanmadı. Küpü telefona daha yakın koy (ekranın üst/orta kısmı)." : since ? "Ölçülüyor… küpü oynatma" : "Küpü sabit tut";
+            if (since && Date.now() - since > 1500) { mcCal = v; mcStep3(); }
+        });
+    }
+    // 3) küpü kaldır: sinyal ölçümün %30'unun altına inmeli
+    function mcStep3() {
+        mcShow(mcFrame(3, "Küpü kaldır", '<div class="mc-phone">0.00<em></em></div>' + mcCube(false), '<p>Şimdi telefona dokunmadan küpü alıp uzaklaştır.</p>' + mcMeter()));
+        mcLoop(function (L) {
+            var v = L.v || 0;
+            mcBar(v, mcCal * 1.2, v < mcCal * 0.3);
+            $("mcVal").textContent = Math.round(v) + mcUnit();
+            if (v < mcCal * 0.3) mcDone();
+        });
+    }
+    function mcDone() {
+        clearInterval(mcT);
+        var th = Math.max(MagnetTimer.source() === "magnet" ? 15 : 5, mcCal * 0.35), u = mcUnit(), max = mcCal * 1.2;
+        mcShow(mcFrame(3, "Hazır", "", '<p>Küpün yerindeyken bu telefonda <b>' + Math.round(mcCal) + u + '</b> değerini gösteriyor. <b>' + Math.round(th) + u + '</b> üzerindeki değerler hazır sayılır.</p>' +
+            '<div class="mc-meter ok"><div class="c-mag-bar"><i style="left:' + (th / max * 100) + '%;width:' + ((mcCal - th) / max * 100) + '%"></i><b style="left:' + (mcCal / max * 100) + '%"></b></div></div>' +
+            '<p>Çözüme başlamadan önce küpü hep bu noktaya koy. Ekrandaki süre yeşile döndüğünde küpü kaldırman yeterli.</p>' +
+            '<div class="mc-acts"><button type="button" class="btn primary" id="mcSave">Kaydet</button><button type="button" class="btn" id="mcAgain">Tekrar dene</button></div>'));
+        $("mcSave").onclick = function () { MagnetTimer.saveCal(mcCal); closeCal(); applyInput(); };
+        $("mcAgain").onclick = mcStep1;
+    }
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && mcOpen) closeCal(); });
     function typeSave(pen) {
         var ms = pen === "dnf" ? DNF : parseTime($("cTypeIn").value);
         if (ms == null) { $("cTypeErr").className = "ak-msg bad"; $("cTypeErr").textContent = "Süreyi rakamla yaz: 1943 = 19.43 · 10234 = 1:02.34"; $("cTypeIn").focus(); return; }
@@ -1081,11 +1184,11 @@
         if (topN && lr) adv = lr.rows.filter(function (r) { return r.a != null && r.a < DNF; }).slice(0, topN).map(function (r) { return r.u; }).join(",");
         var s = []; for (var i = 0; i < (sn === 12 ? 12 : 5); i++) s.push(d.ev === "222" ? genScramble222() : genScramble());
         closeFinal();
-        // İlk tur lobiden hemen başlar; sonraki turlardan önce 2 dk hazırlık (bu sürede odaya katılım açık)
-        var prep = d.st !== "lobby";
-        compPatch({ round: (d.round || 0) + 1, st: prep ? "prep" : "run", pa: prep ? Date.now() + PREP_MS : 0, scr: s.join("|"), fin: fin ? 1 : 0, adv: adv }).then(compPoll);
+        // Her turdan önce hazırlık (bu sürede odaya katılım açık): ilk tur 3 dk, sonrakiler 2 dk
+        var first = d.st === "lobby";
+        compPatch({ round: (d.round || 0) + 1, st: "prep", pa: Date.now() + (first ? FIRST_PREP_MS : PREP_MS), scr: s.join("|"), fin: fin ? 1 : 0, adv: adv }).then(compPoll);
     }
-    var PREP_MS = window.__evPrepMs || 120000;
+    var PREP_MS = window.__evPrepMs || 120000, FIRST_PREP_MS = window.__evPrepMs || 180000;
     function prepLeft() { return comp && comp.doc && comp.doc.st === "prep" ? Math.max(0, (comp.doc.pa || 0) - Date.now()) : null; }
     // Hazırlık bitince (ya da "Hemen başlat" ile) oda sahibi / moderatör turu başlatır
     function checkPrep(force) {
