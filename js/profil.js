@@ -51,6 +51,19 @@
     var rows = [["Bilinen case", st.known || 0], ["Öğrenilen", st.learning || 0], ["Trainer çözüm", st.solves || 0], ["Günlük en iyi", fmt(st.best)], ["Günlük gün", st.daily || 0]];
     return '<div class="stat-tiles">' + rows.map(function (r) { return '<div class="stat-tile"><b>' + esc(r[1]) + "</b><span>" + r[0] + "</span></div>"; }).join("") + "</div>";
   }
+  // Ev yarışması: odalar, turlar, şampiyonluk ve küp başına kişisel rekorlar (en iyi tekil, Ao5, Ao12)
+  function compGrid(st) {
+    var c = st && st.comp;
+    if (!c) return '<p class="p-note">Henüz ev yarışmasına katılmadı.</p>';
+    var tiles = [["Oda", c.rooms || 0], ["Tur", c.rounds || 0], ["Final", c.finals || 0], ["🏆 Şampiyonluk", c.wins || 0]];
+    var html = '<div class="stat-tiles">' + tiles.map(function (r) { return '<div class="stat-tile"><b>' + esc(r[1]) + "</b><span>" + r[0] + "</span></div>"; }).join("") + "</div>";
+    var evs = [["333", "3x3"], ["222", "2x2"]].filter(function (e) { return c.pb && c.pb[e[0]]; });
+    if (evs.length) html += '<div class="p-pb">' + evs.map(function (e) {
+      var pb = c.pb[e[0]];
+      return '<div class="p-pb-row"><b>' + e[1] + '</b><span>Tekil <i dir="ltr">' + fmt(pb.s) + '</i></span><span>Ao5 <i dir="ltr">' + fmt(pb.a5) + '</i></span><span>Ao12 <i dir="ltr">' + fmt(pb.a12) + '</i></span></div>';
+    }).join("") + "</div>";
+    return html;
+  }
   function dailyGrid(st) {
     var dl = (st && st.dlist) || [];
     if (!dl.length) return '<p class="p-note">Henüz günlük çözüm yok.</p>';
@@ -79,6 +92,7 @@
       (isMe ? '<div class="p-actions"><button class="p-btn" id="pShare">🔗 Paylaşım linkini kopyala</button><a class="p-btn" href="/icerikler/profil">← Kendi panona dön</a></div><div class="p-msg" id="pMsg"></div>' : '') +
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistikler</h2>' + statTiles(data.stats) + '</div>' +
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">🏠 Ev yarışması</h2>' + compGrid(data.stats) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerleme</h2>' + setsGrid(data.stats) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümler</h2>' + dailyGrid(data.stats) + '</div>';
     showRole(uid);

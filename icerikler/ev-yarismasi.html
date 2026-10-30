@@ -28,10 +28,10 @@
 <meta property="og:description" content="Evden canlı küp yarışması: kodla katıl, 5 çözüm yaz, sıralamayı paylaş.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/ev-yarismasi">
-<meta property="og:image" content="https://rubikacademy.fun/og/ev-yarismasi.png?v=20261184">
+<meta property="og:image" content="https://rubikacademy.fun/og/ev-yarismasi.png?v=20261185">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://rubikacademy.fun/og/ev-yarismasi.png?v=20261184">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/ev-yarismasi.png?v=20261185">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,7 +39,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20261184">
+<link rel="stylesheet" href="/styles/common.css?v=20261185">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -137,6 +137,8 @@
 .ak-msg { min-height: 18px; margin-top: 10px; font-size: 13.5px; font-weight: 700; color: var(--text-soft); }
 .ak-msg.bad { color: #dc2626; }
 .ak-msg:empty { display: none; }
+.c-finfmt { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; font-size: 13.5px; font-weight: 700; color: var(--text-soft); }
+.c-finfmt select { padding: 6px 10px; border-radius: 10px; border: var(--card-bw) solid var(--card-border); background: var(--surface); color: var(--text); font: 700 13.5px Inter, sans-serif; }
 .ak-room-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
 .ak-code { font: 900 22px "JetBrains Mono", monospace; letter-spacing: 4px; color: var(--primary); }
 .ak-room-top small { display: block; font-size: 12px; font-weight: 800; color: var(--text-soft); letter-spacing: 0; }
@@ -506,7 +508,7 @@ body.c-in-room .nav-bar { margin-bottom: 10px; }
 <section class="box" id="akComp">
     <div id="cLobby">
         <h2>🏠 Ev yarışması</h2>
-        <p class="ak-req">8-16 kişilik <b>3x3</b> ya da <b>2x2</b> yarışması. Her tur 5 çözüm (<b>Ao5</b>); tur bitince sıralama çıkar, sonra yeni tur ya da final. Herkes kendi timer'ıyla çözer ve süresini <b>elle yazar</b> (+2 ve DNF seçilebilir).</p>
+        <p class="ak-req">8-16 kişilik <b>3x3</b> ya da <b>2x2</b> yarışması. Her tur 5 çözüm (<b>Ao5</b>), final istenirse 12 çözüm (<b>Ao12</b>); tur bitince sıralama çıkar, sonra yeni tur ya da final. Herkes kendi timer'ıyla çözer ve süresini <b>elle yazar</b> (+2 ve DNF seçilebilir).</p>
         <div class="c-livewrap" id="cLiveWrap" hidden><h3>🔴 Şu an canlı</h3><div id="cLive"></div></div>
         <div class="ak-lobby">
             <div id="cCreateBox"><h3>Yarışma oluştur</h3>
@@ -611,12 +613,12 @@ body.c-in-room .nav-bar { margin-bottom: 10px; }
 </footer>
 
 <script>var PAGE_ID = "ev_yarismasi";</script>
-<script src="/js/i18n.js?v=20261184"></script>
-<script src="/js/common.js?v=20261184"></script>
-<script src="/js/firebase-config.js?v=20261184"></script>
-<script src="/js/account.js?v=20261184"></script>
-<script src="/js/vendor/cubejs/cube.js?v=20261184"></script>
+<script src="/js/i18n.js?v=20261185"></script>
+<script src="/js/common.js?v=20261185"></script>
+<script src="/js/firebase-config.js?v=20261185"></script>
+<script src="/js/account.js?v=20261185"></script>
+<script src="/js/vendor/cubejs/cube.js?v=20261185"></script>
 <script>window.AK_PAGE = "ev";</script>
-<script src="/js/akilli-kup.js?v=20261184"></script>
+<script src="/js/akilli-kup.js?v=20261185"></script>
 </body>
 </html>
