@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261199";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261200";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -934,8 +934,15 @@
     function magPaint(st) {
         var box = $("cMagBox"); if (!box) return;
         var can = compCanSolve();
-        if (window.MagnetTimer && mag.on) { MagnetTimer.arm(can); st = MagnetTimer.state(); }
-        var cls = st === "off" ? "wait" : !can && st !== "running" && st !== "done" ? "wait" : st === "clear" ? "white" : st;
+        // ayar yapılmadan mıknatısla çözüm yok
+        var noCal = !!(window.MagnetTimer && mag.on && MagnetTimer.source() && !MagnetTimer.hasCal());
+        if (window.MagnetTimer && mag.on) { MagnetTimer.arm(can && !noCal); st = MagnetTimer.state(); }
+        var cls = st === "off" ? "wait" : (!can || noCal) && st !== "running" && st !== "done" ? "wait" : st === "clear" ? "white" : st;
+        if (noCal && st !== "off") {
+            box.className = "c-mag-box wait";
+            $("cMagS").textContent = "Önce mıknatıs ayarını yap (aşağıda)"; magCubeUi(); return;
+        }
+        magCubeUi();
         box.className = "c-mag-box " + cls;
         if (st === "off") {
             $("cMagS").innerHTML = 'Sensör kapalı<br><button type="button" id="cMagGo">🧲 Sensörü başlat</button>';
@@ -995,8 +1002,20 @@
             };
         });
         // Süre yalnız mıknatıs/titreşimle başlar ve durur: kutuya dokunmak bir şey yapmaz
-        $("cMagCal").onclick = openCal;
-        if ($("cMagCalGo")) $("cMagCalGo").onclick = openCal;
+        $("cMagCal").onclick = function () { openCal(); };
+        if ($("cMagCalGo")) $("cMagCalGo").onclick = function () { openCal(); };
+    }
+    // Kayıtlı küpler: hangisiyle çözdüğünü seç ya da yeni küp ayarla
+    function magCubeUi() {
+        var el = $("cMagCube"); if (!el || !window.MagnetTimer) return;
+        var list = mag.on ? MagnetTimer.cubes() : [], cur = MagnetTimer.cube();
+        el.hidden = !list.length;
+        var key = list.join("|") + "#" + cur; if (el.dataset.k === key) return; el.dataset.k = key;
+        el.innerHTML = '<span>🧲 Küp</span><select id="cMagSel" aria-label="Küp">' + list.map(function (n) { return '<option' + (n === cur ? " selected" : "") + '>' + esc(n) + '</option>'; }).join("") + '</select>' +
+            '<button type="button" class="c-linkbtn" id="cMagRe">Yeniden ayarla</button><button type="button" class="c-linkbtn" id="cMagNew">+ Yeni küp</button>';
+        $("cMagSel").onchange = function () { MagnetTimer.useCube(this.value); MagnetTimer.calMode(null); applyInput(); };
+        $("cMagRe").onclick = function () { openCal(); };
+        $("cMagNew").onclick = function () { openCal(""); };
     }
     /* --- sinyal barı: küp telefona ne kadar yakın (tabandan sapma) + "hazır" eşiği --- */
     var barT = 0;
@@ -1010,10 +1029,12 @@
             f.style.width = (L.v == null ? 0 : Math.min(100, L.v / max * 100)) + "%";
             m.style.left = Math.min(100, L.th / max * 100) + "%";
             if ($("cMagNoCal")) $("cMagNoCal").hidden = !L.src || MagnetTimer.hasCal() || mcOpen;
+            // ayar durumu değiştiyse (ör. sensör türü belli oldu) kutuyu yeniden çiz
+            var hc = L.src ? MagnetTimer.hasCal() : null; if (hc !== mag.hc) { mag.hc = hc; magPaint(MagnetTimer.state()); }
         }, 80);
     }
     /* --- mıknatıs ayar sihirbazı (ZKT tarzı, 3 adım): taban → küp üstte → küp kalktı → kaydet --- */
-    var mcOpen = false, mcT = 0, mcCal = 0;
+    var mcOpen = false, mcT = 0, mcCal = 0, mcName = "";
     function mcUnit() { return MagnetTimer.source() === "magnet" ? " µT" : "°"; }
     function mcCube(on) {
         var c = ["#1a9c4a", "#c9a400", "#b3122b", "#1a9c4a", "#1a9c4a", "#d94f0a", "#ffffff", "#0b55c4", "#ffd500"];
@@ -1032,16 +1053,18 @@
         clearInterval(mcT); mcOpen = false; $("mcModal").classList.remove("open");
         if (window.MagnetTimer) MagnetTimer.calMode(null);
     }
-    function openCal() {
+    function openCal(newCube) {
         if (!window.MagnetTimer || !$("mcModal")) return;
         if (!mag.on) { magToggle(true); applyInput(); }
-        clearInterval(mcT);
+        clearInterval(mcT); mcName = typeof newCube === "string" ? newCube : (MagnetTimer.cube() || "");
         mcShow(mcFrame(1, "Telefonu masaya bırak", '<div class="mc-phone">0.00<em></em></div>' + mcCube(false),
             '<p>Bu ayarla telefonunun küpündeki mıknatısları ne kadar güçlü algıladığını ölçüyoruz. Yaklaşık yarım dakika sürer.</p>' +
             '<p><b>Ölçüm boyunca telefona dokunma.</b> Küpü de şimdilik telefondan uzak tut.</p>' +
             '<div class="mc-tips"><b>Başlamadan önce</b>Mıknatıslı kılıf, MagSafe cüzdan ya da yüzük tutucu varsa çıkar. Kulaklık kutusu, akıllı saat ve hoparlörü telefondan uzaklaştır. Telefonu şarjdan çıkar.</div>' +
+            '<label class="mc-name"><span>Küpünün adı</span><input id="mcName" maxlength="30" placeholder="ör. XMan V3" autocomplete="off" enterkeyhint="done"></label>' +
             '<div class="mc-acts"><button type="button" class="btn primary" id="mcGo">Başla</button></div>'));
-        $("mcGo").onclick = mcStep1;
+        $("mcName").value = mcName || "";
+        $("mcGo").onclick = function () { mcName = $("mcName").value.trim().slice(0, 30); mcStep1(); };
     }
     function mcLoop(fn) { clearInterval(mcT); var t0 = Date.now(); mcT = setInterval(function () { if (!mcOpen) { clearInterval(mcT); return; } fn(MagnetTimer.level(), Date.now() - t0); }, 100); }
     function mcBar(v, max, ok) {
@@ -1092,11 +1115,15 @@
     function mcDone() {
         clearInterval(mcT);
         var th = Math.max(MagnetTimer.source() === "magnet" ? 15 : 5, mcCal * 0.35), u = mcUnit(), max = mcCal * 1.2;
-        mcShow(mcFrame(3, "Hazır", "", '<p>Küpün yerindeyken bu telefonda <b>' + Math.round(mcCal) + u + '</b> değerini gösteriyor. <b>' + Math.round(th) + u + '</b> üzerindeki değerler hazır sayılır.</p>' +
+        mcShow(mcFrame(3, "Hazır", "", '<label class="mc-name"><span>Küpünün adı</span><input id="mcName2" maxlength="30" placeholder="ör. XMan V3" autocomplete="off"></label>' +
+            '<p><b id="mcNm"></b> yerindeyken bu telefonda <b>' + Math.round(mcCal) + u + '</b> değerini gösteriyor. <b>' + Math.round(th) + u + '</b> üzerindeki değerler hazır sayılır.</p>' +
             '<div class="mc-meter ok"><div class="c-mag-bar"><i style="left:' + (th / max * 100) + '%;width:' + ((mcCal - th) / max * 100) + '%"></i><b style="left:' + (mcCal / max * 100) + '%"></b></div></div>' +
             '<p>Çözüme başlamadan önce küpü hep bu noktaya koy. Ekrandaki süre yeşile döndüğünde küpü kaldırman yeterli.</p>' +
             '<div class="mc-acts"><button type="button" class="btn primary" id="mcSave">Kaydet</button><button type="button" class="btn" id="mcAgain">Tekrar dene</button></div>'));
-        $("mcSave").onclick = function () { MagnetTimer.saveCal(mcCal); closeCal(); applyInput(); };
+        var nm = function () { return $("mcName2").value.trim().slice(0, 30) || "Küpün"; };
+        $("mcName2").value = mcName; $("mcNm").textContent = nm();
+        $("mcName2").oninput = function () { $("mcNm").textContent = nm(); };
+        $("mcSave").onclick = function () { mcName = $("mcName2").value.trim().slice(0, 30) || "Küpüm"; MagnetTimer.saveCal(mcCal, mcName); closeCal(); applyInput(); };
         $("mcAgain").onclick = mcStep1;
     }
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && mcOpen) closeCal(); });
