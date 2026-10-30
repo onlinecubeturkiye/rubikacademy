@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261187";
+    var V = "20261188";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -1066,7 +1066,7 @@
             for (var j = 0; j < LOCKED.length; j++) if (LOCKED[j][0].test(h)) { e.preventDefault(); e.stopPropagation(); show(tx()[LOCKED[j][1]], true); return; }
             return;
         }
-        if (t.closest(".alg-play-btn, .alg-player")) return;
+        if (t.closest(".alg-play-btn, .alg-player, .alg-sug-btn, .sg-modal")) return;
         for (var i = 0; i < GATES.length; i++) {
             if (t.closest(GATES[i][0])) {
                 // karttaki algoritma metnini seçip kopyalamak serbest

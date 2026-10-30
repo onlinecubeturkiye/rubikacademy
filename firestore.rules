@@ -224,6 +224,30 @@ service cloud.firestore {
       allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid);
     }
 
+    // Topluluk algoritmaları: algsug/{case}/s/{uid}. Herkes okur; her üye bir case'e tek öneri (belge = uid).
+    // Oy: vs haritasına yalnız kendi uid'ini ekler / çıkarır.
+    match /algsug/{cid}/s/{sid} {
+      allow read: if true;
+      allow create: if request.auth != null && request.auth.uid == sid && !suspended(sid) && cid.size() <= 400
+        && request.resource.data.keys().hasOnly(['a', 'u', 'n', 'ts', 'vs'])
+        && request.resource.data.u == sid
+        && request.resource.data.a is string && request.resource.data.a.size() >= 1 && request.resource.data.a.size() <= 200
+        && request.resource.data.n is string && request.resource.data.n.size() <= 24
+        && request.resource.data.ts is timestamp
+        && request.resource.data.vs is map && request.resource.data.vs.keys().hasOnly([sid]);
+      allow update: if request.auth != null && !suspended(request.auth.uid)
+        && request.resource.data.keys().hasOnly(['a', 'u', 'n', 'ts', 'vs'])
+        && (
+          (request.auth.uid == sid && request.resource.data.u == sid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['a', 'n', 'ts', 'u'])
+            && request.resource.data.a is string && request.resource.data.a.size() >= 1 && request.resource.data.a.size() <= 200
+            && request.resource.data.n is string && request.resource.data.n.size() <= 24)
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['vs'])
+            && request.resource.data.vs.diff(resource.data.vs).affectedKeys().hasOnly([request.auth.uid]))
+        );
+      allow delete: if request.auth != null && (request.auth.uid == sid || isAdmin());
+    }
+
     // Site ayarı (bakım modu): herkes okur, yalnız admin yazar
     // Hesapsız ziyaretçiler: cihaz başına tek belge (oturumda bir kez yazılır); yalnız admin okur/siler
     match /anon/{vid} {
