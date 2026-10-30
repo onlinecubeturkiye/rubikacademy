@@ -4,7 +4,7 @@
      beyaz  = küp yok          → küpü telefonun üstüne koy
      turuncu = küp var, sinyal oturuyor (hazırlanıyor)
      yeşil  = sinyal sabit (hazır) → küp kalkınca süre başlar
-   Süre: küp masaya bırakılınca titreşim (ivmeölçer) ile durur;
+   Süre: küp masaya bırakılınca titreşim (ivmeölçer, uyarlanır eşik) ile durur;
    yedek olarak küp tekrar telefona konunca ya da ekrana dokununca durur.
    Kaynak: Magnetometer (Generic Sensor, varsa) → yoksa pusula yönü
    (deviceorientationabsolute / iOS webkitCompassHeading).
@@ -62,8 +62,12 @@
             if (d < thOff() || (back > thLift() && between(v, S.ready) > thLift())) { S.t0 = t; setState("running"); emit("start"); }
             else if (stable) S.ready = median(S.buf); // küp yerinde hafifçe kaydıysa takip et
         } else if (S.state === "running") {
-            // küp tekrar telefonun üstüne konursa da dur
-            if (t - S.t0 > MIN_SOLVE && d > thOn() && stable) finish(t - STABLE_MS * 0.5);
+            // küp tekrar telefonun üstüne konursa da dur: eşiği geçtiği an bitiş sayılır,
+            // 250 ms boyunca üstte kalırsa onaylanır (sabitlenmesi beklenmez)
+            if (t - S.t0 > MIN_SOLVE && d > thOn()) {
+                if (!S.backAt) S.backAt = t;
+                else if (t - S.backAt > 250) { var at = S.backAt; S.backAt = 0; finish(at); }
+            } else S.backAt = 0;
         } else if (S.state === "done") {
             if (d < thOff() && t - S.stopAt > 1500) setState("white");
             else if (d > thOn() && stable && t - S.stopAt > 1500) { S.ready = median(S.buf); setState("green"); }
@@ -75,13 +79,20 @@
         S.stopAt = now(); setState("done"); emit("stop", ms);
     }
 
-    // Titreşim: ivme büyüklüğünde ani sıçrama
-    var lastA = null;
+    // Titreşim: küp masaya bırakılınca telefonda küçük bir sarsıntı olur.
+    // Sabit 2.2 m/s² eşiği hafif bırakışları kaçırıyordu; artık telefonun kendi gürültüsü
+    // ölçülür ve ona göre çok daha düşük, uyarlanır bir eşik kullanılır.
+    var lastA = null, noise = 0.15;
     function onMotion(e) {
         if (!S.on) return;
-        var a = e.accelerationIncludingGravity || e.acceleration; if (!a || a.x == null) return;
+        var lin = e.acceleration && e.acceleration.x != null, a = lin ? e.acceleration : e.accelerationIncludingGravity;
+        if (!a || a.x == null) return;
         var m = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
-        if (lastA != null && S.state === "running" && now() - S.t0 > MIN_SOLVE && Math.abs(m - lastA) > 2.2) finish(now());
+        if (lastA != null) {
+            var j = Math.abs(m - lastA), th = Math.max(lin ? 0.28 : 0.4, noise * 4.5);
+            if (S.state === "running" && now() - S.t0 > MIN_SOLVE && j > th) finish(now());
+            else noise = noise * 0.97 + Math.min(j, 1.5) * 0.03; // sessizken gürültü tabanını öğren
+        }
         lastA = m;
     }
     function onOrient(e) {
@@ -138,6 +149,7 @@
         },
         // Ekrana dokunarak durdurma (yedek)
         tapStop: function () { if (S.state === "running") finish(now()); },
+        _motion: function (x, y, z, lin) { var v = { x: x, y: y, z: z }; onMotion(lin ? { acceleration: v } : { accelerationIncludingGravity: v }); },
         reset: function () { if (S.state === "done") setState(S.base != null && S.last != null && dist(S.last) > thOn() ? "orange" : "white"); },
         recalibrate: function () { S.base = null; S.buf = []; S.firstAt = 0; setState("white"); },
         state: function () { return S.state; },
