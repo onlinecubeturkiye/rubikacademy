@@ -7,7 +7,7 @@
    Tutuş: sarı üstte (U), yeşil önde (F), turuncu sağda (R).
 ========================================================= */
 (function () {
-    var V = "20261189";
+    var V = "20261190";
     var FACES = "URFDLB";
     var COLOR = { U: "#f6c719", R: "#ff7a1a", F: "#179e4f", D: "#eef2f3", L: "#d12d28", B: "#2c6fe6" };
     var CNAME = { U: "c_yellow", R: "c_orange", F: "c_green", D: "c_white", L: "c_red", B: "c_blue" };

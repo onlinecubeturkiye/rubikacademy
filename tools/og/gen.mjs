@@ -192,6 +192,7 @@ const PAGES = {
     "akilli-kup": { k: "BLUETOOTH", t: "Çözüm Analizi", s: "Bluetooth küpünü bağla; Cross, F2L, OLL ve PLL sürelerini gör.", v: () => withBadge(cubeIso(3, "YRGBYOWGB", "GGOGGBGRG", "OOWOOYOBO"), "📶") },
     "baslangic": { k: "BAŞLANGIÇ REHBERİ", t: "Küp Nasıl Çözülür?", s: "7 adım ve sadece 6 algoritmayla 3x3'ü baştan sona çöz.", v: () => cubeIso(3, "WWWWWWWWW", "GGGGGGXXX", "RRRRRRXXX") },
     "cozucu": { k: "ÇÖZÜCÜ", t: "Küp Çözücü", s: "Renkleri gir ya da kamerayla tara; çözümü adım adım gör.", v: () => withBadge(cubeIso(3, "YRGBYOWGB", "GGOGGBGRG", "OOWOOYOBO"), "📷") },
+    "dersler": { k: "KURS", t: "Adım Adım", t2: "Dersler", s: "Sıfırdan CFOP'a 15 ders: açıklama, 3B örnek ve antrenörle pratik.", v: () => emoji("🎓") },
     "tekrar": { k: "AKILLI KÜP", t: "Çözüm", t2: "Tekrarı", s: "Bluetooth küple yapılmış bir çözümü 3B küpte hamle hamle izle.", v: () => emoji("▶️") },
     "rekorlar": { k: "SIRALAMA", t: "Rekor", t2: "Tablosu", s: "Ev yarışmalarının en hızlıları: 3x3 ve 2x2 tekil, Ao5 ve Ao12.", v: () => emoji("🥇") },
     "ev-yarismasi": { k: "CANLI YAYIN YARIŞMASI", t: "Ev Yarışması", s: "8-16 kişilik canlı yarışma: aynı karıştırma, canlı sıralama, final turu.", v: () => emoji("🏆") },
