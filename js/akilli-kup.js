@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261188";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261189";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -256,7 +256,9 @@
         box.innerHTML = '<h2>📊 Çözüm analizi</h2>' +
             '<div class="ak-sum"><div><b>' + fmt(r.t) + '</b><span>Süre</span></div><div><b>' + r.moves + '</b><span>Hamle</span></div><div><b>' + tps + '</b><span>TPS</span></div><div><b>' + (r.face ? r.face.replace("D", "Alt").replace("U", "Üst").replace("F", "Ön").replace("B", "Arka").replace("R", "Sağ").replace("L", "Sol") : "-") + '</b><span>Cross yüzü</span></div></div>' +
             (r.segs.length ? '<div class="ak-bar">' + bar + '</div><div class="ak-tbl"><table><thead><tr><th>Aşama</th><th>Süre</th><th>Hamle</th><th>TPS</th><th>Hamleler</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : "") +
-            '<div class="ak-tip">💡 ' + adviceFor(r) + '</div>';
+            '<div class="ak-tip">💡 ' + adviceFor(r) + '</div>' +
+            (window.SolveReplay && SolveReplay.ok(r) ? '<div class="ak-fin-b" style="margin-top:12px"><button type="button" class="btn primary" id="akReplay">▶ Tekrar izle</button><button type="button" class="btn" id="akShareSolve">🔗 Çözümü paylaş</button></div>' : '');
+        if ($("akReplay")) { $("akReplay").onclick = function () { SolveReplay.open(r); }; $("akShareSolve").onclick = function () { SolveReplay.share(r, this); }; }
     }
 
     /* ---------- geçmiş ---------- */
