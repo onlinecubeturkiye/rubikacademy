@@ -62,6 +62,8 @@
         if (!S.firstAt) S.firstAt = t;
         S.buf.push({ t: t, v: v }); while (S.buf.length && t - S.buf[0].t > STABLE_MS) S.buf.shift();
         var stable = spread(S.buf) < thStable();
+        if (stable) S.stableSince = S.stableSince || t; else S.stableSince = 0;
+        var still = stable ? t - S.stableSince : 0;
         // Taban çizgisi (küp yokken): sinyal oturunca ya da en geç 1.5 sn sonra ortanca değer
         if (S.base == null) {
             if ((stable && S.buf.length > 5) || t - S.firstAt > 1500) { S.base = median(S.buf); emit("calibrated"); }
@@ -69,13 +71,18 @@
         }
         var d = dist(v); S.level = d; S.stable = stable;
         if (S.calMode) { if (stable && S.calMode === "base") S.base = median(S.buf); return; } // ayar sihirbazı: durum makinesi çalışmaz
+        // Pusula zamanla kayar: küp yokken sinyal uzun süre sabit ve küpün ölçülen gücünden belirgin zayıfsa
+        // bu küp değil kaymadır → taban çizgisi yeniden alınır (bar sıfırlanır)
+        var c = cal(), weak = c ? d < c * 0.6 : d < thOn() * 1.3;
         if (S.state === "clear") {
-            if (d < thOff()) setState("white");
+            if (d < thOff()) { if (stable) S.base = median(S.buf); setState("white"); }
+            else if (still > 2500 && weak) { S.base = median(S.buf); setState("white"); }
         } else if (S.state === "white") {
             if (d > thOn()) setState("orange");
             else if (stable) S.base = median(S.buf); // ortam yavaşça değişirse takip et
         } else if (S.state === "orange") {
             if (d < thOff()) setState("white");
+            else if (still > 6000 && (c ? d < c * 0.42 : false)) { S.base = median(S.buf); setState("white"); }
             else if (stable && S.armed && t - S.orangeAt > 1000) { S.ready = median(S.buf); setState("green"); }
         } else if (S.state === "green") {
             if (!S.armed) { setState("clear"); return; }
@@ -92,7 +99,10 @@
             } else S.backAt = 0;
         } else if (S.state === "done") {
             // bitişten sonra küp telefondaysa önce kaldırılmalı (doğrudan yeşile geçmez)
-            if (t - S.stopAt > 1500) setState(d < thOff() ? "white" : "clear");
+            if (t - S.stopAt > 1500) {
+                if (d > thOn()) setState("clear");
+                else { if (stable) S.base = median(S.buf); setState("white"); }
+            }
         }
     }
     function finish(atT) {
@@ -172,7 +182,7 @@
         // Ekrana dokunarak durdurma (yedek)
         tapStop: function () { if (S.state === "running") finish(now()); },
         _motion: function (x, y, z, lin) { var v = { x: x, y: y, z: z }; onMotion(lin ? { acceleration: v } : { accelerationIncludingGravity: v }); },
-        reset: function () { if (S.state === "done") setState(S.base != null && S.last != null && dist(S.last) > thOff() ? "clear" : "white"); },
+        reset: function () { if (S.state === "done") setState(S.base != null && S.last != null && dist(S.last) > thOn() ? "clear" : "white"); },
         // Çözüm yapılabilir mi? false iken yeşil/başlama yok; true olunca küp telefondaysa önce kaldırılmalı
         arm: function (on) {
             on = !!on; if (S.armed === on) return; S.armed = on;
