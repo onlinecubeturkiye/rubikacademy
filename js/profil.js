@@ -62,6 +62,7 @@
       var pb = c.pb[e[0]];
       return '<div class="p-pb-row"><b>' + e[1] + '</b><span>Tekil <i dir="ltr">' + fmt(pb.s) + '</i></span><span>Ao5 <i dir="ltr">' + fmt(pb.a5) + '</i></span><span>Ao12 <i dir="ltr">' + fmt(pb.a12) + '</i></span></div>';
     }).join("") + "</div>";
+    html += '<p class="p-note" style="margin-top:10px"><a href="/icerikler/rekorlar" style="color:var(--ui-accent);font-weight:800">🥇 Rekor tablosu →</a></p>';
     var list = c.list || [];
     if (list.length) html += '<h3 class="p-sub">Yarışma geçmişi</h3><div class="p-clist">' + list.map(function (e) {
       var dt = e.ts ? new Date(e.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" }) : "";

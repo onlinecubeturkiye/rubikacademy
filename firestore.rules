@@ -211,6 +211,19 @@ service cloud.firestore {
       }
     }
 
+    // Rekor tablosu (/icerikler/rekorlar): ev yarışması kişisel rekorları. Herkes okur; sahibi yazar (ms, 0 = yok)
+    match /records/{uid} {
+      function okT(f) { return request.resource.data[f] is int && request.resource.data[f] >= 0 && request.resource.data[f] < 3600000; }
+      allow read: if true;
+      allow create, update: if request.auth != null && request.auth.uid == uid && !suspended(uid)
+        && request.resource.data.keys().hasOnly(['name', 's333', 'a5_333', 'a12_333', 's222', 'a5_222', 'a12_222', 'n', 'w', 'ts'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 24
+        && okT('s333') && okT('a5_333') && okT('a12_333') && okT('s222') && okT('a5_222') && okT('a12_222')
+        && request.resource.data.n is int && request.resource.data.w is int
+        && request.resource.data.ts is timestamp;
+      allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+    }
+
     // Site ayarı (bakım modu): herkes okur, yalnız admin yazar
     // Hesapsız ziyaretçiler: cihaz başına tek belge (oturumda bir kez yazılır); yalnız admin okur/siler
     match /anon/{vid} {

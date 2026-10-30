@@ -192,6 +192,7 @@ const PAGES = {
     "akilli-kup": { k: "BLUETOOTH", t: "Çözüm Analizi", s: "Bluetooth küpünü bağla; Cross, F2L, OLL ve PLL sürelerini gör.", v: () => withBadge(cubeIso(3, "YRGBYOWGB", "GGOGGBGRG", "OOWOOYOBO"), "📶") },
     "baslangic": { k: "BAŞLANGIÇ REHBERİ", t: "Küp Nasıl Çözülür?", s: "7 adım ve sadece 6 algoritmayla 3x3'ü baştan sona çöz.", v: () => cubeIso(3, "WWWWWWWWW", "GGGGGGXXX", "RRRRRRXXX") },
     "cozucu": { k: "ÇÖZÜCÜ", t: "Küp Çözücü", s: "Renkleri gir ya da kamerayla tara; çözümü adım adım gör.", v: () => withBadge(cubeIso(3, "YRGBYOWGB", "GGOGGBGRG", "OOWOOYOBO"), "📷") },
+    "rekorlar": { k: "SIRALAMA", t: "Rekor", t2: "Tablosu", s: "Ev yarışmalarının en hızlıları: 3x3 ve 2x2 tekil, Ao5 ve Ao12.", v: () => emoji("🥇") },
     "ev-yarismasi": { k: "CANLI YAYIN YARIŞMASI", t: "Ev Yarışması", s: "8-16 kişilik canlı yarışma: aynı karıştırma, canlı sıralama, final turu.", v: () => emoji("🏆") },
     "f2l": { k: "3x3 · F2L", t: "Sezgisel F2L", s: "Köşe-kenar çiftlerini birlikte yerleştir: ilk iki katman.", v: () => cubeIso(3, "XXXXXXXXX", "XXXGGGGGG", "XXXOOOOOO") },
     "gunluk": { k: "HER GÜN", t: "Günün Karıştırması", s: "Herkes aynı karıştırmayı çözer; süreni gir, sıralamada yerini al.", v: () => emoji("📅") },
