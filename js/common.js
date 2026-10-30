@@ -26,6 +26,35 @@
     S.removeItem = function (k) { if (priv(this, k)) { delete mem[k]; return; } return oRem.call(this, k); };
     window.raPurgePrivate = purge;
     window.raIsPrivateKey = function (k) { return PRIV.test(String(k)); };
+    // Bağlanan akıllı küp modelleri (admin panelindeki "akıllı küp modelleri" için profil özetine girer)
+    window.raNoteCube = function (name) {
+        name = String(name || "").trim().slice(0, 40); if (!name) return;
+        try { var o = JSON.parse(localStorage.getItem("ra-bt-cubes-v1") || "{}") || {}; o[name] = Date.now(); localStorage.setItem("ra-bt-cubes-v1", JSON.stringify(o)); } catch (e) {}
+    };
+    // Hata kayıtları: tarayıcıdaki JavaScript hataları errs koleksiyonuna yazılır (yalnız admin okur).
+    // Sayfa başına en çok 3, aynı hata oturumda bir kez.
+    (function () {
+        var sent = 0;
+        function report(msg, src, line) {
+            try {
+                var cfg = window.RA_FIREBASE; if (!cfg || !cfg.apiKey || sent >= 3 || /^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)) return;
+                msg = String(msg || "").slice(0, 300); if (!msg || /ResizeObserver loop|Script error\.?$/.test(msg)) return;
+                var key = "ra-err:" + msg.slice(0, 80) + "|" + line;
+                if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, "1");
+                sent++;
+                var u = "", A = window.Account; try { u = A && A.user && A.user() ? A.user().uid : ""; } catch (e) {}
+                var f = { m: { stringValue: msg }, s: { stringValue: String(src || "").replace(location.origin, "").slice(0, 200) }, l: { integerValue: String(+line || 0) },
+                    p: { stringValue: location.pathname.slice(0, 120) }, ua: { stringValue: navigator.userAgent.slice(0, 200) }, u: { stringValue: String(u).slice(0, 40) },
+                    v: { stringValue: String((document.querySelector('script[src*="common.js"]') || {}).src || "").replace(/.*v=/, "").slice(0, 20) } };
+                var id = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+                fetch("https://firestore.googleapis.com/v1/projects/" + cfg.projectId + "/databases/(default)/documents/errs?documentId=" + id + "&key=" + encodeURIComponent(cfg.apiKey) +
+                    "&mask.fieldPaths=m", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields: f }), keepalive: true }).catch(function () {});
+            } catch (e) {}
+        }
+        window.addEventListener("error", function (e) { if (e && e.message) report(e.message, e.filename, e.lineno); });
+        window.addEventListener("unhandledrejection", function (e) { var r = e && e.reason; if (r && (r.message || typeof r === "string")) report("Promise: " + (r.message || r), r.stack ? String(r.stack).split("\n")[1] : "", 0); });
+        window.raReportError = report;
+    })();
 })();
 
 /* =========================================================

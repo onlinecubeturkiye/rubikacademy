@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261200";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261201";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -331,6 +331,7 @@
             if (!c.capabilities || c.capabilities.facelets) c.sendCommand({ type: "REQUEST_FACELETS" }).catch(function () {});
             try { c.sendCommand({ type: "REQUEST_BATTERY" }).catch(function () {}); } catch (e) {}
             setConn("Bağlı: " + (c.deviceName || "akıllı küp"), "ok");
+            if (window.raNoteCube) raNoteCube(c.deviceName);
             $("akConnect").hidden = true; $("akDisc").hidden = false; $("akConnect").disabled = false; $("akReset").hidden = false;
             if (phase !== "solving") { phase = "scrambling"; syncProgress(); }
             renderScramble(); renderHint();
@@ -874,6 +875,8 @@
         while (tt.length < t.length - 1) tt.push(0);
         tt.push(Date.now());
         comp.local = { rnd: comp.doc.round, t: t, tt: tt };
+        // giriş yöntemi sayacı (admin istatistiği): mıknatıs timer mı, elle mi
+        try { var cst = JSON.parse(localStorage.getItem(STATS_KEY) || "{}") || {}; cst.inp = cst.inp || {}; var ik = comp.mode === "timer" ? "mag" : "man"; cst.inp[ik] = (cst.inp[ik] || 0) + 1; localStorage.setItem(STATS_KEY, JSON.stringify(cst)); } catch (e) {}
         mePatch({ name: myName(), mode: comp.mode, t: t.join(","), tt: tt.join(","), rnd: comp.doc.round }).then(compPoll);
         renderComp();
     }

@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261200";
+    var V = "20261201";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -612,7 +612,15 @@
             comp.list = comp.list.slice(0, 25);
             if (!comp.rounds && !comp.rooms) comp = null;
         }
-        return { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount, dlist: dlist.slice(0, 20), comp: comp };
+        // Admin istatistikleri için sayaçlar: çözüm sayıları (akıllı küp / sanal küp / ev yarışması), giriş yöntemi, akıllı küp modelleri
+        var len = function (k) { var v = parse(lsGet(k)); return Array.isArray(v) ? v.length : (isObj(v) && Array.isArray(v.list) ? v.list.length : 0); };
+        var evn = 0; if (isObj(cs) && isObj(cs.r)) for (var rk2 in cs.r) { var e2 = cs.r[rk2]; if (isObj(e2)) evn += e2.n || 5; }
+        var cnt = { sm: len("smart-solves-v1"), vc: len("vcube-times-v1"), ev: evn, tr: solves };
+        if (isObj(cs) && isObj(cs.inp)) { cnt.mag = cs.inp.mag || 0; cnt.man = cs.inp.man || 0; }
+        var cubes = parse(lsGet("ra-bt-cubes-v1")), cl = isObj(cubes) ? Object.keys(cubes).sort(function (a, b) { return cubes[b] - cubes[a]; }).slice(0, 5) : [];
+        var out = { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount, dlist: dlist.slice(0, 20), comp: comp, cnt: cnt };
+        if (cl.length) out.cubes = cl;
+        return out;
     }
     function localProfile() { var p = parse(lsGet(PROF_KEY)); return isObj(p) ? p : {}; }
     // Rekor tablosu (records/{uid}): ev yarışması kişisel rekorları, herkes okur (icerikler/rekorlar)
