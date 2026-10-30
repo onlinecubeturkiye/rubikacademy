@@ -233,6 +233,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://rubikacademy.fun/icerikler/rekorlar</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://rubikacademy.fun/icerikler/ev-yarismasi</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>

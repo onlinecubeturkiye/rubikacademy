@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261186";
+    var V = "20261187";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -564,6 +564,7 @@
                     writes.push({ delete: docName("users/" + uid) });
                     return commit(writes);
                 })
+                .then(function () { return api("/records/" + uid, { method: "DELETE" }).catch(function () {}); })
                 .then(function () { return api("/roles/" + uid, { method: "DELETE" }).catch(function () {}); })
                 .then(function () { return dropPushSub(); })
                 .then(function () { return m.deleteUser(auth.currentUser); });
@@ -614,6 +615,22 @@
         return { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount, dlist: dlist.slice(0, 20), comp: comp };
     }
     function localProfile() { var p = parse(lsGet(PROF_KEY)); return isObj(p) ? p : {}; }
+    // Rekor tablosu (records/{uid}): ev yarışması kişisel rekorları, herkes okur (icerikler/rekorlar)
+    var REC_F = [["s333", "333", "s"], ["a5_333", "333", "a5"], ["a12_333", "333", "a12"], ["s222", "222", "s"], ["a5_222", "222", "a5"], ["a12_222", "222", "a12"]];
+    function writeRecords(name, comp) {
+        if (!user || !comp || !comp.pb) return;
+        var f = { name: { stringValue: name }, n: { integerValue: String(comp.rounds || 0) }, w: { integerValue: String(comp.wins || 0) }, ts: { timestampValue: new Date().toISOString() } }, any = false;
+        REC_F.forEach(function (r) {
+            var v = comp.pb[r[1]] && comp.pb[r[1]][r[2]];
+            v = typeof v === "number" && v > 0 && v < 3600000 ? Math.round(v) : 0;
+            if (v) any = true;
+            f[r[0]] = { integerValue: String(v) };
+        });
+        if (!any) return;
+        var key = JSON.stringify(f).replace(/"ts":\{[^}]*\}/, "");
+        if (lsGet("ra-rec-last") === key) return; // değişmediyse yazma (kota)
+        api("/records/" + user.uid, { method: "PATCH", body: JSON.stringify({ fields: f }) }).then(function (r) { if (r.ok) lsSet("ra-rec-last", key); }).catch(function () {});
+    }
     function writeProfile() {
         if (!user) return Promise.resolve();
         var prof = localProfile();
@@ -632,6 +649,7 @@
             stats: { stringValue: JSON.stringify(st).slice(0, 8000) }
         };
         var mask = "?updateMask.fieldPaths=name&updateMask.fieldPaths=photo&updateMask.fieldPaths=bio&updateMask.fieldPaths=joined&updateMask.fieldPaths=seen&updateMask.fieldPaths=stats";
+        writeRecords(name, st.comp);
         return api("/users/" + user.uid + mask, { method: "PATCH", body: JSON.stringify({ fields: fields }) }).catch(function () {});
     }
     function logVisit() {
