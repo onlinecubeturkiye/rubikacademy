@@ -14,7 +14,7 @@
         on: false, src: "", state: "white", base: null, buf: [], last: null, t0: 0, gotData: 0,
         cb: null, mag: null, armedAt: 0, stopAt: 0
     };
-    var STABLE_MS = 900, MIN_SOLVE = 1200;
+    var STABLE_MS = 700, MIN_SOLVE = 1200;
     function now() { return performance.now(); }
     function emit(type, data) { if (S.cb) try { S.cb(type, data); } catch (e) {} }
     function setState(st) { if (S.state !== st) { S.state = st; emit("state", st); } }
@@ -25,36 +25,48 @@
         if (S.src === "magnet") return Math.abs(v - S.base);
         var d = Math.abs(v - S.base) % 360; return d > 180 ? 360 - d : d;
     }
-    function thOn() { return S.src === "magnet" ? 60 : 22; }   // küp var
-    function thOff() { return S.src === "magnet" ? 30 : 12; }  // küp kalktı
+    // Eşikler: pusula (derece) daha gürültülü ve yumuşatılmış geldiği için daha toleranslı
+    function thOn() { return S.src === "magnet" ? 40 : 14; }    // küp var
+    function thOff() { return S.src === "magnet" ? 20 : 7; }    // küp yok sayılır
+    function thLift() { return S.src === "magnet" ? 25 : 6; }   // hazırken küp kalkıyor
+    function thStable() { return S.src === "magnet" ? 8 : 4; }  // sinyal sabit
     function spread(arr) {
         if (arr.length < 3) return Infinity;
         if (S.src === "magnet") { var mn = Infinity, mx = -Infinity; arr.forEach(function (x) { mn = Math.min(mn, x.v); mx = Math.max(mx, x.v); }); return mx - mn; }
         var ref = arr[0].v, m = 0; arr.forEach(function (x) { var d = Math.abs(x.v - ref) % 360; m = Math.max(m, d > 180 ? 360 - d : d); }); return m;
     }
+    function median(arr) { var v = arr.map(function (x) { return x.v; }).sort(function (a, b) { return a - b; }); return v[Math.floor(v.length / 2)]; }
+    function between(a, b) { if (S.src === "magnet") return Math.abs(a - b); var d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; }
 
     function sample(v) {
         if (!S.on || v == null || isNaN(v)) return;
         var t = now(); S.gotData = t; S.last = v;
+        if (!S.firstAt) S.firstAt = t;
         S.buf.push({ t: t, v: v }); while (S.buf.length && t - S.buf[0].t > STABLE_MS) S.buf.shift();
-        var stable = spread(S.buf) < (S.src === "magnet" ? 6 : 3);
-        // Taban çizgisi: küp yokken sabit sinyal (beyaz durumda sürekli güncellenir)
-        if (S.base == null) { if (stable && S.buf.length > 5) { S.base = S.buf[S.buf.length - 1].v; emit("calibrated"); } return; }
+        var stable = spread(S.buf) < thStable();
+        // Taban çizgisi (küp yokken): sinyal oturunca ya da en geç 1.5 sn sonra ortanca değer
+        if (S.base == null) {
+            if ((stable && S.buf.length > 5) || t - S.firstAt > 1500) { S.base = median(S.buf); emit("calibrated"); }
+            return;
+        }
         var d = dist(v);
         if (S.state === "white") {
             if (d > thOn()) setState("orange");
-            else if (stable) S.base = v; // ortam yavaşça değişirse takip et
+            else if (stable) S.base = median(S.buf); // ortam yavaşça değişirse takip et
         } else if (S.state === "orange") {
             if (d < thOff()) setState("white");
-            else if (stable) { setState("green"); S.armedAt = t; }
+            else if (stable) { S.ready = median(S.buf); setState("green"); }
         } else if (S.state === "green") {
-            if (d < thOff()) { S.t0 = t; setState("running"); emit("start"); }
-            else if (!stable && d > thOn() * 3) { /* küp oynatılıyor: hazır kal */ }
+            // Küp kalkınca sinyal hazır değerden tabana doğru belirgin şekilde döner (sensör gecikse bile ilk kıpırtıda başlar)
+            var back = dist(S.ready) - d;
+            if (d < thOff() || (back > thLift() && between(v, S.ready) > thLift())) { S.t0 = t; setState("running"); emit("start"); }
+            else if (stable) S.ready = median(S.buf); // küp yerinde hafifçe kaydıysa takip et
         } else if (S.state === "running") {
             // küp tekrar telefonun üstüne konursa da dur
             if (t - S.t0 > MIN_SOLVE && d > thOn() && stable) finish(t - STABLE_MS * 0.5);
         } else if (S.state === "done") {
             if (d < thOff() && t - S.stopAt > 1500) setState("white");
+            else if (d > thOn() && stable && t - S.stopAt > 1500) { S.ready = median(S.buf); setState("green"); }
         }
     }
     function finish(atT) {
@@ -92,7 +104,7 @@
         try {
             var m = new window.Magnetometer({ frequency: 60 });
             m.addEventListener("reading", function () {
-                if (S.src !== "magnet") { S.src = "magnet"; S.base = null; S.buf = []; } // pusuladan doğrudan sensöre geç
+                if (S.src !== "magnet") { S.src = "magnet"; S.base = null; S.buf = []; S.firstAt = 0; } // pusuladan doğrudan sensöre geç
                 sample(Math.sqrt(m.x * m.x + m.y * m.y + m.z * m.z));
             });
             m.addEventListener("error", function () { if (S.src === "magnet") S.src = ""; });
@@ -104,7 +116,7 @@
         // Kullanıcı dokunuşuyla çağrılmalı (iOS izinleri için)
         start: function (cb) {
             if (S.on) { S.cb = cb; emit("state", S.state); return Promise.resolve(true); }
-            S.cb = cb; S.base = null; S.buf = []; S.state = "white"; S.src = ""; S.gotData = 0;
+            S.cb = cb; S.base = null; S.buf = []; S.state = "white"; S.src = ""; S.gotData = 0; S.firstAt = 0;
             return needPerm().then(function (ok) {
                 if (!ok) { emit("error", "perm"); return false; }
                 S.on = true;
@@ -127,7 +139,7 @@
         // Ekrana dokunarak durdurma (yedek)
         tapStop: function () { if (S.state === "running") finish(now()); },
         reset: function () { if (S.state === "done") setState(S.base != null && S.last != null && dist(S.last) > thOn() ? "orange" : "white"); },
-        recalibrate: function () { S.base = null; S.buf = []; setState("white"); },
+        recalibrate: function () { S.base = null; S.buf = []; S.firstAt = 0; setState("white"); },
         state: function () { return S.state; },
         elapsed: function () { return S.state === "running" ? now() - S.t0 : 0; },
         source: function () { return S.src; },

@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261194";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261195";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -868,12 +868,16 @@
     /* --- mıknatıs timer (ZKT tarzı): telefonun pusulası/manyetometresiyle --- */
     var mag = { on: false, raf: 0 };
     var MAG_TXT = { white: "Küpü telefonun üstüne koy", orange: "Hazırlanıyor… küpü oynatma", green: "Hazır! Küpü kaldırınca süre başlar", running: "Çözülüyor… bitince küpü masaya bırak", done: "Kaydedildi ✓" };
+    // (kutu yalnız durum gösterir; başlatma/durdurma mıknatıs ve titreşimle)
     function magPaint(st) {
         var box = $("cMagBox"); if (!box) return;
         var can = compCanSolve();
         var cls = st === "off" ? "wait" : !can && st !== "running" && st !== "done" ? "wait" : st;
         box.className = "c-mag-box " + cls;
-        $("cMagS").textContent = st === "off" ? "Mıknatıs timer'ı başlatmak için dokun" : cls === "wait" ? "Sıradaki karıştırmayı bekle" : (MAG_TXT[st] || "");
+        if (st === "off") {
+            $("cMagS").innerHTML = 'Sensör kapalı<br><button type="button" id="cMagGo">🧲 Sensörü başlat</button>';
+            $("cMagGo").onclick = function () { magToggle(true); applyInput(); };
+        } else $("cMagS").textContent = cls === "wait" ? "Sıradaki karıştırmayı bekle" : (MAG_TXT[st] || "");
         if (st !== "running") cancelAnimationFrame(mag.raf);
     }
     function magTick() { $("cMagT").textContent = fmt(MagnetTimer.elapsed()); mag.raf = requestAnimationFrame(magTick); }
@@ -927,8 +931,7 @@
                 applyInput();
             };
         });
-        // Kutuya dokun: kapalıysa sensörü başlat, çalışıyorsa süreyi durdur
-        $("cMagBox").onclick = function () { if (!window.MagnetTimer) return; if (!mag.on) { magToggle(true); applyInput(); } else MagnetTimer.tapStop(); };
+        // Süre yalnız mıknatıs/titreşimle başlar ve durur: kutuya dokunmak bir şey yapmaz
         $("cMagCal").onclick = function () { if (window.MagnetTimer) MagnetTimer.recalibrate(); };
     }
     function typeSave(pen) {
