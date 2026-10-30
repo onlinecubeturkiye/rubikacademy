@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261205";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261206";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -932,7 +932,7 @@
     document.addEventListener("keyup", function (e) { if (e.code === "Space" && phase === "holding") { e.preventDefault(); manualUp(); } });
     /* --- mıknatıs timer (ZKT tarzı): telefonun pusulası/manyetometresiyle --- */
     var mag = { on: false, raf: 0 };
-    var MAG_TXT = { white: "Küpü telefonun üstüne koy", orange: "Bekle… küpü oynatma (1 sn)", green: "Hazır! Küpü kaldırınca süre başlar", clear: "Küpü kaldır, karıştır ve tekrar telefona koy", running: "Çözülüyor… bitince küpü masaya bırak", done: "Kaydedildi ✓" };
+    var MAG_TXT = { white: "Küpü telefonun üstüne koy", orange: "Bekle… küpü oynatma (1 sn)", green: "Hazır! Küpü kaldırınca süre başlar", clear: "Küpü kaldır, karıştır ve tekrar telefona koy", running: "Çözülüyor… bitince küpü masaya bırak (ya da buraya dokun)", done: "Kaydedildi ✓" };
     // (kutu yalnız durum gösterir; başlatma/durdurma mıknatıs ve titreşimle)
     function magPaint(st) {
         var box = $("cMagBox"); if (!box) return;
@@ -1012,6 +1012,8 @@
         });
         // Süre yalnız mıknatıs/titreşimle başlar ve durur: kutuya dokunmak bir şey yapmaz
         $("cMagCal").onclick = function () { openCal(); };
+        // yedek: çözerken kutuya dokunmak süreyi durdurur (başlatmaz)
+        $("cMagBox").onclick = function () { if (window.MagnetTimer && MagnetTimer.state() === "running") MagnetTimer.tapStop(); };
         if ($("cMagCalGo")) $("cMagCalGo").onclick = function () { openCal(); };
     }
     // Kayıtlı küpler: hangisiyle çözdüğünü seç ya da yeni küp ayarla
@@ -1021,7 +1023,9 @@
         el.hidden = !list.length;
         var key = list.join("|") + "#" + cur; if (el.dataset.k === key) return; el.dataset.k = key;
         el.innerHTML = '<span>🧲 Küp</span><select id="cMagSel" aria-label="Küp">' + list.map(function (n) { return '<option' + (n === cur ? " selected" : "") + '>' + esc(n) + '</option>'; }).join("") + '</select>' +
-            '<button type="button" class="c-linkbtn" id="cMagRe">Yeniden ayarla</button><button type="button" class="c-linkbtn" id="cMagNew">+ Yeni küp</button>';
+            '<button type="button" class="c-linkbtn" id="cMagRe">Yeniden ayarla</button><button type="button" class="c-linkbtn" id="cMagNew">+ Yeni küp</button>' +
+            '<label class="c-mag-sens">Durdurma <select id="cMagSens" aria-label="Titreşimle durdurma hassasiyeti"><option value="1">Az hassas</option><option value="2">Normal</option><option value="3">Çok hassas</option></select></label>';
+        $("cMagSens").value = MagnetTimer.sens(); $("cMagSens").onchange = function () { MagnetTimer.sens(this.value); };
         $("cMagSel").onchange = function () { MagnetTimer.useCube(this.value); MagnetTimer.calMode(null); applyInput(); };
         $("cMagRe").onclick = function () { openCal(); };
         $("cMagNew").onclick = function () { openCal(""); };
@@ -1039,6 +1043,8 @@
             m.style.left = Math.min(100, L.th / max * 100) + "%";
             if ($("cMagNoCal")) $("cMagNoCal").hidden = !L.src || MagnetTimer.hasCal() || mcOpen;
             // ayar durumu değiştiyse (ör. sensör türü belli oldu) kutuyu yeniden çiz
+            // masaya hafif vurunca "tık" göstergesi (durdurma hassasiyetini denemek için)
+            if (MagnetTimer.shake() > 1 && MagnetTimer.state() !== "running") { var bb = $("cMagBar"); bb.classList.remove("tap"); void bb.offsetWidth; bb.classList.add("tap"); }
             var hc = L.src ? MagnetTimer.hasCal() : null; if (hc !== mag.hc) { mag.hc = hc; magPaint(MagnetTimer.state()); }
         }, 80);
     }
