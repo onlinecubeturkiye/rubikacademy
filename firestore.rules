@@ -298,6 +298,26 @@ service cloud.firestore {
       allow read: if isAdmin();
     }
 
+    // Hata kayıtları: tarayıcıdaki JavaScript hataları (giriş gerekmez, yalnız ekleme). Yalnız admin okur/siler.
+    match /errs/{id} {
+      allow read, delete: if isAdmin();
+      allow update: if false;
+      allow create: if id.matches('^[a-z0-9]{8,24}$')
+        && request.resource.data.keys().hasOnly(['m', 's', 'l', 'p', 'ua', 'u', 'v'])
+        && request.resource.data.m is string && request.resource.data.m.size() > 0 && request.resource.data.m.size() <= 300
+        && request.resource.data.s is string && request.resource.data.s.size() <= 200
+        && request.resource.data.l is int
+        && request.resource.data.p is string && request.resource.data.p.size() <= 120
+        && request.resource.data.ua is string && request.resource.data.ua.size() <= 200
+        && request.resource.data.u is string && request.resource.data.u.size() <= 40
+        && request.resource.data.v is string && request.resource.data.v.size() <= 20;
+    }
+
+    // Admin paneli: tüm algoritma önerilerini tek sorguda listeler (koleksiyon grubu "s")
+    match /{path=**}/s/{sid} {
+      allow read: if isAdmin();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

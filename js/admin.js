@@ -458,7 +458,7 @@
                 countPushSubs().then(function (n) { var e = $id("ovPush"); if (e) e.textContent = n; });
                 window.Leaderboard.fetchDay(dayNumOf(todayStr()), 300).then(function (rows) { var e = $id("ovDaily"); if (e) e.textContent = rows.length; }, function () {});
             }
-            renderChart(); renderActive();
+            renderChart(); renderActive(); renderSiteStats();
         }, function (e) {
             var code = e && e.message;
             var hint = (code === "429" || code === 429) ? ' — Firebase günlük ücretsiz okuma kotası doldu. Kota her gün saat 10:00 civarı (TR) sıfırlanır; Firebase Console → Usage kısmından kullanımı görebilirsin.' : (code === "403" || code === 403) ? ' — Firestore kurallarını Firebase Console’dan yayımladığından ve bu hesabın yönetici (pikapikachuyt0@gmail.com, Google) olduğundan emin ol.' : '';
@@ -691,7 +691,7 @@
         if (!_users.length) { box.innerHTML = '<p class="a-note">Önce kullanıcılar yüklensin.</p>'; return; }
         box.innerHTML = '<p class="a-note">Hesaplanıyor… (0/' + _users.length + ')</p>';
         if (btn) btn.disabled = true;
-        var browsers = {}, oses = {}, done = 0, total = _users.length;
+        var browsers = {}, oses = {}, langs = {}, themes = {}, cvds = {}, provs = {}, done = 0, total = _users.length;
         function bump(obj, k) { k = k || "Bilinmiyor"; obj[k] = (obj[k] || 0) + 1; }
         Promise.all(_users.map(function (u) {
             return fetchMeta(u.uid).then(function (m) {
@@ -699,13 +699,19 @@
                 var parts = dev.split("·");
                 bump(browsers, (parts[0] || "").trim());
                 bump(oses, (parts[1] || "").trim());
+                bump(langs, m ? ({ tr: "Türkçe", en: "English" }[m.lang] || m.lang || "Türkçe (varsayılan)") : "");
+                bump(themes, m ? (m.theme === "light" ? "☀️ Açık" : m.theme === "dark" ? "🌙 Koyu" : m.theme || "Varsayılan") : "");
+                bump(cvds, m ? (m.cvd ? "Açık: " + m.cvd : "Kapalı") : "");
+                bump(provs, m ? provLabel(m.provider) : "");
             }, function () { bump(browsers, ""); bump(oses, ""); }).then(function () {
                 done++; var p = box.querySelector(".a-note"); if (p) p.textContent = "Hesaplanıyor… (" + done + "/" + total + ")";
             });
         })).then(function () {
             if (btn) btn.disabled = false;
             box.innerHTML = '<div class="dev-cols"><div><h4>Tarayıcı</h4>' + distHtml(browsers, total) + '</div>' +
-                '<div><h4>İşletim sistemi</h4>' + distHtml(oses, total) + '</div></div>';
+                '<div><h4>İşletim sistemi</h4>' + distHtml(oses, total) + '</div>' +
+                '<div><h4>Dil</h4>' + distHtml(langs, total) + '</div><div><h4>Tema</h4>' + distHtml(themes, total) + '</div>' +
+                '<div><h4>Renk körlüğü modu</h4>' + distHtml(cvds, total) + '</div><div><h4>Giriş türü</h4>' + distHtml(provs, total) + '</div></div>';
         });
     }
     function distHtml(obj, total) {
@@ -716,6 +722,170 @@
             return '<div class="dist-row"><span class="dist-lbl">' + esc(k || "Bilinmiyor") + '</span>' +
                 '<span class="dist-bar"><span style="width:' + pct + '%"></span></span><b>' + n + '</b></div>';
         }).join("");
+    }
+
+    /* ---------- site istatistikleri (üyelerin profil özetlerinden; ek okuma yok) ---------- */
+    function tiles(arr) { return arr.map(function (t) { return '<div class="stat-tile"><b>' + t[1] + '</b><span>' + t[0] + '</span></div>'; }).join(""); }
+    function nf(n) { return (n || 0).toLocaleString("tr-TR"); }
+    function renderSiteStats() {
+        var box = $id("aSiteStats"); if (!box) return;
+        if (!_users.length) { box.innerHTML = '<p class="a-note">Kullanıcılar yüklenince hesaplanır.</p>'; return; }
+        var sm = 0, vc = 0, ev = 0, tr = 0, mag = 0, man = 0, cubes = {}, cubeUsers = 0;
+        var rooms = 0, rounds = 0, wins = 0, compUsers = 0, rr = {}, top = [];
+        _users.forEach(function (u) {
+            var s = u.stats || {}, c = s.cnt || {};
+            sm += c.sm || 0; vc += c.vc || 0; ev += c.ev || 0; tr += c.tr || s.solves || 0; mag += c.mag || 0; man += c.man || 0;
+            if (Array.isArray(s.cubes) && s.cubes.length) { cubeUsers++; s.cubes.forEach(function (n) { cubes[n] = (cubes[n] || 0) + 1; }); }
+            var cp = s.comp;
+            if (cp && (cp.rooms || cp.rounds)) {
+                compUsers++; rooms += cp.rooms || 0; rounds += cp.rounds || 0; wins += cp.wins || 0;
+                top.push({ n: u.name, r: cp.rooms || 0, w: cp.wins || 0, t: cp.rounds || 0 });
+                (cp.list || []).forEach(function (x) { if (x.p) rr[x.c + ":" + x.r] = x.p; });
+            }
+        });
+        var sizes = Object.keys(rr).map(function (k) { return rr[k]; }), avg = sizes.length ? (sizes.reduce(function (a, b) { return a + b; }, 0) / sizes.length) : 0;
+        top.sort(function (a, b) { return b.r - a.r || b.w - a.w; });
+        var inpT = mag + man;
+        box.innerHTML =
+            '<h4>Çözümler</h4><div class="stat-tiles">' + tiles([["Akıllı küp çözümü", nf(sm)], ["Sanal küp çözümü", nf(vc)], ["Ev yarışması çözümü", nf(ev)], ["Antrenör denemesi", nf(tr)]]) + '</div>' +
+            '<p class="a-note">Akıllı küp ve sanal küp sayıları kişi başı son 100 kayda kadar sayılır. Sayılar üyelerin profil özetinden gelir; üye siteye girdikçe güncellenir.</p>' +
+            '<h4 style="margin-top:14px">Ev yarışmaları</h4><div class="stat-tiles">' + tiles([["Yarışmaya katılan üye", compUsers], ["Oda girişi (toplam)", nf(rooms)], ["Oynanan tur (kişi×tur)", nf(rounds)], ["Ortalama tur büyüklüğü", avg ? avg.toFixed(1) + " kişi" : "—"], ["Şampiyonluk", wins]]) + '</div>' +
+            (top.length ? '<h4 style="margin-top:12px">En çok yarışan</h4>' + top.slice(0, 8).map(function (x, i) { return '<div class="dist-row"><span class="dist-lbl">' + (i + 1) + '. ' + esc(x.n) + '</span><span class="a-note">' + x.r + ' oda · ' + x.t + ' tur · ' + x.w + ' 🏆</span></div>'; }).join("") : '') +
+            '<h4 style="margin-top:12px">En aktif organizatörler (açık / son odalar)</h4><div id="aOrgTop"><p class="a-note">Yükleniyor…</p></div>' +
+            '<h4 style="margin-top:14px">Süre giriş yöntemi (ev yarışması)</h4>' + (inpT ? distHtml({ "🧲 Mıknatıs timer": mag, "⌨️ Elle yazma": man }, inpT) : '<p class="a-note">Henüz veri yok (bu özellikten sonraki çözümler sayılır).</p>') +
+            '<h4 style="margin-top:14px">Akıllı küp modelleri <span class="a-sub" style="margin:0">' + cubeUsers + ' üye bağlamış</span></h4>' + (cubeUsers ? distHtml(cubes, cubeUsers) : '<p class="a-note">Henüz veri yok (bundan sonra bağlanan küpler kaydedilir).</p>');
+        listComps().then(function (list) {
+            var o = {}; list.forEach(function (c) { var k = c.hName || "?"; o[k] = (o[k] || 0) + 1; });
+            var e = $id("aOrgTop"); if (e) e.innerHTML = list.length ? distHtml(o, list.length) : '<p class="a-note">Şu an kayıtlı oda yok.</p>';
+        }, function () { var e = $id("aOrgTop"); if (e) e.innerHTML = '<p class="a-note">Yüklenemedi.</p>'; });
+    }
+
+    /* ---------- topluluk algoritma önerileri ---------- */
+    function renderSug() {
+        var box = $id("aSugList"); if (!box) return;
+        box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
+        var q = { structuredQuery: { from: [{ collectionId: "s", allDescendants: true }], limit: 400 } };
+        authed(docsBase() + ":runQuery", { method: "POST", body: JSON.stringify(q) }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (rows) {
+            var list = (rows || []).filter(function (x) { return x.document && x.document.name.indexOf("/algsug/") > 0; }).map(function (x) {
+                var f = x.document.fields || {}, path = x.document.name.split("/documents")[1], parts = path.split("/");
+                var vs = (f.vs && f.vs.mapValue && f.vs.mapValue.fields) || {};
+                return { path: path, cid: decodeURIComponent(parts[2] || ""), a: gv(f, "a") || "", n: gv(f, "n") || "?", u: gv(f, "u") || "", v: Object.keys(vs).length, ts: Date.parse(gv(f, "ts") || "") || 0 };
+            });
+            $id("aSugCount").textContent = list.length + " öneri";
+            if (!list.length) { box.innerHTML = '<p class="a-note">Henüz öneri yok.</p>'; return; }
+            var mode = ($id("aSugSort") || {}).value || "new";
+            list.sort(function (a, b) { return mode === "vote" ? b.v - a.v || b.ts - a.ts : b.ts - a.ts; });
+            box.innerHTML = list.slice(0, 150).map(function (x) {
+                return '<div class="a-row2"><div style="min-width:0;flex:1"><b>' + esc(x.cid) + '</b> <span class="a-note">· ' + esc(x.n) + ' · ' + esc(dateFmt(x.ts)) + ' · 👍 ' + x.v + '</span><div class="mono small" style="word-break:break-word">' + esc(x.a) + '</div></div>' +
+                    '<button class="a-btn danger sm" data-sd="' + esc(x.path) + '">Sil</button></div>';
+            }).join("");
+            Array.prototype.forEach.call(box.querySelectorAll("[data-sd]"), function (b) {
+                b.onclick = function () {
+                    if (!confirm("Bu öneri silinsin mi?")) return;
+                    b.disabled = true;
+                    delDoc(b.getAttribute("data-sd")).then(function (ok) { if (ok) b.closest(".a-row2").remove(); else { b.disabled = false; alert("Silinemedi (kuralları yayımladın mı?)"); } });
+                };
+            });
+        }).catch(function (e) { box.innerHTML = '<p class="a-note">Öneriler yüklenemedi (' + esc(e && e.message) + '). Firebase kurallarını yayımladın mı?</p>'; });
+    }
+
+    /* ---------- rekor tablosu yönetimi: şüpheli dereceler ---------- */
+    var REC_LIM = { s333: 4000, a5_333: 5500, a12_333: 6000, s222: 600, a5_222: 1000, a12_222: 1200 };
+    var REC_LBL = { s333: "3x3 tekil", a5_333: "3x3 Ao5", a12_333: "3x3 Ao12", s222: "2x2 tekil", a5_222: "2x2 Ao5", a12_222: "2x2 Ao12" };
+    function renderRecords() {
+        var box = $id("aRecList"); if (!box) return;
+        box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
+        var q = { structuredQuery: { from: [{ collectionId: "records" }], limit: 500 } };
+        authed(docsBase() + ":runQuery", { method: "POST", body: JSON.stringify(q) }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (rows) {
+            var list = (rows || []).filter(function (x) { return x.document; }).map(function (x) {
+                var f = x.document.fields || {}, o = { uid: x.document.name.split("/").pop(), name: gv(f, "name") || "?", flags: [] };
+                Object.keys(REC_LIM).forEach(function (k) { o[k] = +gv(f, k) || 0; if (o[k] && o[k] < REC_LIM[k]) o.flags.push(REC_LBL[k] + " çok hızlı"); });
+                [["333", "s333", "a5_333"], ["222", "s222", "a5_222"]].forEach(function (e) { if (o[e[2]] && o[e[1]] && o[e[2]] < o[e[1]]) o.flags.push(e[0] + " Ao5 tekilden hızlı"); });
+                return o;
+            });
+            var onlyBad = $id("aRecBad") && $id("aRecBad").checked;
+            var bad = list.filter(function (o) { return o.flags.length; });
+            $id("aRecCount").textContent = list.length + " kişi · " + bad.length + " şüpheli";
+            var show = (onlyBad ? bad : list).sort(function (a, b) { return b.flags.length - a.flags.length || (a.s333 || 9e9) - (b.s333 || 9e9); });
+            if (!show.length) { box.innerHTML = '<p class="a-note">' + (onlyBad ? "Şüpheli derece yok ✓" : "Kayıt yok.") + '</p>'; return; }
+            box.innerHTML = show.slice(0, 200).map(function (o) {
+                var vals = Object.keys(REC_LBL).filter(function (k) { return o[k]; }).map(function (k) { return REC_LBL[k] + ' <b class="mono">' + tFmt(o[k]) + '</b>'; }).join(" · ");
+                return '<div class="a-row2"><div style="min-width:0;flex:1"><b>' + esc(o.name) + '</b>' + (o.flags.length ? ' <span class="pill l">⚠ ' + esc(o.flags.join(", ")) + '</span>' : '') + '<div class="a-note">' + (vals || "—") + '</div></div>' +
+                    '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.uid) + '" target="_blank" rel="noopener">👤</a><button class="a-btn danger sm" data-rd="' + esc(o.uid) + '">Sil</button></div>';
+            }).join("");
+            Array.prototype.forEach.call(box.querySelectorAll("[data-rd]"), function (b) {
+                b.onclick = function () {
+                    if (!confirm("Bu kişinin rekor kaydı silinsin mi? (Kişi yeni bir yarışmaya girince rekorları yeniden yazılabilir; tekrarlarsa hesabı askıya al.)")) return;
+                    b.disabled = true;
+                    delDoc("/records/" + b.getAttribute("data-rd")).then(function (ok) { if (ok) b.closest(".a-row2").remove(); else { b.disabled = false; alert("Silinemedi."); } });
+                };
+            });
+        }).catch(function (e) { box.innerHTML = '<p class="a-note">Rekorlar yüklenemedi (' + esc(e && e.message) + ').</p>'; });
+    }
+
+    /* ---------- hata kayıtları ---------- */
+    function renderErrs() {
+        var box = $id("aErrList"); if (!box) return;
+        box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
+        var q = { structuredQuery: { from: [{ collectionId: "errs" }], limit: 500 } };
+        authed(docsBase() + ":runQuery", { method: "POST", body: JSON.stringify(q) }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (rows) {
+            var docs = (rows || []).filter(function (x) { return x.document; }).map(function (x) {
+                var f = x.document.fields || {};
+                return { path: x.document.name.split("/documents")[1], m: gv(f, "m") || "", s: gv(f, "s") || "", l: +gv(f, "l") || 0, p: gv(f, "p") || "", ua: gv(f, "ua") || "", v: gv(f, "v") || "", ts: Date.parse(x.document.createTime) || 0 };
+            });
+            $id("aErrCount").textContent = docs.length + " kayıt";
+            if (!docs.length) { box.innerHTML = '<p class="a-note">Hata kaydı yok ✓</p>'; return; }
+            var g = {};
+            docs.forEach(function (d) {
+                var k = d.m + "|" + d.s + ":" + d.l, e = g[k] || (g[k] = { m: d.m, s: d.s, l: d.l, n: 0, last: 0, pages: {}, uas: {}, v: d.v, paths: [] });
+                e.n++; e.paths.push(d.path); if (d.ts > e.last) { e.last = d.ts; e.v = d.v; }
+                e.pages[d.p] = 1; e.uas[uaShort(d.ua)] = 1;
+            });
+            var arr = Object.keys(g).map(function (k) { return g[k]; }).sort(function (a, b) { return b.last - a.last; });
+            box.innerHTML = arr.map(function (e, i) {
+                return '<details class="duel-row"><summary><b>' + e.n + '×</b><span class="mono small" style="word-break:break-word">' + esc(e.m) + '</span><span class="a-note">' + esc(dateFmt(e.last)) + '</span></summary>' +
+                    '<div class="duel-body"><div class="info-grid">' + infoRow("Dosya", '<span class="mono small">' + esc(e.s || "—") + (e.l ? ":" + e.l : "") + '</span>') +
+                    infoRow("Sayfalar", esc(Object.keys(e.pages).join(", "))) + infoRow("Cihazlar", esc(Object.keys(e.uas).join(", "))) + infoRow("Son sürüm", esc(e.v || "—")) + '</div>' +
+                    '<button class="a-btn danger sm" data-eg="' + i + '">🗑️ Bu hatanın kayıtlarını sil</button></div></details>';
+            }).join("");
+            Array.prototype.forEach.call(box.querySelectorAll("[data-eg]"), function (b) {
+                b.onclick = function () {
+                    var e = arr[+b.getAttribute("data-eg")]; b.disabled = true;
+                    commit(e.paths.map(function (p) { return { delete: docName(p) }; })).then(function () { b.closest("details").remove(); }, function () { b.disabled = false; alert("Silinemedi."); });
+                };
+            });
+            box.dataset.all = JSON.stringify(docs.map(function (d) { return d.path; }));
+        }).catch(function (e) { box.innerHTML = '<p class="a-note">Hata kayıtları yüklenemedi (' + esc(e && e.message) + '). Firebase kurallarını yayımladın mı?</p>'; });
+    }
+    function uaShort(ua) {
+        var b = /Edg\//.test(ua) ? "Edge" : /SamsungBrowser/.test(ua) ? "Samsung" : /OPR\//.test(ua) ? "Opera" : /Firefox\//.test(ua) ? "Firefox" : /Chrome\//.test(ua) ? "Chrome" : /Safari\//.test(ua) ? "Safari" : "Diğer";
+        var o = /Android/.test(ua) ? "Android" : /iPhone|iPad/.test(ua) ? "iOS" : /Windows/.test(ua) ? "Windows" : /Mac OS/.test(ua) ? "macOS" : /Linux/.test(ua) ? "Linux" : "?";
+        return b + "/" + o;
+    }
+
+    /* ---------- Firebase kullanımı (tahmini) ---------- */
+    function countColl(coll) {
+        var body = { structuredAggregationQuery: { structuredQuery: { from: [{ collectionId: coll }] }, aggregations: [{ alias: "n", count: {} }] } };
+        return authed(docsBase() + ":runAggregationQuery", { method: "POST", body: JSON.stringify(body) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
+            var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n; return x ? +x.integerValue : 0;
+        }, function () { return null; });
+    }
+    function renderUsage() {
+        var box = $id("aUsage"); if (!box) return;
+        box.innerHTML = '<p class="a-note">Hesaplanıyor…</p>';
+        var colls = [["users", "Üye profili"], ["comps", "Ev yarışması odası"], ["records", "Rekor kaydı"], ["pushsubs", "Bildirim aboneliği"], ["anon", "Hesapsız cihaz"], ["errs", "Hata kaydı"], ["broadcasts", "Duyuru"]];
+        Promise.all(colls.map(function (c) { return countColl(c[0]); })).then(function (ns) {
+            var now = Date.now(), d1 = 86400000;
+            var act = _users.filter(function (u) { return u.seen && now - u.seen < d1; }).length;
+            var anonN = ns[4] || 0;
+            // kaba tahmin: aktif üye başına ~60 okuma / ~15 yazma (senkron, profil, sıralamalar); hesapsız cihaz ~8 okuma; açık oda başına ~400 okuma
+            var openRooms = ns[1] || 0, estR = act * 60 + Math.round(anonN * 0.15) * 8 + openRooms * 400, estW = act * 15 + openRooms * 60;
+            var pr = Math.round(estR / 50000 * 100), pw = Math.round(estW / 20000 * 100), lvl = Math.max(pr, pw);
+            box.innerHTML = '<div class="stat-tiles">' + tiles([["Tahmini okuma / gün", nf(estR) + " <small>(%" + pr + ")</small>"], ["Tahmini yazma / gün", nf(estW) + " <small>(%" + pw + ")</small>"], ["Son 24 saat aktif üye", act], ["Açık oda", openRooms]]) + '</div>' +
+                (lvl >= 70 ? '<p class="a-msg bad" style="display:block">⚠ Günlük ücretsiz kotanın %' + lvl + '\'ine yaklaşılmış olabilir. Kota dolarsa site verileri yarın 10:00\'a (TR) kadar yüklenmez. Eski odaları ve hata kayıtlarını temizle.</p>' : '<p class="a-note">✓ Kota rahat görünüyor.</p>') +
+                '<p class="a-note">Ücretsiz plan: günde 50.000 okuma, 20.000 yazma, 20.000 silme. Bu değerler kaba bir tahmindir; gerçek kullanım için <a href="https://console.firebase.google.com/project/' + esc(cfg.projectId) + '/firestore/usage" target="_blank" rel="noopener">Firebase Console → Usage</a>.</p>' +
+                '<h4 style="margin-top:12px">Belge sayıları</h4>' + colls.map(function (c, i) { return '<div class="dist-row"><span class="dist-lbl">' + c[1] + '</span><b>' + (ns[i] == null ? "?" : nf(ns[i])) + '</b></div>'; }).join("");
+        });
     }
 
     /* ---------- bakım modu ---------- */
@@ -764,10 +934,20 @@
             '<div class="bulk-bar" id="uBulk" hidden><b id="uSelCount">0</b> seçili · <select id="uBulkRole"><option value="">Rol ata…</option><option value="uye">Üye</option><option value="gelistirici">Geliştirici</option><option value="tester">Tester</option><option value="organizator">Organizatör</option></select> <button class="a-btn sm" id="uBulkRoleGo">Uygula</button> <button class="a-btn sm" id="uBulkNotify">Bildirim gönder</button><span class="a-msg" id="uBulkMsg" style="margin:0"></span></div>' +
             '<div id="aUsersList"></div></div>' +
             '<div class="box"><h2>🏅 En aktif kullanıcılar</h2><div id="aActive"><p class="a-note">Yükleniyor…</p></div></div>' +
-            '<div class="box"><h2>🖥️ Cihaz &amp; tarayıcı dağılımı</h2><p class="a-note">Her üyenin cihaz bilgisini çeker (biraz sürebilir).</p><button class="a-btn main" id="aDevLoad">Hesapla</button><div id="aDevBox" style="margin-top:10px"></div></div>' +
+            '<div class="box"><h2>🖥️ Cihaz, tarayıcı &amp; tercihler</h2><p class="a-note">Her üyenin cihaz, dil, tema, renk körlüğü modu ve giriş türü bilgisini çeker (üye başına 1 okuma, biraz sürebilir).</p><button class="a-btn main" id="aDevLoad">Hesapla</button><div id="aDevBox" style="margin-top:10px"></div></div>' +
             '<div class="box"><h2>🏠 Ev yarışmaları <span class="a-sub" id="aCompCount" style="margin:0"></span></h2>' +
             '<div class="a-ctrl"><button class="a-btn main" id="aCompLoad">↻ Yenile</button><button class="a-btn danger" id="aCompClean">🧹 3 günden eskileri sil</button></div>' +
             '<div class="a-msg" id="aCompMsg"></div><div id="aCompList" class="a-list"></div></div>' +
+            '<div class="box"><h2>📈 Site istatistikleri</h2><div id="aSiteStats"><p class="a-note">Yükleniyor…</p></div></div>' +
+            '<div class="box"><h2>🏆 Rekor tablosu yönetimi <span class="a-sub" id="aRecCount" style="margin:0"></span></h2>' +
+            '<div class="a-ctrl"><button class="a-btn main" id="aRecLoad">↻ Yükle</button><label class="a-note"><input type="checkbox" id="aRecBad" checked> Yalnız şüpheliler</label></div>' +
+            '<p class="a-note">Şüpheli: 3x3 tekil 4 sn, Ao5 5,5 sn, Ao12 6 sn altı; 2x2 tekil 0,6 sn, Ao5 1 sn, Ao12 1,2 sn altı ya da ortalaması tekilinden hızlı olanlar.</p><div id="aRecList" class="a-list"></div></div>' +
+            '<div class="box"><h2>💡 Topluluk algoritma önerileri <span class="a-sub" id="aSugCount" style="margin:0"></span></h2>' +
+            '<div class="a-ctrl"><button class="a-btn main" id="aSugLoad">↻ Yükle</button><select id="aSugSort"><option value="new">En yeni</option><option value="vote">En çok oy</option></select></div><div id="aSugList" class="a-list"></div></div>' +
+            '<div class="box"><h2>🐞 Hata kayıtları <span class="a-sub" id="aErrCount" style="margin:0"></span></h2>' +
+            '<p class="a-note">Ziyaretçilerin tarayıcısında oluşan JavaScript hataları (aynı hata gruplanır).</p>' +
+            '<div class="a-ctrl"><button class="a-btn main" id="aErrLoad">↻ Yükle</button><button class="a-btn danger" id="aErrClear">🗑️ Tümünü sil</button></div><div id="aErrList" class="a-list"></div></div>' +
+            '<div class="box"><h2>🔥 Firebase kullanımı</h2><button class="a-btn main" id="aUsageLoad">Hesapla</button><div id="aUsage" style="margin-top:10px"></div></div>' +
             '<div class="box"><h2>🛠️ Bakım modu</h2><p class="a-note">Açıkken site, sen hariç herkese “Bakımdayız” sayfası gösterir.</p><div id="aMaintBox"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🏆 Günlük sıralama moderasyonu</h2>' +
             '<div class="a-ctrl"><input type="date" id="aDate" value="' + todayStr() + '"><button class="a-btn main" id="aDailyLoad">↻ Yenile</button><button class="a-btn" id="aDailyCsv">⬇ CSV</button></div>' +
@@ -787,6 +967,15 @@
         $id("uFilter").addEventListener("change", applyUserFilter);
         $id("bcReload").addEventListener("click", renderBroadcasts);
         $id("aDevLoad").addEventListener("click", renderDevices);
+        $id("aRecLoad").addEventListener("click", renderRecords); $id("aRecBad").addEventListener("change", renderRecords);
+        $id("aSugLoad").addEventListener("click", renderSug); $id("aSugSort").addEventListener("change", renderSug);
+        $id("aErrLoad").addEventListener("click", renderErrs);
+        $id("aErrClear").addEventListener("click", function () {
+            var all = []; try { all = JSON.parse($id("aErrList").dataset.all || "[]"); } catch (e) {}
+            if (!all.length || !confirm(all.length + " hata kaydı silinsin mi?")) return;
+            commit(all.map(function (p) { return { delete: docName(p) }; })).then(renderErrs, function () { alert("Silinemedi."); });
+        });
+        $id("aUsageLoad").addEventListener("click", renderUsage);
         bindBulk(); renderBroadcasts(); renderMaintenance(); renderAnon();
         $id("bcSend").addEventListener("click", function () {
             var text = $id("bcText").value.trim(), to = $id("bcTarget").value, atv = $id("bcAt").value, at = atv ? new Date(atv).getTime() : 0;
@@ -800,7 +989,7 @@
                 else msg($id("bcMsg"), "Gönderilemedi (kuralları yayımladın mı?)", "bad");
             }, function () { $id("bcSend").disabled = false; msg($id("bcMsg"), "Gönderilemedi.", "bad"); });
         });
-        renderDaily(); renderDayChips(); renderComps();
+        renderDaily(); renderDayChips(); renderComps(); renderErrs();
         renderUsers();   // kullanıcılar ve tüm verileri otomatik gelsin
     }
     function renderGate(kind) {
