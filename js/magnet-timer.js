@@ -112,20 +112,28 @@
     }
 
     // Titreşim: küp masaya bırakılınca telefonda küçük bir sarsıntı olur.
-    // Sabit 2.2 m/s² eşiği hafif bırakışları kaçırıyordu; artık telefonun kendi gürültüsü
-    // ölçülür ve ona göre çok daha düşük, uyarlanır bir eşik kullanılır.
-    var lastA = null, noise = 0.15;
+    // - ivme VEKTÖRÜNDEKİ ani değişim (yalnız büyüklük değil: masa yatayken yan sarsıntılar büyüklüğü değiştirmez)
+    // - jiroskop (dönme hızı) sıçraması: hafif tıklar en çok burada görünür
+    // Eşik telefonun hareketsizken ölçülen kendi gürültüsüne göre uyarlanır; hassasiyet ayardan değişir.
+    var lastV = null, lastR = null, noise = 0.05, noiseR = 0.4, motionN = 0;
+    var SENS_KEY = "ra-mag-sens";
+    function sensK() { var v = "2"; try { v = localStorage.getItem(SENS_KEY) || "2"; } catch (e) {} return v === "3" ? 0.55 : v === "1" ? 1.7 : 1; }
     function onMotion(e) {
         if (!S.on) return;
-        var lin = e.acceleration && e.acceleration.x != null, a = lin ? e.acceleration : e.accelerationIncludingGravity;
-        if (!a || a.x == null) return;
-        var m = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
-        if (lastA != null) {
-            var j = Math.abs(m - lastA), th = Math.max(lin ? 0.28 : 0.4, noise * 4.5);
-            if (S.state === "running" && now() - S.t0 > MIN_SOLVE && j > th) finish(now());
-            else noise = noise * 0.97 + Math.min(j, 1.5) * 0.03; // sessizken gürültü tabanını öğren
+        var lin = e.acceleration && e.acceleration.x != null, v = lin ? e.acceleration : e.accelerationIncludingGravity;
+        if (!v || v.x == null) return;
+        motionN++;
+        var j = lastV ? Math.sqrt(Math.pow(v.x - lastV.x, 2) + Math.pow(v.y - lastV.y, 2) + Math.pow(v.z - lastV.z, 2)) : 0;
+        lastV = { x: v.x, y: v.y, z: v.z };
+        var r = e.rotationRate, rj = 0;
+        if (r && r.alpha != null) {
+            if (lastR) rj = Math.sqrt(Math.pow(r.alpha - lastR.a, 2) + Math.pow((r.beta || 0) - lastR.b, 2) + Math.pow((r.gamma || 0) - lastR.g, 2));
+            lastR = { a: r.alpha, b: r.beta || 0, g: r.gamma || 0 };
         }
-        lastA = m;
+        var k = sensK(), th = Math.max(lin ? 0.09 : 0.14, noise * 4) * k, thR = Math.max(1.2, noiseR * 5) * k;
+        if (motionN > 5) S.shake = Math.max(S.shake || 0, j / th, rj / thR); // bar/ayar için: 1'in üstü = durdurur (okununca sıfırlanır)
+        if (motionN > 5 && S.state === "running" && now() - S.t0 > MIN_SOLVE && (j > th || rj > thR)) finish(now());
+        else { noise = noise * 0.97 + Math.min(j, 1) * 0.03; noiseR = noiseR * 0.97 + Math.min(rj, 20) * 0.03; } // sessizken gürültü tabanını öğren
     }
     function onOrient(e) {
         var h = null;
@@ -200,6 +208,10 @@
         // Ekrana dokunarak durdurma (yedek)
         tapStop: function () { if (S.state === "running") finish(now()); },
         _motion: function (x, y, z, lin) { var v = { x: x, y: y, z: z }; onMotion(lin ? { acceleration: v } : { accelerationIncludingGravity: v }); },
+        // Durdurma hassasiyeti: "1" az, "2" normal, "3" hassas
+        sens: function (v) { if (v) try { localStorage.setItem(SENS_KEY, v); } catch (e) {} try { return localStorage.getItem(SENS_KEY) || "2"; } catch (e) { return "2"; } },
+        motionOk: function () { return motionN > 0; },
+        shake: function () { var x = S.shake || 0; S.shake = 0; return x; },
         reset: function () { if (S.state === "done") setState(S.base != null && S.last != null && dist(S.last) > thOn() ? "clear" : "white"); },
         // Çözüm yapılabilir mi? false iken yeşil/başlama yok; true olunca küp telefondaysa önce kaldırılmalı
         arm: function (on) {
