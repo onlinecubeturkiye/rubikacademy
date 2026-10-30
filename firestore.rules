@@ -161,7 +161,9 @@ service cloud.firestore {
         && request.resource.data.cap is int && request.resource.data.cap >= 8 && request.resource.data.cap <= 16
         && request.resource.data.R is string && request.resource.data.R.size() <= 200000
         && request.resource.data.scr is string && request.resource.data.scr.size() <= 1500;
-      allow delete: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin());
+      // Sahip/admin her zaman; diğer üyeler yalnız 15 dakikadır değişmeyen (boş kalmış) odayı silebilir
+      allow delete: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin()
+        || (beta() && resource.data.ts is timestamp && resource.data.ts < request.time - duration.value(15, 'm')));
 
       // Yarışmacılar: herkes kendi kaydını yazar; oda sahibi ya da moderatör çıkarabilir
       match /p/{uid} {
