@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261193";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261194";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -426,6 +426,15 @@
     }
     function compPatch(fields) { return api(cPath() + "?" + cMask(fields), { method: "PATCH", body: JSON.stringify({ fields: cBody(fields) }) }); }
     function mePatch(fields) { return api(cPath("/p/" + comp.uid) + "?" + cMask(fields), { method: "PATCH", body: JSON.stringify({ fields: cBody(fields) }) }); }
+    // Geliştirici (ve admin) turu tek başına başlatabilir (deneme için); diğerleri en az 2 kişi bekler
+    var devRole = false;
+    function minPlayers() { return devRole ? 1 : 2; }
+    function checkDev() {
+        devRole = false;
+        if (!signedIn()) return;
+        if (Account.isAdmin && Account.isAdmin()) { devRole = true; return; }
+        Account.getRole(Account.user().uid).then(function (r) { devRole = r === "gelistirici"; if (comp) renderComp(); }, function () {});
+    }
     function isOrgUser() {
         if (!signedIn()) return Promise.resolve(false);
         if (Account.isAdmin && Account.isAdmin()) return Promise.resolve(true);
@@ -1294,12 +1303,12 @@
         renderNow();
         $("cOrg").hidden = !host || (d.st === "end" && !!d.fin);
         $("cOrgWho").textContent = owner ? "👑 Oda sahibi:" : "🛡️ Moderatör:";
-        $("cStart").hidden = d.st !== "lobby"; $("cStart").disabled = comp.players.length < 2;
+        $("cStart").hidden = d.st !== "lobby"; $("cStart").disabled = comp.players.length < minPlayers();
         $("cEnd").hidden = d.st !== "run";
         if ($("cFinish")) $("cFinish").hidden = !(d.st === "end" && !d.fin);
         if ($("cCloseRoom")) { $("cCloseRoom").hidden = !owner; $("cCloseRoom").disabled = false; }
         $("cShowRes").hidden = !hist().length;
-        $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? "Yarışmacılar katılınca turu başlat (en az 2 kişi)." : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes " + NS() + " çözümü bitirince tur kendiliğinden biter." : d.st === "prep" ? "Hazırlık: yeni katılımcılar şimdi girebilir." : (d.fin ? "Final bitti." : "Tur bitti.");
+        $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? (devRole ? "Turu başlatabilirsin (geliştirici: tek başına da olur)." : "Yarışmacılar katılınca turu başlat (en az 2 kişi).") : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes " + NS() + " çözümü bitirince tur kendiliğinden biter." : d.st === "prep" ? "Hazırlık: yeni katılımcılar şimdi girebilir." : (d.fin ? "Final bitti." : "Tur bitti.");
         renderModeUi();
     }
     /* --- şu an canlı yarışmalar (izle) --- */
@@ -1358,6 +1367,7 @@
         });
     }
     function initCompRole() {
+        checkDev();
         isOrgUser().then(function (ok) { $("cCreateBox").classList.toggle("locked", !ok); $("cCreate").disabled = !ok; $("cOrgNote").hidden = ok; });
         // Herkese açık: izlemek için giriş gerekmez, katılmak için giriş yeterli
         var p = Promise.resolve(true);
