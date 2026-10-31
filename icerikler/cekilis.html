@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"");if((localStorage.getItem("theme")||"dark")==="dark")document.documentElement.classList.add("dark-mode");}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="only light">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Çekiliş</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0b0d14">
+
+<link rel="canonical" href="https://rubikacademy.fun/icerikler/cekilis">
+<meta name="description" content="Rubik Academy çekilişleri: üye ol, katıl, küp kazan. Kazanan çekiliş günü canlı ve rastgele seçilir.">
+<meta property="og:title" content="Çekiliş — Rubik Academy">
+<meta property="og:description" content="Üye ol, çekilişe katıl, küp kazan!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/icerikler/cekilis">
+<meta property="og:image" content="https://rubikacademy.fun/og/site.png?v=20261207">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/site.png?v=20261207">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20261207">
+<script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
+
+<style>
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; box-shadow: var(--shadow-sm); text-decoration: none; }
+.btn:hover { background: var(--surface-soft); }
+.btn.primary { background: var(--ui-accent); color: var(--ui-accent-text); border-color: transparent; }
+.btn.primary:hover { background: var(--ui-accent-hover); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.sm { padding: 7px 12px; font-size: 13px; }
+.gw-wrap { max-width: 960px; margin: 0 auto; padding: 0 16px 40px; }
+.gw-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.gw-card { display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--surface); border: var(--card-bw, 2px) solid var(--card-border, var(--border)); color: var(--text); text-decoration: none; box-shadow: var(--shadow); transition: transform .15s, box-shadow .15s; }
+.gw-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+.gw-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface-soft); display: block; }
+.gw-ph { display: flex; align-items: center; justify-content: center; font-size: 48px; background: linear-gradient(135deg, rgba(108,92,231,.25), rgba(34,197,94,.18)); }
+.gw-cbody { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+.gw-cbody b { font: 900 18px Inter, sans-serif; }
+.gw-cbody small { color: var(--text-soft); font-weight: 700; font-size: 12.5px; }
+.gw-prize { font-weight: 800; color: var(--primary, #6c5ce7); }
+.gw-prize.big { font-size: 18px; margin: 4px 0 8px; }
+.gw-chip { align-self: flex-start; display: inline-block; padding: 4px 10px; border-radius: 999px; background: var(--surface-soft); border: 1px solid var(--border); font: 800 12.5px Inter, sans-serif; color: var(--text-soft); }
+.gw-chip.on { color: #16a34a; border-color: rgba(34,197,94,.45); background: rgba(34,197,94,.1); }
+.gw-chip.live { color: #ea580c; border-color: rgba(249,115,22,.45); background: rgba(249,115,22,.1); }
+.gw-chip.win { color: #b45309; border-color: rgba(245,158,11,.5); background: rgba(245,158,11,.12); }
+.gw-empty { text-align: center; color: var(--text-soft); font-weight: 700; padding: 30px 10px; }
+.gw-back { border: 0; background: none; color: var(--text-soft); font: 800 14px Inter, sans-serif; cursor: pointer; padding: 6px 0; margin-bottom: 8px; }
+.gw-hero { border-radius: 24px; overflow: hidden; background: var(--surface); border: var(--card-bw, 2px) solid var(--card-border, var(--border)); box-shadow: var(--shadow); }
+.gw-himg { width: 100%; max-height: 380px; object-fit: cover; display: block; }
+.gw-hbody { padding: 18px 20px 20px; }
+.gw-hbody h2 { margin: 0 0 4px; font: 900 clamp(24px, 5vw, 34px) Inter, sans-serif; }
+.gw-desc { margin: 12px 0 0; line-height: 1.6; color: var(--text); }
+.gw-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 16px 0; }
+.gw-facts div { border-radius: 14px; background: var(--surface-soft); border: 1px solid var(--border); padding: 10px; text-align: center; }
+.gw-facts b { display: block; font: 900 15px Inter, sans-serif; color: var(--text); }
+.gw-facts span { font-size: 12px; font-weight: 700; color: var(--text-soft); }
+@media (max-width: 560px) { .gw-facts { grid-template-columns: 1fr; } }
+.gw-act { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+.gw-big { width: 100%; justify-content: center; font-size: 16px; padding: 14px; }
+.gw-in { padding: 12px 14px; border-radius: 14px; background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.4); font-weight: 750; color: var(--text); }
+.gw-note { color: var(--text-soft); font-size: 13.5px; font-weight: 650; margin: 6px 0; }
+.gw-msg { min-height: 18px; margin-top: 6px; font-weight: 750; font-size: 13.5px; color: #16a34a; }
+.gw-msg.bad { color: #dc2626; }
+.gw-rules { margin-top: 14px; font-size: 12.5px; color: var(--text-soft); line-height: 1.55; }
+.gw-mgr, .gw-mgrbox { margin: 0 0 16px; padding: 14px 16px; border-radius: 18px; border: 2px dashed rgba(124,58,237,.45); background: rgba(124,58,237,.06); }
+.gw-mgrbox { margin-top: 16px; }
+.gw-mgrbox h3 { margin: 0 0 8px; font: 900 17px Inter, sans-serif; }
+.gw-mrow { display: flex; flex-wrap: wrap; gap: 8px; }
+.gw-del { color: #dc2626; }
+.gw-new summary { cursor: pointer; font: 900 16px Inter, sans-serif; }
+.gw-form { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.gw-f span { display: block; font: 800 12.5px Inter, sans-serif; color: var(--text-soft); margin-bottom: 4px; }
+.gw-f input, .gw-f textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 650 15px Inter, sans-serif; }
+.gw-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gw-elist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; max-height: 260px; overflow: auto; }
+.gw-elist span { padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: 13px; font-weight: 700; }
+.gw-claim { display: grid; gap: 6px; margin: 8px 0; }
+.gw-claim div { display: flex; gap: 10px; padding: 8px 10px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); }
+.gw-claim span { min-width: 90px; color: var(--text-soft); font-weight: 750; font-size: 13px; }
+.gw-claim b { font-weight: 750; word-break: break-word; }
+.gw-modal { position: fixed; inset: 0; z-index: 1600; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(10,12,18,.7); backdrop-filter: blur(4px); }
+.gw-modal.open { display: flex; }
+.gw-mbox { width: min(440px, 100%); max-height: calc(100vh - 32px); overflow: auto; box-sizing: border-box; padding: 22px; border-radius: 24px; background: var(--surface); color: var(--text); border: var(--card-bw, 2px) solid var(--card-border, var(--border)); box-shadow: 0 30px 80px rgba(0,0,0,.4); text-align: center; animation: gwIn .2s ease-out; }
+.gw-mbox h3 { margin: 6px 0 8px; font: 900 24px Inter, sans-serif; }
+.gw-mbox p { line-height: 1.55; }
+.gw-mbox .gw-form { text-align: left; }
+@keyframes gwIn { from { transform: scale(.94); opacity: 0; } }
+.gw-confetti { font-size: 54px; animation: gwPop .6s ease-out; }
+@keyframes gwPop { 0% { transform: scale(.3) rotate(-20deg); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+.gw-timer { font: 900 48px "JetBrains Mono", monospace; color: #ea580c; margin: 6px 0 14px; }
+.gw-roll { font: 900 clamp(26px, 7vw, 40px) Inter, sans-serif; padding: 26px 10px; border-radius: 18px; background: var(--surface-soft); border: 2px solid var(--border); margin: 12px 0; min-height: 1.2em; }
+.gw-roll.win { color: #b45309; border-color: #f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,.2); animation: gwPop .5s ease-out; }
+</style>
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" class="active" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+
+<nav class="nav-bar">
+    <a href="/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+
+<section class="intro">
+    <div class="badge"><i></i><span>ÇEKİLİŞ</span></div>
+    <h1>Küp <span>Çekilişi</span></h1>
+    <p>Üye ol, çekilişe katıl, küp kazan! Kayıtlar çekilişten 24 saat önce kapanır; çekiliş günü kazanan herkesin önünde rastgele seçilir. Kazanırsan <b>2 dakika içinde onaylaman</b> gerekiyor.</p>
+</section>
+
+<div class="gw-wrap">
+    <div class="gw-mgr" id="gwMgr" hidden></div>
+    <div id="gwListWrap"><div class="gw-list" id="gwList"><p class="gw-empty">Yükleniyor…</p></div></div>
+    <div id="gwOne" hidden></div>
+</div>
+
+</div>
+<div class="gw-modal" id="gwModal" role="dialog" aria-modal="true"></div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script>var PAGE_ID = "cekilis";</script>
+<script src="/js/i18n.js?v=20261207"></script>
+<script src="/js/common.js?v=20261207"></script>
+<script src="/js/firebase-config.js?v=20261207"></script>
+<script src="/js/account.js?v=20261207"></script>
+<script src="/js/cekilis.js?v=20261207"></script>
+</body>
+</html>

@@ -15,6 +15,13 @@ service cloud.firestore {
         && request.auth.token.firebase.sign_in_provider == 'google.com';
     }
 
+    // Çekiliş yöneticisi: site yöneticisi ya da "admin" / "gelistirici" rolü
+    function gwMgr() {
+      return request.auth != null && (isAdmin()
+        || (exists(/databases/$(database)/documents/roles/$(request.auth.uid))
+            && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['admin', 'gelistirici']));
+    }
+
     // Askıya alınmış hesap (roles/{uid}.role == 'askida') yazamaz
     function suspended(uid) {
       return exists(/databases/$(database)/documents/roles/$(uid))
@@ -81,7 +88,12 @@ service cloud.firestore {
       // Bildirimler: yalnız admin gönderir; sahibi + admin okur
       match /notifications/{nid} {
         allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
-        allow create: if isAdmin()
+        // Admin gönderir; çekiliş yöneticisi kazanana yazar; kazanan da bilgilerini gönderince çekilişi kurana
+        // (belge adı = çekiliş kodu) tek bir bildirim yazabilir
+        allow create: if (isAdmin() || gwMgr()
+            || (exists(/databases/$(database)/documents/giveaways/$(nid))
+                && get(/databases/$(database)/documents/giveaways/$(nid)).data.w == request.auth.uid
+                && get(/databases/$(database)/documents/giveaways/$(nid)).data.host == uid))
           && request.resource.data.keys().hasOnly(['text', 'ts', 'at', 'pushed'])
           && request.resource.data.text is string && request.resource.data.text.size() <= 500;
         allow update, delete: if (request.auth != null && request.auth.uid == uid) || isAdmin();
@@ -116,7 +128,7 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isAdmin()
         && request.resource.data.keys().hasOnly(['role'])
-        && request.resource.data.role in ['uye', 'gelistirici', 'tester', 'organizator', 'askida', 'silindi'];
+        && request.resource.data.role in ['uye', 'admin', 'gelistirici', 'tester', 'organizator', 'askida', 'silindi'];
       // Hesabını silen üye kendi rol kaydını da siler (askıya alınmış / silinmişse silemez)
       allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid && !(resource.data.role in ['askida', 'silindi']));
     }
@@ -292,6 +304,62 @@ service cloud.firestore {
         && request.resource.data.uid is string
         && (request.resource.data.uid == '' || (request.auth != null && request.auth.uid == request.resource.data.uid))
         && request.resource.data.ts is timestamp;
+    }
+
+    // Çekilişler (/icerikler/cekilis): yönetici kurar; kayıtlar çekilişten 24 saat önce kapanır.
+    // Çekilişte rastgele seçilen kişi 2 dakika içinde onaylar, sonra teslimat bilgilerini gönderir.
+    match /giveaways/{gid} {
+      function gk() { return ['title', 'prize', 'desc', 'img', 'drawAt', 'closeAt', 'host', 'hName', 'st', 'w', 'wName', 'wAt', 'claimBy', 'cAt', 'x', 'n', 'ts']; }
+      allow read: if true;
+      allow create: if gwMgr() && gid.matches('^[A-Za-z0-9]{6,24}$')
+        && request.resource.data.keys().hasOnly(gk())
+        && request.resource.data.host == request.auth.uid
+        && request.resource.data.st == 'open'
+        && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 80
+        && request.resource.data.prize is string && request.resource.data.prize.size() <= 120
+        && request.resource.data.desc is string && request.resource.data.desc.size() <= 1500
+        && request.resource.data.img is string && request.resource.data.img.size() <= 500
+        && request.resource.data.drawAt is timestamp && request.resource.data.drawAt > request.time
+        && request.resource.data.closeAt == request.resource.data.drawAt - duration.value(24, 'h');
+      // yönetici her şeyi; kazanan yalnız 2 dakika içinde onaylar (st: drawn → claimed)
+      allow update: if request.resource.data.keys().hasOnly(gk())
+        && (gwMgr()
+            || (request.auth != null && resource.data.st == 'drawn' && resource.data.w == request.auth.uid
+                && request.time <= resource.data.claimBy
+                && request.resource.data.st == 'claimed'
+                && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st', 'cAt'])));
+      allow delete: if gwMgr();
+
+      // Katılımcılar: üye kendini ekler/çıkarır (kayıtlar kapanana kadar); herkes sayıyı görür
+      match /e/{uid} {
+        allow read: if true;
+        allow create: if request.auth != null && request.auth.uid == uid && !suspended(uid)
+          && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt
+          && request.resource.data.keys().hasOnly(['name', 'ts'])
+          && request.resource.data.name is string && request.resource.data.name.size() <= 24
+          && request.resource.data.ts == request.time;
+        allow delete: if gwMgr() || (request.auth != null && request.auth.uid == uid
+          && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt);
+        allow update: if false;
+      }
+      // Kazananın teslimat bilgileri: yalnız kazanan yazar (onayladıktan sonra), yalnız kazanan ve yöneticiler okur
+      match /claim/{uid} {
+        allow read: if gwMgr() || (request.auth != null && request.auth.uid == uid);
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && get(/databases/$(database)/documents/giveaways/$(gid)).data.w == uid
+          && get(/databases/$(database)/documents/giveaways/$(gid)).data.st == 'claimed'
+          && request.resource.data.keys().hasOnly(['name', 'phone', 'email', 'city', 'district', 'address', 'zip', 'note', 'ts'])
+          && request.resource.data.name is string && request.resource.data.name.size() > 1 && request.resource.data.name.size() <= 80
+          && request.resource.data.phone is string && request.resource.data.phone.size() >= 7 && request.resource.data.phone.size() <= 25
+          && request.resource.data.email is string && request.resource.data.email.size() <= 120
+          && request.resource.data.city is string && request.resource.data.city.size() <= 40
+          && request.resource.data.district is string && request.resource.data.district.size() <= 60
+          && request.resource.data.address is string && request.resource.data.address.size() > 5 && request.resource.data.address.size() <= 400
+          && request.resource.data.zip is string && request.resource.data.zip.size() <= 10
+          && request.resource.data.note is string && request.resource.data.note.size() <= 300
+          && request.resource.data.ts is timestamp;
+        allow delete: if gwMgr();
+      }
     }
 
     match /users/{uid}/{sub=**} {
