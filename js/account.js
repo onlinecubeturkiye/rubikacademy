@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261206";
+    var V = "20261207";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -746,6 +746,32 @@
         if (t) { t.style.cursor = "pointer"; t.onclick = function () { location.href = "/icerikler/gunluk"; }; }
     }
     document.addEventListener("account-synced", function () { setTimeout(dailyNudge, 2500); });
+    // Çekiliş: katıldığın çekilişin saati geldiyse (çekilişten 1 dk önce – 30 dk sonra) sitenin her sayfasında
+    // 15 sn'de bir bakılır; kazandıysan hemen uyarı çıkar (onay için 2 dakikan var)
+    var gwT = 0;
+    function gwWatch() {
+        clearInterval(gwT);
+        var j = parse(lsGet("ra-gw-joined")) || {}, now = Date.now(), ids = Object.keys(j).filter(function (k) { return now > j[k] - 60000 && now < j[k] + 1800000; });
+        // sayfa açık kalırsa çekiliş saati gelince izlemeye başla
+        Object.keys(j).forEach(function (k) { var dt = j[k] - 60000 - now; if (dt > 0 && dt < 12 * 3600000) setTimeout(gwWatch, dt + 500); });
+        if (!user || !ids.length || /\/cekilis/.test(location.pathname)) return;
+        var shown = {};
+        var tick = function () {
+            ids.forEach(function (id) {
+                fetch(pubUrl("/giveaways/" + id)).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+                    var f = (d && d.fields) || {}, w = f.w && f.w.stringValue, st = f.st && f.st.stringValue, cb = Date.parse((f.claimBy && f.claimBy.timestampValue) || "") || 0;
+                    if (!user || w !== user.uid || st !== "drawn" || Date.now() > cb || shown[id + cb]) return;
+                    shown[id + cb] = 1;
+                    showToast("🎉 Tebrikler! “" + ((f.title && f.title.stringValue) || "Çekiliş") + "” çekilişini kazandın. 2 dakika içinde onaylamak için dokun!");
+                    var t = document.querySelector("#raToasts .ra-toast:last-child .ra-toast-tx");
+                    if (t) { t.style.cursor = "pointer"; t.onclick = function () { location.href = "/icerikler/cekilis?id=" + id; }; }
+                    try { if ("Notification" in window && Notification.permission === "granted") new Notification("Rubik Academy", { body: "Çekilişi kazandın! 2 dakika içinde onayla.", icon: "/icons/icon-192.png" }); } catch (e) {}
+                }).catch(function () {});
+            });
+        };
+        tick(); gwT = setInterval(tick, 15000);
+    }
+    document.addEventListener("account-synced", function () { setTimeout(gwWatch, 1500); });
     function showToast(text) {
         var host = document.getElementById("raToasts");
         if (!host) { host = document.createElement("div"); host.id = "raToasts"; host.className = "ra-toasts"; (document.body || document.documentElement).appendChild(host); }

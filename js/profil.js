@@ -33,6 +33,7 @@
     img.src = url;
   }
   function roleBadge(role) {
+    if (role === "admin") return '<span class="p-badge adm">🛡 Admin</span>';
     if (role === "gelistirici") return '<span class="p-badge dev">Geliştirici</span>';
     if (role === "tester") return '<span class="p-badge test">Tester</span>';
     if (role === "organizator") return '<span class="p-badge org">🏠 Organizatör</span>';
