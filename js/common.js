@@ -616,16 +616,44 @@ if ("serviceWorker" in navigator) {
         var sum = document.getElementById("progressSummary");
         if (!sum || document.getElementById("raMarkAll")) return;
         if (typeof window.loadProgress !== "function" || typeof window.saveProgress !== "function" || typeof window.applyState !== "function") return;
+        // İlerleme kartı: sayılar + ilerleme çubuğu + "Hepsini" tuşları tek kutuda
         var css = document.createElement("style");
-        css.textContent = ".ra-markall{max-width:1250px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:-16px auto 24px}" +
-            ".ra-markall span{font-size:13px;font-weight:800;color:var(--text-soft)}" +
-            ".ra-markall button{border:1px solid var(--border);background:var(--surface);color:var(--text);font:800 13px Inter,sans-serif;padding:7px 12px;border-radius:999px;cursor:pointer}" +
-            ".ra-markall button:hover{background:var(--surface-soft)}";
+        css.textContent = ".ra-prog{max-width:1250px;box-sizing:border-box;margin:0 auto 28px;padding:14px 16px;border-radius:18px;background:var(--surface);border:var(--card-bw,2px) solid var(--card-border,var(--border));box-shadow:var(--shadow-sm,none);display:flex;flex-direction:column;gap:12px}" +
+            ".ra-prog .progress-summary{margin:0!important;max-width:none!important;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;font-weight:800}" +
+            ".ra-prog .progress-summary>span{padding:0!important;border:0!important;background:none!important;border-radius:0!important;color:var(--text);display:inline-flex;align-items:center}" +
+            ".ra-pbar{position:relative;height:10px;border-radius:99px;background:var(--surface-soft);border:1px solid var(--border);overflow:hidden}" +
+            ".ra-pbar i{position:absolute;top:0;bottom:0;left:0;border-radius:99px;transition:width .35s}" +
+            ".ra-pbar i.k{background:#22c55e}.ra-pbar i.l{background:#facc15}" +
+            ".ra-phead{display:flex;align-items:center;gap:10px}.ra-pct{font:900 15px 'JetBrains Mono',monospace;color:#16a34a;margin-inline-start:auto}" +
+            ".ra-markall{display:flex;flex-wrap:wrap;align-items:center;gap:6px}" +
+            ".ra-markall>span{font-size:12.5px;font-weight:800;color:var(--text-soft);margin-inline-end:2px}" +
+            ".ra-markall button{display:inline-flex;align-items:center;border:1px solid var(--border);background:var(--surface-soft);color:var(--text);font:800 13px Inter,sans-serif;padding:6px 12px;border-radius:999px;cursor:pointer}" +
+            ".ra-markall button:hover{border-color:var(--text-soft)}" +
+            "@media(max-width:560px){.ra-prog{padding:12px}.ra-markall button{padding:6px 10px;font-size:12.5px}}";
         document.head.appendChild(css);
+        var wrap = document.createElement("div"); wrap.className = "ra-prog";
+        sum.parentNode.insertBefore(wrap, sum); wrap.appendChild(sum);
+        var pbar = document.createElement("div"); pbar.className = "ra-pbar"; pbar.innerHTML = '<i class="k"></i><i class="l"></i>';
+        wrap.appendChild(pbar);
         var bar = document.createElement("div"); bar.id = "raMarkAll"; bar.className = "ra-markall";
         function draw() { var x = t(); bar.innerHTML = '<span>' + x.all + '</span><button type="button" data-st="known">' + x.k + '</button><button type="button" data-st="learning">' + x.l + '</button><button type="button" data-st="">' + x.c + '</button>'; }
         draw();
-        sum.parentNode.insertBefore(bar, sum.nextSibling);
+        wrap.appendChild(bar);
+        // özet metnindeki sayılardan çubuğu çiz: "öğreniyorum: L" ve "biliyorum: K / T"
+        function fill() {
+            var n = (sum.textContent.match(/\d+/g) || []).map(Number);
+            if (n.length < 3) { pbar.hidden = true; return; }
+            var l = n[0], k = n[1], tot = n[2] || 1; pbar.hidden = false;
+            pbar.children[0].style.width = (k / tot * 100) + "%";
+            pbar.children[1].style.left = (k / tot * 100) + "%"; pbar.children[1].style.width = (l / tot * 100) + "%";
+            pct.textContent = "%" + Math.round(k / tot * 100);
+        }
+        // yüzde, özetin yanında (özetin içine yazılmaz; sayılar karışmasın)
+        var head = document.createElement("div"); head.className = "ra-phead";
+        wrap.insertBefore(head, sum); head.appendChild(sum);
+        var pct = document.createElement("b"); pct.className = "ra-pct"; head.appendChild(pct);
+        fill();
+        if (window.MutationObserver) new MutationObserver(fill).observe(sum, { childList: true, subtree: true, characterData: true });
         document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest("#langMenu")) setTimeout(draw, 60); });
         bar.addEventListener("click", function (e) {
             var b = e.target.closest("button"); if (!b) return;
