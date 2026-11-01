@@ -241,6 +241,8 @@
         ".ra-i{position:relative;display:inline-flex;width:1.15em;height:1.15em;vertical-align:-.2em;margin-inline-end:.35em;flex:none}" +
         ".ra-i.ra-end{margin-inline-end:0}" +
         ".ra-i svg{width:100%;height:100%;display:block}" +
+        // sayfa stilleri ("kutu span" gibi) ikonun içine taşmasın
+        ".ra-i,.ra-t{padding:0!important;border:0!important;background:none!important;border-radius:0!important;box-shadow:none!important;min-width:0!important;font-size:inherit}" +
         ".ra-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;opacity:0}" +
         ".ra-i-owner,.ra-i-mod,.ra-i-ra,.ra-i-trophy,.ra-i-party,.ra-i-gold,.ra-i-silver,.ra-i-bronze,.ra-i-medal{width:1.3em;height:1.3em;vertical-align:-.28em;filter:drop-shadow(0 1px 2px rgba(0,0,0,.22))}" +
         ".ra-i-arrowL,.ra-i-arrowR,.ra-i-check,.ra-i-close,.ra-i-chevD,.ra-i-chevU,.ra-i-ext{width:1em;height:1em;vertical-align:-.14em}" +
