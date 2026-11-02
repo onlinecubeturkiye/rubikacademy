@@ -888,6 +888,45 @@
         });
     }
 
+    /* ---------- sponsor banner'ı (config/ad) ---------- */
+    function renderAd() {
+        var box = $id("aAdBox"); if (!box) return;
+        box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
+        authed(docsBase() + "/config/ad", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            var f = (d && d.fields) || {}, g = function (k) { return f[k] ? (f[k].stringValue != null ? f[k].stringValue : f[k].booleanValue) : ""; };
+            var ad = { on: !!g("on"), title: g("title") || "Minjuan Küp", text: g("text") || "Türkiye'nin küp mağazası: speedcube'ler, akıllı küpler, aksesuarlar. Hızlı kargo!", cta: g("cta") || "Alışverişe başla", url: g("url"), img: g("img"), code: g("code"), where: g("where") || "all" };
+            var inp = function (id, lb, v, ph, max) { return '<label class="ad-f"><span>' + lb + '</span><input id="' + id + '" maxlength="' + max + '" value="' + esc(v) + '" placeholder="' + esc(ph) + '"></label>'; };
+            box.innerHTML = '<label class="mt-tog"><input type="checkbox" id="adOn"' + (ad.on ? ' checked' : '') + '> <span>Banner yayında</span></label>' +
+                '<div class="ad-grid">' + inp("adTitle", "Başlık", ad.title, "Minjuan Küp", 60) + inp("adCta", "Buton yazısı", ad.cta, "Alışverişe başla", 30) +
+                '<label class="ad-f ad-wide"><span>Metin</span><textarea id="adText" maxlength="220" rows="2">' + esc(ad.text) + '</textarea></label>' +
+                inp("adUrl", "Bağlantı (https://…)", ad.url, "https://minjuan…", 300) + inp("adImg", "Görsel bağlantısı (isteğe bağlı)", ad.img, "https://…/logo.png", 500) +
+                inp("adCode", "İndirim kodu (isteğe bağlı)", ad.code, "RUBIK10", 30) +
+                '<label class="ad-f"><span>Nerede görünsün</span><select id="adWhere"><option value="all">Tüm sayfalar</option><option value="home">Ana sayfa + İçerikler</option><option value="cekilis">Sadece çekiliş sayfası</option></select></label></div>' +
+                '<h4 style="margin:12px 0 0">Önizleme</h4><div id="adPrev"></div>' +
+                '<div><button class="a-btn main" id="adSave">Kaydet</button><span class="a-msg" id="adMsg" style="margin:0 0 0 8px"></span></div>' +
+                '<p class="a-note">Zamanlayıcı, antrenör, akıllı küp, sanal küp, giriş ve admin sayfalarında banner çıkmaz. Ziyaretçi kapatırsa o cihazda 1 gün görünmez (içeriği değiştirince yeniden görünür). Değişiklik ziyaretçilere en geç 30 dakikada yansır. Bağlantıya utm_source=rubikacademy eklenir; tıklamaları mağaza kendi istatistiğinde görebilir.</p>';
+            $id("adWhere").value = ad.where;
+            var cur = function () { return { on: $id("adOn").checked, title: $id("adTitle").value.trim(), text: $id("adText").value.trim(), cta: $id("adCta").value.trim(), url: $id("adUrl").value.trim(), img: $id("adImg").value.trim(), code: $id("adCode").value.trim(), where: $id("adWhere").value }; };
+            var prev = function () { if (window.RAAd) RAAd.preview($id("adPrev"), cur()); };
+            Array.prototype.forEach.call(box.querySelectorAll("input,textarea,select"), function (x) { x.addEventListener("input", prev); x.addEventListener("change", prev); });
+            setTimeout(prev, 300);
+            $id("adSave").addEventListener("click", function () {
+                var o = cur();
+                if (o.url && !/^https:\/\//.test(o.url)) { msg($id("adMsg"), "Bağlantı https:// ile başlamalı.", "bad"); return; }
+                if (o.img && !/^https:\/\//.test(o.img)) { msg($id("adMsg"), "Görsel bağlantısı https:// ile başlamalı.", "bad"); return; }
+                if (o.on && !o.url) { msg($id("adMsg"), "Yayına almak için bağlantı gir.", "bad"); return; }
+                var fields = { on: { booleanValue: o.on }, ver: { stringValue: String(Date.now()) } };
+                ["title", "text", "cta", "url", "img", "code", "where"].forEach(function (k) { fields[k] = { stringValue: o[k] }; });
+                $id("adSave").disabled = true; msg($id("adMsg"), "Kaydediliyor…");
+                authed(docsBase() + "/config/ad", { method: "PATCH", body: JSON.stringify({ fields: fields }) }).then(function (r) {
+                    $id("adSave").disabled = false;
+                    if (r.ok) { if (window.RAAd) RAAd.clearCache(); msg($id("adMsg"), o.on ? "Kaydedildi ✓ Banner yayında." : "Kaydedildi ✓ (yayında değil)", "ok"); }
+                    else msg($id("adMsg"), "Kaydedilemedi (" + r.status + ").", "bad");
+                }, function () { $id("adSave").disabled = false; msg($id("adMsg"), "Kaydedilemedi.", "bad"); });
+            });
+        }).catch(function () { box.innerHTML = '<p class="a-note">Yüklenemedi.</p>'; });
+    }
+
     /* ---------- bakım modu ---------- */
     function renderMaintenance() {
         var box = $id("aMaintBox"); if (!box) return;
@@ -948,6 +987,7 @@
             '<p class="a-note">Ziyaretçilerin tarayıcısında oluşan JavaScript hataları (aynı hata gruplanır).</p>' +
             '<div class="a-ctrl"><button class="a-btn main" id="aErrLoad">↻ Yükle</button><button class="a-btn danger" id="aErrClear">🗑️ Tümünü sil</button></div><div id="aErrList" class="a-list"></div></div>' +
             '<div class="box"><h2>🔥 Firebase kullanımı</h2><button class="a-btn main" id="aUsageLoad">Hesapla</button><div id="aUsage" style="margin-top:10px"></div></div>' +
+            '<div class="box"><h2>📣 Sponsor banner\'ı</h2><p class="a-note">Sitedeki reklam alanı (ör. Minjuan küp mağazası).</p><div id="aAdBox"></div></div>' +
             '<div class="box"><h2>🛠️ Bakım modu</h2><p class="a-note">Açıkken site, sen hariç herkese “Bakımdayız” sayfası gösterir.</p><div id="aMaintBox"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🏆 Günlük sıralama moderasyonu</h2>' +
             '<div class="a-ctrl"><input type="date" id="aDate" value="' + todayStr() + '"><button class="a-btn main" id="aDailyLoad">↻ Yenile</button><button class="a-btn" id="aDailyCsv">⬇ CSV</button></div>' +
@@ -976,7 +1016,7 @@
             commit(all.map(function (p) { return { delete: docName(p) }; })).then(renderErrs, function () { alert("Silinemedi."); });
         });
         $id("aUsageLoad").addEventListener("click", renderUsage);
-        bindBulk(); renderBroadcasts(); renderMaintenance(); renderAnon();
+        bindBulk(); renderBroadcasts(); renderMaintenance(); renderAnon(); renderAd();
         $id("bcSend").addEventListener("click", function () {
             var text = $id("bcText").value.trim(), to = $id("bcTarget").value, atv = $id("bcAt").value, at = atv ? new Date(atv).getTime() : 0;
             if (at && at < Date.now() - 60000) { msg($id("bcMsg"), "Planlanan zaman geçmişte.", "bad"); return; }

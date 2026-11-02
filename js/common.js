@@ -9,10 +9,12 @@
 // RA ikonları: sitedeki emojileri Rubik Academy'ye özel ikonlarla değiştirir (js/ra-icons.js)
 (function () {
     try {
-        if (window.RAIcons || document.querySelector('script[src*="/js/ra-icons.js"]')) return;
+        var hasIcons = window.RAIcons || document.querySelector('script[src*="/js/ra-icons.js"]');
         var me = document.currentScript && document.currentScript.src || "", v = (/[?&]v=([^&]+)/.exec(me) || [])[1] || "";
-        var sc = document.createElement("script"); sc.src = "/js/ra-icons.js" + (v ? "?v=" + v : ""); sc.defer = true;
-        (document.head || document.documentElement).appendChild(sc);
+        if (!hasIcons) { var sc = document.createElement("script"); sc.src = "/js/ra-icons.js" + (v ? "?v=" + v : ""); sc.defer = true; (document.head || document.documentElement).appendChild(sc); }
+        // sponsor banner'ı (içerik admin panelinden)
+        var ad = document.createElement("script"); ad.src = "/js/ad-banner.js" + (v ? "?v=" + v : ""); ad.defer = true;
+        (document.head || document.documentElement).appendChild(ad);
     } catch (e) {}
 })();
 (function () {
