@@ -8,6 +8,8 @@
 ========================================================= */
 (function () {
     if (window.RAAd) return;
+    // Admin panelinden hiç ayar kaydedilmediyse gösterilen varsayılan sponsor
+    var DEFAULT = { on: true, title: "Minjuan Küp Mağazası", text: "Tasarım ve zeka küpleri, speedcube'ler ve aksesuarlar Minjuan'da. Rubik Academy önerisi!", cta: "Küplere göz at", url: "https://minjuanrong.com.tr/collections/tasarim-zeka-kupleri", img: "", code: "", where: "all", ver: "d1" };
     var KEY = "ra-ad-cache-v1", HIDE = "ra-ad-hide", TTL = 30 * 60000;
     var SKIP = /\/(admin|giris|zkttimer|gizlilik|yakinda)(\.html)?$|\/algoritmalar\/(antrenor|yazdir)|\/akilli-kup|\/sanal-kup|\/tekrar/;
     function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
@@ -18,7 +20,8 @@
         if (c && Date.now() - c.at < TTL) return Promise.resolve(c.ad);
         var cfg = window.RA_FIREBASE; if (!cfg || !cfg.apiKey) return Promise.resolve(null);
         var url = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents/config/ad?key=" + encodeURIComponent(cfg.apiKey);
-        return fetch(url).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        return fetch(url).then(function (r) { return r.ok ? r.json() : r.status === 404 ? { def: 1 } : null; }).then(function (d) {
+            if (d && d.def) { try { localStorage.setItem(KEY, JSON.stringify({ at: Date.now(), ad: DEFAULT })); } catch (e) {} return DEFAULT; }
             var f = (d && d.fields) || {}, g = function (k) { return f[k] ? (f[k].stringValue != null ? f[k].stringValue : f[k].booleanValue != null ? f[k].booleanValue : f[k].integerValue) : ""; };
             var ad = d ? { on: !!g("on"), title: g("title"), text: g("text"), cta: g("cta"), url: g("url"), img: g("img"), code: g("code"), where: g("where") || "all", ver: String(g("ver") || "") } : null;
             try { localStorage.setItem(KEY, JSON.stringify({ at: Date.now(), ad: ad })); } catch (e) {}
