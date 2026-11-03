@@ -195,7 +195,10 @@ document.addEventListener("DOMContentLoaded", function () {
     document.documentElement.classList.toggle("dark-mode", isDark);
     document.body.classList.toggle("dark-mode", isDark);
     if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
+    // Halloween süresi bittiyse önceki temaya dön
+    if (raSkin() === "halloween" && !raHwOn()) { var prevSk = "standart"; try { prevSk = localStorage.getItem("ra-hw-prev") || "standart"; localStorage.setItem("site-skin", prevSk); } catch (e) {} raSavePrefs(); }
     raApplySkin(raSkin());
+    setTimeout(raHwOffer, 1800);
     if (cvdTheme()) applyCvd(cvdTheme());
     else if (holdSwap()) raRecolor();
     raInitSettings();
@@ -205,12 +208,12 @@ document.addEventListener("DOMContentLoaded", function () {
    AYARLAR MENÜSÜ (⚙) — tema, dil, renk körlüğü tek yerde
 ========================================= */
 var SETTINGS_TXT = {
-    tr: { set: "Ayarlar", theme: "Tema", dark: "Karanlık", light: "Açık", lang: "Dil", cvd: "Renk körlüğü", cvd_off: "Kapalı (normal)", cvd_pro: "Protanopi", cvd_deu: "Döteranopi", cvd_rg: "Kırmızı-Yeşil", cvd_tri: "Tritanopi (mavi-sarı)" , skin: "Tema stili", skin_standart: "Standart", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Gün Batımı" },
-    en: { set: "Settings", theme: "Theme", dark: "Dark", light: "Light", lang: "Language", cvd: "Color blindness", cvd_off: "Off (normal)", cvd_pro: "Protanopia", cvd_deu: "Deuteranopia", cvd_rg: "Red-Green", cvd_tri: "Tritanopia (blue-yellow)" , skin: "Theme style", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Sunset" },
-    fr: { set: "Paramètres", theme: "Thème", dark: "Sombre", light: "Clair", lang: "Langue", cvd: "Daltonisme", cvd_off: "Désactivé (normal)", cvd_pro: "Protanopie", cvd_deu: "Deutéranopie", cvd_rg: "Rouge-Vert", cvd_tri: "Tritanopie (bleu-jaune)" , skin: "Style du thème", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Néon", skin_gunbatimi: "Coucher de soleil" },
-    ru: { set: "Настройки", theme: "Тема", dark: "Тёмная", light: "Светлая", lang: "Язык", cvd: "Дальтонизм", cvd_off: "Выкл (обычный)", cvd_pro: "Протанопия", cvd_deu: "Дейтеранопия", cvd_rg: "Красно-зелёный", cvd_tri: "Тританопия (сине-жёлтый)" , skin: "Стиль темы", skin_standart: "Стандартный", skin_rubik: "Rubik's Cube", skin_neon: "Неон", skin_gunbatimi: "Закат" },
-    de: { set: "Einstellungen", theme: "Thema", dark: "Dunkel", light: "Hell", lang: "Sprache", cvd: "Farbenblindheit", cvd_off: "Aus (normal)", cvd_pro: "Protanopie", cvd_deu: "Deuteranopie", cvd_rg: "Rot-Grün", cvd_tri: "Tritanopie (Blau-Gelb)" , skin: "Designstil", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Sonnenuntergang" },
-    ar: { set: "الإعدادات", theme: "السمة", dark: "داكن", light: "فاتح", lang: "اللغة", cvd: "عمى الألوان", cvd_off: "إيقاف (عادي)", cvd_pro: "بروتانوبيا", cvd_deu: "ديوترانوبيا", cvd_rg: "أحمر-أخضر", cvd_tri: "تريتانوبيا (أزرق-أصفر)" , skin: "نمط السمة", skin_standart: "قياسي", skin_rubik: "Rubik's Cube", skin_neon: "نيون", skin_gunbatimi: "غروب الشمس" }
+    tr: { set: "Ayarlar", theme: "Tema", dark: "Karanlık", light: "Açık", lang: "Dil", cvd: "Renk körlüğü", cvd_off: "Kapalı (normal)", cvd_pro: "Protanopi", cvd_deu: "Döteranopi", cvd_rg: "Kırmızı-Yeşil", cvd_tri: "Tritanopi (mavi-sarı)" , skin: "Tema stili", skin_standart: "Standart", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Gün Batımı", skin_halloween: "🎃 Halloween" },
+    en: { set: "Settings", theme: "Theme", dark: "Dark", light: "Light", lang: "Language", cvd: "Color blindness", cvd_off: "Off (normal)", cvd_pro: "Protanopia", cvd_deu: "Deuteranopia", cvd_rg: "Red-Green", cvd_tri: "Tritanopia (blue-yellow)" , skin: "Theme style", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Sunset", skin_halloween: "🎃 Halloween" },
+    fr: { set: "Paramètres", theme: "Thème", dark: "Sombre", light: "Clair", lang: "Langue", cvd: "Daltonisme", cvd_off: "Désactivé (normal)", cvd_pro: "Protanopie", cvd_deu: "Deutéranopie", cvd_rg: "Rouge-Vert", cvd_tri: "Tritanopie (bleu-jaune)" , skin: "Style du thème", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Néon", skin_gunbatimi: "Coucher de soleil", skin_halloween: "🎃 Halloween" },
+    ru: { set: "Настройки", theme: "Тема", dark: "Тёмная", light: "Светлая", lang: "Язык", cvd: "Дальтонизм", cvd_off: "Выкл (обычный)", cvd_pro: "Протанопия", cvd_deu: "Дейтеранопия", cvd_rg: "Красно-зелёный", cvd_tri: "Тританопия (сине-жёлтый)" , skin: "Стиль темы", skin_standart: "Стандартный", skin_rubik: "Rubik's Cube", skin_neon: "Неон", skin_gunbatimi: "Закат", skin_halloween: "🎃 Halloween" },
+    de: { set: "Einstellungen", theme: "Thema", dark: "Dunkel", light: "Hell", lang: "Sprache", cvd: "Farbenblindheit", cvd_off: "Aus (normal)", cvd_pro: "Protanopie", cvd_deu: "Deuteranopie", cvd_rg: "Rot-Grün", cvd_tri: "Tritanopie (Blau-Gelb)" , skin: "Designstil", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Sonnenuntergang", skin_halloween: "🎃 Halloween" },
+    ar: { set: "الإعدادات", theme: "السمة", dark: "داكن", light: "فاتح", lang: "اللغة", cvd: "عمى الألوان", cvd_off: "إيقاف (عادي)", cvd_pro: "بروتانوبيا", cvd_deu: "ديوترانوبيا", cvd_rg: "أحمر-أخضر", cvd_tri: "تريتانوبيا (أزرق-أصفر)" , skin: "نمط السمة", skin_standart: "قياسي", skin_rubik: "Rubik's Cube", skin_neon: "نيون", skin_gunbatimi: "غروب الشمس", skin_halloween: "🎃 Halloween" }
 };
 function raSetLang() { try { return localStorage.getItem("site-lang") || "tr"; } catch (e) { return "tr"; } }
 function raEsc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
@@ -255,7 +258,11 @@ var RA_SKINS = [
     ["neon", ["#05060b", "#22d3ee", "#d946ef", "#e8f6ff"]],
     ["gunbatimi", ["#fdf6f0", "#e8573a", "#f5a524", "#2a1712"]]
 ];
-var RA_SKIN_FONTS = { rubik: "Rubik:wght@500;600;700;800;900", neon: "Space+Grotesk:wght@500;600;700", gunbatimi: "Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900" };
+// Sınırlı süreli tema: Halloween (30 Kasım 2026 sonuna kadar)
+var RA_HW_END = new Date(2026, 11, 1).getTime(); // 1 Aralık 00:00 (yerel saat)
+function raHwOn() { return Date.now() < RA_HW_END; }
+if (raHwOn()) RA_SKINS.push(["halloween", ["#0b0710", "#f97316", "#7c3aed", "#fff1e6"]]);
+var RA_SKIN_FONTS = { halloween: "Creepster", rubik: "Rubik:wght@500;600;700;800;900", neon: "Space+Grotesk:wght@500;600;700", gunbatimi: "Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900" };
 function raSkin() { try { return localStorage.getItem("site-skin") || "standart"; } catch (e) { return "standart"; } }
 function raApplySkin(k) {
     var d = document.documentElement;
@@ -266,6 +273,54 @@ function raApplySkin(k) {
         l.href = "https://fonts.googleapis.com/css2?family=" + f + "&display=swap";
         document.head.appendChild(l);
     }
+}
+// Siteye girene bir kez: "Halloween teması ister misin?" (30 Kasım'a kadar)
+function raHwOffer() {
+    try {
+        if (!raHwOn() || raSkin() === "halloween" || localStorage.getItem("ra-hw-asked")) return;
+        if (/\/(admin|yazdir|giris)/.test(location.pathname) || document.getElementById("raMaint") || document.getElementById("raHwAsk")) return;
+    } catch (e) { return; }
+    var end = new Date(RA_HW_END - 1), p2 = function (n) { return (n < 10 ? "0" : "") + n; };
+    var endTxt = p2(end.getDate()) + "." + p2(end.getMonth() + 1) + "." + end.getFullYear();
+    var days = Math.max(1, Math.ceil((RA_HW_END - Date.now()) / 86400000));
+    if (!document.getElementById("raSkinFont-halloween")) { var l = document.createElement("link"); l.rel = "stylesheet"; l.id = "raSkinFont-halloween"; l.href = "https://fonts.googleapis.com/css2?family=Creepster&display=swap"; document.head.appendChild(l); }
+    var st = document.createElement("style");
+    st.textContent = ".ra-hw{position:fixed;inset:0;z-index:2100;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,4,14,.72);backdrop-filter:blur(4px);animation:raHwF .25s ease-out}" +
+        "@keyframes raHwF{from{opacity:0}}" +
+        ".ra-hw-b{position:relative;width:min(400px,100%);box-sizing:border-box;padding:26px 22px 20px;border-radius:24px;text-align:center;color:#fff1e6;background:radial-gradient(120% 120% at 0% 0%,#3a1a08 0%,#150e1d 48%,#2a0f45 100%);border:2px solid #f97316;box-shadow:0 0 40px rgba(249,115,22,.35),0 30px 80px rgba(0,0,0,.5);animation:raHwP .35s cubic-bezier(.2,1.4,.4,1)}" +
+        "@keyframes raHwP{from{transform:scale(.85) rotate(-2deg);opacity:0}}" +
+        ".ra-hw-pk{width:84px;height:84px;margin:-6px auto 4px;animation:raHwB 2.2s ease-in-out infinite}" +
+        "@keyframes raHwB{50%{transform:translateY(-6px) rotate(3deg)}}" +
+        ".ra-hw-t{font:400 34px/1.05 Creepster,Inter,cursive;letter-spacing:1.5px;color:#fb923c;text-shadow:0 0 18px rgba(249,115,22,.45);margin:6px 0 8px}" +
+        ".ra-hw-p{font:600 15px/1.55 Inter,sans-serif;color:#e9d8f4;margin:0 0 6px}" +
+        ".ra-hw-d{display:inline-block;margin:6px 0 16px;padding:5px 12px;border-radius:999px;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.5);font:800 13px Inter,sans-serif;color:#fdba74}" +
+        ".ra-hw-a{display:flex;flex-direction:column;gap:8px}" +
+        ".ra-hw-a button{border:0;border-radius:14px;padding:13px;font:900 15px Inter,sans-serif;cursor:pointer}" +
+        ".ra-hw-yes{background:linear-gradient(120deg,#f97316,#c2410c);color:#fff;box-shadow:0 8px 20px rgba(249,115,22,.35)}" +
+        ".ra-hw-no{background:transparent;color:#b9a3c4;border:1px solid #3b2a52!important}" +
+        ".ra-hw-s{font:600 12px Inter,sans-serif;color:#8f7aa0;margin-top:10px}" +
+        ".ra-hw-bat{position:absolute;width:34px;opacity:.8;animation:raHwBat 3s ease-in-out infinite}" +
+        "@keyframes raHwBat{50%{transform:translate(6px,-8px) scale(.92)}}";
+    document.head.appendChild(st);
+    var pumpkin = '<svg class="ra-hw-pk" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 14c-3 0-4-6 0-9" stroke="#16a34a" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="22" cy="37" rx="13" ry="19" fill="#ea580c"/><ellipse cx="42" cy="37" rx="13" ry="19" fill="#ea580c"/><ellipse cx="32" cy="37" rx="12" ry="21" fill="#f97316"/><path d="M20 31l6 4-7 2zM44 31l-6 4 7 2zM21 45q11 9 22 0l-4 1-3-3-3 3-3-3-3 3-3-3z" fill="#1a0d02"/></svg>';
+    var bat = function (css) { return '<svg class="ra-hw-bat" style="' + css + '" viewBox="0 0 48 24" aria-hidden="true"><path d="M24 8c2-3 4-3 5 0 3-4 9-5 15-2-4 1-6 4-6 8-3-2-6-2-8 1-2-2-4-3-6-3s-4 1-6 3c-2-3-5-3-8-1 0-4-2-7-6-8 6-3 12-2 15 2 1-3 3-3 5 0z" fill="#a855f7"/></svg>'; };
+    var el = document.createElement("div"); el.id = "raHwAsk"; el.className = "ra-hw"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true");
+    el.innerHTML = '<div class="ra-hw-b">' + bat("top:14px;left:16px") + bat("top:28px;right:18px;animation-delay:.8s;width:26px") + pumpkin +
+        '<div class="ra-hw-t">Halloween Teması</div>' +
+        '<p class="ra-hw-p">Rubik Academy cadılar bayramı kostümünü giydi! Turuncu-mor renkler, örümcek ağları ve balkabakları… Denemek ister misin?</p>' +
+        '<span class="ra-hw-d">🗓 ' + endTxt + ' tarihine kadar · ' + days + ' gün kaldı</span>' +
+        '<div class="ra-hw-a"><button type="button" class="ra-hw-yes">🎃 Evet, temayı aç</button><button type="button" class="ra-hw-no">Hayır, teşekkürler</button></div>' +
+        '<div class="ra-hw-s">İstediğin zaman ⚙ Ayarlar › Tema stili’nden değiştirebilirsin.</div></div>';
+    var done = function () { try { localStorage.setItem("ra-hw-asked", "1"); } catch (e) {} el.remove(); };
+    el.querySelector(".ra-hw-yes").onclick = function () {
+        try { localStorage.setItem("ra-hw-prev", raSkin()); localStorage.setItem("theme", "dark"); } catch (e) {}
+        document.documentElement.classList.add("dark-mode"); document.body.classList.add("dark-mode");
+        var b = document.getElementById("darkModeBtn"); if (b) b.innerHTML = "☀️";
+        raSetSkin("halloween"); done();
+    };
+    el.querySelector(".ra-hw-no").onclick = done;
+    el.onclick = function (e) { if (e.target === el) done(); };
+    document.body.appendChild(el);
 }
 function raSetSkin(k, target) {
     try { localStorage.setItem("site-skin", k); } catch (e) {}
