@@ -894,12 +894,12 @@
         box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
         authed(docsBase() + "/config/ad", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var f = (d && d.fields) || {}, g = function (k) { return f[k] ? (f[k].stringValue != null ? f[k].stringValue : f[k].booleanValue) : ""; };
-            var ad = { on: d ? !!g("on") : true, title: g("title") || "Minjuan Küp Mağazası", text: g("text") || "Tasarım ve zeka küpleri, speedcube'ler ve aksesuarlar Minjuan'da. Rubik Academy önerisi!", cta: g("cta") || "Küplere göz at", url: g("url") || "https://minjuanrong.com.tr/collections/tasarim-zeka-kupleri", img: g("img"), code: g("code"), where: g("where") || "all" };
+            var ad = { on: d ? !!g("on") : true, title: g("title") || "Minjuan Küp Mağazası", text: g("text") || "Tasarım ve zeka küpleri, speedcube'ler ve aksesuarlar Minjuan'da. Rubik Academy önerisi!", cta: g("cta") || "Küplere göz at", url: g("url") || "https://minjuanrong.com.tr/collections/tasarim-zeka-kupleri", img0: d ? "" : "/img/sponsor/minjuan-mark.jpg", img: g("img"), code: g("code"), where: g("where") || "all" };
             var inp = function (id, lb, v, ph, max) { return '<label class="ad-f"><span>' + lb + '</span><input id="' + id + '" maxlength="' + max + '" value="' + esc(v) + '" placeholder="' + esc(ph) + '"></label>'; };
             box.innerHTML = '<label class="mt-tog"><input type="checkbox" id="adOn"' + (ad.on ? ' checked' : '') + '> <span>Banner yayında</span></label>' +
                 '<div class="ad-grid">' + inp("adTitle", "Başlık", ad.title, "Minjuan Küp", 60) + inp("adCta", "Buton yazısı", ad.cta, "Alışverişe başla", 30) +
                 '<label class="ad-f ad-wide"><span>Metin</span><textarea id="adText" maxlength="220" rows="2">' + esc(ad.text) + '</textarea></label>' +
-                inp("adUrl", "Bağlantı (https://…)", ad.url, "https://minjuan…", 300) + inp("adImg", "Görsel bağlantısı (isteğe bağlı)", ad.img, "https://…/logo.png", 500) +
+                inp("adUrl", "Bağlantı (https://…)", ad.url, "https://minjuan…", 300) + inp("adImg", "Görsel bağlantısı (isteğe bağlı)", ad.img || ad.img0, "https://…/logo.png", 500) +
                 inp("adCode", "İndirim kodu (isteğe bağlı)", ad.code, "RUBIK10", 30) +
                 '<label class="ad-f"><span>Nerede görünsün</span><select id="adWhere"><option value="all">Tüm sayfalar</option><option value="home">Ana sayfa + İçerikler</option><option value="cekilis">Sadece çekiliş sayfası</option></select></label></div>' +
                 '<h4 style="margin:12px 0 0">Önizleme</h4><div id="adPrev"></div>' +
@@ -913,7 +913,7 @@
             $id("adSave").addEventListener("click", function () {
                 var o = cur();
                 if (o.url && !/^https:\/\//.test(o.url)) { msg($id("adMsg"), "Bağlantı https:// ile başlamalı.", "bad"); return; }
-                if (o.img && !/^https:\/\//.test(o.img)) { msg($id("adMsg"), "Görsel bağlantısı https:// ile başlamalı.", "bad"); return; }
+                if (o.img && !/^https:\/\//.test(o.img) && !/^\/img\//.test(o.img)) { msg($id("adMsg"), "Görsel bağlantısı https:// ile başlamalı.", "bad"); return; }
                 if (o.on && !o.url) { msg($id("adMsg"), "Yayına almak için bağlantı gir.", "bad"); return; }
                 var fields = { on: { booleanValue: o.on }, ver: { stringValue: String(Date.now()) } };
                 ["title", "text", "cta", "url", "img", "code", "where"].forEach(function (k) { fields[k] = { stringValue: o[k] }; });

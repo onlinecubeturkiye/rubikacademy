@@ -9,11 +9,11 @@
 (function () {
     if (window.RAAd) return;
     // Admin panelinden hiç ayar kaydedilmediyse gösterilen varsayılan sponsor
-    var DEFAULT = { on: true, title: "Minjuan Küp Mağazası", text: "Tasarım ve zeka küpleri, speedcube'ler ve aksesuarlar Minjuan'da. Rubik Academy önerisi!", cta: "Küplere göz at", url: "https://minjuanrong.com.tr/collections/tasarim-zeka-kupleri", img: "", code: "", where: "all", ver: "d1" };
-    var KEY = "ra-ad-cache-v1", HIDE = "ra-ad-hide", TTL = 30 * 60000;
+    var DEFAULT = { on: true, title: "Minjuan Küp Mağazası", text: "Tasarım ve zeka küpleri, speedcube'ler ve aksesuarlar Minjuan'da. Rubik Academy önerisi!", cta: "Küplere göz at", url: "https://minjuanrong.com.tr/collections/tasarim-zeka-kupleri", img: "/img/sponsor/minjuan-mark.jpg", code: "", where: "all", ver: "d2" };
+    var KEY = "ra-ad-cache-v2", HIDE = "ra-ad-hide", TTL = 30 * 60000;
     var SKIP = /\/(admin|giris|zkttimer|gizlilik|yakinda)(\.html)?$|\/algoritmalar\/(antrenor|yazdir)|\/akilli-kup|\/sanal-kup|\/tekrar/;
     function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-    function safeUrl(u) { u = String(u || "").trim(); return /^https:\/\/[^\s"'<>]+$/.test(u) ? u : ""; }
+    function safeUrl(u) { u = String(u || "").trim(); return /^https:\/\/[^\s"'<>]+$/.test(u) || /^\/img\/[\w\/.-]+$/.test(u) ? u : ""; }
     function withUtm(u) { if (!u) return ""; try { var x = new URL(u); if (!x.searchParams.has("utm_source")) { x.searchParams.set("utm_source", "rubikacademy"); x.searchParams.set("utm_medium", "banner"); } return x.toString(); } catch (e) { return u; } }
     function load() {
         var c = null; try { c = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
