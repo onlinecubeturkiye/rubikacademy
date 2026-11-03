@@ -894,7 +894,7 @@
         box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
         authed(docsBase() + "/config/ad", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var f = (d && d.fields) || {}, g = function (k) { return f[k] ? (f[k].stringValue != null ? f[k].stringValue : f[k].booleanValue) : ""; };
-            var ad = { on: d ? !!g("on") : true, title: g("title") || "Minjuan Küp Mağazası", text: g("text") || "Tasarım ve zeka küpleri, speedcube'ler ve aksesuarlar Minjuan'da. Rubik Academy önerisi!", cta: g("cta") || "Küplere göz at", url: g("url") || "https://minjuanrong.com.tr/collections/tasarim-zeka-kupleri", img0: d ? "" : "/img/sponsor/minjuan-mark.jpg", img: g("img"), code: g("code"), where: g("where") || "all" };
+            var ad = { on: d ? !!g("on") : true, title: g("title") || "Minjuan Küp Mağazası", text: g("text") || "Tasarım ve zeka küpleri, speedcube'ler ve aksesuarlar Minjuan'da. Rubik Academy önerisi!", cta: g("cta") || "Küplere göz at", url: g("url") || "https://minjuanrong.com.tr/collections/tasarim-zeka-kupleri", img0: d ? "" : "/img/sponsor/minjuan-mark.png", img: g("img"), code: g("code"), where: g("where") || "all" };
             var inp = function (id, lb, v, ph, max) { return '<label class="ad-f"><span>' + lb + '</span><input id="' + id + '" maxlength="' + max + '" value="' + esc(v) + '" placeholder="' + esc(ph) + '"></label>'; };
             box.innerHTML = '<label class="mt-tog"><input type="checkbox" id="adOn"' + (ad.on ? ' checked' : '') + '> <span>Banner yayında</span></label>' +
                 '<div class="ad-grid">' + inp("adTitle", "Başlık", ad.title, "Minjuan Küp", 60) + inp("adCta", "Buton yazısı", ad.cta, "Alışverişe başla", 30) +

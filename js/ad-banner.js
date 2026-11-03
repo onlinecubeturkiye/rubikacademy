@@ -9,8 +9,8 @@
 (function () {
     if (window.RAAd) return;
     // Admin panelinden hiç ayar kaydedilmediyse gösterilen varsayılan sponsor
-    var DEFAULT = { on: true, title: "Minjuan Küp Mağazası", text: "Tasarım ve zeka küpleri, speedcube'ler ve aksesuarlar Minjuan'da. Rubik Academy önerisi!", cta: "Küplere göz at", url: "https://minjuanrong.com.tr/collections/tasarim-zeka-kupleri", img: "/img/sponsor/minjuan-mark.jpg", code: "", where: "all", ver: "d2" };
-    var KEY = "ra-ad-cache-v2", HIDE = "ra-ad-hide", TTL = 30 * 60000;
+    var DEFAULT = { on: true, title: "Minjuan Küp Mağazası", text: "Tasarım ve zeka küpleri, speedcube'ler ve aksesuarlar Minjuan'da. Rubik Academy önerisi!", cta: "Küplere göz at", url: "https://minjuanrong.com.tr/collections/tasarim-zeka-kupleri", img: "/img/sponsor/minjuan-mark.png", code: "", where: "all", ver: "d3" };
+    var KEY = "ra-ad-cache-v3", HIDE = "ra-ad-hide", TTL = 30 * 60000;
     var SKIP = /\/(admin|giris|zkttimer|gizlilik|yakinda)(\.html)?$|\/algoritmalar\/(antrenor|yazdir)|\/akilli-kup|\/sanal-kup|\/tekrar/;
     function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
     function safeUrl(u) { u = String(u || "").trim(); return /^https:\/\/[^\s"'<>]+$/.test(u) || /^\/img\/[\w\/.-]+$/.test(u) ? u : ""; }
@@ -42,7 +42,7 @@
         return null;
     }
     var css = ".ra-ad{position:relative;box-sizing:border-box;width:calc(100% - 32px);max-width:1100px;margin:18px auto 26px;display:flex;align-items:center;gap:16px;padding:14px 46px 14px 14px;border-radius:20px;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,#f97316,#ec4899,#6c5ce7) border-box;border:2px solid transparent;box-shadow:var(--shadow-sm,0 6px 20px rgba(0,0,0,.12));color:var(--text);text-align:start}" +
-        ".ra-ad-img{flex:none;width:92px;height:92px;border-radius:14px;object-fit:cover;background:var(--surface-soft)}" +
+        ".ra-ad-img{flex:none;width:92px;height:92px;border-radius:14px;object-fit:cover;background:#fff;border:1px solid var(--border);box-sizing:border-box}" +
         ".ra-ad-ph{flex:none;width:92px;height:92px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:44px;background:linear-gradient(135deg,rgba(249,115,22,.18),rgba(108,92,231,.2))}" +
         ".ra-ad-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}" +
         ".ra-ad-tag{align-self:flex-start;font:900 10.5px Inter,sans-serif;letter-spacing:.8px;padding:2px 8px;border-radius:99px;background:rgba(249,115,22,.14);color:#ea580c}" +
