@@ -1255,6 +1255,60 @@ html[data-skin="gunbatimi"] h1, html[data-skin="gunbatimi"] h2 { letter-spacing:
 html[data-skin="gunbatimi"] .bg-glow::before { background: #ff7a59; }
 html[data-skin="gunbatimi"] .bg-glow::after { background: #f5b14c; }
 
+/* ---------- Halloween (30 Kasım'a kadar) ---------- */
+html[data-skin="halloween"], html[data-skin="halloween"] body {
+    --tint-red: #ffe9e4; --tint-orange: #ffefdf; --tint-yellow: #fff6d9; --tint-green: #eef8e6; --tint-blue: #efeefb; --tint-purple: #f3eafd;
+    --ink: #ecdccb; --card-bw: 1px;
+    --ui-accent: #ea580c; --ui-accent-hover: #c2410c; --ui-accent-text: #ffffff; --ui-accent-soft: #ffedd5;
+    --background: #fdf6ec; --surface: #fffaf3; --surface-soft: #f6eadb;
+    --primary: #ea580c; --primary-dark: #c2410c; --primary-light: #ffedd5;
+    --text: #1f1306; --text-soft: #6f5a44; --border: #eedfcc; --card-border: #ecdccb;
+    --shadow: 0 1px 2px rgba(124, 45, 18, .06), 0 10px 26px rgba(124, 45, 18, .09);
+    --shadow-sm: 0 1px 2px rgba(124, 45, 18, .07), 0 3px 10px rgba(124, 45, 18, .06);
+    --shadow-hover: 0 2px 4px rgba(124, 45, 18, .08), 0 18px 38px rgba(124, 45, 18, .16);
+    --diagram-bg: #f6eadb;
+    --badge-bg: #ffedd5; --badge-text: #c2410c;
+    --hero-bg: linear-gradient(135deg, #ffedd5 0%, #fff7ed 45%, #f3e8ff 100%); --hero-border: #ecdccb;
+    --btn-bg: #ea580c; --btn-hover-bg: #c2410c; --btn-text: #ffffff;
+    --bottom-bg: #ffedd5; --bottom-border: #ecdccb;
+    --nav-bg: rgba(253, 246, 236, .88);
+}
+html.dark-mode[data-skin="halloween"], html.dark-mode[data-skin="halloween"] body {
+    --tint-red: #2e1012; --tint-orange: #2f1707; --tint-yellow: #2a2208; --tint-green: #142312; --tint-blue: #181530; --tint-purple: #24123a;
+    --ink: #2c1d3d;
+    --ui-accent: #f97316; --ui-accent-hover: #fb923c; --ui-accent-text: #170a02; --ui-accent-soft: #3a1a08;
+    --background: #0b0710; --surface: #150e1d; --surface-soft: #1d1428;
+    --primary: #fb923c; --primary-dark: #fdba74; --primary-light: #3a1a08;
+    --text: #fff1e6; --text-soft: #b9a3c4; --border: #24183a; --card-border: #2c1d3d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(124, 58, 237, .12);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35), 0 3px 12px rgba(124, 58, 237, .1);
+    --shadow-hover: 0 0 0 1px rgba(249, 115, 22, .35), 0 0 26px rgba(249, 115, 22, .22), 0 18px 40px rgba(124, 58, 237, .2);
+    --diagram-bg: #120b19;
+    --badge-bg: #3a1a08; --badge-text: #fb923c;
+    --hero-bg: radial-gradient(120% 140% at 0% 0%, #3a1a08 0%, #150e1d 45%, #2a0f45 100%); --hero-border: #2c1d3d;
+    --btn-bg: #f97316; --btn-hover-bg: #fb923c; --btn-text: #170a02;
+    --bottom-bg: #2f1707; --bottom-border: #2c1d3d;
+    --nav-bg-dark: rgba(11, 7, 16, .86);
+}
+html[data-skin="halloween"] .navbar::after { background: linear-gradient(90deg, transparent, #f97316 30%, #7c3aed 70%, transparent); opacity: .75; }
+html[data-skin="halloween"] .gradient-text { background-image: linear-gradient(90deg, #f97316 0%, #a855f7 100%); }
+html[data-skin="halloween"] h1 { font-family: "Creepster", var(--font-display, "Inter"), cursive; font-weight: 400 !important; letter-spacing: 1.5px; }
+html.dark-mode[data-skin="halloween"] h1 { text-shadow: 0 0 22px rgba(249, 115, 22, .35); }
+html[data-skin="halloween"] h1 .gradient-text { text-shadow: none; filter: drop-shadow(0 0 14px rgba(249, 115, 22, .35)); }
+html[data-skin="halloween"] .bg-glow::before { background: #f97316; }
+html[data-skin="halloween"] .bg-glow::after { background: #7c3aed; }
+/* sağ üst köşede örümcek ağı, sol altta küçük balkabağı (sadece süs, tıklanmaz) */
+html[data-skin="halloween"] body::before { content: ""; position: fixed; top: 64px; right: 0; width: 150px; height: 150px; pointer-events: none; z-index: 0; opacity: .32;
+    background: no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23b9a3c4' stroke-width='1.2'%3E%3Cpath d='M100 0 0 100M100 0 30 100M100 0 60 100M100 0 0 30M100 0 0 60'/%3E%3Cpath d='M78 0q2 12 22 22M56 0q4 26 44 44M34 0q6 40 66 66M12 0q8 54 88 88'/%3E%3Cpath d='M70 34v12' /%3E%3Ccircle cx='70' cy='49' r='3.2' fill='%23b9a3c4'/%3E%3C/svg%3E") right top / contain; }
+html[data-skin="halloween"] body::after { content: ""; position: fixed; left: 14px; bottom: 14px; width: 46px; height: 46px; pointer-events: none; z-index: 0; opacity: .85;
+    background: no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 14c-3 0-4-6 0-9' stroke='%2316a34a' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cellipse cx='22' cy='37' rx='13' ry='19' fill='%23ea580c'/%3E%3Cellipse cx='42' cy='37' rx='13' ry='19' fill='%23ea580c'/%3E%3Cellipse cx='32' cy='37' rx='12' ry='21' fill='%23f97316'/%3E%3Cpath d='M20 31l6 4-7 2zM44 31l-6 4 7 2zM21 45q11 9 22 0l-4 1-3-3-3 3-3-3-3 3-3-3z' fill='%231a0d02'/%3E%3C/svg%3E") center / contain; }
+@media (max-width: 600px) { html[data-skin="halloween"] body::before { width: 90px; height: 90px; } html[data-skin="halloween"] body::after { width: 34px; height: 34px; } }
+@media print { html[data-skin="halloween"] body::before, html[data-skin="halloween"] body::after { display: none; } }
+
+/* Renkli (gradyan) başlık yazısı: gradyan yalnız harflerin içinde görünür */
+html[data-skin="neon"] .gradient-text, html[data-skin="gunbatimi"] .gradient-text, html[data-skin="halloween"] .gradient-text {
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+
 /* Ayarlar: tema stili önizleme kutuları */
 .skin-sw { display: inline-flex; gap: 3px; margin-inline-end: 4px; }
 .skin-sw i { width: 14px; height: 14px; border-radius: 4px; display: block; border: 1px solid rgba(0, 0, 0, .12); }

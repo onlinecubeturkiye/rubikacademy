@@ -140,7 +140,7 @@
         return u.photo ? '<img src="' + esc(u.photo) + '" alt="" referrerpolicy="no-referrer">' : esc(ini);
     }
     function skinLabel(k) {
-        var S = { standart: ["Standart", "#6c5ce7"], rubik: ["Rubik's Cube", "#ffd21f"], neon: ["Neon", "#22d3ee"], gunbatimi: ["Gün Batımı", "#e8573a"] };
+        var S = { standart: ["Standart", "#6c5ce7"], rubik: ["Rubik's Cube", "#ffd21f"], neon: ["Neon", "#22d3ee"], gunbatimi: ["Gün Batımı", "#e8573a"], halloween: ["Halloween", "#f97316"] };
         var x = S[k || ""]; if (!x) return k ? esc(k) : "—";
         return '<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:' + x[1] + ';margin-inline-end:6px;vertical-align:middle"></span>' + x[0];
     }
