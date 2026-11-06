@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261213";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261214";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -932,7 +932,7 @@
     document.addEventListener("keyup", function (e) { if (e.code === "Space" && phase === "holding") { e.preventDefault(); manualUp(); } });
     /* --- mıknatıs timer (ZKT tarzı): telefonun pusulası/manyetometresiyle --- */
     var mag = { on: false, raf: 0 };
-    var MAG_TXT = { white: "Küpü telefonun üstüne koy", orange: "Bekle… küpü oynatma (1 sn)", green: "Hazır! Küpü kaldırınca süre başlar", clear: "Küpü kaldır, karıştır ve tekrar telefona koy", running: "Çözülüyor… bitince küpü masaya bırak (ya da buraya dokun)", done: "Kaydedildi ✓" };
+    var MAG_TXT = { white: "Küpü telefonun üstüne koy", orange: "Bekle… küpü oynatma (1 sn)", green: "Hazır! Küpü kaldırınca süre başlar", clear: "Küpü kaldır, karıştır ve tekrar telefona koy", running: "Çözülüyor… bitince küpü masaya bırak", done: "Kaydedildi ✓" };
     // (kutu yalnız durum gösterir; başlatma/durdurma mıknatıs ve titreşimle)
     function magPaint(st) {
         var box = $("cMagBox"); if (!box) return;
@@ -1012,8 +1012,6 @@
         });
         // Süre yalnız mıknatıs/titreşimle başlar ve durur: kutuya dokunmak bir şey yapmaz
         $("cMagCal").onclick = function () { openCal(); };
-        // yedek: çözerken kutuya dokunmak süreyi durdurur (başlatmaz)
-        $("cMagBox").onclick = function () { if (window.MagnetTimer && MagnetTimer.state() === "running") MagnetTimer.tapStop(); };
         if ($("cMagCalGo")) $("cMagCalGo").onclick = function () { openCal(); };
     }
     // Kayıtlı küpler: hangisiyle çözdüğünü seç ya da yeni küp ayarla
