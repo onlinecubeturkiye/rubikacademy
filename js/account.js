@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261213";
+    var V = "20261214";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -905,15 +905,31 @@
         if (!("Notification" in window)) return Promise.resolve("unsupported");
         return Notification.requestPermission().then(function (perm) { if (perm === "granted") return ensurePush().then(function () { return perm; }); return perm; });
     }
-    // Siteye girene bildirim izni sor (kibar banner; "Sonra" derse 7 gün sormaz)
-    function askPushBanner() {
-        if (!enabled || !pushSupported() || Notification.permission !== "default") return;
-        if (+(lsGet("ra-push-ask") || 0) > Date.now() || document.getElementById("raPushAsk") || document.getElementById("raMaint")) return;
-        var el = document.createElement("div"); el.id = "raPushAsk"; el.className = "ra-pushask";
-        el.innerHTML = '<span class="ra-pushask-ic">🔔</span><div class="ra-pushask-tx"><b>Bildirimleri aç</b><span>Duyuruları ve sana özel mesajları site kapalıyken de al.</span></div>' +
-            '<button class="ra-pushask-ok">Aç</button><button class="ra-pushask-no" aria-label="Sonra">Sonra</button>';
-        el.querySelector(".ra-pushask-ok").onclick = function () { el.remove(); enablePush().then(function (p) { if (p === "granted") showToast("Bildirimler açıldı ✓"); }); };
-        el.querySelector(".ra-pushask-no").onclick = function () { el.remove(); lsSet("ra-push-ask", String(Date.now() + 7 * 86400000)); };
+    // Bildirim izni zorunlu: izin verilmedikçe her oturumda pencere çıkar ("Şimdi değil" yalnız o oturum için kapatır).
+    // iPhone/iPad'de bildirim yalnız siteyi Ana Ekran'a ekleyince çalışır → nasıl yapılacağı gösterilir.
+    function pushState() {
+        if (!("Notification" in window) || !pushSupported()) return /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ? "ios" : "unsupported";
+        return Notification.permission; // default | granted | denied
+    }
+    function pushHelpHtml(st) {
+        return st === "ios" ? 'iPhone\'da bildirim almak için siteyi uygulama gibi ekle: Safari\'de <b>Paylaş</b> (kare + ok) → <b>Ana Ekrana Ekle</b>. Sonra Ana Ekran\'daki Rubik Academy simgesinden aç ve bildirimlere izin ver.'
+            : st === "denied" ? 'Bildirimleri daha önce engellemişsin. Adres çubuğundaki <b>kilit / ayar</b> simgesine dokun → <b>Bildirimler</b> → <b>İzin ver</b>, sonra sayfayı yenile.'
+            : st === "unsupported" ? 'Bu tarayıcı bildirimleri desteklemiyor. Chrome, Edge, Firefox ya da Safari\'nin güncel sürümünü kullan.' : '';
+    }
+    function askPushBanner(force) {
+        if (!enabled || document.getElementById("raPushAsk") || document.getElementById("raMaint") || /\/(admin|yazdir)/.test(location.pathname)) return;
+        if (document.getElementById("raHwAsk")) { setTimeout(function () { askPushBanner(force); }, 3000); return; } // tema penceresi açıksa sonra
+        var st = pushState(); if (st === "granted") return;
+        if (!force) { try { if (sessionStorage.getItem("ra-push-later")) return; } catch (e) {} }
+        if (st === "unsupported" && !force) return;
+        var el = document.createElement("div"); el.id = "raPushAsk"; el.className = "ra-pushmod";
+        el.innerHTML = '<div class="ra-pushmod-b"><div class="ra-pushmod-ic">🔔</div><b>Bildirimleri aç</b>' +
+            '<p>Çekiliş sonuçları, yarışmalar ve duyurular için bildirimler gerekli. <b>Çekilişi kazanırsan 2 dakika içinde onaylaman gerekiyor</b>; bildirim kapalıysa haberin olmaz.</p>' +
+            (st === "default" ? '<button type="button" class="ra-pushmod-ok">🔔 Bildirimlere izin ver</button>' : '<div class="ra-pushmod-help">' + pushHelpHtml(st) + '</div>') +
+            '<button type="button" class="ra-pushmod-no">Şimdi değil</button></div>';
+        var ok = el.querySelector(".ra-pushmod-ok");
+        if (ok) ok.onclick = function () { ok.disabled = true; enablePush().then(function (p) { if (p === "granted") { el.remove(); showToast("Bildirimler açıldı ✓"); document.dispatchEvent(new CustomEvent("ra-push-change")); } else { el.remove(); askPushBanner(true); } }); };
+        el.querySelector(".ra-pushmod-no").onclick = function () { el.remove(); try { sessionStorage.setItem("ra-push-later", "1"); } catch (e) {} };
         (document.body || document.documentElement).appendChild(el);
     }
     // Site öndeyken gelen push → site içi bildirim
@@ -1023,7 +1039,7 @@
         authPending: function () { return lsGet(SIGNED_KEY) === "1" && !authResolved; },
         sendNotif: sendNotif, sendBroadcast: sendBroadcast, showNotes: showNotes,
         listBroadcasts: listBroadcasts, deleteBroadcast: deleteBroadcast, getConfig: getConfig, setMaintenance: setMaintenance, setMemberCount: setMemberCount,
-        notifyPermission: enablePush, enablePush: enablePush, pushSupported: pushSupported,
+        notifyPermission: enablePush, enablePush: enablePush, pushSupported: pushSupported, pushState: pushState, pushHelpHtml: pushHelpHtml, askPush: askPushBanner,
         // Hatırlatıcılar: "d" = günün karıştırması (akşam), "c" = yeni ev yarışması. Bildirim izni ister.
         reminders: function () { return String(lsGet("ra-remind-v1") || "").split(",").filter(Boolean); },
         setReminders: function (list) {
@@ -1049,7 +1065,7 @@
         setTimeout(checkMaintenance, 2200);
         setTimeout(logAnon, 3500);
         // Bildirim izni: verilmişse aboneliği tazele, verilmemişse sor
-        setTimeout(function () { ensurePush(); askPushBanner(); }, 4000);
+        setTimeout(function () { ensurePush(); askPushBanner(); }, /\/cekilis/.test(location.pathname) ? 1200 : 4000);
         document.addEventListener("account-change", function () { checkMaintenance(); });
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();

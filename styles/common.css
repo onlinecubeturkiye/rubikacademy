@@ -1109,6 +1109,14 @@ html[dir="rtl"] .acc-mi { text-align: right; }
 .ra-maint-a { display: inline-block; margin-top: 16px; padding: 10px 16px; border-radius: 12px; border: var(--card-bw, 2.5px) solid var(--card-border, #17171f); background: var(--surface, #fff); color: var(--text, #17171f); font-weight: 800; text-decoration: none; box-shadow: var(--shadow-sm); }
 
 /* Bildirim izni bannerı */
+.ra-pushmod { position: fixed; inset: 0; z-index: 2050; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(10, 12, 18, .66); backdrop-filter: blur(3px); animation: raPushIn .25s ease; }
+.ra-pushmod-b { width: min(400px, 100%); box-sizing: border-box; padding: 22px 20px 16px; border-radius: 22px; background: var(--surface, #fff); color: var(--text, #111); border: var(--card-bw, 2px) solid var(--card-border, var(--ink, #111)); box-shadow: 0 24px 60px rgba(0, 0, 0, .35); text-align: center; font-family: Inter, sans-serif; display: flex; flex-direction: column; gap: 8px; }
+.ra-pushmod-ic { font-size: 42px; line-height: 1; }
+.ra-pushmod-b > b { font-size: 21px; font-weight: 900; }
+.ra-pushmod-b p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--text-soft, #555); }
+.ra-pushmod-help { font-size: 14px; line-height: 1.55; padding: 10px 12px; border-radius: 14px; background: var(--surface-soft, #f3f3f3); text-align: start; }
+.ra-pushmod-ok { border: 0; border-radius: 14px; padding: 13px; font: 900 15px Inter, sans-serif; cursor: pointer; background: var(--ui-accent, #6c5ce7); color: var(--ui-accent-text, #fff); margin-top: 4px; }
+.ra-pushmod-no { border: 0; background: none; color: var(--text-soft, #666); font: 700 13px Inter, sans-serif; cursor: pointer; padding: 6px; }
 .ra-pushask { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 9998; width: min(460px, calc(100% - 32px)); display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 16px; background: var(--surface, #fff); color: var(--text, #111); border: var(--card-bw, 2px) solid var(--ink, #111); box-shadow: 0 10px 30px rgba(0,0,0,.18); font-family: Inter, sans-serif; animation: raPushIn .35s ease; }
 @keyframes raPushIn { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
 .ra-pushask-ic { font-size: 24px; }
@@ -1305,8 +1313,61 @@ html[data-skin="halloween"] body::after { content: ""; position: fixed; left: 14
 @media (max-width: 600px) { html[data-skin="halloween"] body::before { width: 90px; height: 90px; } html[data-skin="halloween"] body::after { width: 34px; height: 34px; } }
 @media print { html[data-skin="halloween"] body::before, html[data-skin="halloween"] body::after { display: none; } }
 
+/* ---------- Yılbaşı (1 Aralık – 7 Ocak) ---------- */
+html[data-skin="yilbasi"], html[data-skin="yilbasi"] body {
+    --tint-red: #ffe8e8; --tint-orange: #fff0e3; --tint-yellow: #fff7da; --tint-green: #e6f6ec; --tint-blue: #e8f0fb; --tint-purple: #f1ecfb;
+    --ink: #e2e6ee; --card-bw: 1px;
+    --ui-accent: #dc2626; --ui-accent-hover: #b91c1c; --ui-accent-text: #ffffff; --ui-accent-soft: #fee2e2;
+    --background: #f6f8fc; --surface: #ffffff; --surface-soft: #eef2f8;
+    --primary: #b91c1c; --primary-dark: #991b1b; --primary-light: #fee2e2;
+    --text: #0f172a; --text-soft: #52607a; --border: #e2e7f0; --card-border: #e2e6ee;
+    --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 10px 26px rgba(15, 23, 42, .08);
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 3px 10px rgba(15, 23, 42, .05);
+    --shadow-hover: 0 2px 4px rgba(15, 23, 42, .06), 0 18px 38px rgba(220, 38, 38, .14);
+    --diagram-bg: #eef2f8;
+    --badge-bg: #fee2e2; --badge-text: #b91c1c;
+    --hero-bg: linear-gradient(135deg, #fee2e2 0%, #f6f8fc 50%, #dcfce7 100%); --hero-border: #e2e6ee;
+    --btn-bg: #dc2626; --btn-hover-bg: #b91c1c; --btn-text: #ffffff;
+    --bottom-bg: #fee2e2; --bottom-border: #e2e6ee;
+    --nav-bg: rgba(246, 248, 252, .88);
+}
+html.dark-mode[data-skin="yilbasi"], html.dark-mode[data-skin="yilbasi"] body {
+    --tint-red: #2e1014; --tint-orange: #2e1a0c; --tint-yellow: #2a230b; --tint-green: #0d2618; --tint-blue: #0f1c33; --tint-purple: #1d1532;
+    --ink: #1c2a44;
+    --ui-accent: #ef4444; --ui-accent-hover: #f87171; --ui-accent-text: #ffffff; --ui-accent-soft: #3b1116;
+    --background: #070d19; --surface: #0e1728; --surface-soft: #142036;
+    --primary: #f87171; --primary-dark: #fca5a5; --primary-light: #3b1116;
+    --text: #eef4ff; --text-soft: #9fb0c8; --border: #182540; --card-border: #1c2a44;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35), 0 3px 12px rgba(0, 0, 0, .3);
+    --shadow-hover: 0 0 0 1px rgba(251, 191, 36, .35), 0 0 24px rgba(251, 191, 36, .18), 0 18px 40px rgba(22, 163, 74, .18);
+    --diagram-bg: #0b1322;
+    --badge-bg: #3b1116; --badge-text: #fca5a5;
+    --hero-bg: radial-gradient(120% 140% at 0% 0%, #3b0d12 0%, #0e1728 48%, #0b3320 100%); --hero-border: #1c2a44;
+    --btn-bg: #dc2626; --btn-hover-bg: #ef4444; --btn-text: #ffffff;
+    --bottom-bg: #2e1014; --bottom-border: #1c2a44;
+    --nav-bg-dark: rgba(7, 13, 25, .86);
+}
+html[data-skin="yilbasi"] .navbar::after { background: linear-gradient(90deg, transparent, #dc2626 25%, #fbbf24 50%, #16a34a 75%, transparent); opacity: .8; }
+html[data-skin="yilbasi"] .gradient-text { background-image: linear-gradient(90deg, #ef4444 0%, #fbbf24 50%, #22c55e 100%); }
+html[data-skin="yilbasi"] h1 { font-family: "Mountains of Christmas", var(--font-display, "Inter"), serif; font-weight: 700 !important; letter-spacing: .5px; }
+html.dark-mode[data-skin="yilbasi"] h1 { text-shadow: 0 0 22px rgba(251, 191, 36, .25); }
+html[data-skin="yilbasi"] h1 .gradient-text { text-shadow: none; }
+html[data-skin="yilbasi"] .bg-glow::before { background: #dc2626; }
+html[data-skin="yilbasi"] .bg-glow::after { background: #16a34a; }
+/* yağan kar (iki katman, hareketi azaltma tercihine uyar) */
+html[data-skin="yilbasi"] body::before, html[data-skin="yilbasi"] body::after { content: ""; position: fixed; inset: -10% 0 0 0; pointer-events: none; z-index: 0;
+    background-image: radial-gradient(2.5px 2.5px at 20px 30px, #fff, transparent), radial-gradient(2px 2px at 90px 120px, #fff, transparent), radial-gradient(3px 3px at 160px 60px, #fff, transparent), radial-gradient(2px 2px at 230px 170px, #fff, transparent), radial-gradient(2.5px 2.5px at 300px 90px, #fff, transparent);
+    background-size: 320px 220px; opacity: .55; animation: raSnow 14s linear infinite; }
+html[data-skin="yilbasi"] body::after { background-size: 230px 180px; opacity: .35; animation: raSnow2 22s linear infinite; filter: blur(.6px); }
+html[data-skin="yilbasi"]:not(.dark-mode) body::before, html[data-skin="yilbasi"]:not(.dark-mode) body::after { filter: drop-shadow(0 0 1px rgba(100, 116, 139, .9)); opacity: .5; }
+@keyframes raSnow { from { background-position: 0 0; } to { background-position: 40px 220px; } }
+@keyframes raSnow2 { from { background-position: 0 0; } to { background-position: -30px 180px; } }
+@media (prefers-reduced-motion: reduce) { html[data-skin="yilbasi"] body::before, html[data-skin="yilbasi"] body::after { animation: none; } }
+@media print { html[data-skin="yilbasi"] body::before, html[data-skin="yilbasi"] body::after { display: none; } }
+
 /* Renkli (gradyan) başlık yazısı: gradyan yalnız harflerin içinde görünür */
-html[data-skin="neon"] .gradient-text, html[data-skin="gunbatimi"] .gradient-text, html[data-skin="halloween"] .gradient-text {
+html[data-skin="neon"] .gradient-text, html[data-skin="gunbatimi"] .gradient-text, html[data-skin="halloween"] .gradient-text, html[data-skin="yilbasi"] .gradient-text {
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
 
 /* Ayarlar: tema stili önizleme kutuları */

@@ -70,7 +70,7 @@
         var p = phase(g), now = Date.now();
         return p === "open" ? '<span class="gw-chip on">Kayıtlar açık · kapanmasına ' + left(g.closeAt - now) + '</span>'
             : p === "closed" ? '<span class="gw-chip">Kayıtlar kapandı · çekilişe ' + left(g.drawAt - now) + '</span>'
-            : p === "drawing" ? '<span class="gw-chip live">Çekiliş yapılıyor…</span>'
+            : p === "drawing" ? '<span class="gw-chip live">Çekiliş birazdan başlıyor…</span>'
             : p === "drawn" ? '<span class="gw-chip live">Kazanan: ' + esc(g.wName) + ' · onay bekleniyor</span>'
             : p === "expired" ? '<span class="gw-chip">Onay süresi doldu · yeni kişi çekilecek</span>'
             : p === "claimed" ? '<span class="gw-chip win">🏆 Kazanan: ' + esc(g.wName) + '</span>'
@@ -155,7 +155,9 @@
         var act = "";
         if (p === "open") act = !u ? '<button type="button" class="btn primary gw-big" id="gwLogin">Katılmak için giriş yap</button>'
             : S.joined ? '<div class="gw-in">✅ Çekilişe katıldın. Çekiliş günü sayfada ol: kazanırsan 2 dakika içinde onaylaman gerekiyor.</div><button type="button" class="btn sm" id="gwLeave">Katılımı geri al</button>'
-            : '<button type="button" class="btn primary gw-big" id="gwJoin">🎟 Çekilişe katıl</button>';
+            : pushOk() ? '<button type="button" class="btn primary gw-big" id="gwJoin">🎟 Çekilişe katıl</button>'
+            : Account.pushState() === "default" ? '<div class="gw-note">Katılmak için bildirimlere izin vermen gerekiyor: kazanırsan 2 dakika içinde haber alman lazım.</div><button type="button" class="btn primary gw-big" id="gwJoin">🔔 Bildirimleri aç ve katıl</button>'
+            : '<div class="gw-push"><b>🔔 Katılmak için bildirimler açık olmalı</b><p>' + Account.pushHelpHtml(Account.pushState()) + '</p></div>';
         else if (p === "closed" || p === "drawing") act = S.joined ? '<div class="gw-in">✅ Katıldın. Çekiliş ' + (p === "drawing" ? "şimdi yapılıyor…" : esc(dt(g.drawAt)) + "'de") + ' — sayfada kal!</div>' : '<div class="gw-note">Kayıtlar kapandı.</div>';
         else if (p === "drawn") act = iWon ? '<button type="button" class="btn primary gw-big" id="gwClaimOpen">🎉 Kazandın! Onaylamak için dokun</button>' : '<div class="gw-note">Kazananın onayı bekleniyor (' + left(g.claimBy - now) + ').</div>';
         else if (p === "claimed") act = iWon ? '<button type="button" class="btn primary" id="gwAddr">📦 Teslimat bilgilerim</button>' : '';
@@ -169,7 +171,7 @@
             '<p class="gw-rules">Kurallar: Yalnız site üyeleri katılabilir, herkesin tek hakkı vardır. Kayıtlar çekilişten 24 saat önce kapanır. Kazanan rastgele seçilir ve 2 dakika içinde onaylamazsa yeni bir kişi çekilir. Teslimat bilgileri yalnız çekilişi düzenleyenlerle paylaşılır.</p>';
         $("gwBack").onclick = backToList;
         if ($("gwLogin")) $("gwLogin").onclick = function () { Account.openLogin && Account.openLogin(); };
-        if ($("gwJoin")) $("gwJoin").onclick = join;
+        if ($("gwJoin")) $("gwJoin").onclick = function () { join(false); };
         if ($("gwLeave")) $("gwLeave").onclick = leave;
         if ($("gwClaimOpen")) $("gwClaimOpen").onclick = function () { winModal(g); };
         if ($("gwAddr")) $("gwAddr").onclick = function () { addrModal(g); };
@@ -182,8 +184,15 @@
         }
     }
     function msg(t, bad) { var m = $("gwMsg"); if (m) { m.textContent = t || ""; m.className = "gw-msg" + (bad ? " bad" : ""); } }
-    function join() {
+    // Katılmak için bildirim izni şart (kazanınca 2 dakikada haber alabilmek için)
+    function pushOk() { return !window.Account || !Account.pushState || Account.pushState() === "granted"; }
+    function join(skipPush) {
         var u = me(), g = S.g; if (!u || !g) return;
+        if (!skipPush && !pushOk()) {
+            var st = Account.pushState();
+            if (st === "default") { $("gwJoin").disabled = true; Account.enablePush().then(function (p) { if ($("gwJoin")) $("gwJoin").disabled = false; if (p === "granted") join(true); else { renderOne(); msg("Katılmak için bildirimlere izin vermelisin.", 1); } }); return; }
+            renderOne(); return;
+        }
         $("gwJoin").disabled = true;
         var w = { writes: [{ update: { name: docName("/giveaways/" + g.id + "/e/" + u.uid), fields: { name: { stringValue: myName() } } }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }], currentDocument: { exists: false } }] };
         req(":commit", { method: "POST", body: JSON.stringify(w) }).then(function (r) {
@@ -279,7 +288,8 @@
             (p === "closed" || p === "drawing" ? '<button type="button" class="btn primary sm" id="gwDraw">🎲 Şimdi çek</button>' : '') +
             (p === "drawn" || p === "expired" || p === "claimed" ? '<button type="button" class="btn sm" id="gwRedraw">🔁 Yeniden çek</button>' : '') +
             '<button type="button" class="btn sm" id="gwShowE">👥 Katılımcılar (' + S.count + ')</button><button type="button" class="btn sm gw-del" id="gwDel">🗑 Sil</button></div>' +
-            '<p class="gw-note">Çekiliş saatinde bu sayfa açıksa kazanan kendiliğinden çekilir. Kazanan 2 dakikada onaylamazsa yeni kişi kendiliğinden çekilir.</p>' +
+            '<p class="gw-note">Çekilişi sen başlatırsın (kayıtlar kapandıktan sonra <b>Şimdi çek</b>). Kazanan 2 dakika içinde onaylamazsa bu sayfa açıkken sıradaki kişi kendiliğinden çekilir.</p>' +
+            (skipNames(g).length ? '<p class="gw-note">Onaylamayan / iptal edilenler: <b>' + skipNames(g).map(esc).join(" → ") + '</b></p>' : '') +
             '<div id="gwEList"></div><div id="gwClaim"></div>';
         if ($("gwDraw")) $("gwDraw").onclick = function () { if (confirm("Kazanan şimdi çekilsin mi?")) draw(false); };
         if ($("gwRedraw")) $("gwRedraw").onclick = function () { if (confirm("Mevcut kazanan iptal edilip yeni kişi çekilsin mi?")) draw(true); };
@@ -293,7 +303,12 @@
         };
         if (p === "claimed") req("/giveaways/" + g.id + "/claim/" + g.w).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var c = $("gwClaim"); if (!c) return;
-            if (!d) { c.innerHTML = '<p class="gw-note">Kazanan onayladı; teslimat bilgileri henüz gönderilmedi.</p>'; return; }
+            if (!d) {
+                c.innerHTML = '<div class="gw-wait"><p><b>' + esc(g.wName) + '</b> onayladı ama teslimat bilgilerini henüz göndermedi' + (g.cAt ? ' (' + left(Date.now() - g.cAt).replace("şimdi", "az önce") + ' önce onayladı)' : '') + '.</p>' +
+                    '<button type="button" class="btn sm gw-del" id="gwNoInfo">🔁 Bilgi girmedi — yeni kişi çek</button></div>';
+                $("gwNoInfo").onclick = function () { if (confirm(g.wName + " iptal edilip yeni bir kişi rastgele çekilsin mi?")) draw(true); };
+                return;
+            }
             var o = dec(d), rows = [["Ad soyad", o.name], ["Telefon", o.phone], ["E-posta", o.email], ["İl / ilçe", o.city + " / " + o.district], ["Adres", o.address], ["Posta kodu", o.zip], ["Not", o.note], ["Gönderim", dt(o.ts)]];
             c.innerHTML = '<h4>📦 Teslimat bilgileri</h4><div class="gw-claim">' + rows.map(function (x) { return '<div><span>' + x[0] + '</span><b>' + esc(x[1] || "—") + '</b></div>'; }).join("") + '</div><button type="button" class="btn sm" id="gwCopy">📋 Kopyala</button>';
             $("gwCopy").onclick = function () { var t = rows.map(function (x) { return x[0] + ": " + (x[1] || "-"); }).join("\n"); try { navigator.clipboard.writeText(t); this.textContent = "Kopyalandı ✓"; } catch (e) { prompt("Bilgiler:", t); } };
@@ -303,8 +318,11 @@
         var g = S.g; if (!g || S.busy) return; S.busy = true;
         listEntries(g.id).then(function (l) {
             S.entries = l;
-            var skip = String(g.x || "").split(",").filter(Boolean); if (redo && g.w) skip.push(g.w);
-            var pool = l.filter(function (x) { return skip.indexOf(x.uid) < 0; });
+            // x: onaylamayan / iptal edilen kazananlar ("uid|isim,uid|isim"), tekrar çekilmezler
+            var skip = String(g.x || "").split(",").filter(Boolean);
+            if (redo && g.w) skip.push(g.w + "|" + String(g.wName || "").replace(/[,|]/g, " ").slice(0, 24));
+            var skipU = skip.map(function (x) { return x.split("|")[0]; });
+            var pool = l.filter(function (x) { return skipU.indexOf(x.uid) < 0; });
             var now = Date.now(), o;
             if (!pool.length) o = { st: "empty", x: skip.join(",").slice(0, 20000), n: l.length };
             else { var w = pool[rnd(pool.length)]; o = { st: "drawn", w: w.uid, wName: w.name, wAt: now, claimBy: now + CLAIM_MS + 5000, x: skip.join(",").slice(0, 20000), n: l.length }; }
@@ -319,13 +337,14 @@
             });
         }).then(function () { S.busy = false; return fetchOne(g.id); }, function () { S.busy = false; }).then(function () { renderOne(); schedule(); });
     }
+    function skipNames(g) { return String(g.x || "").split(",").filter(Boolean).map(function (x) { return x.split("|")[1] || "?"; }); }
     function autoMgr() {
         var g = S.g; if (!S.mgr || !g || S.busy) return;
         var p = phase(g);
         // birden çok yönetici açıksa çakışmasın diye kısa rastgele gecikme
-        if ((p === "drawing" || p === "expired") && !S.autoT) S.autoT = setTimeout(function () {
-            S.autoT = 0; var q = S.g && phase(S.g);
-            if (q === "drawing") draw(false); else if (q === "expired") draw(true);
+        // çekilişi yetkili elle başlatır; kazanan süresinde onaylamazsa sıradaki kişi kendiliğinden çekilir
+        if (p === "expired" && !S.autoT) S.autoT = setTimeout(function () {
+            S.autoT = 0; if (S.g && phase(S.g) === "expired") draw(true);
         }, 400 + rnd(2500));
     }
     function createForm() {
@@ -384,6 +403,7 @@
         if (Account.isAdmin && Account.isAdmin()) { S.mgr = true; createForm(); return Promise.resolve(); }
         return Account.getRole(u.uid).then(function (r) { S.mgr = r === "admin" || r === "gelistirici"; createForm(); }, function () { createForm(); });
     }
+    document.addEventListener("ra-push-change", function () { if (S.g) renderOne(); });
     function start() {
         $("gwModal").onclick = function (e) { if (e.target === $("gwModal") && !$("gwModal").querySelector("#gwOk,#gwForm")) closeModal(); };
         var id = (/[?&]id=([^&]+)/.exec(location.search) || [])[1];
