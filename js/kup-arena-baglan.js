@@ -9,7 +9,7 @@
 ========================================================= */
 import { initializeApp, initializeAuth, inMemoryPersistence, browserSessionPersistence, browserPopupRedirectResolver,
     setPersistence, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut }
-    from "/js/vendor/firebase/firebase-auth.js?v=20261216";
+    from "/js/vendor/firebase/firebase-auth.js?v=20261217";
 
 const $ = (id) => document.getElementById(id);
 const cfg = window.RA_FIREBASE || {};
@@ -21,19 +21,20 @@ const donus = params.get("donus") || "";
 function msg(t, kind) { const m = $("kbMsg"); m.textContent = t || ""; m.className = "kb-msg" + (kind ? " " + kind : ""); }
 function errText(e) {
     const c = (e && e.code) || "";
-    if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return "Giriş penceresi kapatıldı. Tekrar dene.";
-    if (c === "auth/network-request-failed") return "İnternet bağlantısı yok gibi görünüyor. Bağlantını kontrol edip tekrar dene.";
+    if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return "Giriş penceresi kapatıldı.";
+    if (c === "auth/network-request-failed") return "İnternet bağlantısı yok gibi görünüyor. Bağlantını kontrol et.";
     if (c === "auth/unauthorized-domain") return "Bu adresten Google girişine izin verilmiyor. Siteyi rubikacademy.fun adresinden aç.";
     if (c === "auth/user-disabled") return "Bu hesap devre dışı bırakılmış.";
     if (c === "auth/too-many-requests") return "Çok fazla deneme yapıldı. Biraz bekleyip tekrar dene.";
-    return "Google ile giriş yapılamadı. Tekrar dene.";
+    return "Google ile giriş yapılamadı.";
 }
 
 if (!RX.test(donus)) {
     // Dönüş adresi yok ya da geçersiz: masaüstünden girildi → tanıtım
-    $("kbPromo").hidden = false;
+    $("kbSub").textContent = "Bu sayfa Küp Arena oyununun içinden açılır. Google ile giriş yapmak için oyundaki “Google ile devam et”e dokun.";
 } else {
-    $("kbConnect").hidden = false;
+    $("kbGo").hidden = false;
+    $("kbGame").href = donus; // hata olursa: oyuna (gid'siz) dön
     const app = initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, projectId: cfg.projectId, appId: cfg.appId }, "kuparena-baglan");
     const auth = initializeAuth(app, { persistence: inMemoryPersistence, popupRedirectResolver: browserPopupRedirectResolver });
     try { auth.languageCode = "tr"; } catch (e) {}
@@ -43,13 +44,13 @@ if (!RX.test(donus)) {
     const back = (idToken) => {
         const url = donus + (donus.indexOf("?") < 0 ? "?" : "&") + "gid=" + encodeURIComponent(idToken);
         signOut(auth).catch(() => {}); // site tarafında oturum kalmasın
-        $("kbGo").hidden = true; $("kbRetry").hidden = true;
+        $("kbGo").hidden = true; $("kbGame").hidden = true;
         const a = $("kbBack"); a.href = url; a.hidden = false;
-        msg("Giriş yapıldı ✓ Küp Arena açılıyor… Açılmazsa aşağıdaki düğmeye dokun.", "ok");
+        msg("Giriş yapıldı. Küp Arena açılıyor… Açılmazsa yukarıdaki düğmeye dokun.", "ok");
         location.href = url;
     };
     const fail = (e) => {
-        $("kbGo").disabled = false; $("kbRetry").hidden = false;
+        $("kbGo").disabled = false; $("kbGame").hidden = false; // "Google ile giriş yap" tekrar denemek için açık kalır
         msg(errText(e), "bad");
     };
     const useResult = (r) => {
@@ -69,7 +70,7 @@ if (!RX.test(donus)) {
     }
 
     const go = () => {
-        $("kbGo").disabled = true; $("kbRetry").hidden = true; msg("Google penceresi açılıyor…");
+        $("kbGo").disabled = true; $("kbGame").hidden = true; msg("Google penceresi açılıyor…");
         signInWithPopup(auth, provider).then(useResult).catch((e) => {
             const c = (e && e.code) || "";
             if (c === "auth/popup-blocked" || c === "auth/operation-not-supported-in-this-environment") {
@@ -83,5 +84,4 @@ if (!RX.test(donus)) {
         });
     };
     $("kbGo").onclick = go;
-    $("kbRetry").onclick = go;
 }
