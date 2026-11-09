@@ -11,7 +11,7 @@
     // Admin panelinden hiç ayar kaydedilmediyse gösterilen varsayılan sponsor
     var DEFAULT = { on: true, title: "Minjuan Küp Mağazası", text: "Tasarım ve zeka küpleri, speedcube'ler ve aksesuarlar Minjuan'da. Rubik Academy önerisi!", cta: "Küplere göz at", url: "https://minjuanrong.com.tr/collections/tasarim-zeka-kupleri", img: "/img/sponsor/minjuan-mark.png", code: "", where: "all", ver: "d3" };
     var KEY = "ra-ad-cache-v3", HIDE = "ra-ad-hide", TTL = 30 * 60000;
-    var SKIP = /\/(admin|giris|zkttimer|gizlilik|yakinda)(\.html)?$|\/algoritmalar\/(antrenor|yazdir)|\/akilli-kup|\/sanal-kup|\/tekrar/;
+    var SKIP = /\/(admin|giris|zkttimer|gizlilik|yakinda)(\.html)?$|\/kup-arena\/baglan|\/algoritmalar\/(antrenor|yazdir)|\/akilli-kup|\/sanal-kup|\/tekrar/;
     function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
     function safeUrl(u) { u = String(u || "").trim(); return /^https:\/\/[^\s"'<>]+$/.test(u) || /^\/img\/[\w\/.-]+$/.test(u) ? u : ""; }
     function withUtm(u) { if (!u) return ""; try { var x = new URL(u); if (!x.searchParams.has("utm_source")) { x.searchParams.set("utm_source", "rubikacademy"); x.searchParams.set("utm_medium", "banner"); } return x.toString(); } catch (e) { return u; } }

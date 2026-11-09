@@ -300,7 +300,7 @@ function raSeasonOffer() {
     var U = RA_SEASON_UI[se.k]; if (!U) return;
     try {
         if (raSkin() === se.k || localStorage.getItem("ra-season-asked-" + se.k) || (se.k === "halloween" && localStorage.getItem("ra-hw-asked"))) return;
-        if (/\/(admin|yazdir|giris)/.test(location.pathname) || document.getElementById("raMaint") || document.getElementById("raHwAsk") || document.getElementById("raPushAsk")) { if (document.getElementById("raPushAsk")) setTimeout(raSeasonOffer, 4000); return; }
+        if (/\/(admin|yazdir|giris|kup-arena\/baglan)/.test(location.pathname) || document.getElementById("raMaint") || document.getElementById("raHwAsk") || document.getElementById("raPushAsk")) { if (document.getElementById("raPushAsk")) setTimeout(raSeasonOffer, 4000); return; }
     } catch (e) { return; }
     var end = new Date(se.to - 1), p2 = function (n) { return (n < 10 ? "0" : "") + n; };
     var endTxt = p2(end.getDate()) + "." + p2(end.getMonth() + 1) + "." + end.getFullYear();
