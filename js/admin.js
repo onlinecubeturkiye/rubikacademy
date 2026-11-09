@@ -888,6 +888,30 @@
         });
     }
 
+    /* ---------- geri bildirim / tema puanları (feedback) ---------- */
+    function renderFeedback() {
+        var box = $id("aFbList"); if (!box) return;
+        box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
+        var q = { structuredQuery: { from: [{ collectionId: "feedback" }], limit: 1000 } };
+        authed(docsBase() + ":runQuery", { method: "POST", body: JSON.stringify(q) }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (rows) {
+            var list = (rows || []).filter(function (x) { return x.document; }).map(function (x) {
+                var f = x.document.fields || {};
+                return { topic: gv(f, "topic") || "?", stars: +gv(f, "stars") || 0, text: gv(f, "text") || "", u: gv(f, "u") || "", ts: Date.parse(gv(f, "ts") || "") || 0 };
+            });
+            if (!list.length) { box.innerHTML = '<p class="a-note">Henüz puan yok.</p>'; return; }
+            var by = {}; list.forEach(function (x) { (by[x.topic] = by[x.topic] || []).push(x); });
+            box.innerHTML = Object.keys(by).map(function (t) {
+                var a = by[t], avg = a.reduce(function (s, x) { return s + x.stars; }, 0) / a.length, dist = {};
+                a.forEach(function (x) { dist[x.stars + " ★"] = (dist[x.stars + " ★"] || 0) + 1; });
+                var ord = {}; [5, 4, 3, 2, 1].forEach(function (n) { if (dist[n + " ★"]) ord[n + " ★"] = dist[n + " ★"]; });
+                var notes = a.filter(function (x) { return x.text; }).sort(function (x, y) { return y.ts - x.ts; });
+                var name = function (uid) { var u = uid && findUser(uid); return u ? u.name : (uid ? "üye" : "hesapsız"); };
+                return '<h4 style="margin-top:10px">' + esc(t.replace(/^tema-/, "") + " teması") + ' · <b>' + avg.toFixed(1) + ' ★</b> <span class="a-sub" style="margin:0">' + a.length + ' oy</span></h4>' + distHtml(ord, a.length) +
+                    (notes.length ? '<div class="a-list" style="margin-top:8px">' + notes.map(function (x) { return '<div class="a-row2"><b>' + x.stars + '★</b><span style="flex:1">' + esc(x.text) + '</span><span class="a-note">' + esc(name(x.u)) + ' · ' + esc(dateFmt(x.ts)) + '</span></div>'; }).join("") + '</div>' : '<p class="a-note">Yorum yok.</p>');
+            }).join("");
+        }).catch(function (e) { box.innerHTML = '<p class="a-note">Yüklenemedi (' + esc(e && e.message) + '). Firebase kurallarını yayımladın mı?</p>'; });
+    }
+
     /* ---------- sponsor banner'ı (config/ad) ---------- */
     function renderAd() {
         var box = $id("aAdBox"); if (!box) return;
@@ -987,6 +1011,7 @@
             '<p class="a-note">Ziyaretçilerin tarayıcısında oluşan JavaScript hataları (aynı hata gruplanır).</p>' +
             '<div class="a-ctrl"><button class="a-btn main" id="aErrLoad">↻ Yükle</button><button class="a-btn danger" id="aErrClear">🗑️ Tümünü sil</button></div><div id="aErrList" class="a-list"></div></div>' +
             '<div class="box"><h2>🔥 Firebase kullanımı</h2><button class="a-btn main" id="aUsageLoad">Hesapla</button><div id="aUsage" style="margin-top:10px"></div></div>' +
+            '<div class="box"><h2>⭐ Puanlar ve geri bildirim</h2><p class="a-note">Biten temalar için kullanıcıların verdiği puanlar ve yorumlar.</p><button class="a-btn main" id="aFbLoad">↻ Yükle</button><div id="aFbList" style="margin-top:8px"></div></div>' +
             '<div class="box"><h2>📣 Sponsor banner\'ı</h2><p class="a-note">Sitedeki reklam alanı (ör. Minjuan küp mağazası).</p><div id="aAdBox"></div></div>' +
             '<div class="box"><h2>🛠️ Bakım modu</h2><p class="a-note">Açıkken site, sen hariç herkese “Bakımdayız” sayfası gösterir.</p><div id="aMaintBox"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🏆 Günlük sıralama moderasyonu</h2>' +
@@ -1016,6 +1041,7 @@
             commit(all.map(function (p) { return { delete: docName(p) }; })).then(renderErrs, function () { alert("Silinemedi."); });
         });
         $id("aUsageLoad").addEventListener("click", renderUsage);
+        $id("aFbLoad").addEventListener("click", renderFeedback);
         bindBulk(); renderBroadcasts(); renderMaintenance(); renderAnon(); renderAd();
         $id("bcSend").addEventListener("click", function () {
             var text = $id("bcText").value.trim(), to = $id("bcTarget").value, atv = $id("bcAt").value, at = atv ? new Date(atv).getTime() : 0;

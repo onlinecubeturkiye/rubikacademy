@@ -381,6 +381,20 @@ service cloud.firestore {
         && request.resource.data.v is string && request.resource.data.v.size() <= 20;
     }
 
+    // Geri bildirim / puan (ör. biten tema için 1-5 yıldız): herkes ekler, yalnız admin okur/siler
+    match /feedback/{id} {
+      allow read, delete: if isAdmin();
+      allow update: if false;
+      allow create: if id.matches('^[a-z0-9]{8,24}$')
+        && request.resource.data.keys().hasOnly(['topic', 'stars', 'text', 'u', 'ts'])
+        && request.resource.data.topic is string && request.resource.data.topic.size() > 0 && request.resource.data.topic.size() <= 40
+        && request.resource.data.stars is int && request.resource.data.stars >= 1 && request.resource.data.stars <= 5
+        && request.resource.data.text is string && request.resource.data.text.size() <= 300
+        && request.resource.data.u is string
+        && (request.resource.data.u == '' || (request.auth != null && request.resource.data.u == request.auth.uid))
+        && request.resource.data.ts == request.time;
+    }
+
     // Admin paneli: tüm algoritma önerilerini tek sorguda listeler (koleksiyon grubu "s")
     match /{path=**}/s/{sid} {
       allow read: if isAdmin();
