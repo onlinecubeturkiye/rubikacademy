@@ -197,9 +197,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (btn) btn.innerHTML = isDark ? "☀️" : "🌙";
     // Halloween süresi bittiyse önceki temaya dön
     // Mevsimlik temanın süresi bittiyse önceki temaya dön
-    if (raSeasonOf(raSkin()) && !raSeasonOn(raSkin())) { var prevSk = "standart"; try { prevSk = localStorage.getItem("ra-season-prev") || localStorage.getItem("ra-hw-prev") || "standart"; if (raSeasonOf(prevSk)) prevSk = "standart"; localStorage.setItem("site-skin", prevSk); } catch (e) {} raSavePrefs(); }
+    if (raSeasonOf(raSkin()) && !raSeasonOn(raSkin())) { var prevSk = "standart"; try { if (!localStorage.getItem("ra-rated-" + raSkin())) localStorage.setItem("ra-rate-pending", raSkin()); prevSk = localStorage.getItem("ra-season-prev") || localStorage.getItem("ra-hw-prev") || "standart"; if (raSeasonOf(prevSk)) prevSk = "standart"; localStorage.setItem("site-skin", prevSk); } catch (e) {} raSavePrefs(); }
     raApplySkin(raSkin());
     setTimeout(raSeasonOffer, 1800);
+    setTimeout(raRateTheme, 2200);
     if (cvdTheme()) applyCvd(cvdTheme());
     else if (holdSwap()) raRecolor();
     raInitSettings();
@@ -262,7 +263,7 @@ var RA_SKINS = [
 // Sınırlı süreli (mevsimlik) temalar: süresi içinde listede görünür, siteye girene bir kez sorulur,
 // süre bitince seçenler önceki temalarına döner
 var RA_SEASONS = [
-    { k: "halloween", from: 0, to: new Date(2026, 11, 1).getTime(), sw: ["#0b0710", "#f97316", "#7c3aed", "#fff1e6"] },
+    { k: "halloween", from: 0, to: 1, sw: ["#0b0710", "#f97316", "#7c3aed", "#fff1e6"] },
     { k: "yilbasi", from: new Date(2026, 11, 1).getTime(), to: new Date(2027, 0, 8).getTime(), sw: ["#0a1222", "#dc2626", "#16a34a", "#fbbf24"] }
 ];
 function raSeasonOf(k) { for (var i = 0; i < RA_SEASONS.length; i++) if (RA_SEASONS[i].k === k) return RA_SEASONS[i]; return null; }
@@ -281,6 +282,50 @@ function raApplySkin(k) {
         l.href = "https://fonts.googleapis.com/css2?family=" + f + "&display=swap";
         document.head.appendChild(l);
     }
+}
+// Kaldırılan mevsimlik temayı kullananlara bir kez puan sor (1-5 yıldız + isteğe bağlı yorum)
+// → Firestore feedback koleksiyonu (herkes ekler, yalnız admin okur)
+var RA_RATE_NAMES = { halloween: "Halloween", yilbasi: "Yılbaşı" };
+function raRateTheme() {
+    var k; try { k = localStorage.getItem("ra-rate-pending"); } catch (e) { return; }
+    if (!k || /\/(admin|yazdir|giris|kup-arena\/baglan)/.test(location.pathname)) return;
+    if (document.getElementById("raHwAsk") || document.getElementById("raPushAsk") || document.getElementById("raRate")) { setTimeout(raRateTheme, 4000); return; }
+    var done = function () { try { localStorage.removeItem("ra-rate-pending"); localStorage.setItem("ra-rated-" + k, "1"); } catch (e) {} el.remove(); };
+    var nm = RA_SEASON_UI[k] ? RA_RATE_NAMES[k] || k : k, stars = 0;
+    var st = document.createElement("style");
+    st.textContent = ".ra-rate{position:fixed;inset:0;z-index:2100;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,12,18,.62);backdrop-filter:blur(3px)}" +
+        ".ra-rate-b{width:min(380px,100%);box-sizing:border-box;padding:22px 20px 16px;border-radius:22px;background:var(--surface,#fff);color:var(--text,#111);border:var(--card-bw,2px) solid var(--card-border,#ddd);box-shadow:0 24px 60px rgba(0,0,0,.35);text-align:center;font-family:Inter,sans-serif}" +
+        ".ra-rate-b h3{margin:4px 0 6px;font:900 20px Inter,sans-serif}.ra-rate-b p{margin:0 0 12px;font-size:14px;line-height:1.5;color:var(--text-soft,#666)}" +
+        ".ra-stars{display:flex;justify-content:center;gap:6px;margin:6px 0 12px}.ra-stars button{border:0;background:none;padding:2px;cursor:pointer;font-size:36px;line-height:1;color:var(--border,#ccc);transition:transform .1s}" +
+        ".ra-stars button.on{color:#f59e0b}.ra-stars button:active{transform:scale(.9)}" +
+        ".ra-rate textarea{width:100%;box-sizing:border-box;min-height:64px;padding:10px 12px;border-radius:12px;border:1px solid var(--border,#ddd);background:var(--surface-soft,#f6f6f6);color:var(--text,#111);font:600 14px Inter,sans-serif;resize:vertical}" +
+        ".ra-rate-a{display:flex;flex-direction:column;gap:6px;margin-top:10px}.ra-rate-a button{border:0;border-radius:14px;padding:12px;font:900 15px Inter,sans-serif;cursor:pointer}" +
+        ".ra-rate-ok{background:var(--ui-accent,#6c5ce7);color:var(--ui-accent-text,#fff)}.ra-rate-ok:disabled{opacity:.5;cursor:default}.ra-rate-no{background:none;color:var(--text-soft,#666);font-weight:700!important;font-size:13px!important}";
+    document.head.appendChild(st);
+    var el = document.createElement("div"); el.id = "raRate"; el.className = "ra-rate"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true");
+    el.innerHTML = '<div class="ra-rate-b"><div style="font-size:40px;line-height:1">' + (k === "halloween" ? "🎃" : "🎄") + '</div><h3>' + nm + ' teması bitti</h3>' +
+        '<p>Bir süre ' + nm + ' temasını kullandın. Beğendin mi? Puanın bir sonraki temayı daha güzel yapmamıza yardım eder.</p>' +
+        '<div class="ra-stars ra-noico" role="radiogroup" aria-label="Puan">' + [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" data-n="' + n + '" aria-label="' + n + ' yıldız">★</button>'; }).join("") + '</div>' +
+        '<textarea maxlength="300" placeholder="Eklemek istediğin bir şey var mı? (isteğe bağlı)"></textarea>' +
+        '<div class="ra-rate-a"><button type="button" class="ra-rate-ok" disabled>Gönder</button><button type="button" class="ra-rate-no">Şimdi değil</button></div></div>';
+    var btns = el.querySelectorAll(".ra-stars button"), ok = el.querySelector(".ra-rate-ok");
+    Array.prototype.forEach.call(btns, function (b) { b.onclick = function () { stars = +b.getAttribute("data-n"); Array.prototype.forEach.call(btns, function (x) { x.classList.toggle("on", +x.getAttribute("data-n") <= stars); }); ok.disabled = false; }; });
+    ok.onclick = function () {
+        var cfg = window.RA_FIREBASE; ok.disabled = true; ok.textContent = "Gönderiliyor…";
+        var u = ""; try { u = window.Account && Account.user && Account.user() ? Account.user().uid : ""; } catch (e) {}
+        var id = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+        var D = "projects/" + cfg.projectId + "/databases/(default)/documents";
+        var body = { writes: [{ update: { name: D + "/feedback/" + id, fields: { topic: { stringValue: "tema-" + k }, stars: { integerValue: String(stars) }, text: { stringValue: el.querySelector("textarea").value.trim().slice(0, 300) }, u: { stringValue: u } } },
+            updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }], currentDocument: { exists: false } }] };
+        var tk = u && window.Account && Account.token ? Account.token().catch(function () { return ""; }) : Promise.resolve("");
+        tk.then(function (t) {
+            if (!t) body.writes[0].update.fields.u.stringValue = ""; // kimlik yoksa uid gönderilmez
+            var h = { "Content-Type": "application/json" }; if (t) h.Authorization = "Bearer " + t;
+            return fetch(((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/" + D + ":commit?key=" + encodeURIComponent(cfg.apiKey), { method: "POST", headers: h, body: JSON.stringify(body) });
+        }).then(function () { el.querySelector(".ra-rate-b").innerHTML = '<div style="font-size:40px">💜</div><h3>Teşekkürler!</h3><p>Puanın kaydedildi.</p>'; setTimeout(done, 1600); }, done);
+    };
+    el.querySelector(".ra-rate-no").onclick = done;
+    document.body.appendChild(el);
 }
 // Siteye girene bir kez: "<mevsim> teması ister misin?"
 var RA_SEASON_UI = {
