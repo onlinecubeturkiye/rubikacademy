@@ -207,7 +207,15 @@ function raMourn() { return raMournInfo().on; }
     if (!raMourn()) return;
     var d = document.documentElement; d.classList.add("ra-mourn");
     var st = document.createElement("style");
-    st.textContent = "html.ra-mourn{filter:grayscale(100%)}" +
+    // Sayfanın tamamı siyah-beyaz yapılmaz (küp diyagramları ve algoritma renkleri okunur kalmalı):
+    // yalnız sitenin vurgu renkleri sade koyu griye döner, logo ve dekoratif parıltılar renksizleşir
+    st.textContent = "html.ra-mourn,html.ra-mourn body{--ui-accent:#3f3f46!important;--ui-accent-hover:#27272a!important;--ui-accent-text:#fff!important;--ui-accent-soft:rgba(113,113,122,.16)!important;" +
+            "--primary:#52525b!important;--primary-dark:#3f3f46!important;--primary-light:rgba(113,113,122,.14)!important;--btn-bg:#3f3f46!important;--btn-hover-bg:#27272a!important;--btn-text:#fff!important;" +
+            "--badge-bg:rgba(113,113,122,.16)!important;--badge-text:#52525b!important;--hero-bg:linear-gradient(135deg,#ececee 0%,#f6f6f7 100%)!important}" +
+        "html.ra-mourn.dark-mode,html.ra-mourn.dark-mode body{--ui-accent:#d4d4d8!important;--ui-accent-hover:#e4e4e7!important;--ui-accent-text:#111!important;--primary:#d4d4d8!important;--primary-dark:#e4e4e7!important;" +
+            "--btn-bg:#d4d4d8!important;--btn-hover-bg:#e4e4e7!important;--btn-text:#111!important;--badge-text:#d4d4d8!important;--hero-bg:linear-gradient(135deg,#1a1a1c 0%,#111113 100%)!important}" +
+        "html.ra-mourn .nav-logo-mark,html.ra-mourn .bg-glow,html.ra-mourn .navbar::after,html.ra-mourn .gradient-text,html.ra-mourn .badge i{filter:grayscale(1)}" +
+        "html.ra-mourn .gradient-text{background:none!important;-webkit-text-fill-color:currentColor!important;color:inherit!important}" +
         "html.ra-mourn #raAd,html.ra-mourn #raHwAsk,html.ra-mourn #raRate{display:none!important}" +
         ".ra-mourn-bar{position:relative;z-index:5;background:#0b0b0c;color:#f2f2f2;border-bottom:1px solid #2a2a2c;font-family:Inter,system-ui,sans-serif}" +
         ".ra-mourn-in{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px}" +
@@ -220,7 +228,7 @@ function raMourn() { return raMournInfo().on; }
         ".ra-silence div{max-width:520px;display:flex;flex-direction:column;align-items:center;gap:12px}" +
         ".ra-silence b{font-size:22px;font-weight:800;line-height:1.35}.ra-silence p{margin:0;font-size:15px;color:#c8c8c8;line-height:1.6}" +
         ".ra-silence small{font-size:12px;color:#8a8a8a}" +
-        "@media print{.ra-mourn-bar{display:none}html.ra-mourn{filter:none}}";
+        "@media print{.ra-mourn-bar{display:none}}";
     (document.head || d).appendChild(st);
     var info = raMournInfo();
     var ribbon = '<svg class="ra-mourn-rib" viewBox="0 0 30 42" aria-hidden="true"><path d="M15 3c-4.5 0-7 3-7 6.5 0 2.6 1.4 5 3.2 7.6L3.5 39l6.2-2.4L15 22.4l5.3 14.2 6.2 2.4-7.7-21.9c1.8-2.6 3.2-5 3.2-7.6C22 6 19.5 3 15 3zm0 4c1.8 0 3 1.2 3 2.8 0 1.4-1.2 3.5-3 5.9-1.8-2.4-3-4.5-3-5.9C12 8.2 13.2 7 15 7z" fill="#e8e8e8"/></svg>';
