@@ -76,6 +76,7 @@
     }
     function styles() { if (document.getElementById("raAdCss")) return; var s = document.createElement("style"); s.id = "raAdCss"; s.textContent = css; (document.head || document.documentElement).appendChild(s); }
     function show() {
+        if (document.documentElement.classList.contains("ra-mourn")) return; // 10 Kasım: reklam gösterilmez
         load().then(function (ad) {
             if (!ad || !ad.on || !(ad.title || ad.text) || !fits(ad) || document.getElementById("raAd")) return;
             try { var h = JSON.parse(localStorage.getItem(HIDE) || "null"); if (h && h.until > Date.now() && h.ver === ad.ver) return; } catch (e) {}

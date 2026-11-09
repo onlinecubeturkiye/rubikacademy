@@ -188,6 +188,66 @@ function cvdSwatches(theme) {
     }).join("") + "</span>";
 }
 
+/* =========================================================
+   10 KASIM ANMA GÖRÜNÜMÜ
+   Türkiye saatiyle 10 Kasım 00:00 – 23:59: site siyah-beyaz olur, sayfaların üstünde anma şeridi
+   (yas kurdelesi + söz) çıkar; reklam, tema ve puan pencereleri gösterilmez.
+   09.05'te bir dakikalık saygı duruşu ekranı açılır (dokununca kapanır).
+   Her yıl kendiliğinden çalışır (yalnız tarih kontrolü).
+========================================================= */
+function raMournInfo(now) {
+    now = now || Date.now();
+    var y = new Date(now).getUTCFullYear();
+    // 10 Kasım 00:00 TSİ = 9 Kasım 21:00 UTC; 23:59:59 TSİ = 10 Kasım 20:59:59 UTC
+    var from = Date.UTC(y, 10, 9, 21, 0, 0), to = Date.UTC(y, 10, 10, 21, 0, 0);
+    return { on: now >= from && now < to, year: y - 1938, from: from };
+}
+function raMourn() { return raMournInfo().on; }
+(function () {
+    if (!raMourn()) return;
+    var d = document.documentElement; d.classList.add("ra-mourn");
+    var st = document.createElement("style");
+    st.textContent = "html.ra-mourn{filter:grayscale(100%)}" +
+        "html.ra-mourn #raAd,html.ra-mourn #raHwAsk,html.ra-mourn #raRate{display:none!important}" +
+        ".ra-mourn-bar{position:relative;z-index:5;background:#0b0b0c;color:#f2f2f2;border-bottom:1px solid #2a2a2c;font-family:Inter,system-ui,sans-serif}" +
+        ".ra-mourn-in{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px}" +
+        ".ra-mourn-rib{flex:none;width:30px;height:42px}" +
+        ".ra-mourn-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}" +
+        ".ra-mourn-tx b{font-size:14.5px;font-weight:800;letter-spacing:.2px;line-height:1.4}" +
+        ".ra-mourn-tx span{font-size:12.5px;color:#bdbdbd;font-style:italic;line-height:1.45}" +
+        "@media(max-width:600px){.ra-mourn-in{padding:10px 14px;gap:10px}.ra-mourn-rib{width:24px;height:34px}.ra-mourn-tx b{font-size:13px}.ra-mourn-tx span{font-size:11.5px}}" +
+        ".ra-silence{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.94);color:#f2f2f2;text-align:center;font-family:Inter,system-ui,sans-serif;cursor:pointer}" +
+        ".ra-silence div{max-width:520px;display:flex;flex-direction:column;align-items:center;gap:12px}" +
+        ".ra-silence b{font-size:22px;font-weight:800;line-height:1.35}.ra-silence p{margin:0;font-size:15px;color:#c8c8c8;line-height:1.6}" +
+        ".ra-silence small{font-size:12px;color:#8a8a8a}" +
+        "@media print{.ra-mourn-bar{display:none}html.ra-mourn{filter:none}}";
+    (document.head || d).appendChild(st);
+    var info = raMournInfo();
+    var ribbon = '<svg class="ra-mourn-rib" viewBox="0 0 30 42" aria-hidden="true"><path d="M15 3c-4.5 0-7 3-7 6.5 0 2.6 1.4 5 3.2 7.6L3.5 39l6.2-2.4L15 22.4l5.3 14.2 6.2 2.4-7.7-21.9c1.8-2.6 3.2-5 3.2-7.6C22 6 19.5 3 15 3zm0 4c1.8 0 3 1.2 3 2.8 0 1.4-1.2 3.5-3 5.9-1.8-2.4-3-4.5-3-5.9C12 8.2 13.2 7 15 7z" fill="#e8e8e8"/></svg>';
+    function bar() {
+        if (document.getElementById("raMourn") || !document.body || /\/(admin|yazdir|kup-arena\/baglan)/.test(location.pathname)) return;
+        var el = document.createElement("aside"); el.id = "raMourn"; el.className = "ra-mourn-bar ra-noico"; el.setAttribute("aria-label", "10 Kasım anma");
+        el.innerHTML = '<div class="ra-mourn-in">' + ribbon + '<div class="ra-mourn-tx"><b>Cumhuriyetimizin kurucusu Ulu Önder Gazi Mustafa Kemal Atatürk\'ü aramızdan ayrılışının ' + info.year + '. yılında saygı, özlem ve minnetle anıyoruz.</b>' +
+            '<span>“Benim naçiz vücudum elbet bir gün toprak olacaktır, fakat Türkiye Cumhuriyeti ilelebet payidar kalacaktır.”</span></div></div>';
+        document.body.insertBefore(el, document.body.firstChild);
+    }
+    // 09.05 (TSİ): bir dakikalık saygı duruşu
+    function silence() {
+        var t = Date.now(), at = info.from + (9 * 60 + 5) * 60000; // 10 Kasım 09:05 TSİ
+        var show = function () {
+            if (document.getElementById("raSilence") || !document.body) return;
+            var s = document.createElement("div"); s.id = "raSilence"; s.className = "ra-silence ra-noico"; s.setAttribute("role", "dialog");
+            s.innerHTML = '<div>' + ribbon.replace('class="ra-mourn-rib"', 'width="44" height="62"') + '<b>Saat 09.05 — Saygı duruşu</b><p>Ulu Önder Mustafa Kemal Atatürk\'ü saygı ve minnetle anıyoruz.</p><small>Ekran bir dakika sonra kendiliğinden kapanır.</small></div>';
+            s.onclick = function () { s.remove(); };
+            document.body.appendChild(s);
+            setTimeout(function () { s.remove(); }, Math.max(5000, at + 60000 - Date.now()));
+        };
+        if (t >= at && t < at + 60000) show();
+        else if (t < at && at - t < 24 * 3600000) setTimeout(show, at - t);
+    }
+    if (document.body) { bar(); silence(); } else document.addEventListener("DOMContentLoaded", function () { bar(); silence(); });
+})();
+
 document.addEventListener("DOMContentLoaded", function () {
     var btn = document.getElementById("darkModeBtn");
     // Varsayılan karanlık mod: "light" açıkça seçilmedikçe karanlık
@@ -287,6 +347,7 @@ function raApplySkin(k) {
 // → Firestore feedback koleksiyonu (herkes ekler, yalnız admin okur)
 var RA_RATE_NAMES = { halloween: "Halloween", yilbasi: "Yılbaşı" };
 function raRateTheme() {
+    if (raMourn()) return; // 10 Kasım'da pencere açılmaz (ertesi gün sorulur)
     var k; try { k = localStorage.getItem("ra-rate-pending"); } catch (e) { return; }
     if (!k || /\/(admin|yazdir|giris|kup-arena\/baglan)/.test(location.pathname)) return;
     if (document.getElementById("raHwAsk") || document.getElementById("raPushAsk") || document.getElementById("raRate")) { setTimeout(raRateTheme, 4000); return; }
@@ -341,6 +402,7 @@ var RA_SEASON_UI = {
         deco: function (css) { return '<svg class="ra-hw-bat" style="' + css + '" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M12 5l-2-2M12 5l2-2M12 19l-2 2M12 19l2 2" stroke="#e0f2fe" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>'; } }
 };
 function raSeasonOffer() {
+    if (raMourn()) return;
     var se = raSeasonNow(); if (!se) return;
     var U = RA_SEASON_UI[se.k]; if (!U) return;
     try {
