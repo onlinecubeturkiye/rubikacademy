@@ -220,11 +220,17 @@ function raMourn() { return raMournInfo().on; }
         ".ra-mourn-bar{position:relative;z-index:5;background:#0b0b0c;color:#f2f2f2;border-bottom:1px solid #2a2a2c;font-family:Inter,system-ui,sans-serif}" +
         ".ra-mourn-in{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px}" +
         ".ra-mourn-rib{flex:none;width:30px;height:42px}" +
-        ".ra-mourn-pic{flex:none;width:58px;height:58px;border-radius:50%;object-fit:cover;border:2px solid #d4d4d8;box-shadow:0 0 0 3px #0b0b0c,0 0 0 4px #3a3a3d;background:#222}" +
+        // Ana sayfa: portre şeridin arka planında, sağa doğru siyaha karışır
+        ".ra-mourn-bar.home{overflow:hidden;background:#0b0b0c}" +
+        ".ra-mourn-bar.home::before{content:'';position:absolute;left:0;top:0;bottom:0;width:min(420px,48%);background:url(/img/ataturk-banner.jpg) 50% 0/cover no-repeat;" +
+            "-webkit-mask-image:linear-gradient(90deg,#000 45%,transparent);mask-image:linear-gradient(90deg,#000 45%,transparent);opacity:.95}" +
+        ".ra-mourn-bar.home .ra-mourn-in{position:relative;min-height:210px;padding:26px 16px 26px min(380px,40%)}" +
+        ".ra-mourn-bar.home .ra-mourn-tx b{font-size:19px}.ra-mourn-bar.home .ra-mourn-tx span{font-size:14px;margin-top:4px}" +
+        ".ra-mourn-bar.home .ra-mourn-rib{width:34px;height:48px}" +
         ".ra-mourn-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}" +
         ".ra-mourn-tx b{font-size:14.5px;font-weight:800;letter-spacing:.2px;line-height:1.4}" +
         ".ra-mourn-tx span{font-size:12.5px;color:#bdbdbd;font-style:italic;line-height:1.45}" +
-        "@media(max-width:600px){.ra-mourn-in{padding:10px 14px;gap:10px}.ra-mourn-rib{width:20px;height:28px}.ra-mourn-pic{width:46px;height:46px}.ra-mourn-tx b{font-size:13px}.ra-mourn-tx span{font-size:11.5px}}" +
+        "@media(max-width:600px){.ra-mourn-in{padding:10px 14px;gap:10px}.ra-mourn-rib{width:20px;height:28px}.ra-mourn-bar.home::before{width:62%;opacity:.55}.ra-mourn-bar.home .ra-mourn-in{min-height:190px;padding:20px 14px 20px 34%}.ra-mourn-bar.home .ra-mourn-tx b{font-size:14.5px;text-shadow:0 1px 6px #000}.ra-mourn-bar.home .ra-mourn-tx span{font-size:12px;color:#d0d0d0;text-shadow:0 1px 6px #000}.ra-mourn-bar.home .ra-mourn-rib{display:none}.ra-mourn-tx b{font-size:13px}.ra-mourn-tx span{font-size:11.5px}}" +
         ".ra-silence{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.94);color:#f2f2f2;text-align:center;font-family:Inter,system-ui,sans-serif;cursor:pointer}" +
         ".ra-silence div{max-width:520px;display:flex;flex-direction:column;align-items:center;gap:12px}" +
         ".ra-silence b{font-size:22px;font-weight:800;line-height:1.35}.ra-silence p{margin:0;font-size:15px;color:#c8c8c8;line-height:1.6}" +
@@ -236,8 +242,8 @@ function raMourn() { return raMournInfo().on; }
     var ribbon = '<svg class="ra-mourn-rib" viewBox="0 0 30 42" aria-hidden="true"><path d="M15 3c-4.5 0-7 3-7 6.5 0 2.6 1.4 5 3.2 7.6L3.5 39l6.2-2.4L15 22.4l5.3 14.2 6.2 2.4-7.7-21.9c1.8-2.6 3.2-5 3.2-7.6C22 6 19.5 3 15 3zm0 4c1.8 0 3 1.2 3 2.8 0 1.4-1.2 3.5-3 5.9-1.8-2.4-3-4.5-3-5.9C12 8.2 13.2 7 15 7z" fill="#e8e8e8"/></svg>';
     function bar() {
         if (document.getElementById("raMourn") || !document.body || /\/(admin|yazdir|kup-arena\/baglan)/.test(location.pathname)) return;
-        var el = document.createElement("aside"); el.id = "raMourn"; el.className = "ra-mourn-bar ra-noico"; el.setAttribute("aria-label", "10 Kasım anma");
-        el.innerHTML = '<div class="ra-mourn-in"><img class="ra-mourn-pic" src="/img/ataturk-yuz.jpg" alt="Mustafa Kemal Atatürk" width="58" height="58">' + ribbon + '<div class="ra-mourn-tx"><b>Cumhuriyetimizin kurucusu Ulu Önder Gazi Mustafa Kemal Atatürk\'ü aramızdan ayrılışının ' + info.year + '. yılında saygı, özlem ve minnetle anıyoruz.</b>' +
+        var el = document.createElement("aside"); el.id = "raMourn"; el.className = "ra-mourn-bar ra-noico" + (/^\/(index(\.html)?)?$/.test(location.pathname) ? " home" : ""); el.setAttribute("aria-label", "10 Kasım anma");
+        el.innerHTML = '<div class="ra-mourn-in">' + ribbon + '<div class="ra-mourn-tx"><b>Cumhuriyetimizin kurucusu Ulu Önder Gazi Mustafa Kemal Atatürk\'ü aramızdan ayrılışının ' + info.year + '. yılında saygı, özlem ve minnetle anıyoruz.</b>' +
             '<span>“Benim naçiz vücudum elbet bir gün toprak olacaktır, fakat Türkiye Cumhuriyeti ilelebet payidar kalacaktır.”</span></div></div>';
         document.body.insertBefore(el, document.body.firstChild);
     }
