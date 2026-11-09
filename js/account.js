@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261215";
+    var V = "20261216";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -639,8 +639,31 @@
         if (lsGet("ra-rec-last") === key) return; // değişmediyse yazma (kota)
         api("/records/" + user.uid, { method: "PATCH", body: JSON.stringify({ fields: f }) }).then(function (r) { if (r.ok) lsSet("ra-rec-last", key); }).catch(function () {});
     }
+    // users/{uid} belgesi başka yerde (ör. Küp Arena oyunu) oluşturulmuş olabilir: yazmadan önce bir kez oku,
+    // sitede ad belirlenmediyse oradaki adı, katılma tarihi olarak da ikisinin eskisini koru
+    var profSync = {};
+    function reconcileProfile() {
+        var uid = user.uid;
+        if (profSync[uid]) return profSync[uid];
+        return (profSync[uid] = api("/users/" + uid, { method: "GET" }).then(function (r) {
+            if (r.status === 404) return true;            // belge yok: olduğu gibi yaz
+            if (!r.ok) throw new Error(r.status);         // okunamadı: üzerine yazma
+            return r.json().then(function (d) {
+                var f = (d && d.fields) || {}, prof = localProfile(), ch = false;
+                var rName = f.name && f.name.stringValue, rJoined = +((f.joined && (f.joined.integerValue || f.joined.doubleValue)) || 0);
+                if (!prof.name && rName) { prof.name = String(rName).slice(0, 24); ch = true; }
+                if (rJoined > 0 && (!prof.joined || rJoined < prof.joined)) { prof.joined = rJoined; ch = true; }
+                if (ch) lsSet(PROF_KEY, JSON.stringify(prof));
+                return true;
+            });
+        }).catch(function (e) { delete profSync[uid]; throw e; }));
+    }
     function writeProfile() {
         if (!user) return Promise.resolve();
+        return reconcileProfile().then(writeProfileNow, function () {});
+    }
+    function writeProfileNow() {
+        if (!user) return;
         var prof = localProfile();
         if (!prof.joined) { prof.joined = Date.now(); lsSet(PROF_KEY, JSON.stringify(prof)); }
         var name = (prof.name || user.displayName || (user.email || "?").split("@")[0] || "Cuber").slice(0, 24);

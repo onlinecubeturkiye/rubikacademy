@@ -122,8 +122,12 @@
   function renderOwn() {
     var u = window.Account.user(), prof = window.Account.localProfile(), st = window.Account.computeStats();
     // Paylaşım linki çalışsın diye herkese açık profil dokümanının yazıldığından emin ol
-    if (window.Account.writeProfile) window.Account.writeProfile();
     var name = prof.name || (u && u.displayName) || (u && (u.email || "").split("@")[0]) || "Cuber";
+    // ad başka yerde (ör. Küp Arena) belirlenmişse ilk yazımda yerel profile alınır → sayfayı onunla yenile
+    if (window.Account.writeProfile) Promise.resolve(window.Account.writeProfile()).then(function () {
+      var p2 = window.Account.localProfile();
+      if ((p2.name || "") !== (prof.name || "") && p2.name && $("pEdit")) renderOwn();
+    });
     root.innerHTML =
       '<div class="box"><div class="p-head"><div class="p-ava"' + avaStyle(prof.accent) + '>' + avatar(u && u.photoURL, name) + '</div>' +
       '<div class="p-id"><h1>' + esc(name) + '</h1>' + (prof.bio ? '<div class="p-bio">' + esc(prof.bio) + '</div>' : '') +
