@@ -220,11 +220,16 @@ function raMourn() { return raMournInfo().on; }
         ".ra-mourn-bar{position:relative;z-index:5;background:#0b0b0c;color:#f2f2f2;border-bottom:1px solid #2a2a2c;font-family:Inter,system-ui,sans-serif}" +
         ".ra-mourn-in{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px}" +
         ".ra-mourn-rib{flex:none;width:30px;height:42px}" +
-        ".ra-mourn-pic{flex:none;width:58px;height:58px;border-radius:50%;object-fit:cover;border:2px solid #d4d4d8;box-shadow:0 0 0 3px #0b0b0c,0 0 0 4px #3a3a3d;background:#222}" +
+        // Ana sayfa: Atatürk portresi büyük giriş alanının ("Küpü çöz…") arkasında, kenarlara doğru silinir
+        "html.ra-mourn .h-hero::before{content:'';position:absolute;z-index:1;pointer-events:none;left:50%;top:0;height:100%;aspect-ratio:732/987;transform:translateX(-50%);" +
+            "background:url(/img/ataturk-hero.jpg) 50% 0/cover no-repeat;opacity:.24;" +
+            "-webkit-mask-image:radial-gradient(closest-side at 50% 42%,#000 55%,transparent 100%);mask-image:radial-gradient(closest-side at 50% 42%,#000 55%,transparent 100%)}" +
+        "html.ra-mourn.dark-mode .h-hero::before{opacity:.32}" +
+        "@media(max-width:700px){html.ra-mourn .h-hero::before{height:auto;width:118%;aspect-ratio:732/987;top:-4%}}" +
         ".ra-mourn-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}" +
         ".ra-mourn-tx b{font-size:14.5px;font-weight:800;letter-spacing:.2px;line-height:1.4}" +
         ".ra-mourn-tx span{font-size:12.5px;color:#bdbdbd;font-style:italic;line-height:1.45}" +
-        "@media(max-width:600px){.ra-mourn-in{padding:10px 14px;gap:10px}.ra-mourn-rib{width:20px;height:28px}.ra-mourn-pic{width:46px;height:46px}.ra-mourn-tx b{font-size:13px}.ra-mourn-tx span{font-size:11.5px}}" +
+        "@media(max-width:600px){.ra-mourn-in{padding:10px 14px;gap:10px}.ra-mourn-rib{width:24px;height:34px}.ra-mourn-tx b{font-size:13px}.ra-mourn-tx span{font-size:11.5px}}" +
         ".ra-silence{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.94);color:#f2f2f2;text-align:center;font-family:Inter,system-ui,sans-serif;cursor:pointer}" +
         ".ra-silence div{max-width:520px;display:flex;flex-direction:column;align-items:center;gap:12px}" +
         ".ra-silence b{font-size:22px;font-weight:800;line-height:1.35}.ra-silence p{margin:0;font-size:15px;color:#c8c8c8;line-height:1.6}" +
@@ -237,7 +242,7 @@ function raMourn() { return raMournInfo().on; }
     function bar() {
         if (document.getElementById("raMourn") || !document.body || /\/(admin|yazdir|kup-arena\/baglan)/.test(location.pathname)) return;
         var el = document.createElement("aside"); el.id = "raMourn"; el.className = "ra-mourn-bar ra-noico"; el.setAttribute("aria-label", "10 Kasım anma");
-        el.innerHTML = '<div class="ra-mourn-in"><img class="ra-mourn-pic" src="/img/ataturk-yuz.jpg" alt="Mustafa Kemal Atatürk" width="58" height="58">' + ribbon + '<div class="ra-mourn-tx"><b>Cumhuriyetimizin kurucusu Ulu Önder Gazi Mustafa Kemal Atatürk\'ü aramızdan ayrılışının ' + info.year + '. yılında saygı, özlem ve minnetle anıyoruz.</b>' +
+        el.innerHTML = '<div class="ra-mourn-in">' + ribbon + '<div class="ra-mourn-tx"><b>Cumhuriyetimizin kurucusu Ulu Önder Gazi Mustafa Kemal Atatürk\'ü aramızdan ayrılışının ' + info.year + '. yılında saygı, özlem ve minnetle anıyoruz.</b>' +
             '<span>“Benim naçiz vücudum elbet bir gün toprak olacaktır, fakat Türkiye Cumhuriyeti ilelebet payidar kalacaktır.”</span></div></div>';
         document.body.insertBefore(el, document.body.firstChild);
     }
