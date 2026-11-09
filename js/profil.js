@@ -152,13 +152,11 @@
       '<button class="p-btn main" id="pSave" style="justify-self:start">Kaydet</button></div></div>' +
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistiklerim</h2>' + statTiles(st) + '</div>' +
-      '<div class="box" id="pKA"></div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerlemem</h2>' + setsGrid(st) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>';
 
     showRole(u.uid);
     bindShare(u.uid);
-    loadKupArena(u.uid);
     $("pEdit").onclick = function () { var e = $("pEditBox"); e.hidden = !e.hidden; };
     var pickedAcc = prof.accent || "", pickedPhoto = prof.photo || "", photoChanged = false;
     if ($("pAccents")) Array.prototype.forEach.call($("pAccents").querySelectorAll(".p-acc"), function (b) {
@@ -189,30 +187,6 @@
     };
     $("pOut").onclick = function () { window.Account.signOut(); };
     $("pDel").onclick = function () { if (confirm("Hesabın ve buluttaki verilerin kalıcı olarak silinsin mi?")) window.Account.deleteAccount(); };
-  }
-
-  // Küp Arena özeti: oyun kaydı users/{uid}/kv/kup-arena ({ v: JSON, t }) — yalnız sahibi okur
-  var KA_APK = "https://github.com/onlinecubeturkiye/rubiksimulation/releases/latest/download/KupArena.apk";
-  function loadKupArena(uid) {
-    var box = $("pKA"); if (!box || !window.Account.token) return;
-    var cfg = window.RA_FIREBASE || {};
-    var url = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents/users/" + encodeURIComponent(uid) + "/kv/kup-arena";
-    var head = '<h2 style="font-size:19px;font-weight:850;margin-bottom:12px;display:flex;align-items:center;gap:8px"><img src="/img/kup-arena/icon.png" alt="" width="28" height="28" style="border-radius:8px"> Küp Arena</h2>';
-    box.innerHTML = head + '<p class="p-note">Yükleniyor…</p>';
-    window.Account.token().then(function (tk) { return fetch(url, { headers: { Authorization: "Bearer " + tk } }); }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-      var v = null; try { v = JSON.parse((d && d.fields && d.fields.v && d.fields.v.stringValue) || "null"); } catch (e) {}
-      if (!v || typeof v !== "object") {
-        box.innerHTML = head + '<p class="p-note">Küp Arena\'yı henüz bu hesapla oynamadın. Oyunu kur, Rubik Academy hesabınla giriş yap; ilerlemen burada görünsün.</p>' +
-          '<div class="p-actions" style="margin-top:10px"><a class="p-btn main" href="' + KA_APK + '" rel="noopener">⬇ Android için indir</a><a class="p-btn" href="/kup-arena">Ayrıntılar</a></div>';
-        return;
-      }
-      var stars = 0, a = v.adv && v.adv.stars;
-      if (a && typeof a === "object") Object.keys(a).forEach(function (k) { var x = +a[k]; if (x > 0) stars += x; });
-      var inv = v.inv && typeof v.inv === "object" ? Object.keys(v.inv).length : 0;
-      var t = [["Seviye", +v.level || 1], ["Kupa", +v.trophies || 0], ["Galibiyet", +(v.stats && v.stats.wins) || 0], ["Küp koleksiyonu", inv + " / 26"], ["Yıldız", stars + " / 108"]];
-      box.innerHTML = head + '<div class="stat-tiles">' + t.map(function (x) { return '<div class="stat-tile"><b>' + esc(String(x[1])) + '</b><span>' + x[0] + '</span></div>'; }).join("") + '</div>' +
-        '<p class="p-note" style="margin-top:8px">Oyun kaydı hesabına bağlı. Yalnız oyun kaydını silmek için oyundaki “Küp Arena kaydımı sil”i kullan.</p>';
-    }).catch(function () { box.innerHTML = head + '<p class="p-note">Küp Arena bilgisi şu an yüklenemedi.</p>'; });
   }
 
   function renderSignin() {
