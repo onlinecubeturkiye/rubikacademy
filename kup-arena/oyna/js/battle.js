@@ -768,6 +768,17 @@
     });
   };
 
+  // Klavye (bilgisayarda): 1-3 küp seç, E turu bitir, S yetenek, Esc seçimi bırak
+  window.addEventListener('keydown', (e) => {
+    if (!B || B.over || !B.endTurn || B.busy || $('battle').hidden || G.isModalOpen() || !$('power').hidden || !$('defend').hidden) return;
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    const k = e.key.toLowerCase();
+    if (k === 'e') { e.preventDefault(); $('act-end').click(); }
+    else if (k === 's') { e.preventDefault(); $('act-skill').click(); }
+    else if (k === 'escape') { B.sel = null; B.aim = null; renderAll(); }
+    else if (/^[1-3]$/.test(k)) { const f = B[B.turnSide].list[+k - 1]; if (f && f.hp > 0) tapCell(f.r, f.c); }
+  });
+
   // ---------- İfadeler ----------
   function showEmote(side, i) {
     const wrap = $('b-' + side);

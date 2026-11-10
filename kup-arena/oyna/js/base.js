@@ -127,7 +127,7 @@
     const T = total(), sg = STAGES.filter(x => T >= x.min).length - 1;
     const night = sg >= 4;
     const sky = night ? ['#2a2f8a', '#7a5cff'] : sg >= 3 ? ['#3d8bff', '#ffc38a'] : ['#4fb4ff', '#bfe9ff'];
-    let o = `<svg viewBox="0 0 360 150" class="town-svg" aria-hidden="true"><defs><linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs>
+    let o = `<svg viewBox="0 0 360 150" class="town-svg" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><defs><linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs>
       <rect width="360" height="150" fill="url(#tsky)"/>`;
     if (night) o += [[30, 20], [80, 12], [140, 26], [220, 14], [300, 22], [340, 10]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#fff"/>`).join('') + '<circle cx="320" cy="30" r="12" fill="#fff6c8"/>';
     else o += '<circle cx="315" cy="30" r="14" fill="#fff3a0"/><ellipse cx="70" cy="30" rx="26" ry="8" fill="#fff" opacity=".8"/><ellipse cx="190" cy="22" rx="20" ry="6" fill="#fff" opacity=".7"/>';

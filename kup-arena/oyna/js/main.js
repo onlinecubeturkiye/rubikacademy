@@ -4,6 +4,9 @@
   const Snd = window.Sound;
   const RENDER = { base: () => G.renderBase(), home: () => G.renderHome(), adv: () => G.renderAdventure(), arena: () => G.renderArena(), shop: () => G.renderShop(), inv: () => G.renderInv(), solve: () => G.renderSolve() };
 
+  // Tarayıcıda (uygulama dışında) masaüstü yerleşimi ve web'e özel parçalar
+  const native = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  document.documentElement.classList.toggle('web', !native);
   G.current = 'home';
   G.show = function (tab) {
     if (!RENDER[tab]) return;
@@ -90,7 +93,7 @@
         <button class="btn btn-small" id="set-intro">Nasıl oynanır?</button>
         <button class="btn btn-small danger" id="set-reset">Oyunu sıfırla</button>
       </div>
-      <p class="note">Küp Arena v3.2 · Oyundaki küp markaları (TOPAÇ, KAIRO, HAYATE, TORVA, ZENKO, VEXA) kurgusaldır; gerçek markalarla ilgisi yoktur.</p>`, [{ label: 'Kapat' }], { replace: true, wide: true });
+      <p class="note">Küp Arena v3.3 · Oyundaki küp markaları (TOPAÇ, KAIRO, HAYATE, TORVA, ZENKO, VEXA) kurgusaldır; gerçek markalarla ilgisi yoktur.</p>`, [{ label: 'Kapat' }], { replace: true, wide: true });
     if (!body) return;
     G.bindProfileCard(body, openProfile);
     G.bindReplayList(body);
