@@ -1,0 +1,43 @@
+# Küp Arena web sürümü: oyunun GitHub sürüm sayfasındaki en son KupArena-Web.zip dosyasını
+# indirip kup-arena/oyna/ klasörüne açar. Değişiklik varsa main'e commit eder (site yeniden yayınlanır).
+# Bu klasöre sitenin üst barı, reklamı veya common.js gibi betikleri eklenmez; oyunun kendi sayfasıdır.
+name: Küp Arena web sürümü
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+concurrency:
+  group: kup-arena-web
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Paketi indir
+        run: curl -fsSL --retry 3 -o "$RUNNER_TEMP/web.zip" https://github.com/onlinecubeturkiye/rubiksimulation/releases/latest/download/KupArena-Web.zip
+      - name: Paketi denetle
+        run: |
+          list=$(unzip -Z1 "$RUNNER_TEMP/web.zip")
+          # Klasör dışına yazan, mutlak ya da gizli yollar kabul edilmez
+          if echo "$list" | grep -Eq '(^/|(^|/)\.\.(/|$)|(^|/)\.)'; then echo "Paket güvenli olmayan yol içeriyor"; exit 1; fi
+          echo "$list" | grep -qx 'index.html' || { echo "Paketin kökünde index.html yok"; exit 1; }
+      - name: kup-arena/oyna/ klasörüne aç
+        run: |
+          rm -rf kup-arena/oyna
+          mkdir -p kup-arena/oyna
+          unzip -q "$RUNNER_TEMP/web.zip" -d kup-arena/oyna
+          # Sembolik bağlantı bırakılmaz
+          find kup-arena/oyna -type l -delete
+      - name: Değişiklik varsa gönder
+        run: |
+          git add -A kup-arena/oyna
+          if git diff --cached --quiet; then echo "Yeni sürüm yok"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Küp Arena web sürümü güncellendi"
+          git pull --rebase origin main
+          git push origin HEAD:main

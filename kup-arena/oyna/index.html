@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Küp Arena</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#0b1033">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <button class="player" id="lvl-btn" aria-label="Profil ve başarımlar">
+      <span class="lvl-badge"><span id="lvl-num">1</span></span>
+      <span class="player-info"><b id="hdr-name">Oyuncu</b><span class="xp"><i id="hdr-xp"></i></span></span>
+    </button>
+    <div class="wallet">
+      <span class="res"><svg class="res-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3h3v3a4 4 0 0 1-4 4h-.4A5 5 0 0 1 13 15.9V18h3v3H8v-3h3v-2.1A5 5 0 0 1 8.4 13H8a4 4 0 0 1-4-4V6h3V3Z" fill="#ffc928" stroke="#0b1033" stroke-width="1.5"/></svg><b id="hdr-tr">0</b></span>
+      <span class="res"><i class="coin res-ico" aria-hidden="true"></i><b id="coins">0</b></span>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ANA SAYFA -->
+    <section class="tab tab-home" id="tab-home">
+      <button class="event-banner" id="event-banner"></button>
+      <div class="home-stage">
+        <div class="home-side">
+          <button class="side-btn" id="quest-btn"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="6" width="28" height="36" rx="4" fill="#fff" stroke="#0b1033" stroke-width="3"/><path d="M16 16h16M16 24h16M16 32h10" stroke="#2e8cff" stroke-width="4" stroke-linecap="round"/></svg><span>Görevler</span></button>
+          <button class="side-btn" id="login-btn"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="10" width="36" height="32" rx="5" fill="#fff" stroke="#0b1033" stroke-width="3"/><rect x="6" y="10" width="36" height="10" rx="4" fill="#ff4d5e" stroke="#0b1033" stroke-width="3"/><circle cx="24" cy="31" r="5" fill="#ffc928" stroke="#0b1033" stroke-width="2.5"/></svg><span>Günlük</span></button>
+          <button class="side-btn" id="wheel-home"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="#8a5cff" stroke="#0b1033" stroke-width="3"/><path d="M24 6v36M6 24h36M11 11l26 26M37 11 11 37" stroke="#fff" stroke-width="2.5"/><circle cx="24" cy="24" r="5" fill="#ffc928" stroke="#0b1033" stroke-width="2.5"/></svg><span>Çark</span></button>
+        </div>
+        <button class="showcase" id="showcase" aria-label="Vitrin küpü, değiştirmek için dokun">
+          <span class="sc-rays"></span><span class="sc-stage"><span class="sc-plat"></span><canvas id="sc-cv"></canvas></span>
+          <span class="sc-name" id="sc-name"></span>
+        </button>
+        <div class="home-side">
+          <button class="side-btn" id="chest-home"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 20h36v20a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V20Z" fill="#ff8a1f" stroke="#0b1033" stroke-width="3"/><path d="M6 20c0-8 6-13 18-13s18 5 18 13H6Z" fill="#ffc928" stroke="#0b1033" stroke-width="3"/><rect x="20" y="17" width="8" height="10" rx="2" fill="#fff" stroke="#0b1033" stroke-width="3"/></svg><span id="chest-home-txt">Sandık</span></button>
+          <button class="side-btn" id="season-btn"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l6 13 14 2-10 10 2 14-12-7-12 7 2-14L4 19l14-2z" fill="#ffc928" stroke="#0b1033" stroke-width="3" stroke-linejoin="round"/></svg><span>Sezon</span></button>
+          <button class="side-btn" id="tower-home"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 44V18h20v26z" fill="#8a5cff" stroke="#0b1033" stroke-width="3"/><path d="M11 18V8h6v4h4V8h6v4h4V8h6v10z" fill="#b896ff" stroke="#0b1033" stroke-width="3" stroke-linejoin="round"/><rect x="20" y="30" width="8" height="14" fill="#0b1033"/></svg><span>Kule</span></button>
+        </div>
+      </div>
+      <button class="season-bar" id="season-bar"></button>
+      <div class="chest-row" id="chest-row"></div>
+      <div class="home-play">
+        <button class="btn btn-blue play-side" id="home-arena"><span>ARENA</span><small id="home-arena-sub"></small></button>
+        <button class="btn btn-yellow play-main" id="home-play"><span>OYNA</span><small id="home-play-sub"></small></button>
+      </div>
+    </section>
+
+    <!-- MACERA -->
+    <section class="tab" id="tab-adv" hidden>
+      <div class="sec-head">
+        <button class="back" id="adv-back" aria-label="Ana sayfaya dön">‹</button>
+        <h2 class="sec-title">Macera</h2>
+        <span class="star-total">★ <b id="adv-stars">0</b></span>
+      </div>
+      <div class="adv-top" id="adv-top"></div>
+      <button class="puz-card" id="puz-card"></button>
+      <div class="worlds" id="worlds"></div>
+      <div class="tower" id="tower"></div>
+    </section>
+
+    <!-- ARENA -->
+    <section class="tab" id="tab-arena" hidden>
+      <h2 class="sec-title">Arena</h2>
+      <div class="lock-card" id="arena-lock" hidden></div>
+      <div class="league" id="league"></div>
+      <button class="event-banner" id="arena-mode"></button>
+      <div class="vs-card">
+        <div class="side">
+          <span class="label">Takımın</span>
+          <div class="mini-row" id="my-team"></div>
+        </div>
+        <div class="vs">VS</div>
+        <div class="side">
+          <span class="label" id="opp-name">Rakip</span>
+          <span class="opp-tr" id="opp-tr"></span>
+          <div class="mini-row" id="opp-team"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="opp-new">Rakip değiştir</button>
+        <button class="btn btn-pink btn-big" id="fight">Savaşa başla</button>
+      </div>
+      <button class="pvp-card" id="pvp-btn">
+        <span><b>Arkadaşınla oyna</b><small>Aynı telefonda 2 kişilik maç</small></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm8 0a4 4 0 1 1 0-8 4 4 0 0 1 0 8ZM2 20c0-3.3 2.7-6 6-6s6 2.7 6 6H2Zm12.6 0a7.9 7.9 0 0 0-2-5.3A6 6 0 0 1 22 20h-7.4Z"/></svg>
+      </button>
+      <button class="pvp-card club-card" id="club-btn">
+        <span><b>Kulüp</b><small>Sohbet et, küp bağışla, takas yap</small></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm0 5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Zm-4.5 9.5c.6-2 2.4-3 4.5-3s3.9 1 4.5 3h-9Z"/></svg>
+      </button>
+      <h3 class="sub-title">Kupa Yolu</h3>
+      <p class="note">Her 100 kupada bir ödül. Kupa kaybetsen bile kazandığın ödüller gitmez.</p>
+      <div class="road" id="road"></div>
+    </section>
+
+    <!-- MAĞAZA -->
+    <section class="tab" id="tab-shop" hidden>
+      <h2 class="sec-title">Mağaza</h2>
+      <div class="freebies">
+        <div class="gift">
+          <div><h3>Günlük hediye</h3><p id="gift-text"></p></div>
+          <button class="btn btn-yellow" id="gift-btn">Al</button>
+        </div>
+        <div class="gift free">
+          <div><h3>Bedava paket</h3><p id="free-text"></p></div>
+          <button class="btn btn-yellow" id="free-btn">Aç</button>
+        </div>
+        <div class="gift wheel">
+          <div><h3>Şans Çarkı</h3><p id="wheel-text"></p></div>
+          <button class="btn btn-yellow" id="wheel-btn">Çevir</button>
+        </div>
+      </div>
+      <div id="owned-wrap" hidden>
+        <h3 class="sub-title">Paketlerin</h3>
+        <div class="owned-row" id="owned-packs"></div>
+      </div>
+      <div class="deal" id="deal"></div>
+      <h3 class="sub-title">Paketler</h3>
+      <div class="packs" id="packs"></div>
+      <h3 class="sub-title">Marka Kutuları</h3>
+      <p class="note">Ekonomikten rekabetçiye 6 marka. Her kutudan yalnızca o markanın bulmacaları çıkar. Rekabetçi küpler 3B’de daha hızlı döner.</p>
+      <div class="packs" id="brand-packs"></div>
+      <p class="note">Her paketten 1 bulmaca çıkar. Aynı bulmaca tekrar çıkarsa seviyesi yükselir.</p>
+    </section>
+
+    <!-- ENVANTER -->
+    <section class="tab" id="tab-inv" hidden>
+      <div class="sec-head">
+        <h2 class="sec-title">Envanter</h2>
+        <span class="progress" id="inv-progress"></span>
+      </div>
+      <div class="team-strip">
+        <span class="label">Savaş takımı (en fazla 3)</span>
+        <div class="team-slots" id="team-slots"></div>
+      </div>
+      <div class="sec-head">
+        <div class="seg" id="inv-filter" role="group" aria-label="Türe göre süz">
+          <button data-f="all" aria-pressed="true">Hepsi</button>
+          <button data-f="kup" aria-pressed="false">Küp</button>
+          <button data-f="piramit" aria-pressed="false">Piramit</button>
+          <button data-f="ozel" aria-pressed="false">Özel</button>
+        </div>
+        <button class="btn btn-small" id="sell-all">Fazlaları sat</button>
+        <button class="btn btn-small btn-blue" id="trade-btn">Takas</button>
+      </div>
+      <div class="brand-row" id="brand-filter"></div>
+      <div class="brand-banner" id="brand-info" hidden></div>
+      <div class="grid" id="inv-grid"></div>
+    </section>
+
+    <!-- ATÖLYE -->
+    <section class="tab" id="tab-base" hidden>
+      <div class="sec-head"><h2 class="sec-title">Atölye</h2></div>
+      <div class="town" id="town"></div>
+      <div class="builder" id="builder"></div>
+      <div class="village" id="village"></div>
+      <p class="note">Binaları yükselt: jeton üretsin, küplerin güçlensin. Aynı anda tek bina yükseltilir.</p>
+    </section>
+
+    <!-- ÇÖZ (Atölye > Küp Masası) -->
+    <section class="tab tab-solve" id="tab-solve" hidden>
+      <div class="chal" id="chal" hidden>
+        <div><b id="chal-title"></b><small id="chal-goal"></small></div>
+        <button class="btn btn-small" id="chal-exit">Vazgeç</button>
+      </div>
+      <div class="daily" id="daily"></div>
+      <div class="solve-head">
+        <button class="back" id="solve-back" aria-label="Atölyeye dön">‹</button>
+        <div class="pick" id="solve-pick"></div>
+        <div class="sim-stats">
+          <div><span class="label">Hamle</span><b id="sim-moves">0</b></div>
+          <div><span class="label">Süre</span><b class="timer" id="sim-timer">0:00.00</b></div>
+        </div>
+      </div>
+      <div class="sim-stage" id="sim-stage">
+        <canvas id="sim-cv" aria-label="3B küp. Bir yüzü kaydırarak çevir, boş alanda sürükleyerek döndür."></canvas>
+        <span class="status" id="sim-status" data-phase="idle">Serbest mod</span>
+        <span class="reward" id="sim-reward"></span>
+        <div class="trail" id="sim-trail"></div>
+      </div>
+      <div class="pad" id="sim-pad">
+        <button data-move="U">U</button><button data-move="L">L</button><button data-move="F">F</button>
+        <button data-move="R">R</button><button data-move="B">B</button><button data-move="D">D</button>
+        <button data-move="U'">U'</button><button data-move="L'">L'</button><button data-move="F'">F'</button>
+        <button data-move="R'">R'</button><button data-move="B'">B'</button><button data-move="D'">D'</button>
+      </div>
+      <div class="sim-actions">
+        <button class="btn btn-yellow" id="sim-scramble">Karıştır</button>
+        <button class="btn" id="sim-undo">Geri al</button>
+        <button class="btn" id="sim-solve">Otomatik çöz</button>
+        <button class="btn" id="sim-reset">Sıfırla</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="shop"><svg viewBox="0 0 48 48"><path d="M8 18h32l-3 24H11z" fill="#ff4f9a" stroke="#0b1033" stroke-width="3" stroke-linejoin="round"/><path d="M16 18a8 8 0 0 1 16 0" fill="none" stroke="#0b1033" stroke-width="3"/><circle cx="24" cy="30" r="5" fill="#ffc928" stroke="#0b1033" stroke-width="2.5"/></svg><span>Mağaza</span></button>
+    <button data-tab="inv"><svg viewBox="0 0 48 48"><rect x="6" y="6" width="16" height="16" rx="3" fill="#2e8cff" stroke="#0b1033" stroke-width="3"/><rect x="26" y="6" width="16" height="16" rx="3" fill="#3bdc6e" stroke="#0b1033" stroke-width="3"/><rect x="6" y="26" width="16" height="16" rx="3" fill="#ffc928" stroke="#0b1033" stroke-width="3"/><rect x="26" y="26" width="16" height="16" rx="3" fill="#ff4d5e" stroke="#0b1033" stroke-width="3"/></svg><span>Koleksiyon</span></button>
+    <button data-tab="home" class="home-tab" aria-current="page"><svg viewBox="0 0 48 48"><path d="M24 4 42 14v20L24 44 6 34V14z" fill="#ffc928" stroke="#0b1033" stroke-width="3" stroke-linejoin="round"/><path d="M6 14l18 10 18-10M24 24v20" fill="none" stroke="#0b1033" stroke-width="3"/><path d="M24 24 42 14v20L24 44z" fill="#ff8a1f" stroke="#0b1033" stroke-width="3" stroke-linejoin="round"/></svg><span>Ana Sayfa</span></button>
+    <button data-tab="arena"><svg viewBox="0 0 48 48"><path d="M10 8h6l18 18-4 4L12 12z" fill="#e8ecff" stroke="#0b1033" stroke-width="3" stroke-linejoin="round"/><path d="M38 8h-6L14 26l4 4L36 12z" fill="#e8ecff" stroke="#0b1033" stroke-width="3" stroke-linejoin="round"/><path d="M8 34l6-6 6 6-6 6zM28 34l6-6 6 6-6 6z" fill="#ff8a1f" stroke="#0b1033" stroke-width="3" stroke-linejoin="round"/></svg><span>Arena</span></button>
+    <button data-tab="base"><svg viewBox="0 0 48 48"><path d="M6 22 24 8l18 14" fill="none" stroke="#0b1033" stroke-width="3" stroke-linejoin="round"/><path d="M10 20v22h28V20L24 9z" fill="#ffc928" stroke="#0b1033" stroke-width="3" stroke-linejoin="round"/><path d="M4 23 24 7l20 16" fill="none" stroke="#ff4d5e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="20" y="28" width="8" height="14" fill="#8a5a22" stroke="#0b1033" stroke-width="2.5"/><rect x="29" y="23" width="6" height="6" fill="#7fbfff" stroke="#0b1033" stroke-width="2"/></svg><span>Atölye</span></button>
+  </nav>
+</div>
+
+<!-- Savaş ekranı -->
+<div class="bscreen" id="battle" hidden>
+  <div class="b-top">
+    <span id="b-title"></span>
+    <div class="b-tools">
+      <button class="btn btn-small" id="b-emote" aria-label="İfade gönder">😀</button>
+      <button class="btn btn-small" id="b-auto">Oto: Kapalı</button>
+      <button class="btn btn-small" id="b-quit">Pes et</button>
+    </div>
+  </div>
+  <div class="emote-pop" id="emote-pop" hidden></div>
+  <div class="b-strip enemy" id="b-B"></div>
+  <div class="board" id="bd"></div>
+  <div class="b-event" id="b-event" hidden></div>
+  <div class="b-strip me" id="b-A"></div>
+  <div class="blog" id="blog" aria-live="polite"></div>
+  <div class="power" id="power" hidden>
+    <div class="power-head"><b>Doğru anda dokun!</b><span class="combo-txt" id="power-combo"></span></div>
+    <div class="power-track"><span class="perfect"></span><span class="power-needle"></span></div>
+    <div class="power-hint">Yeşilin tam ortası: MÜKEMMEL vuruş (1,5 kat)</div>
+  </div>
+  <div class="defend" id="defend" hidden>
+    <span class="def-hint">Rakip saldırıyor! Halka kalkana değince dokun!</span>
+    <span class="def-wrap"><span class="def-ring" id="def-ring"></span><button class="def-btn" id="def-btn">SAVUN!</button></span>
+  </div>
+  <div class="b-acts" id="b-acts">
+    <div class="b-hp" id="b-hp"></div>
+    <div class="b-sel" id="b-sel"></div>
+    <div class="b-btns">
+      <button class="btn btn-pink" id="act-skill">Yetenek</button>
+      <button class="btn btn-yellow" id="act-end">Turu bitir<small>Sırayı rakibe ver</small></button>
+    </div>
+  </div>
+</div>
+
+<!-- Savaş tekrarı -->
+<div class="bscreen replay" id="replay" hidden>
+  <div class="b-top"><span id="rp-title">Tekrar</span><div class="b-tools"><button class="btn btn-small btn-blue" id="rp-share">Paylaş</button><button class="btn btn-small" id="rp-close">Kapat</button></div></div>
+  <div class="board" id="rp-board"></div>
+  <div class="blog" id="rp-log"></div>
+  <div class="rp-prog"><i id="rp-bar"></i></div>
+  <div class="rp-ctrl"><button class="btn" id="rp-prev" aria-label="Geri">⏮</button><button class="btn btn-yellow" id="rp-play" aria-label="Oynat">⏸</button><button class="btn" id="rp-next" aria-label="İleri">⏭</button><span id="rp-step"></span></div>
+</div>
+
+<!-- Paket açma -->
+<div class="overlay opener" id="opener" hidden>
+  <div class="rays" id="rays"></div>
+  <div class="open-slot" id="open-slot"></div>
+  <div class="reveal" id="reveal" hidden>
+    <span class="rarity-tag" id="rv-rarity"></span>
+    <canvas id="rv-canvas"></canvas>
+    <h3 id="rv-name"></h3>
+    <p id="rv-sub"></p>
+  </div>
+  <p class="tap-hint" id="open-hint">Açmak için pakete dokun</p>
+  <div class="btn-row open-actions" id="open-actions" hidden>
+    <button class="btn" id="open-ok">Tamam</button>
+    <button class="btn btn-yellow" id="open-again">Bir tane daha</button>
+  </div>
+</div>
+
+<!-- Küp kutusu açma -->
+<div class="overlay chest-open" id="chest-open" hidden>
+  <div class="rays on" style="--ray:#ffc928"></div>
+  <div class="co-left" id="co-left"></div>
+  <div class="co-chest" id="co-chest"></div>
+  <div class="co-card" id="co-card" hidden></div>
+  <div class="co-summary" id="co-summary" hidden></div>
+  <p class="tap-hint" id="co-hint"></p>
+</div>
+
+<!-- Genel pencere -->
+<div class="overlay" id="modal" hidden>
+  <div class="modal-card" role="dialog" aria-labelledby="modal-title">
+    <h2 id="modal-title"></h2>
+    <div id="modal-body"></div>
+    <div class="btn-row" id="modal-actions"></div>
+  </div>
+</div>
+
+<div class="tut" id="tut" hidden>
+  <div class="tut-hole" id="tut-hole"></div>
+  <div class="tut-bubble" id="tut-bubble">
+    <svg class="mascot" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 58 18v28L32 60 6 46V18z" fill="#ffc928" stroke="#0b1033" stroke-width="4" stroke-linejoin="round"/><path d="M6 18l26 14 26-14M32 32v28" fill="none" stroke="#0b1033" stroke-width="3"/><path d="M32 32 58 18v28L32 60z" fill="#ff8a1f" stroke="#0b1033" stroke-width="4" stroke-linejoin="round"/><circle cx="17" cy="34" r="4.5" fill="#0b1033"/><circle cx="26" cy="38" r="4.5" fill="#0b1033"/><circle cx="18.5" cy="32.5" r="1.5" fill="#fff"/><circle cx="27.5" cy="36.5" r="1.5" fill="#fff"/><path d="M15 44q6 5 12 3" fill="none" stroke="#0b1033" stroke-width="3" stroke-linecap="round"/></svg>
+    <div class="tut-text"><b id="tut-title"></b><p id="tut-msg"></p></div>
+    <div class="tut-actions"><button class="btn btn-small" id="tut-skip">Geç</button><button class="btn btn-yellow btn-small" id="tut-next">İleri</button></div>
+    <span class="tut-step" id="tut-step"></span>
+  </div>
+</div>
+<div class="coach" id="coach" hidden><svg class="mascot" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 58 18v28L32 60 6 46V18z" fill="#ffc928" stroke="#0b1033" stroke-width="4" stroke-linejoin="round"/><path d="M32 32 58 18v28L32 60z" fill="#ff8a1f" stroke="#0b1033" stroke-width="4" stroke-linejoin="round"/><circle cx="17" cy="34" r="4.5" fill="#0b1033"/><circle cx="26" cy="38" r="4.5" fill="#0b1033"/></svg><span id="coach-msg"></span></div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/render.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/core.js"></script>
+<script src="vendor/firebase/firebase-app-compat.js"></script>
+<script src="vendor/firebase/firebase-auth-compat.js"></script>
+<script src="vendor/firebase/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/social.js"></script>
+<script src="js/club.js"></script>
+<script src="js/adventure.js"></script>
+<script src="js/puzzles.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/chests.js"></script>
+<script src="js/arena.js"></script>
+<script src="js/solve.js"></script>
+<script src="js/base.js"></script>
+<script src="js/home.js"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
