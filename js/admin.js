@@ -557,12 +557,16 @@
             list.sort(function (a, b) { return b.updated - a.updated; });
             $id("aCompCount").textContent = list.length + " yarışma";
             if (!list.length) { box.innerHTML = '<p class="a-note">Henüz ev yarışması yok.</p>'; return; }
+            var byCode = {};
             box.innerHTML = list.map(function (o) {
+                byCode[o.code] = o;
                 var ev = o.ev === "222" ? "2x2" : "3x3";
                 var stt = o.st === "lobby" ? "⏳ Lobi" : o.st === "run" ? "▶ " + (o.fin ? "Final" : "Tur " + o.round) + " sürüyor" : (o.fin ? "🏆 Final bitti" : "🏁 Tur " + o.round + " bitti");
                 var R = []; try { R = JSON.parse(o.R || "[]"); } catch (e) {}
-                var hist = R.map(function (r) {
-                    return '<div class="cr"><b>' + (r.f ? "🏆 Final" : "Tur " + r.n) + '</b>' + (r.rows || []).map(function (x, i) {
+                o._R = R;
+                var hist = R.map(function (r, ri) {
+                    var rb = window.RACompShare && (r.rows || []).length ? ' <button class="a-btn sm" data-rimg="' + esc(o.code) + '|' + ri + '">🖼️ Görseli indir</button><button class="a-btn sm" data-rtxt="' + esc(o.code) + '|' + ri + '">📝 Metni kopyala</button>' : '';
+                    return '<div class="cr"><b>' + (r.f ? "🏆 Final" : "Tur " + r.n) + '</b>' + rb + (r.rows || []).map(function (x, i) {
                         return '<div class="cr-row"><span>' + (i + 1) + '. ' + esc(x.n) + '</span><b class="mono">' + (x.a == null ? "-" : tFmt(x.a)) + '</b><span class="mono small">' + (x.t || []).map(tFmt).join(", ") + '</span></div>';
                     }).join("") + '</div>';
                 }).join("");
@@ -574,7 +578,7 @@
                     infoRow("Durum", stt) +
                     infoRow("Oluşturulma", esc(dateFmt(o.created))) + '</div>' +
                     '<h4>Yarışmacılar</h4><div class="c-ps a-note">Açınca yüklenir…</div>' +
-                    (hist ? '<h4>Tur sonuçları</h4>' + hist : '') +
+                    (hist ? '<h4>Tur sonuçları' + (window.RACompShare && R.length > 1 ? ' <button class="a-btn sm" data-rall="' + esc(o.code) + '">🖼️ Tüm turların görsellerini indir</button>' : '') + '</h4>' + hist : '') +
                     '<div class="a-ctrl" style="margin-top:8px"><a class="a-btn sm" href="/icerikler/ev-yarismasi?ev=' + esc(o.code) + '" target="_blank" rel="noopener">👁 Yarışmayı aç</a>' +
                     (o.host ? '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.host) + '" target="_blank" rel="noopener">👤 Oda sahibi</a>' : '') +
                     '<button class="a-btn danger sm" data-cd="' + esc(o.code) + '">🗑️ Yarışmayı sil</button></div></div></details>';
@@ -599,6 +603,32 @@
                         });
                     }, function () { el.textContent = "Yüklenemedi."; });
                 });
+            });
+            // Tur sonuç görselleri (yarışma sayfasındakiyle aynı görsel: js/comp-share.js)
+            var fileName = function (o, r) { return "ev-yarismasi-" + o.code + "-" + (r.f ? "final" : "tur" + r.n) + ".png"; };
+            var saveImg = function (o, r) {
+                return RACompShare.image(o, r).then(function (blob) {
+                    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fileName(o, r);
+                    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+                });
+            };
+            box.byCode = byCode;
+            if (!box.raImgBound) box.raImgBound = 1, box.addEventListener("click", function (e) {
+                var b = e.target.closest && e.target.closest("[data-rimg],[data-rtxt],[data-rall]"); if (!b) return;
+                e.preventDefault();
+                var k = (b.getAttribute("data-rimg") || b.getAttribute("data-rtxt") || b.getAttribute("data-rall")).split("|"), o = box.byCode[k[0]]; if (!o) return;
+                var old = b.textContent;
+                if (b.hasAttribute("data-rtxt")) {
+                    var t = RACompShare.text(o, o._R[+k[1]]);
+                    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { b.textContent = "✓ Kopyalandı"; }, function () { prompt("Sonuçlar:", t); })
+                        .then(function () { setTimeout(function () { b.textContent = old; }, 1500); });
+                    return;
+                }
+                b.disabled = true; b.textContent = "Hazırlanıyor…";
+                var list2 = b.hasAttribute("data-rall") ? o._R.filter(function (r) { return (r.rows || []).length; }) : [o._R[+k[1]]];
+                list2.reduce(function (p, r) { return p.then(function () { return saveImg(o, r); }).then(function () { return new Promise(function (res) { setTimeout(res, 400); }); }); }, Promise.resolve())
+                    .then(function () { b.textContent = "✓ İndirildi"; }, function () { b.textContent = "İndirilemedi"; })
+                    .then(function () { setTimeout(function () { b.disabled = false; b.textContent = old; }, 1800); });
             });
             Array.prototype.forEach.call(box.querySelectorAll("[data-cd]"), function (b) {
                 b.addEventListener("click", function () {
