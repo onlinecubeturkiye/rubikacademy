@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261227";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261228";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -408,13 +408,15 @@
             askBox.querySelector('[data-a="1"]').textContent = okTx || "Tamam";
             askBox.classList.add("open");
             var kd = function (e) { if (e.key === "Escape") done(false); };
-            var done = function (v) { askBox.classList.remove("open"); askBox.onclick = null; document.removeEventListener("keydown", kd); res(v); };
+            var done = function (v) { askBox.classList.remove("open"); askBox.onclick = null; askBox.done = null; document.removeEventListener("keydown", kd); res(v); };
+            askBox.done = done;
             document.addEventListener("keydown", kd);
             askBox.onclick = function (e) { var b = e.target.closest("[data-a]"); if (b) done(b.getAttribute("data-a") === "1"); else if (e.target === askBox) done(false); };
             setTimeout(function () { var o = askBox.querySelector('[data-a="1"]'); if (o) try { o.focus(); } catch (x) {} }, 30);
         });
     }
     function say(msg) { return ask(msg, "Tamam", false, true); }
+    function askClose() { if (askBox && askBox.done) askBox.done(false); }
     (function () {
         var st = document.createElement("style");
         st.textContent = ".ra-ask{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(10,12,18,.62);backdrop-filter:blur(3px)}" +
@@ -429,6 +431,7 @@
         (document.head || document.documentElement).appendChild(st);
     })();
     function cMsg(t, bad) { var m = $("cMsg"); m.innerHTML = t || ""; m.className = "ak-msg" + (bad ? " bad" : ""); }
+    function flashMsg(t) { cMsg(t); clearTimeout(flashMsg.t); flashMsg.t = setTimeout(function () { if ($("cMsg").innerHTML === t) cMsg(""); }, 6000); }
     function cBody(fields) { var b = {}; Object.keys(fields).forEach(function (k) { b[k] = val(fields[k]); }); b.ts = { timestampValue: new Date().toISOString() }; return b; }
     function cMask(fields) { return Object.keys(fields).concat(["ts"]).map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&"); }
     // Giriş yapmamış izleyici de okuyabilsin (kurallar comps okumayı herkese açar)
@@ -805,7 +808,13 @@
             chatUi();
             comp.mode = "manual";
             // tur ya da durum değişti: sıradaki karıştırmayı göster
-            if (prev.round !== d.round || prev.st !== d.st) { comp.local = null; comp.orig = {}; comp.editIdx = null; nextScramble(true); }
+            if (prev.round !== d.round || prev.st !== d.st) {
+                comp.local = null; comp.orig = {}; comp.editIdx = null; nextScramble(true);
+                // Başka bir yönetici (sahip / moderatör) yeni turu başlattıysa: öndeki sonuç penceresi ve
+                // "yeni tur / yarışmayı bitir" soruları eskide kalmasın
+                if (prev.st && d.st !== "end") { closeFinal(); if (comp.askRound) { comp.askRound = false; askClose(); } }
+                if (prev.st && prev.st !== d.st && d.st === "prep" && comp.startedByMe !== d.round) flashMsg((d.fin ? "🏆 Final turu" : "Tur " + d.round) + " başladı: hazırlık süresi işliyor.");
+            }
             if (isHost() && d.st === "run") autoEnd();
             checkPrep();
             checkTimeout();
@@ -1218,7 +1227,20 @@
         compPatch({ st: "end", R: JSON.stringify(h) }).then(function () { comp && (comp.ending = false); compPoll(); });
     }
     function startRound(fin, topN, sn) {
-        if (!isHost()) return;
+        if (!isHost() || comp.starting) return;
+        comp.starting = true;
+        var base = comp.doc, c0 = comp;
+        apiAny(cPath(), { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (x) {
+            if (comp !== c0) return;
+            comp.starting = false;
+            var cur = x ? parseDoc(x) : base;
+            if ((cur.round || 0) !== (base.round || 0) || cur.st !== base.st || (cur.st !== "lobby" && cur.st !== "end")) {
+                closeFinal(); compPoll(); flashMsg("Tur başka bir yönetici tarafından zaten başlatıldı."); return;
+            }
+            doStartRound(fin, topN, sn);
+        }, function () { if (comp === c0) { comp.starting = false; doStartRound(fin, topN, sn); } });
+    }
+    function doStartRound(fin, topN, sn) {
         var d = comp.doc, adv = "";
         var lr = lastRound();
         if (topN && lr) adv = lr.rows.filter(function (r) { return r.a != null && r.a < DNF; }).slice(0, topN).map(function (r) { return r.u; }).join(",");
@@ -1226,6 +1248,7 @@
         closeFinal();
         // Her turdan önce hazırlık (bu sürede odaya katılım açık): ilk tur 3 dk, sonrakiler 2 dk
         var first = d.st === "lobby";
+        comp.startedByMe = (d.round || 0) + 1;
         compPatch({ round: (d.round || 0) + 1, st: "prep", pa: Date.now() + (first ? FIRST_PREP_MS : PREP_MS), scr: s.join("|"), fin: fin ? 1 : 0, adv: adv }).then(compPoll);
     }
     var PREP_MS = window.__evPrepMs || 120000, FIRST_PREP_MS = window.__evPrepMs || 180000;
@@ -1240,7 +1263,8 @@
     // Final turu yapmadan bitir: son tur final sayılır, birincisi şampiyon olur
     function finishComp() {
         if (!isHost() || !comp.doc || comp.doc.st !== "end" || comp.doc.fin) return;
-        ask("Yarışma burada bitirilsin mi? Son turun birincisi şampiyon olur.", "Yarışmayı bitir").then(function (ok) { if (ok && comp) doFinish(); });
+        comp.askRound = true;
+        ask("Yarışma burada bitirilsin mi? Son turun birincisi şampiyon olur.", "Yarışmayı bitir").then(function (ok) { if (comp) comp.askRound = false; if (ok && comp) doFinish(); });
     }
     function doFinish() {
         if (!isHost() || !comp.doc || comp.doc.st !== "end" || comp.doc.fin) return;
@@ -1295,79 +1319,9 @@
         if ($("cChatLoginBtn")) $("cChatLoginBtn").onclick = function () { Account.openLogin && Account.openLogin(); };
     }
     function modeIcon(m) { return m === "bt" ? "🧊" : m === "manual" ? "⌨️" : "⏱️"; }
-    function shareTextR(r) {
-        var d = comp.doc;
-        return "🏠 " + d.name + " · " + (r.f ? "Final" : "Tur " + r.n) + " (" + evName(d.ev) + " Ao" + rS(r) + ")\n" + r.rows.map(function (x, i) {
-            return (i + 1) + ". " + x.n + " — " + (x.a == null ? "-" : fmt(x.a)) + "  (" + x.t.map(fmt).join(", ") + ")";
-        }).join("\n") + "\nrubikacademy.fun/icerikler/ev-yarismasi";
-    }
-    var logoP = null;
-    function loadLogo() {
-        if (!logoP) logoP = new Promise(function (res) { var i = new Image(); i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = "/RubikAcademyLogo.png"; });
-        return logoP;
-    }
-    // Metni verilen genişliğe sığdırır: önce yazıyı küçültür, yetmezse sonunu "…" ile keser
-    function fitText(x, s, maxW, weight, size, minSize, fam) {
-        s = String(s || ""); fam = fam || "Inter, sans-serif";
-        for (var z = size; z >= minSize; z -= 2) { x.font = weight + " " + z + "px " + fam; if (x.measureText(s).width <= maxW) return s; }
-        while (s.length > 1 && x.measureText(s + "…").width > maxW) s = s.slice(0, -1);
-        return s + "…";
-    }
-    function shareBg(x, W, H, acc) {
-        x.fillStyle = "#0b0d14"; x.fillRect(0, 0, W, H);
-        [[W * 0.1, 80, 520, acc], [W * 0.95, H * 0.55, 560, "#e84393"], [W * 0.3, H, 480, acc]].forEach(function (b) {
-            var g = x.createRadialGradient(b[0], b[1], 0, b[0], b[1], b[2]); g.addColorStop(0, b[3] + "55"); g.addColorStop(1, b[3] + "00");
-            x.fillStyle = g; x.fillRect(0, 0, W, H);
-        });
-        var bar = x.createLinearGradient(0, 0, W, 0); bar.addColorStop(0, acc); bar.addColorStop(1, "#e84393");
-        x.fillStyle = bar; x.fillRect(0, H - 12, W, 12);
-        return bar;
-    }
-    function shareHead(x, W, logo, kicker) {
-        if (logo) { x.fillStyle = "#151826"; roundRect(x, 60, 52, 76, 76, 20); x.fill(); x.drawImage(logo, 69, 61, 58, 58); }
-        x.textAlign = "left"; x.fillStyle = "#eef0f7"; x.font = "800 36px Inter, sans-serif"; x.fillText("Rubik Academy", logo ? 156 : 60, 102);
-        x.font = "800 24px Inter, sans-serif"; var kw = x.measureText(kicker).width + 44;
-        x.fillStyle = "rgba(108,92,231,.22)"; roundRect(x, W - 60 - kw, 64, kw, 52, 26); x.fill();
-        x.strokeStyle = "rgba(162,155,254,.5)"; x.lineWidth = 2; x.stroke();
-        x.fillStyle = "#c9c3ff"; x.textAlign = "center"; x.fillText(kicker, W - 60 - kw / 2, 98);
-    }
-    function shareImageR(r) {
-        return loadLogo().then(function (logo) {
-            var d = comp.doc, W = 1080, rowH = 112, top = 360, H = Math.max(1080, top + r.rows.length * rowH + 130);
-            var c = document.createElement("canvas"); c.width = W; c.height = H;
-            var x = c.getContext("2d"), acc = (getComputedStyle(document.body).getPropertyValue("--ui-accent") || "#6c5ce7").trim();
-            if (!/^#[0-9a-f]{6}$/i.test(acc)) acc = "#6c5ce7";
-            var bar = shareBg(x, W, H, acc);
-            shareHead(x, W, logo, "🏠 EV YARIŞMASI");
-            x.textAlign = "left"; x.fillStyle = "#eef0f7";
-            x.fillText(fitText(x, d.name, W - 120, "900", 64, 40), 60, 220);
-            x.font = "800 34px Inter, sans-serif"; x.fillStyle = bar;
-            x.fillText((r.f ? "🏆 Final" : "Tur " + r.n) + " · " + evName(d.ev) + " · Ao" + rS(r) + " · " + r.rows.length + " yarışmacı", 60, 280);
-            var medal = ["🥇", "🥈", "🥉"], aoW = 230;
-            r.rows.forEach(function (row, i) {
-                var y = top + i * rowH, win = i === 0;
-                if (win) { var wg = x.createLinearGradient(60, 0, W - 60, 0); wg.addColorStop(0, acc); wg.addColorStop(1, "#a03a8a"); x.fillStyle = wg; }
-                else x.fillStyle = i % 2 ? "rgba(255,255,255,.045)" : "rgba(255,255,255,.075)";
-                roundRect(x, 60, y, W - 120, rowH - 14, 22); x.fill();
-                var mid = y + (rowH - 14) / 2;
-                x.textAlign = "center";
-                if (i < 3) { x.fillStyle = "#fff"; x.font = "48px 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif"; x.fillText(medal[i], 116, mid + 17); }
-                else { x.fillStyle = "#a4aabe"; x.font = "900 36px Inter, sans-serif"; x.fillText(i + 1, 116, mid + 13); }
-                // Ao5 kutusu (sağ) — isim ve süreler bu kutuya asla taşmaz
-                var bx = W - 60 - 18 - aoW;
-                x.fillStyle = win ? "rgba(0,0,0,.22)" : "rgba(0,0,0,.28)"; roundRect(x, bx, y + 14, aoW, rowH - 42, 16); x.fill();
-                x.fillStyle = "#fff"; x.textAlign = "center";
-                x.fillText(fitText(x, row.a == null ? "DNF" : fmt(row.a), aoW - 24, "900", 42, 26, "'JetBrains Mono', monospace"), bx + aoW / 2, mid + 15);
-                var nx = 166, nw = bx - 24 - nx;
-                x.textAlign = "left"; x.fillStyle = win ? "#fff" : "#eef0f7";
-                x.fillText(fitText(x, row.n, nw, "800", 34, 22), nx, y + 46);
-                x.fillStyle = win ? "rgba(255,255,255,.85)" : "#a4aabe";
-                x.fillText(fitText(x, row.t.map(fmt).join(row.t.length > 5 ? " " : "  ·  "), nw, "600", 22, 14, "'JetBrains Mono', monospace"), nx, y + 80);
-            });
-            x.textAlign = "center"; x.fillStyle = "#a4aabe"; x.font = "700 28px Inter, sans-serif"; x.fillText("rubikacademy.fun/icerikler/ev-yarismasi", W / 2, H - 50);
-            return new Promise(function (res) { c.toBlob(res, "image/png"); });
-        });
-    }
+    // Sonuç görseli / metni js/comp-share.js içinde (yönetim paneli de kullanır)
+    function shareTextR(r) { return RACompShare.text(comp.doc, r); }
+    function shareImageR(r) { return RACompShare.image(comp.doc, r); }
     function showRoundResults(r) {
         if (!r) return;
         var d = comp.doc, host = isHost(), latest = d.st === "end" && r.n === d.round;
