@@ -565,9 +565,10 @@
                 var R = []; try { R = JSON.parse(o.R || "[]"); } catch (e) {}
                 o._R = R;
                 var hist = R.map(function (r, ri) {
-                    var rb = window.RACompShare && (r.rows || []).length ? ' <button class="a-btn sm" data-rimg="' + esc(o.code) + '|' + ri + '">🖼️ Görseli indir</button><button class="a-btn sm" data-rtxt="' + esc(o.code) + '|' + ri + '">📝 Metni kopyala</button>' : '';
+                    var rb = window.RACompShare && (r.rows || []).length ? ' <button class="a-btn sm" data-rimg="' + esc(o.code) + '|' + ri + '">🖼️ Görseli indir</button><button class="a-btn sm" data-rtxt="' + esc(o.code) + '|' + ri + '">📝 Metni kopyala</button>' + (r.f ? (r.rows || []).slice(0, 3).map(function (x, i) { return '<button class="a-btn sm" data-rcert="' + esc(o.code) + '|' + ri + '|' + i + '" title="Sertifika: ' + esc(x.n) + '">🎓 ' + (i + 1) + '. ' + esc(x.n) + '</button>'; }).join("") : '') : '';
                     return '<div class="cr"><b>' + (r.f ? "🏆 Final" : "Tur " + r.n) + '</b>' + rb + (r.rows || []).map(function (x, i) {
-                        return '<div class="cr-row"><span>' + (i + 1) + '. ' + esc(x.n) + '</span><b class="mono">' + (x.a == null ? "-" : tFmt(x.a)) + '</b><span class="mono small">' + (x.t || []).map(tFmt).join(", ") + '</span></div>';
+                        var sus = window.RACompShare ? RACompShare.suspect(x.t, o.ev) : {}, sk = Object.keys(sus);
+                        return '<div class="cr-row"><span>' + (i + 1) + '. ' + esc(x.n) + (sk.length ? ' <span title="' + esc(sk.map(function (k) { return (+k + 1) + ". çözüm: " + sus[k]; }).join(" · ")) + '" style="cursor:help">⚠️</span>' : '') + '</span><b class="mono">' + (x.a == null ? "-" : tFmt(x.a)) + '</b><span class="mono small">' + (x.t || []).map(function (t, k) { return sus[k] ? '<b style="color:#d97706">' + tFmt(t) + '</b>' : tFmt(t); }).join(", ") + '</span></div>';
                     }).join("") + '</div>';
                 }).join("");
                 return '<details class="duel-row" data-code="' + esc(o.code) + '"><summary><b class="mono">' + esc(o.code) + '</b><span><b>' + esc(o.name || "-") + '</b> · ' + ev + ' · ' + (o.cap || "?") + ' kişilik</span><span class="a-note">' + stt + ' · ' + esc(o.hName || "?") + ' · ' + esc(dateFmt(o.updated)) + '</span></summary>' +
@@ -614,9 +615,15 @@
             };
             box.byCode = byCode;
             if (!box.raImgBound) box.raImgBound = 1, box.addEventListener("click", function (e) {
-                var b = e.target.closest && e.target.closest("[data-rimg],[data-rtxt],[data-rall]"); if (!b) return;
+                var b = e.target.closest && e.target.closest("[data-rimg],[data-rtxt],[data-rall],[data-rcert]"); if (!b) return;
                 e.preventDefault();
-                var k = (b.getAttribute("data-rimg") || b.getAttribute("data-rtxt") || b.getAttribute("data-rall")).split("|"), o = box.byCode[k[0]]; if (!o) return;
+                var k = (b.getAttribute("data-rimg") || b.getAttribute("data-rtxt") || b.getAttribute("data-rall") || b.getAttribute("data-rcert")).split("|"), o = box.byCode[k[0]]; if (!o) return;
+                if (b.hasAttribute("data-rcert")) {
+                    var ci = RACompShare.certInfo(o, o._R[+k[1]], +k[2]); if (!ci) return;
+                    ci.ts = o.updated || Date.now(); b.disabled = true;
+                    RACompShare.downloadCert(ci).then(function () { b.disabled = false; }, function () { b.disabled = false; });
+                    return;
+                }
                 var old = b.textContent;
                 if (b.hasAttribute("data-rtxt")) {
                     var t = RACompShare.text(o, o._R[+k[1]]);

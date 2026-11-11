@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261228";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261229";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -737,6 +737,7 @@
     }
     function leaveComp(keep) {
         if (mag.on) magToggle(false); mag.tried = false; // odadan çıkınca sensörleri kapat
+        if (window.HwTimer) HwTimer.stop(); hw.auto = false;
         clearInterval(compPollT); clearInterval(hbT); if (comp) { clearInterval(comp.cdT); if (comp.liveStop) comp.liveStop(); }
         // Odadan çıkan son kişiysen oda kapanır (bitmemiş tur yüzünden boş oda açık kalmasın)
         // (yerel liste eski olabilir: sunucudaki yarışmacı listesine bakılır)
@@ -907,8 +908,9 @@
         if (!comp) return;
         var can = compCanSolve();
         $("akPad").hidden = !(tab === "comp" && comp.mode === "timer" && can);
-        $("cType").hidden = !(tab === "comp" && (can || comp.editIdx != null || mag.on));
+        $("cType").hidden = !(tab === "comp" && (can || comp.editIdx != null || mag.on || !!hwKind()));
         magBind();
+        if (window.HwTimer && !hw.auto && !$("cType").hidden) { hw.auto = true; hwInit(); HwTimer.auto(); }
         // mıknatıs seçiliyse odaya girince sensörü başlatmayı dene (iPhone dokunuş ister: kutuda "dokun" yazar)
         if (inPref() === "magnet" && !mag.on && !mag.tried && !$("cType").hidden) { mag.tried = true; magToggle(true, true); }
         applyInput();
@@ -983,7 +985,45 @@
         }
     }
     // Süre giriş yöntemi: "manual" (elle) ya da "magnet" (mıknatıs timer); ⚙️ menüsünden seçilir, cihazda hatırlanır
-    function inPref() { try { return localStorage.getItem("ra-ev-input") === "magnet" ? "magnet" : "manual"; } catch (e) { return "manual"; } }
+    function inPref() { try { var v = localStorage.getItem("ra-ev-input"); return v === "magnet" || v === "stackmat" || v === "gan" ? v : "manual"; } catch (e) { return "manual"; } }
+    function setPref(v) { try { localStorage.setItem("ra-ev-input", v); } catch (e) {} }
+    /* --- donanım timer (kablolu Stackmat / GAN akıllı timer): js/hw-timer.js --- */
+    var hw = { bound: false, auto: false, st: {}, saved: 0 };
+    function hwKind() { var v = inPref(); return v === "stackmat" || v === "gan" ? v : ""; }
+    function hwPaint() {
+        var box = $("cHwBox"); if (!box || !window.HwTimer) return;
+        var k = hwKind(), on = k && HwTimer.connected(k), can = compCanSolve();
+        var s = hw.st[k] || {};
+        box.className = "c-mag-box " + (!on ? "wait" : HwTimer.running() ? "running" : can ? "green" : "white");
+        $("cHwName").textContent = k === "gan" ? "📶 Akıllı timer (GAN)" : "⏱️ Kablolu timer";
+        $("cHwS").innerHTML = !on ? esc(s.msg || (k === "gan" ? "Bağlı değil" : "Kapalı")) : HwTimer.running() ? "Çözülüyor…" : hw.saved && Date.now() - hw.saved < 2500 ? "Kaydedildi ✓" : can ? "Hazır: timer'ı başlat, süre kendiliğinden kaydedilir" : "Sıradaki karıştırmayı bekle";
+        $("cHwGo").hidden = !!on || (k === "stackmat" && HwTimer.listening());
+        $("cHwGo").textContent = k === "gan" ? "📶 Timer'a bağlan" : "🎙️ Kablolu timer'ı dinle";
+        $("cHwHelp").innerHTML = k === "gan" ? "GAN Smart Timer'ı aç ve <b>Bağlan</b>'a dokun. Bir kez eşleştikten sonra sonraki girişlerde kendiliğinden bağlanır. Timer durunca süre otomatik kaydedilir."
+            : "Timer'ın <b>veri çıkışını</b> (3,5 mm) ses kablosuyla telefonun ya da bilgisayarın <b>mikrofon girişine</b> tak (telefonda 4 kutuplu TRRS adaptör gerekir). Mikrofon izni ver; timer açılınca kendiliğinden algılanır, durunca süre otomatik kaydedilir.";
+    }
+    function hwEvent(type, d) {
+        if (type === "status") { hw.st[d.kind] = d; hwPaint(); return; }
+        if (type === "detected") {
+            // timer bağlanınca giriş yöntemi kendiliğinden ona geçer
+            if (comp && inPref() !== d) { setPref(d); applyInput(); flashMsg(d === "gan" ? "📶 Akıllı timer algılandı: süreler otomatik girilecek." : "⏱️ Kablolu timer algılandı: süreler otomatik girilecek."); }
+            hwPaint(); return;
+        }
+        if (!hwKind()) return;
+        if (type === "tick") { var el = $("cHwT"); if (el) el.textContent = fmt(d); }
+        else if (type === "start" || type === "reset" || type === "ready") hwPaint();
+        else if (type === "stop") {
+            $("cHwT").textContent = fmt(d);
+            if (compCanSolve() && d > 0) { comp.mode = "timer"; compDone(d); hw.saved = Date.now(); }
+            else flashMsg("Süre kaydedilmedi: şu an sıradaki karıştırma bekleniyor.");
+            hwPaint(); setTimeout(hwPaint, 2600);
+        }
+    }
+    function hwInit() {
+        if (!window.HwTimer || hw.bound || !$("cHwGo")) return; hw.bound = true;
+        HwTimer.on(hwEvent);
+        $("cHwGo").onclick = function () { var k = hwKind(); if (k) HwTimer.connect(k).then(hwPaint); };
+    }
     function magToggle(on, quiet) {
         if (!window.MagnetTimer) return;
         if (on === mag.on) return;
@@ -999,8 +1039,10 @@
     // Hangi giriş görünür: mıknatıs seçiliyken süre kutusu gizli (son süreyi düzenlerken elle giriş görünür)
     function applyInput() {
         if (!$("cMag")) return;
-        var magMode = inPref() === "magnet" && !(comp && comp.editIdx != null);
-        $("cMag").hidden = !magMode; $("cManual").hidden = magMode;
+        var editing = !!(comp && comp.editIdx != null);
+        var magMode = inPref() === "magnet" && !editing, hwMode = !!hwKind() && !editing;
+        $("cMag").hidden = !magMode; $("cManual").hidden = magMode || hwMode;
+        if ($("cHw")) { $("cHw").hidden = !hwMode; if (hwMode) { hwInit(); if (hwKind() === "stackmat" && !HwTimer.listening()) HwTimer.connect("stackmat").then(hwPaint); hwPaint(); } }
         Array.prototype.forEach.call(document.querySelectorAll("#cInMenu [data-in]"), function (b) { var on = b.getAttribute("data-in") === inPref(); b.classList.toggle("on", on); b.setAttribute("aria-checked", on ? "true" : "false"); });
         if (!magMode && mag.on && inPref() !== "magnet") magToggle(false);
         if (magMode) magPaint(mag.on ? MagnetTimer.state() : "off");
@@ -1013,8 +1055,9 @@
         Array.prototype.forEach.call(menu.querySelectorAll("[data-in]"), function (b) {
             b.onclick = function () {
                 var v = b.getAttribute("data-in");
-                try { localStorage.setItem("ra-ev-input", v); } catch (e) {}
+                setPref(v);
                 menu.hidden = true; $("cInBtn").setAttribute("aria-expanded", "false");
+                if (window.HwTimer && v !== "stackmat") HwTimer.stop("stackmat"); // mikrofonu boşuna açık tutma
                 if (v === "magnet") magToggle(true); // dokunuşla başlat (iPhone izni)
                 applyInput();
             };
@@ -1209,7 +1252,7 @@
             if (i < 0) return;
             var row = r.rows[i], ok = (row.t || []).filter(function (x) { return x < DNF; });
             var k = comp.code + ":" + r.n, old = st.r[k] || {};
-            st.r[k] = { nm: String(d.name || "").slice(0, 40), ev: d.ev === "222" ? "222" : "333", n: rS(r), s: ok.length ? Math.min.apply(null, ok) : null, a: row.a != null && row.a < DNF ? Math.round(row.a) : null, rk: i + 1, p: r.rows.length, f: r.f ? 1 : 0, ts: old.ts || Date.now() };
+            st.r[k] = { nm: String(d.name || "").slice(0, 40), ev: d.ev === "222" ? "222" : "333", n: rS(r), s: ok.length ? Math.min.apply(null, ok) : null, a: row.a != null && row.a < DNF ? Math.round(row.a) : null, rk: i + 1, p: r.rows.length, f: r.f ? 1 : 0, t: (row.t || []).slice(0, 12).map(function (x) { return x >= DNF ? -1 : Math.round(x); }), ts: old.ts || Date.now() };
             if (!st.rooms[comp.code]) st.rooms[comp.code] = st.r[k].ts;
         });
         var after = JSON.stringify(st);
@@ -1338,6 +1381,7 @@
                 '<label class="c-finfmt">Final formatı <select id="cFinFmt"><option value="5">Ao5 (5 çözüm)</option><option value="12">Ao12 (12 çözüm)</option></select></label>' +
                 '<div class="ak-fin-b" style="margin-top:6px"><button type="button" class="btn" id="cFinishR">🏁 Final olmadan yarışmayı bitir</button></div></div>' : "") +
             (latest && r.f ? '<p class="ak-fin-s">Yarışma bitti 🎉</p>' : "") +
+            (r.f && r.rows.length ? '<div class="ak-fin-b c-certs"><span>🎓 Sertifika:</span>' + r.rows.slice(0, 3).map(function (x, i) { return '<button type="button" class="btn' + (signedIn() && x.u === Account.user().uid ? ' primary' : '') + '" data-cert="' + i + '">' + ["🥇", "🥈", "🥉"][i] + ' ' + esc(x.n) + '</button>'; }).join("") + '</div>' : "") +
             '<div class="ak-fin-b" style="margin-top:8px"><button type="button" class="btn" id="akFinClose2">Kapat</button></div><div class="ak-msg" id="akShareMsg"></div>';
         $("akFinClose").onclick = $("akFinClose2").onclick = closeFinal;
         $("cShareTxt").onclick = function () {
@@ -1360,6 +1404,9 @@
         if ($("cNextR")) $("cNextR").onclick = function () { startRound(false, +$("cAdv").value); };
         if ($("cFinalR")) $("cFinalR").onclick = function () { startRound(true, +$("cAdv").value, +(($("cFinFmt") || {}).value || 5)); };
         if ($("cFinishR")) $("cFinishR").onclick = finishComp;
+        Array.prototype.forEach.call($("akFinalBox").querySelectorAll("[data-cert]"), function (b) {
+            b.onclick = function () { var o = RACompShare.certInfo(comp.doc, r, +b.getAttribute("data-cert")); if (o) { o.ts = Date.now(); RACompShare.downloadCert(o); } };
+        });
     }
     // Karıştırılmış küpün açılımı (beyaz üst, yeşil ön). 2x2: aynı R U F hamleleri 3x3 modelinde, yalnız köşeler.
     var NET_COL = { U: "#f4f4f4", R: "#e3262c", F: "#16a34a", D: "#f6c719", L: "#ff7a1a", B: "#2c6fe6" };
@@ -1448,6 +1495,8 @@
             slotsArr().filter(function (i) { return i <= cur || rows.some(function (r) { return r.t[i] != null; }); }).map(function (i) {
                 return line(String(i + 1), i === cur ? "cur" : "", function (r) {
                     var x = r.t[i]; if (x == null) return i === cur ? '<span class="c-wait">…</span>' : "-";
+                    var sus = host && window.RACompShare ? (r.sus || (r.sus = RACompShare.suspect(r.t, d.ev)))[i] : null;
+                    if (sus) return '<span class="c-sus" title="' + esc(sus) + '">⚠️ ' + fmt(x) + '</span>';
                     var pen = r.uid === comp.uid && !comp.watch && d.st === "run" && i === r.t.length - 1 && comp.editIdx == null ? ' <button type="button" class="c-pen" data-edit="1" title="Son süreyi düzenle">✏️</button>' : "";
                     return '<span class="' + (x >= DNF ? "dnf" : bestOf[i] === x ? "best" : "") + '">' + fmt(x) + "</span>" + pen;
                 });
@@ -1455,6 +1504,9 @@
         // tablo değişmediyse yeniden çizme (yoksa butona basarken buton yenilenip tıklama kayboluyor)
         if (comp.tableHtml !== tHtml) { comp.tableHtml = tHtml; $("cTable").innerHTML = tHtml; bindTable(); }
         $("cOut").textContent = out.length ? "Elenenler: " + out.map(function (p) { return p.name; }).join(", ") : "";
+        var susL = host && window.RACompShare ? rows.reduce(function (acc, r) { var m = r.sus || RACompShare.suspect(r.t, d.ev); Object.keys(m).forEach(function (i) { acc.push("<b>" + esc(r.n) + "</b> " + (+i + 1) + ". çözüm: " + esc(m[i])); }); return acc; }, []) : [];
+        var sb = $("cSus"); if (!sb) { sb = document.createElement("div"); sb.id = "cSus"; sb.className = "c-susbox"; $("cOut").parentNode.insertBefore(sb, $("cOut").nextSibling); }
+        sb.hidden = !susL.length; sb.innerHTML = susL.length ? "⚠️ <b>Kontrol et</b> (yalnız yöneticiler görür):<br>" + susL.join("<br>") : "";
         renderComp2();
         recordStats();
     }
@@ -1481,6 +1533,7 @@
         $("cEnd").hidden = d.st !== "run";
         if ($("cFinish")) $("cFinish").hidden = !(d.st === "end" && !d.fin);
         if ($("cCloseRoom")) { $("cCloseRoom").hidden = !owner; $("cCloseRoom").disabled = false; }
+        if ($("cCast")) $("cCast").href = "/icerikler/ev-yayin?ev=" + encodeURIComponent(comp.code);
         $("cShowRes").hidden = !hist().length;
         $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? (devRole ? "Turu başlatabilirsin (geliştirici: tek başına da olur)." : "Yarışmacılar katılınca turu başlat (en az 2 kişi).") : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes " + NS() + " çözümü bitirince tur kendiliğinden biter." : d.st === "prep" ? "Hazırlık: yeni katılımcılar şimdi girebilir." : (d.fin ? "Final bitti." : "Tur bitti.");
         renderModeUi();
