@@ -53,7 +53,7 @@
     return '<div class="stat-tiles">' + rows.map(function (r) { return '<div class="stat-tile"><b>' + esc(r[1]) + "</b><span>" + r[0] + "</span></div>"; }).join("") + "</div>";
   }
   // Ev yarışması: odalar, turlar, şampiyonluk ve küp başına kişisel rekorlar (en iyi tekil, Ao5, Ao12)
-  function compGrid(st) {
+  function compGrid(st, isMe, myName) {
     var c = st && st.comp;
     if (!c) return '<p class="p-note">Henüz ev yarışmasına katılmadı.</p>';
     var tiles = [["Oda", c.rooms || 0], ["Tur", c.rounds || 0], ["Final", c.finals || 0], ["🏆 Şampiyonluk", c.wins || 0]];
@@ -65,14 +65,52 @@
     }).join("") + "</div>";
     html += '<p class="p-note" style="margin-top:10px"><a href="/icerikler/rekorlar" style="color:var(--ui-accent);font-weight:800">🥇 Rekor tablosu →</a></p>';
     var list = c.list || [];
-    if (list.length) html += '<h3 class="p-sub">Yarışma geçmişi</h3><div class="p-clist">' + list.map(function (e) {
-      var dt = e.ts ? new Date(e.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" }) : "";
-      var place = e.rk ? (e.rk === 1 && e.f ? "🏆 1." : e.rk + ".") + (e.p ? " / " + e.p : "") : "-";
-      return '<div class="p-crow' + (e.f && e.rk === 1 ? " win" : "") + '">' +
-        '<div class="p-c1"><b>' + esc(e.nm || e.c) + '</b><small>' + esc(dt) + ' · ' + (e.ev === "222" ? "2x2" : "3x3") + ' · ' + (e.f ? "Final" : "Tur " + e.r) + '</small></div>' +
-        '<div class="p-c2"><span class="p-place">' + esc(place) + '</span><span>Ao' + (e.n || 5) + ' <i dir="ltr">' + fmt(e.a) + '</i></span><span>Tekil <i dir="ltr">' + fmt(e.s) + '</i></span></div></div>';
+    if (list.length) html += progressChart(list) + '<h3 class="p-sub">Yarışma geçmişi</h3><div class="p-clist">' + groupComps(list).map(function (g) {
+      var dt = g.ts ? new Date(g.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" }) : "";
+      var fin = g.rounds.filter(function (e) { return e.f; })[0], medal = fin && fin.rk <= 3 ? ["🥇", "🥈", "🥉"][fin.rk - 1] + " " : "";
+      return '<details class="p-cgrp' + (fin && fin.rk === 1 ? " win" : "") + '"><summary><span class="p-c1"><b>' + medal + esc(g.nm || g.c) + '</b><small>' + esc(dt) + ' · ' + (g.ev === "222" ? "2x2" : "3x3") + ' · ' + g.rounds.length + ' tur' + (fin ? ' · Final ' + fin.rk + '.' : '') + '</small></span><span class="p-cbest">Ao <i dir="ltr">' + fmt(g.bestA) + '</i></span></summary>' +
+        g.rounds.map(function (e) {
+          var place = e.rk ? (e.rk === 1 && e.f ? "🏆 1." : e.rk + ".") + (e.p ? " / " + e.p : "") : "-";
+          var ts = Array.isArray(e.t) && e.t.length ? '<div class="p-ctimes" dir="ltr">' + e.t.map(function (x) { return '<span class="' + (x < 0 ? "dnf" : x === e.s ? "pb" : "") + '">' + (x < 0 ? "DNF" : fmt(x)) + '</span>'; }).join("") + '</div>' : '';
+          var cert = isMe && e.f && e.rk >= 1 && e.rk <= 3 && window.RACompShare ? '<button type="button" class="p-btn sm" data-cert="' + encodeURIComponent(JSON.stringify({ name: myName || "", comp: g.nm || g.c, ev: e.ev, place: e.rk, a: e.a, n: e.n || 5, ts: e.ts })) + '">🎓 Sertifika</button>' : '';
+          return '<div class="p-crow' + (e.f && e.rk === 1 ? " win" : "") + '"><div class="p-c1"><b>' + (e.f ? "🏆 Final" : "Tur " + e.r) + '</b>' + ts + '</div>' +
+            '<div class="p-c2"><span class="p-place">' + esc(place) + '</span><span>Ao' + (e.n || 5) + ' <i dir="ltr">' + fmt(e.a) + '</i></span><span>Tekil <i dir="ltr">' + fmt(e.s) + '</i></span>' + cert + '</div></div>';
+        }).join("") + '</details>';
     }).join("") + "</div>";
     return html;
+  }
+  // Aynı yarışmanın turlarını bir arada göster (en yeni yarışma üstte, turlar sırayla)
+  function groupComps(list) {
+    var by = {}, out = [];
+    list.forEach(function (e) {
+      var g = by[e.c]; if (!g) { g = by[e.c] = { c: e.c, nm: e.nm, ev: e.ev, ts: 0, rounds: [], bestA: null }; out.push(g); }
+      g.rounds.push(e); g.ts = Math.max(g.ts, e.ts || 0);
+      if (typeof e.a === "number" && (g.bestA == null || e.a < g.bestA)) g.bestA = e.a;
+    });
+    out.forEach(function (g) { g.rounds.sort(function (a, b) { return (a.f - b.f) || (a.r - b.r); }); });
+    return out.sort(function (a, b) { return b.ts - a.ts; });
+  }
+  // Gelişim grafiği: her turun ortalaması (eskiden yeniye); her küp türü kendi ölçeğinde ayrı grafik
+  function progressChart(list) {
+    var html = ["333", "222"].map(function (ev, k) {
+      var pts = list.filter(function (e) { return (e.ev || "333") === ev && typeof e.a === "number" && e.ts; }).sort(function (a, b) { return a.ts - b.ts; });
+      if (pts.length < 2) return "";
+      var W = 640, H = 180, P = { l: 52, r: 14, t: 14, b: 26 };
+      var ys = pts.map(function (e) { return e.a; }), lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
+      var pad = Math.max(300, (hi - lo) * 0.15); lo -= pad; hi += pad;
+      var X = function (i) { return P.l + (W - P.l - P.r) * i / (pts.length - 1); };
+      var Y = function (v) { return P.t + (H - P.t - P.b) * (1 - (v - lo) / (hi - lo)); };
+      var grid = [0, 0.5, 1].map(function (f) { var v = lo + (hi - lo) * f, y = Y(v); return '<line x1="' + P.l + '" x2="' + (W - P.r) + '" y1="' + y + '" y2="' + y + '" class="g"/><text x="' + (P.l - 8) + '" y="' + (y + 4) + '" text-anchor="end">' + fmt(v) + '</text>'; }).join("");
+      var d = pts.map(function (e, i) { return (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(e.a).toFixed(1); }).join(" ");
+      var dots = pts.map(function (e, i) { return '<circle cx="' + X(i).toFixed(1) + '" cy="' + Y(e.a).toFixed(1) + '" r="4.5" class="s' + k + '"><title>' + esc((e.nm || e.c) + " · " + (e.f ? "Final" : "Tur " + e.r) + " · Ao" + (e.n || 5) + " " + fmt(e.a)) + '</title></circle>'; }).join("");
+      var dt = function (t) { return new Date(t).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }); };
+      var first = pts[0].a, last = pts[pts.length - 1].a, diff = first - last;
+      var trend = Math.abs(diff) >= 50 ? (diff > 0 ? '<b class="up">▼ ' + fmt(diff) + ' hızlandın</b>' : '<b class="down">▲ ' + fmt(-diff) + ' yavaşladın</b>') : '<b>≈ aynı</b>';
+      return '<div class="p-chart"><div class="p-chart-h"><span class="s' + k + '">' + (ev === "222" ? "2x2" : "3x3") + ' tur ortalaması</span>' + trend + '</div><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + (ev === "222" ? "2x2" : "3x3") + ' tur ortalamalarının zamanla değişimi">' + grid +
+        '<path d="' + d + '" class="s' + k + '"/>' + dots +
+        '<text x="' + P.l + '" y="' + (H - 6) + '">' + dt(pts[0].ts) + '</text><text x="' + (W - P.r) + '" y="' + (H - 6) + '" text-anchor="end">' + dt(pts[pts.length - 1].ts) + '</text></svg></div>';
+    }).join("");
+    return html ? '<h3 class="p-sub">Gelişim <small style="font-weight:700;color:var(--text-soft)">(aşağı = daha hızlı)</small></h3><div class="p-charts">' + html + '</div>' : "";
   }
   function dailyGrid(st) {
     var dl = (st && st.dlist) || [];
@@ -102,11 +140,14 @@
       (isMe ? '<div class="p-actions"><button class="p-btn" id="pShare">🔗 Paylaşım linkini kopyala</button><a class="p-btn" href="/icerikler/profil">← Kendi panona dön</a></div><div class="p-msg" id="pMsg"></div>' : '') +
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistikler</h2>' + statTiles(data.stats) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">🏠 Ev yarışması</h2>' + compGrid(data.stats) + '</div>' +
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">🏠 Ev yarışması</h2>' + compGrid(data.stats, isMe, data.name) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerleme</h2>' + setsGrid(data.stats) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümler</h2>' + dailyGrid(data.stats) + '</div>';
     showRole(uid);
     if (isMe) bindShare(uid);
+    Array.prototype.forEach.call(root.querySelectorAll("[data-cert]"), function (b) {
+      b.onclick = function (e) { e.preventDefault(); try { RACompShare.downloadCert(JSON.parse(decodeURIComponent(b.getAttribute("data-cert")))); } catch (x) {} };
+    });
   }
 
   function bindShare(uid) {

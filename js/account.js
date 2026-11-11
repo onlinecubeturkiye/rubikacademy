@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261228";
+    var V = "20261229";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -605,11 +605,11 @@
                 if (typeof e.s === "number" && (!pb.s || e.s < pb.s)) pb.s = e.s;
                 var ak = e.n === 12 ? "a12" : "a5";
                 if (typeof e.a === "number" && (!pb[ak] || e.a < pb[ak])) pb[ak] = e.a;
-                comp.list.push({ c: rk.split(":")[0], r: +rk.split(":")[1] || 0, nm: e.nm || "", ev: e.ev, n: e.n || 5, s: e.s, a: e.a, rk: e.rk, p: e.p, f: e.f ? 1 : 0, ts: e.ts || 0 });
+                comp.list.push({ c: rk.split(":")[0], r: +rk.split(":")[1] || 0, nm: e.nm || "", ev: e.ev, n: e.n || 5, s: e.s, a: e.a, rk: e.rk, p: e.p, f: e.f ? 1 : 0, t: Array.isArray(e.t) ? e.t.slice(0, 12) : undefined, ts: e.ts || 0 });
             }
-            // geçmiş listesi: en yeni 25 tur (profil verisi sınırı için kısa)
+            // geçmiş listesi: en yeni 40 tur (profil verisi sınırı için kısa; süreler dahil)
             comp.list.sort(function (x, y) { return y.ts - x.ts; });
-            comp.list = comp.list.slice(0, 25);
+            comp.list = comp.list.slice(0, 40);
             if (!comp.rounds && !comp.rooms) comp = null;
         }
         // Admin istatistikleri için sayaçlar: çözüm sayıları (akıllı küp / sanal küp / ev yarışması), giriş yöntemi, akıllı küp modelleri
@@ -621,6 +621,15 @@
         var out = { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount, dlist: dlist.slice(0, 20), comp: comp, cnt: cnt };
         if (cl.length) out.cubes = cl;
         return out;
+    }
+    // Profil istatistiği en fazla 8000 karakter (kural sınırı). Kesip JSON'u bozmak yerine küçült:
+    // önce eski yarışma turlarının süreleri, sonra eski turlar, sonra günlük listesi atılır
+    function fitStats(st) {
+        var j = JSON.stringify(st), L = st.comp && st.comp.list;
+        if (L) for (var i = L.length - 1; j.length > 7900 && i >= 0; i--) { delete L[i].t; j = JSON.stringify(st); }
+        while (j.length > 7900 && L && L.length > 5) { L.pop(); j = JSON.stringify(st); }
+        while (j.length > 7900 && st.dlist && st.dlist.length) { st.dlist.pop(); j = JSON.stringify(st); }
+        return j.length > 8000 ? JSON.stringify({ known: st.known, learning: st.learning, solves: st.solves, best: st.best, daily: st.daily }) : j;
     }
     function localProfile() { var p = parse(lsGet(PROF_KEY)); return isObj(p) ? p : {}; }
     // Rekor tablosu (records/{uid}): ev yarışması kişisel rekorları, herkes okur (icerikler/rekorlar)
@@ -677,7 +686,7 @@
             bio: { stringValue: String(prof.bio || "").slice(0, 160) },
             joined: { integerValue: String(prof.joined) },
             seen: { integerValue: String(Date.now()) },
-            stats: { stringValue: JSON.stringify(st).slice(0, 8000) }
+            stats: { stringValue: fitStats(st) }
         };
         var mask = "?updateMask.fieldPaths=name&updateMask.fieldPaths=photo&updateMask.fieldPaths=bio&updateMask.fieldPaths=joined&updateMask.fieldPaths=seen&updateMask.fieldPaths=stats";
         writeRecords(name, st.comp);

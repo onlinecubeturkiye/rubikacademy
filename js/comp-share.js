@@ -83,5 +83,68 @@
             return new Promise(function (res) { c.toBlob(res, "image/png"); });
         });
     }
-    window.RACompShare = { image: shareImageR, text: shareTextR, fmt: fmt };
+    // Final sertifikası (ilk 3): o = { name: kişi, comp: yarışma adı, ev, place: 1-3, a: ortalama (ms), n: 5|12, ts }
+    function certImage(o) {
+        return loadLogo().then(function (logo) {
+            var W = 1600, H = 1131, c = document.createElement("canvas"); c.width = W; c.height = H;
+            var x = c.getContext("2d");
+            var MED = [["#f5c542", "#b8860b", "BİRİNCİLİK"], ["#d9dde6", "#8a93a6", "İKİNCİLİK"], ["#e0a36b", "#9a5b2b", "ÜÇÜNCÜLÜK"]][Math.max(0, Math.min(2, (o.place || 1) - 1))];
+            // zemin
+            var bg = x.createLinearGradient(0, 0, W, H); bg.addColorStop(0, "#10121c"); bg.addColorStop(1, "#1b1530"); x.fillStyle = bg; x.fillRect(0, 0, W, H);
+            [[W * 0.12, H * 0.1, 520, "#6c5ce7"], [W * 0.92, H * 0.95, 560, "#e84393"]].forEach(function (b) {
+                var g = x.createRadialGradient(b[0], b[1], 0, b[0], b[1], b[2]); g.addColorStop(0, b[3] + "44"); g.addColorStop(1, b[3] + "00"); x.fillStyle = g; x.fillRect(0, 0, W, H);
+            });
+            // çerçeve
+            x.strokeStyle = MED[0]; x.lineWidth = 6; roundRect(x, 40, 40, W - 80, H - 80, 28); x.stroke();
+            x.strokeStyle = MED[0] + "55"; x.lineWidth = 2; roundRect(x, 62, 62, W - 124, H - 124, 20); x.stroke();
+            x.textAlign = "center";
+            if (logo) { x.fillStyle = "#151826"; roundRect(x, W / 2 - 48, 100, 96, 96, 24); x.fill(); x.drawImage(logo, W / 2 - 37, 111, 74, 74); }
+            x.fillStyle = "#c9c3ff"; x.font = "800 30px Inter, sans-serif"; x.fillText("RUBIK ACADEMY · EV YARIŞMASI", W / 2, 250);
+            x.fillStyle = "#eef0f7"; x.font = "900 86px Inter, sans-serif"; x.fillText("BAŞARI SERTİFİKASI", W / 2, 350);
+            // madalya rozeti
+            var my = 470, g2 = x.createLinearGradient(W / 2 - 60, my - 60, W / 2 + 60, my + 60); g2.addColorStop(0, MED[0]); g2.addColorStop(1, MED[1]);
+            x.fillStyle = g2; x.beginPath(); x.arc(W / 2, my, 62, 0, Math.PI * 2); x.fill();
+            x.fillStyle = "#1b1530"; x.font = "900 64px Inter, sans-serif"; x.fillText(String(o.place || 1), W / 2, my + 23);
+            x.fillStyle = "#a4aabe"; x.font = "700 30px Inter, sans-serif"; x.fillText("Bu sertifika", W / 2, 600);
+            x.fillStyle = "#ffffff"; x.fillText(fitText(x, o.name || "Yarışmacı", W - 300, "900", 78, 44), W / 2, 690);
+            x.strokeStyle = MED[0]; x.lineWidth = 3; x.beginPath(); x.moveTo(W / 2 - 300, 720); x.lineTo(W / 2 + 300, 720); x.stroke();
+            x.fillStyle = "#d7d9e4"; x.font = "700 32px Inter, sans-serif";
+            x.fillText(fitText(x, "“" + (o.comp || "Ev yarışması") + "” " + evName(o.ev) + " finalinde", W - 300, "700", 32, 22), W / 2, 780);
+            x.fillStyle = MED[0]; x.font = "900 46px Inter, sans-serif"; x.fillText(MED[2] + " ELDE ETTİĞİ İÇİN VERİLMİŞTİR", W / 2, 845);
+            x.fillStyle = "#eef0f7"; x.font = "800 34px 'JetBrains Mono', monospace"; x.fillText("Ao" + (o.n || 5) + ": " + (o.a == null ? "DNF" : fmt(o.a)), W / 2, 915);
+            var dt = new Date(o.ts || Date.now()).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+            x.fillStyle = "#8d93a8"; x.font = "700 26px Inter, sans-serif"; x.fillText(dt + "  ·  rubikacademy.fun", W / 2, 1010);
+            return new Promise(function (res) { c.toBlob(res, "image/png"); });
+        });
+    }
+    // Bir final turundan ilk 3 için sertifika bilgisi
+    function certInfo(d, r, i) { var row = r.rows[i]; return row ? { name: row.n, comp: d.name, ev: d.ev, place: i + 1, a: row.a, n: rS(r), ts: d.ts ? Date.parse(d.ts) : Date.now() } : null; }
+    function save(blob, name) {
+        var file = null; try { file = new File([blob], name, { type: "image/png" }); } catch (e) {}
+        var dl = function () { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000); };
+        // telefonda paylaşım menüsü (galeriye kaydet / WhatsApp), masaüstünde indirme
+        if (file && navigator.canShare && navigator.canShare({ files: [file] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) return navigator.share({ files: [file] }).catch(function (e) { if (!e || e.name !== "AbortError") dl(); });
+        dl(); return Promise.resolve();
+    }
+    // Dosya adı yalnız ASCII (bazı tarayıcılar Türkçe harfli adı yok sayıp "download" diye kaydediyor)
+    function certFile(o) {
+        var tr = { "ç": "c", "ğ": "g", "ı": "i", "ö": "o", "ş": "s", "ü": "u", "Ç": "c", "Ğ": "g", "İ": "i", "Ö": "o", "Ş": "s", "Ü": "u" };
+        var n = String(o.name || "yarismaci").replace(/[çğıöşüÇĞİÖŞÜ]/g, function (c) { return tr[c]; }).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "yarismaci";
+        return "sertifika-" + n + "-" + (o.place || 1) + ".png";
+    }
+    function downloadCert(o) { return certImage(o).then(function (b) { return save(b, certFile(o)); }); }
+    // Şüpheli süre kontrolü (yalnız yöneticiye uyarı; süreyi değiştirmez)
+    //  - dünya rekoru seviyesinde süre: 3x3 < 4.00, 2x2 < 0.70
+    //  - kişinin bu turdaki diğer (DNF olmayan) sürelerinin ortancasının yarısından hızlı (en az 3 süre daha varsa)
+    function suspect(times, ev) {
+        var out = {}, lim = ev === "222" ? 700 : 4000;
+        var ok = (times || []).map(function (x, i) { return { x: x, i: i }; }).filter(function (o) { return o.x != null && o.x > 0 && o.x < DNF; });
+        ok.forEach(function (o) {
+            if (o.x < lim) { out[o.i] = "Dünya rekoru seviyesinde süre (" + fmt(o.x) + ")"; return; }
+            var rest = ok.filter(function (p) { return p.i !== o.i; }).map(function (p) { return p.x; }).sort(function (a, b) { return a - b; });
+            if (rest.length >= 3) { var med = rest[Math.floor(rest.length / 2)]; if (o.x < med * 0.5) out[o.i] = "Kişinin diğer sürelerinin yarısından hızlı (ortanca " + fmt(med) + ")"; }
+        });
+        return out;
+    }
+    window.RACompShare = { suspect: suspect, image: shareImageR, save: save, downloadCert: downloadCert, text: shareTextR, cert: certImage, certInfo: certInfo, fmt: fmt };
 })();
