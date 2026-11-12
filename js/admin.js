@@ -1023,13 +1023,17 @@
         var sizes = Object.keys(rr).map(function (k) { return rr[k]; }), avg = sizes.length ? (sizes.reduce(function (a, b) { return a + b; }, 0) / sizes.length) : 0;
         top.sort(function (a, b) { return b.r - a.r || b.w - a.w; });
         var inpT = mag + man;
-        box.innerHTML =
-            '<h4>Çözümler</h4><div class="stat-tiles">' + tiles([["Akıllı küp çözümü", nf(sm)], ["Sanal küp çözümü", nf(vc)], ["Ev yarışması çözümü", nf(ev)], ["Antrenör denemesi", nf(tr)]]) + '</div>' +
-            '<p class="a-note">Akıllı küp ve sanal küp sayıları kişi başı son 100 kayda kadar sayılır. Sayılar üyelerin profil özetinden gelir; üye siteye girdikçe güncellenir.</p>' +
-            '<h4 style="margin-top:14px">Ev yarışmaları</h4><div class="stat-tiles">' + tiles([["Yarışmaya katılan üye", compUsers], ["Oda girişi (toplam)", nf(rooms)], ["Oynanan tur (kişi×tur)", nf(rounds)], ["Ortalama tur büyüklüğü", avg ? avg.toFixed(1) + " kişi" : "—"], ["Şampiyonluk", wins]]) + '</div>' +
+        var evBox = $id("aEvStats");
+        var evHtml =
+            '<div class="stat-tiles">' + tiles([["Ev yarışması çözümü", nf(ev)]]) +
+            tiles([["Yarışmaya katılan üye", compUsers], ["Oda girişi (toplam)", nf(rooms)], ["Oynanan tur (kişi×tur)", nf(rounds)], ["Ortalama tur büyüklüğü", avg ? avg.toFixed(1) + " kişi" : "—"], ["Şampiyonluk", wins]]) + '</div>' +
             (top.length ? '<h4 style="margin-top:12px">En çok yarışan</h4>' + top.slice(0, 8).map(function (x, i) { return '<div class="dist-row"><span class="dist-lbl">' + (i + 1) + '. ' + esc(x.n) + '</span><span class="a-note">' + x.r + ' oda · ' + x.t + ' tur · ' + x.w + ' 🏆</span></div>'; }).join("") : '') +
             '<h4 style="margin-top:12px">En aktif organizatörler (açık / son odalar)</h4><div id="aOrgTop"><p class="a-note">Yükleniyor…</p></div>' +
-            '<h4 style="margin-top:14px">Süre giriş yöntemi (ev yarışması)</h4>' + (inpT ? distHtml({ "🧲 Mıknatıs timer": mag, "⌨️ Elle yazma": man }, inpT) : '<p class="a-note">Henüz veri yok (bu özellikten sonraki çözümler sayılır).</p>') +
+            '<h4 style="margin-top:14px">Süre giriş yöntemi (ev yarışması)</h4>' + (inpT ? distHtml({ "🧲 Mıknatıs timer": mag, "⌨️ Elle yazma": man }, inpT) : '<p class="a-note">Henüz veri yok (bu özellikten sonraki çözümler sayılır).</p>');
+        if (evBox) evBox.innerHTML = evHtml;
+        box.innerHTML =
+            '<h4>Çözümler</h4><div class="stat-tiles">' + tiles([["Akıllı küp çözümü", nf(sm)], ["Sanal küp çözümü", nf(vc)], ["Antrenör denemesi", nf(tr)]]) + '</div>' +
+            '<p class="a-note">Akıllı küp ve sanal küp sayıları kişi başı son 100 kayda kadar sayılır. Sayılar üyelerin profil özetinden gelir; üye siteye girdikçe güncellenir.</p>' +
             '<h4 style="margin-top:14px">Akıllı küp modelleri <span class="a-sub" style="margin:0">' + cubeUsers + ' üye bağlamış</span></h4>' + (cubeUsers ? distHtml(cubes, cubeUsers) : '<p class="a-note">Henüz veri yok (bundan sonra bağlanan küpler kaydedilir).</p>');
         listComps().then(function (list) {
             var o = {}; list.forEach(function (c) { var k = c.hName || "?"; o[k] = (o[k] || 0) + 1; });
@@ -1264,6 +1268,7 @@
             '<div class="box cp-sec" id="aEvSec"><h2>🏠 Ev yarışmaları <span class="a-sub" id="aCompCount" style="margin:0"></span></h2>' +
             '<div class="a-ctrl"><button class="a-btn main" id="aCompLoad">↻ Yenile</button><button class="a-btn danger" id="aCompClean">🧹 Eski boş / reddedilmişleri sil</button></div>' +
             '<div class="a-msg" id="aCompMsg"></div><div id="aCompList" class="a-list"></div>' +
+            '<h3 class="cp-h3">📊 Ev yarışması istatistikleri</h3><div id="aEvStats"><p class="a-note">Kullanıcılar yüklenince hesaplanır.</p></div>' +
             '<h3 class="cp-h3">🏆 Rekor tablosu yönetimi <span class="a-sub" id="aRecCount" style="margin:0"></span></h3>' +
             '<div class="a-ctrl"><button class="a-btn main" id="aRecLoad">↻ Yükle</button><label class="a-note"><input type="checkbox" id="aRecBad" checked> Yalnız şüpheliler</label></div>' +
             '<p class="a-note">Şüpheli: 3x3 tekil 4 sn, Ao5 5,5 sn, Ao12 6 sn altı; 2x2 tekil 0,6 sn, Ao5 1 sn, Ao12 1,2 sn altı ya da ortalaması tekilinden hızlı olanlar.</p><div id="aRecList" class="a-list"></div>' +
