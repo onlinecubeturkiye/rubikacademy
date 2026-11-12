@@ -28,6 +28,20 @@
         while (s.length > 1 && x.measureText(s + "…").width > maxW) s = s.slice(0, -1);
         return s + "…";
     }
+    // Madalya (emoji yerine çizim): kurdele + altın/gümüş/bronz daire + sıra numarası
+    var MEDAL = [["#fde68a", "#f59e0b", "#b45309"], ["#f1f5f9", "#cbd5e1", "#64748b"], ["#fed7aa", "#d97706", "#92400e"]];
+    function drawMedal(x, cx, cy, r, n) {
+        var m = MEDAL[Math.max(0, Math.min(2, n - 1))];
+        x.save();
+        x.fillStyle = "#6c5ce7"; x.beginPath(); x.moveTo(cx - r * .62, cy - r * 1.55); x.lineTo(cx - r * .12, cy - r * 1.55); x.lineTo(cx + r * .2, cy - r * .55); x.lineTo(cx - r * .3, cy - r * .55); x.closePath(); x.fill();
+        x.fillStyle = "#ec4899"; x.beginPath(); x.moveTo(cx + r * .62, cy - r * 1.55); x.lineTo(cx + r * .12, cy - r * 1.55); x.lineTo(cx - r * .2, cy - r * .55); x.lineTo(cx + r * .3, cy - r * .55); x.closePath(); x.fill();
+        var g = x.createLinearGradient(cx - r, cy - r, cx + r, cy + r); g.addColorStop(0, m[0]); g.addColorStop(.55, m[1]); g.addColorStop(1, m[2]);
+        x.fillStyle = g; x.beginPath(); x.arc(cx, cy + r * .15, r, 0, Math.PI * 2); x.fill();
+        x.strokeStyle = "rgba(255,255,255,.65)"; x.lineWidth = Math.max(2, r * .09); x.beginPath(); x.arc(cx, cy + r * .15, r * .78, 0, Math.PI * 2); x.stroke();
+        x.fillStyle = n === 2 ? "#334155" : "#fff"; x.font = "900 " + Math.round(r * 1.05) + "px Inter, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+        x.fillText(String(n), cx, cy + r * .2);
+        x.restore();
+    }
     function shareBg(x, W, H, acc) {
         x.fillStyle = "#0b0d14"; x.fillRect(0, 0, W, H);
         [[W * 0.1, 80, 520, acc], [W * 0.95, H * 0.55, 560, "#e84393"], [W * 0.3, H, 480, acc]].forEach(function (b) {
@@ -53,12 +67,12 @@
             var x = c.getContext("2d"), acc = (getComputedStyle(document.body).getPropertyValue("--ui-accent") || "#6c5ce7").trim();
             if (!/^#[0-9a-f]{6}$/i.test(acc)) acc = "#6c5ce7";
             var bar = shareBg(x, W, H, acc);
-            shareHead(x, W, logo, "🏠 EV YARIŞMASI");
+            shareHead(x, W, logo, "EV YARIŞMASI");
             x.textAlign = "left"; x.fillStyle = "#eef0f7";
             x.fillText(fitText(x, d.name, W - 120, "900", 64, 40), 60, 220);
             x.font = "800 34px Inter, sans-serif"; x.fillStyle = bar;
-            x.fillText((r.f ? "🏆 Final" : "Tur " + r.n) + " · " + evName(d.ev) + " · Ao" + rS(r) + " · " + r.rows.length + " yarışmacı", 60, 280);
-            var medal = ["🥇", "🥈", "🥉"], aoW = 230;
+            x.fillText((r.f ? "FİNAL" : "Tur " + r.n) + " · " + evName(d.ev) + " · Ao" + rS(r) + " · " + r.rows.length + " yarışmacı", 60, 280);
+            var aoW = 230;
             r.rows.forEach(function (row, i) {
                 var y = top + i * rowH, win = i === 0;
                 if (win) { var wg = x.createLinearGradient(60, 0, W - 60, 0); wg.addColorStop(0, acc); wg.addColorStop(1, "#a03a8a"); x.fillStyle = wg; }
@@ -66,7 +80,7 @@
                 roundRect(x, 60, y, W - 120, rowH - 14, 22); x.fill();
                 var mid = y + (rowH - 14) / 2;
                 x.textAlign = "center";
-                if (i < 3) { x.fillStyle = "#fff"; x.font = "48px 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif"; x.fillText(medal[i], 116, mid + 17); }
+                if (i < 3) drawMedal(x, 116, mid + 4, 25, i + 1);
                 else { x.fillStyle = "#a4aabe"; x.font = "900 36px Inter, sans-serif"; x.fillText(i + 1, 116, mid + 13); }
                 // Ao5 kutusu (sağ) — isim ve süreler bu kutuya asla taşmaz
                 var bx = W - 60 - 18 - aoW;
@@ -83,37 +97,57 @@
             return new Promise(function (res) { c.toBlob(res, "image/png"); });
         });
     }
-    // Final sertifikası (ilk 3): o = { name: kişi, comp: yarışma adı, ev, place: 1-3, a: ortalama (ms), n: 5|12, ts }
+    // Final sertifikası (ilk 3): beyaz, sade. o = { name, comp, ev, place: 1-3, a: ortalama (ms), n: 5|12, ts }
     function certImage(o) {
         return loadLogo().then(function (logo) {
-            var W = 1600, H = 1131, c = document.createElement("canvas"); c.width = W; c.height = H;
-            var x = c.getContext("2d");
-            var MED = [["#f5c542", "#b8860b", "BİRİNCİLİK"], ["#d9dde6", "#8a93a6", "İKİNCİLİK"], ["#e0a36b", "#9a5b2b", "ÜÇÜNCÜLÜK"]][Math.max(0, Math.min(2, (o.place || 1) - 1))];
-            // zemin
-            var bg = x.createLinearGradient(0, 0, W, H); bg.addColorStop(0, "#10121c"); bg.addColorStop(1, "#1b1530"); x.fillStyle = bg; x.fillRect(0, 0, W, H);
-            [[W * 0.12, H * 0.1, 520, "#6c5ce7"], [W * 0.92, H * 0.95, 560, "#e84393"]].forEach(function (b) {
-                var g = x.createRadialGradient(b[0], b[1], 0, b[0], b[1], b[2]); g.addColorStop(0, b[3] + "44"); g.addColorStop(1, b[3] + "00"); x.fillStyle = g; x.fillRect(0, 0, W, H);
+            var W = 2000, H = 1414, c = document.createElement("canvas"); c.width = W; c.height = H;
+            var x = c.getContext("2d"), place = Math.max(1, Math.min(3, o.place || 1)), m = MEDAL[place - 1];
+            var INK = "#111827", SOFT = "#6b7280", ACC = "#6c5ce7", GOLD = m[1];
+            var CUBE = ["#e3262c", "#16a34a", "#2c6fe6", "#f6c719", "#ff7a1a", "#e5e7eb"];
+            x.fillStyle = "#ffffff"; x.fillRect(0, 0, W, H);
+            // ince çift çerçeve
+            x.strokeStyle = "#e5e7eb"; x.lineWidth = 3; roundRect(x, 50, 50, W - 100, H - 100, 26); x.stroke();
+            x.strokeStyle = GOLD; x.lineWidth = 2; roundRect(x, 72, 72, W - 144, H - 144, 18); x.stroke();
+            // köşelerde küp yüzü süsü (3x3 küçük kare)
+            [[110, 110], [W - 110 - 66, 110], [110, H - 110 - 66], [W - 110 - 66, H - 110 - 66]].forEach(function (p, k) {
+                for (var i = 0; i < 9; i++) { x.fillStyle = CUBE[(i + k * 2) % 6]; x.globalAlpha = .9; roundRect(x, p[0] + (i % 3) * 23, p[1] + Math.floor(i / 3) * 23, 19, 19, 4); x.fill(); }
+                x.globalAlpha = 1;
             });
-            // çerçeve
-            x.strokeStyle = MED[0]; x.lineWidth = 6; roundRect(x, 40, 40, W - 80, H - 80, 28); x.stroke();
-            x.strokeStyle = MED[0] + "55"; x.lineWidth = 2; roundRect(x, 62, 62, W - 124, H - 124, 20); x.stroke();
-            x.textAlign = "center";
-            if (logo) { x.fillStyle = "#151826"; roundRect(x, W / 2 - 48, 100, 96, 96, 24); x.fill(); x.drawImage(logo, W / 2 - 37, 111, 74, 74); }
-            x.fillStyle = "#c9c3ff"; x.font = "800 30px Inter, sans-serif"; x.fillText("RUBIK ACADEMY · EV YARIŞMASI", W / 2, 250);
-            x.fillStyle = "#eef0f7"; x.font = "900 86px Inter, sans-serif"; x.fillText("BAŞARI SERTİFİKASI", W / 2, 350);
-            // madalya rozeti
-            var my = 470, g2 = x.createLinearGradient(W / 2 - 60, my - 60, W / 2 + 60, my + 60); g2.addColorStop(0, MED[0]); g2.addColorStop(1, MED[1]);
-            x.fillStyle = g2; x.beginPath(); x.arc(W / 2, my, 62, 0, Math.PI * 2); x.fill();
-            x.fillStyle = "#1b1530"; x.font = "900 64px Inter, sans-serif"; x.fillText(String(o.place || 1), W / 2, my + 23);
-            x.fillStyle = "#a4aabe"; x.font = "700 30px Inter, sans-serif"; x.fillText("Bu sertifika", W / 2, 600);
-            x.fillStyle = "#ffffff"; x.fillText(fitText(x, o.name || "Yarışmacı", W - 300, "900", 78, 44), W / 2, 690);
-            x.strokeStyle = MED[0]; x.lineWidth = 3; x.beginPath(); x.moveTo(W / 2 - 300, 720); x.lineTo(W / 2 + 300, 720); x.stroke();
-            x.fillStyle = "#d7d9e4"; x.font = "700 32px Inter, sans-serif";
-            x.fillText(fitText(x, "“" + (o.comp || "Ev yarışması") + "” " + evName(o.ev) + " finalinde", W - 300, "700", 32, 22), W / 2, 780);
-            x.fillStyle = MED[0]; x.font = "900 46px Inter, sans-serif"; x.fillText(MED[2] + " ELDE ETTİĞİ İÇİN VERİLMİŞTİR", W / 2, 845);
-            x.fillStyle = "#eef0f7"; x.font = "800 34px 'JetBrains Mono', monospace"; x.fillText("Ao" + (o.n || 5) + ": " + (o.a == null ? "DNF" : fmt(o.a)), W / 2, 915);
+            x.textAlign = "center"; x.textBaseline = "alphabetic";
+            if (logo) x.drawImage(logo, W / 2 - 46, 128, 92, 92);
+            x.fillStyle = SOFT; x.font = "800 26px Inter, sans-serif";
+            if (x.letterSpacing !== undefined) x.letterSpacing = "8px";
+            x.fillText("RUBIK ACADEMY", W / 2, 268);
+            x.fillStyle = INK; x.font = "900 112px Inter, sans-serif"; if (x.letterSpacing !== undefined) x.letterSpacing = "2px";
+            x.fillText("BAŞARI SERTİFİKASI", W / 2, 400);
+            if (x.letterSpacing !== undefined) x.letterSpacing = "6px";
+            x.fillStyle = ACC; x.font = "800 30px Inter, sans-serif";
+            x.fillText("EV YARIŞMASI · " + evName(o.ev).toUpperCase() + " FİNALİ", W / 2, 462);
+            if (x.letterSpacing !== undefined) x.letterSpacing = "0px";
+            // isim
+            x.fillStyle = SOFT; x.font = "600 34px Inter, sans-serif"; x.fillText("Bu sertifika", W / 2, 560);
+            x.fillStyle = INK; x.fillText(fitText(x, o.name || "Yarışmacı", W - 520, "900", 120, 60), W / 2, 690);
+            var lg = x.createLinearGradient(W / 2 - 420, 0, W / 2 + 420, 0); lg.addColorStop(0, "rgba(0,0,0,0)"); lg.addColorStop(.2, GOLD); lg.addColorStop(.8, GOLD); lg.addColorStop(1, "rgba(0,0,0,0)");
+            x.fillStyle = lg; x.fillRect(W / 2 - 420, 722, 840, 4);
+            // açıklama
+            var title = ["birincisi", "ikincisi", "üçüncüsü"][place - 1];
+            x.fillStyle = "#374151"; x.font = "600 38px Inter, sans-serif";
+            x.fillText(fitText(x, "“" + (o.comp || "Ev yarışması") + "” yarışmasının", W - 520, "600", 38, 26), W / 2, 806);
+            x.fillText("final turunu " + title + " olarak tamamlayan", W / 2, 858);
+            x.fillStyle = INK; x.font = "800 38px Inter, sans-serif";
+            x.fillText("yarışmacıya başarısından dolayı verilmiştir.", W / 2, 910);
+            // alt satır: tarih · madalya · sonuç
+            var by = 1130;
             var dt = new Date(o.ts || Date.now()).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
-            x.fillStyle = "#8d93a8"; x.font = "700 26px Inter, sans-serif"; x.fillText(dt + "  ·  rubikacademy.fun", W / 2, 1010);
+            [[W / 2 - 560, dt, "TARİH"], [W / 2 + 560, "Ao" + (o.n || 5) + "  " + (o.a == null || o.a >= DNF ? "DNF" : fmt(o.a)), "SONUÇ"]].forEach(function (b, k) {
+                x.fillStyle = INK; x.font = (k ? "800 40px 'JetBrains Mono', monospace" : "800 38px Inter, sans-serif"); x.fillText(b[1], b[0], by);
+                x.fillStyle = "#d1d5db"; x.fillRect(b[0] - 190, by + 26, 380, 3);
+                x.fillStyle = SOFT; x.font = "800 22px Inter, sans-serif"; if (x.letterSpacing !== undefined) x.letterSpacing = "4px"; x.fillText(b[2], b[0], by + 66); if (x.letterSpacing !== undefined) x.letterSpacing = "0px";
+            });
+            // ortada madalya mührü
+            x.save(); x.shadowColor = "rgba(0,0,0,.18)"; x.shadowBlur = 24; x.shadowOffsetY = 8; drawMedal(x, W / 2, by - 30, 92, place); x.restore();
+            x.fillStyle = SOFT; x.font = "700 24px Inter, sans-serif"; x.fillText(["BİRİNCİ", "İKİNCİ", "ÜÇÜNCÜ"][place - 1], W / 2, by + 122);
+            x.fillStyle = "#9ca3af"; x.font = "700 22px Inter, sans-serif"; x.fillText("rubikacademy.fun", W / 2, H - 92);
             return new Promise(function (res) { c.toBlob(res, "image/png"); });
         });
     }
