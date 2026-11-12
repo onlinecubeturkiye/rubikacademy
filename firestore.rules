@@ -507,6 +507,22 @@ service cloud.firestore {
       allow delete: if request.auth != null && (resource.data.from == request.auth.uid || isAdmin());
     }
 
+    // Şikayetler (kullanıcı içeriği politikası): giriş yapan üye sohbet mesajını ya da kullanıcıyı şikayet eder; yalnız admin okur/siler
+    match /reports/{id} {
+      allow create: if request.auth != null && !suspended(request.auth.uid)
+        && request.resource.data.keys().hasOnly(['t', 'tu', 'tn', 'x', 'ref', 'r', 'note', 'by', 'ts'])
+        && request.resource.data.by == request.auth.uid
+        && request.resource.data.t in ['chat', 'user']
+        && request.resource.data.r in ['spam', 'abuse', 'inappropriate', 'cheat', 'impersonation', 'other']
+        && request.resource.data.tu is string && request.resource.data.tu.size() <= 128
+        && request.resource.data.tn is string && request.resource.data.tn.size() <= 60
+        && request.resource.data.x is string && request.resource.data.x.size() <= 300
+        && request.resource.data.ref is string && request.resource.data.ref.size() <= 200
+        && request.resource.data.note is string && request.resource.data.note.size() <= 300
+        && request.resource.data.ts is timestamp;
+      allow read, delete: if isAdmin();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

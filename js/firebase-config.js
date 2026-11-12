@@ -5,6 +5,8 @@
 window.RA_FIREBASE = {
     apiKey: "AIzaSyC5veIMb1gZLo4c36HlyCPLn2SeoJy2spI",
     authDomain: "rubikacademydb.firebaseapp.com",
+    // Android uygulamasında Google girişi için (yönlendirme); /__/auth/handler sitede sunulur
+    authDomainApp: "rubikacademy.fun",
     projectId: "rubikacademydb",
     appId: "1:724519357215:web:1f51fb763b681c8ef1be2a"
 };

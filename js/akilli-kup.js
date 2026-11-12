@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270107";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270108";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -1346,13 +1346,16 @@
     }
     function renderChat() {
         var box = $("cChatList"); if (!box || !comp) return;
-        var list = comp.chat || [], host = isHost(), key = list.map(function (m) { return m.id; }).join(",") + "|" + host;
+        var list = comp.chat || [], host = isHost(), RR = window.RAReport, key = list.map(function (m) { return m.id; }).join(",") + "|" + host + "|" + (RR ? RR.list().join(",") : "");
         if (comp.chatKey === key) return;
         comp.chatKey = key;
         var atEnd = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
         box.innerHTML = list.length ? list.map(function (m) {
             var me = m.u === comp.uid, badge = comp.doc && m.u === comp.doc.host ? "👑 " : isMod(m.u) ? "🛡️ " : "";
+            // engellenen kişinin mesajı gizli (Şikayet penceresinden engellenir)
+            if (!me && RR && RR.blocked(m.u)) return '<div class="c-cm c-cblk">Engellediğin bir kişinin mesajı gizlendi · <button type="button" class="c-linkbtn" data-unb="' + esc(m.u) + '">Engeli kaldır</button></div>';
             return '<div class="c-cm' + (me ? " me" : "") + '"><b>' + badge + '<span class="c-cx">' + esc(m.n) + '</span></b> <span class="c-cx">' + esc(m.x) + '</span>' +
+                (!me && RR && signedIn() ? '<button type="button" class="c-crep" data-rep="' + esc(m.id) + '" title="Şikayet et / engelle" aria-label="Şikayet et">⚑</button>' : '') +
                 (host || me ? '<button type="button" class="c-cdel" data-mid="' + esc(m.id) + '" title="Sil">✕</button>' : '') + '</div>';
         }).join("") : '<p class="c-chat-empty">Henüz mesaj yok. İlk mesajı sen yaz 👋</p>';
         if (atEnd || !comp.chatSeen) box.scrollTop = box.scrollHeight;
@@ -1360,7 +1363,12 @@
         Array.prototype.forEach.call(box.querySelectorAll("[data-mid]"), function (b) {
             b.onclick = function () { api(cPath("/m/" + b.getAttribute("data-mid")), { method: "DELETE" }).then(function () { comp && (comp.chatKey = ""); chatLoad(); }); };
         });
+        Array.prototype.forEach.call(box.querySelectorAll("[data-rep]"), function (b) {
+            b.onclick = function () { var m = (comp.chat || []).filter(function (x) { return x.id === b.getAttribute("data-rep"); })[0]; if (m) RR.open({ t: "chat", tu: m.u, tn: m.n, x: m.x, ref: "comps/" + comp.code + "/m/" + m.id }); };
+        });
+        Array.prototype.forEach.call(box.querySelectorAll("[data-unb]"), function (b) { b.onclick = function () { RR.block(b.getAttribute("data-unb"), false); }; });
     }
+    document.addEventListener("ra-blocked-change", function () { if (comp) { comp.chatKey = ""; renderChat(); } });
     function chatSend() {
         var inp = $("cChatIn"), x = inp.value.trim().slice(0, 200), err = $("cChatErr");
         if (!x || !comp || !signedIn()) return;

@@ -3,7 +3,7 @@
    - CSS/JS/JSON/görseller: önbellekten hemen ver, arka planda güncelle
    - Algoritma sayfaları ve antrenör kurulumda önceden indirilir (çevrimdışı açılsın diye)
    Sürüm (VERSION) değişince eski önbellek silinir. */
-var VERSION = "ra-20270107";
+var VERSION = "ra-20270108";
 var PRECACHE = [
     "/",
     "/icerikler.html",
@@ -20,8 +20,8 @@ var PRECACHE = [
     "/icerikler/algoritmalar/zbll.html",
     "/icerikler/algoritmalar/megaminx.html",
     "/icerikler/algoritmalar/square1.html",
-    "/icerikler/algoritmalar/mgSvg.js?v=20270107",
-    "/icerikler/algoritmalar/sq1Svg.js?v=20270107",
+    "/icerikler/algoritmalar/mgSvg.js?v=20270108",
+    "/icerikler/algoritmalar/sq1Svg.js?v=20270108",
     "/icerikler/algoritmalar/wv.html",
     "/icerikler/algoritmalar/cll.html",
     "/icerikler/algoritmalar/ortega-oll.html",
@@ -37,44 +37,44 @@ var PRECACHE = [
     "/icerikler/algoritmalar/2look-pll.html",
     "/icerikler/algoritmalar/antrenor.html",
     "/icerikler/algoritmalar/yazdir.html",
-    "/icerikler/algoritmalar/tanima-pll.json?v=20270107",
-    "/js/cross-solver.js?v=20270107",
-    "/js/recog-trainer.js?v=20270107",
-    "/styles/common.css?v=20270107",
-    "/js/i18n.js?v=20270107",
-    "/js/common.js?v=20270107",
-    "/js/ra-icons.js?v=20270107",
-    "/js/ad-banner.js?v=20270107",
-    "/js/custom-algs.js?v=20270107",
+    "/icerikler/algoritmalar/tanima-pll.json?v=20270108",
+    "/js/cross-solver.js?v=20270108",
+    "/js/recog-trainer.js?v=20270108",
+    "/styles/common.css?v=20270108",
+    "/js/i18n.js?v=20270108",
+    "/js/common.js?v=20270108",
+    "/js/ra-icons.js?v=20270108",
+    "/js/ad-banner.js?v=20270108",
+    "/js/custom-algs.js?v=20270108",
     "/darkmode.js",
     "/icerikler/algoritmalar/ll.js",
     "/icerikler/algoritmalar/cllSvg.js",
     "/icerikler/algoritmalar/ortegaSvg.js",
     "/icerikler/algoritmalar/ortegaOllSvg.js",
-    "/icerikler/algoritmalar/antrenor-bt.js?v=20270107",
+    "/icerikler/algoritmalar/antrenor-bt.js?v=20270108",
     "/icons/icon-192.png",
     "/icons/favicon-48.png",
     "/manifest.webmanifest",
     "/icerikler/algoritmalar/oll-pll.json",
-    "/icerikler/algoritmalar/oll-pll.json?v=20270107",
+    "/icerikler/algoritmalar/oll-pll.json?v=20270108",
     "/icerikler/algoritmalar/coll.json",
-    "/icerikler/algoritmalar/coll.json?v=20270107",
+    "/icerikler/algoritmalar/coll.json?v=20270108",
     "/icerikler/algoritmalar/wv.json",
-    "/icerikler/algoritmalar/wv.json?v=20270107",
+    "/icerikler/algoritmalar/wv.json?v=20270108",
     "/icerikler/algoritmalar/cll.json",
-    "/icerikler/algoritmalar/cll.json?v=20270107",
+    "/icerikler/algoritmalar/cll.json?v=20270108",
     "/icerikler/algoritmalar/ortega-oll.json",
-    "/icerikler/algoritmalar/ortega-oll.json?v=20270107",
+    "/icerikler/algoritmalar/ortega-oll.json?v=20270108",
     "/icerikler/algoritmalar/ortega-pbl.json",
-    "/icerikler/algoritmalar/ortega-pbl.json?v=20270107",
+    "/icerikler/algoritmalar/ortega-pbl.json?v=20270108",
     "/icerikler/algoritmalar/eg.json",
-    "/icerikler/algoritmalar/eg.json?v=20270107",
-    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20270107",
-    "/icerikler/algoritmalar/4x4.json?v=20270107",
-    "/icerikler/algoritmalar/5x5.json?v=20270107",
-    "/icerikler/algoritmalar/pyraminx.json?v=20270107",
+    "/icerikler/algoritmalar/eg.json?v=20270108",
+    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20270108",
+    "/icerikler/algoritmalar/4x4.json?v=20270108",
+    "/icerikler/algoritmalar/5x5.json?v=20270108",
+    "/icerikler/algoritmalar/pyraminx.json?v=20270108",
     "/icerikler/algoritmalar/roux.json",
-    "/icerikler/algoritmalar/skewb.json?v=20270107"
+    "/icerikler/algoritmalar/skewb.json?v=20270108"
 ];
 
 self.addEventListener("install", function (event) {
@@ -115,6 +115,8 @@ self.addEventListener("fetch", function (event) {
     if (url.origin !== self.location.origin) return; // Google Analytics, fontlar vb. tarayıcıya kalsın
     // Küp Arena web sürümü (/kup-arena/oyna/): hiç önbelleğe alınmaz, her zaman ağdan gelir (eski sürüm takılı kalmasın)
     if (url.pathname.indexOf("/kup-arena/oyna/") === 0 || url.pathname === "/kup-arena/oyna") return;
+    // Firebase giriş yardımcısı (/__/auth/*): önbelleğe alınmaz
+    if (url.pathname.indexOf("/__/") === 0) return;
 
     if (req.mode === "navigate") {
         event.respondWith(fetch(req).then(function (res) {
@@ -156,7 +158,7 @@ self.addEventListener("push", function (event) {
         // Site o an önündeyse sistem bildirimi yerine site içi bildirim göster
         var front = list.filter(function (c) { return c.focused; })[0];
         if (front) { front.postMessage({ type: "ra-push", body: body, tag: tag }); return; }
-        return self.registration.showNotification(title, { body: body, tag: tag, icon: "/icons/icon-192.png", badge: "/icons/favicon-48.png", data: { url: url } });
+        return self.registration.showNotification(title, { body: body, tag: tag, icon: "/icons/icon-192.png", badge: "/icons/badge-96.png", vibrate: [120, 60, 120], renotify: true, timestamp: Date.now(), data: { url: url } });
     }));
 });
 

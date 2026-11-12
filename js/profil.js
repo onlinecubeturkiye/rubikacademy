@@ -9,6 +9,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function fmt(ms) { if (!ms) return "—"; var s = ms / 1000; if (s < 60) return s.toFixed(2); var m = Math.floor(s / 60); return m + ":" + (s - m * 60).toFixed(2).padStart(5, "0"); }
   var root = $("profRoot");
+  var SUPPORT_MAIL = "muhammederenyalcin@gmail.com"; // sitede yayımlanan iletişim adresi (ana sayfa)
   var ACCENTS = [["", "Varsayılan"], ["#d12d28", "Kırmızı"], ["#ff7a1a", "Turuncu"], ["#f6c719", "Sarı"], ["#179e4f", "Yeşil"], ["#2c6fe6", "Mavi"], ["#8b5cf6", "Mor"], ["#ec4899", "Pembe"]];
   var CUBES = ["", "3x3", "2x2", "4x4", "5x5", "6x6", "7x7", "Pyraminx", "Skewb", "Megaminx", "Square-1", "Clock", "FTO"];
   function avaStyle(acc) { return acc ? ' style="border-color:' + acc + ';box-shadow:0 0 0 4px ' + acc + '33"' : ''; }
@@ -153,10 +154,12 @@
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistikler</h2>' + statTiles(data.stats) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">🏠 Ev yarışması</h2>' + compGrid(data.stats, isMe, data.name) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerleme</h2>' + setsGrid(data.stats) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümler</h2>' + dailyGrid(data.stats) + '</div>';
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümler</h2>' + dailyGrid(data.stats) + '</div>' +
+      (!isMe && window.RAReport ? '<p class="p-note" style="text-align:center;margin:4px 0 18px"><button class="p-btn sm" id="pReport">⚑ Bu profili şikayet et</button></p>' : '');
     showRole(uid);
     if (isMe) bindShare(uid);
     bindCerts();
+    if ($("pReport")) $("pReport").onclick = function () { RAReport.open({ t: "user", tu: uid, tn: data.name || "", x: data.bio || "", ref: "users/" + uid }); };
   }
 
   function bindCerts() {
@@ -213,7 +216,7 @@
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistiklerim</h2>' + statTiles(st) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">🏠 Ev yarışmalarım</h2>' + compGrid(st, true, name) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerlemem</h2>' + setsGrid(st) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>';
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>' + linksBox();
 
     showRole(u.uid);
     bindShare(u.uid);
@@ -250,10 +253,15 @@
     $("pDel").onclick = function () { if (confirm("Hesabın ve buluttaki verilerin kalıcı olarak silinsin mi?")) window.Account.deleteAccount(); };
   }
 
+  // Uygulama içi zorunlu bağlantılar (Google Play): ayarlar, gizlilik, koşullar, hesap silme, iletişim
+  function linksBox() {
+    var L = [["/ayarlar", "⚙️", "Ayarlar"], ["/gizlilik", "🔒", "Gizlilik politikası"], ["/kosullar", "📄", "Kullanım koşulları"], ["/hesap-silme", "🗑️", "Hesap ve veri silme"], ["mailto:" + SUPPORT_MAIL, "✉️", "İletişim: " + SUPPORT_MAIL]];
+    return '<div class="box p-links">' + L.map(function (l) { return '<a href="' + l[0] + '"><span>' + l[1] + '</span>' + esc(l[2]) + '<i aria-hidden="true">›</i></a>'; }).join("") + '</div>';
+  }
   function renderSignin() {
     root.innerHTML = '<div class="box p-signin"><h1 style="font-size:26px;font-weight:900;margin-bottom:6px">Profilim</h1>' +
       '<p>İlerlemeni (bildiğin case\'ler, trainer istatistikleri, günlük çözümler) her cihazda görmek ve paylaşılabilir profilin olması için giriş yap.</p>' +
-      '<button class="p-btn main" id="pLogin" style="margin:auto">👤 Giriş yap / Kayıt ol</button></div>';
+      '<button class="p-btn main" id="pLogin" style="margin:auto">👤 Giriş yap / Kayıt ol</button></div>' + linksBox();
     var b = $("pLogin"); if (b) b.onclick = function () { if (window.Account) window.Account.openLogin(); };
   }
 
