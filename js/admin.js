@@ -596,6 +596,7 @@
             });
             box.byCode = byCode;
             $id("aCompCount").textContent = list.length + " yarışma" + (cnt.pend ? " · " + cnt.pend + " onay bekliyor" : "");
+            if (adminTabs.badge) adminTabs.badge("ev", cnt.pend);
             var tile = function (k, label, v) { return '<button class="cp-tile' + (compTab === k ? " on" : "") + (k === "pend" && v ? " hot" : "") + '" data-tab="' + k + '"><b>' + v + '</b><span>' + label + '</span></button>'; };
             var head = '<div class="cp-tiles">' + tile("pend", "⏳ Onay bekleyen", cnt.pend) + tile("live", "🔴 Canlı", cnt.live) + tile("ok", "✓ Onaylı", cnt.ok) + tile("rej", "✗ Reddedilen", cnt.rej) + tile("all", "Tümü", list.length) + '</div>' +
                 '<p class="a-note" style="margin:6px 0 10px">👥 Toplam ' + Object.keys(people).length + ' farklı yarışmacı. ' +
@@ -792,6 +793,39 @@
         }, function () { msg($id("aCompMsg"), "Silinemedi.", "bad"); });
     }
 
+    /* ---------- kategori sekmeleri: paneli bölümlere ayırır, yalnız seçili kategori görünür ---------- */
+    var ADM_CATS = [
+        ["ev", "🏠", "Ev yarışmaları", ["Ev yarışmaları"]],
+        ["users", "👥", "Kullanıcılar", ["Kullanıcılar", "En aktif kullanıcılar", "Hesapsız ziyaretçiler", "Günlük sıralama"]],
+        ["notify", "🔔", "Bildirimler", ["Bildirim gönder", "Duyuru geçmişi"]],
+        ["stats", "📊", "İstatistik", ["Genel bakış", "Site istatistikleri", "Cihaz, tarayıcı", "Firebase kullanımı"]],
+        ["content", "🧩", "İçerik", ["Topluluk algoritma", "Puanlar ve geri bildirim", "Sponsor banner"]],
+        ["system", "🛠️", "Sistem", ["Bakım modu", "Hata kayıtları"]]
+    ];
+    function adminTabs(root) {
+        var boxes = Array.prototype.slice.call(root.querySelectorAll(":scope > .box"));
+        boxes.forEach(function (b) {
+            var h = (b.querySelector("h2") || {}).textContent || "", cat = "stats";
+            ADM_CATS.forEach(function (c) { c[3].forEach(function (k) { if (h.indexOf(k) >= 0) cat = c[0]; }); });
+            b.setAttribute("data-cat", cat);
+        });
+        var cur = "ev"; try { cur = (location.hash || "").slice(1) || localStorage.getItem("ra-adm-tab") || "ev"; } catch (e) {}
+        if (!ADM_CATS.some(function (c) { return c[0] === cur; })) cur = "ev";
+        var bar = document.createElement("nav"); bar.className = "adm-tabs"; bar.setAttribute("role", "tablist");
+        bar.innerHTML = ADM_CATS.map(function (c) { return '<button type="button" role="tab" data-cat="' + c[0] + '"><span class="i">' + c[1] + '</span><span class="t">' + c[2] + '</span><b class="n" hidden></b></button>'; }).join("");
+        var first = root.querySelector(":scope > .box"); root.insertBefore(bar, first);
+        function show(c) {
+            cur = c;
+            boxes.forEach(function (b) { b.hidden = b.getAttribute("data-cat") !== c; });
+            Array.prototype.forEach.call(bar.children, function (x) { var on = x.getAttribute("data-cat") === c; x.classList.toggle("on", on); x.setAttribute("aria-selected", on ? "true" : "false"); });
+            try { localStorage.setItem("ra-adm-tab", c); history.replaceState(null, "", "#" + c); } catch (e) {}
+            var on = bar.querySelector(".on"); if (on && on.scrollIntoView) try { on.scrollIntoView({ block: "nearest", inline: "center" }); } catch (e) {}
+        }
+        bar.addEventListener("click", function (e) { var b = e.target.closest("[data-cat]"); if (!b) return; show(b.getAttribute("data-cat")); try { window.scrollTo({ top: bar.offsetTop - 70, behavior: "smooth" }); } catch (x) {} });
+        show(cur);
+        // onay bekleyen yarışma sayısı sekmede rozet olarak görünür
+        adminTabs.badge = function (cat, n) { var b = bar.querySelector('[data-cat="' + cat + '"] .n'); if (b) { b.hidden = !n; b.textContent = n; } };
+    }
     /* ---------- bildirim formu: kime (herkes / aramalı kişi seçimi) ve ne zaman (hazır seçenekler) ---------- */
     function bcFormInit() {
         var sel = $id("bcTarget"), at = $id("bcAt"); if (!sel || bcFormInit.done) return; bcFormInit.done = 1;
@@ -1240,6 +1274,7 @@
             '<div class="day-chips" id="aDayChips"></div>' +
             '<p class="a-note">Yanlış bir süreyi sil; o kullanıcı o gün için yeniden gönderebilir.</p>' +
             '<div class="a-msg" id="aDailyMsg"></div><div id="aDailyList" class="a-list"></div></div>';
+        adminTabs(root);
         $id("aDailyLoad").addEventListener("click", function () { renderDaily(); renderDayChips(); });
         $id("aDate").addEventListener("change", renderDaily);
         $id("aDayChips").addEventListener("click", function (e) { var b = e.target.closest(".day-chip"); if (!b) return; $id("aDate").value = b.getAttribute("data-ds"); renderDaily(); });
