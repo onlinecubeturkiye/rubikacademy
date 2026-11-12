@@ -76,7 +76,7 @@ Rubik Academy bağımsız bir eğitim projesidir; Rubik's Cube markasının sahi
 
 ## İletişim bilgileri
 
-- **E-posta:** muhammederenyalcin@gmail.com _(doğrula)_
+- **E-posta:** rubikacademy.iletisim@gmail.com
 - **Web sitesi:** https://rubikacademy.fun
 - **Telefon:** isteğe bağlı, boş bırakılabilir
 

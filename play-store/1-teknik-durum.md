@@ -41,9 +41,9 @@ Uygulama bir **Trusted Web Activity (TWA)**: telefondaki Chrome motoruyla https:
 |---|---|---|---|
 | 1 | **Firebase kurallarını yayınla** (`firestore.rules`'in tamamı) | Şikayet özelliği için yeni `reports` kuralı | Zorunlu |
 | 2 | Play Console'da uygulamayı oluştur, **Play App Signing**'i aç, **Uygulama imzalama anahtarı SHA-256**'yı bana gönder | `.well-known/assetlinks.json`'a eklenmezse Play'den inen uygulamada üstte adres çubuğu çıkar | Zorunlu |
-| 3 | İletişim e-postasını doğrula: şu an `muhammederenyalcin@gmail.com` (sitede yayımlı adres) | Mağaza ve gizlilik sayfasında görünür | Zorunlu |
+| 3 | ~~İletişim e-postası~~ → `rubikacademy.iletisim@gmail.com` (onaylandı) | Mağaza ve gizlilik sayfasında görünür | ✓ Tamam |
 | 4 | Reviewer için **test hesabı** aç (e-posta/şifre) | Antrenör, küp çözücü gibi bazı özellikler üyelere özel | Zorunlu |
-| 5 | Kapalı test için **12 test kullanıcısı** bul | 13 Kasım 2023'ten sonra açılan kişisel hesaplarda üretime geçmeden önce 14 gün kapalı test şart | Hesabına bağlı |
+| 5 | Kapalı test için **12 test kullanıcısı** bul | Hesap **kişisel**: 13 Kasım 2023'ten sonra açıldıysa üretime geçmeden önce 12 kişiyle 14 gün kapalı test şart (Play Console Gösterge panelinde yazar) | Zorunlu (kişisel hesap) |
 | 6 | `VAPID_PRIVATE_KEY` gizli anahtarını GitHub'a ekle | Telefon bildirimleri bu anahtar olmadan gitmiyor | Önerilir |
 
 ## Bilinen riskler

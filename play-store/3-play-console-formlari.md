@@ -26,7 +26,7 @@ The admin panel is only for the site owner.
 
 ## 3. Content rating (İçerik derecelendirmesi — IARC anketi)
 
-- E-posta: muhammederenyalcin@gmail.com
+- E-posta: rubikacademy.iletisim@gmail.com
 - Kategori: **"Referans, Haber veya Eğitim"** (Reference, News, or Educational)
 - Sorular:
   - Şiddet, korku, cinsellik, küfür, uyuşturucu/alkol/tütün: **Hayır**

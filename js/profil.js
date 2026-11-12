@@ -9,7 +9,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function fmt(ms) { if (!ms) return "—"; var s = ms / 1000; if (s < 60) return s.toFixed(2); var m = Math.floor(s / 60); return m + ":" + (s - m * 60).toFixed(2).padStart(5, "0"); }
   var root = $("profRoot");
-  var SUPPORT_MAIL = "muhammederenyalcin@gmail.com"; // sitede yayımlanan iletişim adresi (ana sayfa)
+  var SUPPORT_MAIL = "rubikacademy.iletisim@gmail.com"; // sitede yayımlanan iletişim adresi (ana sayfa)
   var ACCENTS = [["", "Varsayılan"], ["#d12d28", "Kırmızı"], ["#ff7a1a", "Turuncu"], ["#f6c719", "Sarı"], ["#179e4f", "Yeşil"], ["#2c6fe6", "Mavi"], ["#8b5cf6", "Mor"], ["#ec4899", "Pembe"]];
   var CUBES = ["", "3x3", "2x2", "4x4", "5x5", "6x6", "7x7", "Pyraminx", "Skewb", "Megaminx", "Square-1", "Clock", "FTO"];
   function avaStyle(acc) { return acc ? ' style="border-color:' + acc + ';box-shadow:0 0 0 4px ' + acc + '33"' : ''; }
