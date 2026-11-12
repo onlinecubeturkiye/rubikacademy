@@ -76,14 +76,16 @@
       var dt = g.ts ? new Date(g.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" }) : "";
       var fin = g.rounds.filter(function (e) { return e.f; })[0], last = fin || g.rounds[g.rounds.length - 1];
       var bestS = null; g.rounds.forEach(function (e) { if (typeof e.s === "number" && (bestS == null || e.s < bestS)) bestS = e.s; });
-      var place = fin ? (fin.rk === 1 ? "🏆 Şampiyon" : fin.rk <= 3 ? ["", "🥈 2.", "🥉 3."][fin.rk - 1] : fin.rk + ". (final)") : last && last.rk ? last.rk + ". (tur " + last.r + ")" : "-";
+      // sıra rozeti: final derecesi ya da (final yoksa) son turdaki sıra
+      var place = fin ? (fin.rk === 1 ? '<span class="p-badge gold">🏆 Şampiyon</span>' : fin.rk <= 3 ? '<span class="p-badge ' + (fin.rk === 2 ? "silver" : "bronze") + '">' + ["", "🥈", "🥉"][fin.rk - 1] + ' Final ' + fin.rk + '.</span>' : '<span class="p-badge">Final ' + fin.rk + '.' + (fin.p ? ' / ' + fin.p : '') + '</span>')
+        : last && last.rk ? '<span class="p-badge">Tur ' + last.r + ' · ' + last.rk + '.' + (last.p ? ' / ' + last.p : '') + '</span>' : '<span class="p-badge">—</span>';
       var rounds = g.rounds.map(function (e) {
         var ts = Array.isArray(e.t) && e.t.length ? ' <span class="p-ctimes" dir="ltr">' + e.t.map(function (x) { return '<span class="' + (x < 0 ? "dnf" : x === e.s ? "pb" : "") + '">' + (x < 0 ? "DNF" : fmt(x)) + '</span>'; }).join("") + '</span>' : '';
         return '<div class="p-rnd"><b>' + (e.f ? "Final" : "Tur " + e.r) + '</b><span>' + (e.rk ? e.rk + "." + (e.p ? "/" + e.p : "") : "-") + '</span><span>Ao' + (e.n || 5) + ' <i dir="ltr">' + fmt(e.a) + '</i></span>' + ts + '</div>';
       }).join("");
       var pend = g.rounds.some(function (e) { return e.pd; });
       return '<div class="p-comp' + (fin && fin.rk === 1 && !pend ? " win" : "") + '"><div class="p-comp-h"><div class="p-c1"><b>' + esc(g.nm || g.c) + (pend ? ' <span class="p-pend" title="Yönetici süreleri kontrol edince rekorlara ve sertifikalara işlenir">⏳ Onay bekliyor</span>' : '') + '</b><small>' + esc(dt) + ' · ' + (g.ev === "222" ? "2x2" : "3x3") + ' · ' + g.rounds.length + ' tur</small></div>' +
-        '<div class="p-comp-s"><span class="p-place">' + place + '</span><span>En iyi Ao <i dir="ltr">' + fmt(g.bestA) + '</i></span><span>Tekil <i dir="ltr">' + fmt(bestS) + '</i></span></div></div>' +
+        '<div class="p-comp-s">' + place + '<span>En iyi Ao <i dir="ltr">' + fmt(g.bestA) + '</i></span><span>Tekil <i dir="ltr">' + fmt(bestS) + '</i></span></div></div>' +
         '<details class="p-rnds"><summary>Turlar</summary>' + rounds + '</details></div>';
     }).join("") + "</div>";
     return html;

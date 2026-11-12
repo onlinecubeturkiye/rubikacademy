@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20270101";
+    var V = "20270102";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -646,8 +646,14 @@
     function syncCompOk() {
         if (!user || !every("compok", 10 * 60000)) return Promise.resolve(false);
         var cs = parse(lsGet("comp-stats-v1")); if (!isObj(cs) || !isObj(cs.r)) return Promise.resolve(false);
-        var codes = {}; Object.keys(cs.r).forEach(function (k) { var e = cs.r[k]; if (isObj(e) && !compOk(e)) codes[k.split(":")[0]] = 1; });
-        var list = Object.keys(codes).slice(0, 8); if (!list.length) return Promise.resolve(false);
+        // bekleyenler + adı 3 günden uzun süredir kontrol edilmeyen (admin adını değiştirmiş olabilir) yarışmalar, en yeniler önce
+        var codes = {}, last = {}, now = Date.now();
+        Object.keys(cs.r).forEach(function (k) {
+            var e = cs.r[k]; if (!isObj(e)) return; var c = k.split(":")[0];
+            if (!compOk(e)) codes[c] = 2; else if (compOk(e) > 0 && (!e.nmAt || now - e.nmAt > 3 * 86400000) && !codes[c]) codes[c] = 1;
+            last[c] = Math.max(last[c] || 0, e.ts || 0);
+        });
+        var list = Object.keys(codes).sort(function (a, b) { return (codes[b] - codes[a]) || (last[b] - last[a]); }).slice(0, 8); if (!list.length) return Promise.resolve(false);
         return Promise.all(list.map(function (code) {
             return fetch(pubUrl("/comps/" + code)).then(function (r) { return r.status === 404 ? { gone: 1 } : r.ok ? r.json() : null; }, function () { return null; });
         })).then(function (docs) {
@@ -655,10 +661,13 @@
             docs.forEach(function (d, i) {
                 if (!d) return;
                 var code = list[i], f = d.fields || {}, ok = d.gone ? -1 : f.ok ? +(f.ok.integerValue || 0) : 0;
+                var nm = f.name && f.name.stringValue;
+                Object.keys(cur.r).forEach(function (k) { var e = cur.r[k]; if (k.split(":")[0] !== code || !isObj(e)) return; if (nm && e.nm !== nm.slice(0, 40)) { e.nm = nm.slice(0, 40); changed = true; } e.nmAt = Date.now(); });
+                if (codes[code] === 1) { changed = true; return; } // yalnız ad kontrolü (onaylı yarışma)
                 if (!ok) return;
                 var R = []; try { R = JSON.parse((f.R && f.R.stringValue) || "[]") || []; } catch (x) {}
                 Object.keys(cur.r).forEach(function (k) {
-                    if (k.split(":")[0] !== code) return;
+                    if (k.split(":")[0] !== code || compOk(cur.r[k]) !== 0) return;
                     var e = cur.r[k], rn = +k.split(":")[1], r = R.filter(function (x) { return x.n === rn; })[0];
                     if (ok === 1 && r) {
                         var i2 = -1; (r.rows || []).forEach(function (x, j) { if (x.u === me) i2 = j; });

@@ -646,6 +646,7 @@
             '<div class="a-ctrl" style="margin-top:10px"><a class="a-btn sm" href="/icerikler/ev-yarismasi?ev=' + esc(o.code) + '" target="_blank" rel="noopener">👁 Aç</a>' +
             '<a class="a-btn sm" href="/icerikler/ev-yayin?ev=' + esc(o.code) + '" target="_blank" rel="noopener">📺 Yayın ekranı</a>' +
             (o.host ? '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.host) + '" target="_blank" rel="noopener">👤 Oda sahibi</a>' : '') +
+            '<button class="a-btn sm" data-rn="' + esc(o.code) + '">✏️ Adı değiştir</button>' +
             '<button class="a-btn danger sm" data-cd="' + esc(o.code) + '">🗑️ Sil</button></div></div></details>';
     }
     function redrawComp(box, o) {
@@ -697,6 +698,18 @@
                     if (!ok) { b.disabled = false; alert("Kaydedilemedi. Güncel Firebase kurallarını yayınladın mı?"); return; }
                     msg($id("aCompMsg"), (yes ? "✓ " + (o4.name || code) + " onaylandı. Yarışmacılar siteye bir sonraki girişlerinde rekorları güncellenir." : "✗ " + (o4.name || code) + " reddedildi."), "ok");
                     renderComps();
+                });
+                return;
+            }
+            if (b.hasAttribute("data-rn")) {
+                var rc = b.getAttribute("data-rn"), orn = B[rc]; if (!orn) return;
+                var nn = prompt("Yarışmanın yeni adı (en çok 40 karakter):", orn.name || ""); if (nn == null) return;
+                nn = nn.trim().slice(0, 40); if (!nn || nn === orn.name) return;
+                b.disabled = true;
+                compPatchAdmin(rc, { name: nn }).then(function (ok) {
+                    b.disabled = false; if (!ok) { alert("Kaydedilemedi."); return; }
+                    orn.name = nn; redrawComp(box, orn);
+                    msg($id("aCompMsg"), "✓ Ad değişti: " + nn + ". Yarışmacıların profilinde birkaç dakika içinde (siteye girdiklerinde) güncellenir.", "ok");
                 });
                 return;
             }
@@ -779,6 +792,48 @@
         }, function () { msg($id("aCompMsg"), "Silinemedi.", "bad"); });
     }
 
+    /* ---------- bildirim formu: kime (herkes / aramalı kişi seçimi) ve ne zaman (hazır seçenekler) ---------- */
+    function bcFormInit() {
+        var sel = $id("bcTarget"), at = $id("bcAt"); if (!sel || bcFormInit.done) return; bcFormInit.done = 1;
+        var who = "all", when = "now";
+        function pad(n) { return String(n).padStart(2, "0"); }
+        function local(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes()); }
+        function label() {
+            var name = who === "all" ? "Herkese" : (sel.options[sel.selectedIndex] || {}).text || "";
+            if (who === "one" && sel.value === "all") name = "";
+            var w = when === "now" || !at.value ? "şimdi gönder" : "planla · " + dateFmt(new Date(at.value).getTime());
+            $id("bcSendTx").textContent = who === "one" && !name ? "👤 Önce kişiyi seç" : (when === "now" ? "🚀 " : "⏰ ") + name + " " + w;
+            $id("bcSend").disabled = who === "one" && !name;
+        }
+        function list() {
+            var q = ($id("bcSearch").value || "").trim().toLocaleLowerCase("tr"), opts = Array.prototype.slice.call(sel.options, 1);
+            var hit = opts.filter(function (o) { return !q || o.text.toLocaleLowerCase("tr").indexOf(q) >= 0; }).slice(0, 30);
+            $id("bcList").innerHTML = hit.length ? hit.map(function (o) { return '<button type="button" class="bc-u' + (sel.value === o.value ? " on" : "") + '" data-u="' + esc(o.value) + '"><span class="bc-av">' + esc((o.text || "?").trim().charAt(0).toLocaleUpperCase("tr")) + '</span>' + esc(o.text) + '</button>'; }).join("") : '<p class="a-note">Üye bulunamadı.</p>';
+        }
+        $id("bcText").addEventListener("input", function () { $id("bcCnt").textContent = this.value.length + "/500"; });
+        $id("bcWho").addEventListener("click", function (e) {
+            var b = e.target.closest("[data-who]"); if (!b) return; who = b.getAttribute("data-who");
+            Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle("on", x === b); });
+            $id("bcPick").hidden = who !== "one"; if (who === "all") sel.value = "all"; else { sel.value = "all"; list(); $id("bcSearch").focus(); }
+            label();
+        });
+        $id("bcSearch").addEventListener("input", list);
+        $id("bcList").addEventListener("click", function (e) { var b = e.target.closest("[data-u]"); if (!b) return; sel.value = b.getAttribute("data-u"); list(); label(); });
+        $id("bcWhen").addEventListener("click", function (e) {
+            var b = e.target.closest("[data-w]"); if (!b) return; when = b.getAttribute("data-w");
+            Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle("on", x === b); });
+            var d = new Date(); at.hidden = when !== "pick";
+            if (when === "now") at.value = "";
+            else if (when === "1h") at.value = local(new Date(d.getTime() + 3600000));
+            else if (when === "eve") { d.setHours(20, 0, 0, 0); if (d < new Date()) d.setDate(d.getDate() + 1); at.value = local(d); }
+            else if (when === "tom") { d.setDate(d.getDate() + 1); d.setHours(10, 0, 0, 0); at.value = local(d); }
+            else { if (!at.value) at.value = local(new Date(d.getTime() + 3600000)); at.focus(); }
+            label();
+        });
+        at.addEventListener("input", label);
+        bcFormInit.reset = function () { $id("bcCnt").textContent = "0/500"; when = "now"; at.hidden = true; Array.prototype.forEach.call($id("bcWhen").children, function (x, i) { x.classList.toggle("on", i === 0); }); label(); };
+        label();
+    }
     /* ---------- duyuru geçmişi ---------- */
     function renderBroadcasts() {
         var box = $id("aBcList"); if (!box) return;
@@ -1154,13 +1209,15 @@
             '<p class="a-note" style="margin-top:12px">Yarışmalar herkese açık sayfada: <a href="/icerikler/ev-yarismasi" target="_blank" rel="noopener">Ev yarışması</a> · <a href="/icerikler/rekorlar" target="_blank" rel="noopener">Rekor tablosu</a></p></div>' +
             '<div class="box"><h2>👤 Hesapsız ziyaretçiler</h2><p class="a-note">Giriş yapmadan siteyi kullanan cihazlar (her cihaz bir kez sayılır, oturum başına güncellenir).</p><div id="aAnon" class="stat-tiles"><p class="a-note">Yükleniyor…</p></div><div id="aAnonMore"></div></div>' +
             '<div class="box"><h2>🔔 Bildirim gönder</h2>' +
-            '<p class="a-note">Yazdığın mesaj seçtiğin kişiye (ya da herkese) bildirim olarak gider. Bildirime izin veren kullanıcılarda telefon/sistem bildirimi; herkeste site içi bildirim olarak düşer.</p>' +
-            '<div class="a-ctrl" style="flex-direction:column;align-items:stretch">' +
-            '<textarea id="bcText" maxlength="500" rows="2" placeholder="Bildirim metni…" style="width:100%;box-sizing:border-box;padding:11px 12px;border-radius:12px;border:var(--card-bw) solid var(--ink);background:var(--surface);color:var(--text);font:600 14.5px Inter,sans-serif"></textarea>' +
-            '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><select id="bcTarget"><option value="all">📢 Herkese (duyuru)</option></select>' +
-            '<label class="bc-at">⏰ Planla <input type="datetime-local" id="bcAt"></label>' +
-            '<button class="a-btn main" id="bcSend">Gönder</button><span class="a-msg" id="bcMsg" style="margin:0"></span></div>' +
-            '<p class="a-note">Zaman boş bırakılırsa hemen gider. Telefon/arka plan bildirimi birkaç dakika içinde ulaşır.</p></div></div>' +
+            '<div class="bc-form">' +
+            '<div class="bc-step"><span class="bc-lbl">1 · Mesaj</span><div class="bc-ta"><textarea id="bcText" maxlength="500" rows="3" placeholder="Ör. Bu akşam 21.00\'de ev yarışması var, kaçırma! 🏠"></textarea><span class="bc-cnt" id="bcCnt">0/500</span></div></div>' +
+            '<div class="bc-step"><span class="bc-lbl">2 · Kime</span><div class="bc-seg" id="bcWho"><button type="button" class="on" data-who="all">📢 Herkese</button><button type="button" data-who="one">👤 Bir kişiye</button></div>' +
+            '<div class="bc-pick" id="bcPick" hidden><input type="search" id="bcSearch" placeholder="Üye ara…" autocomplete="off"><div class="bc-list" id="bcList"></div></div>' +
+            '<select id="bcTarget" hidden><option value="all">📢 Herkese (duyuru)</option></select></div>' +
+            '<div class="bc-step"><span class="bc-lbl">3 · Ne zaman</span><div class="bc-chips" id="bcWhen"><button type="button" class="on" data-w="now">⚡ Şimdi</button><button type="button" data-w="1h">1 saat sonra</button><button type="button" data-w="eve">Bu akşam 20:00</button><button type="button" data-w="tom">Yarın 10:00</button><button type="button" data-w="pick">📅 Tarih seç</button></div>' +
+            '<input type="datetime-local" id="bcAt" class="bc-dt" hidden></div>' +
+            '<button class="bc-send" id="bcSend"><span id="bcSendTx">🚀 Herkese şimdi gönder</span></button><span class="a-msg" id="bcMsg"></span>' +
+            '<p class="a-note">Bildirime izin verenlere telefon/sistem bildirimi, herkese site içi bildirim olarak düşer. Telefon bildirimi birkaç dakika içinde ulaşır.</p></div></div>' +
             '<div class="box"><h2>📜 Duyuru geçmişi <button class="a-btn sm" id="bcReload" style="float:right">↻</button></h2><div id="aBcList"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>👥 Kullanıcılar <span class="a-sub" id="aUsersCount" style="margin:0"></span></h2>' +
             '<div class="a-ctrl"><input id="uSearch" placeholder="Ada göre ara…" style="flex:1;min-width:140px"><select id="uFilter"><option value="all">Tümü</option><option value="a1">Son 24 saat aktif</option><option value="a7">Son 7 gün aktif</option><option value="pasif">30 günden eski</option></select><button class="a-btn" id="aUsersLoad">↻ Yenile</button><button class="a-btn" id="uCsv">⬇ CSV</button><button class="a-btn" id="uJson">⬇ JSON</button></div>' +
@@ -1207,6 +1264,7 @@
         $id("aUsageLoad").addEventListener("click", renderUsage);
         $id("aFbLoad").addEventListener("click", renderFeedback);
         bindBulk(); renderBroadcasts(); renderMaintenance(); renderAnon(); renderAd();
+        bcFormInit();
         $id("bcSend").addEventListener("click", function () {
             var text = $id("bcText").value.trim(), to = $id("bcTarget").value, atv = $id("bcAt").value, at = atv ? new Date(atv).getTime() : 0;
             if (at && at < Date.now() - 60000) { msg($id("bcMsg"), "Planlanan zaman geçmişte.", "bad"); return; }
@@ -1215,7 +1273,7 @@
             var p = (to === "all") ? window.Account.sendBroadcast(text, at) : window.Account.sendNotif(to, text, at);
             p.then(function (ok) {
                 $id("bcSend").disabled = false;
-                if (ok) { msg($id("bcMsg"), at > Date.now() ? "Planlandı ✓ (" + dateFmt(at) + ")" : "Gönderildi ✓", "ok"); $id("bcText").value = ""; $id("bcAt").value = ""; renderBroadcasts(); }
+                if (ok) { msg($id("bcMsg"), at > Date.now() ? "Planlandı ✓ (" + dateFmt(at) + ")" : "Gönderildi ✓", "ok"); $id("bcText").value = ""; $id("bcAt").value = ""; bcFormInit.reset && bcFormInit.reset(); renderBroadcasts(); }
                 else msg($id("bcMsg"), "Gönderilemedi (kuralları yayımladın mı?)", "bad");
             }, function () { $id("bcSend").disabled = false; msg($id("bcMsg"), "Gönderilemedi.", "bad"); });
         });
