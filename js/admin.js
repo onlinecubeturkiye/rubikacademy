@@ -598,13 +598,40 @@
             $id("aCompCount").textContent = list.length + " yarışma" + (cnt.pend ? " · " + cnt.pend + " onay bekliyor" : "");
             if (adminTabs.badge) adminTabs.badge("ev", cnt.pend);
             var tile = function (k, label, v) { return '<button class="cp-tile' + (compTab === k ? " on" : "") + (k === "pend" && v ? " hot" : "") + '" data-tab="' + k + '"><b>' + v + '</b><span>' + label + '</span></button>'; };
-            var head = '<div class="cp-tiles">' + tile("pend", "⏳ Onay bekleyen", cnt.pend) + tile("live", "🔴 Canlı", cnt.live) + tile("ok", "✓ Onaylı", cnt.ok) + tile("rej", "✗ Reddedilen", cnt.rej) + tile("all", "Tümü", list.length) + '</div>' +
+            var head = '<div class="cp-tiles">' + tile("pend", "⏳ Onay bekleyen", cnt.pend) + tile("live", "🔴 Canlı", cnt.live) + tile("ok", "✓ Onaylı", cnt.ok) + tile("rej", "✗ Reddedilen", cnt.rej) + tile("all", "Tümü", list.length) + tile("cert", "🎓 Sertifikalar", certCount(list)) + '</div>' +
                 '<p class="a-note" style="margin:6px 0 10px">👥 Toplam ' + Object.keys(people).length + ' farklı yarışmacı. ' +
                 (compTab === "pend" ? 'Biten yarışmaların süreleri <b>sen onaylayana kadar</b> rekor tablosuna, profillere, şampiyonluklara ve sertifikalara girmez. Süreye dokunarak düzelt ya da DNF yap; hileli kişiyi 🚫 ile diskalifiye et; sonra <b>Onayla</b>.' : '') + '</p>';
+            if (compTab === "cert") { box.innerHTML = head + certList(list); bindCompList(box); bindCompExtras(box, byCode); bindCertSearch(box); return; }
             var shown = list.filter(function (o) { return compTab === "all" ? true : o._st === compTab; });
             box.innerHTML = head + (shown.length ? shown.map(function (o) { return compCard(o); }).join("") : '<p class="a-note">' + (compTab === "pend" ? "Onay bekleyen yarışma yok ✓" : "Bu listede yarışma yok.") + '</p>');
             bindCompList(box); bindCompExtras(box, byCode);
         }, function (e) { box.innerHTML = '<p class="a-note">Yarışmalar yüklenemedi (' + esc(e && e.message) + ') — kuralları yayımladın mı?</p>'; });
+    }
+    // Sertifikalar: onaylı (ya da özellikten önceki) yarışmaların final ilk 3'ü — herkesinkini indir
+    function certFinals(list) {
+        var out = [];
+        list.forEach(function (o) {
+            if (o._st !== "ok") return;
+            o._R.forEach(function (r, ri) { if (r.f && (r.rows || []).length) out.push({ o: o, r: r, ri: ri }); });
+        });
+        return out;
+    }
+    function certCount(list) { var n = 0; certFinals(list).forEach(function (x) { n += Math.min(3, x.r.rows.length); }); return n; }
+    function certList(list) {
+        var F = certFinals(list);
+        if (!F.length) return '<p class="a-note">Henüz sertifika yok. Final turu olan yarışmalar onaylanınca ilk 3 burada çıkar.</p>';
+        return '<input type="search" class="cp-search" id="cpCertQ" placeholder="İsim ya da yarışma ara…" autocomplete="off">' +
+            '<div class="cp-certs">' + F.map(function (x) {
+                return x.r.rows.slice(0, 3).map(function (row, i) {
+                    return '<div class="cp-cert p' + (i + 1) + '" data-q="' + esc((row.n + " " + (x.o.name || "")).toLocaleLowerCase("tr")) + '"><span class="m">' + ["🥇", "🥈", "🥉"][i] + '</span>' +
+                        '<span class="t"><b>' + esc(row.n) + '</b><small>' + esc(x.o.name || x.o.code) + ' · ' + (x.o.ev === "222" ? "2x2" : "3x3") + ' · Ao' + (x.r.s || 5) + ' ' + tFmt(row.a) + ' · ' + esc(dateFmt(x.o.updated).split(" ")[0]) + '</small></span>' +
+                        '<button class="a-btn sm main" data-rcert="' + esc(x.o.code) + '|' + x.ri + '|' + i + '">İndir</button></div>';
+                }).join("");
+            }).join("") + '</div>';
+    }
+    function bindCertSearch(box) {
+        var q = $id("cpCertQ"); if (!q) return;
+        q.addEventListener("input", function () { var v = q.value.trim().toLocaleLowerCase("tr"); Array.prototype.forEach.call(box.querySelectorAll(".cp-cert"), function (c) { c.hidden = !!v && c.getAttribute("data-q").indexOf(v) < 0; }); });
     }
     function compCard(o, open) {
         var ev = o.ev === "222" ? "2x2" : "3x3", R = o._R, st = o._st, names = o._names, edit = st === "pend" || o._editing;
