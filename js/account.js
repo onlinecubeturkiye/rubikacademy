@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20270110";
+    var V = "20270111";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -660,7 +660,7 @@
         var codes = {}, last = {}, now = Date.now();
         Object.keys(cs.r).forEach(function (k) {
             var e = cs.r[k]; if (!isObj(e)) return; var c = k.split(":")[0];
-            if (!compOk(e)) codes[c] = 2; else if (compOk(e) > 0 && (!e.nmAt || now - e.nmAt > 3 * 86400000) && !codes[c]) codes[c] = 1;
+            if (!compOk(e)) codes[c] = 2; else if (compOk(e) > 0 && (!e.nmAt || now - e.nmAt > 3 * 86400000 || !(cs.fill || {})[c]) && !codes[c]) codes[c] = 1;
             last[c] = Math.max(last[c] || 0, e.ts || 0);
         });
         var list = Object.keys(codes).sort(function (a, b) { return (codes[b] - codes[a]) || (last[b] - last[a]); }).slice(0, 8); if (!list.length) return Promise.resolve(false);
@@ -673,6 +673,20 @@
                 var code = list[i], f = d.fields || {}, ok = d.gone ? -1 : f.ok ? +(f.ok.integerValue || 0) : 0;
                 var nm = f.name && f.name.stringValue;
                 Object.keys(cur.r).forEach(function (k) { var e = cur.r[k]; if (k.split(":")[0] !== code || !isObj(e)) return; if (nm && e.nm !== nm.slice(0, 40)) { e.nm = nm.slice(0, 40); changed = true; } e.nmAt = Date.now(); });
+                // Eksik turları tamamla (ör. final sonucu cihaza hiç yazılmamış → profilde sıra/sertifika yoktu): bir kez
+                cur.fill = cur.fill || {};
+                if (!cur.fill[code] && !d.gone && (ok === 1 || (ok === 0 && (Date.parse(d.createTime) || 0) < COMP_OK_FROM))) {
+                    var RR = []; try { RR = JSON.parse((f.R && f.R.stringValue) || "[]") || []; } catch (x) {}
+                    var ev = f.ev && f.ev.stringValue === "222" ? "222" : "333", DN2 = 99999999, uts = Date.parse(d.updateTime) || Date.now();
+                    RR.forEach(function (r) {
+                        var k = code + ":" + r.n; if (cur.r[k]) return;
+                        var j = -1; (r.rows || []).forEach(function (x, q) { if (x.u === me) j = q; }); if (j < 0) return;
+                        var row = r.rows[j], okT = (row.t || []).filter(function (t) { return t > 0 && t < DN2; });
+                        cur.r[k] = { nm: String(nm || "").slice(0, 40), ev: ev, n: r.s === 12 ? 12 : 5, s: okT.length ? Math.min.apply(null, okT) : null, a: row.a != null && row.a < DN2 ? Math.round(row.a) : null,
+                            rk: j + 1, p: r.rows.length, f: r.f ? 1 : 0, t: (row.t || []).slice(0, 12).map(function (t) { return t >= DN2 ? -1 : Math.round(t); }), ts: uts, ok: 1, nmAt: Date.now() };
+                    });
+                    cur.fill[code] = 1; changed = true;
+                }
                 if (codes[code] === 1) { changed = true; return; } // yalnız ad kontrolü (onaylı yarışma)
                 if (!ok) return;
                 var R = []; try { R = JSON.parse((f.R && f.R.stringValue) || "[]") || []; } catch (x) {}

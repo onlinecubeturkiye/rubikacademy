@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270110";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270111";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -770,7 +770,7 @@
         var was = comp && !comp.watch;
         comp = null; closeFinal(); document.body.classList.remove("c-in-room"); if (!(keep && was)) forgetRoom();
         try { history.replaceState(null, "", location.pathname); } catch (e) {}
-        $("cLobby").hidden = false; $("cRoom").hidden = true; $("cType").hidden = true; $("akPad").hidden = true;
+        $("cLobby").hidden = false; if (streamOn()) setStream(false); $("cRoom").hidden = true; $("cType").hidden = true; $("akPad").hidden = true;
         setScramble(""); loadLive(); setTimeout(showResume, 300);
     }
     function parsePlayers(d) {
@@ -1237,6 +1237,34 @@
         e.textContent = ms == null ? "Geçersiz süre" : "= " + fmt(ms);
     }
     /* --- sonuçlar --- */
+    // YAYIN MODU (yarışma sayfasında): yayıncı kendi süresini büyük gösterir, altta bu turda diğerlerinin süreleri küçük.
+    // Ekran paylaşımı / OBS pencere yakalama için; site menüsü, sohbet ve tablo gizlenir.
+    function streamOn() { return document.documentElement.classList.contains("c-stream"); }
+    function setStream(on) {
+        document.documentElement.classList.toggle("c-stream", !!on);
+        try { sessionStorage.setItem("ra-c-stream", on ? "1" : ""); } catch (e) {}
+        if (on && comp) streamStrip(rankRows());
+        if (on && document.documentElement.requestFullscreen && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {});
+        if (!on && document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+    }
+    function streamStrip(rows) {
+        var el = $("cStrip");
+        if (!el) {
+            el = document.createElement("div"); el.id = "cStrip"; el.className = "c-strip"; document.body.appendChild(el);
+            var x = document.createElement("button"); x.type = "button"; x.className = "c-strip-x"; x.id = "cStreamX"; x.textContent = "✕ Yayın modundan çık"; x.onclick = function () { setStream(false); }; document.body.appendChild(x);
+        }
+        if (!streamOn() || !comp || !comp.doc) return;
+        var d = comp.doc, me = rows.filter(function (r) { return r.uid === comp.uid; })[0], others = rows.filter(function (r) { return r.uid !== comp.uid; });
+        var rk = me ? rows.indexOf(me) + 1 : 0;
+        el.innerHTML = '<div class="c-strip-me">' + (me ? '<b>' + esc(me.n) + '</b><span>' + (me.a != null ? "Ao" + NS() + " " + fmt(me.a) + " · " : "") + (rk && me.a != null ? rk + ". sırada" : (me.t.length + "/" + NS() + " çözüm")) + '</span>' : '') +
+            '<em>' + esc(d.name || "Ev yarışması") + ' · ' + (d.fin ? "Final" : "Tur " + (d.round || 1)) + '</em></div>' +
+            '<div class="c-strip-o">' + (others.length ? others.map(function (r) {
+                return '<div class="c-so"><div class="h"><i>' + (rows.indexOf(r) + 1) + '.</i><b>' + esc(r.n) + '</b><u>' + (r.a != null ? fmt(r.a) : r.t.length + "/" + NS()) + '</u></div><div class="t">' +
+                    slotsArr().map(function (i) { var x = r.t[i]; return '<span class="' + (x == null ? "e" : x >= DNF ? "dnf" : "") + '">' + (x == null ? "·" : fmt(x)) + '</span>'; }).join("") + '</div></div>';
+            }).join("") : '<div class="c-so"><b>Diğer yarışmacılar bekleniyor…</b></div>') + '</div>';
+    }
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && streamOn()) setStream(false); });
+    window.raCompStream = setStream;
     function rankRows() {
         var d = comp.doc;
         return comp.players.filter(function (p) { return eligible(p.uid); }).map(function (p) {
@@ -1557,6 +1585,7 @@
         var sb = $("cSus"); if (!sb) { sb = document.createElement("div"); sb.id = "cSus"; sb.className = "c-susbox"; $("cOut").parentNode.insertBefore(sb, $("cOut").nextSibling); }
         sb.hidden = !susL.length; sb.innerHTML = susL.length ? "⚠️ <b>Kontrol et</b> (yalnız yöneticiler görür):<br>" + susL.join("<br>") : "";
         renderComp2();
+        streamStrip(rows);
         recordStats();
     }
     function ic(n) { return '<span class="ra-i ra-i-' + n + '">' + (window.RAIcons ? RAIcons.svg(n) : "") + '</span>'; }
@@ -1583,6 +1612,7 @@
         if ($("cFinish")) $("cFinish").hidden = !(d.st === "end" && !d.fin);
         if ($("cCloseRoom")) { $("cCloseRoom").hidden = !owner; $("cCloseRoom").disabled = false; }
         if ($("cCast")) $("cCast").href = "/icerikler/ev-yayin?ev=" + encodeURIComponent(comp.code);
+        if ($("cStream") && !$("cStream").raB) { $("cStream").raB = 1; $("cStream").onclick = function () { setStream(!streamOn()); }; }
         $("cShowRes").hidden = !hist().length;
         $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? (devRole ? "Turu başlatabilirsin (geliştirici: tek başına da olur)." : "Yarışmacılar katılınca turu başlat (en az 2 kişi).") : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes " + NS() + " çözümü bitirince tur kendiliğinden biter." : d.st === "prep" ? "Hazırlık: yeni katılımcılar şimdi girebilir." : (d.fin ? "Final bitti." : "Tur bitti.");
         renderModeUi();
