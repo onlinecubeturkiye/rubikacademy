@@ -1,0 +1,46 @@
+# Firebase giriş yardımcısı (/__/auth/*): Android uygulamasında Google girişi yönlendirmeyle yapılır.
+# Tarayıcıların üçüncü taraf depolama engeline takılmaması için yardımcı dosyalar Firebase'den
+# (rubikacademydb.firebaseapp.com) kopyalanıp sitenin kendi alan adından sunulur.
+# https://firebase.google.com/docs/auth/web/redirect-best-practices (4. seçenek)
+# GitHub Pages uzantısız dosyayı indirme olarak verdiği için handler/iframe .html adıyla kaydedilir
+# (/__/auth/handler → handler.html). Haftada bir ve elle çalıştırılınca güncellenir.
+name: Firebase giriş yardımcısı
+on:
+  schedule:
+    - cron: "41 3 * * 1"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [".github/workflows/auth-helper.yml"]
+concurrency:
+  group: auth-helper
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dosyaları indir
+        run: |
+          B=https://rubikacademydb.firebaseapp.com/__
+          mkdir -p __/auth __/firebase
+          curl -fsSL --retry 3 -o __/auth/handler.html "$B/auth/handler"
+          curl -fsSL --retry 3 -o __/auth/handler.js "$B/auth/handler.js"
+          curl -fsSL --retry 3 -o __/auth/experiments.js "$B/auth/experiments.js"
+          curl -fsSL --retry 3 -o __/auth/iframe.html "$B/auth/iframe"
+          curl -fsSL --retry 3 -o __/auth/iframe.js "$B/auth/iframe.js"
+          curl -fsSL --retry 3 -o __/firebase/init.json "$B/firebase/init.json"
+          ls -la __/auth __/firebase
+          grep -qi "<html" __/auth/handler.html || { echo "handler beklenen HTML değil"; exit 1; }
+      - name: Değişiklik varsa gönder
+        run: |
+          git add -A __
+          if git diff --cached --quiet; then echo "Değişiklik yok"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Firebase giriş yardımcısı güncellendi"
+          git pull --rebase origin main
+          git push origin HEAD:main

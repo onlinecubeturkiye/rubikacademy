@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20270107";
+    var V = "20270108";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -79,6 +79,8 @@
     function authErr(msg) {
         try { console.error(msg); } catch (e) {}
         lsSet(SIGNED_KEY, null); renderNav();
+        // "oturum geri yükleniyor" durumu bitti: üyelere özel sayfalar kilitlensin
+        listeners.forEach(function (f) { try { f(null); } catch (e) {} });
         setTimeout(function () { try { showToast("⚠️ " + msg + " Sayfayı yenile ya da tekrar giriş yap."); } catch (e) {} }, 300);
     }
     // Firestore SDK (yalnız canlı dinleme gereken sayfalarda yüklenir; auth ile aynı uygulamayı paylaşır)
@@ -90,6 +92,18 @@
         fsP.catch(function () { fsP = null; });
         return fsP;
     }
+    // Android uygulamasında (TWA) Google girişi açılır pencereyle çalışmaz; yönlendirme ile yapılır.
+    // Yönlendirmenin üçüncü taraf depolama engeline takılmaması için giriş yardımcısı sitenin kendi
+    // alan adından sunulur (/__/auth/*, .github/workflows/auth-helper.yml ile Firebase'den kopyalanır).
+    function inApp() { return !!window.RA_APP; }
+    function authDomain() { return (inApp() && cfg.authDomainApp) || cfg.authDomain; }
+    function googleIn(m, p) {
+        if (inApp()) return m.signInWithRedirect(auth, p);
+        return m.signInWithPopup(auth, p).catch(function (err) {
+            if (err && /popup-blocked|operation-not-supported/.test(err.code || "")) return m.signInWithRedirect(auth, p);
+            throw err;
+        });
+    }
     function loadSDK() {
         if (sdkP) return sdkP;
         // Yükleme bir kez başarısız olursa (bozuk önbellek, kesik bağlantı) önbelleği atlayarak bir kez daha dene
@@ -99,7 +113,7 @@
         });
         sdkP = imp.then(function (m) {
             fb = m;
-            var app = fbApp = m.initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, projectId: cfg.projectId, appId: cfg.appId });
+            var app = fbApp = m.initializeApp({ apiKey: cfg.apiKey, authDomain: authDomain(), projectId: cfg.projectId, appId: cfg.appId });
             auth = m.getAuth(app);
             if (cfg.emulator && cfg.emulator.auth) m.connectAuthEmulator(auth, cfg.emulator.auth, { disableWarnings: true });
             try { auth.languageCode = lang(); } catch (e) {}
@@ -113,6 +127,8 @@
                 listeners.forEach(function (f) { try { f(u); } catch (e) {} });
                 try { document.dispatchEvent(new CustomEvent("account-change", { detail: u })); } catch (e) {}
             });
+            // Yönlendirmeyle girişten dönüldüyse hata varsa göster
+            m.getRedirectResult(auth).catch(function (e) { if (e && e.code && !/no-auth-event|redirect-cancelled/.test(e.code)) setTimeout(function () { try { showToast("⚠️ " + errMsg(e)); } catch (x) {} }, 400); });
             return m;
         });
         sdkP.catch(function (e) {
@@ -266,10 +282,7 @@
     function doGoogle() {
         return loadSDK().then(function (m) {
             var p = new m.GoogleAuthProvider(); p.setCustomParameters({ prompt: "select_account" });
-            return m.signInWithPopup(auth, p).catch(function (err) {
-                if (err && /popup-blocked|operation-not-supported/.test(err.code || "")) return m.signInWithRedirect(auth, p);
-                throw err;
-            });
+            return googleIn(m, p);
         });
     }
     function doEmail(mode, email, pass, name) {
@@ -286,10 +299,7 @@
         loadSDK().then(function (m) {
             var p = new m.GoogleAuthProvider();
             p.setCustomParameters({ prompt: "select_account" });
-            return m.signInWithPopup(auth, p).catch(function (err) {
-                if (err && /popup-blocked|operation-not-supported/.test(err.code || "")) return m.signInWithRedirect(auth, p);
-                throw err;
-            });
+            return googleIn(m, p);
         }).catch(function (err) {
             if (err && /popup-closed-by-user|cancelled-popup-request/.test(err.code || "")) return;
             setErr(err && err.code ? errMsg(err) : t("e_load"));
@@ -988,7 +998,10 @@
     }
     function enablePush() {
         if (!("Notification" in window)) return Promise.resolve("unsupported");
-        return Notification.requestPermission().then(function (perm) { if (perm === "granted") return ensurePush().then(function () { return perm; }); return perm; });
+        // Bazı cihazlarda (eski uygulama sürümü) izin penceresi hiç dönmeyebilir: 20 sn sonra yardım göster
+        var ask = Promise.resolve(Notification.requestPermission());
+        var to = new Promise(function (res) { setTimeout(function () { res(Notification.permission === "default" ? "stuck" : Notification.permission); }, 20000); });
+        return Promise.race([ask, to]).then(function (perm) { if (perm === "granted") return ensurePush().then(function () { return perm; }); return perm; });
     }
     // Bildirim izni zorunlu: izin verilmedikçe her oturumda pencere çıkar ("Şimdi değil" yalnız o oturum için kapatır).
     // iPhone/iPad'de bildirim yalnız siteyi Ana Ekran'a ekleyince çalışır → nasıl yapılacağı gösterilir.
@@ -998,22 +1011,25 @@
     }
     function pushHelpHtml(st) {
         return st === "ios" ? 'iPhone\'da bildirim almak için siteyi uygulama gibi ekle: Safari\'de <b>Paylaş</b> (kare + ok) → <b>Ana Ekrana Ekle</b>. Sonra Ana Ekran\'daki Rubik Academy simgesinden aç ve bildirimlere izin ver.'
+            : st === "stuck" ? 'İzin penceresi açılmadı. Uygulamayı Play Store\'dan güncelle; olmazsa telefonun <b>Ayarlar → Uygulamalar → Rubik Academy → Bildirimler</b> bölümünden aç.'
+            : st === "denied" && window.RA_APP ? 'Bildirimleri daha önce kapatmışsın. Telefonun <b>Ayarlar → Uygulamalar → Rubik Academy → Bildirimler</b> bölümünden aç, sonra uygulamaya dön.'
             : st === "denied" ? 'Bildirimleri daha önce engellemişsin. Adres çubuğundaki <b>kilit / ayar</b> simgesine dokun → <b>Bildirimler</b> → <b>İzin ver</b>, sonra sayfayı yenile.'
             : st === "unsupported" ? 'Bu tarayıcı bildirimleri desteklemiyor. Chrome, Edge, Firefox ya da Safari\'nin güncel sürümünü kullan.' : '';
     }
-    function askPushBanner(force) {
+    function askPushBanner(force, why) {
         if (!enabled || document.getElementById("raPushAsk") || document.getElementById("raMaint") || /\/(admin|yazdir)/.test(location.pathname)) return;
         if (document.getElementById("raHwAsk")) { setTimeout(function () { askPushBanner(force); }, 3000); return; } // tema penceresi açıksa sonra
         var st = pushState(); if (st === "granted") return;
+        if (why === "stuck") st = "stuck";
         if (!force) { try { if (sessionStorage.getItem("ra-push-later")) return; } catch (e) {} }
         if (st === "unsupported" && !force) return;
         var el = document.createElement("div"); el.id = "raPushAsk"; el.className = "ra-pushmod";
         el.innerHTML = '<div class="ra-pushmod-b"><div class="ra-pushmod-ic">🔔</div><b>Bildirimleri aç</b>' +
             '<p>Çekiliş sonuçları, yarışmalar ve duyurular için bildirimler gerekli. <b>Çekilişi kazanırsan 2 dakika içinde onaylaman gerekiyor</b>; bildirim kapalıysa haberin olmaz.</p>' +
             (st === "default" ? '<button type="button" class="ra-pushmod-ok">🔔 Bildirimlere izin ver</button>' : '<div class="ra-pushmod-help">' + pushHelpHtml(st) + '</div>') +
-            '<button type="button" class="ra-pushmod-no">Şimdi değil</button></div>';
+            '<button type="button" class="ra-pushmod-no">' + (window.RA_APP ? "Daha sonra" : "Şimdi değil") + '</button></div>';
         var ok = el.querySelector(".ra-pushmod-ok");
-        if (ok) ok.onclick = function () { ok.disabled = true; enablePush().then(function (p) { if (p === "granted") { el.remove(); showToast("Bildirimler açıldı ✓"); document.dispatchEvent(new CustomEvent("ra-push-change")); } else { el.remove(); askPushBanner(true); } }); };
+        if (ok) ok.onclick = function () { ok.disabled = true; enablePush().then(function (p) { if (p === "granted") { el.remove(); showToast("Bildirimler açıldı ✓"); document.dispatchEvent(new CustomEvent("ra-push-change")); } else { el.remove(); askPushBanner(true, p); } }); };
         el.querySelector(".ra-pushmod-no").onclick = function () { el.remove(); try { sessionStorage.setItem("ra-push-later", "1"); } catch (e) {} };
         (document.body || document.documentElement).appendChild(el);
     }

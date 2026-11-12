@@ -853,6 +853,29 @@
         // onay bekleyen yarışma sayısı sekmede rozet olarak görünür
         adminTabs.badge = function (cat, n) { var b = bar.querySelector('[data-cat="' + cat + '"] .n'); if (b) { b.hidden = !n; b.textContent = n; } };
     }
+    /* ---------- şikayetler (reports/{id}) ---------- */
+    var REP_R = { spam: "Spam / reklam", abuse: "Hakaret / taciz", inappropriate: "Uygunsuz içerik", cheat: "Hile", impersonation: "Taklit", other: "Diğer" };
+    function renderReports() {
+        var box = $id("aRepList"); if (!box) return;
+        box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
+        authed(docsBase() + "/reports?pageSize=200", { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+            var L = (d.documents || []).map(function (x) { var f = x.fields || {}, o = { id: x.name.split("/").pop() }; Object.keys(f).forEach(function (k) { o[k] = gv(f, k); }); o.when = Date.parse(o.ts || x.createTime) || 0; return o; })
+                .sort(function (a, b) { return b.when - a.when; });
+            $id("aRepCount").textContent = L.length ? L.length + " açık şikayet" : "";
+            if (adminTabs.badge) adminTabs.badge("users", L.length);
+            var nm = function (uid) { var u = (_users || []).filter(function (x) { return x.uid === uid; })[0]; return u ? u.name : (uid || "?").slice(0, 8) + "…"; };
+            box.innerHTML = L.length ? L.map(function (o) {
+                return '<div class="rep-row" data-id="' + esc(o.id) + '"><div class="rep-h"><b>' + (o.t === "user" ? "👤 Profil" : "💬 Sohbet mesajı") + '</b><span class="cp-chip pend">' + esc(REP_R[o.r] || o.r || "?") + '</span><span class="a-note">' + esc(dateFmt(o.when)) + '</span></div>' +
+                    '<div class="rep-x"><b>' + esc(o.tn || nm(o.tu)) + ':</b> ' + esc(o.x || "(içerik yok)") + '</div>' + (o.note ? '<div class="a-note">Not: ' + esc(o.note) + '</div>' : '') +
+                    '<div class="a-note">Bildiren: ' + esc(nm(o.by)) + (o.ref ? ' · <span class="mono small">' + esc(o.ref) + '</span>' : '') + '</div>' +
+                    '<div class="a-ctrl"><a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.tu || "") + '" target="_blank" rel="noopener">👤 Profil</a>' +
+                    (o.t === "chat" && /^comps\/[A-Z0-9]{5}\/m\/[\w-]+$/.test(o.ref || "") ? '<button class="a-btn danger sm" data-repdel="' + esc(o.ref) + '">🗑️ Mesajı sil</button>' : '') +
+                    '<button class="a-btn sm" data-repok="' + esc(o.id) + '">✓ Kapat</button></div></div>';
+            }).join("") : '<p class="a-note">Açık şikayet yok ✓</p>';
+            Array.prototype.forEach.call(box.querySelectorAll("[data-repdel]"), function (b) { b.onclick = function () { if (!confirm("Bu sohbet mesajı silinsin mi?")) return; b.disabled = true; delDoc("/" + b.getAttribute("data-repdel")).then(function (ok) { b.textContent = ok ? "✓ Silindi" : "Silinemedi"; }); }; });
+            Array.prototype.forEach.call(box.querySelectorAll("[data-repok]"), function (b) { b.onclick = function () { b.disabled = true; delDoc("/reports/" + b.getAttribute("data-repok")).then(function (ok) { if (ok) renderReports(); else { b.disabled = false; alert("Kapatılamadı (kuralları yayımladın mı?)"); } }); }; });
+        }, function (e) { box.innerHTML = '<p class="a-note">Şikayetler yüklenemedi (' + esc(e && e.message) + ') — güncel Firebase kurallarını yayımladın mı?</p>'; });
+    }
     /* ---------- bildirim formu: kime (herkes / aramalı kişi seçimi) ve ne zaman (hazır seçenekler) ---------- */
     function bcFormInit() {
         var sel = $id("bcTarget"), at = $id("bcAt"); if (!sel || bcFormInit.done) return; bcFormInit.done = 1;
@@ -1291,6 +1314,7 @@
             '<div class="a-ctrl"><input id="uSearch" placeholder="Ada göre ara…" style="flex:1;min-width:140px"><select id="uFilter"><option value="all">Tümü</option><option value="a1">Son 24 saat aktif</option><option value="a7">Son 7 gün aktif</option><option value="pasif">30 günden eski</option></select><button class="a-btn" id="aUsersLoad">↻ Yenile</button><button class="a-btn" id="uCsv">⬇ CSV</button><button class="a-btn" id="uJson">⬇ JSON</button></div>' +
             '<div class="bulk-bar" id="uBulk" hidden><b id="uSelCount">0</b> seçili · <select id="uBulkRole"><option value="">Rol ata…</option><option value="uye">Üye</option><option value="admin">Admin</option><option value="gelistirici">Geliştirici</option><option value="tester">Tester</option><option value="organizator">Organizatör</option></select> <button class="a-btn sm" id="uBulkRoleGo">Uygula</button> <button class="a-btn sm" id="uBulkNotify">Bildirim gönder</button><span class="a-msg" id="uBulkMsg" style="margin:0"></span></div>' +
             '<div id="aUsersList"></div></div>' +
+            '<div class="box"><h2>🚩 Şikayetler <span class="a-sub" id="aRepCount" style="margin:0"></span></h2><p class="a-note">Kullanıcıların uygulama içinden bildirdiği sohbet mesajları ve profiller (Google Play kullanıcı içeriği kuralı). İncele, gerekirse içeriği sil ya da hesabı askıya al, sonra kapat.</p><div class="a-ctrl"><button class="a-btn main" id="aRepLoad">↻ Yükle</button></div><div id="aRepList" class="a-list"></div></div>' +
             '<div class="box"><h2>🏅 En aktif kullanıcılar</h2><div id="aActive"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🖥️ Cihaz, tarayıcı &amp; tercihler</h2><p class="a-note">Her üyenin cihaz, dil, tema, renk körlüğü modu ve giriş türü bilgisini çeker (üye başına 1 okuma, biraz sürebilir).</p><button class="a-btn main" id="aDevLoad">Hesapla</button><div id="aDevBox" style="margin-top:10px"></div></div>' +
             '<div class="box"><h2>📈 Site istatistikleri</h2><div id="aSiteStats"><p class="a-note">Yükleniyor…</p></div></div>' +
@@ -1334,6 +1358,7 @@
         $id("aFbLoad").addEventListener("click", renderFeedback);
         bindBulk(); renderBroadcasts(); renderMaintenance(); renderAnon(); renderAd();
         bcFormInit();
+        if ($id("aRepLoad")) { $id("aRepLoad").addEventListener("click", renderReports); renderReports(); }
         $id("bcSend").addEventListener("click", function () {
             var text = $id("bcText").value.trim(), to = $id("bcTarget").value, atv = $id("bcAt").value, at = atv ? new Date(atv).getTime() : 0;
             if (at && at < Date.now() - 60000) { msg($id("bcMsg"), "Planlanan zaman geçmişte.", "bad"); return; }

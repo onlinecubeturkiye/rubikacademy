@@ -30,11 +30,13 @@
     var st = document.createElement("style");
     st.textContent =
         "html.ra-app{-webkit-tap-highlight-color:transparent}" +
-        "html.ra-app body{overscroll-behavior-y:none}" +
+        "html.ra-app-nobar body{overscroll-behavior-y:none}" +
+        // uygulama üst barı: logo + ad, ince ve sayfayla aynı zemin (site başlığı gibi durmasın)
+        "html.ra-app .navbar{min-height:0;padding-bottom:6px}html.ra-app .nav-logo{gap:9px}html.ra-app .nav-logo-mark{width:30px;height:30px}html.ra-app .nav-logo-text{display:inline!important;font-size:17px;font-weight:900;letter-spacing:-.3px}" +
         // üst menü: yalnız logo + hesap; sayfa bağlantıları alttaki sekmelerde
         "html.ra-app .nav-links{display:none!important}" +
         // hesap/profil alttaki "Profil" sekmesinde; üstte ikinci kez görünmesin (sekme çubuğu olmayan sayfalarda kalır)
-        "html.ra-app:not(.ra-app-nobar) #accWrap{display:none!important}" +
+        "html.ra-app #accWrap{display:none!important}" +
         "html.ra-app .navbar{padding-top:max(env(safe-area-inset-top),0px)}" +
         "html.ra-app footer{display:none!important}" +
         "html.ra-app #btnInstall,html.ra-app .pwa-install,html.ra-app [data-install]{display:none!important}" +

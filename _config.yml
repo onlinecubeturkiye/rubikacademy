@@ -1,2 +1,2 @@
-# GitHub Pages: .well-known klasörü yayınlansın (Android uygulamasının site doğrulaması: assetlinks.json)
-include: [".well-known"]
+# GitHub Pages: .well-known (Android site doğrulaması: assetlinks.json) ve __ (Firebase giriş yardımcısı /__/auth) klasörleri yayınlansın
+include: [".well-known", "__"]
