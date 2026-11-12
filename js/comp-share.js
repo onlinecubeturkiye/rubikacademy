@@ -139,7 +139,7 @@
             // alt satır: tarih · madalya · sonuç
             var by = 1130;
             var dt = new Date(o.ts || Date.now()).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
-            [[W / 2 - 560, dt, "TARİH"], [W / 2 + 560, "Ao" + (o.n || 5) + "  " + (o.a == null || o.a >= DNF ? "DNF" : fmt(o.a)), "SONUÇ"]].forEach(function (b, k) {
+            [[W / 2 - 560, dt, "TARİH"], [W / 2 + 560, (o.a == null || o.a >= DNF ? (o.b ? "En iyi  " + fmt(o.b) : "Ao" + (o.n || 5) + "  DNF") : "Ao" + (o.n || 5) + "  " + fmt(o.a)), "SONUÇ"]].forEach(function (b, k) {
                 x.fillStyle = INK; x.font = (k ? "800 40px 'JetBrains Mono', monospace" : "800 38px Inter, sans-serif"); x.fillText(b[1], b[0], by);
                 x.fillStyle = "#d1d5db"; x.fillRect(b[0] - 190, by + 26, 380, 3);
                 x.fillStyle = SOFT; x.font = "800 22px Inter, sans-serif"; if (x.letterSpacing !== undefined) x.letterSpacing = "4px"; x.fillText(b[2], b[0], by + 66); if (x.letterSpacing !== undefined) x.letterSpacing = "0px";
@@ -152,7 +152,11 @@
         });
     }
     // Bir final turundan ilk 3 için sertifika bilgisi
-    function certInfo(d, r, i) { var row = r.rows[i]; return row ? { name: row.n, comp: d.name, ev: d.ev, place: i + 1, a: row.a, n: rS(r), ts: d.ts ? Date.parse(d.ts) : Date.now() } : null; }
+    function certInfo(d, r, i) {
+        var row = r.rows[i]; if (!row) return null;
+        var ok = (row.t || []).filter(function (t) { return t > 0 && t < DNF; });
+        return { name: row.n, comp: d.name, ev: d.ev, place: i + 1, a: row.a, b: ok.length ? Math.min.apply(null, ok) : null, n: rS(r), ts: d.ts ? Date.parse(d.ts) : Date.now() };
+    }
     function save(blob, name) {
         var file = null; try { file = new File([blob], name, { type: "image/png" }); } catch (e) {}
         var dl = function () { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000); };
