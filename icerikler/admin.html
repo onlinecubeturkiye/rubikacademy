@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20270110">
+<link rel="stylesheet" href="/styles/common.css?v=20270111">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 <style>
 .wrap { max-width: 1040px; margin: 0 auto; }
@@ -228,6 +228,21 @@ details.m-set > summary { font-size: 12.5px; }
 @media (max-width: 560px) { .cp-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .cp-search { width: 100%; box-sizing: border-box; padding: 11px 13px; margin: 4px 0 10px; border-radius: 13px; border: var(--card-bw) solid var(--card-border, var(--border)); background: var(--surface); color: var(--text); font: 650 14px Inter, sans-serif; }
 .cp-people { display: grid; gap: 8px; }
+.cv-prog { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 4px 0 10px; }
+.cv-bar { flex: 1 1 160px; height: 10px; border-radius: 99px; background: var(--surface-soft); overflow: hidden; border: 1px solid var(--border); }
+.cv-bar i { display: block; height: 100%; background: linear-gradient(90deg, #16a34a, #22c55e); transition: width .3s; }
+.cv-list { display: grid; gap: 10px; }
+.cv-p { border-radius: 16px; border: 2px solid var(--border); background: var(--surface); padding: 10px 12px; }
+.cv-p.sus { border-color: rgba(217, 119, 6, .6); background: rgba(217, 119, 6, .05); }
+.cv-p.ok { border-color: rgba(22, 163, 74, .6); background: rgba(22, 163, 74, .06); }
+.cv-h { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.cv-h b { flex: 1 1 auto; min-width: 0; font-size: 16px; font-weight: 900; }
+.cv-flag { font-size: 12px; font-weight: 850; color: #d97706; }
+.cv-ok.on { background: #16a34a; border-color: #16a34a; color: #fff; }
+.cv-r { display: grid; grid-template-columns: 52px 30px minmax(0, 1fr) auto; align-items: center; gap: 6px; padding: 6px 0; border-top: 1px dashed var(--border); }
+.cv-rn { font-weight: 900; font-size: 13px; color: var(--text-soft); } .cv-rk { font-weight: 900; text-align: center; }
+.cv-ts { display: flex; flex-wrap: wrap; gap: 4px; } .cv-a { font-size: 12.5px; font-weight: 800; color: var(--text-soft); white-space: nowrap; } .cv-a b { font-family: "JetBrains Mono", monospace; color: var(--text); }
+@media (max-width: 520px) { .cv-r { grid-template-columns: 46px 26px 1fr; } .cv-a { grid-column: 3; } }
 .cp-person { border-radius: 16px; border: 2px solid var(--border); background: var(--surface); overflow: hidden; }
 .cp-person[hidden] { display: none; }
 .cp-person > summary { list-style: none; display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; }
@@ -293,13 +308,13 @@ details.m-set > summary { font-size: 12.5px; }
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20270110"></script>
-<script src="/js/common.js?v=20270110"></script>
-<script src="/js/firebase-config.js?v=20270110"></script>
-<script src="/js/account.js?v=20270110"></script>
-<script src="/js/leaderboard.js?v=20270110"></script>
-<script src="/js/data-editor.js?v=20270110"></script>
-<script src="/js/comp-share.js?v=20270110"></script>
-<script src="/js/admin.js?v=20270110"></script>
+<script src="/js/i18n.js?v=20270111"></script>
+<script src="/js/common.js?v=20270111"></script>
+<script src="/js/firebase-config.js?v=20270111"></script>
+<script src="/js/account.js?v=20270111"></script>
+<script src="/js/leaderboard.js?v=20270111"></script>
+<script src="/js/data-editor.js?v=20270111"></script>
+<script src="/js/comp-share.js?v=20270111"></script>
+<script src="/js/admin.js?v=20270111"></script>
 </body>
 </html>

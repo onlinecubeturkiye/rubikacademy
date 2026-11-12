@@ -676,6 +676,26 @@
                 }).join("") + '</tbody></table></div>';
         }).join("");
         var sus = 0; R.forEach(function (r) { (r.rows || []).forEach(function (x) { if (window.RACompShare && Object.keys(RACompShare.suspect(x.t, o.ev)).length) sus++; }); });
+        // Onay ekranı: kişi kişi kontrol (her kişinin bütün turları tek kartta, "✓ Doğru" ile işaretlenir)
+        if (edit) {
+            var P = [], seen = {}, chk = o._chk || {};
+            R.slice().reverse().forEach(function (r) { (r.rows || []).forEach(function (x) { if (!seen[x.u]) { seen[x.u] = 1; P.push({ u: x.u, n: x.n }); } }); });
+            var nOk = P.filter(function (p) { return chk[p.u]; }).length;
+            rounds = '<div class="cv-prog"><div class="cv-bar"><i style="width:' + (P.length ? Math.round(nOk * 100 / P.length) : 0) + '%"></i></div><b>' + nOk + ' / ' + P.length + ' kişi kontrol edildi</b>' +
+                (nOk < P.length ? '<button class="a-btn sm" data-chkall="' + esc(o.code) + '">Hepsini doğru say</button>' : '') + '</div><div class="cv-list">' + P.map(function (p) {
+                var any = false, lines = R.map(function (r, ri) {
+                    var j = -1; (r.rows || []).forEach(function (x, q) { if (x.u === p.u) j = q; }); if (j < 0) return "";
+                    var x = r.rows[j], sus = window.RACompShare ? RACompShare.suspect(x.t, o.ev) : {}; if (Object.keys(sus).length) any = true;
+                    return '<div class="cv-r"><span class="cv-rn">' + (r.f ? "Final" : "Tur " + r.n) + '</span><span class="cv-rk">' + (["🥇", "🥈", "🥉"][j] || (j + 1) + ".") + '</span><span class="cv-ts">' + (x.t || []).map(function (t, k) {
+                        return '<button class="cp-tm ' + (sus[k] ? "s" : "") + (x._ed && x._ed[k] ? " e" : "") + '" data-ed="' + esc(o.code) + '|' + ri + '|' + esc(p.u) + '|' + k + '" title="' + esc(sus[k] || "Düzelt / DNF") + '">' + tFmt(t) + '</button>';
+                    }).join("") + '</span><span class="cv-a">Ao' + (r.s || 5) + ' <b>' + (x.a == null ? "—" : tFmt(x.a)) + '</b></span></div>';
+                }).join("");
+                return '<div class="cv-p' + (chk[p.u] ? " ok" : any ? " sus" : "") + '"><div class="cv-h"><b>' + esc(p.n) + '</b>' + (any ? '<span class="cv-flag">⚠️ şüpheli süre</span>' : '') +
+                    '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(p.u) + '" target="_blank" rel="noopener" title="Profil">👤</a>' +
+                    '<button class="a-btn sm cv-ok' + (chk[p.u] ? " on" : "") + '" data-chk="' + esc(o.code) + '|' + esc(p.u) + '">' + (chk[p.u] ? "✓ Doğru" : "Doğru mu?") + '</button>' +
+                    '<button class="a-btn danger sm" data-dq="' + esc(o.code) + '|' + esc(p.u) + '" title="Diskalifiye et">🚫</button></div>' + lines + '</div>';
+            }).join("") + '</div><p class="a-note">Süreye dokun → düzelt ya da DNF yaz. Turuncu süreler şüpheli.</p>';
+        }
         var review = edit ? '<div class="cp-rev">' + (o._dirty ? '<p class="cp-dirty">✏️ Düzeltmeler yapıldı (' + o._dirty.length + '): onaylayınca kaydedilir.</p>' : '') +
                 (sus ? '<p class="cp-dirty" style="color:#d97706">⚠️ ' + sus + ' kişide şüpheli süre var, kontrol et.</p>' : '') +
                 '<div class="a-ctrl"><button class="a-btn main" data-ok="' + esc(o.code) + '">✓ Onayla, rekorlara ekle</button><button class="a-btn danger" data-rej="' + esc(o.code) + '">✗ Reddet (hiç sayılmasın)</button>' +
@@ -731,11 +751,15 @@
                 (o2._dirty = o2._dirty || []).push(nm + " diskalifiye");
                 redrawComp(box, o2); return;
             }
+            if (b.hasAttribute("data-chk")) { e.preventDefault(); var c1 = g("data-chk"), oc1 = B[c1[0]]; if (!oc1) return; oc1._chk = oc1._chk || {}; oc1._chk[c1[1]] = !oc1._chk[c1[1]]; redrawComp(box, oc1); return; }
+            if (b.hasAttribute("data-chkall")) { e.preventDefault(); var oc2 = B[b.getAttribute("data-chkall")]; if (!oc2) return; oc2._chk = oc2._chk || {}; oc2._R.forEach(function (r) { (r.rows || []).forEach(function (x) { oc2._chk[x.u] = 1; }); }); redrawComp(box, oc2); return; }
             if (b.hasAttribute("data-undo")) { var o3 = B[b.getAttribute("data-undo")]; if (o3 && o3._orig) { o3._R = JSON.parse(o3._orig); o3._orig = null; o3._dirty = null; redrawComp(box, o3); } return; }
             if (b.hasAttribute("data-ok") || b.hasAttribute("data-rej")) {
                 var code = b.getAttribute("data-ok") || b.getAttribute("data-rej"), o4 = B[code], yes = b.hasAttribute("data-ok"); if (!o4) return;
                 var note = yes ? (o4._dirty ? o4._dirty.join("; ") : "") : prompt("Reddetme nedeni (isteğe bağlı, ör. hileli süreler):", "");
                 if (!yes && note == null) return;
+                var unc = 0; if (yes) { var sn = {}; o4._R.forEach(function (r) { (r.rows || []).forEach(function (x) { if (!sn[x.u]) { sn[x.u] = 1; if (!(o4._chk || {})[x.u]) unc++; } }); }); }
+                if (yes && unc && !confirm(unc + " kişiyi henüz kontrol etmedin. Yine de onaylansın mı?")) return;
                 if (yes && !confirm(o4._dirty ? o4._dirty.length + " düzeltmeyle onaylansın mı? Sonuçlar rekorlara ve profillere işlenir." : "Sonuçlar olduğu gibi onaylansın mı? Rekorlara ve profillere işlenir.")) return;
                 // düzeltme yapılmadıysa R'ye dokunma (yarışma hâlâ odadaysa sonuç ezilmesin)
                 var f = { ok: yes ? 1 : -1, okBy: (Account.user && Account.user() && Account.user().uid) || "admin", okTs: { ts: 1 }, okNote: String(note || "").slice(0, 300) };

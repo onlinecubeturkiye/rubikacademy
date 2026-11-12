@@ -78,8 +78,8 @@
       var fin = g.rounds.filter(function (e) { return e.f; })[0], last = fin || g.rounds[g.rounds.length - 1];
       var bestS = null; g.rounds.forEach(function (e) { if (typeof e.s === "number" && (bestS == null || e.s < bestS)) bestS = e.s; });
       // sıra rozeti: final derecesi ya da (final yoksa) son turdaki sıra
-      var place = fin ? (fin.rk === 1 ? '<span class="p-badge gold">🏆 Şampiyon</span>' : fin.rk <= 3 ? '<span class="p-badge ' + (fin.rk === 2 ? "silver" : "bronze") + '">' + ["", "🥈", "🥉"][fin.rk - 1] + ' Final ' + fin.rk + '.</span>' : '<span class="p-badge">Final ' + fin.rk + '.' + (fin.p ? ' / ' + fin.p : '') + '</span>')
-        : last && last.rk ? '<span class="p-badge">Tur ' + last.r + ' · ' + last.rk + '.' + (last.p ? ' / ' + last.p : '') + '</span>' : '<span class="p-badge">—</span>';
+      var place = fin ? (fin.rk === 1 ? '<span class="p-place gold">🏆 Şampiyon</span>' : fin.rk <= 3 ? '<span class="p-place ' + (fin.rk === 2 ? "silver" : "bronze") + '">' + ["", "🥈", "🥉"][fin.rk - 1] + ' Final ' + fin.rk + '.</span>' : '<span class="p-place">Final ' + fin.rk + '.' + (fin.p ? ' / ' + fin.p : '') + '</span>')
+        : last && last.rk ? '<span class="p-place">Tur ' + last.r + ' · ' + last.rk + '.' + (last.p ? ' / ' + last.p : '') + '</span>' : '<span class="p-place">—</span>';
       var rounds = g.rounds.map(function (e) {
         var ts = Array.isArray(e.t) && e.t.length ? ' <span class="p-ctimes" dir="ltr">' + e.t.map(function (x) { return '<span class="' + (x < 0 ? "dnf" : x === e.s ? "pb" : "") + '">' + (x < 0 ? "DNF" : fmt(x)) + '</span>'; }).join("") + '</span>' : '';
         return '<div class="p-rnd"><b>' + (e.f ? "Final" : "Tur " + e.r) + '</b><span>' + (e.rk ? e.rk + "." + (e.p ? "/" + e.p : "") : "-") + '</span><span>Ao' + (e.n || 5) + ' <i dir="ltr">' + fmt(e.a) + '</i></span>' + ts + '</div>';
