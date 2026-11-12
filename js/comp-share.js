@@ -173,14 +173,14 @@
     function comps() {
         return cached("comps", function () {
             return runQuery({ from: [{ collectionId: "comps" }], orderBy: [{ field: { fieldPath: "ts" }, direction: "DESCENDING" }], limit: 40 }).then(function (docs) {
-                return docs.map(function (d) { var x = d.fields || {}, o = {}; Object.keys(x).forEach(function (k) { o[k] = fv(x, k); }); o.code = d.name.split("/").pop(); o.up = Date.parse(d.updateTime) || 0; return o; });
+                return docs.map(function (d) { var x = d.fields || {}, o = {}; Object.keys(x).forEach(function (k) { o[k] = fv(x, k); }); o.code = d.name.split("/").pop(); o.up = Date.parse(d.updateTime) || 0; o.created = Date.parse(d.createTime) || 0; return o; });
             });
         });
     }
     function liveComps() { var now = Date.now(); return comps().then(function (l) { return l.filter(function (o) { return o.st && o.st !== "lobby" && !(o.st === "end" && o.fin) && now - o.up < 6 * 3600000; }); }); }
     function champions(n) {
         return comps().then(function (l) {
-            return l.filter(function (o) { return o.fin && o.st === "end"; }).map(function (o) {
+            return l.filter(function (o) { return o.fin && o.st === "end" && (o.ok === 1 || (o.ok !== -1 && (o.created || 0) < Date.UTC(2026, 10, 12, 8, 0))); }).map(function (o) {
                 var R = []; try { R = JSON.parse(o.R || "[]"); } catch (e) {}
                 var fin = R.filter(function (r) { return r.f; }).pop() || R[R.length - 1]; if (!fin || !fin.rows || !fin.rows.length) return null;
                 return { code: o.code, comp: o.name, ev: o.ev, name: fin.rows[0].n, uid: fin.rows[0].u, a: fin.rows[0].a, n: rS(fin), ts: o.up, rows: fin.rows.length };

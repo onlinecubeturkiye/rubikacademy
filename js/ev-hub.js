@@ -36,7 +36,12 @@
         ".evh-rec .n small{display:block;font-size:11.5px;color:var(--text-soft);font-weight:700}" +
         ".evh-rec .t{font:800 16px 'JetBrains Mono',monospace}" +
         ".evh-empty{font-size:13.5px;color:var(--text-soft);font-weight:700;padding:6px 0}" +
-        ".evh.compact .evh-grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}";
+        ".evh.compact .evh-grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}" +
+        // telefon: başlık küçük, iki düğme yan yana, kartlar yana kaydırılan tek şerit
+        "@media(max-width:640px){.evh{padding:16px 16px 14px;border-radius:20px}.evh-top{gap:10px;margin-bottom:12px}.evh-top h2{font-size:20px}.evh-top h2 small{font-size:12.5px}" +
+        ".evh-cta{display:grid;grid-template-columns:1fr 1fr;width:100%}.evh-btn{justify-content:center;padding:10px 8px;font-size:13.5px;border-radius:12px}" +
+        ".evh-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;margin:0 -16px;padding:0 16px 6px;scrollbar-width:none}.evh-grid::-webkit-scrollbar{display:none}" +
+        ".evh-card{flex:0 0 80%;scroll-snap-align:start;padding:12px 12px 8px}.evh-rec{padding:6px 0}.evh-rec .n{font-size:13.5px}.evh-rec .t{font-size:15px}.evh-live a{font-size:12.5px;padding:7px 10px}.evh.rekor .evh-card{flex-basis:100%}.evh.rekor .evh-cta{grid-template-columns:1fr}}";
     if (!document.getElementById("raEvHubCss")) { var st = document.createElement("style"); st.id = "raEvHubCss"; st.textContent = css; document.head.appendChild(st); }
 
     function recRow(label, r, ev) {
@@ -51,11 +56,12 @@
         var recs = '<div class="evh-card"><h3>🥇 Rekorlar · 3x3</h3>' + recRow("Tekil", d.s333[0]) + recRow("Ao5", d.a5_333[0]) + '</div>' +
             '<div class="evh-card"><h3>🥇 Rekorlar · 2x2</h3>' + recRow("Tekil", d.s222[0]) + recRow("Ao5", d.a5_222[0]) + '</div>';
         var champs = '<div class="evh-card"><h3>🏆 Son şampiyonlar</h3>' + (ch.length ? ch.slice(0, mode === "compact" ? 3 : 4).map(function (c) {
-            return '<a class="evh-rec" href="' + (c.uid ? "/icerikler/profil?u=" + encodeURIComponent(c.uid) : "#") + '"><span class="k">' + (c.ev === "222" ? "2x2" : "3x3") + '</span><span class="n">' + esc(c.name) + '<small>' + esc(c.comp || "") + ' · ' + ago(c.ts) + '</small></span><span class="t" dir="ltr">' + fmt(c.a) + '</span></a>';
+            return '<a class="evh-rec" href="' + (c.uid ? "/icerikler/profil?u=" + encodeURIComponent(c.uid) : "#") + '"><span class="k">' + (c.ev === "222" ? "2x2" : "3x3") + '</span><span class="n">' + esc(c.name) + '<small>' + esc(c.comp || "") + ' · ' + ago(c.ts) + '</small></span><span class="t" dir="ltr">' + (c.a == null || c.a >= 99999999 ? "DNF" : fmt(c.a)) + '</span></a>';
         }).join("") : '<div class="evh-empty">İlk şampiyon sen ol!</div>') + '</div>';
+        if (mode === "rekor") recs = "";
         el.innerHTML = '<div class="evh ' + mode + '"><div class="evh-top"><h2>🏠 Ev Yarışması & Rekorlar<small>' +
             (live.length ? "🔴 Şu an " + live.length + " yarışma canlı" : "Evden canlı küp yarışması: aynı karıştırma, canlı sıralama, final ve sertifika") + '</small></h2>' +
-            '<div class="evh-cta"><a class="evh-btn p" href="/icerikler/ev-yarismasi">' + (live.length ? "▶ Canlı yarışmaya katıl" : "🏠 Yarışmaya katıl") + '</a><a class="evh-btn" href="/icerikler/rekorlar">🥇 Rekor tablosu</a></div></div>' +
+            '<div class="evh-cta"><a class="evh-btn p" href="/icerikler/ev-yarismasi">' + (live.length ? "▶ Yarışmaya katıl" : "🏠 Yarışmaya katıl") + '</a>' + (mode === "rekor" ? '' : '<a class="evh-btn" href="/icerikler/rekorlar">🥇 Rekor tablosu</a>') + '</div></div>' +
             liveHtml + '<div class="evh-grid">' + recs + champs + '</div></div>';
     }
     var pr = { s333: S.records("333", "s", 1), a5_333: S.records("333", "a5", 1), s222: S.records("222", "s", 1), a5_222: S.records("222", "a5", 1), live: S.liveComps(), champs: S.champions(4) };

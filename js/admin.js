@@ -550,53 +550,170 @@
             return Promise.all(res[0].map(function (p) { return delDoc("/comps/" + code + "/p/" + p.uid); }).concat(res[1].map(delDoc), res[2].map(delDoc)));
         }).then(function () { return delDoc("/comps/" + code); });
     }
+    /* --- Ev yarışmaları: liste + onay (double check) ---
+       Durumlar: canlı (son 6 saatte hareketli, bitmemiş) · bekliyor (sonucu var, onay/ret yok) · onaylı (ok=1) · reddedildi (ok=-1)
+       Bu özellikten önce açılan yarışmalar onaylı sayılır (oyuncuların kayıtları da öyle sayar). */
+    var COMP_OK_FROM = Date.UTC(2026, 10, 12, 8, 0), compTab = "pend";
+    function compState(o) {
+        var now = Date.now(), R = o._R || [];
+        if (!(o.st === "end" && o.fin) && now - o.updated < 6 * 3600000) return "live";
+        if (o.ok === 1) return "ok"; if (o.ok === -1) return "rej";
+        if (!R.length) return "empty";
+        return o.created < COMP_OK_FROM ? "ok" : "pend";
+    }
+    var DNFV = 99999999;
+    function avgN(t, n) {
+        if (t.length < n) return null;
+        var a = t.slice(0, n).slice().sort(function (x, y) { return x - y; }).slice(1, -1);
+        if (a.some(function (x) { return x >= DNFV; })) return DNFV;
+        return a.reduce(function (x, y) { return x + y; }, 0) / a.length;
+    }
+    function reRank(r) {
+        var n = r.s || 5;
+        (r.rows || []).forEach(function (x) { x.a = (x.t || []).length >= n ? avgN(x.t, n) : null; });
+        r.rows.sort(function (x, y) {
+            var ax = x.a == null ? Infinity : x.a, ay = y.a == null ? Infinity : y.a; if (ax !== ay) return ax - ay;
+            var bx = Math.min.apply(null, (x.t || []).concat([Infinity])), by = Math.min.apply(null, (y.t || []).concat([Infinity])); return bx - by;
+        });
+    }
+    function parseTimeIn(v) {
+        v = String(v || "").trim().replace(",", ".");
+        if (/^dnf$/i.test(v)) return DNFV;
+        var m = /^(?:(\d+):)?(\d+(?:\.\d+)?)$/.exec(v); if (!m) return null;
+        var ms = Math.round(((+m[1] || 0) * 60 + parseFloat(m[2])) * 1000);
+        return ms > 0 && ms < 3600000 ? ms : null;
+    }
     function renderComps() {
         var box = $id("aCompList"); if (!box) return;
         box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
         listComps().then(function (list) {
             list.sort(function (a, b) { return b.updated - a.updated; });
-            var now = Date.now();
-            var isLive = function (o) { return !(o.st === "end" && o.fin) && now - o.updated < 6 * 3600000; };
-            var nLive = list.filter(isLive).length;
-            $id("aCompCount").textContent = list.length + " yarışma" + (nLive ? " · " + nLive + " canlı" : "");
-            if (!list.length) { box.innerHTML = '<p class="a-note">Henüz ev yarışması yok.</p>'; return; }
-            var byCode = {};
-            box.innerHTML = list.map(function (o) {
-                byCode[o.code] = o;
-                var ev = o.ev === "222" ? "2x2" : "3x3", live = isLive(o), done = o.st === "end" && o.fin;
+            var byCode = {}, cnt = { live: 0, pend: 0, ok: 0, rej: 0, empty: 0 }, people = {};
+            list.forEach(function (o) {
                 var R = []; try { R = JSON.parse(o.R || "[]"); } catch (e) {}
-                o._R = R;
-                // isimler: tur sonuçlarından (uid → ad)
-                var names = {}; R.forEach(function (r) { (r.rows || []).forEach(function (x) { if (x.u) names[x.u] = x.n; }); });
-                o._names = names;
-                var fin = R.filter(function (r) { return r.f; }).pop(), champ = fin && fin.rows && fin.rows[0];
-                var people = 0; R.forEach(function (r) { people = Math.max(people, (r.rows || []).length); });
-                var chip = done ? '<span class="cp-chip done">🏆 Bitti</span>' : live ? '<span class="cp-chip live">● Canlı · ' + (o.st === "lobby" ? "lobi" : o.st === "prep" ? "hazırlık" : o.fin ? "final" : "tur " + (o.round || 1)) + '</span>' : '<span class="cp-chip idle">Yarım kaldı</span>';
-                var mods = String(o.mods || "").split(",").filter(Boolean).map(function (u) { return esc(names[u] || u.slice(0, 6) + "…"); }).join(", ");
-                var rounds = R.map(function (r, ri) {
-                    var acts = window.RACompShare && (r.rows || []).length ? '<span class="cp-acts"><button class="a-btn sm" data-rimg="' + esc(o.code) + '|' + ri + '" title="Sonuç görselini indir">🖼️</button><button class="a-btn sm" data-rtxt="' + esc(o.code) + '|' + ri + '" title="Sonuç metnini kopyala">📝</button>' +
-                        (r.f ? (r.rows || []).slice(0, 3).map(function (x, i) { return '<button class="a-btn sm" data-rcert="' + esc(o.code) + '|' + ri + '|' + i + '" title="Sertifika: ' + esc(x.n) + '">🎓' + (i + 1) + '</button>'; }).join("") : '') + '</span>' : '';
-                    return '<div class="cp-round"><div class="cp-rh"><b>' + (r.f ? "🏆 Final" : "Tur " + r.n) + '</b><small>' + (r.rows || []).length + ' kişi · Ao' + ((r.s || 5)) + '</small>' + acts + '</div>' +
-                        '<table class="cp-t"><tbody>' + (r.rows || []).map(function (x, i) {
-                            var sus = window.RACompShare ? RACompShare.suspect(x.t, o.ev) : {}, sk = Object.keys(sus);
-                            var tl = (x.t || []).map(function (t, k) { return '<span' + (sus[k] ? ' class="s"' : '') + '>' + tFmt(t) + '</span>'; }).join("");
-                            return '<tr' + (i === 0 ? ' class="w"' : '') + '><td class="p">' + (["🥇", "🥈", "🥉"][i] || (i + 1) + ".") + '</td><td class="n">' + esc(x.n) +
-                                (sk.length ? ' <span class="cp-sus" title="' + esc(sk.map(function (k) { return (+k + 1) + ". çözüm: " + sus[k]; }).join(" · ")) + '">⚠️</span>' : '') +
-                                '<div class="tt">' + tl + '</div></td><td class="a">' + (x.a == null ? "-" : tFmt(x.a)) + '</td><td class="t">' + tl + '</td></tr>';
-                        }).join("") + '</tbody></table></div>';
-                }).join("");
-                return '<details class="cp" data-code="' + esc(o.code) + '"' + (live ? ' data-live="1"' : '') + '><summary>' +
-                    '<div class="cp-s1"><b>' + esc(o.name || "Ev yarışması") + '</b>' + chip + '</div>' +
-                    '<div class="cp-s2"><span class="mono">' + esc(o.code) + '</span><span>' + ev + '</span><span>' + (people || "?") + ' / ' + (o.cap || "?") + ' kişi</span><span>' + R.length + ' tur</span>' +
-                    (champ ? '<span class="cp-champ">🏆 ' + esc(champ.n) + ' · ' + tFmt(champ.a) + '</span>' : '') + '<span class="a-note">' + esc(dateFmt(o.updated)) + '</span></div></summary>' +
-                    '<div class="cp-body"><div class="cp-meta"><span>👑 <b>' + esc(o.hName || "?") + '</b></span>' + (mods ? '<span>🛡️ ' + mods + '</span>' : '') + '<span>📅 ' + esc(dateFmt(o.created)) + '</span></div>' +
-                    (live ? '<h4>Yarışmacılar (canlı)</h4><div class="c-ps a-note">Açınca yüklenir…</div>' : '') +
-                    (rounds ? '<div class="cp-rhead"><h4>Tur sonuçları</h4>' + (window.RACompShare && R.length > 1 ? '<button class="a-btn sm" data-rall="' + esc(o.code) + '">🖼️ Tüm görseller</button>' : '') + '</div>' + rounds : '<p class="a-note">Henüz biten tur yok.</p>') +
-                    '<div class="a-ctrl" style="margin-top:10px"><a class="a-btn sm" href="/icerikler/ev-yarismasi?ev=' + esc(o.code) + '" target="_blank" rel="noopener">👁 Aç</a>' +
-                    '<a class="a-btn sm" href="/icerikler/ev-yayin?ev=' + esc(o.code) + '" target="_blank" rel="noopener">📺 Yayın ekranı</a>' +
-                    (o.host ? '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.host) + '" target="_blank" rel="noopener">👤 Oda sahibi</a>' : '') +
-                    '<button class="a-btn danger sm" data-cd="' + esc(o.code) + '">🗑️ Sil</button></div></div></details>';
-            }).join("");
+                o._R = R; o._st = compState(o); cnt[o._st]++; byCode[o.code] = o;
+                var names = {}; R.forEach(function (r) { (r.rows || []).forEach(function (x) { if (x.u) { names[x.u] = x.n; people[x.u] = 1; } }); }); o._names = names;
+            });
+            box.byCode = byCode;
+            $id("aCompCount").textContent = list.length + " yarışma" + (cnt.pend ? " · " + cnt.pend + " onay bekliyor" : "");
+            var tile = function (k, label, v) { return '<button class="cp-tile' + (compTab === k ? " on" : "") + (k === "pend" && v ? " hot" : "") + '" data-tab="' + k + '"><b>' + v + '</b><span>' + label + '</span></button>'; };
+            var head = '<div class="cp-tiles">' + tile("pend", "⏳ Onay bekleyen", cnt.pend) + tile("live", "🔴 Canlı", cnt.live) + tile("ok", "✓ Onaylı", cnt.ok) + tile("rej", "✗ Reddedilen", cnt.rej) + tile("all", "Tümü", list.length) + '</div>' +
+                '<p class="a-note" style="margin:6px 0 10px">👥 Toplam ' + Object.keys(people).length + ' farklı yarışmacı. ' +
+                (compTab === "pend" ? 'Biten yarışmaların süreleri <b>sen onaylayana kadar</b> rekor tablosuna, profillere, şampiyonluklara ve sertifikalara girmez. Süreye dokunarak düzelt ya da DNF yap; hileli kişiyi 🚫 ile diskalifiye et; sonra <b>Onayla</b>.' : '') + '</p>';
+            var shown = list.filter(function (o) { return compTab === "all" ? true : o._st === compTab; });
+            box.innerHTML = head + (shown.length ? shown.map(function (o) { return compCard(o); }).join("") : '<p class="a-note">' + (compTab === "pend" ? "Onay bekleyen yarışma yok ✓" : "Bu listede yarışma yok.") + '</p>');
+            bindCompList(box); bindCompExtras(box, byCode);
+        }, function (e) { box.innerHTML = '<p class="a-note">Yarışmalar yüklenemedi (' + esc(e && e.message) + ') — kuralları yayımladın mı?</p>'; });
+    }
+    function compCard(o, open) {
+        var ev = o.ev === "222" ? "2x2" : "3x3", R = o._R, st = o._st, names = o._names, edit = st === "pend" || o._editing;
+        var fin = R.filter(function (r) { return r.f; }).pop(), champ = fin && fin.rows && fin.rows[0];
+        var nP = 0; R.forEach(function (r) { nP = Math.max(nP, (r.rows || []).length); });
+        var chip = { live: '<span class="cp-chip live">● Canlı · ' + (o.st === "lobby" ? "lobi" : o.st === "prep" ? "hazırlık" : o.fin ? "final" : "tur " + (o.round || 1)) + '</span>', pend: '<span class="cp-chip pend">⏳ Onay bekliyor</span>',
+            ok: '<span class="cp-chip done">✓ Onaylı</span>', rej: '<span class="cp-chip rej">✗ Reddedildi</span>', empty: '<span class="cp-chip idle">Sonuç yok</span>' }[st];
+        var mods = String(o.mods || "").split(",").filter(Boolean).map(function (u) { return esc(names[u] || u.slice(0, 6) + "…"); }).join(", ");
+        var rounds = R.map(function (r, ri) {
+            var acts = window.RACompShare && (r.rows || []).length && !edit ? '<span class="cp-acts"><button class="a-btn sm" data-rimg="' + esc(o.code) + '|' + ri + '" title="Sonuç görselini indir">🖼️</button><button class="a-btn sm" data-rtxt="' + esc(o.code) + '|' + ri + '" title="Sonuç metnini kopyala">📝</button>' +
+                (r.f && st === "ok" ? (r.rows || []).slice(0, 3).map(function (x, i) { return '<button class="a-btn sm" data-rcert="' + esc(o.code) + '|' + ri + '|' + i + '" title="Sertifika: ' + esc(x.n) + '">🎓' + (i + 1) + '</button>'; }).join("") : '') + '</span>' : '';
+            return '<div class="cp-round"><div class="cp-rh"><b>' + (r.f ? "🏆 Final" : "Tur " + r.n) + '</b><small>' + (r.rows || []).length + ' kişi · Ao' + (r.s || 5) + '</small>' + acts + '</div>' +
+                '<table class="cp-t"><tbody>' + (r.rows || []).map(function (x, i) {
+                    var sus = window.RACompShare ? RACompShare.suspect(x.t, o.ev) : {}, sk = Object.keys(sus);
+                    var tl = (x.t || []).map(function (t, k) {
+                        var cls = (sus[k] ? "s" : "") + (x._ed && x._ed[k] ? " e" : "");
+                        return edit ? '<button class="cp-tm ' + cls + '" data-ed="' + esc(o.code) + '|' + ri + '|' + esc(x.u) + '|' + k + '" title="' + esc(sus[k] || "Düzelt / DNF") + '">' + tFmt(t) + '</button>' : '<span class="' + cls + '">' + tFmt(t) + '</span>';
+                    }).join("");
+                    return '<tr' + (i === 0 ? ' class="w"' : '') + '><td class="p">' + (["🥇", "🥈", "🥉"][i] || (i + 1) + ".") + '</td><td class="n">' + esc(x.n) +
+                        (sk.length ? ' <span class="cp-sus" title="' + esc(sk.map(function (k) { return (+k + 1) + ". çözüm: " + sus[k]; }).join(" · ")) + '">⚠️</span>' : '') +
+                        (edit ? ' <button class="cp-dq" data-dq="' + esc(o.code) + '|' + esc(x.u) + '" title="Diskalifiye et (tüm turlardan çıkar)">🚫</button>' : '') +
+                        '<div class="tt">' + tl + '</div></td><td class="a">' + (x.a == null ? "-" : tFmt(x.a)) + '</td><td class="t">' + tl + '</td></tr>';
+                }).join("") + '</tbody></table></div>';
+        }).join("");
+        var sus = 0; R.forEach(function (r) { (r.rows || []).forEach(function (x) { if (window.RACompShare && Object.keys(RACompShare.suspect(x.t, o.ev)).length) sus++; }); });
+        var review = edit ? '<div class="cp-rev">' + (o._dirty ? '<p class="cp-dirty">✏️ Düzeltmeler yapıldı (' + o._dirty.length + '): onaylayınca kaydedilir.</p>' : '') +
+                (sus ? '<p class="cp-dirty" style="color:#d97706">⚠️ ' + sus + ' kişide şüpheli süre var, kontrol et.</p>' : '') +
+                '<div class="a-ctrl"><button class="a-btn main" data-ok="' + esc(o.code) + '">✓ Onayla, rekorlara ekle</button><button class="a-btn danger" data-rej="' + esc(o.code) + '">✗ Reddet (hiç sayılmasın)</button>' +
+                (o._dirty ? '<button class="a-btn" data-undo="' + esc(o.code) + '">↺ Düzeltmeleri geri al</button>' : '') + '</div></div>'
+            : (st === "ok" || st === "rej") && (o.okBy || o.ok) ? '<div class="cp-rev"><p class="a-note">' + (st === "ok" ? "✓ Onaylandı" : "✗ Reddedildi") + (o.okTs ? " · " + esc(dateFmt(Date.parse(o.okTs) || 0)) : "") + (o.okNote ? " · " + esc(o.okNote) : "") + '</p>' +
+                '<div class="a-ctrl"><button class="a-btn sm" data-reopen="' + esc(o.code) + '">↺ Yeniden incele</button></div></div>' : '';
+        return '<details class="cp" data-code="' + esc(o.code) + '"' + (st === "live" ? ' data-live="1"' : '') + (open || st === "pend" ? ' open' : '') + '><summary>' +
+            '<div class="cp-s1"><b>' + esc(o.name || "Ev yarışması") + '</b>' + chip + '</div>' +
+            '<div class="cp-s2"><span class="mono">' + esc(o.code) + '</span><span>' + ev + '</span><span>' + (nP || "?") + ' / ' + (o.cap || "?") + ' kişi</span><span>' + R.length + ' tur</span>' +
+            (champ ? '<span class="cp-champ">🏆 ' + esc(champ.n) + ' · ' + tFmt(champ.a) + '</span>' : '') + '<span class="a-note">' + esc(dateFmt(o.updated)) + '</span></div></summary>' +
+            '<div class="cp-body"><div class="cp-meta"><span>👑 <b>' + esc(o.hName || "?") + '</b></span>' + (mods ? '<span>🛡️ ' + mods + '</span>' : '') + '<span>📅 ' + esc(dateFmt(o.created)) + '</span></div>' +
+            (st === "live" ? '<h4>Yarışmacılar (canlı)</h4><div class="c-ps a-note">Açınca yüklenir…</div>' : '') +
+            (rounds ? '<div class="cp-rhead"><h4>Tur sonuçları</h4>' + (window.RACompShare && R.length > 1 && !edit ? '<button class="a-btn sm" data-rall="' + esc(o.code) + '">🖼️ Tüm görseller</button>' : '') + '</div>' + rounds : '<p class="a-note">Henüz biten tur yok.</p>') +
+            review +
+            '<div class="a-ctrl" style="margin-top:10px"><a class="a-btn sm" href="/icerikler/ev-yarismasi?ev=' + esc(o.code) + '" target="_blank" rel="noopener">👁 Aç</a>' +
+            '<a class="a-btn sm" href="/icerikler/ev-yayin?ev=' + esc(o.code) + '" target="_blank" rel="noopener">📺 Yayın ekranı</a>' +
+            (o.host ? '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.host) + '" target="_blank" rel="noopener">👤 Oda sahibi</a>' : '') +
+            '<button class="a-btn danger sm" data-cd="' + esc(o.code) + '">🗑️ Sil</button></div></div></details>';
+    }
+    function redrawComp(box, o) {
+        var old = box.querySelector('details[data-code="' + o.code + '"]'); if (!old) return;
+        var t = document.createElement("div"); t.innerHTML = compCard(o, true); old.replaceWith(t.firstChild);
+    }
+    function compPatchAdmin(code, fields, del) {
+        var body = {}, mask = Object.keys(fields).concat(del || []);
+        Object.keys(fields).forEach(function (k) { var v = fields[k]; body[k] = typeof v === "number" ? { integerValue: String(v) } : v && v.ts ? { timestampValue: new Date().toISOString() } : { stringValue: String(v) }; });
+        return authed(docsBase() + "/comps/" + code + "?" + mask.map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&"), { method: "PATCH", body: JSON.stringify({ fields: body }) }).then(function (r) { return r.ok; }, function () { return false; });
+    }
+    function bindCompList(box) {
+        if (box.raCompBound) return; box.raCompBound = 1;
+        box.addEventListener("click", function (e) {
+            var b = e.target.closest && e.target.closest("button,[data-tab]"); if (!b) return;
+            var B = box.byCode || {}, g = function (a) { return (b.getAttribute(a) || "").split("|"); };
+            if (b.hasAttribute("data-tab")) { compTab = b.getAttribute("data-tab"); renderComps(); return; }
+            // süre düzelt / DNF
+            if (b.hasAttribute("data-ed")) {
+                e.preventDefault(); var k = g("data-ed"), o = B[k[0]], r = o && o._R[+k[1]], row = r && r.rows.filter(function (x) { return x.u === k[2]; })[0]; if (!row) return;
+                var cur = row.t[+k[3]], v = prompt(row.n + " · " + (r.f ? "Final" : "Tur " + r.n) + " · " + (+k[3] + 1) + ". çözüm\nŞu an: " + tFmt(cur) + "\n\nYeni süreyi yaz (ör. 12.34 ya da 1:02.50) ya da DNF yaz:", cur >= DNFV ? "DNF" : (cur / 1000).toFixed(2));
+                if (v == null) return; var ms = parseTimeIn(v); if (ms == null) { alert("Süre anlaşılamadı. Örnek: 12.34 ya da DNF"); return; }
+                if (ms === cur) return;
+                if (!o._orig) o._orig = JSON.stringify(o._R);
+                row.t[+k[3]] = ms; row._ed = row._ed || {}; row._ed[+k[3]] = 1; reRank(r);
+                (o._dirty = o._dirty || []).push(row.n + " " + (r.f ? "final" : "tur " + r.n) + " " + (+k[3] + 1) + ". çözüm: " + tFmt(cur) + " → " + tFmt(ms));
+                redrawComp(box, o); return;
+            }
+            // diskalifiye: kişiyi bütün turlardan çıkar
+            if (b.hasAttribute("data-dq")) {
+                e.preventDefault(); var q = g("data-dq"), o2 = B[q[0]]; if (!o2) return;
+                var nm = o2._names[q[1]] || "Bu kişi"; if (!confirm(nm + " diskalifiye edilsin mi? Bütün turlardan çıkarılır, süreleri hiç sayılmaz (onaylayınca kesinleşir).")) return;
+                if (!o2._orig) o2._orig = JSON.stringify(o2._R);
+                o2._R.forEach(function (r) { r.rows = (r.rows || []).filter(function (x) { return x.u !== q[1]; }); reRank(r); });
+                (o2._dirty = o2._dirty || []).push(nm + " diskalifiye");
+                redrawComp(box, o2); return;
+            }
+            if (b.hasAttribute("data-undo")) { var o3 = B[b.getAttribute("data-undo")]; if (o3 && o3._orig) { o3._R = JSON.parse(o3._orig); o3._orig = null; o3._dirty = null; redrawComp(box, o3); } return; }
+            if (b.hasAttribute("data-ok") || b.hasAttribute("data-rej")) {
+                var code = b.getAttribute("data-ok") || b.getAttribute("data-rej"), o4 = B[code], yes = b.hasAttribute("data-ok"); if (!o4) return;
+                var note = yes ? (o4._dirty ? o4._dirty.join("; ") : "") : prompt("Reddetme nedeni (isteğe bağlı, ör. hileli süreler):", "");
+                if (!yes && note == null) return;
+                if (yes && !confirm(o4._dirty ? o4._dirty.length + " düzeltmeyle onaylansın mı? Sonuçlar rekorlara ve profillere işlenir." : "Sonuçlar olduğu gibi onaylansın mı? Rekorlara ve profillere işlenir.")) return;
+                // düzeltme yapılmadıysa R'ye dokunma (yarışma hâlâ odadaysa sonuç ezilmesin)
+                var f = { ok: yes ? 1 : -1, okBy: (Account.user && Account.user() && Account.user().uid) || "admin", okTs: { ts: 1 }, okNote: String(note || "").slice(0, 300) };
+                if (o4._dirty) f.R = JSON.stringify(o4._R.map(function (r) { return { n: r.n, f: r.f, s: r.s, rows: r.rows.map(function (x) { return { u: x.u, n: x.n, t: x.t, a: x.a }; }) }; }));
+                b.disabled = true;
+                compPatchAdmin(code, f).then(function (ok) {
+                    if (!ok) { b.disabled = false; alert("Kaydedilemedi. Güncel Firebase kurallarını yayınladın mı?"); return; }
+                    msg($id("aCompMsg"), (yes ? "✓ " + (o4.name || code) + " onaylandı. Yarışmacılar siteye bir sonraki girişlerinde rekorları güncellenir." : "✗ " + (o4.name || code) + " reddedildi."), "ok");
+                    renderComps();
+                });
+                return;
+            }
+            if (b.hasAttribute("data-cd")) {
+                var cd = b.getAttribute("data-cd"), oc = B[cd];
+                if (!confirm(cd + " yarışması ve tüm kayıtları silinsin mi?" + (oc && oc._st === "pend" ? "\n\nOnay bekliyordu: silinirse sonuçları hiç sayılmaz (reddetmekle aynı)." : ""))) return;
+                b.disabled = true;
+                deleteComp(cd).then(function (ok) { if (ok) renderComps(); else { b.disabled = false; alert("Silinemedi (kuralları yayımladın mı?)"); } });
+                return;
+            }
+            if (b.hasAttribute("data-reopen")) {
+                var c5 = b.getAttribute("data-reopen"); if (!confirm("Onay/ret kaldırılsın ve yeniden incelensin mi? (Siteye girmiş oyuncuların kayıtları değişmez; yeniden onaylayınca güncellenir.)")) return;
+                compPatchAdmin(c5, {}, ["ok", "okBy", "okTs", "okNote"]).then(function (ok) { if (ok) { compTab = "pend"; renderComps(); } else alert("Kaydedilemedi."); });
+            }
+        });
+    }
+    function bindCompExtras(box, byCode) {
             // canlı odalarda yarışmacı listesi (çıkarma yalnız burada; biten odada kimse çıkarılamaz)
             Array.prototype.forEach.call(box.querySelectorAll("details[data-live]"), function (d) {
                 d.addEventListener("toggle", function () {
@@ -651,20 +768,13 @@
                     .then(function () { b.textContent = "✓ İndirildi"; }, function () { b.textContent = "İndirilemedi"; })
                     .then(function () { setTimeout(function () { b.disabled = false; b.textContent = old; }, 1800); });
             });
-            Array.prototype.forEach.call(box.querySelectorAll("[data-cd]"), function (b) {
-                b.addEventListener("click", function () {
-                    if (!confirm(b.getAttribute("data-cd") + " yarışması ve tüm yarışmacı kayıtları silinsin mi?")) return;
-                    b.disabled = true;
-                    deleteComp(b.getAttribute("data-cd")).then(function (ok) { if (ok) renderComps(); else { b.disabled = false; alert("Silinemedi (kuralları yayımladın mı?)"); } });
-                });
-            });
-        }, function (e) { box.innerHTML = '<p class="a-note">Yarışmalar yüklenemedi (' + esc(e && e.message) + ') — kuralları yayımladın mı?</p>'; });
     }
     function cleanOldComps() {
-        if (!confirm("3 günden eski tüm ev yarışmaları silinsin mi?")) return;
+        if (!confirm("3 günden eski, sonucu olmayan ya da reddedilmiş ev yarışmaları silinsin mi? (Onay bekleyenler ve onaylılar kalır.)")) return;
         var lim = Date.now() - 3 * 86400000;
         listComps().then(function (list) {
-            var old = list.filter(function (o) { return o.updated < lim; });
+            // onay bekleyenler silinmez (önce incelenmeli); onaylı yarışmalar da geçmiş/şampiyon kaydı olarak kalır
+            var old = list.filter(function (o) { var R = []; try { R = JSON.parse(o.R || "[]"); } catch (e) {} o._R = R; return o.updated < lim && (!R.length || o.ok === -1); });
             return Promise.all(old.map(function (o) { return deleteComp(o.code); })).then(function () { msg($id("aCompMsg"), old.length + " eski yarışma silindi ✓", "ok"); renderComps(); });
         }, function () { msg($id("aCompMsg"), "Silinemedi.", "bad"); });
     }
@@ -1035,6 +1145,13 @@
             '<h1 class="a-h1">Yönetim paneli</h1><p class="a-sub">Yalnızca sen görüyorsun.</p>' +
             '<div class="box"><h2>📊 Genel bakış</h2><div id="aOverview" class="stat-tiles"><p class="a-note">Yükleniyor…</p></div>' +
             '<h4 style="margin-top:14px">Aktiflik (son görülmeye göre)</h4><div id="aChart"></div></div>' +
+            '<div class="box cp-sec" id="aEvSec"><h2>🏠 Ev yarışmaları <span class="a-sub" id="aCompCount" style="margin:0"></span></h2>' +
+            '<div class="a-ctrl"><button class="a-btn main" id="aCompLoad">↻ Yenile</button><button class="a-btn danger" id="aCompClean">🧹 Eski boş / reddedilmişleri sil</button></div>' +
+            '<div class="a-msg" id="aCompMsg"></div><div id="aCompList" class="a-list"></div>' +
+            '<h3 class="cp-h3">🏆 Rekor tablosu yönetimi <span class="a-sub" id="aRecCount" style="margin:0"></span></h3>' +
+            '<div class="a-ctrl"><button class="a-btn main" id="aRecLoad">↻ Yükle</button><label class="a-note"><input type="checkbox" id="aRecBad" checked> Yalnız şüpheliler</label></div>' +
+            '<p class="a-note">Şüpheli: 3x3 tekil 4 sn, Ao5 5,5 sn, Ao12 6 sn altı; 2x2 tekil 0,6 sn, Ao5 1 sn, Ao12 1,2 sn altı ya da ortalaması tekilinden hızlı olanlar.</p><div id="aRecList" class="a-list"></div>' +
+            '<p class="a-note" style="margin-top:12px">Yarışmalar herkese açık sayfada: <a href="/icerikler/ev-yarismasi" target="_blank" rel="noopener">Ev yarışması</a> · <a href="/icerikler/rekorlar" target="_blank" rel="noopener">Rekor tablosu</a></p></div>' +
             '<div class="box"><h2>👤 Hesapsız ziyaretçiler</h2><p class="a-note">Giriş yapmadan siteyi kullanan cihazlar (her cihaz bir kez sayılır, oturum başına güncellenir).</p><div id="aAnon" class="stat-tiles"><p class="a-note">Yükleniyor…</p></div><div id="aAnonMore"></div></div>' +
             '<div class="box"><h2>🔔 Bildirim gönder</h2>' +
             '<p class="a-note">Yazdığın mesaj seçtiğin kişiye (ya da herkese) bildirim olarak gider. Bildirime izin veren kullanıcılarda telefon/sistem bildirimi; herkeste site içi bildirim olarak düşer.</p>' +
@@ -1051,13 +1168,7 @@
             '<div id="aUsersList"></div></div>' +
             '<div class="box"><h2>🏅 En aktif kullanıcılar</h2><div id="aActive"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🖥️ Cihaz, tarayıcı &amp; tercihler</h2><p class="a-note">Her üyenin cihaz, dil, tema, renk körlüğü modu ve giriş türü bilgisini çeker (üye başına 1 okuma, biraz sürebilir).</p><button class="a-btn main" id="aDevLoad">Hesapla</button><div id="aDevBox" style="margin-top:10px"></div></div>' +
-            '<div class="box"><h2>🏠 Ev yarışmaları <span class="a-sub" id="aCompCount" style="margin:0"></span></h2>' +
-            '<div class="a-ctrl"><button class="a-btn main" id="aCompLoad">↻ Yenile</button><button class="a-btn danger" id="aCompClean">🧹 3 günden eskileri sil</button></div>' +
-            '<div class="a-msg" id="aCompMsg"></div><div id="aCompList" class="a-list"></div></div>' +
             '<div class="box"><h2>📈 Site istatistikleri</h2><div id="aSiteStats"><p class="a-note">Yükleniyor…</p></div></div>' +
-            '<div class="box"><h2>🏆 Rekor tablosu yönetimi <span class="a-sub" id="aRecCount" style="margin:0"></span></h2>' +
-            '<div class="a-ctrl"><button class="a-btn main" id="aRecLoad">↻ Yükle</button><label class="a-note"><input type="checkbox" id="aRecBad" checked> Yalnız şüpheliler</label></div>' +
-            '<p class="a-note">Şüpheli: 3x3 tekil 4 sn, Ao5 5,5 sn, Ao12 6 sn altı; 2x2 tekil 0,6 sn, Ao5 1 sn, Ao12 1,2 sn altı ya da ortalaması tekilinden hızlı olanlar.</p><div id="aRecList" class="a-list"></div></div>' +
             '<div class="box"><h2>💡 Topluluk algoritma önerileri <span class="a-sub" id="aSugCount" style="margin:0"></span></h2>' +
             '<div class="a-ctrl"><button class="a-btn main" id="aSugLoad">↻ Yükle</button><select id="aSugSort"><option value="new">En yeni</option><option value="vote">En çok oy</option></select></div><div id="aSugList" class="a-list"></div></div>' +
             '<div class="box"><h2>🐞 Hata kayıtları <span class="a-sub" id="aErrCount" style="margin:0"></span></h2>' +
