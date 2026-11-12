@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20261231">
+<link rel="stylesheet" href="/styles/common.css?v=20270101">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 <style>
 .wrap { max-width: 1040px; margin: 0 auto; }
@@ -176,7 +176,20 @@ details.m-set > summary { font-size: 12.5px; }
 .cp-s1 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .cp-s1 b { font-size: 15.5px; font-weight: 900; color: var(--text); }
 .cp-s2 { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; font-weight: 700; color: var(--text-soft); align-items: center; }
 .cp-chip { font-size: 11.5px; font-weight: 900; padding: 2px 9px; border-radius: 99px; }
-.cp-chip.live { background: rgba(239, 68, 68, .14); color: #dc2626; } .cp-chip.done { background: rgba(230, 180, 34, .16); color: #b7791f; } .cp-chip.idle { background: var(--surface-soft); color: var(--text-soft); }
+.cp-chip.live { background: rgba(239, 68, 68, .14); color: #dc2626; } .cp-chip.pend { background: rgba(217, 119, 6, .16); color: #d97706; } .cp-chip.rej { background: rgba(220, 38, 38, .12); color: #dc2626; }
+.cp-sec { border: 2px solid rgba(255, 138, 31, .35); }
+.cp-h3 { margin: 22px 0 8px; font-size: 16px; font-weight: 900; padding-top: 14px; border-top: 1px solid var(--border); }
+.cp-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.cp-tile { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; border-radius: 14px; border: 2px solid var(--border); background: var(--surface-soft); color: var(--text); cursor: pointer; font-family: inherit; }
+.cp-tile b { font: 900 22px Inter, sans-serif; } .cp-tile span { font-size: 11.5px; font-weight: 800; color: var(--text-soft); text-align: center; }
+.cp-tile.on { border-color: var(--ui-accent); background: var(--surface); } .cp-tile.hot b { color: #d97706; }
+@media (max-width: 560px) { .cp-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.cp-tm { font: 700 12px "JetBrains Mono", monospace; padding: 3px 6px; margin: 2px 4px 2px 0; border-radius: 7px; border: 1px dashed var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+.cp-tm.s { color: #d97706; border-color: rgba(217, 119, 6, .6); } .cp-tm.e { border-style: solid; border-color: var(--ui-accent); background: rgba(108, 92, 231, .12); }
+.cp-dq { border: 0; background: none; cursor: pointer; font-size: 14px; padding: 0 2px; }
+.cp-t .t span.e, .cp-t .tt span.e { text-decoration: underline; }
+.cp-rev { margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--surface-soft); border: 1px solid var(--border); }
+.cp-dirty { margin: 0 0 8px; font-size: 13px; font-weight: 800; color: var(--ui-accent); } .cp-chip.done { background: rgba(230, 180, 34, .16); color: #b7791f; } .cp-chip.idle { background: var(--surface-soft); color: var(--text-soft); }
 .cp-champ { color: var(--text); font-weight: 800; }
 .cp-body { padding: 0 14px 14px; border-top: 1px solid var(--border); }
 .cp-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--text-soft); padding: 10px 0 4px; }
@@ -216,13 +229,13 @@ details.m-set > summary { font-size: 12.5px; }
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20261231"></script>
-<script src="/js/common.js?v=20261231"></script>
-<script src="/js/firebase-config.js?v=20261231"></script>
-<script src="/js/account.js?v=20261231"></script>
-<script src="/js/leaderboard.js?v=20261231"></script>
-<script src="/js/data-editor.js?v=20261231"></script>
-<script src="/js/comp-share.js?v=20261231"></script>
-<script src="/js/admin.js?v=20261231"></script>
+<script src="/js/i18n.js?v=20270101"></script>
+<script src="/js/common.js?v=20270101"></script>
+<script src="/js/firebase-config.js?v=20270101"></script>
+<script src="/js/account.js?v=20270101"></script>
+<script src="/js/leaderboard.js?v=20270101"></script>
+<script src="/js/data-editor.js?v=20270101"></script>
+<script src="/js/comp-share.js?v=20270101"></script>
+<script src="/js/admin.js?v=20270101"></script>
 </body>
 </html>

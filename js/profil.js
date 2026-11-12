@@ -66,13 +66,13 @@
     html += '<p class="p-note" style="margin-top:10px"><a href="/icerikler/rekorlar" style="color:var(--ui-accent);font-weight:800">🥇 Rekor tablosu →</a></p>';
     var list = c.list || [], groups = groupComps(list);
     // Sertifikalar: final ilk 3 (yalnız kendi profilinde indirilebilir; başkasının profilinde rozet olarak görünür)
-    var certs = groups.map(function (g) { var f = g.rounds.filter(function (e) { return e.f && e.rk >= 1 && e.rk <= 3; })[0]; return f ? { g: g, e: f } : null; }).filter(Boolean);
+    var certs = groups.map(function (g) { var f = g.rounds.filter(function (e) { return e.f && !e.pd && e.rk >= 1 && e.rk <= 3; })[0]; return f ? { g: g, e: f } : null; }).filter(Boolean);
     html += '<h3 class="p-sub">🎓 ' + (isMe ? "Sertifikalarım" : "Sertifikalar") + '</h3>' + (certs.length ? '<div class="p-certs">' + certs.map(function (x) {
       var o = { name: myName || "", comp: x.g.nm || x.g.c, ev: x.e.ev, place: x.e.rk, a: x.e.a, n: x.e.n || 5, ts: x.e.ts };
       return '<div class="p-cert p' + x.e.rk + '"><span class="p-cert-m">' + ["🥇", "🥈", "🥉"][x.e.rk - 1] + '</span><span class="p-cert-t"><b>' + esc(o.comp) + '</b><small>' + (x.e.ev === "222" ? "2x2" : "3x3") + ' finali · ' + x.e.rk + '. · Ao' + o.n + ' ' + fmt(o.a) + '</small></span>' +
         (isMe && window.RACompShare ? '<button type="button" class="p-btn sm" data-cert="' + encodeURIComponent(JSON.stringify(o)) + '">İndir</button>' : '') + '</div>';
     }).join("") + '</div>' : '<p class="p-note">' + (isMe ? "Bir ev yarışmasının finalinde ilk 3'e girince sertifikan burada çıkar." : "Henüz final derecesi yok.") + '</p>');
-    if (list.length) html += progressChart(list) + '<h3 class="p-sub">Yarışma geçmişi</h3><div class="p-clist">' + groups.map(function (g) {
+    if (list.length) html += progressChart(list.filter(function (e) { return !e.pd; })) + '<h3 class="p-sub">Yarışma geçmişi</h3><div class="p-clist">' + groups.map(function (g) {
       var dt = g.ts ? new Date(g.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" }) : "";
       var fin = g.rounds.filter(function (e) { return e.f; })[0], last = fin || g.rounds[g.rounds.length - 1];
       var bestS = null; g.rounds.forEach(function (e) { if (typeof e.s === "number" && (bestS == null || e.s < bestS)) bestS = e.s; });
@@ -81,7 +81,8 @@
         var ts = Array.isArray(e.t) && e.t.length ? ' <span class="p-ctimes" dir="ltr">' + e.t.map(function (x) { return '<span class="' + (x < 0 ? "dnf" : x === e.s ? "pb" : "") + '">' + (x < 0 ? "DNF" : fmt(x)) + '</span>'; }).join("") + '</span>' : '';
         return '<div class="p-rnd"><b>' + (e.f ? "Final" : "Tur " + e.r) + '</b><span>' + (e.rk ? e.rk + "." + (e.p ? "/" + e.p : "") : "-") + '</span><span>Ao' + (e.n || 5) + ' <i dir="ltr">' + fmt(e.a) + '</i></span>' + ts + '</div>';
       }).join("");
-      return '<div class="p-comp' + (fin && fin.rk === 1 ? " win" : "") + '"><div class="p-comp-h"><div class="p-c1"><b>' + esc(g.nm || g.c) + '</b><small>' + esc(dt) + ' · ' + (g.ev === "222" ? "2x2" : "3x3") + ' · ' + g.rounds.length + ' tur</small></div>' +
+      var pend = g.rounds.some(function (e) { return e.pd; });
+      return '<div class="p-comp' + (fin && fin.rk === 1 && !pend ? " win" : "") + '"><div class="p-comp-h"><div class="p-c1"><b>' + esc(g.nm || g.c) + (pend ? ' <span class="p-pend" title="Yönetici süreleri kontrol edince rekorlara ve sertifikalara işlenir">⏳ Onay bekliyor</span>' : '') + '</b><small>' + esc(dt) + ' · ' + (g.ev === "222" ? "2x2" : "3x3") + ' · ' + g.rounds.length + ' tur</small></div>' +
         '<div class="p-comp-s"><span class="p-place">' + place + '</span><span>En iyi Ao <i dir="ltr">' + fmt(g.bestA) + '</i></span><span>Tekil <i dir="ltr">' + fmt(bestS) + '</i></span></div></div>' +
         '<details class="p-rnds"><summary>Turlar</summary>' + rounds + '</details></div>';
     }).join("") + "</div>";

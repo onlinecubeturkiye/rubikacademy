@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261231";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270101";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -626,7 +626,8 @@
     // Boş odayı sil: sahibi değilsen kurallar yalnız uzun süredir değişmeyen odayı silmene izin verir
     function closeEmpty(code) {
         return api("/comps/" + code + "/p/" + (signedIn() ? Account.user().uid : "x"), { method: "DELETE" }).catch(function () {}).then(function () {
-            return api("/comps/" + code, { method: "DELETE" }).then(function (r) { return r.ok; }, function () { return false; });
+            // sonucu olan oda kurallar gereği silinmez (onay için saklanır); 403 sessizce yok sayılır
+            return api("/comps/" + code, { method: "DELETE" }).then(function (r) { return r.ok || r.status === 403; }, function () { return false; });
         });
     }
     function closeRoom(code, quiet) {
@@ -634,7 +635,18 @@
         var sub = function (c) { return api("/comps/" + code + "/" + c + "?pageSize=100&mask.fieldPaths=zz", { method: "GET" }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
             return Promise.all((d.documents || []).map(function (x) { return del("/comps/" + code + "/" + c + "/" + x.name.split("/").pop()); }));
         }, function () {}); };
-        return Promise.all([sub("p"), sub("w"), sub("m")]).then(function () { return api("/comps/" + code, { method: "DELETE" }); }).then(function (r) {
+        // Sonucu olan (en az bir turu bitmiş) oda silinmez: onay (double check) için saklanır, yarışma bitmiş sayılır
+        var keepDoc = function () {
+            return apiAny("/comps/" + code, { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }).then(function (x) {
+                var d = x ? parseDoc(x) : null, R = []; try { R = JSON.parse((d && d.R) || "[]") || []; } catch (e) {}
+                if (!d || !R.length) return api("/comps/" + code, { method: "DELETE" });
+                if (d.st === "end" && d.fin) return { ok: true };
+                R[R.length - 1].f = 1; // son tur final sayılır (birincisi şampiyon)
+                var f = { st: "end", fin: 1, R: JSON.stringify(R), pa: 0 };
+                return api("/comps/" + code + "?" + Object.keys(f).concat(["ts"]).map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&"), { method: "PATCH", body: JSON.stringify({ fields: cBody(f) }) });
+            });
+        };
+        return Promise.all([sub("p"), sub("w"), sub("m")]).then(keepDoc).then(function (r) {
             if (!r || !r.ok) { if (quiet) return false; say("Oda kapatılamadı" + (r ? " (" + r.status + ")" : "") + ". " + (r && r.status === 403 ? "Firebase kurallarının son halini yayımladığından emin ol." : r && r.status === 429 ? "Firebase günlük kotası dolmuş; yarın tekrar dene." : "Tekrar dene.")); return false; }
             return true;
         }, function () { if (!quiet) say("Oda kapatılamadı: bağlantı hatası."); return false; });
@@ -1259,6 +1271,8 @@
             var row = r.rows[i], ok = (row.t || []).filter(function (x) { return x < DNF; });
             var k = comp.code + ":" + r.n, old = st.r[k] || {};
             st.r[k] = { nm: String(d.name || "").slice(0, 40), ev: d.ev === "222" ? "222" : "333", n: rS(r), s: ok.length ? Math.min.apply(null, ok) : null, a: row.a != null && row.a < DNF ? Math.round(row.a) : null, rk: i + 1, p: r.rows.length, f: r.f ? 1 : 0, t: (row.t || []).slice(0, 12).map(function (x) { return x >= DNF ? -1 : Math.round(x); }), ts: old.ts || Date.now() };
+            // onay (double check): admin onaylayana kadar rekorlara / profile işlenmez
+            var okv = d.ok === 1 ? 1 : d.ok === -1 ? -1 : old.ok; if (okv != null) st.r[k].ok = okv;
             if (!st.rooms[comp.code]) st.rooms[comp.code] = st.r[k].ts;
         });
         var after = JSON.stringify(st);
@@ -1383,7 +1397,8 @@
                 var ok = (x.t || []).filter(function (t) { return t < DNF; }), best = ok.length ? Math.min.apply(null, ok) : null, b = [];
                 // rekor tablosu bu turdan sonra güncellenmiş olabilir: kendisi zaten rekor sahibiyse ve süre eşitse de rekor say
                 var siteS = best != null && (!rs || best < rs.t || (rs.uid === x.u && best === rs.t)), siteA = x.a != null && x.a < DNF && (!ra || x.a < ra.t || (ra.uid === x.u && Math.round(x.a) === ra.t));
-                if (siteS) b.push("🔥 Tekil site rekoru"); if (siteA) b.push("🔥 Ao" + rS(r) + " site rekoru");
+                var pend = d.ok === 1 ? "" : " (onay bekliyor)";
+                if (siteS) b.push("🔥 Tekil site rekoru" + pend); if (siteA) b.push("🔥 Ao" + rS(r) + " site rekoru" + pend);
                 if (!siteS && !siteA && x.u === me && ((best != null && pb.s != null && best < pb.s) || (x.a != null && x.a < DNF && pb.a != null && x.a < pb.a))) b.push("⭐ Kişisel rekor");
                 var cell = box.querySelector('tr[data-ri="' + i + '"] .c-recb'); if (cell && b.length) cell.innerHTML = b.map(function (t) { return '<span class="c-rec">' + t + '</span>'; }).join("");
             });
@@ -1405,7 +1420,8 @@
                 '<label class="c-finfmt">Final formatı <select id="cFinFmt"><option value="5">Ao5 (5 çözüm)</option><option value="12">Ao12 (12 çözüm)</option></select></label>' +
                 '<div class="ak-fin-b" style="margin-top:6px"><button type="button" class="btn" id="cFinishR">🏁 Final olmadan yarışmayı bitir</button></div></div>' : "") +
             (latest && r.f ? '<p class="ak-fin-s">Yarışma bitti 🎉</p>' : "") +
-            (r.f && r.rows.length ? '<div class="ak-fin-b c-certs"><span>🎓 Sertifika:</span>' + r.rows.slice(0, 3).map(function (x, i) { return '<button type="button" class="btn' + (signedIn() && x.u === Account.user().uid ? ' primary' : '') + '" data-cert="' + i + '">' + ["🥇", "🥈", "🥉"][i] + ' ' + esc(x.n) + '</button>'; }).join("") + '</div>' : "") +
+            (d.ok === 1 ? '' : '<p class="ak-fin-s c-pend">⏳ Sonuçlar yönetici kontrolünden (double check) sonra rekorlara, profillere ve sertifikalara işlenir.</p>') +
+            (r.f && r.rows.length && d.ok === 1 ? '<div class="ak-fin-b c-certs"><span>🎓 Sertifika:</span>' + r.rows.slice(0, 3).map(function (x, i) { return '<button type="button" class="btn' + (signedIn() && x.u === Account.user().uid ? ' primary' : '') + '" data-cert="' + i + '">' + ["🥇", "🥈", "🥉"][i] + ' ' + esc(x.n) + '</button>'; }).join("") + '</div>' : "") +
             '<div class="ak-fin-b" style="margin-top:8px"><button type="button" class="btn" id="akFinClose2">Kapat</button></div><div class="ak-msg" id="akShareMsg"></div>';
         $("akFinClose").onclick = $("akFinClose2").onclick = closeFinal;
         $("cShareTxt").onclick = function () {

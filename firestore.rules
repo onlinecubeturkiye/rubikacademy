@@ -151,13 +151,18 @@ service cloud.firestore {
           || (exists(/databases/$(database)/documents/roles/$(request.auth.uid))
               && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['organizator', 'gelistirici']));
       }
-      function ck() { return ['host', 'hName', 'name', 'cap', 'ev', 'round', 'fin', 'st', 'scr', 'adv', 'R', 'ts', 'mods', 'ban', 'pa']; }
+      function ck() { return ['host', 'hName', 'name', 'cap', 'ev', 'round', 'fin', 'st', 'scr', 'adv', 'R', 'ts', 'mods', 'ban', 'pa', 'ok', 'okBy', 'okTs', 'okNote']; }
+      // Onay (double check): ok = 1 onaylandı, -1 reddedildi; yalnız admin yazar. Onay/ret verilmiş odanın sonuçları (R) da yalnız admin'ce değişir.
+      function okSafe() {
+        return isAdmin() || (!chgC().hasAny(['ok', 'okBy', 'okTs', 'okNote']) && !(('ok' in resource.data) && chgC().hasAny(['R'])));
+      }
       // Moderatör: oda sahibinin atadığı kişiler (mods = virgülle uid listesi)
       function isModOf(d) { return request.auth != null && ('mods' in d) && d.mods.split(',').hasAny([request.auth.uid]); }
       function chgC() { return request.resource.data.diff(resource.data).affectedKeys(); }
       allow get, list: if true;
       allow create: if org() && code.matches('^[A-Z0-9]{5}$')
         && request.resource.data.keys().hasOnly(ck())
+        && !('ok' in request.resource.data) && !('okBy' in request.resource.data) && !('okTs' in request.resource.data) && !('okNote' in request.resource.data)
         && request.resource.data.host == request.auth.uid
         && request.resource.data.cap is int && request.resource.data.cap >= 8 && request.resource.data.cap <= 16
         && request.resource.data.ev in ['333', '222']
@@ -166,16 +171,21 @@ service cloud.firestore {
       allow update: if request.auth != null
         && (request.auth.uid == resource.data.host || isAdmin()
             || (isModOf(resource.data) && !chgC().hasAny(['host', 'hName', 'mods', 'cap', 'name'])))
+        && okSafe()
         && request.resource.data.keys().hasOnly(ck())
+        && (!('okNote' in request.resource.data) || (request.resource.data.okNote is string && request.resource.data.okNote.size() <= 300))
         && request.resource.data.host is string && request.resource.data.host.size() > 0
         && (!('mods' in request.resource.data) || request.resource.data.mods.size() <= 600)
         && (!('ban' in request.resource.data) || request.resource.data.ban.size() <= 1500)
         && request.resource.data.cap is int && request.resource.data.cap >= 8 && request.resource.data.cap <= 16
         && request.resource.data.R is string && request.resource.data.R.size() <= 200000
         && request.resource.data.scr is string && request.resource.data.scr.size() <= 1500;
-      // Sahip/admin her zaman; diğer üyeler yalnız 15 dakikadır değişmeyen (boş kalmış) odayı silebilir
-      allow delete: if request.auth != null && (request.auth.uid == resource.data.host || isAdmin()
-        || (beta() && resource.data.ts is timestamp && resource.data.ts < request.time - duration.value(15, 'm')));
+      // Admin her zaman. Sonucu olan (en az bir tur bitmiş) oda onay için saklanır: yalnız admin siler.
+      // Sonucu olmayan odayı sahip her zaman, diğer üyeler 15 dakikadır değişmiyorsa (boş kalmışsa) silebilir.
+      allow delete: if request.auth != null && (isAdmin()
+        || ((!('R' in resource.data) || resource.data.R == '[]')
+          && (request.auth.uid == resource.data.host
+            || (beta() && resource.data.ts is timestamp && resource.data.ts < request.time - duration.value(15, 'm')))));
 
       // Yarışmacılar: herkes kendi kaydını yazar; oda sahibi ya da moderatör çıkarabilir
       match /p/{uid} {

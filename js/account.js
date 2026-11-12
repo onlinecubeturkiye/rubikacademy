@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20261231";
+    var V = "20270101";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -360,6 +360,9 @@
         if (k.indexOf("recog-") === 0) return ((a.n || 0) >= (b.n || 0)) ? loc : cl;
         if (k === "comp-stats-v1") { // odalar ve turlar: iki cihazdakinin birleşimi
             o.rooms = Object.assign({}, b.rooms || {}, a.rooms || {}); o.r = Object.assign({}, b.r || {}, a.r || {});
+            // onay (double check) sonucu bir cihazda varsa o kayıt geçerli (admin düzeltmesi dahil)
+            for (x in b.r || {}) if (b.r[x] && b.r[x].ok != null && (!a.r || !a.r[x] || a.r[x].ok == null)) o.r[x] = b.r[x];
+            if (a.inp || b.inp) o.inp = a.inp || b.inp;
             return JSON.stringify(o);
         }
         if (k === "site-prefs-v1") return (b.t || 0) >= (a.t || 0) ? cl : loc; // en son seçilen tema geçerli
@@ -599,18 +602,20 @@
             comp = { rooms: Object.keys(cs.rooms || {}).length, rounds: 0, wins: 0, finals: 0, pb: {}, list: [] };
             for (var rk in cs.r) {
                 var e = cs.r[rk]; if (!isObj(e)) continue;
+                var okd = compOk(e); if (okd < 0) continue; // reddedilen yarışma hiç sayılmaz
+                comp.list.push({ c: rk.split(":")[0], r: +rk.split(":")[1] || 0, nm: e.nm || "", ev: e.ev, n: e.n || 5, s: e.s, a: e.a, rk: e.rk, p: e.p, f: e.f ? 1 : 0, t: Array.isArray(e.t) ? e.t.slice(0, 12) : undefined, ts: e.ts || 0, pd: okd ? undefined : 1 });
+                if (!okd) { comp.pending = (comp.pending || 0) + 1; continue; } // onay bekliyor: rekor sayılmaz
                 comp.rounds++;
                 if (e.f) { comp.finals++; if (e.rk === 1) comp.wins++; }
                 var pb = comp.pb[e.ev] || (comp.pb[e.ev] = {});
                 if (typeof e.s === "number" && (!pb.s || e.s < pb.s)) pb.s = e.s;
                 var ak = e.n === 12 ? "a12" : "a5";
                 if (typeof e.a === "number" && (!pb[ak] || e.a < pb[ak])) pb[ak] = e.a;
-                comp.list.push({ c: rk.split(":")[0], r: +rk.split(":")[1] || 0, nm: e.nm || "", ev: e.ev, n: e.n || 5, s: e.s, a: e.a, rk: e.rk, p: e.p, f: e.f ? 1 : 0, t: Array.isArray(e.t) ? e.t.slice(0, 12) : undefined, ts: e.ts || 0 });
             }
             // geçmiş listesi: en yeni 40 tur (profil verisi sınırı için kısa; süreler dahil)
             comp.list.sort(function (x, y) { return y.ts - x.ts; });
             comp.list = comp.list.slice(0, 40);
-            if (!comp.rounds && !comp.rooms) comp = null;
+            if (!comp.rounds && !comp.rooms && !comp.list.length) comp = null;
         }
         // Admin istatistikleri için sayaçlar: çözüm sayıları (akıllı küp / sanal küp / ev yarışması), giriş yöntemi, akıllı küp modelleri
         var len = function (k) { var v = parse(lsGet(k)); return Array.isArray(v) ? v.length : (isObj(v) && Array.isArray(v.list) ? v.list.length : 0); };
@@ -632,10 +637,48 @@
         return j.length > 8000 ? JSON.stringify({ known: st.known, learning: st.learning, solves: st.solves, best: st.best, daily: st.daily }) : j;
     }
     function localProfile() { var p = parse(lsGet(PROF_KEY)); return isObj(p) ? p : {}; }
+    // Ev yarışması onayı (double check): 1 onaylı, 0 bekliyor, -1 reddedildi.
+    // Bu özellikten önce biten yarışmalar onaylı sayılır.
+    var COMP_OK_FROM = Date.UTC(2026, 10, 12, 8, 0);
+    function compOk(e) { return e.ok === 1 ? 1 : e.ok === -1 ? -1 : (e.ts || 0) < COMP_OK_FROM ? 1 : 0; }
+    // Onay bekleyen yarışmaların durumunu (herkese açık) oda belgesinden öğren; onaylandıysa admin'in
+    // düzelttiği sonuçları al, reddedildi / silindiyse işaretle. 10 dakikada bir, en çok 8 oda.
+    function syncCompOk() {
+        if (!user || !every("compok", 10 * 60000)) return Promise.resolve(false);
+        var cs = parse(lsGet("comp-stats-v1")); if (!isObj(cs) || !isObj(cs.r)) return Promise.resolve(false);
+        var codes = {}; Object.keys(cs.r).forEach(function (k) { var e = cs.r[k]; if (isObj(e) && !compOk(e)) codes[k.split(":")[0]] = 1; });
+        var list = Object.keys(codes).slice(0, 8); if (!list.length) return Promise.resolve(false);
+        return Promise.all(list.map(function (code) {
+            return fetch(pubUrl("/comps/" + code)).then(function (r) { return r.status === 404 ? { gone: 1 } : r.ok ? r.json() : null; }, function () { return null; });
+        })).then(function (docs) {
+            var cur = parse(lsGet("comp-stats-v1")) || cs, changed = false, me = user.uid;
+            docs.forEach(function (d, i) {
+                if (!d) return;
+                var code = list[i], f = d.fields || {}, ok = d.gone ? -1 : f.ok ? +(f.ok.integerValue || 0) : 0;
+                if (!ok) return;
+                var R = []; try { R = JSON.parse((f.R && f.R.stringValue) || "[]") || []; } catch (x) {}
+                Object.keys(cur.r).forEach(function (k) {
+                    if (k.split(":")[0] !== code) return;
+                    var e = cur.r[k], rn = +k.split(":")[1], r = R.filter(function (x) { return x.n === rn; })[0];
+                    if (ok === 1 && r) {
+                        var i2 = -1; (r.rows || []).forEach(function (x, j) { if (x.u === me) i2 = j; });
+                        if (i2 < 0) { e.ok = -1; changed = true; return; } // diskalifiye edildi
+                        var row = r.rows[i2], DN = 99999999, okT = (row.t || []).filter(function (t) { return t < DN; });
+                        e.s = okT.length ? Math.min.apply(null, okT) : null; e.a = row.a != null && row.a < DN ? Math.round(row.a) : null;
+                        e.rk = i2 + 1; e.p = r.rows.length; e.f = r.f ? 1 : 0; e.t = (row.t || []).slice(0, 12).map(function (t) { return t >= DN ? -1 : Math.round(t); });
+                    }
+                    e.ok = ok === 1 && r ? 1 : -1; changed = true;
+                });
+            });
+            if (changed) { lsSet("comp-stats-v1", JSON.stringify(cur)); writeProfile(); }
+            return changed;
+        });
+    }
     // Rekor tablosu (records/{uid}): ev yarışması kişisel rekorları, herkes okur (icerikler/rekorlar)
     var REC_F = [["s333", "333", "s"], ["a5_333", "333", "a5"], ["a12_333", "333", "a12"], ["s222", "222", "s"], ["a5_222", "222", "a5"], ["a12_222", "222", "a12"]];
     function writeRecords(name, comp) {
-        if (!user || !comp || !comp.pb) return;
+        if (!user || !comp) return;
+        comp.pb = comp.pb || {};
         var f = { name: { stringValue: name }, n: { integerValue: String(comp.rounds || 0) }, w: { integerValue: String(comp.wins || 0) }, ts: { timestampValue: new Date().toISOString() } }, any = false;
         REC_F.forEach(function (r) {
             var v = comp.pb[r[1]] && comp.pb[r[1]][r[2]];
@@ -643,7 +686,8 @@
             if (v) any = true;
             f[r[0]] = { integerValue: String(v) };
         });
-        if (!any) return;
+        // onaylı sonucu kalmadıysa (reddedildi / diskalifiye) daha önce yazılmış rekoru sıfırla (tablo 0'ları göstermez)
+        if (!any && !lsGet("ra-rec-last")) return;
         var key = JSON.stringify(f).replace(/"ts":\{[^}]*\}/, "");
         if (lsGet("ra-rec-last") === key) return; // değişmediyse yazma (kota)
         api("/records/" + user.uid, { method: "PATCH", body: JSON.stringify({ fields: f }) }).then(function (r) { if (r.ok) lsSet("ra-rec-last", key); }).catch(function () {});
@@ -723,7 +767,7 @@
         var mask = "?" + ["email", "provider", "name", "theme", "cvd", "skin", "lang", "seen", "dev", "marks"].map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
         return api("/users/" + user.uid + "/meta/self" + mask, { method: "PATCH", body: JSON.stringify({ fields: fields }) }).catch(function () {});
     }
-    document.addEventListener("account-synced", function () { if (every("prof", 10 * 60000)) { writeProfile(); writeMeta(); } logVisit(); });
+    document.addEventListener("account-synced", function () { if (every("prof", 10 * 60000)) { writeProfile(); writeMeta(); } logVisit(); syncCompOk(); });
 
     /* ---------- sosyal: takip, beğeni, bildirim ---------- */
     function pubUrl(path) { return base() + path + (path.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey); }
