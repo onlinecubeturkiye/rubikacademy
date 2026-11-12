@@ -33,6 +33,8 @@
         "html.ra-app body{overscroll-behavior-y:none}" +
         // üst menü: yalnız logo + hesap; sayfa bağlantıları alttaki sekmelerde
         "html.ra-app .nav-links{display:none!important}" +
+        // hesap/profil alttaki "Profil" sekmesinde; üstte ikinci kez görünmesin (sekme çubuğu olmayan sayfalarda kalır)
+        "html.ra-app:not(.ra-app-nobar) #accWrap{display:none!important}" +
         "html.ra-app .navbar{padding-top:max(env(safe-area-inset-top),0px)}" +
         "html.ra-app footer{display:none!important}" +
         "html.ra-app #btnInstall,html.ra-app .pwa-install,html.ra-app [data-install]{display:none!important}" +
