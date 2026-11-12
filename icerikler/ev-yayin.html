@@ -71,6 +71,8 @@ body:not(.green):not(.clear)::before { content: ""; position: fixed; inset: 0; p
 .oc .ts span.dnf { color: var(--bad); } .oc .ts span.best { color: var(--good); } .oc .ts span.e { opacity: .35; }
 .msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 1.6em; font-weight: 800; color: var(--soft); padding: 2em; }
 .scr { color: var(--soft); font: 700 .95em "JetBrains Mono", monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recb { display: inline-block; margin-left: .5em; padding: .15em .6em; border-radius: 99px; background: linear-gradient(120deg,#ff8a1f,#e84393); color: #fff; font-weight: 900; font-size: .55em; letter-spacing: .04em; vertical-align: middle; }
+.rec { color: var(--soft); font-weight: 800; }
 .prep { font: 800 4.2em "JetBrains Mono", monospace; }
 @media (max-aspect-ratio: 1/1) { body { overflow: auto; font-size: 13px; } .wrap { height: auto; } .main { grid-template-columns: 1fr; } .others { max-height: none; } }
 </style>
@@ -79,7 +81,8 @@ body:not(.green):not(.clear)::before { content: ""; position: fixed; inset: 0; p
 <div class="wrap" id="w">
     <div class="msg" id="msg">Yükleniyor…</div>
 </div>
-<script src="/js/firebase-config.js?v=20261230"></script>
-<script src="/js/ev-yayin.js?v=20261230"></script>
+<script src="/js/firebase-config.js?v=20261231"></script>
+<script src="/js/comp-share.js?v=20261231"></script>
+<script src="/js/ev-yayin.js?v=20261231"></script>
 </body>
 </html>

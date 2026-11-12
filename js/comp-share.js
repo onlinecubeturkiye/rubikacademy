@@ -146,5 +146,46 @@
         });
         return out;
     }
-    window.RACompShare = { suspect: suspect, image: shareImageR, save: save, downloadCert: downloadCert, text: shareTextR, cert: certImage, certInfo: certInfo, fmt: fmt };
+    /* --- Rekorlar ve yarışmalar (herkese açık okuma, 5 dk bellekte) --- */
+    var memo = {};
+    function cfg() { return window.RA_FIREBASE || {}; }
+    function runQuery(q) {
+        var c = cfg(); if (!c.apiKey) return Promise.resolve([]);
+        var base = ((c.emulator && c.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + c.projectId + "/databases/(default)/documents:runQuery?key=" + encodeURIComponent(c.apiKey);
+        return fetch(base, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ structuredQuery: q }) })
+            .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+            .then(function (a) { return (a || []).filter(function (x) { return x.document; }).map(function (x) { return x.document; }); });
+    }
+    function cached(key, fn) {
+        var m = memo[key]; if (m && Date.now() - m.t < 300000) return m.p;
+        var p = fn().catch(function () { delete memo[key]; return []; }); memo[key] = { t: Date.now(), p: p }; return p;
+    }
+    function fv(f, k) { var x = f[k]; return x == null ? null : x.integerValue != null ? +x.integerValue : x.stringValue != null ? x.stringValue : x.timestampValue != null ? x.timestampValue : null; }
+    // Rekor tablosu: kind "s" (tekil), "a5", "a12"; ev "333" | "222"
+    function records(ev, kind, n) {
+        var f = kind === "s" ? "s" + ev : kind + "_" + ev;
+        return cached("rec:" + f + ":" + (n || 10), function () {
+            return runQuery({ from: [{ collectionId: "records" }], where: { fieldFilter: { field: { fieldPath: f }, op: "GREATER_THAN", value: { integerValue: "0" } } }, orderBy: [{ field: { fieldPath: f }, direction: "ASCENDING" }], limit: n || 10 })
+                .then(function (docs) { return docs.map(function (d) { var x = d.fields || {}; return { uid: d.name.split("/").pop(), name: fv(x, "name") || "Cuber", t: fv(x, f), n: fv(x, "n") || 0, w: fv(x, "w") || 0 }; }); });
+        });
+    }
+    // Son güncellenen yarışmalar: canlı olanlar ve finali bitenlerin şampiyonları
+    function comps() {
+        return cached("comps", function () {
+            return runQuery({ from: [{ collectionId: "comps" }], orderBy: [{ field: { fieldPath: "ts" }, direction: "DESCENDING" }], limit: 40 }).then(function (docs) {
+                return docs.map(function (d) { var x = d.fields || {}, o = {}; Object.keys(x).forEach(function (k) { o[k] = fv(x, k); }); o.code = d.name.split("/").pop(); o.up = Date.parse(d.updateTime) || 0; return o; });
+            });
+        });
+    }
+    function liveComps() { var now = Date.now(); return comps().then(function (l) { return l.filter(function (o) { return o.st && o.st !== "lobby" && !(o.st === "end" && o.fin) && now - o.up < 6 * 3600000; }); }); }
+    function champions(n) {
+        return comps().then(function (l) {
+            return l.filter(function (o) { return o.fin && o.st === "end"; }).map(function (o) {
+                var R = []; try { R = JSON.parse(o.R || "[]"); } catch (e) {}
+                var fin = R.filter(function (r) { return r.f; }).pop() || R[R.length - 1]; if (!fin || !fin.rows || !fin.rows.length) return null;
+                return { code: o.code, comp: o.name, ev: o.ev, name: fin.rows[0].n, uid: fin.rows[0].u, a: fin.rows[0].a, n: rS(fin), ts: o.up, rows: fin.rows.length };
+            }).filter(Boolean).slice(0, n || 6);
+        });
+    }
+    window.RACompShare = { records: records, comps: comps, liveComps: liveComps, champions: champions, suspect: suspect, image: shareImageR, save: save, downloadCert: downloadCert, text: shareTextR, cert: certImage, certInfo: certInfo, fmt: fmt };
 })();

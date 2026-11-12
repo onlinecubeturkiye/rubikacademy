@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261230";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20261231";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -696,6 +696,11 @@
             cMsg("Oluşturuluyor…");
             api("/comps?documentId=" + c, { method: "POST", body: JSON.stringify({ fields: cBody(f) }) }).then(function (r) {
                 if (!r.ok) throw new Error(r.status);
+                // Yeni yarışma duyurusu: sitedeki herkese site içi bildirim (5 dk içinde), bildirim abonelerine telefon bildirimi.
+                // Kurallar yarışma başına tek duyuruya ve yalnız oda sahibine izin verir (belge adı comp-KOD).
+                api("/broadcasts?documentId=comp-" + c, { method: "POST", body: JSON.stringify({ fields: {
+                    text: { stringValue: ("🏠 Yeni ev yarışması: " + name + " (" + (evc === "222" ? "2x2" : "3x3") + "). Katılmak için Ev Yarışması sayfasına gel, kod: " + c).slice(0, 200) },
+                    pushed: { booleanValue: false }, ts: { timestampValue: new Date().toISOString() } } }) }).catch(function () {});
                 joinComp(c);
             }).catch(function (e) { cMsg("Oluşturulamadı (" + esc(e.message) + "). Kurallar yayımlandı mı?", 1); });
     }
@@ -1366,6 +1371,24 @@
     // Sonuç görseli / metni js/comp-share.js içinde (yönetim paneli de kullanır)
     function shareTextR(r) { return RACompShare.text(comp.doc, r); }
     function shareImageR(r) { return RACompShare.image(comp.doc, r); }
+    // Tur sonuçlarında rekor işaretleri: site rekoru (rekor tablosunun 1.'sinden hızlı) ve kişisel rekor (yalnız kendin için)
+    function markRecords(r) {
+        if (!window.RACompShare || !r || !r.rows) return;
+        var d = comp.doc, ev = d.ev === "222" ? "222" : "333", ak = rS(r) === 12 ? "a12" : "a5", me = signedIn() ? Account.user().uid : "";
+        var pb = {}; // bu yarışma dışındaki kişisel en iyiler
+        try { var cs = JSON.parse(localStorage.getItem(STATS_KEY) || "{}") || {}; Object.keys(cs.r || {}).forEach(function (k) { var e = cs.r[k]; if (k.split(":")[0] === comp.code || e.ev !== ev) return; if (e.s != null && (pb.s == null || e.s < pb.s)) pb.s = e.s; if ((e.n === 12) === (ak === "a12") && e.a != null && (pb.a == null || e.a < pb.a)) pb.a = e.a; }); } catch (x) {}
+        Promise.all([RACompShare.records(ev, "s", 1), RACompShare.records(ev, ak, 1)]).then(function (v) {
+            var rs = v[0][0], ra = v[1][0], box = $("akFinalBox"); if (!box) return;
+            r.rows.forEach(function (x, i) {
+                var ok = (x.t || []).filter(function (t) { return t < DNF; }), best = ok.length ? Math.min.apply(null, ok) : null, b = [];
+                // rekor tablosu bu turdan sonra güncellenmiş olabilir: kendisi zaten rekor sahibiyse ve süre eşitse de rekor say
+                var siteS = best != null && (!rs || best < rs.t || (rs.uid === x.u && best === rs.t)), siteA = x.a != null && x.a < DNF && (!ra || x.a < ra.t || (ra.uid === x.u && Math.round(x.a) === ra.t));
+                if (siteS) b.push("🔥 Tekil site rekoru"); if (siteA) b.push("🔥 Ao" + rS(r) + " site rekoru");
+                if (!siteS && !siteA && x.u === me && ((best != null && pb.s != null && best < pb.s) || (x.a != null && x.a < DNF && pb.a != null && x.a < pb.a))) b.push("⭐ Kişisel rekor");
+                var cell = box.querySelector('tr[data-ri="' + i + '"] .c-recb'); if (cell && b.length) cell.innerHTML = b.map(function (t) { return '<span class="c-rec">' + t + '</span>'; }).join("");
+            });
+        });
+    }
     function showRoundResults(r) {
         if (!r) return;
         var d = comp.doc, host = isHost(), latest = d.st === "end" && r.n === d.round;
@@ -1374,7 +1397,7 @@
         $("akFinalBox").innerHTML = '<button type="button" class="ak-x" id="akFinClose" aria-label="Kapat">✕</button>' +
             '<h3>🏁 ' + (r.f ? "Final" : "Tur " + r.n) + ' sonuçları</h3>' + champ +
             '<div class="c-res"><table><thead><tr><th>#</th><th>Yarışmacı</th><th>Ao' + rS(r) + '</th><th>Süreler</th></tr></thead><tbody>' +
-            r.rows.map(function (x, i) { return '<tr' + (i === 0 ? ' class="win"' : '') + '><td>' + (i + 1) + '</td><td>' + esc(x.n) + '</td><td class="mono"><b>' + (x.a == null ? "-" : fmt(x.a)) + '</b></td><td class="mono small">' + x.t.map(fmt).join(", ") + '</td></tr>'; }).join("") +
+            r.rows.map(function (x, i) { return '<tr data-ri="' + i + '"' + (i === 0 ? ' class="win"' : '') + '><td>' + (i + 1) + '</td><td>' + esc(x.n) + '<span class="c-recb"></span></td><td class="mono"><b>' + (x.a == null ? "-" : fmt(x.a)) + '</b></td><td class="mono small">' + x.t.map(fmt).join(", ") + '</td></tr>'; }).join("") +
             '</tbody></table></div>' +
             '<div class="ak-fin-b"><button type="button" class="btn primary" id="cShareImg">🖼️ Görsel paylaş</button><button type="button" class="btn" id="cShareTxt">📝 Metin paylaş</button></div>' +
             (host && latest && !r.f ? '<div class="c-next"><label>Sonraki tura geçenler <select id="cAdv"><option value="0">Herkes</option><option value="8">İlk 8</option><option value="4">İlk 4</option><option value="2">İlk 2</option></select></label>' +
@@ -1405,6 +1428,7 @@
         if ($("cNextR")) $("cNextR").onclick = function () { startRound(false, +$("cAdv").value); };
         if ($("cFinalR")) $("cFinalR").onclick = function () { startRound(true, +$("cAdv").value, +(($("cFinFmt") || {}).value || 5)); };
         if ($("cFinishR")) $("cFinishR").onclick = finishComp;
+        markRecords(r);
         Array.prototype.forEach.call($("akFinalBox").querySelectorAll("[data-cert]"), function (b) {
             b.onclick = function () { var o = RACompShare.certInfo(comp.doc, r, +b.getAttribute("data-cert")); if (o) { o.ts = Date.now(); RACompShare.downloadCert(o); } };
         });
