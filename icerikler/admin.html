@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/common.css?v=20270101">
+<link rel="stylesheet" href="/styles/common.css?v=20270102">
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 <style>
 .wrap { max-width: 1040px; margin: 0 auto; }
@@ -35,11 +35,42 @@ body { overflow-x: hidden; }
 .box h2 { font-size: 20px; font-weight: 850; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .a-h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 900; letter-spacing: -1px; color: var(--text); margin-bottom: 4px; }
 .a-sub { color: var(--text-soft); font-size: 14px; margin-bottom: 18px; }
-.a-btn { padding: 9px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 800; font-size: 13.5px; box-shadow: var(--shadow-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-.a-btn.main { background: var(--ui-accent); color: var(--ui-accent-text); }
-.a-btn.danger { color: var(--cube-red); border-color: var(--cube-red); }
-.a-btn.sm { padding: 5px 10px; font-size: 12px; border-radius: 10px; }
-.a-btn:disabled { opacity: .5; cursor: default; }
+/* Düğmeler: sitenin ana düğmeleriyle aynı dil (kalın kenar, gölge, basınca çöken) */
+.a-btn { font-family: inherit; padding: 10px 15px; border-radius: 13px; border: var(--card-bw) solid var(--card-border, var(--border)); background: var(--surface); color: var(--text); font-weight: 850; font-size: 13.5px; box-shadow: var(--shadow-sm); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; transition: transform .12s ease, box-shadow .12s ease, background .15s ease, border-color .15s ease; -webkit-tap-highlight-color: transparent; }
+.a-btn:hover { transform: translateY(-1px); border-color: var(--ui-accent); }
+.a-btn:active { transform: translateY(1px); box-shadow: none; }
+.a-btn.main { background: var(--btn-bg, var(--ui-accent)); color: var(--btn-text, var(--ui-accent-text)); border-color: var(--ink, transparent); }
+.a-btn.main:hover { background: var(--btn-hover-bg, var(--ui-accent)); }
+.a-btn.danger { color: #dc2626; border-color: rgba(220, 38, 38, .45); background: rgba(220, 38, 38, .06); }
+.a-btn.danger:hover { background: rgba(220, 38, 38, .12); border-color: #dc2626; }
+.a-btn.sm { padding: 6px 11px; font-size: 12.5px; border-radius: 11px; box-shadow: none; }
+.a-btn:disabled { opacity: .5; cursor: default; transform: none; }
+.a-btn:focus-visible, .bc-seg button:focus-visible, .bc-chips button:focus-visible, .bc-send:focus-visible { outline: 3px solid color-mix(in srgb, var(--ui-accent) 45%, transparent); outline-offset: 2px; }
+/* Bildirim formu */
+.bc-form { display: grid; gap: 14px; margin-top: 6px; }
+.bc-step { display: grid; gap: 8px; }
+.bc-lbl { font-size: 12px; font-weight: 900; letter-spacing: .5px; color: var(--text-soft); text-transform: uppercase; }
+.bc-ta { position: relative; }
+.bc-ta textarea { width: 100%; box-sizing: border-box; padding: 13px 14px 26px; border-radius: 16px; border: var(--card-bw) solid var(--card-border, var(--border)); background: var(--surface); color: var(--text); font: 650 15px/1.5 Inter, sans-serif; resize: vertical; min-height: 92px; }
+.bc-ta textarea:focus, .bc-pick input:focus, .bc-dt:focus { outline: none; border-color: var(--ui-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-accent) 20%, transparent); }
+.bc-cnt { position: absolute; right: 12px; bottom: 9px; font-size: 11.5px; font-weight: 800; color: var(--text-soft); }
+.bc-seg { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; gap: 4px; border-radius: 15px; background: var(--surface-soft); border: 1px solid var(--border); }
+.bc-seg button { font-family: inherit; border: 0; border-radius: 11px; padding: 10px; background: transparent; color: var(--text-soft); font-weight: 850; font-size: 14px; cursor: pointer; }
+.bc-seg button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+.bc-pick { display: grid; gap: 8px; }
+.bc-pick input { width: 100%; box-sizing: border-box; padding: 11px 13px; border-radius: 13px; border: var(--card-bw) solid var(--card-border, var(--border)); background: var(--surface); color: var(--text); font: 650 14px Inter, sans-serif; }
+.bc-list { display: grid; gap: 4px; max-height: 240px; overflow-y: auto; padding: 4px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface-soft); }
+.bc-u { font-family: inherit; display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 2px solid transparent; border-radius: 11px; background: var(--surface); color: var(--text); font-weight: 750; font-size: 14px; text-align: left; cursor: pointer; }
+.bc-u.on { border-color: var(--ui-accent); background: color-mix(in srgb, var(--ui-accent) 10%, var(--surface)); }
+.bc-av { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--ui-accent) 18%, var(--surface)); color: var(--ui-accent); font-weight: 900; font-size: 13px; }
+.bc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.bc-chips button { font-family: inherit; padding: 8px 12px; border-radius: 99px; border: 2px solid var(--border); background: var(--surface); color: var(--text); font-weight: 800; font-size: 13px; cursor: pointer; }
+.bc-chips button.on { border-color: var(--ui-accent); background: color-mix(in srgb, var(--ui-accent) 12%, var(--surface)); color: var(--ui-accent); }
+.bc-dt { width: 100%; box-sizing: border-box; padding: 11px 13px; border-radius: 13px; border: var(--card-bw) solid var(--card-border, var(--border)); background: var(--surface); color: var(--text); font: 700 14px Inter, sans-serif; }
+.bc-send { font-family: inherit; width: 100%; padding: 15px 16px; border-radius: 16px; border: var(--card-bw) solid var(--ink, transparent); background: var(--btn-bg, var(--ui-accent)); color: var(--btn-text, #fff); font-weight: 900; font-size: 15.5px; box-shadow: var(--shadow); cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; }
+.bc-send:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover, var(--shadow)); }
+.bc-send:active { transform: translateY(1px); box-shadow: none; }
+.bc-send:disabled { opacity: .55; cursor: default; transform: none; }
 .a-row { display: grid; grid-template-columns: 34px minmax(0,1fr) auto auto; gap: 10px; align-items: center; padding: 8px 6px; border-bottom: 1px solid var(--border); font-size: 14.5px; }
 .ad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
 .ad-f span { display: block; font: 800 12px Inter, sans-serif; color: var(--text-soft); margin-bottom: 4px; }
@@ -229,13 +260,13 @@ details.m-set > summary { font-size: 12.5px; }
 </div>
 </div>
 <footer><span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span></footer>
-<script src="/js/i18n.js?v=20270101"></script>
-<script src="/js/common.js?v=20270101"></script>
-<script src="/js/firebase-config.js?v=20270101"></script>
-<script src="/js/account.js?v=20270101"></script>
-<script src="/js/leaderboard.js?v=20270101"></script>
-<script src="/js/data-editor.js?v=20270101"></script>
-<script src="/js/comp-share.js?v=20270101"></script>
-<script src="/js/admin.js?v=20270101"></script>
+<script src="/js/i18n.js?v=20270102"></script>
+<script src="/js/common.js?v=20270102"></script>
+<script src="/js/firebase-config.js?v=20270102"></script>
+<script src="/js/account.js?v=20270102"></script>
+<script src="/js/leaderboard.js?v=20270102"></script>
+<script src="/js/data-editor.js?v=20270102"></script>
+<script src="/js/comp-share.js?v=20270102"></script>
+<script src="/js/admin.js?v=20270102"></script>
 </body>
 </html>
