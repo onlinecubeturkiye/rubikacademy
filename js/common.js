@@ -6,6 +6,65 @@
    - Hesaptan çıkınca ya da bu cihazda oturum yokken cihazda kalan kişisel veri silinir.
    - Tema, dil, renk körlüğü, tutuş gibi tercihler herkes için saklanır.
 ========================================================= */
+/* =========================================================
+   UYGULAMA MODU (Android uygulaması / ana ekrana eklenmiş site)
+   Algılama: ?source=twa|pwa, android-app:// yönlendireni ya da display-mode: standalone → oturum boyunca hatırlanır.
+   html.ra-app: altta uygulama sekme çubuğu (Ana Sayfa · İçerikler · Antrenör · Yarışma · Profil),
+   üst menü ve alt bilgi sadeleşir, "uygulama olarak yükle" gibi tarayıcı öğeleri gizlenir, güvenli alan boşluğu.
+   Zamanlayıcı / antrenör / yarışma odası / yayın ekranı gibi tam ekran sayfalarda sekme çubuğu çıkmaz.
+========================================================= */
+(function () {
+    var on = false;
+    try {
+        var q = /[?&]source=(twa|pwa)\b/.test(location.search), ref = /^android-app:\/\//.test(document.referrer || "");
+        var sa = window.matchMedia && (matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches) || navigator.standalone === true;
+        if (q || ref || sa) sessionStorage.setItem("ra-app", "1");
+        on = sessionStorage.getItem("ra-app") === "1";
+    } catch (e) {}
+    window.RA_APP = on;
+    if (!on) return;
+    var d = document.documentElement; d.classList.add("ra-app");
+    var path = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
+    var noBar = /\/(zkttimer|sanal-kup|tekrar|ev-yayin|admin|giris|yakinda)$|\/algoritmalar\/(antrenor|yazdir)|\/kup-arena\//.test(path);
+    if (noBar) d.classList.add("ra-app-nobar");
+    var st = document.createElement("style");
+    st.textContent =
+        "html.ra-app{-webkit-tap-highlight-color:transparent}" +
+        "html.ra-app body{overscroll-behavior-y:none}" +
+        // üst menü: yalnız logo + hesap; sayfa bağlantıları alttaki sekmelerde
+        "html.ra-app .nav-links{display:none!important}" +
+        "html.ra-app .navbar{padding-top:max(env(safe-area-inset-top),0px)}" +
+        "html.ra-app footer{display:none!important}" +
+        "html.ra-app #btnInstall,html.ra-app .pwa-install,html.ra-app [data-install]{display:none!important}" +
+        "html.ra-app:not(.ra-app-nobar) body{padding-bottom:calc(74px + env(safe-area-inset-bottom))}" +
+        ".ra-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:900;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(6px + env(safe-area-inset-bottom));" +
+            "background:color-mix(in srgb,var(--surface,#fff) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--border,#e5e7eb);box-shadow:0 -6px 20px rgba(0,0,0,.08)}" +
+        ".ra-tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;border-radius:14px;color:var(--text-soft,#6b7280);text-decoration:none;font:800 11px Inter,system-ui,sans-serif;letter-spacing:.1px}" +
+        ".ra-tabbar a svg{width:24px;height:24px}" +
+        ".ra-tabbar a.on{color:var(--ui-accent,#6c5ce7);background:color-mix(in srgb,var(--ui-accent,#6c5ce7) 12%,transparent)}" +
+        ".ra-tabbar a:active{transform:scale(.94)}" +
+        "html.ra-app-nobar .ra-tabbar{display:none}" +
+        "html.ra-app:not(.ra-app-nobar) .ra-pushask{bottom:calc(86px + env(safe-area-inset-bottom))}" +
+        "body.c-in-room .ra-tabbar{display:none}" +
+        "@media(min-width:900px){.ra-tabbar{left:50%;right:auto;transform:translateX(-50%);width:560px;bottom:12px;border-radius:22px;border:1px solid var(--border,#e5e7eb);padding:6px}html.ra-app:not(.ra-app-nobar) body{padding-bottom:96px}}" +
+        "@media print{.ra-tabbar{display:none}}";
+    (document.head || d).appendChild(st);
+    var ic = function (p) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; };
+    var TABS = [
+        ["/", "Ana Sayfa", ic('<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>'), /^\/$/],
+        ["/icerikler", "İçerikler", ic('<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>'), /^\/icerikler$|^\/icerikler\/(algoritmalar|videolar|kup-rehberi|cozucu|akilli-kup|yol-haritasi|dersler|keyhole|sss)/],
+        ["/icerikler/algoritmalar/antrenor", "Antrenör", ic('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>'), /antrenor/],
+        ["/icerikler/ev-yarismasi", "Yarışma", ic('<path d="M8 4h8v4.5a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a2.5 2.5 0 0 0 3 4M16 5.5h3a2.5 2.5 0 0 1-3 4"/><path d="M12 12.5V16M8.5 20h7M10 16h4v4h-4z"/>'), /ev-yarismasi|rekorlar|cekilis|gunluk/],
+        ["/icerikler/profil", "Profil", ic('<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>'), /profil|ayarlar/]
+    ];
+    function bar() {
+        if (noBar || document.getElementById("raTabbar") || !document.body) return;
+        var n = document.createElement("nav"); n.id = "raTabbar"; n.className = "ra-tabbar ra-noico"; n.setAttribute("aria-label", "Uygulama menüsü");
+        n.innerHTML = TABS.map(function (t) { var cur = t[3].test(path); return '<a href="' + t[0] + '"' + (cur ? ' class="on" aria-current="page"' : '') + '>' + t[2] + '<span>' + t[1] + '</span></a>'; }).join("");
+        document.body.appendChild(n);
+    }
+    if (document.body) bar(); else document.addEventListener("DOMContentLoaded", bar);
+})();
 // RA ikonları: sitedeki emojileri Rubik Academy'ye özel ikonlarla değiştirir (js/ra-icons.js)
 (function () {
     try {

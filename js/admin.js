@@ -1007,11 +1007,12 @@
     function renderSiteStats() {
         var box = $id("aSiteStats"); if (!box) return;
         if (!_users.length) { box.innerHTML = '<p class="a-note">Kullanıcılar yüklenince hesaplanır.</p>'; return; }
-        var sm = 0, vc = 0, ev = 0, tr = 0, mag = 0, man = 0, cubes = {}, cubeUsers = 0;
+        var sm = 0, vc = 0, ev = 0, tr = 0, mag = 0, man = 0, magU = 0, manU = 0, cubes = {}, cubeUsers = 0;
         var rooms = 0, rounds = 0, wins = 0, compUsers = 0, rr = {}, top = [];
         _users.forEach(function (u) {
             var s = u.stats || {}, c = s.cnt || {};
             sm += c.sm || 0; vc += c.vc || 0; ev += c.ev || 0; tr += c.tr || s.solves || 0; mag += c.mag || 0; man += c.man || 0;
+            if (c.mag) magU++; if (c.man) manU++;
             if (Array.isArray(s.cubes) && s.cubes.length) { cubeUsers++; s.cubes.forEach(function (n) { cubes[n] = (cubes[n] || 0) + 1; }); }
             var cp = s.comp;
             if (cp && (cp.rooms || cp.rounds)) {
@@ -1029,7 +1030,8 @@
             tiles([["Yarışmaya katılan üye", compUsers], ["Oda girişi (toplam)", nf(rooms)], ["Oynanan tur (kişi×tur)", nf(rounds)], ["Ortalama tur büyüklüğü", avg ? avg.toFixed(1) + " kişi" : "—"], ["Şampiyonluk", wins]]) + '</div>' +
             (top.length ? '<h4 style="margin-top:12px">En çok yarışan</h4>' + top.slice(0, 8).map(function (x, i) { return '<div class="dist-row"><span class="dist-lbl">' + (i + 1) + '. ' + esc(x.n) + '</span><span class="a-note">' + x.r + ' oda · ' + x.t + ' tur · ' + x.w + ' 🏆</span></div>'; }).join("") : '') +
             '<h4 style="margin-top:12px">En aktif organizatörler (açık / son odalar)</h4><div id="aOrgTop"><p class="a-note">Yükleniyor…</p></div>' +
-            '<h4 style="margin-top:14px">Süre giriş yöntemi (ev yarışması)</h4>' + (inpT ? distHtml({ "🧲 Mıknatıs timer": mag, "⌨️ Elle yazma": man }, inpT) : '<p class="a-note">Henüz veri yok (bu özellikten sonraki çözümler sayılır).</p>');
+            '<h4 style="margin-top:14px">Süre giriş yöntemi</h4>' + (inpT ? '<p class="a-note" style="margin:0 0 6px">Kişi = o yöntemi en az bir kez kullanan üye; çözüm = o yöntemle girilen toplam süre (her tur 5 çözüm).</p>' +
+                [["⌨️ Elle yazma", manU, man], ["⏱️ Timer (mıknatıs / kablolu / akıllı)", magU, mag]].map(function (r) { var pc = Math.round(100 * r[2] / inpT); return '<div class="dist-row"><span class="dist-lbl">' + r[0] + '</span><span class="a-note"><b>' + r[1] + ' kişi</b> · ' + nf(r[2]) + ' çözüm · %' + pc + '</span></div>'; }).join("") : '<p class="a-note">Henüz veri yok.</p>');
         if (evBox) evBox.innerHTML = evHtml;
         box.innerHTML =
             '<h4>Çözümler</h4><div class="stat-tiles">' + tiles([["Akıllı küp çözümü", nf(sm)], ["Sanal küp çözümü", nf(vc)], ["Antrenör denemesi", nf(tr)]]) + '</div>' +
