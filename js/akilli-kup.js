@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270104";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270105";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -1757,7 +1757,8 @@
         var qs = new URLSearchParams(location.search), ev = qs.get("ev"), EV_PAGE = window.AK_PAGE === "ev";
         // Ev yarışması ayrı sayfada: eski bağlantılar oraya gitsin
         if (!EV_PAGE && (ev || qs.get("tab") === "ev")) { location.replace("/icerikler/ev-yarismasi" + (ev ? "?ev=" + encodeURIComponent(ev) : "")); return; }
-        renderStages(null); renderHist(); initComp();
+        renderStages(null); renderHist();
+        if (EV_PAGE) initComp(); // ev yarışması yalnız kendi sayfasında çalışır (Akıllı Küp sayfasında boşuna Firebase okuması yapmasın)
         if (EV_PAGE) {
             setTab("comp");
             var iz = qs.get("izle");
@@ -1779,7 +1780,7 @@
             }
         }
         if (!EV_PAGE) setTab("analysis");
-        if (window.Account && Account.onChange) Account.onChange(function () { $("cLoginNote").hidden = signedIn(); initCompRole(); if (comp) chatUi(); });
+        if (EV_PAGE && window.Account && Account.onChange) Account.onChange(function () { $("cLoginNote").hidden = signedIn(); initCompRole(); if (comp) chatUi(); });
     }
     // Ev yarışması sayfasında emojiler yerine RA ikonları
     if (window.RAIcons && $("akComp")) RAIcons.watch([$("cJoinCard"), $("akComp"), $("akFinal"), document.querySelector(".ev-how")]);
