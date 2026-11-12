@@ -27,13 +27,14 @@ jobs:
         run: |
           B=https://rubikacademydb.firebaseapp.com/__
           mkdir -p __/auth __/firebase
-          curl -fsSL --retry 3 -o __/auth/handler.html "$B/auth/handler"
-          curl -fsSL --retry 3 -o __/auth/handler.js "$B/auth/handler.js"
-          curl -fsSL --retry 3 -o __/auth/experiments.js "$B/auth/experiments.js"
-          curl -fsSL --retry 3 -o __/auth/iframe.html "$B/auth/iframe"
-          curl -fsSL --retry 3 -o __/auth/iframe.js "$B/auth/iframe.js"
-          curl -fsSL --retry 3 -o __/firebase/init.json "$B/firebase/init.json"
-          ls -la __/auth __/firebase
+          get() { code=$(curl -sSL --retry 3 -o "$1" -w "%{http_code}" "$2"); echo "$2 -> $code"; [ "$code" = 200 ] || { rm -f "$1"; [ "$3" = opt ]; }; }
+          get __/auth/handler.html "$B/auth/handler"
+          get __/auth/handler.js "$B/auth/handler.js"
+          get __/auth/iframe.html "$B/auth/iframe"
+          get __/auth/iframe.js "$B/auth/iframe.js"
+          get __/auth/experiments.js "$B/auth/experiments.js" opt
+          get __/firebase/init.json "$B/firebase/init.json" opt
+          ls -laR __
           grep -qi "<html" __/auth/handler.html || { echo "handler beklenen HTML değil"; exit 1; }
       - name: Değişiklik varsa gönder
         run: |
