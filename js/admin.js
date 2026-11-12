@@ -617,21 +617,40 @@
         return out;
     }
     function certCount(list) { var n = 0; certFinals(list).forEach(function (x) { n += Math.min(3, x.r.rows.length); }); return n; }
+    // Kişi kişi: isme dokununca altında o kişinin bütün sertifikaları açılır
     function certList(list) {
         var F = certFinals(list);
         if (!F.length) return '<p class="a-note">Henüz sertifika yok. Final turu olan yarışmalar onaylanınca ilk 3 burada çıkar.</p>';
+        var P = {}, order = [];
+        F.forEach(function (x) {
+            x.r.rows.slice(0, 3).forEach(function (row, i) {
+                var k = row.u || ("n:" + row.n), e = P[k];
+                if (!e) { e = P[k] = { n: row.n, u: row.u, m: [0, 0, 0], c: [] }; order.push(k); }
+                e.m[i]++; e.c.push({ x: x, row: row, i: i, ts: x.o.updated || 0 });
+            });
+        });
+        var people = order.map(function (k) { return P[k]; }).sort(function (a, b) { return b.m[0] - a.m[0] || b.m[1] - a.m[1] || b.m[2] - a.m[2] || a.n.localeCompare(b.n, "tr"); });
+        var res = function (row, r) {
+            if (row.a != null && row.a < 99999999) return "Ao" + (r.s || 5) + " " + tFmt(row.a);
+            var ok = (row.t || []).filter(function (t) { return t > 0 && t < 99999999; });
+            return ok.length ? "en iyi " + tFmt(Math.min.apply(null, ok)) : "DNF";
+        };
         return '<input type="search" class="cp-search" id="cpCertQ" placeholder="İsim ya da yarışma ara…" autocomplete="off">' +
-            '<div class="cp-certs">' + F.map(function (x) {
-                return x.r.rows.slice(0, 3).map(function (row, i) {
-                    return '<div class="cp-cert p' + (i + 1) + '" data-q="' + esc((row.n + " " + (x.o.name || "")).toLocaleLowerCase("tr")) + '"><span class="m">' + ["🥇", "🥈", "🥉"][i] + '</span>' +
-                        '<span class="t"><b>' + esc(row.n) + '</b><small>' + esc(x.o.name || x.o.code) + ' · ' + (x.o.ev === "222" ? "2x2" : "3x3") + ' · Ao' + (x.r.s || 5) + ' ' + tFmt(row.a) + ' · ' + esc(dateFmt(x.o.updated).split(" ")[0]) + '</small></span>' +
-                        '<button class="a-btn sm main" data-rcert="' + esc(x.o.code) + '|' + x.ri + '|' + i + '">İndir</button></div>';
-                }).join("");
+            '<p class="a-note" style="margin:0 0 8px">' + people.length + ' kişi · ' + certCount(list) + ' sertifika. İsme dokun, sertifikaları açılsın.</p>' +
+            '<div class="cp-people">' + people.map(function (e) {
+                var q = (e.n + " " + e.c.map(function (c) { return c.x.o.name || ""; }).join(" ")).toLocaleLowerCase("tr");
+                return '<details class="cp-person" data-q="' + esc(q) + '"><summary><span class="nm">' + esc(e.n) + '</span>' +
+                    '<span class="md">' + (e.m[0] ? '<span class="g">🥇' + e.m[0] + '</span>' : '') + (e.m[1] ? '<span class="s">🥈' + e.m[1] + '</span>' : '') + (e.m[2] ? '<span class="b">🥉' + e.m[2] + '</span>' : '') + '</span><span class="ch">▾</span></summary>' +
+                    '<div class="cp-certs">' + e.c.sort(function (a, b) { return b.ts - a.ts; }).map(function (c) {
+                        return '<div class="cp-cert p' + (c.i + 1) + '"><span class="m">' + ["🥇", "🥈", "🥉"][c.i] + '</span>' +
+                            '<span class="t"><b>' + esc(c.x.o.name || c.x.o.code) + '</b><small>' + (c.x.o.ev === "222" ? "2x2" : "3x3") + ' · ' + (c.i + 1) + '. · ' + res(c.row, c.x.r) + ' · ' + esc(dateFmt(c.x.o.updated).split(" ")[0]) + '</small></span>' +
+                            '<button class="a-btn sm main" data-rcert="' + esc(c.x.o.code) + '|' + c.x.ri + '|' + c.i + '">İndir</button></div>';
+                    }).join("") + '</div></details>';
             }).join("") + '</div>';
     }
     function bindCertSearch(box) {
         var q = $id("cpCertQ"); if (!q) return;
-        q.addEventListener("input", function () { var v = q.value.trim().toLocaleLowerCase("tr"); Array.prototype.forEach.call(box.querySelectorAll(".cp-cert"), function (c) { c.hidden = !!v && c.getAttribute("data-q").indexOf(v) < 0; }); });
+        q.addEventListener("input", function () { var v = q.value.trim().toLocaleLowerCase("tr"); Array.prototype.forEach.call(box.querySelectorAll(".cp-person"), function (c) { c.hidden = !!v && c.getAttribute("data-q").indexOf(v) < 0; }); });
     }
     function compCard(o, open) {
         var ev = o.ev === "222" ? "2x2" : "3x3", R = o._R, st = o._st, names = o._names, edit = st === "pend" || o._editing;
@@ -1115,8 +1134,12 @@
             var show = (onlyBad ? bad : list).sort(function (a, b) { return b.flags.length - a.flags.length || (a.s333 || 9e9) - (b.s333 || 9e9); });
             if (!show.length) { box.innerHTML = '<p class="a-note">' + (onlyBad ? "Şüpheli derece yok ✓" : "Kayıt yok.") + '</p>'; return; }
             box.innerHTML = show.slice(0, 200).map(function (o) {
-                var vals = Object.keys(REC_LBL).filter(function (k) { return o[k]; }).map(function (k) { return REC_LBL[k] + ' <b class="mono">' + tFmt(o[k]) + '</b>'; }).join(" · ");
-                return '<div class="a-row2"><div style="min-width:0;flex:1"><b>' + esc(o.name) + '</b>' + (o.flags.length ? ' <span class="pill l">⚠ ' + esc(o.flags.join(", ")) + '</span>' : '') + '<div class="a-note">' + (vals || "—") + '</div></div>' +
+                // 3x3 ve 2x2: tekil · Ao5 · Ao12 (olmayan "—"); şüpheli değer kırmızı
+                var cell = function (k) { var bad = o[k] && o[k] < REC_LIM[k]; return '<span' + (bad ? ' class="bad"' : '') + '>' + (o[k] ? tFmt(o[k]) : "—") + '</span>'; };
+                var vals = '<div class="rec-g"><i></i><i>Tekil</i><i>Ao5</i><i>Ao12</i>' +
+                    '<b>3x3</b>' + cell("s333") + cell("a5_333") + cell("a12_333") +
+                    '<b>2x2</b>' + cell("s222") + cell("a5_222") + cell("a12_222") + '</div>';
+                return '<div class="a-row2"><div style="min-width:0;flex:1"><b>' + esc(o.name) + '</b>' + (o.flags.length ? ' <span class="pill l">⚠ ' + esc(o.flags.join(", ")) + '</span>' : '') + vals + '</div>' +
                     '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.uid) + '" target="_blank" rel="noopener">👤</a><button class="a-btn danger sm" data-rd="' + esc(o.uid) + '">Sil</button></div>';
             }).join("");
             Array.prototype.forEach.call(box.querySelectorAll("[data-rd]"), function (b) {
