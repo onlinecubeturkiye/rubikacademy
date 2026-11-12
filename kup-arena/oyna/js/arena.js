@@ -105,7 +105,7 @@
       let x = Math.random() * w.reduce((a, b) => a + b, 0), ri = 0;
       for (; ri < 5; ri++) { x -= w[ri]; if (x < 0) break; }
       const def = G.pickOne(D.CUBES.filter(c => c.rarity === D.RARITY_ORDER[Math.min(ri, 4)]));
-      const lvl = Math.max(1, Math.min(10, 1 + Math.floor(t / 280) + ((Math.random() * 3) | 0) - 1));
+      const lvl = Math.max(1, Math.min(G.MAX_LVL, 1 + Math.floor(t / 200) + ((Math.random() * 3) | 0) - 1));
       team.push({ id: def.id, lvl, mult: 0.9 });
     }
     return { name: bot.name, tr: bot.tr, team };

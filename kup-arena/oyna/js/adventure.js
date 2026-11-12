@@ -21,7 +21,7 @@
 
   function enemyTeam(st) {
     const { w, wi, i } = st;
-    const lv = (x) => Math.min(10, x);
+    const lv = (x) => Math.min(G.MAX_LVL, x);
     if (st.type === 'boss') {
       return [
         { id: w.pool[(wi + 1) % w.pool.length], lvl: lv(w.base + 1), mult: w.mult },
@@ -215,7 +215,7 @@
       for (; ri < 5; ri++) { x -= w[ri]; if (x < 0) break; }
       const pool = D.CUBES.filter(c => c.rarity === D.RARITY_ORDER[Math.min(ri, 4)]);
       const boss = f % 10 === 0 && i === size - 1;
-      team.push({ id: G.pickOne(pool, rng).id, lvl: Math.min(10, 1 + Math.floor(f / 3)), mult: 0.75 + f * 0.025, boss, label: boss ? `Kule Muhafızı ${f / 10}` : undefined });
+      team.push({ id: G.pickOne(pool, rng).id, lvl: Math.min(G.MAX_LVL, 1 + Math.floor(f / 3)), mult: 0.75 + f * 0.025, boss, label: boss ? `Kule Muhafızı ${f / 10}` : undefined });
     }
     return team;
   }

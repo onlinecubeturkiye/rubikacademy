@@ -37,7 +37,7 @@
     out.adv = Object.assign({ stars: {}, bosses: [] }, s.adv || {});
     out.settings = Object.assign({ sound: true, power: true }, s.settings || {});
     out.login = Object.assign({ day: -1, streak: 0 }, s.login || {});
-    if (!s.lvl) { out.lvl = {}; for (const id in out.inv) out.lvl[id] = Math.min(10, out.inv[id]); }
+    if (!s.lvl) { out.lvl = {}; for (const id in out.inv) out.lvl[id] = Math.min(20, out.inv[id]); }
     if (!s.v) out.seenIntro = true; // eski oyuncular rehberi tekrar görmesin
     out.team = (out.team || []).filter(id => out.inv[id]).slice(0, 3);
     out.holo = s.holo || {};
@@ -73,12 +73,13 @@
   // ---------- Bulmacalar ----------
   G.level = (id) => G.S.inv[id] ? (G.S.lvl[id] || 1) : 0;
   G.statsOf = (def, lvl, mult = 1) => { const m = (1 + 0.1 * (lvl - 1)) * mult; return { hp: Math.round(def.hp * m), atk: Math.round(def.atk * m) }; };
+  G.MAX_LVL = 20;
   G.HOLO_CHANCE = 0.04;
   G.isHolo = (id) => !!(G.S.holo && G.S.holo[id]);
   G.addCube = function (id) {
     const isNew = !G.S.inv[id];
     G.S.inv[id] = (G.S.inv[id] || 0) + 1;
-    if (isNew) G.S.lvl[id] = 1; else G.S.lvl[id] = Math.min(10, (G.S.lvl[id] || 1) + 1);
+    if (isNew) G.S.lvl[id] = 1; else G.S.lvl[id] = Math.min(G.MAX_LVL, (G.S.lvl[id] || 1) + 1);
     if (isNew && G.S.team.length < 3) G.S.team.push(id);
     // Parlak (holo) sürüm: %4 şans. Gücü değişmez, koleksiyonda parlar.
     G.S.holo = G.S.holo || {};
@@ -99,7 +100,11 @@
   G.skillCost = (def) => Math.max(1, D.SKILLS[def.skill].cost - (def.brand === 'hayate' ? 1 : 0));
   G.tierOf = (def) => D.TIERS[D.BRANDS[def.brand].tier];
   G.tierChip = (t) => `<span class="tier" style="--tc:${D.TIERS[t].color}">${D.TIERS[t].name}</span>`;
-  G.brandChip = (def, cls = '') => { const b = D.BRANDS[def.brand]; return `<span class="bm ${cls}" style="--bc:${b.color}">${b.name}</span>`; };
+  // Marka amblemi (şekilli logo) ve amblemli marka etiketi
+  G.brandLogo = (id, cls = '') => `<svg class="blogo ${cls}" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="${D.BRANDS[id].logo}"/></svg>`;
+  G.brandChip = (def, cls = '') => { const b = D.BRANDS[def.brand]; return `<span class="bm ${cls}" style="--bc:${b.color}">${G.brandLogo(def.brand)}<i>${b.name}</i></span>`; };
+  // Seviye kademesi: 1-5 bronz, 6-10 gümüş, 11-15 altın, 16-20 elmas
+  G.lvTier = (lv) => (lv >= 16 ? 'd' : lv >= 11 ? 'g' : lv >= 6 ? 's' : 'b');
   G.typeOf = (def) => D.TYPE_OF[def.type];
 
   // ---------- Jeton ve deneyim ----------

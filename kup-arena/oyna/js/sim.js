@@ -385,13 +385,16 @@
   logoTex.repeat.set(1 / 0.84, 1 / 0.84); logoTex.offset.set(0.5, 0.5);
   const logoMat = glossy({ map: logoTex });
   let logoOn = false;
-  function paintLogo(pal, text) {
+  function paintLogo(pal, brand) {
     const c = logoCanvas.getContext('2d');
+    c.setTransform(1, 0, 0, 1, 0, 0);
     c.fillStyle = pal.U; c.fillRect(0, 0, 256, 256);
     const n = parseInt(pal.U.slice(1), 16), l = (0.3 * (n >> 16) + 0.59 * ((n >> 8) & 255) + 0.11 * (n & 255)) / 255;
-    c.fillStyle = l > 0.55 ? 'rgba(29,20,70,0.78)' : 'rgba(255,255,255,0.9)';
-    c.font = '800 84px "Baloo 2", "Arial Black", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.fillText(text, 128, 132);
+    c.fillStyle = l > 0.55 ? brand.color : 'rgba(255,255,255,0.92)';
+    c.save(); c.translate(128 - 60, 108 - 60); c.scale(5, 5); c.fill(new Path2D(brand.logo), 'evenodd'); c.restore();
+    c.fillStyle = l > 0.55 ? 'rgba(29,20,70,0.8)' : 'rgba(255,255,255,0.9)';
+    c.font = '800 40px "Baloo 2", "Arial Black", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(brand.name, 128, 198);
     logoTex.needsUpdate = true;
   }
   function paint(pal, logo) {

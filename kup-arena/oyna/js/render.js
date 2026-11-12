@@ -148,16 +148,18 @@
 
   // Marka logosu: üst yüzün ortasına, yüzeyin açısına uygun basılır.
   function lum(hex) { const n = parseInt(hex.slice(1), 16); return (0.3 * (n >> 16) + 0.59 * ((n >> 8) & 255) + 0.11 * (n & 255)) / 255; }
-  function drawLogo(ctx, top, n, text, stickerColor) {
+  const logoPaths = {};
+  function drawLogo(ctx, top, n, brand, stickerColor) {
     const [c0, c1, , c3] = top;
     const odd = n % 2 === 1, k = odd ? 0.5 : (n / 2 + 0.5) / n;
-    const fs = Math.min(30, (100 / n) * 0.36);
+    const size = (100 / n) * 0.74;
+    if (!logoPaths[brand.name]) logoPaths[brand.name] = new Path2D(brand.logo);
     ctx.save();
     ctx.transform((c1[0] - c0[0]) / 100, (c1[1] - c0[1]) / 100, (c3[0] - c0[0]) / 100, (c3[1] - c0[1]) / 100, c0[0], c0[1]);
-    ctx.font = `800 ${fs}px "Baloo 2", "Arial Black", sans-serif`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = lum(stickerColor) > 0.55 ? 'rgba(29,20,70,0.7)' : 'rgba(255,255,255,0.85)';
-    ctx.fillText(text, k * 100, k * 100);
+    ctx.translate(k * 100 - size / 2, k * 100 - size / 2);
+    ctx.scale(size / 24, size / 24);
+    ctx.fillStyle = lum(stickerColor) > 0.55 ? brand.color : 'rgba(255,255,255,0.92)';
+    ctx.fill(logoPaths[brand.name], 'evenodd');
     ctx.restore();
   }
 
@@ -174,7 +176,7 @@
       default: drawCube(ctx, cx, cy, s, def.n, pal);
     }
     const B = window.GameData.BRANDS;
-    if (def.brand && !opts.unknown && !opts.noLogo && s > 25) drawLogo(ctx, cubeFaces(cx, cy, s).top, def.type === 'mirror' ? 3 : def.n, B[def.brand].name, pal.U);
+    if (def.brand && !opts.unknown && !opts.noLogo && s > 25) drawLogo(ctx, cubeFaces(cx, cy, s).top, def.type === 'mirror' ? 3 : def.n, B[def.brand], pal.U);
   }
 
   function setup(canvas) {

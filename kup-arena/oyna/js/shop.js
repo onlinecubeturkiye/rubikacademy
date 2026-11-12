@@ -270,7 +270,7 @@
     const btn = (id, label, color, extra) => `<button data-b="${id}" aria-pressed="${brandFilter === id}" style="--bc:${color}">${label}${extra || ''}</button>`;
     row.innerHTML = btn('all', 'Tüm markalar', '#1d1446') + Object.entries(D.BRANDS).map(([id, b]) => {
       const all = D.CUBES.filter(c => c.brand === id), got = all.filter(c => S.inv[c.id]).length;
-      return btn(id, b.name, b.color, ` <small>${got}/${all.length}</small>`);
+      return btn(id, G.brandLogo(id) + b.name, b.color, ` <small>${got}/${all.length}</small>`);
     }).join('');
     const info = $('brand-info');
     if (brandFilter === 'all') { info.hidden = true; return; }
@@ -299,7 +299,7 @@
       card.style.setProperty('--rc', D.RARITIES[def.rarity].color);
       const ty = D.TYPES[G.typeOf(def)];
       card.innerHTML = `${have ? `<span class="cost" title="Yetenek enerjisi">${G.skillCost(def)}</span>` : ''}<canvas></canvas>${have ? G.brandChip(def, 'sm') : ''}<span class="nm">${have ? esc(def.model) : '???'}</span><span class="rr">${D.RARITIES[def.rarity].name}</span>` +
-        (have ? `<span class="lv">Sv ${G.level(def.id)}</span>${have > 1 ? `<span class="cnt">×${have}</span>` : ''}<span class="ty" style="background:${ty.color}">${ty.name}</span>` : '');
+        (have ? `<span class="lv lt-${G.lvTier(G.level(def.id))}">Sv ${G.level(def.id)}</span>${have > 1 ? `<span class="cnt">×${have}</span>` : ''}<span class="ty" style="background:${ty.color}">${ty.name}</span>` : '');
       if (have) card.onclick = () => openDetail(def);
       else card.disabled = true;
       grid.appendChild(card);
@@ -348,16 +348,16 @@
   function openDetail(def) {
     const S = G.S;
     const r = D.RARITIES[def.rarity], lv = G.level(def.id), st = G.statsOf(def, lv), have = S.inv[def.id];
-    const next = lv < 10 ? G.statsOf(def, lv + 1) : null;
+    const next = lv < G.MAX_LVL ? G.statsOf(def, lv + 1) : null;
     const inTeam = S.team.includes(def.id);
     const sk = D.SKILLS[def.skill], ty = D.TYPES[G.typeOf(def)];
     const cost = G.upgradeCost(def);
     const body = G.modal(def.name, `
       <div class="tags"><span class="rarity-tag" style="--glow:${r.color}">${r.name}</span><span class="rarity-tag" style="--glow:${ty.color}">${ty.name}</span></div>
       <canvas class="detail-cv"></canvas>
-      <div class="brand-banner" style="--bc:${G.brandOf(def).color}">${G.brandChip(def, 'big')}<div>${G.tierChip(G.brandOf(def).tier)}<b>${esc(G.brandOf(def).tag)}</b><small>Marka avantajı: ${esc(G.brandOf(def).perk)}${def.type === 'cube' ? ` · 3B dönüş: ${G.tierOf(def).speed < 150 ? 'çok hızlı' : G.tierOf(def).speed < 200 ? 'akıcı' : 'yavaş'}` : ''}</small></div></div>
+      <div class="brand-banner" style="--bc:${G.brandOf(def).color}">${G.brandLogo(def.brand, 'wm')}${G.brandChip(def, 'big')}<div>${G.tierChip(G.brandOf(def).tier)}<b>${esc(G.brandOf(def).tag)}</b><small>Marka avantajı: ${esc(G.brandOf(def).perk)}${def.type === 'cube' ? ` · 3B dönüş: ${G.tierOf(def).speed < 150 ? 'çok hızlı' : G.tierOf(def).speed < 200 ? 'akıcı' : 'yavaş'}` : ''}</small></div></div>
       <div class="stats">
-        <div><span class="label">Seviye</span><b>${lv}/10</b></div>
+        <div><span class="label">Seviye</span><b>${lv}/${G.MAX_LVL}</b></div>
         <div><span class="label">Can</span><b>${st.hp}${next ? `<small> → ${next.hp}</small>` : ''}</b></div>
         <div><span class="label">Saldırı</span><b>${st.atk}${next ? `<small> → ${next.atk}</small>` : ''}</b></div>
       </div>
@@ -366,7 +366,7 @@
       <button class="link-btn" id="fav-btn">${(G.S.prof && (G.S.prof.fav || []).includes(def.id)) ? '★ Profil vitrininden çıkar' : '☆ Profil vitrinine koy'}</button>
       <p class="note">${have} adet var. Kopyalar seviyeyi bedava yükseltir.</p>`,
       [
-        { label: lv >= 10 ? 'En yüksek seviye' : `Güçlendir (${cost})`, cls: 'btn-yellow', disabled: lv >= 10 || S.coins < cost, onClick: () => upgrade(def) },
+        { label: lv >= G.MAX_LVL ? 'En yüksek seviye' : `Güçlendir (${cost})`, cls: 'btn-yellow', disabled: lv >= G.MAX_LVL || S.coins < cost, onClick: () => upgrade(def) },
         { label: inTeam ? 'Takımdan çıkar' : (S.team.length >= 3 ? 'Takım dolu' : 'Takıma ekle'), cls: 'btn-pink', disabled: !inTeam && S.team.length >= 3,
           onClick: () => { toggleTeam(def.id); renderInv(); } },
         { label: `Sat (+${r.sell})`, disabled: have < 2, onClick: () => sell(def) },
@@ -381,7 +381,7 @@
   G.openDetail = openDetail;
   function upgrade(def) {
     const cost = G.upgradeCost(def);
-    if (G.S.coins < cost || G.level(def.id) >= 10) return;
+    if (G.S.coins < cost || G.level(def.id) >= G.MAX_LVL) return;
     G.S.coins -= cost;
     G.S.lvl[def.id] = G.level(def.id) + 1;
     G.bump('upgrades');

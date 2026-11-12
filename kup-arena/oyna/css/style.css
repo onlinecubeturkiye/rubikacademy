@@ -1377,3 +1377,37 @@ body::before { background: radial-gradient(140% 90% at 50% 40%, transparent 60%,
   .tab { max-width: 1320px; }
   .tabs { width: auto; }
 }
+
+/* ===== v3.4: şekilli marka logoları, seviye kademeleri, kart cilası ===== */
+.blogo { width: 1.15em; height: 1.15em; flex: none; fill: currentColor; }
+.bm { display: inline-flex; align-items: center; gap: 0.35em; transform: none; border: 0; border-radius: 99px; padding: 0.1em 0.7em 0.1em 0.15em; letter-spacing: 0.08em; line-height: 1.6;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bc) 82%, #fff), var(--bc)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 2px 0 rgba(9,11,31,0.55); text-shadow: 0 1px 0 rgba(0,0,0,0.35); }
+.bm i { font-style: normal; }
+.bm .blogo { width: 1.5em; height: 1.5em; padding: 0.2em; border-radius: 50%; background: #fff; fill: var(--bc); box-shadow: 0 0 0 1px rgba(9,11,31,0.25); }
+.bm.sm { font-size: 0.52rem; padding: 0.1em 0.6em 0.1em 0.12em; }
+.bm.big { font-size: 1rem; border-width: 0; padding: 0.12em 0.8em 0.12em 0.18em; box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 3px 0 rgba(9,11,31,0.55); }
+.brand-row button { display: inline-flex; align-items: center; gap: 6px; }
+.brand-row button .blogo { fill: var(--bc); background: #fff; border-radius: 50%; padding: 2px; width: 1.4em; height: 1.4em; }
+.brand-banner { position: relative; overflow: hidden; }
+.blogo.wm { position: absolute; right: -14px; top: 50%; width: 96px; height: 96px; transform: translateY(-50%) rotate(-12deg); fill: var(--bc); opacity: 0.22; pointer-events: none; }
+
+/* seviye kademeleri */
+.card .lv { border-radius: 99px; padding: 0 7px; font-size: 0.7rem; box-shadow: 0 2px 0 rgba(0,0,0,0.35); }
+.lv.lt-b { background: linear-gradient(180deg, #f2b27a, #a8602c); color: #2a1200; }
+.lv.lt-s { background: linear-gradient(180deg, #f3f6fb, #8a98b3); color: #1a2030; }
+.lv.lt-g { background: linear-gradient(180deg, #fff1a6, #d39400); color: #3a2400; }
+.lv.lt-d { background: linear-gradient(180deg, #e6fbff, #22c6e6 60%, #7b5cff); color: #06203a; box-shadow: 0 0 8px rgba(120,230,255,0.9), 0 2px 0 rgba(0,0,0,0.35); }
+
+/* kart cilası: parlak yüzey, yumuşak çerçeve, zemin ışığı */
+.card { outline: 0; border: 0; margin: 2px; padding-top: 12px; border-radius: 18px; overflow: hidden;
+  background: radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--rc) 75%, #fff), var(--rc) 45%, color-mix(in srgb, var(--rc) 45%, #0d1030) 100%);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--rc) 60%, #fff), inset 0 0 0 5px rgba(9,11,31,0.28), 0 6px 0 rgba(9,11,31,0.55), 0 12px 18px rgba(0,0,0,0.28); }
+.card > canvas { position: relative; z-index: 1; filter: drop-shadow(0 6px 4px rgba(9,11,31,0.45)); }
+.card .nm { background: rgba(9,11,31,0.78); border-top: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.18); font-size: 0.8rem; }
+.card:not(.holo)::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(125deg, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.08) 28%, transparent 42%); }
+.card.locked { background: rgba(18,22,70,0.55); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.12); }
+.card.locked::before { display: none; }
+.card.in-team { box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 0 6px rgba(9,11,31,0.28), 0 6px 0 rgba(9,11,31,0.55), 0 0 16px rgba(255,201,40,0.55); overflow: visible; }
+.card.holo { overflow: visible; }
+.card .cost { z-index: 2; } .card .lv, .card .cnt { z-index: 2; }
+.team-strip .slot .bm { font-size: 0.5rem; }
