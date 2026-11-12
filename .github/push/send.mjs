@@ -40,7 +40,10 @@ async function sendTo(list, payload) {
 for (const d of (await db.collection("broadcasts").where("pushed", "==", false).get()).docs) {
     const at = ms(d.get("at")) || ms(d.get("ts"));
     if (at > now) continue;   // planlı, zamanı gelmedi
-    const n = await sendTo(subs, { title: "Rubik Academy", body: d.get("text") || "", tag: "b:" + at, url: "/" });
+    // comp-KOD: yeni ev yarışması duyurusu (oda sahibinin tarayıcısı yazar) → bildirim o yarışmayı açar
+    const isComp = /^comp-[A-Z0-9]{5}$/.test(d.id), code = isComp ? d.id.slice(5) : "";
+    const n = await sendTo(subs, isComp ? { title: "Yeni ev yarışması 🏠", body: d.get("text") || "", tag: "c:" + code, url: "/icerikler/ev-yarismasi?ev=" + code }
+        : { title: "Rubik Academy", body: d.get("text") || "", tag: "b:" + at, url: "/" });
     await d.ref.update({ pushed: true });
     console.log("duyuru", d.id, "→", n);
 }
@@ -57,7 +60,7 @@ for (const uid of Object.keys(byUid)) {
         console.log("bildirim", uid, d.id, "→", n);
     }
 }
-// Hatırlatıcılar (abonelikte rem: "d" = günün karıştırması, "c" = yeni ev yarışması)
+// Hatırlatıcılar (abonelikte rem: "d" = günün karıştırması). Yeni ev yarışması artık tüm abonelere gider.
 // Durum config/remind belgesinde tutulur: aynı hatırlatma iki kez gitmesin
 const remRef = db.collection("config").doc("remind");
 const rem = (await remRef.get()).data() || {};
@@ -77,13 +80,17 @@ if (tr.getUTCHours() >= 19 && rem.d !== today) {
     rem.d = today;
     console.log("günlük hatırlatma →", n);
 }
-// 2) Yeni ev yarışması: son 2 saatte açılmış, lobide bekleyen odalar
+// 2) Yeni ev yarışması (yedek): duyurusu yazılmamış, son 2 saatte açılmış odalar → herkese
 const seen = new Set(rem.c || []);
 const fresh = (await db.collection("comps").where("st", "==", "lobby").get()).docs
     .filter((d) => !seen.has(d.id) && now - ms(d.get("ts")) < 2 * 3600e3);
 for (const d of fresh) {
-    const n = await sendTo(wants("c"), { title: "Yeni ev yarışması 🏠", body: (d.get("name") || "Ev yarışması") + " açıldı. Kod: " + d.id, tag: "c:" + d.id, url: "/icerikler/ev-yarismasi?ev=" + d.id });
     seen.add(d.id);
+    const bRef = db.collection("broadcasts").doc("comp-" + d.id);
+    if ((await bRef.get()).exists) continue; // site zaten duyurdu (yukarıda gönderildi)
+    const text = "🏠 Yeni ev yarışması: " + (d.get("name") || "Ev yarışması") + ". Katılmak için Ev Yarışması sayfasına gel, kod: " + d.id;
+    const n = await sendTo(subs, { title: "Yeni ev yarışması 🏠", body: text, tag: "c:" + d.id, url: "/icerikler/ev-yarismasi?ev=" + d.id });
+    await bRef.set({ text, ts: admin.firestore.Timestamp.now(), pushed: true });
     console.log("ev yarışması", d.id, "→", n);
 }
 rem.c = Array.from(seen).slice(-60);

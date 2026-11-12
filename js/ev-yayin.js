@@ -10,7 +10,14 @@
     var code = String(qs.get("ev") || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
     var arka = qs.get("arka"); if (arka === "yesil") document.body.classList.add("green"); else if (arka === "seffaf") document.body.classList.add("clear");
     var W = document.getElementById("w");
-    var st = { doc: null, players: [], prev: {}, spot: null, spotAt: 0, lastHtml: "" };
+    var st = { doc: null, players: [], prev: {}, spot: null, spotAt: 0, lastHtml: "", rec: {} };
+    // Rekor tablosunun 1.'leri (5 dk'da bir): yeni süre onları geçerse "SİTE REKORU" yazar
+    function loadRec() {
+        if (!window.RACompShare || !st.doc) return;
+        var ev = st.doc.ev === "222" ? "222" : "333", ak = NS(st.doc) === 12 ? "a12" : "a5";
+        Promise.all([RACompShare.records(ev, "s", 1), RACompShare.records(ev, ak, 1)]).then(function (v) { st.rec = { ev: ev, s: v[0][0] || null, a: v[1][0] || null }; st.lastHtml = ""; render(); }, function () {});
+    }
+    setInterval(loadRec, 300000);
 
     function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
     function fmt(ms) { if (ms == null || isNaN(ms)) return "-"; if (ms >= DNF) return "DNF"; var s = ms / 1000; if (s < 60) return s.toFixed(2); var m = Math.floor(s / 60); return m + ":" + (s - m * 60).toFixed(2).padStart(5, "0"); }
@@ -65,7 +72,7 @@
             : d.st === "prep" ? '<span class="chip">⏳ Hazırlık ' + mmss((d.pa || 0) - now) + '</span>'
             : d.st === "end" ? '<span class="chip">' + (d.fin ? "🏆 Final bitti" : "🏁 Tur bitti") + '</span>' : '<span class="chip">⏳ Lobi</span>';
         var scr = String(d.scr || "").split("|")[Math.min(n - 1, done)] || "";
-        var top = '<div class="top"><img src="/RubikAcademyLogo.png" alt=""><div class="t1"><h1>' + esc(d.name || "Ev yarışması") + '</h1><small>' + rl + ' · ' + ev + ' · Ao' + n + ' · ' + R.length + ' yarışmacı' + (d.st === "run" && scr ? ' · <span class="scr">' + esc(scr) + '</span>' : '') + '</small></div>' + chip + '</div>';
+        var top = '<div class="top"><img src="/RubikAcademyLogo.png" alt=""><div class="t1"><h1>' + esc(d.name || "Ev yarışması") + '</h1><small>' + rl + ' · ' + ev + ' · Ao' + n + ' · ' + R.length + ' yarışmacı' + (d.st === "run" && scr ? ' · <span class="scr">' + esc(scr) + '</span>' : '') + (st.rec.s ? ' · <span class="rec">Rekor ' + fmt(st.rec.s.t) + ' (' + esc(st.rec.s.name) + ')</span>' : '') + '</small></div>' + chip + '</div>';
 
         var main;
         if (!R.length || d.st === "lobby") {
@@ -81,7 +88,7 @@
             var bigV = ended || isLeader ? (sp.a != null ? sp.a : sp.mean) : last;
             main = '<div class="main"><div class="spot' + (st.pop ? " pop" : "") + '">' +
                 (ended && pos === 0 ? '<div class="medal">' + (d.fin ? "🏆" : "🥇") + '</div>' : '') +
-                '<div class="k">' + kick + (MODE[sp.m] ? " · " + MODE[sp.m] : "") + '</div><div class="nm">' + esc(sp.n) + '</div>' +
+                '<div class="k">' + kick + (MODE[sp.m] ? " · " + MODE[sp.m] : "") + '</div><div class="nm">' + esc(sp.n) + recBadge(sp, n) + '</div>' +
                 '<div class="big' + (bigV != null && bigV >= DNF ? " dnf" : "") + '">' + (bigV == null ? "—" : fmt(bigV)) + '</div>' +
                 '<div class="row">' + chips(sp.t, n, "tm", ended || isLeader ? -1 : sp.t.length - 1) +
                 '<div class="avg"><span>' + (sp.a != null ? "AO" + n : "ORT.") + ' · ' + (pos + 1) + '. SIRA</span><b>' + fmt(sp.a != null ? sp.a : sp.mean) + '</b></div></div></div>' +
@@ -94,6 +101,12 @@
         }
         var html = top + main;
         if (html !== st.lastHtml) { st.lastHtml = html; W.innerHTML = html; }
+    }
+    function recBadge(r, n) {
+        var ok = r.t.filter(function (x) { return x < DNF; }), best = ok.length ? Math.min.apply(null, ok) : null, b = [];
+        if (best != null && st.rec.s && best < st.rec.s.t) b.push("🔥 TEKİL SİTE REKORU");
+        if (r.a != null && r.a < DNF && st.rec.a && r.a < st.rec.a.t) b.push("🔥 AO" + n + " SİTE REKORU");
+        return b.map(function (t) { return '<span class="recb">' + t + '</span>'; }).join("");
     }
     function rankHtml(R) {
         var n = st.doc ? NS(st.doc) : 5;
@@ -110,6 +123,7 @@
             st.doc = parse(res[0]);
             st.players = (res[1].documents || []).map(function (x) { var o = parse(x); o.uid = x.name.split("/").pop(); return o; });
             document.title = (st.doc.name || "Ev yarışması") + " · Yayın ekranı";
+            if (!st.recAsked) { st.recAsked = 1; loadRec(); }
             render();
         }).catch(function () {}).then(function () { setTimeout(poll, POLL); });
     }

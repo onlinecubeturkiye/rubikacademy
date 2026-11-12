@@ -64,18 +64,26 @@
       return '<div class="p-pb-row"><b>' + e[1] + '</b><span>Tekil <i dir="ltr">' + fmt(pb.s) + '</i></span><span>Ao5 <i dir="ltr">' + fmt(pb.a5) + '</i></span><span>Ao12 <i dir="ltr">' + fmt(pb.a12) + '</i></span></div>';
     }).join("") + "</div>";
     html += '<p class="p-note" style="margin-top:10px"><a href="/icerikler/rekorlar" style="color:var(--ui-accent);font-weight:800">🥇 Rekor tablosu →</a></p>';
-    var list = c.list || [];
-    if (list.length) html += progressChart(list) + '<h3 class="p-sub">Yarışma geçmişi</h3><div class="p-clist">' + groupComps(list).map(function (g) {
+    var list = c.list || [], groups = groupComps(list);
+    // Sertifikalar: final ilk 3 (yalnız kendi profilinde indirilebilir; başkasının profilinde rozet olarak görünür)
+    var certs = groups.map(function (g) { var f = g.rounds.filter(function (e) { return e.f && e.rk >= 1 && e.rk <= 3; })[0]; return f ? { g: g, e: f } : null; }).filter(Boolean);
+    html += '<h3 class="p-sub">🎓 ' + (isMe ? "Sertifikalarım" : "Sertifikalar") + '</h3>' + (certs.length ? '<div class="p-certs">' + certs.map(function (x) {
+      var o = { name: myName || "", comp: x.g.nm || x.g.c, ev: x.e.ev, place: x.e.rk, a: x.e.a, n: x.e.n || 5, ts: x.e.ts };
+      return '<div class="p-cert p' + x.e.rk + '"><span class="p-cert-m">' + ["🥇", "🥈", "🥉"][x.e.rk - 1] + '</span><span class="p-cert-t"><b>' + esc(o.comp) + '</b><small>' + (x.e.ev === "222" ? "2x2" : "3x3") + ' finali · ' + x.e.rk + '. · Ao' + o.n + ' ' + fmt(o.a) + '</small></span>' +
+        (isMe && window.RACompShare ? '<button type="button" class="p-btn sm" data-cert="' + encodeURIComponent(JSON.stringify(o)) + '">İndir</button>' : '') + '</div>';
+    }).join("") + '</div>' : '<p class="p-note">' + (isMe ? "Bir ev yarışmasının finalinde ilk 3'e girince sertifikan burada çıkar." : "Henüz final derecesi yok.") + '</p>');
+    if (list.length) html += progressChart(list) + '<h3 class="p-sub">Yarışma geçmişi</h3><div class="p-clist">' + groups.map(function (g) {
       var dt = g.ts ? new Date(g.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" }) : "";
-      var fin = g.rounds.filter(function (e) { return e.f; })[0], medal = fin && fin.rk <= 3 ? ["🥇", "🥈", "🥉"][fin.rk - 1] + " " : "";
-      return '<details class="p-cgrp' + (fin && fin.rk === 1 ? " win" : "") + '"><summary><span class="p-c1"><b>' + medal + esc(g.nm || g.c) + '</b><small>' + esc(dt) + ' · ' + (g.ev === "222" ? "2x2" : "3x3") + ' · ' + g.rounds.length + ' tur' + (fin ? ' · Final ' + fin.rk + '.' : '') + '</small></span><span class="p-cbest">Ao <i dir="ltr">' + fmt(g.bestA) + '</i></span></summary>' +
-        g.rounds.map(function (e) {
-          var place = e.rk ? (e.rk === 1 && e.f ? "🏆 1." : e.rk + ".") + (e.p ? " / " + e.p : "") : "-";
-          var ts = Array.isArray(e.t) && e.t.length ? '<div class="p-ctimes" dir="ltr">' + e.t.map(function (x) { return '<span class="' + (x < 0 ? "dnf" : x === e.s ? "pb" : "") + '">' + (x < 0 ? "DNF" : fmt(x)) + '</span>'; }).join("") + '</div>' : '';
-          var cert = isMe && e.f && e.rk >= 1 && e.rk <= 3 && window.RACompShare ? '<button type="button" class="p-btn sm" data-cert="' + encodeURIComponent(JSON.stringify({ name: myName || "", comp: g.nm || g.c, ev: e.ev, place: e.rk, a: e.a, n: e.n || 5, ts: e.ts })) + '">🎓 Sertifika</button>' : '';
-          return '<div class="p-crow' + (e.f && e.rk === 1 ? " win" : "") + '"><div class="p-c1"><b>' + (e.f ? "🏆 Final" : "Tur " + e.r) + '</b>' + ts + '</div>' +
-            '<div class="p-c2"><span class="p-place">' + esc(place) + '</span><span>Ao' + (e.n || 5) + ' <i dir="ltr">' + fmt(e.a) + '</i></span><span>Tekil <i dir="ltr">' + fmt(e.s) + '</i></span>' + cert + '</div></div>';
-        }).join("") + '</details>';
+      var fin = g.rounds.filter(function (e) { return e.f; })[0], last = fin || g.rounds[g.rounds.length - 1];
+      var bestS = null; g.rounds.forEach(function (e) { if (typeof e.s === "number" && (bestS == null || e.s < bestS)) bestS = e.s; });
+      var place = fin ? (fin.rk === 1 ? "🏆 Şampiyon" : fin.rk <= 3 ? ["", "🥈 2.", "🥉 3."][fin.rk - 1] : fin.rk + ". (final)") : last && last.rk ? last.rk + ". (tur " + last.r + ")" : "-";
+      var rounds = g.rounds.map(function (e) {
+        var ts = Array.isArray(e.t) && e.t.length ? ' <span class="p-ctimes" dir="ltr">' + e.t.map(function (x) { return '<span class="' + (x < 0 ? "dnf" : x === e.s ? "pb" : "") + '">' + (x < 0 ? "DNF" : fmt(x)) + '</span>'; }).join("") + '</span>' : '';
+        return '<div class="p-rnd"><b>' + (e.f ? "Final" : "Tur " + e.r) + '</b><span>' + (e.rk ? e.rk + "." + (e.p ? "/" + e.p : "") : "-") + '</span><span>Ao' + (e.n || 5) + ' <i dir="ltr">' + fmt(e.a) + '</i></span>' + ts + '</div>';
+      }).join("");
+      return '<div class="p-comp' + (fin && fin.rk === 1 ? " win" : "") + '"><div class="p-comp-h"><div class="p-c1"><b>' + esc(g.nm || g.c) + '</b><small>' + esc(dt) + ' · ' + (g.ev === "222" ? "2x2" : "3x3") + ' · ' + g.rounds.length + ' tur</small></div>' +
+        '<div class="p-comp-s"><span class="p-place">' + place + '</span><span>En iyi Ao <i dir="ltr">' + fmt(g.bestA) + '</i></span><span>Tekil <i dir="ltr">' + fmt(bestS) + '</i></span></div></div>' +
+        '<details class="p-rnds"><summary>Turlar</summary>' + rounds + '</details></div>';
     }).join("") + "</div>";
     return html;
   }
@@ -95,7 +103,7 @@
     var html = ["333", "222"].map(function (ev, k) {
       var pts = list.filter(function (e) { return (e.ev || "333") === ev && typeof e.a === "number" && e.ts; }).sort(function (a, b) { return a.ts - b.ts; });
       if (pts.length < 2) return "";
-      var W = 640, H = 180, P = { l: 52, r: 14, t: 14, b: 26 };
+      var W = 640, H = 200, P = { l: 70, r: 14, t: 16, b: 30 };
       var ys = pts.map(function (e) { return e.a; }), lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
       var pad = Math.max(300, (hi - lo) * 0.15); lo -= pad; hi += pad;
       var X = function (i) { return P.l + (W - P.l - P.r) * i / (pts.length - 1); };
@@ -145,11 +153,18 @@
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümler</h2>' + dailyGrid(data.stats) + '</div>';
     showRole(uid);
     if (isMe) bindShare(uid);
-    Array.prototype.forEach.call(root.querySelectorAll("[data-cert]"), function (b) {
-      b.onclick = function (e) { e.preventDefault(); try { RACompShare.downloadCert(JSON.parse(decodeURIComponent(b.getAttribute("data-cert")))); } catch (x) {} };
-    });
+    bindCerts();
   }
 
+  function bindCerts() {
+    Array.prototype.forEach.call(root.querySelectorAll("[data-cert]"), function (b) {
+      b.onclick = function (e) {
+        e.preventDefault(); var t = b.textContent; b.disabled = true; b.textContent = "Hazırlanıyor…";
+        var done = function () { b.disabled = false; b.textContent = t; };
+        try { RACompShare.downloadCert(JSON.parse(decodeURIComponent(b.getAttribute("data-cert")))).then(done, done); } catch (x) { done(); }
+      };
+    });
+  }
   function bindShare(uid) {
     var b = $("pShare"); if (!b) return;
     b.onclick = function () {
@@ -193,11 +208,13 @@
       '<button class="p-btn main" id="pSave" style="justify-self:start">Kaydet</button></div></div>' +
       '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistiklerim</h2>' + statTiles(st) + '</div>' +
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">🏠 Ev yarışmalarım</h2>' + compGrid(st, true, name) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerlemem</h2>' + setsGrid(st) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>';
 
     showRole(u.uid);
     bindShare(u.uid);
+    bindCerts();
     $("pEdit").onclick = function () { var e = $("pEditBox"); e.hidden = !e.hidden; };
     var pickedAcc = prof.accent || "", pickedPhoto = prof.photo || "", photoChanged = false;
     if ($("pAccents")) Array.prototype.forEach.call($("pAccents").querySelectorAll(".p-acc"), function (b) {

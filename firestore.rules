@@ -286,9 +286,15 @@ service cloud.firestore {
     // Herkese açık duyurular: yalnız admin yazar, herkes okur
     match /broadcasts/{id} {
       allow read: if true;
-      allow create: if isAdmin()
+      allow create: if (isAdmin()
         && request.resource.data.keys().hasOnly(['text', 'ts', 'at', 'pushed'])
-        && request.resource.data.text is string && request.resource.data.text.size() <= 500;
+        && request.resource.data.text is string && request.resource.data.text.size() <= 500)
+        // Yeni ev yarışması duyurusu: yalnız oda sahibi, yarışma başına bir kez (belge adı comp-KOD)
+        || (request.auth != null && id.matches('^comp-[A-Z0-9]{5}$')
+          && get(/databases/$(database)/documents/comps/$(id.split('-')[1])).data.host == request.auth.uid
+          && request.resource.data.keys().hasOnly(['text', 'ts', 'pushed'])
+          && request.resource.data.text is string && request.resource.data.text.size() <= 200
+          && request.resource.data.pushed == false && request.resource.data.ts is timestamp);
       allow update, delete: if isAdmin();
     }
 
