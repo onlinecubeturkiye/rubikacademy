@@ -1,0 +1,108 @@
+/* =========================================================
+   UYGULAMA GÖRÜNÜMÜ (html.ra-app) — sade tema
+   Yalnız Android uygulamasında / ana ekrana eklenmiş sitede yüklenir (js/common.js).
+   İlke: düz zemin, siyah yazı, tek vurgu rengi; geçişli renk, parlama, cam efekti,
+   rozet etiketleri ve gölge yığınları yok. Masaüstü site bu dosyadan etkilenmez.
+========================================================= */
+html.ra-app {
+    --ui-accent: #111111 !important;
+    --ui-accent-hover: #000000 !important;
+    --ui-accent-text: #ffffff !important;
+    --ui-accent-soft: #f1f1f1 !important;
+    --primary: #111111 !important;
+    --primary-dark: #000000 !important;
+    --primary-light: #f1f1f1 !important;
+    --ra-red: #e0262b;
+    --background: #f4f4f2 !important;
+    --surface: #ffffff !important;
+    --surface-soft: #f4f4f2 !important;
+    --text: #111111 !important;
+    --text-soft: #6b6b6b !important;
+    --border: #e4e4e0 !important;
+    --card-border: #e4e4e0 !important;
+    --card-bw: 1px !important;
+    --shadow: none !important;
+    --shadow-sm: none !important;
+    --shadow-hover: none !important;
+    --hero-bg: #ffffff !important;
+    --hero-border: #e4e4e0 !important;
+    --badge-bg: #f1f1f1 !important;
+    --badge-text: #111111 !important;
+    --btn-bg: #111111 !important;
+    --btn-hover-bg: #000000 !important;
+    --btn-text: #ffffff !important;
+    --bottom-bg: #ffffff !important;
+    --font-display: "Inter", system-ui, sans-serif !important;
+}
+html.ra-app.dark-mode {
+    --ui-accent: #f2f2f2 !important;
+    --ui-accent-hover: #ffffff !important;
+    --ui-accent-text: #111111 !important;
+    --ui-accent-soft: #232325 !important;
+    --primary: #f2f2f2 !important;
+    --primary-dark: #ffffff !important;
+    --primary-light: #232325 !important;
+    --background: #0e0e0f !important;
+    --surface: #18181a !important;
+    --surface-soft: #1f1f21 !important;
+    --text: #f2f2f2 !important;
+    --text-soft: #9a9a9e !important;
+    --border: #2a2a2d !important;
+    --card-border: #2a2a2d !important;
+    --hero-bg: #18181a !important;
+    --hero-border: #2a2a2d !important;
+    --badge-bg: #232325 !important;
+    --badge-text: #f2f2f2 !important;
+    --btn-bg: #f2f2f2 !important;
+    --btn-hover-bg: #ffffff !important;
+    --btn-text: #111111 !important;
+    --bottom-bg: #18181a !important;
+}
+
+/* zemin: düz renk; süs, parlama, desen yok */
+html.ra-app, html.ra-app body { background: var(--background) !important; background-image: none !important; }
+html.ra-app body::before, html.ra-app body::after, html.ra-app .h-glow, html.ra-app .hero::before { display: none !important; }
+
+/* başlıklar: tek renk, geçişsiz */
+html.ra-app .gradient-text, html.ra-app h1 span, html.ra-app h1 em, html.ra-app h2 span {
+    background: none !important; -webkit-background-clip: border-box !important; background-clip: border-box !important;
+    -webkit-text-fill-color: currentColor !important; color: inherit !important; }
+html.ra-app h1, html.ra-app h2, html.ra-app h3 { font-family: "Inter", system-ui, sans-serif !important; letter-spacing: -.02em !important; }
+
+/* "● SPEEDCUBING'E HOŞ GELDİN" tarzı etiket rozetleri */
+html.ra-app .badge, html.ra-app .intro-badge, html.ra-app .h-badge, html.ra-app .h-kicker, html.ra-app .hero-badge { display: none !important; }
+
+/* kartlar ve kutular: ince çizgi, gölgesiz */
+html.ra-app .box, html.ra-app .card, html.ra-app .hero, html.ra-app .evh, html.ra-app .evh-card,
+html.ra-app [class$="-card"], html.ra-app [class*="-card "] {
+    box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+html.ra-app .hero, html.ra-app .evh { background: var(--surface) !important; border: 1px solid var(--border) !important; }
+
+/* düğmeler: düz siyah (birincil) / çizgili (ikincil) */
+html.ra-app .btn, html.ra-app .h-btn, html.ra-app .evh-btn, html.ra-app button.primary, html.ra-app .btn.primary {
+    box-shadow: none !important; background-image: none !important; border-radius: 12px !important; }
+html.ra-app .btn.primary, html.ra-app .h-btn.primary, html.ra-app .h-btn-main, html.ra-app .evh-btn.p {
+    background: var(--btn-bg) !important; color: var(--btn-text) !important; border-color: var(--btn-bg) !important; }
+
+/* sponsor kutusu: tek çizgi, renkli çerçeve yok */
+html.ra-app [class*="ra-ad"] { box-shadow: none !important; background-image: none !important; }
+
+/* üst bar: düz, ince alt çizgi */
+html.ra-app .navbar { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important; border-bottom: 1px solid var(--border) !important; }
+html.ra-app .navbar::after { display: none !important; }
+html.ra-app .nav-logo-mark { border-radius: 8px !important; box-shadow: none !important; }
+
+/* alt sekme çubuğu: düz; seçili sekme yalnız koyu yazı + üst çizgi */
+html.ra-app .ra-tabbar { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important; }
+html.ra-app .ra-tabbar a { border-radius: 0 !important; color: #8a8a8a !important; position: relative; }
+html.ra-app .ra-tabbar a.on { background: none !important; color: var(--text) !important; }
+html.ra-app .ra-tabbar a.on::before { content: ""; position: absolute; top: -6px; left: 28%; right: 28%; height: 2px; border-radius: 2px; background: var(--text); }
+
+/* açılır pencereler: düz */
+html.ra-app .ra-pushmod, html.ra-app .ra-lock { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+html.ra-app .ra-pushmod-b, html.ra-app .ra-lock-box { box-shadow: none !important; border-radius: 18px !important; }
+
+/* bölüm üstündeki küçük büyük-harf etiketler ve renkli (tonlu) kartlar */
+html.ra-app .section-title small, html.ra-app .h-sec-k, html.ra-app .sec-kicker { display: none !important; }
+html.ra-app .tr-card, html.ra-app [class*="tr-"][class*="card"] { background: var(--surface) !important; border: 1px solid var(--border) !important; box-shadow: none !important; }
+html.ra-app .section-title h2 { font-size: 24px !important; }
