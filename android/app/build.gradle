@@ -1,5 +1,5 @@
 // Rubik Academy Android uygulaması: siteyi (rubikacademy.fun) tam ekran açan Trusted Web Activity.
-// Sürüm yükseltmek için versionCode'u 1 artır, versionName'i değiştir.
+// Sürüm OTOMATİK: GitHub Actions her derlemede RA_VERSION_CODE verir (çalışma numarası + 10). Elle değiştirme.
 plugins { id "com.android.application" }
 
 android {
@@ -10,8 +10,9 @@ android {
         applicationId "fun.rubikacademy.app"
         minSdk 23
         targetSdk 36
-        versionCode 4
-        versionName "1.2.1"
+        def vc = (System.getenv("RA_VERSION_CODE") ?: "4") as int
+        versionCode vc
+        versionName "1.2." + vc
     }
     buildTypes {
         release { minifyEnabled false }

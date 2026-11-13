@@ -1,6 +1,7 @@
 /* Rubik Academy service worker
    - Sayfalar: önce ağ (güncel içerik), bağlantı yoksa önbellek
-   - CSS/JS/JSON/görseller: önbellekten hemen ver, arka planda güncelle
+   - CSS/JS/JSON: önce ağ (değişmediyse 304), çevrimdışıysa önbellek → ?v= sürümünü elle artırmak gerekmez
+   - Görseller/fontlar: önbellekten hemen ver, arka planda güncelle
    - Algoritma sayfaları ve antrenör kurulumda önceden indirilir (çevrimdışı açılsın diye)
    Sürüm (VERSION) değişince eski önbellek silinir. */
 var VERSION = "ra-20270113";
@@ -119,7 +120,7 @@ self.addEventListener("fetch", function (event) {
     if (url.pathname.indexOf("/__/") === 0 || url.pathname.indexOf("/indir/") === 0) return;
 
     if (req.mode === "navigate") {
-        event.respondWith(fetch(req).then(function (res) {
+        event.respondWith(fetch(req, { cache: "no-cache" }).then(function (res) {
             if (res && res.ok) {
                 var copy = res.clone();
                 caches.open(VERSION).then(function (c) { c.put(req, copy); });
@@ -133,9 +134,16 @@ self.addEventListener("fetch", function (event) {
         return;
     }
 
-    // CSS/JS/JSON: aynı adres (?v= dahil) önbellekte varsa hemen ver, arka planda güncelle.
-    // Sürümü farklı bir kopyayı ASLA ağdan önce verme: eski (ör. hatalı) dosya yeni sayfaya karışmasın.
-    // Farklı sürümlü kopya sadece çevrimdışıyken kullanılır.
+    // CSS/JS/JSON: ÖNCE AĞ (sunucuya "değişti mi?" diye sorulur, değişmediyse 304 ile hızlı döner).
+    // Böylece her değişiklikte ?v= sürüm numarası değiştirmek gerekmez; çevrimdışıysa önbellekteki kopya.
+    if (!/\.(png|jpe?g|webp|gif|svg|ico|woff2?|ttf|mp3|mp4)$/i.test(url.pathname)) {
+        event.respondWith(fetch(req, { cache: "no-cache" }).then(function (res) {
+            if (res && res.ok) { var copy = res.clone(); caches.open(VERSION).then(function (c) { c.put(req, copy); }); return res; }
+            return fromCache(req).then(function (hit) { return hit || res; });
+        }).catch(function () { return fromCache(req); }));
+        return;
+    }
+    // Görseller/fontlar: önbellekte varsa hemen ver, arka planda güncelle
     event.respondWith(caches.open(VERSION).then(function (cache) { return cache.match(req); }).then(function (hit) {
         var net = fetch(req).then(function (res) {
             if (res && res.ok) {
