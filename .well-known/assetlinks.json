@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "fun.rubikacademy.app",
       "sha256_cert_fingerprints": [
-        "73:DA:2E:94:BF:9E:EC:7E:18:FC:6B:8C:0B:7E:30:2E:45:CE:CE:71:16:11:F1:46:1C:44:98:DD:40:68:DA:29"
+        "73:DA:2E:94:BF:9E:EC:7E:18:FC:6B:8C:0B:7E:30:2E:45:CE:CE:71:16:11:F1:46:1C:44:98:DD:40:68:DA:29",
+        "A1:99:0F:B8:63:A5:32:F1:DD:49:0D:0C:2A:E0:F1:D6:40:67:22:D7:DE:52:DA:FF:0A:D8:08:F0:6A:CF:ED:B0"
       ]
     }
   }

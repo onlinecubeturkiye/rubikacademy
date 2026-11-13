@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20270111";
+    var V = "20270112";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -974,7 +974,7 @@
         }).catch(function () {});
     }
     /* ---------- Web Push aboneliği (arka plan / telefon bildirimi) ---------- */
-    var VAPID_PUBLIC = "BMpaJpKyVf1rBuvqAtht6TAvoDqLokvcjkMvjB5-XZNG_ptzEqBV9xwaJTOr0Q-QX-qRo3eZ5DqxK5EvEB4wAfo";
+    var VAPID_PUBLIC = "BMwVZRwQzVDgRKtUfF6J-WCwdXdLLT4rVXaatCqkbFDV2x147sPH99Kzp9PXktSjvYEs3Y-Vw0nU8wZrLogH1Q4";
     function pushSupported() { return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window; }
     function b64ToBytes(b) { b = b.replace(/-/g, "+").replace(/_/g, "/"); while (b.length % 4) b += "="; var raw = atob(b), out = new Uint8Array(raw.length); for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out; }
     function subId(endpoint) {
@@ -1005,8 +1005,13 @@
     function ensurePush() {
         if (!enabled || !pushSupported() || Notification.permission !== "granted") return Promise.resolve(false);
         return navigator.serviceWorker.ready.then(function (reg) {
+            var key = b64ToBytes(VAPID_PUBLIC);
+            var sub0 = function () { return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key }); };
             return reg.pushManager.getSubscription().then(function (sub) {
-                return sub || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(VAPID_PUBLIC) });
+                // anahtar değiştiyse (yeni VAPID) eski aboneliği bırak, yenisiyle abone ol
+                var old = sub && sub.options && sub.options.applicationServerKey;
+                if (sub && old) { var a = new Uint8Array(old), same = a.length === key.length; for (var i = 0; same && i < a.length; i++) if (a[i] !== key[i]) same = false; if (!same) return sub.unsubscribe().then(sub0, sub0); }
+                return sub || sub0();
             });
         }).then(saveSub).catch(function () { return false; });
     }
