@@ -1374,3 +1374,103 @@ html[data-skin="neon"] .gradient-text, html[data-skin="gunbatimi"] .gradient-tex
 .skin-sw { display: inline-flex; gap: 3px; margin-inline-end: 4px; }
 .skin-sw i { width: 14px; height: 14px; border-radius: 4px; display: block; border: 1px solid rgba(0, 0, 0, .12); }
 html.dark-mode .skin-sw i { border-color: rgba(255, 255, 255, .22); }
+
+/* =========================================================
+   SADE TEMA (varsayılan; Ayarlar'dan özel tema seçilince devre dışı)
+   Düz zemin, siyah/beyaz, tek renk başlıklar; geçişli renk, parlama, cam efekti,
+   büyük harfli etiket rozetleri ve gölge yığınları yok.
+========================================================= */
+html:not([data-skin]), html:not([data-skin]) body {
+    --ui-accent: #111111 !important;
+    --ui-accent-hover: #000000 !important;
+    --ui-accent-text: #ffffff !important;
+    --ui-accent-soft: #f1f1f1 !important;
+    --primary: #111111 !important;
+    --primary-dark: #000000 !important;
+    --primary-light: #f1f1f1 !important;
+    --ra-red: #e0262b;
+    --background: #f4f4f2 !important;
+    --surface: #ffffff !important;
+    --surface-soft: #f4f4f2 !important;
+    --text: #111111 !important;
+    --text-soft: #6b6b6b !important;
+    --border: #e4e4e0 !important;
+    --card-border: #e4e4e0 !important;
+    --card-bw: 1px !important;
+    --shadow: none !important;
+    --shadow-sm: none !important;
+    --shadow-hover: none !important;
+    --hero-bg: #ffffff !important;
+    --hero-border: #e4e4e0 !important;
+    --badge-bg: #f1f1f1 !important;
+    --badge-text: #111111 !important;
+    --btn-bg: #111111 !important;
+    --btn-hover-bg: #000000 !important;
+    --btn-text: #ffffff !important;
+    --bottom-bg: #ffffff !important;
+    --font-display: "Inter", system-ui, sans-serif !important;
+}
+html.dark-mode:not([data-skin]), html.dark-mode:not([data-skin]) body, html:not([data-skin]) body.dark-mode {
+    --ui-accent: #f2f2f2 !important;
+    --ui-accent-hover: #ffffff !important;
+    --ui-accent-text: #111111 !important;
+    --ui-accent-soft: #232325 !important;
+    --primary: #f2f2f2 !important;
+    --primary-dark: #ffffff !important;
+    --primary-light: #232325 !important;
+    --background: #0e0e0f !important;
+    --surface: #18181a !important;
+    --surface-soft: #1f1f21 !important;
+    --text: #f2f2f2 !important;
+    --text-soft: #9a9a9e !important;
+    --border: #2a2a2d !important;
+    --card-border: #2a2a2d !important;
+    --hero-bg: #18181a !important;
+    --hero-border: #2a2a2d !important;
+    --badge-bg: #232325 !important;
+    --badge-text: #f2f2f2 !important;
+    --btn-bg: #f2f2f2 !important;
+    --btn-hover-bg: #ffffff !important;
+    --btn-text: #111111 !important;
+    --bottom-bg: #18181a !important;
+}
+
+/* zemin: düz renk; süs, parlama, desen yok */
+html:not([data-skin]), html:not([data-skin]) body { background: var(--background) !important; background-image: none !important; }
+html:not([data-skin]) body::before, html:not([data-skin]) body::after, html:not([data-skin]) .h-glow, html:not([data-skin]) .hero::before { display: none !important; }
+
+/* başlıklar: tek renk, geçişsiz */
+html:not([data-skin]) .gradient-text, html:not([data-skin]) h1 span, html:not([data-skin]) h1 em, html:not([data-skin]) h2 span {
+    background: none !important; -webkit-background-clip: border-box !important; background-clip: border-box !important;
+    -webkit-text-fill-color: currentColor !important; color: inherit !important; }
+html:not([data-skin]) h1, html:not([data-skin]) h2, html:not([data-skin]) h3 { font-family: "Inter", system-ui, sans-serif !important; letter-spacing: -.02em !important; }
+
+/* "● SPEEDCUBING'E HOŞ GELDİN" tarzı etiket rozetleri */
+html:not([data-skin]) .badge, html:not([data-skin]) .intro-badge, html:not([data-skin]) .h-badge, html:not([data-skin]) .h-kicker, html:not([data-skin]) .hero-badge { display: none !important; }
+
+/* kartlar ve kutular: ince çizgi, gölgesiz */
+html:not([data-skin]) .box, html:not([data-skin]) .card, html:not([data-skin]) .hero, html:not([data-skin]) .evh, html:not([data-skin]) .evh-card,
+html:not([data-skin]) [class$="-card"], html:not([data-skin]) [class*="-card "] {
+    box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+html:not([data-skin]) .hero, html:not([data-skin]) .evh { background: var(--surface) !important; border: 1px solid var(--border) !important; }
+
+/* düğmeler: düz siyah (birincil) / çizgili (ikincil) */
+html:not([data-skin]) .btn, html:not([data-skin]) .h-btn, html:not([data-skin]) .evh-btn, html:not([data-skin]) button.primary, html:not([data-skin]) .btn.primary {
+    box-shadow: none !important; background-image: none !important; border-radius: 12px !important; }
+html:not([data-skin]) .btn.primary, html:not([data-skin]) .h-btn.primary, html:not([data-skin]) .h-btn-main, html:not([data-skin]) .evh-btn.p {
+    background: var(--btn-bg) !important; color: var(--btn-text) !important; border-color: var(--btn-bg) !important; }
+
+/* sponsor kutusu: tek çizgi, renkli çerçeve yok */
+html:not([data-skin]) [class*="ra-ad"] { box-shadow: none !important; background-image: none !important; }
+
+/* bölüm üstündeki küçük büyük-harf etiketler ve renkli (tonlu) kartlar */
+html:not([data-skin]) .section-title small, html:not([data-skin]) .h-sec-k, html:not([data-skin]) .sec-kicker { display: none !important; }
+html:not([data-skin]) .tr-card, html:not([data-skin]) [class*="tr-"][class*="card"] { background: var(--surface) !important; border: 1px solid var(--border) !important; box-shadow: none !important; }
+html:not([data-skin]) .section-title h2 { font-size: 24px !important; }
+
+html:not([data-skin]) .navbar { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important; border-bottom: 1px solid var(--border) !important; }
+html:not([data-skin]) .navbar::after { display: none !important; }
+html:not([data-skin]) .nav-links a.active, html:not([data-skin]) .nav-links a:hover { background: var(--surface-soft) !important; color: var(--text) !important; box-shadow: none !important; }
+html:not([data-skin]) footer { background: var(--surface) !important; background-image: none !important; }
+html:not([data-skin]) .h-hero { min-height: 0 !important; padding: 72px 0 48px !important; }
+html:not([data-skin]) .hero { min-height: 0 !important; }
