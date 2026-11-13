@@ -19,7 +19,7 @@ Uygulama bir **Trusted Web Activity (TWA)**: telefondaki Chrome motoruyla https:
 | Bildirimler | Site bildirimleri Android bildirimi olarak gelir (bildirim aktarımı, Android 13+ izin penceresi, tek renk simge) | ✓ 1.2.0'da eklendi |
 | Chrome yoksa | Uygulama içi tarayıcı (WebView) yedeği | ✓ |
 | Sürüm | versionName 1.2.0, versionCode 3 | ✓ |
-| İmza | Yükleme anahtarı (upload key), SHA-256 `73:DA:2E:…:DA:29` | ✓ |
+| İmza | Yükleme anahtarı (upload key, 13 Kasım 2026'da yenilendi), SHA-256 `A1:99:0F:…:ED:B0` — anahtar dosyası depoda YOK, sende saklanmalı | ✓ |
 | Çıktı | İmzalı `.aab` (Play) ve `.apk` (deneme) | ✓ |
 
 **Kamera, mikrofon, Bluetooth, sensörler:** Bu izinler uygulamanın değil, Chrome'un izinleridir; site ilgili özelliği açınca Chrome sorar. Bu yüzden Android manifestinde yoklar ve Play'de izin beyanı gerektirmezler.

@@ -6,7 +6,7 @@
 import admin from "firebase-admin";
 import webpush from "web-push";
 
-const VAPID_PUBLIC = "BMpaJpKyVf1rBuvqAtht6TAvoDqLokvcjkMvjB5-XZNG_ptzEqBV9xwaJTOr0Q-QX-qRo3eZ5DqxK5EvEB4wAfo";
+const VAPID_PUBLIC = "BMwVZRwQzVDgRKtUfF6J-WCwdXdLLT4rVXaatCqkbFDV2x147sPH99Kzp9PXktSjvYEs3Y-Vw0nU8wZrLogH1Q4";
 const SA = process.env.FIREBASE_SERVICE_ACCOUNT, PRIV = process.env.VAPID_PRIVATE_KEY;
 if (!SA || !PRIV) { console.log("Gizli anahtarlar (FIREBASE_SERVICE_ACCOUNT / VAPID_PRIVATE_KEY) tanımlı değil; atlanıyor."); process.exit(0); }
 
