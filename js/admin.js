@@ -1147,7 +1147,7 @@
         var q = { structuredQuery: { from: [{ collectionId: "records" }], limit: 500 } };
         authed(docsBase() + ":runQuery", { method: "POST", body: JSON.stringify(q) }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (rows) {
             var list = (rows || []).filter(function (x) { return x.document; }).map(function (x) {
-                var f = x.document.fields || {}, o = { uid: x.document.name.split("/").pop(), name: gv(f, "name") || "?", flags: [] };
+                var f = x.document.fields || {}, o = { uid: x.document.name.split("/").pop(), name: gv(f, "name") || "?", xs: gv(f, "xs") || "", flags: [] };
                 Object.keys(REC_LIM).forEach(function (k) { o[k] = +gv(f, k) || 0; if (o[k] && o[k] < REC_LIM[k]) o.flags.push(REC_LBL[k] + " çok hızlı"); });
                 [["333", "s333", "a5_333"], ["222", "s222", "a5_222"]].forEach(function (e) { if (o[e[2]] && o[e[1]] && o[e[2]] < o[e[1]]) o.flags.push(e[0] + " Ao5 tekilden hızlı"); });
                 return o;
@@ -1159,18 +1159,26 @@
             if (!show.length) { box.innerHTML = '<p class="a-note">' + (onlyBad ? "Şüpheli derece yok ✓" : "Kayıt yok.") + '</p>'; return; }
             box.innerHTML = show.slice(0, 200).map(function (o) {
                 // 3x3 ve 2x2: tekil · Ao5 · Ao12 (olmayan "—"); şüpheli değer kırmızı
-                var cell = function (k) { var bad = o[k] && o[k] < REC_LIM[k]; return '<span' + (bad ? ' class="bad"' : '') + '>' + (o[k] ? tFmt(o[k]) : "—") + '</span>'; };
+                // dolu değere dokun → yalnız o süre silinir (diğer rekorları kalır; silinen bir daha rekor yazılmaz)
+                var cell = function (k) { var bad = o[k] && o[k] < REC_LIM[k]; return o[k] ? '<button type="button" class="rx' + (bad ? ' bad' : '') + '" data-rx="' + esc(o.uid) + '|' + k + '|' + o[k] + '" title="Bu süreyi sil">' + tFmt(o[k]) + '<i>✕</i></button>' : '<span>—</span>'; };
                 var vals = '<div class="rec-g"><i></i><i>Tekil</i><i>Ao5</i><i>Ao12</i>' +
                     '<b>3x3</b>' + cell("s333") + cell("a5_333") + cell("a12_333") +
                     '<b>2x2</b>' + cell("s222") + cell("a5_222") + cell("a12_222") + '</div>';
                 return '<div class="a-row2"><div style="min-width:0;flex:1"><b>' + esc(o.name) + '</b>' + (o.flags.length ? ' <span class="pill l">⚠ ' + esc(o.flags.join(", ")) + '</span>' : '') + vals + '</div>' +
-                    '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.uid) + '" target="_blank" rel="noopener">👤</a><button class="a-btn danger sm" data-rd="' + esc(o.uid) + '">Sil</button></div>';
+                    '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.uid) + '" target="_blank" rel="noopener">👤</a></div>';
             }).join("");
-            Array.prototype.forEach.call(box.querySelectorAll("[data-rd]"), function (b) {
+            var byUid = {}; list.forEach(function (o) { byUid[o.uid] = o; });
+            Array.prototype.forEach.call(box.querySelectorAll("[data-rx]"), function (b) {
                 b.onclick = function () {
-                    if (!confirm("Bu kişinin rekor kaydı silinsin mi? (Kişi yeni bir yarışmaya girince rekorları yeniden yazılabilir; tekrarlarsa hesabı askıya al.)")) return;
+                    var k = b.getAttribute("data-rx").split("|"), o = byUid[k[0]]; if (!o) return;
+                    if (!confirm(o.name + " · " + REC_LBL[k[1]] + " " + tFmt(+k[2]) + " silinsin mi?\n\nYalnız bu süre silinir; kişinin diğer rekorları kalır. Silinen süre bir daha rekor sayılmaz, varsa sıradaki en iyi süresi geçer.")) return;
+                    var xs = o.xs.split(",").filter(Boolean); xs.push(k[1] + ":" + k[2]); xs = xs.slice(-150).join(",");
+                    var body = { fields: {} }; body.fields[k[1]] = { integerValue: "0" }; body.fields.xs = { stringValue: xs };
                     b.disabled = true;
-                    delDoc("/records/" + b.getAttribute("data-rd")).then(function (ok) { if (ok) b.closest(".a-row2").remove(); else { b.disabled = false; alert("Silinemedi."); } });
+                    authed(docsBase() + "/records/" + encodeURIComponent(k[0]) + "?updateMask.fieldPaths=" + k[1] + "&updateMask.fieldPaths=xs", { method: "PATCH", body: JSON.stringify(body) }).then(function (r) {
+                        if (!r.ok) throw new Error(r.status);
+                        o.xs = xs; o[k[1]] = 0; var sp = document.createElement("span"); sp.textContent = "—"; b.replaceWith(sp);
+                    }).catch(function () { b.disabled = false; alert("Silinemedi. Güncel Firebase kurallarını yayınladın mı?"); });
                 };
             });
         }).catch(function (e) { box.innerHTML = '<p class="a-note">Rekorlar yüklenemedi (' + esc(e && e.message) + ').</p>'; });
@@ -1343,7 +1351,7 @@
             '<h3 class="cp-h3">📊 Ev yarışması istatistikleri</h3><div id="aEvStats"><p class="a-note">Kullanıcılar yüklenince hesaplanır.</p></div>' +
             '<h3 class="cp-h3">🏆 Rekor tablosu yönetimi <span class="a-sub" id="aRecCount" style="margin:0"></span></h3>' +
             '<div class="a-ctrl"><button class="a-btn main" id="aRecLoad">↻ Yükle</button><label class="a-note"><input type="checkbox" id="aRecBad" checked> Yalnız şüpheliler</label></div>' +
-            '<p class="a-note">Şüpheli: 3x3 tekil 4 sn, Ao5 5,5 sn, Ao12 6 sn altı; 2x2 tekil 0,6 sn, Ao5 1 sn, Ao12 1,2 sn altı ya da ortalaması tekilinden hızlı olanlar.</p><div id="aRecList" class="a-list"></div>' +
+            '<p class="a-note">Bir süreye dokun → yalnız o süre silinir, kişinin diğer rekorları kalır ve silinen süre geri gelmez. Şüpheli: 3x3 tekil 4 sn, Ao5 5,5 sn, Ao12 6 sn altı; 2x2 tekil 0,6 sn, Ao5 1 sn, Ao12 1,2 sn altı ya da ortalaması tekilinden hızlı olanlar.</p><div id="aRecList" class="a-list"></div>' +
             '<p class="a-note" style="margin-top:12px">Yarışmalar herkese açık sayfada: <a href="/icerikler/ev-yarismasi" target="_blank" rel="noopener">Ev yarışması</a> · <a href="/icerikler/rekorlar" target="_blank" rel="noopener">Rekor tablosu</a></p></div>' +
             '<div class="box"><h2>👤 Hesapsız ziyaretçiler</h2><p class="a-note">Giriş yapmadan siteyi kullanan cihazlar (her cihaz bir kez sayılır, oturum başına güncellenir).</p><div id="aAnon" class="stat-tiles"><p class="a-note">Yükleniyor…</p></div><div id="aAnonMore"></div></div>' +
             '<div class="box"><h2>🔔 Bildirim gönder</h2>' +
