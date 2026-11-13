@@ -24,6 +24,9 @@
     window.RA_APP = on;
     if (!on) return;
     var d = document.documentElement; d.classList.add("ra-app");
+    // sade uygulama teması (styles/app.css); mevsimlik/renkli temalar uygulamada kapalı
+    d.removeAttribute("data-skin");
+    var ln = document.createElement("link"); ln.rel = "stylesheet"; ln.href = "/styles/app.css"; (document.head || d).appendChild(ln);
     var path = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
     var noBar = /\/(zkttimer|sanal-kup|tekrar|ev-yayin|giris|yakinda)$|\/algoritmalar\/(antrenor|yazdir)|\/kup-arena\//.test(path);
     if (noBar) d.classList.add("ra-app-nobar");
