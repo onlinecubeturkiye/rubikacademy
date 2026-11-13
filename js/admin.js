@@ -698,10 +698,12 @@
         }
         var review = edit ? '<div class="cp-rev">' + (o._dirty ? '<p class="cp-dirty">✏️ Düzeltmeler yapıldı (' + o._dirty.length + '): onaylayınca kaydedilir.</p>' : '') +
                 (sus ? '<p class="cp-dirty" style="color:#d97706">⚠️ ' + sus + ' kişide şüpheli süre var, kontrol et.</p>' : '') +
-                '<div class="a-ctrl"><button class="a-btn main" data-ok="' + esc(o.code) + '">✓ Onayla, rekorlara ekle</button><button class="a-btn danger" data-rej="' + esc(o.code) + '">✗ Reddet (hiç sayılmasın)</button>' +
-                (o._dirty ? '<button class="a-btn" data-undo="' + esc(o.code) + '">↺ Düzeltmeleri geri al</button>' : '') + '</div></div>'
-            : (st === "ok" || st === "rej") && (o.okBy || o.ok) ? '<div class="cp-rev"><p class="a-note">' + (st === "ok" ? "✓ Onaylandı" : "✗ Reddedildi") + (o.okTs ? " · " + esc(dateFmt(Date.parse(o.okTs) || 0)) : "") + (o.okNote ? " · " + esc(o.okNote) : "") + '</p>' +
-                '<div class="a-ctrl"><button class="a-btn sm" data-reopen="' + esc(o.code) + '">↺ Yeniden incele</button></div></div>' : '';
+                '<div class="a-ctrl"><button class="a-btn main" data-ok="' + esc(o.code) + '">' + (o._editing ? "💾 Kaydet" : "✓ Onayla, rekorlara ekle") + '</button><button class="a-btn danger" data-rej="' + esc(o.code) + '">✗ Reddet (hiç sayılmasın)</button>' +
+                (o._dirty ? '<button class="a-btn" data-undo="' + esc(o.code) + '">↺ Düzeltmeleri geri al</button>' : '') +
+                (o._editing ? '<button class="a-btn" data-edstop="' + esc(o.code) + '">Vazgeç</button>' : '') + '</div></div>'
+            : (st === "ok" || st === "rej") ? '<div class="cp-rev"><p class="a-note">' + (st === "ok" ? "✓ Onaylandı" : "✗ Reddedildi") + (o.okTs ? " · " + esc(dateFmt(Date.parse(o.okTs) || 0)) : (o.ok ? "" : " · eski yarışma")) + (o.okNote ? " · " + esc(o.okNote) : "") + '</p>' +
+                // biten yarışma her zaman düzenlenebilir: süre düzelt / DNF / diskalifiye → kaydedince yarışmacıların profil ve rekorları güncellenir
+                '<div class="a-ctrl"><button class="a-btn main sm" data-edit2="' + esc(o.code) + '">✏️ Sonuçları düzenle</button>' + (o.okBy || o.ok ? '<button class="a-btn sm" data-reopen="' + esc(o.code) + '">↺ Yeniden incele</button>' : '') + '</div></div>' : '';
         return '<details class="cp" data-code="' + esc(o.code) + '"' + (st === "live" ? ' data-live="1"' : '') + (open || st === "pend" ? ' open' : '') + '><summary>' +
             '<div class="cp-s1"><b>' + esc(o.name || "Ev yarışması") + '</b>' + chip + '</div>' +
             '<div class="cp-s2"><span class="mono">' + esc(o.code) + '</span><span>' + ev + '</span><span>' + (nP || "?") + ' / ' + (o.cap || "?") + ' kişi</span><span>' + R.length + ' tur</span>' +
@@ -759,7 +761,8 @@
                 var note = yes ? (o4._dirty ? o4._dirty.join("; ") : "") : prompt("Reddetme nedeni (isteğe bağlı, ör. hileli süreler):", "");
                 if (!yes && note == null) return;
                 var unc = 0; if (yes) { var sn = {}; o4._R.forEach(function (r) { (r.rows || []).forEach(function (x) { if (!sn[x.u]) { sn[x.u] = 1; if (!(o4._chk || {})[x.u]) unc++; } }); }); }
-                if (yes && unc && !confirm(unc + " kişiyi henüz kontrol etmedin. Yine de onaylansın mı?")) return;
+                if (yes && o4._editing && !o4._dirty) { alert("Değişiklik yok. Bir süreye dokunup düzelt ya da DNF yap, sonra Kaydet'e bas."); return; }
+                if (yes && unc && !o4._editing && !confirm(unc + " kişiyi henüz kontrol etmedin. Yine de onaylansın mı?")) return;
                 if (yes && !confirm(o4._dirty ? o4._dirty.length + " düzeltmeyle onaylansın mı? Sonuçlar rekorlara ve profillere işlenir." : "Sonuçlar olduğu gibi onaylansın mı? Rekorlara ve profillere işlenir.")) return;
                 // düzeltme yapılmadıysa R'ye dokunma (yarışma hâlâ odadaysa sonuç ezilmesin)
                 var f = { ok: yes ? 1 : -1, okBy: (Account.user && Account.user() && Account.user().uid) || "admin", okTs: { ts: 1 }, okNote: String(note || "").slice(0, 300) };
@@ -791,6 +794,8 @@
                 deleteComp(cd).then(function (ok) { if (ok) renderComps(); else { b.disabled = false; alert("Silinemedi (kuralları yayımladın mı?)"); } });
                 return;
             }
+            if (b.hasAttribute("data-edit2")) { e.preventDefault(); var oe = B[b.getAttribute("data-edit2")]; if (oe) { oe._editing = true; redrawComp(box, oe); } return; }
+            if (b.hasAttribute("data-edstop")) { e.preventDefault(); var os = B[b.getAttribute("data-edstop")]; if (os) { if (os._orig) os._R = JSON.parse(os._orig); os._orig = null; os._dirty = null; os._editing = false; redrawComp(box, os); } return; }
             if (b.hasAttribute("data-reopen")) {
                 var c5 = b.getAttribute("data-reopen"); if (!confirm("Onay/ret kaldırılsın ve yeniden incelensin mi? (Siteye girmiş oyuncuların kayıtları değişmez; yeniden onaylayınca güncellenir.)")) return;
                 compPatchAdmin(c5, {}, ["ok", "okBy", "okTs", "okNote"]).then(function (ok) { if (ok) { compTab = "pend"; renderComps(); } else alert("Kaydedilemedi."); });
