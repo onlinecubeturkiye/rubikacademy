@@ -1411,13 +1411,13 @@ html:not([data-skin]), html:not([data-skin]) body {
     --font-display: "Inter", system-ui, sans-serif !important;
 }
 html.dark-mode:not([data-skin]), html.dark-mode:not([data-skin]) body, html:not([data-skin]) body.dark-mode {
-    --ui-accent: #f2f2f2 !important;
-    --ui-accent-hover: #ffffff !important;
-    --ui-accent-text: #111111 !important;
-    --ui-accent-soft: #232325 !important;
-    --primary: #f2f2f2 !important;
-    --primary-dark: #ffffff !important;
-    --primary-light: #232325 !important;
+    --ui-accent: #5b8def !important;
+    --ui-accent-hover: #7aa3f3 !important;
+    --ui-accent-text: #ffffff !important;
+    --ui-accent-soft: #1b2333 !important;
+    --primary: #6f9bf2 !important;
+    --primary-dark: #8fb2f5 !important;
+    --primary-light: #1b2333 !important;
     --background: #0e0e0f !important;
     --surface: #18181a !important;
     --surface-soft: #1f1f21 !important;
@@ -1474,3 +1474,10 @@ html:not([data-skin]) .nav-links a.active, html:not([data-skin]) .nav-links a:ho
 html:not([data-skin]) footer { background: var(--surface) !important; background-image: none !important; }
 html:not([data-skin]) .h-hero { min-height: 0 !important; padding: 72px 0 48px !important; }
 html:not([data-skin]) .hero { min-height: 0 !important; }
+/* sayfa içi: gölge yok, kart köşeleri ölçülü, ikon kutuları düz */
+html:not([data-skin]) .page *, html:not([data-skin]) main *, html:not([data-skin]) .h-sec *, html:not([data-skin]) .h-hero * { box-shadow: none !important; text-shadow: none !important; }
+html:not([data-skin]) .h-feat, html:not([data-skin]) .h-step, html:not([data-skin]) .h-stat, html:not([data-skin]) .h-soc, html:not([data-skin]) .h-contact,
+html:not([data-skin]) .box, html:not([data-skin]) .card, html:not([data-skin]) .hero, html:not([data-skin]) .evh, html:not([data-skin]) .tr-card { border-radius: 16px !important; border: 1px solid var(--border) !important; }
+html:not([data-skin]) .h-feat:hover, html:not([data-skin]) .tr-card:hover, html:not([data-skin]) .h-step:hover { transform: none !important; border-color: var(--text-soft) !important; }
+html:not([data-skin]) .h-contact { background: var(--surface) !important; }
+html:not([data-skin]) .h-tag { background: var(--text) !important; color: var(--surface) !important; }
