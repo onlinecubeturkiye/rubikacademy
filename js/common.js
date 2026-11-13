@@ -33,8 +33,7 @@
     window.RA_APP = on;
     if (!on) return;
     var d = document.documentElement; d.classList.add("ra-app");
-    // sade uygulama teması (styles/app.css); mevsimlik/renkli temalar uygulamada kapalı
-    d.removeAttribute("data-skin");
+    // uygulamaya özel parçalar (styles/app.css); renk teması sitedeki gibi Ayarlar'dan seçilir
     var ln = document.createElement("link"); ln.rel = "stylesheet"; ln.href = "/styles/app.css"; (document.head || d).appendChild(ln);
     var path = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
     var noBar = /\/(zkttimer|sanal-kup|tekrar|ev-yayin|giris|yakinda)$|\/algoritmalar\/(antrenor|yazdir)|\/kup-arena\//.test(path);
@@ -406,12 +405,12 @@ document.addEventListener("DOMContentLoaded", function () {
    AYARLAR MENÜSÜ (⚙) — tema, dil, renk körlüğü tek yerde
 ========================================= */
 var SETTINGS_TXT = {
-    tr: { set: "Ayarlar", theme: "Tema", dark: "Karanlık", light: "Açık", lang: "Dil", cvd: "Renk körlüğü", cvd_off: "Kapalı (normal)", cvd_pro: "Protanopi", cvd_deu: "Döteranopi", cvd_rg: "Kırmızı-Yeşil", cvd_tri: "Tritanopi (mavi-sarı)" , skin: "Tema stili", skin_standart: "Standart", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Gün Batımı", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" },
-    en: { set: "Settings", theme: "Theme", dark: "Dark", light: "Light", lang: "Language", cvd: "Color blindness", cvd_off: "Off (normal)", cvd_pro: "Protanopia", cvd_deu: "Deuteranopia", cvd_rg: "Red-Green", cvd_tri: "Tritanopia (blue-yellow)" , skin: "Theme style", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Sunset", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" },
-    fr: { set: "Paramètres", theme: "Thème", dark: "Sombre", light: "Clair", lang: "Langue", cvd: "Daltonisme", cvd_off: "Désactivé (normal)", cvd_pro: "Protanopie", cvd_deu: "Deutéranopie", cvd_rg: "Rouge-Vert", cvd_tri: "Tritanopie (bleu-jaune)" , skin: "Style du thème", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Néon", skin_gunbatimi: "Coucher de soleil", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" },
-    ru: { set: "Настройки", theme: "Тема", dark: "Тёмная", light: "Светлая", lang: "Язык", cvd: "Дальтонизм", cvd_off: "Выкл (обычный)", cvd_pro: "Протанопия", cvd_deu: "Дейтеранопия", cvd_rg: "Красно-зелёный", cvd_tri: "Тританопия (сине-жёлтый)" , skin: "Стиль темы", skin_standart: "Стандартный", skin_rubik: "Rubik's Cube", skin_neon: "Неон", skin_gunbatimi: "Закат", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" },
-    de: { set: "Einstellungen", theme: "Thema", dark: "Dunkel", light: "Hell", lang: "Sprache", cvd: "Farbenblindheit", cvd_off: "Aus (normal)", cvd_pro: "Protanopie", cvd_deu: "Deuteranopie", cvd_rg: "Rot-Grün", cvd_tri: "Tritanopie (Blau-Gelb)" , skin: "Designstil", skin_standart: "Standard", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Sonnenuntergang", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" },
-    ar: { set: "الإعدادات", theme: "السمة", dark: "داكن", light: "فاتح", lang: "اللغة", cvd: "عمى الألوان", cvd_off: "إيقاف (عادي)", cvd_pro: "بروتانوبيا", cvd_deu: "ديوترانوبيا", cvd_rg: "أحمر-أخضر", cvd_tri: "تريتانوبيا (أزرق-أصفر)" , skin: "نمط السمة", skin_standart: "قياسي", skin_rubik: "Rubik's Cube", skin_neon: "نيون", skin_gunbatimi: "غروب الشمس", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" }
+    tr: { set: "Ayarlar", theme: "Tema", dark: "Karanlık", light: "Açık", lang: "Dil", cvd: "Renk körlüğü", cvd_off: "Kapalı (normal)", cvd_pro: "Protanopi", cvd_deu: "Döteranopi", cvd_rg: "Kırmızı-Yeşil", cvd_tri: "Tritanopi (mavi-sarı)" , skin: "Tema stili", skin_standart: "Sade", skin_klasik: "Klasik", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Gün Batımı", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" },
+    en: { set: "Settings", theme: "Theme", dark: "Dark", light: "Light", lang: "Language", cvd: "Color blindness", cvd_off: "Off (normal)", cvd_pro: "Protanopia", cvd_deu: "Deuteranopia", cvd_rg: "Red-Green", cvd_tri: "Tritanopia (blue-yellow)" , skin: "Theme style", skin_standart: "Simple", skin_klasik: "Classic", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Sunset", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" },
+    fr: { set: "Paramètres", theme: "Thème", dark: "Sombre", light: "Clair", lang: "Langue", cvd: "Daltonisme", cvd_off: "Désactivé (normal)", cvd_pro: "Protanopie", cvd_deu: "Deutéranopie", cvd_rg: "Rouge-Vert", cvd_tri: "Tritanopie (bleu-jaune)" , skin: "Style du thème", skin_standart: "Sobre", skin_klasik: "Classique", skin_rubik: "Rubik's Cube", skin_neon: "Néon", skin_gunbatimi: "Coucher de soleil", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" },
+    ru: { set: "Настройки", theme: "Тема", dark: "Тёмная", light: "Светлая", lang: "Язык", cvd: "Дальтонизм", cvd_off: "Выкл (обычный)", cvd_pro: "Протанопия", cvd_deu: "Дейтеранопия", cvd_rg: "Красно-зелёный", cvd_tri: "Тританопия (сине-жёлтый)" , skin: "Стиль темы", skin_standart: "Простой", skin_klasik: "Классический", skin_rubik: "Rubik's Cube", skin_neon: "Неон", skin_gunbatimi: "Закат", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" },
+    de: { set: "Einstellungen", theme: "Thema", dark: "Dunkel", light: "Hell", lang: "Sprache", cvd: "Farbenblindheit", cvd_off: "Aus (normal)", cvd_pro: "Protanopie", cvd_deu: "Deuteranopie", cvd_rg: "Rot-Grün", cvd_tri: "Tritanopie (Blau-Gelb)" , skin: "Designstil", skin_standart: "Schlicht", skin_klasik: "Klassisch", skin_rubik: "Rubik's Cube", skin_neon: "Neon", skin_gunbatimi: "Sonnenuntergang", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" },
+    ar: { set: "الإعدادات", theme: "السمة", dark: "داكن", light: "فاتح", lang: "اللغة", cvd: "عمى الألوان", cvd_off: "إيقاف (عادي)", cvd_pro: "بروتانوبيا", cvd_deu: "ديوترانوبيا", cvd_rg: "أحمر-أخضر", cvd_tri: "تريتانوبيا (أزرق-أصفر)" , skin: "نمط السمة", skin_standart: "بسيط", skin_klasik: "كلاسيكي", skin_rubik: "Rubik's Cube", skin_neon: "نيون", skin_gunbatimi: "غروب الشمس", skin_halloween: "🎃 Halloween", skin_yilbasi: "🎄 Yılbaşı" }
 };
 function raSetLang() { try { return localStorage.getItem("site-lang") || "tr"; } catch (e) { return "tr"; } }
 function raEsc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
@@ -451,7 +450,8 @@ function raApplyPrefs(json) {
 })();
 /* Tema stili (renk paleti + yazı tipi): localStorage "site-skin" */
 var RA_SKINS = [
-    ["standart", ["#f7f8fc", "#6c5ce7", "#ec4899", "#12141f"]],
+    ["standart", ["#f4f4f2", "#111111", "#ffffff", "#6b6b6b"]],
+    ["klasik", ["#f7f8fc", "#6c5ce7", "#ec4899", "#12141f"]],
     ["rubik", ["#fff8ec", "#ffd21f", "#1d5bff", "#17171f"]],
     ["neon", ["#05060b", "#22d3ee", "#d946ef", "#e8f6ff"]],
     ["gunbatimi", ["#fdf6f0", "#e8573a", "#f5a524", "#2a1712"]]
