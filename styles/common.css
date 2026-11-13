@@ -1461,7 +1461,10 @@ html:not([data-skin]) .btn.primary, html:not([data-skin]) .h-btn.primary, html:n
     background: var(--btn-bg) !important; color: var(--btn-text) !important; border-color: var(--btn-bg) !important; }
 
 /* sponsor kutusu: tek çizgi, renkli çerçeve yok */
-html:not([data-skin]) [class*="ra-ad"] { box-shadow: none !important; background-image: none !important; }
+html:not([data-skin]) .ra-ad { box-shadow: none !important; background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: 16px !important; margin-top: 12px !important; margin-bottom: 16px !important; }
+html:not([data-skin]) .ra-ad-cta { background: var(--btn-bg) !important; color: var(--btn-text) !important; box-shadow: none !important; }
+html:not([data-skin]) .ra-ad-ph { background: var(--surface-soft) !important; }
+html:not([data-skin]) .ra-ad-code { border-color: var(--border) !important; }
 
 /* bölüm üstündeki küçük büyük-harf etiketler ve renkli (tonlu) kartlar */
 html:not([data-skin]) .section-title small, html:not([data-skin]) .h-sec-k, html:not([data-skin]) .sec-kicker { display: none !important; }
