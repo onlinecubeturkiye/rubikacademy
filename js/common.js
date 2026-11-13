@@ -6,6 +6,15 @@
    - Hesaptan çıkınca ya da bu cihazda oturum yokken cihazda kalan kişisel veri silinir.
    - Tema, dil, renk körlüğü, tutuş gibi tercihler herkes için saklanır.
 ========================================================= */
+/* Sade tema geçişi (bir kerelik): daha önce Ayarlar'dan seçilmiş renkli temayı sıfırla,
+   herkes sade varsayılan görünüme geçsin. İsteyen Ayarlar'dan yeniden tema seçebilir. */
+(function () {
+    try {
+        if (localStorage.getItem("ra-sade-v1")) return;
+        localStorage.setItem("ra-sade-v1", "1");
+        if (localStorage.getItem("site-skin")) { localStorage.removeItem("site-skin"); document.documentElement.removeAttribute("data-skin"); }
+    } catch (e) {}
+})();
 /* =========================================================
    UYGULAMA MODU (Android uygulaması / ana ekrana eklenmiş site)
    Algılama: ?source=twa|pwa, android-app:// yönlendireni ya da display-mode: standalone → oturum boyunca hatırlanır.
