@@ -1,0 +1,29 @@
+# firestore.rules main'e gelince Firebase'e otomatik yayınlanır (elle Firebase Console'a yapıştırmak gerekmez).
+name: Firebase kurallarını yayınla
+on:
+  push:
+    branches: [main]
+    paths: ["firestore.rules", ".github/workflows/rules.yml", ".github/push/rules.mjs"]
+  workflow_dispatch:
+concurrency:
+  group: firestore-rules
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: .github/push/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: .github/push
+      - run: node rules.mjs
+        working-directory: .github/push
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
