@@ -116,7 +116,7 @@ self.addEventListener("fetch", function (event) {
     // Küp Arena web sürümü (/kup-arena/oyna/): hiç önbelleğe alınmaz, her zaman ağdan gelir (eski sürüm takılı kalmasın)
     if (url.pathname.indexOf("/kup-arena/oyna/") === 0 || url.pathname === "/kup-arena/oyna") return;
     // Firebase giriş yardımcısı (/__/auth/*): önbelleğe alınmaz
-    if (url.pathname.indexOf("/__/") === 0) return;
+    if (url.pathname.indexOf("/__/") === 0 || url.pathname.indexOf("/indir/") === 0) return;
 
     if (req.mode === "navigate") {
         event.respondWith(fetch(req).then(function (res) {

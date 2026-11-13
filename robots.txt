@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /indir/
 
 Sitemap: https://rubikacademy.fun/sitemap.xml
