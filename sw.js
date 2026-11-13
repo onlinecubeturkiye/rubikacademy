@@ -12,7 +12,6 @@ var PRECACHE = [
     "/icerikler/baslangic.html",
     "/icerikler/f2l.html",
     "/icerikler/yol-haritasi.html",
-    "/icerikler/kocluklar.html",
     "/icerikler/videolar.html",
     "/icerikler/sss.html",
     "/icerikler/algoritmalar/oll.html",
