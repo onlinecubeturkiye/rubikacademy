@@ -661,7 +661,7 @@
         var codes = {}, last = {}, now = Date.now();
         Object.keys(cs.r).forEach(function (k) {
             var e = cs.r[k]; if (!isObj(e)) return; var c = k.split(":")[0];
-            if (!compOk(e)) codes[c] = 2; else if (compOk(e) > 0 && (!e.nmAt || now - e.nmAt > 3 * 86400000 || !(cs.fill || {})[c]) && !codes[c]) codes[c] = 1;
+            if (!compOk(e)) codes[c] = 2; else if (compOk(e) > 0 && (!e.nmAt || now - e.nmAt > 2 * 3600000 || !(cs.fill || {})[c]) && !codes[c]) codes[c] = 1;
             last[c] = Math.max(last[c] || 0, e.ts || 0);
         });
         var list = Object.keys(codes).sort(function (a, b) { return (codes[b] - codes[a]) || (last[b] - last[a]); }).slice(0, 8); if (!list.length) return Promise.resolve(false);
@@ -688,12 +688,18 @@
                     });
                     cur.fill[code] = 1; changed = true;
                 }
-                if (codes[code] === 1) { changed = true; return; } // yalnız ad kontrolü (onaylı yarışma)
+                // Yönetici onaylı yarışmayı sonradan düzenlediyse (okTs değişti) sonuçları yeniden al
+                var okv = (f.okTs && f.okTs.timestampValue) || "";
+                var stale = ok === 1 && okv && Object.keys(cur.r).some(function (k) { var e = cur.r[k]; return k.split(":")[0] === code && isObj(e) && e.ok !== -1 && e.okv !== okv; });
+                if (codes[code] === 1 && !stale) { changed = true; return; } // yalnız ad kontrolü (onaylı yarışma)
                 if (!ok) return;
                 var R = []; try { R = JSON.parse((f.R && f.R.stringValue) || "[]") || []; } catch (x) {}
                 Object.keys(cur.r).forEach(function (k) {
-                    if (k.split(":")[0] !== code || compOk(cur.r[k]) !== 0) return;
+                    if (k.split(":")[0] !== code || !isObj(cur.r[k])) return;
+                    var pend = compOk(cur.r[k]) === 0, upd = ok === 1 && okv && cur.r[k].ok !== -1 && cur.r[k].okv !== okv;
+                    if (!pend && !upd) return;
                     var e = cur.r[k], rn = +k.split(":")[1], r = R.filter(function (x) { return x.n === rn; })[0];
+                    e.okv = okv;
                     if (ok === 1 && r) {
                         var i2 = -1; (r.rows || []).forEach(function (x, j) { if (x.u === me) i2 = j; });
                         if (i2 < 0) { e.ok = -1; changed = true; return; } // diskalifiye edildi
