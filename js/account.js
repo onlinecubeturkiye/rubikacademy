@@ -618,9 +618,10 @@
                 comp.rounds++;
                 if (e.f) { comp.finals++; if (e.rk === 1) comp.wins++; }
                 var pb = comp.pb[e.ev] || (comp.pb[e.ev] = {});
-                if (typeof e.s === "number" && (!pb.s || e.s < pb.s)) pb.s = e.s;
+                // yöneticinin rekor tablosundan sildiği değerler (records/{uid}.xs) rekor sayılmaz; sıradaki en iyi geçer
+                if (typeof e.s === "number" && !recX("s" + e.ev, e.s) && (!pb.s || e.s < pb.s)) pb.s = e.s;
                 var ak = e.n === 12 ? "a12" : "a5";
-                if (typeof e.a === "number" && (!pb[ak] || e.a < pb[ak])) pb[ak] = e.a;
+                if (typeof e.a === "number" && !recX(ak + "_" + e.ev, e.a) && (!pb[ak] || e.a < pb[ak])) pb[ak] = e.a;
             }
             // geçmiş listesi: en yeni 40 tur (profil verisi sınırı için kısa; süreler dahil)
             comp.list.sort(function (x, y) { return y.ts - x.ts; });
@@ -709,7 +710,20 @@
     }
     // Rekor tablosu (records/{uid}): ev yarışması kişisel rekorları, herkes okur (icerikler/rekorlar)
     var REC_F = [["s333", "333", "s"], ["a5_333", "333", "a5"], ["a12_333", "333", "a12"], ["s222", "222", "s"], ["a5_222", "222", "a5"], ["a12_222", "222", "a12"]];
+    // Yöneticinin sildiği rekor değerleri: "alan:ms" listesi (records/{uid}.xs), cihazda ra-rec-x
+    function recXList() { var a = parse(lsGet("ra-rec-x")); return Array.isArray(a) ? a : []; }
+    function recX(field, v) { return typeof v === "number" && recXList().indexOf(field + ":" + Math.round(v)) >= 0; }
     function writeRecords(name, comp) {
+        if (!user || !comp) return;
+        // önce kayıttaki silinmiş değerleri al; değiştiyse istatistikleri onlara göre yeniden hesapla
+        api("/records/" + user.uid, { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }).then(function (d) {
+            if (!user) return;
+            var xs = (d && d.fields && d.fields.xs && d.fields.xs.stringValue) || "", arr = xs.split(",").filter(Boolean);
+            if (JSON.stringify(arr) !== JSON.stringify(recXList())) { lsSet("ra-rec-x", JSON.stringify(arr)); comp = computeStats().comp || comp; lsSet("ra-rec-last", null); }
+            writeRecordsNow(name, comp);
+        });
+    }
+    function writeRecordsNow(name, comp) {
         if (!user || !comp) return;
         comp.pb = comp.pb || {};
         var f = { name: { stringValue: name }, n: { integerValue: String(comp.rounds || 0) }, w: { integerValue: String(comp.wins || 0) }, ts: { timestampValue: new Date().toISOString() } }, any = false;
@@ -723,7 +737,9 @@
         if (!any && !lsGet("ra-rec-last")) return;
         var key = JSON.stringify(f).replace(/"ts":\{[^}]*\}/, "");
         if (lsGet("ra-rec-last") === key) return; // değişmediyse yazma (kota)
-        api("/records/" + user.uid, { method: "PATCH", body: JSON.stringify({ fields: f }) }).then(function (r) { if (r.ok) lsSet("ra-rec-last", key); }).catch(function () {});
+        // updateMask: yöneticinin xs alanına dokunulmaz
+        var mask = "?" + Object.keys(f).map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
+        api("/records/" + user.uid + mask, { method: "PATCH", body: JSON.stringify({ fields: f }) }).then(function (r) { if (r.ok) lsSet("ra-rec-last", key); }).catch(function () {});
     }
     // users/{uid} belgesi başka yerde (ör. Küp Arena oyunu) oluşturulmuş olabilir: yazmadan önce bir kez oku,
     // sitede ad belirlenmediyse oradaki adı, katılma tarihi olarak da ikisinin eskisini koru
