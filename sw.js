@@ -1,9 +1,10 @@
 /* Rubik Academy service worker
    - Sayfalar: önce ağ (güncel içerik), bağlantı yoksa önbellek
-   - CSS/JS/JSON/görseller: önbellekten hemen ver, arka planda güncelle
+   - CSS/JS/JSON: önce ağ (değişmediyse 304), çevrimdışıysa önbellek → ?v= sürümünü elle artırmak gerekmez
+   - Görseller/fontlar: önbellekten hemen ver, arka planda güncelle
    - Algoritma sayfaları ve antrenör kurulumda önceden indirilir (çevrimdışı açılsın diye)
    Sürüm (VERSION) değişince eski önbellek silinir. */
-var VERSION = "ra-20270112";
+var VERSION = "ra-20270113";
 var PRECACHE = [
     "/",
     "/icerikler.html",
@@ -20,8 +21,8 @@ var PRECACHE = [
     "/icerikler/algoritmalar/zbll.html",
     "/icerikler/algoritmalar/megaminx.html",
     "/icerikler/algoritmalar/square1.html",
-    "/icerikler/algoritmalar/mgSvg.js?v=20270112",
-    "/icerikler/algoritmalar/sq1Svg.js?v=20270112",
+    "/icerikler/algoritmalar/mgSvg.js?v=20270113",
+    "/icerikler/algoritmalar/sq1Svg.js?v=20270113",
     "/icerikler/algoritmalar/wv.html",
     "/icerikler/algoritmalar/cll.html",
     "/icerikler/algoritmalar/ortega-oll.html",
@@ -37,44 +38,44 @@ var PRECACHE = [
     "/icerikler/algoritmalar/2look-pll.html",
     "/icerikler/algoritmalar/antrenor.html",
     "/icerikler/algoritmalar/yazdir.html",
-    "/icerikler/algoritmalar/tanima-pll.json?v=20270112",
-    "/js/cross-solver.js?v=20270112",
-    "/js/recog-trainer.js?v=20270112",
-    "/styles/common.css?v=20270112",
-    "/js/i18n.js?v=20270112",
-    "/js/common.js?v=20270112",
-    "/js/ra-icons.js?v=20270112",
-    "/js/ad-banner.js?v=20270112",
-    "/js/custom-algs.js?v=20270112",
+    "/icerikler/algoritmalar/tanima-pll.json?v=20270113",
+    "/js/cross-solver.js?v=20270113",
+    "/js/recog-trainer.js?v=20270113",
+    "/styles/common.css?v=20270113",
+    "/js/i18n.js?v=20270113",
+    "/js/common.js?v=20270113",
+    "/js/ra-icons.js?v=20270113",
+    "/js/ad-banner.js?v=20270113",
+    "/js/custom-algs.js?v=20270113",
     "/darkmode.js",
     "/icerikler/algoritmalar/ll.js",
     "/icerikler/algoritmalar/cllSvg.js",
     "/icerikler/algoritmalar/ortegaSvg.js",
     "/icerikler/algoritmalar/ortegaOllSvg.js",
-    "/icerikler/algoritmalar/antrenor-bt.js?v=20270112",
+    "/icerikler/algoritmalar/antrenor-bt.js?v=20270113",
     "/icons/icon-192.png",
     "/icons/favicon-48.png",
     "/manifest.webmanifest",
     "/icerikler/algoritmalar/oll-pll.json",
-    "/icerikler/algoritmalar/oll-pll.json?v=20270112",
+    "/icerikler/algoritmalar/oll-pll.json?v=20270113",
     "/icerikler/algoritmalar/coll.json",
-    "/icerikler/algoritmalar/coll.json?v=20270112",
+    "/icerikler/algoritmalar/coll.json?v=20270113",
     "/icerikler/algoritmalar/wv.json",
-    "/icerikler/algoritmalar/wv.json?v=20270112",
+    "/icerikler/algoritmalar/wv.json?v=20270113",
     "/icerikler/algoritmalar/cll.json",
-    "/icerikler/algoritmalar/cll.json?v=20270112",
+    "/icerikler/algoritmalar/cll.json?v=20270113",
     "/icerikler/algoritmalar/ortega-oll.json",
-    "/icerikler/algoritmalar/ortega-oll.json?v=20270112",
+    "/icerikler/algoritmalar/ortega-oll.json?v=20270113",
     "/icerikler/algoritmalar/ortega-pbl.json",
-    "/icerikler/algoritmalar/ortega-pbl.json?v=20270112",
+    "/icerikler/algoritmalar/ortega-pbl.json?v=20270113",
     "/icerikler/algoritmalar/eg.json",
-    "/icerikler/algoritmalar/eg.json?v=20270112",
-    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20270112",
-    "/icerikler/algoritmalar/4x4.json?v=20270112",
-    "/icerikler/algoritmalar/5x5.json?v=20270112",
-    "/icerikler/algoritmalar/pyraminx.json?v=20270112",
+    "/icerikler/algoritmalar/eg.json?v=20270113",
+    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20270113",
+    "/icerikler/algoritmalar/4x4.json?v=20270113",
+    "/icerikler/algoritmalar/5x5.json?v=20270113",
+    "/icerikler/algoritmalar/pyraminx.json?v=20270113",
     "/icerikler/algoritmalar/roux.json",
-    "/icerikler/algoritmalar/skewb.json?v=20270112"
+    "/icerikler/algoritmalar/skewb.json?v=20270113"
 ];
 
 self.addEventListener("install", function (event) {
@@ -119,7 +120,7 @@ self.addEventListener("fetch", function (event) {
     if (url.pathname.indexOf("/__/") === 0 || url.pathname.indexOf("/indir/") === 0) return;
 
     if (req.mode === "navigate") {
-        event.respondWith(fetch(req).then(function (res) {
+        event.respondWith(fetch(req, { cache: "no-cache" }).then(function (res) {
             if (res && res.ok) {
                 var copy = res.clone();
                 caches.open(VERSION).then(function (c) { c.put(req, copy); });
@@ -133,9 +134,16 @@ self.addEventListener("fetch", function (event) {
         return;
     }
 
-    // CSS/JS/JSON: aynı adres (?v= dahil) önbellekte varsa hemen ver, arka planda güncelle.
-    // Sürümü farklı bir kopyayı ASLA ağdan önce verme: eski (ör. hatalı) dosya yeni sayfaya karışmasın.
-    // Farklı sürümlü kopya sadece çevrimdışıyken kullanılır.
+    // CSS/JS/JSON: ÖNCE AĞ (sunucuya "değişti mi?" diye sorulur, değişmediyse 304 ile hızlı döner).
+    // Böylece her değişiklikte ?v= sürüm numarası değiştirmek gerekmez; çevrimdışıysa önbellekteki kopya.
+    if (!/\.(png|jpe?g|webp|gif|svg|ico|woff2?|ttf|mp3|mp4)$/i.test(url.pathname)) {
+        event.respondWith(fetch(req, { cache: "no-cache" }).then(function (res) {
+            if (res && res.ok) { var copy = res.clone(); caches.open(VERSION).then(function (c) { c.put(req, copy); }); return res; }
+            return fromCache(req).then(function (hit) { return hit || res; });
+        }).catch(function () { return fromCache(req); }));
+        return;
+    }
+    // Görseller/fontlar: önbellekte varsa hemen ver, arka planda güncelle
     event.respondWith(caches.open(VERSION).then(function (cache) { return cache.match(req); }).then(function (hit) {
         var net = fetch(req).then(function (res) {
             if (res && res.ok) {

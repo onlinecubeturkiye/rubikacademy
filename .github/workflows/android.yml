@@ -22,7 +22,7 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" > /dev/null
       - name: Derle (APK + AAB)
-        run: gradle -p android --no-daemon assembleRelease bundleRelease
+        run: export RA_VERSION_CODE=$((GITHUB_RUN_NUMBER + 10)) && echo "versionCode=$RA_VERSION_CODE" && gradle -p android --no-daemon assembleRelease bundleRelease
       - name: Çıktıları topla
         run: |
           BT="$ANDROID_HOME/build-tools/36.0.0"
