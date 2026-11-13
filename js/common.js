@@ -25,19 +25,20 @@
     if (!on) return;
     var d = document.documentElement; d.classList.add("ra-app");
     var path = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
-    var noBar = /\/(zkttimer|sanal-kup|tekrar|ev-yayin|admin|giris|yakinda)$|\/algoritmalar\/(antrenor|yazdir)|\/kup-arena\//.test(path);
+    var noBar = /\/(zkttimer|sanal-kup|tekrar|ev-yayin|giris|yakinda)$|\/algoritmalar\/(antrenor|yazdir)|\/kup-arena\//.test(path);
     if (noBar) d.classList.add("ra-app-nobar");
     var st = document.createElement("style");
     st.textContent =
         "html.ra-app{-webkit-tap-highlight-color:transparent}" +
         "html.ra-app-nobar body{overscroll-behavior-y:none}" +
         // uygulama üst barı: logo + ad, ince ve sayfayla aynı zemin (site başlığı gibi durmasın)
-        "html.ra-app .navbar{min-height:0;padding-bottom:6px}html.ra-app .nav-logo{gap:9px}html.ra-app .nav-logo-mark{width:30px;height:30px}html.ra-app .nav-logo-text{display:inline!important;font-size:17px;font-weight:900;letter-spacing:-.3px}" +
+        "html.ra-app .navbar{min-height:0;padding-bottom:8px;justify-content:center;position:sticky}html.ra-app .nav-logo{gap:10px;margin:0 auto}html.ra-app .nav-logo-mark{width:34px;height:34px}html.ra-app .nav-logo-text{display:inline!important;font-size:19px;font-weight:900;letter-spacing:-.4px}" +
+        "html.ra-app .nav-right{position:absolute;right:12px;bottom:8px}" +
         // üst menü: yalnız logo + hesap; sayfa bağlantıları alttaki sekmelerde
         "html.ra-app .nav-links{display:none!important}" +
         // hesap/profil alttaki "Profil" sekmesinde; üstte ikinci kez görünmesin (sekme çubuğu olmayan sayfalarda kalır)
         "html.ra-app #accWrap{display:none!important}" +
-        "html.ra-app .navbar{padding-top:max(env(safe-area-inset-top),0px)}" +
+        "html.ra-app .navbar{padding-top:max(env(safe-area-inset-top),10px)}" +
         "html.ra-app footer{display:none!important}" +
         "html.ra-app #btnInstall,html.ra-app .pwa-install,html.ra-app [data-install]{display:none!important}" +
         "html.ra-app:not(.ra-app-nobar) body{padding-bottom:calc(74px + env(safe-area-inset-bottom))}" +
@@ -48,6 +49,7 @@
         ".ra-tabbar a.on{color:var(--ui-accent,#6c5ce7);background:color-mix(in srgb,var(--ui-accent,#6c5ce7) 12%,transparent)}" +
         ".ra-tabbar a:active{transform:scale(.94)}" +
         "html.ra-app-nobar .ra-tabbar{display:none}" +
+        ".ra-tabbar.six{grid-template-columns:repeat(6,1fr)}.ra-tabbar.six a{font-size:10px}@media(min-width:900px){.ra-tabbar.six{width:640px}}" +
         "html.ra-app:not(.ra-app-nobar) .ra-pushask{bottom:calc(86px + env(safe-area-inset-bottom))}" +
         "body.c-in-room .ra-tabbar{display:none}" +
         "@media(min-width:900px){.ra-tabbar{left:50%;right:auto;transform:translateX(-50%);width:560px;bottom:12px;border-radius:22px;border:1px solid var(--border,#e5e7eb);padding:6px}html.ra-app:not(.ra-app-nobar) body{padding-bottom:96px}}" +
@@ -68,6 +70,19 @@
         document.body.appendChild(n);
     }
     if (document.body) bar(); else document.addEventListener("DOMContentLoaded", bar);
+    // Yönetim sekmesi: yalnız site yöneticisinde (giriş doğrulanınca); hata/oturum yoksa hiç görünmez
+    var ADM = ["/icerikler/admin", "Yönetim", ic('<path d="M12 3.5 19 6v5.5c0 4.3-3 7.7-7 9-4-1.3-7-4.7-7-9V6z"/><path d="m9 12 2 2 4-4"/>'), /\/admin$/];
+    function admTab() {
+        var n = document.getElementById("raTabbar"); if (!n) return;
+        var on = false; try { on = !!(window.Account && Account.user && Account.user() && Account.isAdmin && Account.isAdmin()); } catch (e) {}
+        var a = document.getElementById("raTabAdm");
+        if (on && !a) {
+            a = document.createElement("a"); a.id = "raTabAdm"; a.href = ADM[0]; if (ADM[3].test(path)) { a.className = "on"; a.setAttribute("aria-current", "page"); }
+            a.innerHTML = ADM[2] + "<span>" + ADM[1] + "</span>"; n.insertBefore(a, n.lastChild); n.classList.add("six");
+        } else if (!on && a) { a.remove(); n.classList.remove("six"); }
+    }
+    document.addEventListener("account-change", admTab);
+    document.addEventListener("DOMContentLoaded", function () { setTimeout(admTab, 0); });
 })();
 // RA ikonları: sitedeki emojileri Rubik Academy'ye özel ikonlarla değiştirir (js/ra-icons.js)
 (function () {
