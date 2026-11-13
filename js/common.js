@@ -34,6 +34,23 @@
         // uygulama üst barı: logo + ad, ince ve sayfayla aynı zemin (site başlığı gibi durmasın)
         "html.ra-app .navbar{min-height:0;padding-bottom:8px;justify-content:center;position:sticky}html.ra-app .nav-logo{gap:10px;margin:0 auto}html.ra-app .nav-logo-mark{width:34px;height:34px}html.ra-app .nav-logo-text{display:inline!important;font-size:19px;font-weight:900;letter-spacing:-.4px}" +
         "html.ra-app .nav-right{position:absolute;right:12px;bottom:8px}" +
+        // Uygulama düzeni (telefon): "Geri Dön" düğmesi yerine üst barda geri oku; başlıklar ve boşluklar sıkı
+        "html.ra-app .nav-bar{display:none!important}" +
+        ".ra-back{position:absolute;left:10px;bottom:6px;width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--text,#111);cursor:pointer}" +
+        ".ra-back svg{width:24px;height:24px}.ra-back:active{background:color-mix(in srgb,var(--text,#111) 8%,transparent)}" +
+        "@media(max-width:899px){" +
+            "html.ra-app .page{padding-top:14px!important;padding-left:14px!important;padding-right:14px!important}" +
+            "html.ra-app .intro,html.ra-app section.intro{margin-bottom:16px!important;padding-top:4px!important}" +
+            "html.ra-app .intro h1{font-size:30px!important;letter-spacing:-.8px!important;margin-bottom:8px!important;line-height:1.08!important}" +
+            "html.ra-app .intro p{font-size:14px!important;line-height:1.55!important;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;cursor:pointer}" +
+            "html.ra-app .intro p.ra-more{-webkit-line-clamp:unset;display:block}" +
+            "html.ra-app .intro .badge,html.ra-app .intro-badge,html.ra-app .hero .badge{margin-bottom:10px!important;padding:6px 11px!important}" +
+            "html.ra-app .hero{min-height:0!important;padding:22px 18px!important;margin-bottom:16px!important;border-radius:22px!important}" +
+            "html.ra-app .hero h1{font-size:32px!important;letter-spacing:-1px!important;margin-bottom:10px!important}" +
+            "html.ra-app .hero p{font-size:14px!important;line-height:1.55!important}" +
+            "html.ra-app .hero-cube{display:none!important}" +
+            "html.ra-app .box,html.ra-app .card{border-radius:20px}" +
+        "}" +
         // üst menü: yalnız logo + hesap; sayfa bağlantıları alttaki sekmelerde
         "html.ra-app .nav-links{display:none!important}" +
         // hesap/profil alttaki "Profil" sekmesinde; üstte ikinci kez görünmesin (sekme çubuğu olmayan sayfalarda kalır)
@@ -70,6 +87,19 @@
         document.body.appendChild(n);
     }
     if (document.body) bar(); else document.addEventListener("DOMContentLoaded", bar);
+    // Ana sekmeler dışındaki sayfalarda üst barda geri oku (sayfadaki "Geri Dön" gizli)
+    var ROOT = /^\/$|^\/icerikler$|^\/icerikler\/(algoritmalar\/antrenor|ev-yarismasi|profil|admin)$/;
+    function backBtn() {
+        var nb = document.querySelector(".navbar"); if (!nb || ROOT.test(path) || document.getElementById("raBack")) return;
+        var old = document.querySelector(".nav-bar .back-btn"), fallback = (old && old.getAttribute("href")) || "/icerikler";
+        var b = document.createElement("button"); b.type = "button"; b.id = "raBack"; b.className = "ra-back"; b.setAttribute("aria-label", "Geri");
+        b.innerHTML = ic('<path d="M15 5 8 12l7 7"/>');
+        b.onclick = function () { if (history.length > 1 && document.referrer && document.referrer.indexOf(location.origin) === 0) history.back(); else location.href = fallback; };
+        nb.appendChild(b);
+    }
+    // uzun giriş yazısı 3 satır; dokununca tamamı
+    document.addEventListener("click", function (e) { var p = e.target.closest && e.target.closest(".intro p"); if (p) p.classList.toggle("ra-more"); });
+    if (document.readyState !== "loading") backBtn(); else document.addEventListener("DOMContentLoaded", backBtn);
     // Yönetim sekmesi: yalnız site yöneticisinde (giriş doğrulanınca); hata/oturum yoksa hiç görünmez
     var ADM = ["/icerikler/admin", "Yönetim", ic('<path d="M12 3.5 19 6v5.5c0 4.3-3 7.7-7 9-4-1.3-7-4.7-7-9V6z"/><path d="m9 12 2 2 4-4"/>'), /\/admin$/];
     function admTab() {
