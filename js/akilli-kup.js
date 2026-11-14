@@ -1472,6 +1472,7 @@
         $("cShareImg").onclick = function () {
             imgP.then(function (blob) {
                 var file = new File([blob], "ev-yarismasi-" + (r.f ? "final" : "tur" + r.n) + ".png", { type: "image/png" });
+                if (window.RAApp && RAApp.native && window.RACompShare) { RACompShare.save(blob, file.name); return; }
                 var save = function () { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); $("akShareMsg").textContent = "Görsel indirildi ✓"; };
                 if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] }).catch(function (e) { if (!e || e.name !== "AbortError") save(); });
                 else save();

@@ -98,6 +98,15 @@
     function inApp() { return !!window.RA_APP; }
     function authDomain() { return (inApp() && cfg.authDomainApp) || cfg.authDomain; }
     function googleIn(m, p) {
+        // Android uygulaması (kendi WebView'i): Google, uygulama içi tarayıcıda girişi engeller → Android'in Google giriş penceresi
+        if (window.RAApp && RAApp.native) {
+            return RAApp.call("googleSignIn").then(function (r) {
+                if (r && r.token) return m.signInWithCredential(auth, m.GoogleAuthProvider.credential(r.token));
+                var e = new Error((r && r.msg) || "Google girişi yapılamadı");
+                e.code = r && r.err === "cancel" ? "auth/popup-closed-by-user" : r && r.err === "unavailable" ? "auth/operation-not-supported-in-this-environment" : "auth/internal-error";
+                throw e;
+            });
+        }
         if (inApp()) return m.signInWithRedirect(auth, p);
         return m.signInWithPopup(auth, p).catch(function (err) {
             if (err && /popup-blocked|operation-not-supported/.test(err.code || "")) return m.signInWithRedirect(auth, p);
@@ -1017,6 +1026,7 @@
     }
     // Hesap silinirken bu cihazın bildirim aboneliğini de kaldır
     function dropPushSub() {
+        if (appPush()) return RAApp.call("pushToken").then(function (tok) { return tok ? subId("fcm:" + tok).then(function (id) { return api("/pushsubs/" + id, { method: "DELETE" }).catch(function () {}); }) : null; }).catch(function () {});
         if (!pushSupported()) return Promise.resolve();
         return navigator.serviceWorker.ready.then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (sub) {
             if (!sub) return;
@@ -1024,7 +1034,13 @@
                 .then(function () { return sub.unsubscribe().catch(function () {}); });
         }).catch(function () {});
     }
+    function appPush() { return !!(window.RAApp && RAApp.native); }
     function ensurePush() {
+        // Android uygulaması: Firebase Cloud Messaging jetonu, aynı pushsubs belgesine { endpoint: "fcm:…", fcm } olarak
+        if (appPush()) {
+            if (!enabled || RAApp.info().push !== "granted") return Promise.resolve(false);
+            return RAApp.call("pushToken").then(function (tok) { return tok ? saveSub({ endpoint: "fcm:" + tok, fcm: tok }) : false; });
+        }
         if (!enabled || !pushSupported() || Notification.permission !== "granted") return Promise.resolve(false);
         return navigator.serviceWorker.ready.then(function (reg) {
             var key = b64ToBytes(VAPID_PUBLIC);
@@ -1038,6 +1054,7 @@
         }).then(saveSub).catch(function () { return false; });
     }
     function enablePush() {
+        if (appPush()) return RAApp.call("requestPush").then(function (st) { st = st || "unsupported"; if (st === "granted") return ensurePush().then(function () { return st; }); return st === "unavailable" ? "unsupported" : st; });
         if (!("Notification" in window)) return Promise.resolve("unsupported");
         // Bazı cihazlarda (eski uygulama sürümü) izin penceresi hiç dönmeyebilir: 20 sn sonra yardım göster
         var ask = Promise.resolve(Notification.requestPermission());
@@ -1047,6 +1064,7 @@
     // Bildirim izni zorunlu: izin verilmedikçe her oturumda pencere çıkar ("Şimdi değil" yalnız o oturum için kapatır).
     // iPhone/iPad'de bildirim yalnız siteyi Ana Ekran'a ekleyince çalışır → nasıl yapılacağı gösterilir.
     function pushState() {
+        if (appPush()) { var ps = RAApp.info().push; return ps === "unavailable" || !ps ? "unsupported" : ps; }
         if (!("Notification" in window) || !pushSupported()) return /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ? "ios" : "unsupported";
         return Notification.permission; // default | granted | denied
     }

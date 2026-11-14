@@ -158,6 +158,15 @@
         return { name: row.n, comp: d.name, ev: d.ev, place: i + 1, a: row.a, b: ok.length ? Math.min.apply(null, ok) : null, n: rS(r), ts: d.ts ? Date.parse(d.ts) : Date.now() };
     }
     function save(blob, name) {
+        // Android uygulaması: WebView'de indirme yok → Android'in kaydet/paylaş menüsü
+        if (window.RAApp && RAApp.native) {
+            return new Promise(function (res) {
+                var fr = new FileReader();
+                fr.onload = function () { RAApp.call("saveFile", { name: name, mime: blob.type || "image/png", b64: String(fr.result).split(",")[1] || "" }).then(res, res); };
+                fr.onerror = function () { res(); };
+                fr.readAsDataURL(blob);
+            });
+        }
         var file = null; try { file = new File([blob], name, { type: "image/png" }); } catch (e) {}
         var dl = function () { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000); };
         // telefonda paylaşım menüsü (galeriye kaydet / WhatsApp), masaüstünde indirme

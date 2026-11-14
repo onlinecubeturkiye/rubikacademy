@@ -1,4 +1,4 @@
-/* Rubik Academy — Web Push gönderici (GitHub Actions'ta birkaç dakikada bir çalışır)
+/* Rubik Academy — bildirim gönderici: tarayıcılar (Web Push) + Android uygulaması (Firebase Cloud Messaging) (GitHub Actions'ta birkaç dakikada bir çalışır)
    - broadcasts/{id}           pushed == false ve zamanı gelmiş (at || ts) → tüm abonelere
    - users/{uid}/notifications pushed == false ve zamanı gelmiş           → o kullanıcının cihazlarına
    Gönderilen belge pushed = true yapılır; süresi dolmuş abonelikler (404/410) silinir.
@@ -8,10 +8,11 @@ import webpush from "web-push";
 
 const VAPID_PUBLIC = "BMwVZRwQzVDgRKtUfF6J-WCwdXdLLT4rVXaatCqkbFDV2x147sPH99Kzp9PXktSjvYEs3Y-Vw0nU8wZrLogH1Q4";
 const SA = process.env.FIREBASE_SERVICE_ACCOUNT, PRIV = process.env.VAPID_PRIVATE_KEY;
-if (!SA || !PRIV) { console.log("Gizli anahtarlar (FIREBASE_SERVICE_ACCOUNT / VAPID_PRIVATE_KEY) tanımlı değil; atlanıyor."); process.exit(0); }
+if (!SA) { console.log("FIREBASE_SERVICE_ACCOUNT tanımlı değil; atlanıyor."); process.exit(0); }
+if (!PRIV) console.log("VAPID_PRIVATE_KEY yok: tarayıcı bildirimleri atlanır, yalnız Android uygulaması (FCM) gönderilir.");
 
 admin.initializeApp({ credential: admin.credential.cert(JSON.parse(SA)) });
-webpush.setVapidDetails("https://rubikacademy.fun", VAPID_PUBLIC, PRIV);
+if (PRIV) webpush.setVapidDetails("https://rubikacademy.fun", VAPID_PUBLIC, PRIV);
 const db = admin.firestore();
 const now = Date.now();
 const ms = (t) => (t && t.toMillis ? t.toMillis() : 0);
@@ -19,7 +20,7 @@ const ms = (t) => (t && t.toMillis ? t.toMillis() : 0);
 const subs = (await db.collection("pushsubs").get()).docs.map((d) => {
     let sub = null; try { sub = JSON.parse(d.get("sub") || "null"); } catch (e) {}
     return { ref: d.ref, sub, uid: d.get("uid") || "", rem: d.get("rem") || "" };
-}).filter((s) => s.sub && s.sub.endpoint);
+}).filter((s) => s.sub && s.sub.endpoint && (s.sub.fcm || PRIV));
 console.log("abone:", subs.length);
 
 const dead = new Set();
@@ -27,6 +28,19 @@ async function sendTo(list, payload) {
     let ok = 0;
     await Promise.all(list.map(async (s) => {
         if (dead.has(s.ref.path)) return;
+        // Android uygulaması: Firebase Cloud Messaging (yalnız veri; bildirimi uygulama kurar)
+        if (s.sub.fcm) {
+            try {
+                await admin.messaging().send({ token: s.sub.fcm, android: { priority: "high", ttl: 86400000 },
+                    data: { title: String(payload.title || ""), body: String(payload.body || ""), url: String(payload.url || "/"), tag: String(payload.tag || "ra") } });
+                ok++;
+            } catch (e) {
+                const c = (e && (e.code || (e.errorInfo && e.errorInfo.code))) || "";
+                if (/registration-token-not-registered|invalid-registration-token|invalid-argument/.test(c)) { dead.add(s.ref.path); await s.ref.delete().catch(() => {}); }
+                else console.log("fcm hata", c, String(e.message || "").slice(0, 120));
+            }
+            return;
+        }
         try { await webpush.sendNotification(s.sub, JSON.stringify(payload), { TTL: 86400, urgency: "high" }); ok++; }
         catch (e) {
             if (e.statusCode === 404 || e.statusCode === 410) { dead.add(s.ref.path); await s.ref.delete().catch(() => {}); }
