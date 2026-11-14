@@ -876,7 +876,7 @@
         ["users", "👥", "Kullanıcılar", ["Kullanıcılar", "En aktif kullanıcılar", "Hesapsız ziyaretçiler", "Günlük sıralama"]],
         ["notify", "🔔", "Bildirimler", ["Bildirim gönder", "Duyuru geçmişi"]],
         ["stats", "📊", "İstatistik", ["Genel bakış", "Site istatistikleri", "Cihaz, tarayıcı", "Firebase kullanımı"]],
-        ["content", "🧩", "İçerik", ["Topluluk algoritma", "Puanlar ve geri bildirim", "Sponsor banner"]],
+        ["content", "🧩", "İçerik", ["Topluluk algoritma", "Puanlar ve geri bildirim", "Sponsor banner", "Özel paketler"]],
         ["system", "🛠️", "Sistem", ["Bakım modu", "Hata kayıtları"]]
     ];
     function adminTabs(root) {
@@ -903,6 +903,107 @@
         // onay bekleyen yarışma sayısı sekmede rozet olarak görünür
         adminTabs.badge = function (cat, n) { var b = bar.querySelector('[data-cat="' + cat + '"] .n'); if (b) { b.hidden = !n; b.textContent = n; } };
     }
+    /* ---------- özel paketler (packs/{id}, grants/{uid}) — js/packs.js kullanıcı tarafı ---------- */
+    var _packs = [], _grants = {};
+    function aval(x) { if (!x) return null; if (x.arrayValue) return (x.arrayValue.values || []).map(aval); return x.stringValue != null ? x.stringValue : x.integerValue != null ? +x.integerValue : x.timestampValue || null; }
+    function runQ(col) {
+        return authed(docsBase() + ":runQuery", { method: "POST", body: JSON.stringify({ structuredQuery: { from: [{ collectionId: col }], limit: 500 } }) })
+            .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (rows) { return (rows || []).filter(function (x) { return x.document; }).map(function (x) { return x.document; }); });
+    }
+    function packsLoad() {
+        var box = $id("aPackBox"); if (!box) return;
+        box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
+        Promise.all([runQ("packs"), runQ("grants"), _users.length ? _users : listUsers().then(function (u) { _users = u; return u; }, function () { return []; })]).then(function (r) {
+            _packs = r[0].map(function (d) { var f = d.fields || {}, data = {}; try { data = JSON.parse(aval(f.data) || "{}") || {}; } catch (e) {} return { id: d.name.split("/").pop(), name: aval(f.name) || "?", kind: aval(f.kind) || "theme", desc: aval(f.desc) || "", data: data }; });
+            _grants = {}; r[1].forEach(function (d) { _grants[d.name.split("/").pop()] = (aval((d.fields || {}).p) || []).filter(Boolean); });
+            packsRender();
+            var sel = $id("uBulkPack"); if (sel) sel.innerHTML = '<option value="">Paket ata…</option>' + _packs.map(function (p) { return '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>'; }).join("");
+        }, function (e) { box.innerHTML = '<p class="a-note">Paketler yüklenemedi (' + esc(e && e.message) + ').</p>'; });
+    }
+    function uName(uid) { var u = _users.filter(function (x) { return x.uid === uid; })[0]; return u ? u.name : uid.slice(0, 8) + "…"; }
+    function packHolders(id) { return Object.keys(_grants).filter(function (u) { return _grants[u].indexOf(id) >= 0; }); }
+    function packForm(p) {
+        p = p || { id: "", name: "", kind: "theme", desc: "", data: {} };
+        var t = p.data || {}, algs = ((p.data && p.data.algs) || []).map(function (a) { return [a.n || "", a.a || "", a.note || ""].join(" | ").replace(/( \| )+$/, ""); }).join("\n");
+        var col = function (k, l, d) { return '<label class="pk-col">' + l + '<input type="color" data-pk="' + k + '" value="' + esc(/^#[0-9a-f]{6}$/i.test(t[k] || "") ? t[k] : d) + '"></label>'; };
+        return '<div class="pk-form" data-edit="' + esc(p.id) + '"><h3 class="cp-h3">' + (p.id ? "✏️ Paketi düzenle" : "➕ Yeni paket") + '</h3>' +
+            '<div class="a-ctrl"><input data-pk="name" maxlength="40" placeholder="Paket adı (ör. Altın tema, Ömer\'in ZBLL seti)" value="' + esc(p.name) + '" style="flex:1;min-width:180px">' +
+            '<select data-pk="kind"><option value="theme"' + (p.kind === "theme" ? " selected" : "") + '>🎨 Özel tema</option><option value="alg"' + (p.kind === "alg" ? " selected" : "") + '>🧩 Özel algoritma seti</option></select></div>' +
+            '<input data-pk="desc" maxlength="300" placeholder="Kısa açıklama (isteğe bağlı)" value="' + esc(p.desc) + '" style="width:100%;margin:6px 0">' +
+            '<div class="pk-theme"' + (p.kind === "theme" ? "" : " hidden") + '><div class="pk-cols">' + col("bg", "Zemin", "#f4f4f2") + col("surface", "Kart", "#ffffff") + col("text", "Yazı", "#111111") + col("accent", "Vurgu / düğme", "#e0262b") + '</div></div>' +
+            '<div class="pk-alg"' + (p.kind === "alg" ? "" : " hidden") + '><textarea data-pk="algs" rows="7" placeholder="Her satıra bir algoritma:  Ad | algoritma | not (isteğe bağlı)&#10;Ör: T-Perm | R U R\' U\' R\' F R2 U\' R\' U\' R U R\' F\'" style="width:100%;font:600 13px \'JetBrains Mono\',monospace">' + esc(algs) + '</textarea></div>' +
+            '<div class="a-ctrl"><button class="a-btn main" data-pksave="1">💾 Kaydet</button>' + (p.id ? '<button class="a-btn" data-pkcancel="1">Vazgeç</button>' : '') + '<span class="a-msg" data-pkmsg></span></div></div>';
+    }
+    function packsRender() {
+        var box = $id("aPackBox"); if (!box) return;
+        var names = _users.map(function (u) { return '<option value="' + esc(u.name) + '">'; }).join("");
+        box.innerHTML = packForm() + '<datalist id="pkUsers">' + names + '</datalist>' +
+            (_packs.length ? '<div class="pk-list">' + _packs.map(function (p) {
+                var hs = packHolders(p.id), t = p.data || {};
+                var sw = p.kind === "theme" ? '<span class="pk-sw">' + [t.bg, t.surface, t.accent, t.text].map(function (c) { return '<i style="background:' + esc(c || "#ccc") + '"></i>'; }).join("") + '</span>' : '<span class="pk-k">🧩 ' + ((t.algs || []).length) + ' alg</span>';
+                return '<div class="pk-row" data-id="' + esc(p.id) + '"><div class="pk-h">' + sw + '<b>' + esc(p.name) + '<small>' + (p.kind === "theme" ? "Tema" : "Algoritma seti") + (p.desc ? " · " + esc(p.desc) : "") + '</small></b>' +
+                    '<button class="a-btn sm" data-pkedit="' + esc(p.id) + '">✏️</button><button class="a-btn danger sm" data-pkdel="' + esc(p.id) + '">🗑️</button></div>' +
+                    '<div class="pk-who">' + (hs.length ? hs.map(function (u) { return '<span class="pk-chip">' + esc(uName(u)) + '<button title="Paketi bu hesaptan kaldır" data-pkun="' + esc(p.id) + '|' + esc(u) + '">✕</button></span>'; }).join("") : '<span class="a-note">Henüz kimseye atanmadı.</span>') + '</div>' +
+                    '<div class="a-ctrl"><input list="pkUsers" placeholder="Kullanıcı adı yaz, seç" data-pkwho="' + esc(p.id) + '" style="flex:1;min-width:150px"><button class="a-btn sm main" data-pkgive="' + esc(p.id) + '">🎁 Hesaba ata</button></div></div>';
+            }).join("") + '</div>' : '<p class="a-note">Henüz paket yok.</p>');
+    }
+    function packSave(form) {
+        var g = function (k) { var e = form.querySelector('[data-pk="' + k + '"]'); return e ? e.value : ""; };
+        var name = g("name").trim().slice(0, 40), kind = g("kind"), msg = form.querySelector("[data-pkmsg]");
+        if (!name) { msg.textContent = "Ad yaz."; return; }
+        var data = kind === "theme" ? { bg: g("bg"), surface: g("surface"), text: g("text"), accent: g("accent") }
+            : { algs: g("algs").split("\n").map(function (l) { var x = l.split("|").map(function (s) { return s.trim(); }); return x[1] ? { n: x[0].slice(0, 60), a: x[1].slice(0, 300), note: (x[2] || "").slice(0, 200) } : null; }).filter(Boolean).slice(0, 300) };
+        if (kind === "alg" && !data.algs.length) { msg.textContent = "En az bir satır yaz: Ad | algoritma"; return; }
+        var id = form.getAttribute("data-edit") || (name.toLocaleLowerCase("tr").replace(/[çğıöşü]/g, function (c) { return { "ç": "c", "ğ": "g", "ı": "i", "ö": "o", "ş": "s", "ü": "u" }[c]; }).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 28) || "paket") + "-" + Date.now().toString(36).slice(-4);
+        var f = { name: { stringValue: name }, kind: { stringValue: kind }, desc: { stringValue: g("desc").trim().slice(0, 300) }, data: { stringValue: JSON.stringify(data) }, ts: { timestampValue: new Date().toISOString() } };
+        msg.textContent = "Kaydediliyor…";
+        authed(docsBase() + "/packs/" + id, { method: "PATCH", body: JSON.stringify({ fields: f }) }).then(function (r) {
+            if (!r.ok) throw new Error(r.status); packsLoad();
+        }).catch(function (e) { msg.textContent = "Kaydedilemedi (" + (e && e.message) + "). Kurallar yayınlandı mı?"; });
+    }
+    function packGrant(uid, id, on) {
+        var cur = (_grants[uid] || []).filter(function (x) { return x !== id; }); if (on) cur.push(id);
+        var body = { fields: { p: { arrayValue: { values: cur.map(function (x) { return { stringValue: x }; }) } }, ts: { timestampValue: new Date().toISOString() } } };
+        return authed(docsBase() + "/grants/" + uid, { method: "PATCH", body: JSON.stringify(body) }).then(function (r) { if (!r.ok) throw new Error(r.status); _grants[uid] = cur; });
+    }
+    function packsBind() {
+        var box = $id("aPackBox"); if (!box || box.raB) return; box.raB = 1;
+        box.addEventListener("change", function (e) {
+            if (e.target.getAttribute("data-pk") !== "kind") return;
+            var f = e.target.closest(".pk-form"); f.querySelector(".pk-theme").hidden = e.target.value !== "theme"; f.querySelector(".pk-alg").hidden = e.target.value !== "alg";
+        });
+        box.addEventListener("click", function (e) {
+            var b = e.target.closest("button"); if (!b) return;
+            if (b.hasAttribute("data-pksave")) { packSave(b.closest(".pk-form")); return; }
+            if (b.hasAttribute("data-pkcancel")) { packsRender(); return; }
+            if (b.hasAttribute("data-pkedit")) {
+                var p = _packs.filter(function (x) { return x.id === b.getAttribute("data-pkedit"); })[0]; if (!p) return;
+                var row = b.closest(".pk-row"), d = document.createElement("div"); d.innerHTML = packForm(p); row.replaceWith(d.firstChild); return;
+            }
+            if (b.hasAttribute("data-pkdel")) {
+                var id = b.getAttribute("data-pkdel"), hs = packHolders(id);
+                if (!confirm("Paket silinsin mi?" + (hs.length ? " " + hs.length + " kişiden de kaldırılır." : ""))) return;
+                b.disabled = true;
+                hs.reduce(function (pr, u) { return pr.then(function () { return packGrant(u, id, false); }); }, Promise.resolve())
+                    .then(function () { return delDoc("/packs/" + id); }).then(packsLoad, function () { b.disabled = false; alert("Silinemedi."); });
+                return;
+            }
+            if (b.hasAttribute("data-pkgive")) {
+                var pid = b.getAttribute("data-pkgive"), inp = box.querySelector('[data-pkwho="' + pid + '"]'), nm = (inp.value || "").trim();
+                var m = _users.filter(function (u) { return u.name === nm || u.uid === nm; });
+                if (m.length !== 1) { alert(m.length ? "Bu adla birden çok kullanıcı var; Kullanıcılar listesinden seçip toplu atamayı kullan." : "Kullanıcı bulunamadı. Listeden seç."); return; }
+                b.disabled = true;
+                packGrant(m[0].uid, pid, true).then(packsRender, function () { b.disabled = false; alert("Atanamadı. Kurallar yayınlandı mı?"); });
+                return;
+            }
+            if (b.hasAttribute("data-pkun")) {
+                var k = b.getAttribute("data-pkun").split("|");
+                if (!confirm(uName(k[1]) + " hesabından paket kaldırılsın mı?")) return;
+                packGrant(k[1], k[0], false).then(packsRender, function () { alert("Kaldırılamadı."); });
+            }
+        });
+    }
+
     /* ---------- şikayetler (reports/{id}) ---------- */
     var REP_R = { spam: "Spam / reklam", abuse: "Hakaret / taciz", inappropriate: "Uygunsuz içerik", cheat: "Hile", impersonation: "Taklit", other: "Diğer" };
     function renderReports() {
@@ -1374,7 +1475,7 @@
             '<div class="box"><h2>📜 Duyuru geçmişi <button class="a-btn sm" id="bcReload" style="float:right">↻</button></h2><div id="aBcList"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>👥 Kullanıcılar <span class="a-sub" id="aUsersCount" style="margin:0"></span></h2>' +
             '<div class="a-ctrl"><input id="uSearch" placeholder="Ada göre ara…" style="flex:1;min-width:140px"><select id="uFilter"><option value="all">Tümü</option><option value="a1">Son 24 saat aktif</option><option value="a7">Son 7 gün aktif</option><option value="pasif">30 günden eski</option></select><button class="a-btn" id="aUsersLoad">↻ Yenile</button><button class="a-btn" id="uCsv">⬇ CSV</button><button class="a-btn" id="uJson">⬇ JSON</button></div>' +
-            '<div class="bulk-bar" id="uBulk" hidden><b id="uSelCount">0</b> seçili · <select id="uBulkRole"><option value="">Rol ata…</option><option value="uye">Üye</option><option value="admin">Admin</option><option value="gelistirici">Geliştirici</option><option value="tester">Tester</option><option value="organizator">Organizatör</option></select> <button class="a-btn sm" id="uBulkRoleGo">Uygula</button> <button class="a-btn sm" id="uBulkNotify">Bildirim gönder</button><span class="a-msg" id="uBulkMsg" style="margin:0"></span></div>' +
+            '<div class="bulk-bar" id="uBulk" hidden><b id="uSelCount">0</b> seçili · <select id="uBulkRole"><option value="">Rol ata…</option><option value="uye">Üye</option><option value="admin">Admin</option><option value="gelistirici">Geliştirici</option><option value="tester">Tester</option><option value="organizator">Organizatör</option></select> <button class="a-btn sm" id="uBulkRoleGo">Uygula</button> <button class="a-btn sm" id="uBulkNotify">Bildirim gönder</button> · <select id="uBulkPack"><option value="">Paket ata…</option></select> <button class="a-btn sm" id="uBulkPackGo">🎁 Ata</button><span class="a-msg" id="uBulkMsg" style="margin:0"></span></div>' +
             '<div id="aUsersList"></div></div>' +
             '<div class="box"><h2>🚩 Şikayetler <span class="a-sub" id="aRepCount" style="margin:0"></span></h2><p class="a-note">Kullanıcıların uygulama içinden bildirdiği sohbet mesajları ve profiller (Google Play kullanıcı içeriği kuralı). İncele, gerekirse içeriği sil ya da hesabı askıya al, sonra kapat.</p><div class="a-ctrl"><button class="a-btn main" id="aRepLoad">↻ Yükle</button></div><div id="aRepList" class="a-list"></div></div>' +
             '<div class="box"><h2>🏅 En aktif kullanıcılar</h2><div id="aActive"><p class="a-note">Yükleniyor…</p></div></div>' +
@@ -1387,6 +1488,7 @@
             '<div class="a-ctrl"><button class="a-btn main" id="aErrLoad">↻ Yükle</button><button class="a-btn danger" id="aErrClear">🗑️ Tümünü sil</button></div><div id="aErrList" class="a-list"></div></div>' +
             '<div class="box"><h2>🔥 Firebase kullanımı</h2><button class="a-btn main" id="aUsageLoad">Hesapla</button><div id="aUsage" style="margin-top:10px"></div></div>' +
             '<div class="box"><h2>⭐ Puanlar ve geri bildirim</h2><p class="a-note">Biten temalar için kullanıcıların verdiği puanlar ve yorumlar.</p><button class="a-btn main" id="aFbLoad">↻ Yükle</button><div id="aFbList" style="margin-top:8px"></div></div>' +
+            '<div class="box"><h2>🎁 Özel paketler</h2><p class="a-note">Hesaplara özel tema ya da algoritma seti ata. Paket yalnız atanan kişide görünür: tema Ayarlar → Tema stili\'nde, algoritmalar profilinde "Özel paketlerim" altında. Kişi siteye girince gelir.</p><div class="a-ctrl"><button class="a-btn" id="aPackLoad">↻ Yenile</button></div><div id="aPackBox"></div></div>' +
             '<div class="box"><h2>📣 Sponsor banner\'ı</h2><p class="a-note">Sitedeki reklam alanı (ör. Minjuan küp mağazası).</p><div id="aAdBox"></div></div>' +
             '<div class="box"><h2>🛠️ Bakım modu</h2><p class="a-note">Açıkken site, sen hariç herkese “Bakımdayız” sayfası gösterir.</p><div id="aMaintBox"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🏆 Günlük sıralama moderasyonu</h2>' +
@@ -1421,6 +1523,14 @@
         bindBulk(); renderBroadcasts(); renderMaintenance(); renderAnon(); renderAd();
         bcFormInit();
         if ($id("aRepLoad")) { $id("aRepLoad").addEventListener("click", renderReports); renderReports(); }
+        if ($id("aPackLoad")) { $id("aPackLoad").addEventListener("click", packsLoad); packsBind(); packsLoad(); }
+        // Kullanıcılar listesinde seçilenlere toplu paket atama
+        if ($id("uBulkPackGo")) $id("uBulkPackGo").addEventListener("click", function () {
+            var pid = $id("uBulkPack").value, us = selectedUids(); if (!pid || !us.length) return;
+            if (!confirm(us.length + " kişiye paket atansın mı?")) return;
+            us.reduce(function (pr, u) { return pr.then(function () { return packGrant(u, pid, true); }); }, Promise.resolve())
+                .then(function () { msg($id("uBulkMsg"), "🎁 " + us.length + " kişiye atandı", "ok"); packsRender(); }, function () { msg($id("uBulkMsg"), "Atanamadı", "err"); });
+        });
         $id("bcSend").addEventListener("click", function () {
             var text = $id("bcText").value.trim(), to = $id("bcTarget").value, atv = $id("bcAt").value, at = atv ? new Date(atv).getTime() : 0;
             if (at && at < Date.now() - 60000) { msg($id("bcMsg"), "Planlanan zaman geçmişte.", "bad"); return; }

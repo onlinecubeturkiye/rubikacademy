@@ -257,6 +257,20 @@ details.m-set > summary { font-size: 12.5px; }
 .rec-g { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); gap: 3px 10px; margin-top: 6px; font: 700 13.5px "JetBrains Mono", monospace; max-width: 340px; }
 .rec-g i { font: 800 11px Inter, sans-serif; font-style: normal; color: var(--text-soft); text-transform: uppercase; letter-spacing: .4px; }
 .rec-g b { font: 900 12px Inter, sans-serif; color: var(--text-soft); align-self: center; }
+.pk-form { border: 1px dashed var(--border); border-radius: 14px; padding: 12px; margin-bottom: 12px; }
+.pk-cols { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0; }
+.pk-col { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 800; color: var(--text-soft); }
+.pk-col input { width: 64px; height: 36px; padding: 0; border: 1px solid var(--border); border-radius: 10px; background: none; }
+.pk-list { display: grid; gap: 10px; }
+.pk-row { border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; background: var(--surface); }
+.pk-h { display: flex; align-items: center; gap: 8px; }
+.pk-h b { flex: 1; min-width: 0; font-weight: 850; } .pk-h small { display: block; font-weight: 600; color: var(--text-soft); font-size: 12.5px; }
+.pk-sw { display: flex; gap: 3px; } .pk-sw i { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--border); }
+.pk-k { font-size: 12px; font-weight: 800; color: var(--text-soft); white-space: nowrap; }
+.pk-who { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.pk-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 4px 3px 10px; border-radius: 99px; background: var(--surface-soft); font-size: 12.5px; font-weight: 800; }
+.pk-chip button { border: 0; background: none; color: var(--text-soft); cursor: pointer; font-size: 11px; padding: 2px 6px; border-radius: 99px; }
+.pk-chip button:hover { background: rgba(220, 38, 38, .12); color: #dc2626; }
 .rec-g span { color: var(--text); } .rec-g span.bad { color: #dc2626; }
 .rec-g .rx { font: inherit; text-align: left; padding: 1px 4px; margin: -1px -4px; border: 0; border-radius: 6px; background: none; color: var(--text); cursor: pointer; }
 .rec-g .rx i { font-style: normal; font-size: 10px; margin-left: 4px; color: var(--text-soft); opacity: .6; }
