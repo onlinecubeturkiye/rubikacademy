@@ -930,9 +930,81 @@
             '<div class="a-ctrl"><input data-pk="name" maxlength="40" placeholder="Paket adı (ör. Altın tema, Ömer\'in ZBLL seti)" value="' + esc(p.name) + '" style="flex:1;min-width:180px">' +
             '<select data-pk="kind"><option value="theme"' + (p.kind === "theme" ? " selected" : "") + '>🎨 Özel tema</option><option value="alg"' + (p.kind === "alg" ? " selected" : "") + '>🧩 Özel algoritma seti</option></select></div>' +
             '<input data-pk="desc" maxlength="300" placeholder="Kısa açıklama (isteğe bağlı)" value="' + esc(p.desc) + '" style="width:100%;margin:6px 0">' +
-            '<div class="pk-theme"' + (p.kind === "theme" ? "" : " hidden") + '><div class="pk-cols">' + col("bg", "Zemin", "#f4f4f2") + col("surface", "Kart", "#ffffff") + col("text", "Yazı", "#111111") + col("accent", "Vurgu / düğme", "#e0262b") + '</div></div>' +
-            '<div class="pk-alg"' + (p.kind === "alg" ? "" : " hidden") + '><textarea data-pk="algs" rows="7" placeholder="Her satıra bir algoritma:  Ad | algoritma | not (isteğe bağlı)&#10;Ör: T-Perm | R U R\' U\' R\' F R2 U\' R\' U\' R U R\' F\'" style="width:100%;font:600 13px \'JetBrains Mono\',monospace">' + esc(algs) + '</textarea></div>' +
+            '<div class="pk-theme"' + (p.kind === "theme" ? "" : " hidden") + '>' + themeBuilder(t) + '</div>' +
+            '<div class="pk-alg"' + (p.kind === "alg" ? "" : " hidden") + '><textarea data-pk="algs" rows="7" placeholder="Her satıra bir algoritma:  Ad | algoritma | not (isteğe bağlı)&#10;Ör: T-Perm | R U R\' U\' R\' F R2 U\' R\' U\' R U R\' F\'" style="width:100%;font:600 13px \'JetBrains Mono\',monospace">' + esc(algs) + '</textarea><div class="pk-lbl" style="margin-top:8px">Önizleme <span data-pkalgn></span></div><div class="pk-algp" data-pkalgp></div></div>' +
             '<div class="a-ctrl"><button class="a-btn main" data-pksave="1">💾 Kaydet</button>' + (p.id ? '<button class="a-btn" data-pkcancel="1">Vazgeç</button>' : '') + '<span class="a-msg" data-pkmsg></span></div></div>';
+    }
+    /* --- tema oluşturucu: hazır paletler, uyumlu palet üret, renk + HEX, yazı tipi, köşe, canlı önizleme, kontrast --- */
+    var PK_PRESETS = [
+        ["Sade", "#f4f4f2", "#ffffff", "#111111", "#111111"], ["Gece", "#0e0e10", "#18181b", "#f2f2f2", "#5b8def"],
+        ["Altın", "#fff7e0", "#ffffff", "#3a2a00", "#c99400"], ["Okyanus", "#eaf6fb", "#ffffff", "#0b2a3a", "#0e7490"],
+        ["Orman", "#eef5ee", "#ffffff", "#14301c", "#1f8a4c"], ["Gül", "#fdf0f3", "#ffffff", "#3a1220", "#d6336c"],
+        ["Lavanta", "#f3f0ff", "#ffffff", "#221a44", "#6c5ce7"], ["Gün batımı", "#fff2ea", "#ffffff", "#3a1708", "#ea580c"],
+        ["Kömür + limon", "#121212", "#1d1d1d", "#f5f5f5", "#d4e157"], ["Lacivert", "#0b1324", "#121c33", "#e8edf7", "#f5b301"],
+        ["Kiraz", "#1a0b10", "#26111a", "#fde8ee", "#ff4d6d"], ["Küp", "#ffffff", "#f6f6f6", "#111111", "#1d5bff"]
+    ];
+    var PK_FONTS = [["", "Varsayılan (Inter)"], ["Rubik", "Rubik"], ["Space Grotesk", "Space Grotesk"], ["Poppins", "Poppins"], ["Nunito", "Nunito"], ["Fraunces", "Fraunces (serif)"], ["JetBrains Mono", "JetBrains Mono"]];
+    function hx(c, d) { return /^#[0-9a-f]{6}$/i.test(String(c || "")) ? String(c).toLowerCase() : d; }
+    function rgbOf(h) { var n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
+    function relLum(h) { return rgbOf(h).map(function (v) { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }).reduce(function (a, v, i) { return a + v * [.2126, .7152, .0722][i]; }, 0); }
+    function contrast(a, b) { var x = relLum(a), y = relLum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
+    function onAccent(h) { return contrast(h, "#ffffff") >= contrast(h, "#111111") ? "#ffffff" : "#111111"; }
+    function hsl2hex(h, s, l) {
+        s /= 100; l /= 100; var k = function (n) { return (n + h / 30) % 12; }, a = s * Math.min(l, 1 - l);
+        var f = function (n) { return Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1))))); };
+        return "#" + [f(0), f(8), f(4)].map(function (v) { return ("0" + v.toString(16)).slice(-2); }).join("");
+    }
+    function randPalette(dark) {
+        var h = Math.floor(Math.random() * 360), h2 = (h + [0, 30, 150, 180, 210][Math.floor(Math.random() * 5)]) % 360;
+        return dark ? [hsl2hex(h, 18, 7), hsl2hex(h, 16, 12), hsl2hex(h, 20, 94), hsl2hex(h2, 80, 62)]
+            : [hsl2hex(h, 40, 96), "#ffffff", hsl2hex(h, 45, 12), hsl2hex(h2, 75, 42)];
+    }
+    function themeBuilder(t) {
+        t = t || {};
+        var v = { bg: hx(t.bg, "#f4f4f2"), surface: hx(t.surface, "#ffffff"), text: hx(t.text, "#111111"), accent: hx(t.accent, "#e0262b") };
+        var col = function (k, l) { return '<label class="pk-col"><span>' + l + '</span><span class="pk-cin"><input type="color" data-pk="' + k + '" value="' + v[k] + '"><input type="text" class="pk-hex" data-pkhex="' + k + '" value="' + v[k] + '" maxlength="7" spellcheck="false"></span></label>'; };
+        return '<div class="pk-tb"><div class="pk-tb-l">' +
+            '<div class="pk-lbl">Hazır paletler</div><div class="pk-presets">' + PK_PRESETS.map(function (p, i) {
+                return '<button type="button" class="pk-pre" data-pkpre="' + i + '" title="' + esc(p[0]) + '"><span>' + p.slice(1).map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("") + '</span>' + esc(p[0]) + '</button>';
+            }).join("") + '</div>' +
+            '<div class="a-ctrl" style="margin:8px 0"><button type="button" class="a-btn sm" data-pkrand="0">🎲 Uyumlu palet (açık)</button><button type="button" class="a-btn sm" data-pkrand="1">🎲 Uyumlu palet (koyu)</button></div>' +
+            '<div class="pk-lbl">Renkler</div><div class="pk-cols">' + col("bg", "Zemin") + col("surface", "Kart") + col("text", "Yazı") + col("accent", "Vurgu / düğme") + '</div>' +
+            '<div class="pk-row2"><label class="pk-col"><span>Yazı tipi</span><select data-pk="font">' + PK_FONTS.map(function (f) { return '<option value="' + esc(f[0]) + '"' + ((t.font || "") === f[0] ? " selected" : "") + '>' + esc(f[1]) + '</option>'; }).join("") + '</select></label>' +
+            '<label class="pk-col" style="flex:1"><span>Köşe yuvarlaklığı <b data-pkrv>' + (t.r != null ? t.r : 16) + 'px</b></span><input type="range" min="0" max="28" step="2" data-pk="r" value="' + (t.r != null ? t.r : 16) + '"></label></div>' +
+            '<div class="pk-cr" data-pkcr></div></div>' +
+            '<div class="pk-tb-r"><div class="pk-lbl">Canlı önizleme</div><div class="pk-prev" data-pkprev></div></div></div>';
+    }
+    function themeRead(form) {
+        var g = function (k) { var e = form.querySelector('[data-pk="' + k + '"]'); return e ? e.value : ""; };
+        return { bg: hx(g("bg"), "#f4f4f2"), surface: hx(g("surface"), "#ffffff"), text: hx(g("text"), "#111111"), accent: hx(g("accent"), "#e0262b"), font: g("font") || "", r: +g("r") || 0 };
+    }
+    function algPreview(form) {
+        var ta = form.querySelector('[data-pk="algs"]'), out = form.querySelector("[data-pkalgp]"); if (!ta || !out) return;
+        var rows = ta.value.split("\n").map(function (l) { var x = l.split("|").map(function (s) { return s.trim(); }); return l.trim() ? { n: x[0], a: x[1] || "", note: x[2] || "", bad: !x[1] } : null; }).filter(Boolean);
+        form.querySelector("[data-pkalgn]").textContent = "· " + rows.filter(function (r) { return !r.bad; }).length + " algoritma";
+        out.innerHTML = rows.length ? rows.slice(0, 60).map(function (r) {
+            return '<div class="pk-ar' + (r.bad ? " bad" : "") + '"><b>' + esc(r.n || "?") + '</b>' + (r.bad ? '<small>⚠ "|" ile algoritmayı ayır: Ad | algoritma</small>' : '<code>' + esc(r.a) + '</code>' + (r.note ? '<small>' + esc(r.note) + '</small>' : '')) + '</div>';
+        }).join("") : '<p class="a-note">Satır yazınca burada görünür.</p>';
+    }
+    function themePreview(form) {
+        algPreview(form);
+        var pv = form.querySelector("[data-pkprev]"); if (!pv) return;
+        var t = themeRead(form), at = onAccent(t.accent), r = t.r + "px", soft = "color-mix(in srgb," + t.text + " 60%," + t.bg + ")", bd = "color-mix(in srgb," + t.text + " 14%," + t.surface + ")";
+        var ff = t.font ? "'" + t.font + "',Inter,sans-serif" : "Inter,sans-serif";
+        if (t.font && !document.getElementById("pkFont-" + t.font)) { var l = document.createElement("link"); l.id = "pkFont-" + t.font; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=" + t.font.replace(/ /g, "+") + ":wght@500;700;800;900&display=swap"; document.head.appendChild(l); }
+        pv.innerHTML = '<div style="background:' + t.bg + ';color:' + t.text + ';font-family:' + ff + ';border-radius:' + Math.min(t.r, 18) + 'px;overflow:hidden;border:1px solid ' + bd + '">' +
+            '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:' + t.surface + ';border-bottom:1px solid ' + bd + '"><span style="width:20px;height:20px;border-radius:6px;background:' + t.accent + '"></span><b style="font-size:14px">Rubik Academy</b><span style="margin-left:auto;font-size:11px;padding:4px 8px;border-radius:' + r + ';background:' + t.accent + ';color:' + at + ';font-weight:800">Ana Sayfa</span></div>' +
+            '<div style="padding:14px 12px"><div style="font-size:22px;font-weight:900;line-height:1.1;margin-bottom:6px">Küpü çöz. Hızlan.</div><div style="font-size:12.5px;color:' + soft + ';margin-bottom:10px">Algoritmalar, antrenör ve ev yarışmaları.</div>' +
+            '<div style="display:flex;gap:6px;margin-bottom:12px"><span style="padding:8px 12px;border-radius:' + r + ';background:' + t.accent + ';color:' + at + ';font-size:12.5px;font-weight:800">Hemen başla →</span><span style="padding:8px 12px;border-radius:' + r + ';background:' + t.surface + ';border:1px solid ' + bd + ';font-size:12.5px;font-weight:800">Antrenör</span></div>' +
+            '<div style="background:' + t.surface + ';border:1px solid ' + bd + ';border-radius:' + r + ';padding:10px 12px"><b style="font-size:13px">PLL · 21 case</b><div style="font:700 12px \'JetBrains Mono\',monospace;margin-top:4px">R U R\' U\' R\' F R2 U\' R\'</div><div style="font-size:11.5px;color:' + soft + ';margin-top:4px">Bildiğin: <b style="color:' + t.accent + '">14 / 21</b></div></div></div></div>';
+        var c1 = contrast(t.text, t.bg), c2 = contrast(at, t.accent), c3 = contrast(t.text, t.surface);
+        var row = function (l, c) { return '<span class="' + (c >= 4.5 ? "ok" : c >= 3 ? "mid" : "bad") + '">' + l + ' ' + c.toFixed(1) + ':1 ' + (c >= 4.5 ? "✓" : c >= 3 ? "⚠ zayıf" : "✗ okunmaz") + '</span>'; };
+        form.querySelector("[data-pkcr]").innerHTML = '<div class="pk-lbl">Okunabilirlik</div>' + row("Yazı / zemin", c1) + row("Yazı / kart", c3) + row("Düğme yazısı", c2);
+        var rv = form.querySelector("[data-pkrv]"); if (rv) rv.textContent = t.r + "px";
+    }
+    function themeSet(form, c) {
+        ["bg", "surface", "text", "accent"].forEach(function (k, i) { var a = form.querySelector('[data-pk="' + k + '"]'), b = form.querySelector('[data-pkhex="' + k + '"]'); if (a) a.value = c[i]; if (b) b.value = c[i]; });
+        themePreview(form);
     }
     function packsRender() {
         var box = $id("aPackBox"); if (!box) return;
@@ -946,12 +1018,13 @@
                     '<div class="pk-who">' + (hs.length ? hs.map(function (u) { return '<span class="pk-chip">' + esc(uName(u)) + '<button title="Paketi bu hesaptan kaldır" data-pkun="' + esc(p.id) + '|' + esc(u) + '">✕</button></span>'; }).join("") : '<span class="a-note">Henüz kimseye atanmadı.</span>') + '</div>' +
                     '<div class="a-ctrl"><input list="pkUsers" placeholder="Kullanıcı adı yaz, seç" data-pkwho="' + esc(p.id) + '" style="flex:1;min-width:150px"><button class="a-btn sm main" data-pkgive="' + esc(p.id) + '">🎁 Hesaba ata</button></div></div>';
             }).join("") + '</div>' : '<p class="a-note">Henüz paket yok.</p>');
+        Array.prototype.forEach.call(box.querySelectorAll(".pk-form"), themePreview);
     }
     function packSave(form) {
         var g = function (k) { var e = form.querySelector('[data-pk="' + k + '"]'); return e ? e.value : ""; };
         var name = g("name").trim().slice(0, 40), kind = g("kind"), msg = form.querySelector("[data-pkmsg]");
         if (!name) { msg.textContent = "Ad yaz."; return; }
-        var data = kind === "theme" ? { bg: g("bg"), surface: g("surface"), text: g("text"), accent: g("accent") }
+        var data = kind === "theme" ? themeRead(form)
             : { algs: g("algs").split("\n").map(function (l) { var x = l.split("|").map(function (s) { return s.trim(); }); return x[1] ? { n: x[0].slice(0, 60), a: x[1].slice(0, 300), note: (x[2] || "").slice(0, 200) } : null; }).filter(Boolean).slice(0, 300) };
         if (kind === "alg" && !data.algs.length) { msg.textContent = "En az bir satır yaz: Ad | algoritma"; return; }
         var id = form.getAttribute("data-edit") || (name.toLocaleLowerCase("tr").replace(/[çğıöşü]/g, function (c) { return { "ç": "c", "ğ": "g", "ı": "i", "ö": "o", "ş": "s", "ü": "u" }[c]; }).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 28) || "paket") + "-" + Date.now().toString(36).slice(-4);
@@ -971,14 +1044,26 @@
         box.addEventListener("change", function (e) {
             if (e.target.getAttribute("data-pk") !== "kind") return;
             var f = e.target.closest(".pk-form"); f.querySelector(".pk-theme").hidden = e.target.value !== "theme"; f.querySelector(".pk-alg").hidden = e.target.value !== "alg";
+            themePreview(f);
+        });
+        // renk seçici ↔ HEX kutusu, yazı tipi, köşe: anında önizleme
+        box.addEventListener("input", function (e) {
+            var el = e.target, f = el.closest && el.closest(".pk-form"); if (!f) return;
+            var k = el.getAttribute("data-pk"), hk = el.getAttribute("data-pkhex");
+            if (k && el.type === "color") { var h = f.querySelector('[data-pkhex="' + k + '"]'); if (h) h.value = el.value; }
+            if (hk) { var v = el.value.trim(); if (v && v[0] !== "#") v = "#" + v; if (/^#[0-9a-f]{6}$/i.test(v)) { var c = f.querySelector('[data-pk="' + hk + '"]'); if (c) c.value = v.toLowerCase(); } else return; }
+            if (k === "algs") { algPreview(f); return; }
+            if (k || hk) themePreview(f);
         });
         box.addEventListener("click", function (e) {
             var b = e.target.closest("button"); if (!b) return;
             if (b.hasAttribute("data-pksave")) { packSave(b.closest(".pk-form")); return; }
+            if (b.hasAttribute("data-pkpre")) { var pr = PK_PRESETS[+b.getAttribute("data-pkpre")]; if (pr) themeSet(b.closest(".pk-form"), pr.slice(1)); return; }
+            if (b.hasAttribute("data-pkrand")) { themeSet(b.closest(".pk-form"), randPalette(b.getAttribute("data-pkrand") === "1")); return; }
             if (b.hasAttribute("data-pkcancel")) { packsRender(); return; }
             if (b.hasAttribute("data-pkedit")) {
                 var p = _packs.filter(function (x) { return x.id === b.getAttribute("data-pkedit"); })[0]; if (!p) return;
-                var row = b.closest(".pk-row"), d = document.createElement("div"); d.innerHTML = packForm(p); row.replaceWith(d.firstChild); return;
+                var row = b.closest(".pk-row"), d = document.createElement("div"); d.innerHTML = packForm(p); var nf = d.firstChild; row.replaceWith(nf); themePreview(nf); return;
             }
             if (b.hasAttribute("data-pkdel")) {
                 var id = b.getAttribute("data-pkdel"), hs = packHolders(id);

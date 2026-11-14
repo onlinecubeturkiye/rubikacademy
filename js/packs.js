@@ -23,13 +23,24 @@
             ";--ui-accent:" + ac + ";--ui-accent-hover:" + ac + ";--ui-accent-text:" + at + ";--ui-accent-soft:color-mix(in srgb," + ac + " 16%," + sf + ")" +
             ";--primary:" + ac + ";--primary-dark:" + ac + ";--primary-light:color-mix(in srgb," + ac + " 16%," + sf + ")" +
             ";--btn-bg:" + ac + ";--btn-hover-bg:" + ac + ";--btn-text:" + at + ";--hero-bg:" + sf + ";--hero-border:color-mix(in srgb," + tx + " 14%," + sf + ");--badge-bg:color-mix(in srgb," + ac + " 16%," + sf + ");--badge-text:" + tx + ";--bottom-bg:" + sf + ";";
-        return sel + "," + sel + " body{" + v + "}" + sel + "," + sel + " body{background:" + bg + "!important;background-image:none!important}";
+        var css = sel + "," + sel + " body{" + v + "}" + sel + "," + sel + " body{background:" + bg + "!important;background-image:none!important}";
+        // yazı tipi (Google Fonts) ve köşe yuvarlaklığı
+        var font = /^[A-Za-z ]{2,30}$/.test(t.font || "") ? t.font : "";
+        if (font) css += sel + " body," + sel + " h1," + sel + " h2," + sel + " h3," + sel + " .btn{font-family:'" + font + "',Inter,system-ui,sans-serif!important}";
+        if (typeof t.r === "number" && t.r >= 0 && t.r <= 28) css += sel + " .box," + sel + " .card," + sel + " .hero," + sel + " .h-feat," + sel + " .h-step," + sel + " .h-stat," + sel + " .evh," + sel + " .evh-card," + sel + " .tr-card," + sel + " .item," + sel + " .ra-ad{border-radius:" + t.r + "px!important}" +
+            sel + " .btn," + sel + " .h-btn," + sel + " .evh-btn," + sel + " .back-btn{border-radius:" + Math.min(t.r, 14) + "px!important}";
+        return css;
     }
     function apply(list) {
         var themes = list.filter(function (p) { return p.kind === "theme"; });
         var st = document.getElementById("raPackCss");
         if (!st) { st = document.createElement("style"); st.id = "raPackCss"; (document.head || document.documentElement).appendChild(st); }
         st.textContent = themes.map(themeCss).join("");
+        themes.forEach(function (p) {
+            var f = (p.data || {}).font; if (!/^[A-Za-z ]{2,30}$/.test(f || "") || document.getElementById("raPackFont-" + f.replace(/ /g, ""))) return;
+            var l = document.createElement("link"); l.id = "raPackFont-" + f.replace(/ /g, ""); l.rel = "stylesheet";
+            l.href = "https://fonts.googleapis.com/css2?family=" + f.replace(/ /g, "+") + ":wght@500;600;700;800;900&display=swap"; (document.head || document.documentElement).appendChild(l);
+        });
         try { localStorage.setItem("ra-pack-css", st.textContent); } catch (e) {}
         // Ayarlar > Tema stili listesine ekle
         if (window.RA_SKINS) {
