@@ -171,6 +171,11 @@
         var me = document.currentScript && document.currentScript.src || "", v = (/[?&]v=([^&]+)/.exec(me) || [])[1] || "";
         if (!hasIcons) { var sc = document.createElement("script"); sc.src = "/js/ra-icons.js" + (v ? "?v=" + v : ""); sc.defer = true; (document.head || document.documentElement).appendChild(sc); }
         // sponsor banner'ı (içerik admin panelinden)
+        // özel paketler (hesaba atanmış tema / algoritma): önbellekteki tema hemen, güncel liste packs.js ile
+        var pc = ""; try { pc = localStorage.getItem("ra-pack-css") || ""; } catch (e) {}
+        if (pc) { var ps = document.createElement("style"); ps.id = "raPackCss"; ps.textContent = pc; (document.head || document.documentElement).appendChild(ps); }
+        var pk = document.createElement("script"); pk.src = "/js/packs.js" + (v ? "?v=" + v : ""); pk.defer = true;
+        (document.head || document.documentElement).appendChild(pk);
         var ad = document.createElement("script"); ad.src = "/js/ad-banner.js" + (v ? "?v=" + v : ""); ad.defer = true;
         (document.head || document.documentElement).appendChild(ad);
     } catch (e) {}
@@ -641,7 +646,7 @@ function renderSettingsMenu(target) {
     var sk = raSkin();
     html += '<div class="set-grp"><div class="set-h">' + raEsc(L.skin || "Tema stili") + '</div>';
     RA_SKINS.forEach(function (o) {
-        html += '<button class="set-opt" data-skin="' + o[0] + '"' + cur(o[0] === sk) + '><span class="skin-sw" aria-hidden="true">' + o[1].map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("") + '</span>' + raEsc(L["skin_" + o[0]] || o[0]) + '</button>';
+        html += '<button class="set-opt" data-skin="' + o[0] + '"' + cur(o[0] === sk) + '><span class="skin-sw" aria-hidden="true">' + o[1].map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("") + '</span>' + raEsc(L["skin_" + o[0]] || (window.RA_SKIN_LABEL || {})[o[0]] || o[0]) + '</button>';
     });
     html += '</div>';
     var codes = Object.keys(langs);

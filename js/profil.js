@@ -216,8 +216,9 @@
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistiklerim</h2>' + statTiles(st) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">🏠 Ev yarışmalarım</h2>' + compGrid(st, true, name) + '</div>' +
       '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerlemem</h2>' + setsGrid(st) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>' + linksBox();
+      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>' + '<div id="raPacks"></div>' + linksBox();
 
+    if (window.RAPacks) RAPacks.render();
     showRole(u.uid);
     bindShare(u.uid);
     bindCerts();
