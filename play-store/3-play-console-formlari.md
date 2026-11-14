@@ -88,7 +88,7 @@ https://rubikacademy.fun/gizlilik
 
 ## 7. Permissions declaration (İzin beyanı)
 
-Hassas izin yok (`INTERNET`, `POST_NOTIFICATIONS`). Ek form çıkmaz. Çıkarsa: bildirimler yarışma duyuruları ve hatırlatmalar içindir.
+İzinler: `INTERNET`, `POST_NOTIFICATIONS`, `CAMERA`, `RECORD_AUDIO`. Özel beyan formu gerektiren (kısıtlı) izin yok. Sorulursa: kamera küpü taramak, mikrofon kablolu timer sinyalini okumak içindir; veriler cihazda işlenir.
 
 ## 8. App category (Kategori)
 
