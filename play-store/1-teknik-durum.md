@@ -4,25 +4,25 @@ _Son denetim: 12 Kasım 2026 · Uygulama sürümü 1.2.0 (versionCode 3)_
 
 ## Uygulamanın yapısı
 
-Uygulama bir **Trusted Web Activity (TWA)**: telefondaki Chrome motoruyla https://rubikacademy.fun sitesini tam ekran açan bir Android kabuğu. Bütün özellikler sitededir; site güncellenince uygulama da güncellenir (mağazaya yeni sürüm yüklemeden).
+Uygulama siteyi (https://rubikacademy.fun) **kendi içindeki WebView'de** açar; Chrome'a bağlı değildir. Bildirimler (Firebase Cloud Messaging), Google ile giriş (Android Credential Manager), kaydet/paylaş ve yazdır Android tarafında yapılır. Site güncellenince uygulama da güncellenir (mağazaya yeni sürüm yüklemeden). Bluetooth akıllı küp/timer WebView'de çalışmaz (yalnız tarayıcıda).
 
 | Konu | Değer | Durum |
 |---|---|---|
 | Paket adı | `fun.rubikacademy.app` | ✓ |
-| Kütüphane | `com.google.androidbrowserhelper:androidbrowserhelper:2.5.0` | ✓ |
+| Kütüphaneler | AndroidX Core, Firebase Messaging, AndroidX Credentials + Google ID | ✓ |
 | Android Gradle Plugin | 8.10.1, Java 17 | ✓ |
 | compileSdk / targetSdk | 36 / 36 (Google Play şartı: API 36) | ✓ |
 | minSdk | 23 (Android 6.0) | ✓ |
 | Mimari | Yerel (native) kod yok → bütün ABI'ler | ✓ |
 | Ekran yönü | Dikey (portrait) | ✓ (bilgi) |
-| İzinler | `INTERNET`, `POST_NOTIFICATIONS` | ✓ gereksiz izin yok |
+| İzinler | `INTERNET`, `ACCESS_NETWORK_STATE`, `POST_NOTIFICATIONS`, `CAMERA` (küp tarama), `RECORD_AUDIO` (kablolu timer) — kamera/mikrofon yalnız o özellik açılınca sorulur | ✓ |
 | Bildirimler | Site bildirimleri Android bildirimi olarak gelir (bildirim aktarımı, Android 13+ izin penceresi, tek renk simge) | ✓ 1.2.0'da eklendi |
 | Chrome yoksa | Uygulama içi tarayıcı (WebView) yedeği | ✓ |
 | Sürüm | versionName 1.2.0, versionCode 3 | ✓ |
 | İmza | Yükleme anahtarı (upload key, 13 Kasım 2026'da yenilendi), SHA-256 `A1:99:0F:…:ED:B0` — anahtar dosyası depoda YOK, sende saklanmalı | ✓ |
 | Çıktı | İmzalı `.aab` (Play) ve `.apk` (deneme) | ✓ |
 
-**Kamera, mikrofon, Bluetooth, sensörler:** Bu izinler uygulamanın değil, Chrome'un izinleridir; site ilgili özelliği açınca Chrome sorar. Bu yüzden Android manifestinde yoklar ve Play'de izin beyanı gerektirmezler.
+**Kamera ve mikrofon:** Uygulama izinleridir, yalnız ilgili özellik (kamera ile küp tarama, kablolu timer) açılınca sorulur; görüntü ve ses cihazda işlenir, gönderilmez.
 
 ## Bu çalışmada yapılanlar
 
