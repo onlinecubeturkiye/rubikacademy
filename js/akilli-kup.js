@@ -779,7 +779,30 @@
     // Canlı dinleme varsa yalnız ondan gelen veri kullanılır; yoksa REST ile yavaş yoklama (yedek)
     function compPoll() {
         if (!comp) return;
-        if (comp.live) { applyComp(comp.doc, comp.players); return; }
+        if (comp.live) {
+            // Canlı dinleme bazen (özellikle iPhone Safari'de) hata vermeden donuyor: oda belgesini 5 sn'de bir,
+            // yarışmacıları 12 sn'de bir doğrudan oku; canlı veriden farklıysa ona geç ve dinlemeyi yeniden kur
+            var now = Date.now(), wantP = now - (comp.chkP || 0) > 12000;
+            if (now - (comp.chk || 0) < 5000) { applyComp(comp.doc, comp.players); return; }
+            comp.chk = now; if (wantP) comp.chkP = now;
+            var code0 = comp.code;
+            Promise.all([apiAny(cPath(), { method: "GET" }), wantP ? apiAny(cPath("/p?pageSize=50"), { method: "GET" }) : null]).then(function (rs) {
+                if (!rs[0] || !rs[0].ok) throw new Error("x");
+                return Promise.all([rs[0].json(), rs[1] && rs[1].ok ? rs[1].json() : null]);
+            }).then(function (res) {
+                if (!comp || comp.code !== code0 || !comp.live) return;
+                var d = parseDoc(res[0]), cd = comp.doc || {}, ps = res[1] ? parsePlayers(res[1]) : null;
+                var key = function (l) { return (l || []).map(function (p) { return p.uid + ":" + (p.rnd || 0) + ":" + (p.t || ""); }).sort().join("|"); };
+                var stale = ["st", "round", "pa", "fin", "scr", "host", "mods", "ban"].some(function (k) { return String(d[k] == null ? "" : d[k]) !== String(cd[k] == null ? "" : cd[k]); })
+                    || (ps && key(ps) !== key(comp.players));
+                if (!stale) { applyComp(comp.doc, comp.players); return; }
+                try { comp.live(); } catch (e) {}
+                comp.live = null;
+                applyComp(d, ps || comp.players);
+                setTimeout(function () { if (comp && comp.code === code0 && !comp.live) liveStart(); }, 2500);
+            }).catch(function () { if (comp) applyComp(comp.doc, comp.players); });
+            return;
+        }
         Promise.all([apiAny(cPath(), { method: "GET" }), apiAny(cPath("/p?pageSize=50"), { method: "GET" })]).then(function (rs) {
             if (!rs[0].ok) throw new Error(rs[0].status);
             return Promise.all([rs[0].json(), rs[1].ok ? rs[1].json() : {}]);
