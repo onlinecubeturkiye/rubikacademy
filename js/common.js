@@ -16,6 +16,45 @@
     } catch (e) {}
 })();
 /* =========================================================
+   ANDROID UYGULAMASI KÖPRÜSÜ (window.RAApp)
+   Uygulama siteyi kendi WebView'inde açar ve window.RAAppNative verir (android/…/MainActivity.java).
+   Yanıtlar window.raAppCb(id, değer) ile gelir; burada Promise'e çevrilir.
+   RAApp.info() → { v, push: granted|default|denied|unavailable, google: bool }
+   RAApp.call("requestPush" | "pushToken" | "googleSignIn" | "saveFile" | "share" | "print" | "openExternal" | "setBars", arg)
+========================================================= */
+(function () {
+    var N = window.RAAppNative; if (!N) return;
+    var cbs = {};
+    window.raAppCb = function (id, v) { var f = cbs[id]; delete cbs[id]; if (f) f(v); };
+    function call(m, arg) {
+        return new Promise(function (res) {
+            var id = "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+            cbs[id] = res;
+            try { N[m](id, typeof arg === "string" ? arg : JSON.stringify(arg || {})); } catch (e) { delete cbs[id]; res(null); }
+        });
+    }
+    window.RAApp = {
+        native: true, call: call,
+        info: function () { try { return JSON.parse(N.info()) || {}; } catch (e) { return {}; } }
+    };
+    // Yazdır / PDF: WebView window.print desteklemiyor → Android yazdırma
+    window.print = function () { call("print"); };
+    // Paylaş: WebView'de navigator.share yok → Android paylaşım menüsü (yalnız metin/bağlantı)
+    if (!navigator.share) { try { navigator.share = function (d) { return call("share", { title: (d && d.title) || "", text: (d && d.text) || "", url: (d && d.url) || "" }).then(function () {}); }; } catch (e) {} }
+    // Durum çubuğu rengi sitenin zeminine uysun (tema değişince de)
+    function bars() {
+        try {
+            var c = getComputedStyle(document.body || document.documentElement).backgroundColor || "rgb(244,244,242)";
+            var m = c.match(/\d+(\.\d+)?/g) || [244, 244, 242], r = +m[0], g = +m[1], b = +m[2];
+            var hex = "#" + [r, g, b].map(function (x) { return ("0" + Math.round(x).toString(16)).slice(-2); }).join("");
+            call("setBars", { bg: hex, light: (r * 299 + g * 587 + b * 114) / 1000 > 140 });
+        } catch (e) {}
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bars); else bars();
+    window.addEventListener("load", bars);
+    try { new MutationObserver(bars).observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-skin"] }); } catch (e) {}
+})();
+/* =========================================================
    UYGULAMA MODU (Android uygulaması / ana ekrana eklenmiş site)
    Algılama: ?source=twa|pwa, android-app:// yönlendireni ya da display-mode: standalone → oturum boyunca hatırlanır.
    html.ra-app: altta uygulama sekme çubuğu (Ana Sayfa · İçerikler · Antrenör · Yarışma · Profil),
@@ -25,7 +64,7 @@
 (function () {
     var on = false;
     try {
-        var q = /[?&]source=(twa|pwa)\b/.test(location.search), ref = /^android-app:\/\//.test(document.referrer || "");
+        var q = /[?&]source=(twa|pwa|app)\b/.test(location.search) || !!window.RAAppNative, ref = /^android-app:\/\//.test(document.referrer || "");
         var sa = window.matchMedia && (matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches) || navigator.standalone === true;
         if (q || ref || sa) sessionStorage.setItem("ra-app", "1");
         on = sessionStorage.getItem("ra-app") === "1";

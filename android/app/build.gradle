@@ -1,6 +1,9 @@
-// Rubik Academy Android uygulaması: siteyi (rubikacademy.fun) tam ekran açan Trusted Web Activity.
+// Rubik Academy Android uygulaması: siteyi (rubikacademy.fun) uygulamanın KENDİ WebView'inde açar (Chrome'a bağlı değil).
+// Yerel parçalar: bildirim (Firebase Cloud Messaging), Google ile giriş (Credential Manager), dosya kaydet/paylaş, yazdır.
 // Sürüm OTOMATİK: GitHub Actions her derlemede RA_VERSION_CODE verir (çalışma numarası + 10). Elle değiştirme.
 plugins { id "com.android.application" }
+// Firebase (bildirim + Google girişi) app/google-services.json varsa açılır; yoksa uygulama yine derlenir, bu iki özellik kapalı kalır
+if (file("google-services.json").exists()) apply plugin: "com.google.gms.google-services"
 
 android {
     namespace "fun.rubikacademy.app"
@@ -12,7 +15,7 @@ android {
         targetSdk 36
         def vc = (System.getenv("RA_VERSION_CODE") ?: "4") as int
         versionCode vc
-        versionName "1.2." + vc
+        versionName "2.0." + vc
     }
     buildTypes {
         release { minifyEnabled false }
@@ -25,5 +28,10 @@ android {
 }
 
 dependencies {
-    implementation "com.google.androidbrowserhelper:androidbrowserhelper:2.5.0"
+    implementation "androidx.core:core:1.15.0"
+    implementation platform("com.google.firebase:firebase-bom:33.7.0")
+    implementation "com.google.firebase:firebase-messaging"
+    implementation "androidx.credentials:credentials:1.5.0"
+    implementation "androidx.credentials:credentials-play-services-auth:1.5.0"
+    implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"
 }

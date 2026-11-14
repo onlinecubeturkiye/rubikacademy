@@ -468,6 +468,7 @@
 
     /* ---------- dışa aktarma ---------- */
     function download(name, text, type) {
+        if (window.RAApp && RAApp.native && window.RACompShare) { RACompShare.save(new Blob([text], { type: type }), name); return; }
         var a = document.createElement("a"), url = URL.createObjectURL(new Blob([text], { type: type }));
         a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
@@ -829,6 +830,7 @@
             var fileName = function (o, r) { return "ev-yarismasi-" + o.code + "-" + (r.f ? "final" : "tur" + r.n) + ".png"; };
             var saveImg = function (o, r) {
                 return RACompShare.image(o, r).then(function (blob) {
+                    if (window.RAApp && RAApp.native) return RACompShare.save(blob, fileName(o, r));
                     var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fileName(o, r);
                     document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
                 });
