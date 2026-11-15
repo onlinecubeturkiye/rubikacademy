@@ -1035,16 +1035,19 @@
         var k = hwKind(), on = k && HwTimer.connected(k), can = compCanSolve();
         var s = hw.st[k] || {};
         box.className = "c-mag-box " + (!on ? "wait" : HwTimer.running() ? "running" : can ? "green" : "white");
-        $("cHwName").textContent = k === "gan" ? "📶 Akıllı timer" : "⏱️ Kablolu timer";
+        var inf = k === "gan" && HwTimer.info ? HwTimer.info() : {};
+        // bağlı akıllı timer'ın adı ve (destekliyorsa) pili
+        $("cHwName").textContent = k === "gan" ? (on && inf.name ? "📶 " + inf.name + (inf.batt != null ? " · 🔋 %" + inf.batt : "") : "📶 Akıllı timer") : "⏱️ Kablolu timer";
         $("cHwS").innerHTML = !on ? esc(s.msg || (k === "gan" ? "Bağlı değil" : "Kapalı")) : HwTimer.running() ? "Çözülüyor…" : hw.saved && Date.now() - hw.saved < 2500 ? "Kaydedildi ✓" : can ? "Hazır: timer'ı başlat, süre kendiliğinden kaydedilir" : "Sıradaki karıştırmayı bekle";
         $("cHwGo").hidden = !!on || (k === "stackmat" && HwTimer.listening());
         $("cHwGo").textContent = k === "gan" ? "📶 Timer'a bağlan" : "🎙️ Kablolu timer'ı dinle";
-        $("cHwHelp").innerHTML = k === "gan" ? "Desteklenenler: <b>GAN Smart Timer</b>, <b>GAN Halo</b>, <b>QiYi Smart Timer</b>. Timer'ı aç, <b>Bağlan</b>'a dokun ve listeden seç. Bir kez eşleştikten sonra sonraki girişlerde kendiliğinden bağlanır; timer durunca süre otomatik kaydedilir. " +
+        $("cHwHelp").innerHTML = (k === "gan" && on ? '<span class="c-hw-sig">Son sinyal: <code>' + esc(inf.last || "henüz yok (timer'ı başlatıp durdur)") + '</code></span><br>' : "") + (k === "gan" ? "Desteklenenler: <b>GAN Smart Timer</b>, <b>GAN Halo</b>, <b>QiYi Smart Timer</b>. Timer'ı aç, <b>Bağlan</b>'a dokun ve listeden seç. Bir kez eşleştikten sonra sonraki girişlerde kendiliğinden bağlanır; timer durunca süre otomatik kaydedilir. " +
                 "<br>Bluetooth için Android'de ya da bilgisayarda <b>Chrome</b> gerekir (iPhone'da Safari desteklemez, <b>Bluefy</b> tarayıcısı kullan). MoYu ve diğer markalar Bluetooth protokollerini yayımlamadığı için bu listede yok: timer'ında <b>veri çıkışı</b> varsa <b>Kablolu timer</b> seçeneğiyle bağla."
-            : "Veri çıkışı olan her timer çalışır (SpeedStacks Gen 2–5, QiYi, MoYu, YJ ve Stackmat uyumlu diğerleri). Timer'ın <b>veri çıkışını</b> (3,5 mm) ses kablosuyla telefonun ya da bilgisayarın <b>mikrofon girişine</b> tak (telefonda 4 kutuplu TRRS adaptör gerekir). Mikrofon izni ver; timer açılınca kendiliğinden algılanır, durunca süre otomatik kaydedilir.";
+            : "Veri çıkışı olan her timer çalışır (SpeedStacks Gen 2–5, QiYi, MoYu, YJ ve Stackmat uyumlu diğerleri). Timer'ın <b>veri çıkışını</b> (3,5 mm) ses kablosuyla telefonun ya da bilgisayarın <b>mikrofon girişine</b> tak (telefonda 4 kutuplu TRRS adaptör gerekir). Mikrofon izni ver; timer açılınca kendiliğinden algılanır, durunca süre otomatik kaydedilir.");
     }
     function hwEvent(type, d) {
         if (type === "status") { hw.st[d.kind] = d; hwPaint(); return; }
+        if (type === "info") { hwPaint(); return; }
         if (type === "detected") {
             // timer bağlanınca giriş yöntemi kendiliğinden ona geçer
             if (comp && inPref() !== d) { setPref(d); applyInput(); flashMsg(d === "gan" ? "📶 Akıllı timer algılandı: süreler otomatik girilecek." : "⏱️ Kablolu timer algılandı: süreler otomatik girilecek."); }
