@@ -240,17 +240,22 @@ service cloud.firestore {
       function okT(f) { return request.resource.data[f] is int && request.resource.data[f] >= 0 && request.resource.data[f] < 3600000; }
       allow read: if true;
       // xs: yöneticinin sildiği değerler ("alan:ms" virgüllü). Sahibi xs'i değiştiremez; cihazı bu değerleri bir daha rekor yazmaz.
+      // pin: yöneticinin sabitlediği rekorlar ("alan:ms", 0 = rekor yok); xc: sayılmayan yarışmalar ("KOD,KOD"). Sahibi bunları değiştiremez.
       allow create, update: if request.auth != null && request.auth.uid == uid && !suspended(uid)
-        && request.resource.data.keys().hasOnly(['name', 's333', 'a5_333', 'a12_333', 's222', 'a5_222', 'a12_222', 'n', 'w', 'ts', 'xs'])
+        && request.resource.data.keys().hasOnly(['name', 's333', 'a5_333', 'a12_333', 's222', 'a5_222', 'a12_222', 'n', 'w', 'ts', 'xs', 'pin', 'xc'])
         && request.resource.data.get('xs', '') == (resource == null ? '' : resource.data.get('xs', ''))
+        && request.resource.data.get('pin', '') == (resource == null ? '' : resource.data.get('pin', ''))
+        && request.resource.data.get('xc', '') == (resource == null ? '' : resource.data.get('xc', ''))
         && request.resource.data.name is string && request.resource.data.name.size() <= 24
         && okT('s333') && okT('a5_333') && okT('a12_333') && okT('s222') && okT('a5_222') && okT('a12_222')
         && request.resource.data.n is int && request.resource.data.w is int
         && request.resource.data.ts is timestamp;
-      // Yönetici tek bir rekor değerini siler (0 yapar) ve xs'e ekler
+      // Yönetici rekor değerlerini, sabitlenen rekorları (pin) ve sayılmayan yarışmaları (xc) değiştirir
       allow update: if isAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['s333', 'a5_333', 'a12_333', 's222', 'a5_222', 'a12_222', 'xs'])
-        && request.resource.data.xs is string && request.resource.data.xs.size() <= 3000;
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['s333', 'a5_333', 'a12_333', 's222', 'a5_222', 'a12_222', 'xs', 'pin', 'xc'])
+        && request.resource.data.get('xs', '') is string && request.resource.data.get('xs', '').size() <= 3000
+        && request.resource.data.get('pin', '') is string && request.resource.data.get('pin', '').size() <= 300
+        && request.resource.data.get('xc', '') is string && request.resource.data.get('xc', '').size() <= 1500;
       allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid);
     }
 

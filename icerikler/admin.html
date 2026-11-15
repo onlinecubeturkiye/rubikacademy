@@ -302,6 +302,16 @@ details.m-set > summary { font-size: 12.5px; }
 .pk-chip button { border: 0; background: none; color: var(--text-soft); cursor: pointer; font-size: 11px; padding: 2px 6px; border-radius: 99px; }
 .pk-chip button:hover { background: rgba(220, 38, 38, .12); color: #dc2626; }
 .rec-g span { color: var(--text); } .rec-g span.bad { color: #dc2626; }
+.rec-ed { margin-top: 10px; }
+.rec-edb { border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; background: var(--surface-soft); }
+.rec-cs { display: grid; gap: 4px; max-height: 220px; overflow: auto; margin-bottom: 8px; }
+.rec-c { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); cursor: pointer; }
+.rec-c input { width: 18px; height: 18px; flex: none; }
+.rec-c b { display: block; font-size: 13.5px; } .rec-c small { font-size: 12px; color: var(--text-soft); font-weight: 700; }
+.rec-c:has(input:not(:checked)) { opacity: .55; text-decoration: line-through; }
+.rec-fs { display: grid; gap: 6px; margin-bottom: 8px; }
+.rec-f { display: grid; grid-template-columns: 90px minmax(0, 1fr); align-items: center; gap: 8px; font-size: 13px; font-weight: 800; }
+.rec-f select { width: 100%; min-width: 0; padding: 7px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 700 12.5px Inter, sans-serif; }
 .rec-g .rx { font: inherit; text-align: left; padding: 1px 4px; margin: -1px -4px; border: 0; border-radius: 6px; background: none; color: var(--text); cursor: pointer; }
 .rec-g .rx i { font-style: normal; font-size: 10px; margin-left: 4px; color: var(--text-soft); opacity: .6; }
 .rec-g .rx:hover { background: rgba(220, 38, 38, .1); color: #dc2626; } .rec-g .rx.bad { color: #dc2626; }

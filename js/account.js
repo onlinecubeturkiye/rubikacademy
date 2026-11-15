@@ -624,6 +624,7 @@
                 var okd = compOk(e); if (okd < 0) continue; // reddedilen yarışma hiç sayılmaz
                 comp.list.push({ c: rk.split(":")[0], r: +rk.split(":")[1] || 0, nm: e.nm || "", ev: e.ev, n: e.n || 5, s: e.s, a: e.a, rk: e.rk, p: e.p, f: e.f ? 1 : 0, t: Array.isArray(e.t) ? e.t.slice(0, 12) : undefined, ts: e.ts || 0, pd: okd ? undefined : 1 });
                 if (!okd) { comp.pending = (comp.pending || 0) + 1; continue; } // onay bekliyor: rekor sayılmaz
+                if (recXc().indexOf(rk.split(":")[0]) >= 0) continue; // yönetici bu yarışmayı saymıyor (records/{uid}.xc)
                 comp.rounds++;
                 if (e.f) { comp.finals++; if (e.rk === 1) comp.wins++; }
                 var pb = comp.pb[e.ev] || (comp.pb[e.ev] = {});
@@ -632,6 +633,13 @@
                 var ak = e.n === 12 ? "a12" : "a5";
                 if (typeof e.a === "number" && !recX(ak + "_" + e.ev, e.a) && (!pb[ak] || e.a < pb[ak])) pb[ak] = e.a;
             }
+            // yöneticinin sabitlediği rekorlar (records/{uid}.pin): 0 = rekor yok, sayı = o değer
+            var pins = recPins();
+            REC_F.forEach(function (r) {
+                if (!(r[0] in pins)) return;
+                var pbx = comp.pb[r[1]] || (comp.pb[r[1]] = {});
+                if (pins[r[0]] > 0) pbx[r[2]] = pins[r[0]]; else delete pbx[r[2]];
+            });
             // geçmiş listesi: en yeni 40 tur (profil verisi sınırı için kısa; süreler dahil)
             comp.list.sort(function (x, y) { return y.ts - x.ts; });
             comp.list = comp.list.slice(0, 40);
@@ -728,13 +736,22 @@
     // Yöneticinin sildiği rekor değerleri: "alan:ms" listesi (records/{uid}.xs), cihazda ra-rec-x
     function recXList() { var a = parse(lsGet("ra-rec-x")); return Array.isArray(a) ? a : []; }
     function recX(field, v) { return typeof v === "number" && recXList().indexOf(field + ":" + Math.round(v)) >= 0; }
+    // Yöneticinin sabitlediği rekorlar (pin: "alan:ms" — 0 = rekor yok) ve saymadığı yarışmalar (xc: "KOD,KOD")
+    function recPins() { var o = parse(lsGet("ra-rec-pin")); return isObj(o) ? o : {}; }
+    function recXc() { var a = parse(lsGet("ra-rec-xc")); return Array.isArray(a) ? a : []; }
     function writeRecords(name, comp) {
         if (!user || !comp) return;
-        // önce kayıttaki silinmiş değerleri al; değiştiyse istatistikleri onlara göre yeniden hesapla
+        // önce yöneticinin ayarlarını (xs, pin, xc) al; değiştiyse istatistikleri onlara göre yeniden hesapla
         api("/records/" + user.uid, { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }).then(function (d) {
             if (!user) return;
-            var xs = (d && d.fields && d.fields.xs && d.fields.xs.stringValue) || "", arr = xs.split(",").filter(Boolean);
-            if (JSON.stringify(arr) !== JSON.stringify(recXList())) { lsSet("ra-rec-x", JSON.stringify(arr)); comp = computeStats().comp || comp; lsSet("ra-rec-last", null); }
+            var fl = (d && d.fields) || {}, sv = function (k) { return (fl[k] && fl[k].stringValue) || ""; };
+            var arr = sv("xs").split(",").filter(Boolean), xc = sv("xc").split(",").filter(Boolean), pins = {};
+            sv("pin").split(",").forEach(function (x) { var p = x.split(":"); if (p.length === 2 && /^[a-z0-9_]+$/.test(p[0]) && /^\d+$/.test(p[1])) pins[p[0]] = +p[1]; });
+            var ch = false;
+            if (JSON.stringify(arr) !== JSON.stringify(recXList())) { lsSet("ra-rec-x", JSON.stringify(arr)); ch = true; }
+            if (JSON.stringify(xc) !== JSON.stringify(recXc())) { lsSet("ra-rec-xc", JSON.stringify(xc)); ch = true; }
+            if (JSON.stringify(pins) !== JSON.stringify(recPins())) { lsSet("ra-rec-pin", JSON.stringify(pins)); ch = true; }
+            if (ch) { comp = computeStats().comp || comp; lsSet("ra-rec-last", null); }
             writeRecordsNow(name, comp);
         });
     }
