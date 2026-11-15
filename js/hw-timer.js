@@ -138,22 +138,28 @@
     /* ---------------- Akıllı timer'lar (Bluetooth): GAN Smart Timer / Halo, QiYi Smart Timer ---------------- */
     var GAN_SVC = "0000fff0-0000-1000-8000-00805f9b34fb", GAN_STATE = "0000fff5-0000-1000-8000-00805f9b34fb";
     var QY_SVC = "0000fd50-0000-1000-8000-00805f9b34fb", QY_W = "00000001-0000-1001-8001-00805f9b07d0", QY_R = "00000002-0000-1001-8001-00805f9b07d0", QY_CIC = 0x0504;
-    var GT = { dev: null, on: false, running: false, t0: 0, raf: 0, model: "", stopped: false };
+    var GT = { dev: null, on: false, running: false, t0: 0, raf: 0, model: "", stopped: false, name: "", batt: null, last: "", lastMs: -1, lastAt: 0 };
+    function info() { emit("info", { name: GT.name, model: GT.model, batt: GT.batt, last: GT.last }); }
+    function hex(dv) { var o = []; for (var i = 0; i < dv.byteLength && i < 20; i++) o.push((dv.getUint8(i) + 0x100).toString(16).slice(1).toUpperCase()); return o.join(" "); }
     function btStart() { GT.running = true; GT.stopped = false; GT.t0 = now(); emit("start"); tickLoop(); }
+    // "Başladı" sinyali kaçırılmış olsa bile durunca gelen süre kaydedilir (aynı süre iki kez gelirse bir kez sayılır)
     function btStop(ms) {
         cancelAnimationFrame(GT.raf);
-        var was = GT.running && !GT.stopped; GT.running = false;
-        if (was && ms > 0) { GT.stopped = true; emit("tick", ms); emit("stop", ms); }
+        GT.running = false;
+        if (ms > 0 && !GT.stopped && !(ms === GT.lastMs && now() - GT.lastAt < 4000)) { GT.stopped = true; GT.lastMs = ms; GT.lastAt = now(); emit("tick", ms); emit("stop", ms); }
     }
-    function btIdle() { GT.running = false; cancelAnimationFrame(GT.raf); emit("reset"); emit("tick", 0); }
+    function btIdle() { GT.running = false; GT.stopped = false; cancelAnimationFrame(GT.raf); emit("reset"); emit("tick", 0); }
     function tickLoop() { cancelAnimationFrame(GT.raf); var f = function () { if (!GT.running) return; emit("tick", Math.round(now() - GT.t0)); GT.raf = requestAnimationFrame(f); }; f(); }
     function btLost() { GT.on = false; GT.running = false; cancelAnimationFrame(GT.raf); emit("status", { kind: "gan", on: false, msg: "Akıllı timer bağlantısı koptu." }); }
 
     // --- GAN: düz bildirim paketi
+    // durumlar: 0 koptu, 1 hazırlan, 2 eller kalktı, 3 çalışıyor, 4 durdu (süreyle), 5 boşta, 6 eller üstünde, 7 bitti
     function ganEvent(e) {
-        var v = e.target.value; if (!v || v.byteLength < 4 || v.getUint8(0) !== 0xFE) return;
+        var v = e.target.value; if (!v) return;
+        GT.last = hex(v); info();
+        if (v.byteLength < 4 || v.getUint8(0) !== 0xFE) return;
         var s = v.getUint8(3);
-        if (s === 1 || s === 6) emit("ready");
+        if (s === 1 || s === 6) { GT.stopped = false; emit("ready"); }
         else if (s === 3) btStart();
         else if (s === 4 && v.byteLength >= 8) btStop(v.getUint8(4) * 60000 + v.getUint8(5) * 1000 + v.getUint16(6, true));
         else if (s === 5) btIdle();
@@ -162,6 +168,14 @@
     function ganInit(srv) {
         return srv.getPrimaryService(GAN_SVC).then(function (svc) { return svc.getCharacteristic(GAN_STATE); })
             .then(function (ch) { ch.addEventListener("characteristicvaluechanged", ganEvent); return ch.startNotifications(); });
+    }
+    // Pil: standart pil servisi (destekleyen timer'larda)
+    function battInit(srv) {
+        return srv.getPrimaryService("battery_service").then(function (svc) { return svc.getCharacteristic("battery_level"); }).then(function (ch) {
+            var upd = function (dv) { GT.batt = dv.getUint8(0); info(); };
+            ch.addEventListener("characteristicvaluechanged", function (e) { upd(e.target.value); });
+            return ch.readValue().then(upd).then(function () { return ch.startNotifications().catch(function () {}); });
+        }).catch(function () {});
     }
 
     // --- QiYi: AES-128 (ECB, anahtar 16 × 0x77) ile şifreli, parçalı paketler; CRC16/MODBUS
@@ -248,7 +262,7 @@
             else if (s === 6) btLost();
         }
     }
-    function qyEvent(e) { var v = e.target.value; qyMsg(qyFeed(new Uint8Array(v.buffer, v.byteOffset, v.byteLength))); }
+    function qyEvent(e) { var v = e.target.value; GT.last = hex(v); info(); qyMsg(qyFeed(new Uint8Array(v.buffer, v.byteOffset, v.byteLength))); }
     // MAC adresi: önce yayın paketindeki üretici verisi, yoksa addan (QY-Timer-XXXX → CC:A1:00:00:XX:XX), yoksa sor
     function qyMac(dev) {
         var key = PREF + "-mac-" + (dev.id || dev.name), saved = ""; try { saved = localStorage.getItem(key) || ""; } catch (e) {}
@@ -292,13 +306,13 @@
     // --- ortak bağlanma
     function btModel(dev) { return /^QY-/i.test(dev.name || "") ? "qiyi" : "gan"; }
     function btAttach(dev) {
-        GT.dev = dev; GT.model = btModel(dev);
+        GT.dev = dev; GT.model = btModel(dev); GT.name = dev.name || ""; GT.batt = null; GT.last = "";
         dev.removeEventListener("gattserverdisconnected", btLost); dev.addEventListener("gattserverdisconnected", btLost);
         var label = (GT.model === "qiyi" ? "QiYi" : "GAN") + " (" + (dev.name || "timer") + ")";
         emit("status", { kind: "gan", on: false, msg: "Bağlanıyor… " + label });
         var macP = GT.model === "qiyi" ? qyMac(dev) : Promise.resolve("");
         return macP.then(function (mac) {
-            return dev.gatt.connect().then(function (srv) { return GT.model === "qiyi" ? qyInit(srv, dev, mac) : ganInit(srv); });
+            return dev.gatt.connect().then(function (srv) { return (GT.model === "qiyi" ? qyInit(srv, dev, mac) : ganInit(srv)).then(function () { battInit(srv); }); });
         }).then(function () {
             GT.on = true;
             try { localStorage.setItem(PREF + "-gan", dev.id || "1"); } catch (e) {}
@@ -308,7 +322,7 @@
     }
     function btConnect() {
         if (!navigator.bluetooth) { emit("status", { kind: "gan", on: false, msg: "Bu tarayıcı Bluetooth desteklemiyor (Android/masaüstü Chrome kullan; iPhone'da Bluefy)." }); return Promise.resolve(false); }
-        var opts = { filters: [{ namePrefix: "GAN" }, { namePrefix: "Gan" }, { namePrefix: "gan" }, { namePrefix: "QY-Timer" }, { namePrefix: "QY-Adapter" }], optionalServices: [GAN_SVC, QY_SVC], optionalManufacturerData: [QY_CIC] };
+        var opts = { filters: [{ namePrefix: "GAN" }, { namePrefix: "Gan" }, { namePrefix: "gan" }, { namePrefix: "QY-Timer" }, { namePrefix: "QY-Adapter" }], optionalServices: [GAN_SVC, QY_SVC, "battery_service"], optionalManufacturerData: [QY_CIC] };
         if (!/Bluefy/i.test(navigator.userAgent || "")) opts.filters.push({ services: [GAN_SVC] });
         return navigator.bluetooth.requestDevice(opts).catch(function (e) {
             // eski tarayıcı optionalManufacturerData'yı tanımıyorsa onsuz dene
@@ -344,6 +358,7 @@
         connected: function (kind) { return kind === "gan" ? GT.on : SM.seen; },
         listening: function () { return SM.on; },
         running: function () { return SM.running || GT.running; },
+        info: function () { return { name: GT.name, model: GT.model, batt: GT.batt, last: GT.last }; },
         // Otomatik algılama: izin daha önce verildiyse sormadan dene
         auto: function () {
             btAuto();
@@ -351,6 +366,6 @@
             return used ? micGranted().then(function (ok) { return ok ? smStart(true) : false; }) : Promise.resolve(false);
         },
         supported: function () { return { stackmat: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia), gan: !!navigator.bluetooth }; },
-        _feed: smFeed, _parse: parsePkt, _qy: { box: QY, frames: qyFrames, feed: qyFeed, msg: qyMsg, aes: makeAes, crc: crc16modbus, state: GT }, _reset: function () { SM.decs = null; SM.seen = false; SM.running = false; SM.lastMs = -1; SM.lastSt = ""; }
+        _feed: smFeed, _parse: parsePkt, _gan: ganEvent, _qy: { box: QY, frames: qyFrames, feed: qyFeed, msg: qyMsg, aes: makeAes, crc: crc16modbus, state: GT }, _reset: function () { SM.decs = null; SM.seen = false; SM.running = false; SM.lastMs = -1; SM.lastSt = ""; }
     };
 })();
