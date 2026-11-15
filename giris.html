@@ -118,11 +118,20 @@
         $("aPriv").innerHTML = T("privacy");
     }
     function err(m, ok) { var e = $("aErr"); e.textContent = m || ""; e.classList.toggle("ok", !!ok); }
-    function busy(b) { $("aSubmit").disabled = b; $("gBtn").disabled = b; }
+    // Bir deneme takılırsa (Google penceresi geri dönmedi, bağlantı koptu) düğmeler kilitli kalmasın: 25 sn sonra aç
+    var busyT = 0;
+    function busy(b, why) {
+        $("aSubmit").disabled = b; $("gBtn").disabled = b;
+        clearTimeout(busyT);
+        if (b) busyT = setTimeout(function () {
+            $("aSubmit").disabled = false; $("gBtn").disabled = false;
+            err(why === "google" ? "Google girişi tamamlanmadı. Açılan Google sekmesini kapatıp tekrar dene; olmazsa e-posta ve şifrenle gir (şifren yoksa \"Şifremi unuttum\")." : "Giriş yanıt vermedi. İnternet bağlantını kontrol edip tekrar dene.");
+        }, 25000);
+    }
     $("tabLogin").onclick = function () { mode = "login"; err(""); render(); };
     $("tabSignup").onclick = function () { mode = "signup"; err(""); render(); };
     $("gBtn").onclick = function () {
-        err(""); busy(true);
+        err(""); busy(true, "google");
         A.googleSignIn().catch(function (e) {
             if (e && /popup-closed-by-user|cancelled-popup-request/.test(e.code || "")) return;
             err(e && e.code ? A.errText(e) : T("e_load"));
