@@ -182,7 +182,7 @@
     } catch (e) {}
 })();
 (function () {
-    var PRIV = /^(algo-progress-|algo-set-|recog-|roadmap-|trainer-stats-v1$|daily-results-v1$|daily-sent-v1$|daily-name-v1$|custom-algs-v1$|timer-solves-v1$|smart-solves-v1$|vcube-times-v1$|activity-days-v1$|comp-stats-v1$|lessons-v1$|ra-profile-v1$|ra-last-page$|ra-sync-meta-v1$)/;
+    var PRIV = /^(algo-progress-|algo-set-|recog-|roadmap-|trainer-stats-v1$|daily-results-v1$|daily-sent-v1$|daily-name-v1$|custom-algs-v1$|timer-solves-v1$|smart-solves-v1$|vcube-times-v1$|activity-days-v1$|comp-stats-v1$|lessons-v1$|ra-profile-v1$|ra-last-page$|ra-sync-meta-v1$|ra-rec-(x|xc|pin|last)$)/;
     var ls; try { ls = window.localStorage; if (!ls) return; } catch (e) { return; }
     var S = Storage.prototype, oGet = S.getItem, oSet = S.setItem, oRem = S.removeItem, oKey = S.key;
     function signed() { try { return oGet.call(ls, "ra-auth-v1") === "1"; } catch (e) { return false; } }

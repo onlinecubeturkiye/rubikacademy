@@ -1375,13 +1375,89 @@
     /* ---------- rekor tablosu yönetimi: şüpheli dereceler ---------- */
     var REC_LIM = { s333: 4000, a5_333: 5500, a12_333: 6000, s222: 600, a5_222: 1000, a12_222: 1200 };
     var REC_LBL = { s333: "3x3 tekil", a5_333: "3x3 Ao5", a12_333: "3x3 Ao12", s222: "2x2 tekil", a5_222: "2x2 Ao5", a12_222: "2x2 Ao12" };
+    /* Rekor düzenleyici: kişinin onaylı yarışmalarındaki bütün sonuçları aday olarak listelenir.
+       pin  = "alan:ms" (elle seçilen rekor; 0 = rekor yok) · xc = sayılmayan yarışmalar ("KOD,KOD")
+       Kişinin sitesi bunları okuyup rekorlarını ve profil istatistiklerini buna göre yazar (account.js). */
+    var _recComps = null;
+    function recComps() {
+        if (_recComps) return _recComps;
+        return (_recComps = runQ("comps").then(function (docs) {
+            return docs.map(function (d) {
+                var f = d.fields || {}, R = []; try { R = JSON.parse(aval(f.R) || "[]") || []; } catch (e) {}
+                var ok = aval(f.ok), created = Date.parse(d.createTime) || 0;
+                return { code: d.name.split("/").pop(), name: aval(f.name) || "Ev yarışması", ev: aval(f.ev) === "222" ? "222" : "333", R: R, ts: Date.parse(d.updateTime) || 0,
+                    counted: ok === 1 || (ok !== -1 && ok == null && created < COMP_OK_FROM) };
+            }).filter(function (c) { return c.counted && c.R.length; });
+        }, function (e) { _recComps = null; throw e; }));
+    }
+    function recCands(uid, comps) {
+        var out = [], DN = 99999999;
+        comps.forEach(function (c) {
+            c.R.forEach(function (r) {
+                var row = (r.rows || []).filter(function (x) { return x.u === uid; })[0]; if (!row) return;
+                var lbl = (r.f ? "Final" : "Tur " + r.n), ok = (row.t || []).filter(function (t) { return t > 0 && t < DN; });
+                if (ok.length) out.push({ c: c, f: "s" + c.ev, v: Math.round(Math.min.apply(null, ok)), l: lbl });
+                if (row.a != null && row.a > 0 && row.a < DN) out.push({ c: c, f: ((r.s || 5) === 12 ? "a12_" : "a5_") + c.ev, v: Math.round(row.a), l: lbl });
+            });
+        });
+        return out;
+    }
+    function recEditor(o, ed) {
+        if (!ed.hidden) { ed.hidden = true; ed.innerHTML = ""; return; }
+        ed.hidden = false; ed.innerHTML = '<p class="a-note">Yarışmaları yükleniyor…</p>';
+        recComps().then(function (comps) {
+            var cand = recCands(o.uid, comps), mine = comps.filter(function (c) { return cand.some(function (x) { return x.c === c; }); }).sort(function (a, b) { return b.ts - a.ts; });
+            o._cand = cand;
+            var compHtml = mine.length ? mine.map(function (c) {
+                return '<label class="rec-c"><input type="checkbox" data-rc="' + esc(c.code) + '"' + (o.xc.indexOf(c.code) < 0 ? " checked" : "") + '><span><b>' + esc(c.name) + '</b><small>' + (c.ev === "222" ? "2x2" : "3x3") + ' · ' + esc(dateFmt(c.ts).split(" ")[0]) + ' · ' + esc(c.code) + '</small></span></label>';
+            }).join("") : '<p class="a-note">Onaylı yarışma sonucu bulunamadı.</p>';
+            var sel = function (k) {
+                var opts = cand.filter(function (x) { return x.f === k; }).sort(function (a, b) { return a.v - b.v; });
+                var cur = k in o.pins ? String(o.pins[k]) : "auto";
+                return '<label class="rec-f"><span>' + REC_LBL[k] + '</span><select data-rf="' + k + '"><option value="auto"' + (cur === "auto" ? " selected" : "") + '>Otomatik (sayılan yarışmalardaki en iyi)</option><option value="0"' + (cur === "0" ? " selected" : "") + '>Yok — rekor olmasın</option>' +
+                    opts.map(function (x) { return '<option value="' + x.v + '"' + (cur === String(x.v) ? " selected" : "") + '>' + tFmt(x.v) + ' · ' + esc(x.c.name) + ' · ' + x.l + ' · ' + esc(dateFmt(x.c.ts).split(" ")[0]) + '</option>'; }).join("") + '</select></label>';
+            };
+            ed.innerHTML = '<div class="rec-edb"><div class="pk-lbl">Sayılan yarışmalar (işareti kaldırınca rekor ve istatistiğe girmez)</div><div class="rec-cs">' + compHtml + '</div>' +
+                '<div class="pk-lbl">Rekorlar</div><div class="rec-fs">' + Object.keys(REC_LBL).map(sel).join("") + '</div>' +
+                '<div class="a-ctrl"><button class="a-btn main sm" data-rsave="' + esc(o.uid) + '">💾 Kaydet</button><button class="a-btn sm" data-rclose="1">Kapat</button><span class="a-msg" data-rmsg></span></div>' +
+                '<p class="a-note">Kişinin sitesi bir sonraki girişinde rekor tablosunu ve profilini buna göre günceller.</p></div>';
+        }, function (e) { ed.innerHTML = '<p class="a-note">Yüklenemedi (' + esc(e && e.message) + ').</p>'; });
+    }
+    function recEditorSave(o, ed, b) {
+        var xc = []; Array.prototype.forEach.call(ed.querySelectorAll("[data-rc]"), function (c) { if (!c.checked) xc.push(c.getAttribute("data-rc")); });
+        var pins = {}; Array.prototype.forEach.call(ed.querySelectorAll("[data-rf]"), function (s) { if (s.value !== "auto") pins[s.getAttribute("data-rf")] = +s.value || 0; });
+        o.xc = xc; o.pins = pins; b.disabled = true;
+        recSave(o, {}).then(function () { renderRecords(); }, function () { b.disabled = false; ed.querySelector("[data-rmsg]").textContent = "Kaydedilemedi. Kurallar yayınlandı mı?"; });
+    }
+    // Rekor belgesini yaz: pin + xc ve tablodaki değerler (otomatik alanlar: sayılan yarışmalardaki en iyi aday)
+    function recSave(o, opt) {
+        var fields = Object.keys(REC_LBL), f = {};
+        var pinStr = Object.keys(o.pins).map(function (k) { return k + ":" + Math.round(o.pins[k] || 0); }).join(",");
+        f.pin = { stringValue: pinStr }; f.xc = { stringValue: o.xc.join(",").slice(0, 1500) };
+        var set = opt.only || fields;
+        var done = function (cand) {
+            set.forEach(function (k) {
+                var v;
+                if (k in o.pins) v = o.pins[k];
+                else if (cand) { var c = cand.filter(function (x) { return x.f === k && o.xc.indexOf(x.c.code) < 0; }).map(function (x) { return x.v; }); v = c.length ? Math.min.apply(null, c) : 0; }
+                else v = o[k] || 0;
+                f[k] = { integerValue: String(Math.round(v || 0)) };
+            });
+            var mask = Object.keys(f).map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
+            return authed(docsBase() + "/records/" + encodeURIComponent(o.uid) + "?" + mask, { method: "PATCH", body: JSON.stringify({ fields: f }) }).then(function (r) { if (!r.ok) throw new Error(r.status); });
+        };
+        if (opt.only) return done(null);
+        return (o._cand ? Promise.resolve(o._cand) : recComps().then(function (c) { return (o._cand = recCands(o.uid, c)); })).then(done);
+    }
     function renderRecords() {
         var box = $id("aRecList"); if (!box) return;
+        _recComps = null;
         box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
         var q = { structuredQuery: { from: [{ collectionId: "records" }], limit: 500 } };
         authed(docsBase() + ":runQuery", { method: "POST", body: JSON.stringify(q) }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (rows) {
             var list = (rows || []).filter(function (x) { return x.document; }).map(function (x) {
-                var f = x.document.fields || {}, o = { uid: x.document.name.split("/").pop(), name: gv(f, "name") || "?", xs: gv(f, "xs") || "", flags: [] };
+                var f = x.document.fields || {}, o = { uid: x.document.name.split("/").pop(), name: gv(f, "name") || "?", xs: gv(f, "xs") || "", flags: [], pins: {}, xc: String(gv(f, "xc") || "").split(",").filter(Boolean) };
+                String(gv(f, "pin") || "").split(",").forEach(function (p) { var q = p.split(":"); if (q.length === 2) o.pins[q[0]] = +q[1] || 0; });
                 Object.keys(REC_LIM).forEach(function (k) { o[k] = +gv(f, k) || 0; if (o[k] && o[k] < REC_LIM[k]) o.flags.push(REC_LBL[k] + " çok hızlı"); });
                 [["333", "s333", "a5_333"], ["222", "s222", "a5_222"]].forEach(function (e) { if (o[e[2]] && o[e[1]] && o[e[2]] < o[e[1]]) o.flags.push(e[0] + " Ao5 tekilden hızlı"); });
                 return o;
@@ -1393,28 +1469,28 @@
             if (!show.length) { box.innerHTML = '<p class="a-note">' + (onlyBad ? "Şüpheli derece yok ✓" : "Kayıt yok.") + '</p>'; return; }
             box.innerHTML = show.slice(0, 200).map(function (o) {
                 // 3x3 ve 2x2: tekil · Ao5 · Ao12 (olmayan "—"); şüpheli değer kırmızı
-                // dolu değere dokun → yalnız o süre silinir (diğer rekorları kalır; silinen bir daha rekor yazılmaz)
-                var cell = function (k) { var bad = o[k] && o[k] < REC_LIM[k]; return o[k] ? '<button type="button" class="rx' + (bad ? ' bad' : '') + '" data-rx="' + esc(o.uid) + '|' + k + '|' + o[k] + '" title="Bu süreyi sil">' + tFmt(o[k]) + '<i>✕</i></button>' : '<span>—</span>'; };
+                // dolu değere dokun → o rekor silinir, yerine başka süre GELMEZ (pin = 0); seçmek / yarışma saymamak için ✏️ Düzenle
+                var cell = function (k) { var bad = o[k] && o[k] < REC_LIM[k], pin = k in o.pins ? ' <i title="Elle ayarlandı">📌</i>' : ''; return o[k] ? '<button type="button" class="rx' + (bad ? ' bad' : '') + '" data-rx="' + esc(o.uid) + '|' + k + '|' + o[k] + '" title="Bu rekoru sil">' + tFmt(o[k]) + '<i>✕</i></button>' + pin : '<span>—' + pin + '</span>'; };
                 var vals = '<div class="rec-g"><i></i><i>Tekil</i><i>Ao5</i><i>Ao12</i>' +
                     '<b>3x3</b>' + cell("s333") + cell("a5_333") + cell("a12_333") +
                     '<b>2x2</b>' + cell("s222") + cell("a5_222") + cell("a12_222") + '</div>';
-                return '<div class="a-row2"><div style="min-width:0;flex:1"><b>' + esc(o.name) + '</b>' + (o.flags.length ? ' <span class="pill l">⚠ ' + esc(o.flags.join(", ")) + '</span>' : '') + vals + '</div>' +
-                    '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.uid) + '" target="_blank" rel="noopener">👤</a></div>';
+                return '<div class="a-row2" data-ru="' + esc(o.uid) + '"><div style="min-width:0;flex:1"><b>' + esc(o.name) + '</b>' + (o.flags.length ? ' <span class="pill l">⚠ ' + esc(o.flags.join(", ")) + '</span>' : '') + (o.xc.length ? ' <span class="pill">' + o.xc.length + ' yarışma sayılmıyor</span>' : '') + vals + '<div class="rec-ed" hidden></div></div>' +
+                    '<button class="a-btn sm" data-red="' + esc(o.uid) + '" title="Rekor seç / yarışma sayma">✏️</button><a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.uid) + '" target="_blank" rel="noopener">👤</a></div>';
             }).join("");
             var byUid = {}; list.forEach(function (o) { byUid[o.uid] = o; });
-            Array.prototype.forEach.call(box.querySelectorAll("[data-rx]"), function (b) {
-                b.onclick = function () {
+            box.onclick = function (e) {
+                var b = e.target.closest("button"); if (!b) return;
+                if (b.hasAttribute("data-rx")) {
                     var k = b.getAttribute("data-rx").split("|"), o = byUid[k[0]]; if (!o) return;
-                    if (!confirm(o.name + " · " + REC_LBL[k[1]] + " " + tFmt(+k[2]) + " silinsin mi?\n\nYalnız bu süre silinir; kişinin diğer rekorları kalır. Silinen süre bir daha rekor sayılmaz, varsa sıradaki en iyi süresi geçer.")) return;
-                    var xs = o.xs.split(",").filter(Boolean); xs.push(k[1] + ":" + k[2]); xs = xs.slice(-150).join(",");
-                    var body = { fields: {} }; body.fields[k[1]] = { integerValue: "0" }; body.fields.xs = { stringValue: xs };
-                    b.disabled = true;
-                    authed(docsBase() + "/records/" + encodeURIComponent(k[0]) + "?updateMask.fieldPaths=" + k[1] + "&updateMask.fieldPaths=xs", { method: "PATCH", body: JSON.stringify(body) }).then(function (r) {
-                        if (!r.ok) throw new Error(r.status);
-                        o.xs = xs; o[k[1]] = 0; var sp = document.createElement("span"); sp.textContent = "—"; b.replaceWith(sp);
-                    }).catch(function () { b.disabled = false; alert("Silinemedi. Güncel Firebase kurallarını yayınladın mı?"); });
-                };
-            });
+                    if (!confirm(o.name + " · " + REC_LBL[k[1]] + " " + tFmt(+k[2]) + " silinsin mi?\n\nYerine başka bir süre gelmez. Başka bir süresini rekor yapmak ya da bazı yarışmalarını saymamak için ✏️ Düzenle.")) return;
+                    o.pins[k[1]] = 0; b.disabled = true;
+                    recSave(o, { only: [k[1]] }).then(function () { renderRecords(); }, function () { b.disabled = false; alert("Silinemedi. Güncel Firebase kurallarını yayınladın mı?"); });
+                    return;
+                }
+                if (b.hasAttribute("data-red")) { var o2 = byUid[b.getAttribute("data-red")]; if (o2) recEditor(o2, b.closest(".a-row2").querySelector(".rec-ed")); return; }
+                if (b.hasAttribute("data-rsave")) { var o3 = byUid[b.getAttribute("data-rsave")]; if (o3) recEditorSave(o3, b.closest(".rec-ed"), b); return; }
+                if (b.hasAttribute("data-rclose")) { var ed = b.closest(".rec-ed"); ed.hidden = true; ed.innerHTML = ""; }
+            };
         }).catch(function (e) { box.innerHTML = '<p class="a-note">Rekorlar yüklenemedi (' + esc(e && e.message) + ').</p>'; });
     }
 
