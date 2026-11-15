@@ -926,13 +926,38 @@
         p = p || { id: "", name: "", kind: "theme", desc: "", data: {} };
         var t = p.data || {}, algs = ((p.data && p.data.algs) || []).map(function (a) { return [a.n || "", a.a || "", a.note || ""].join(" | ").replace(/( \| )+$/, ""); }).join("\n");
         var col = function (k, l, d) { return '<label class="pk-col">' + l + '<input type="color" data-pk="' + k + '" value="' + esc(/^#[0-9a-f]{6}$/i.test(t[k] || "") ? t[k] : d) + '"></label>'; };
-        return '<div class="pk-form" data-edit="' + esc(p.id) + '"><h3 class="cp-h3">' + (p.id ? "✏️ Paketi düzenle" : "➕ Yeni paket") + '</h3>' +
-            '<div class="a-ctrl"><input data-pk="name" maxlength="40" placeholder="Paket adı (ör. Altın tema, Ömer\'in ZBLL seti)" value="' + esc(p.name) + '" style="flex:1;min-width:180px">' +
+        var body = '<div class="a-ctrl"><input data-pk="name" maxlength="40" placeholder="Paket adı (ör. Altın tema, Ömer\'in ZBLL seti)" value="' + esc(p.name) + '" style="flex:1;min-width:180px">' +
             '<select data-pk="kind"><option value="theme"' + (p.kind === "theme" ? " selected" : "") + '>🎨 Özel tema</option><option value="alg"' + (p.kind === "alg" ? " selected" : "") + '>🧩 Özel algoritma seti</option></select></div>' +
             '<input data-pk="desc" maxlength="300" placeholder="Kısa açıklama (isteğe bağlı)" value="' + esc(p.desc) + '" style="width:100%;margin:6px 0">' +
             '<div class="pk-theme"' + (p.kind === "theme" ? "" : " hidden") + '>' + themeBuilder(t) + '</div>' +
-            '<div class="pk-alg"' + (p.kind === "alg" ? "" : " hidden") + '><textarea data-pk="algs" rows="7" placeholder="Her satıra bir algoritma:  Ad | algoritma | not (isteğe bağlı)&#10;Ör: T-Perm | R U R\' U\' R\' F R2 U\' R\' U\' R U R\' F\'" style="width:100%;font:600 13px \'JetBrains Mono\',monospace">' + esc(algs) + '</textarea><div class="pk-lbl" style="margin-top:8px">Önizleme <span data-pkalgn></span></div><div class="pk-algp" data-pkalgp></div></div>' +
-            '<div class="a-ctrl"><button class="a-btn main" data-pksave="1">💾 Kaydet</button>' + (p.id ? '<button class="a-btn" data-pkcancel="1">Vazgeç</button>' : '') + '<span class="a-msg" data-pkmsg></span></div></div>';
+            '<div class="pk-alg"' + (p.kind === "alg" ? "" : " hidden") + '><div class="pk-presets pk-algsets">' + PK_ALGSETS.map(function (s, i) { return '<button type="button" class="pk-aset" data-pkalg="' + i + '">' + esc(s[0]) + '</button>'; }).join("") + '</div>' +
+            '<textarea data-pk="algs" rows="5" placeholder="Her satıra bir algoritma:  Ad | algoritma | not (isteğe bağlı)&#10;Ör: T-Perm | R U R\' U\' R\' F R2 U\' R\' U\' R U R\' F\'" style="width:100%;font:600 13px \'JetBrains Mono\',monospace">' + esc(algs) + '</textarea><div class="pk-lbl" style="margin-top:8px">Önizleme <span data-pkalgn></span></div><div class="pk-algp" data-pkalgp></div></div>' +
+            '<div class="a-ctrl"><button class="a-btn main" data-pksave="1">💾 Kaydet</button>' + (p.id ? '<button class="a-btn" data-pkcancel="1">Vazgeç</button>' : '') + '<span class="a-msg" data-pkmsg></span></div>';
+        // yeni paket formu katlı başlar (bölüm kısa kalsın); düzenleme formu açık
+        return p.id ? '<div class="pk-form" data-edit="' + esc(p.id) + '"><h3 class="cp-h3">✏️ Paketi düzenle</h3>' + body + '</div>'
+            : '<details class="pk-form pk-new" data-edit=""><summary>➕ Yeni paket oluştur</summary>' + body + '</details>';
+    }
+    // Hazır algoritma setleri: sitedeki algoritma dosyalarından tek dokunuşla doldurulur
+    // [ad, dosya, anahtar] — dosya ya { sets: [{ id, groups }] } ya da { anahtar: [ { subset, cases } ] } biçiminde
+    var PK_ALGSETS = [
+        ["OLL (57)", "oll-pll.json", "oll"], ["PLL (21)", "oll-pll.json", "pll"], ["2-Look OLL", "2look.json", "2lo"], ["2-Look PLL", "2look.json", "2lp"],
+        ["F2L temel", "f2l.json", "f2l"], ["COLL", "coll.json", "coll"], ["WV", "wv.json", "wv"], ["ZBLL (472)", "zbll.json", "zbll"],
+        ["Tek el OLL", "oh.json", "oll"], ["Tek el PLL", "oh.json", "pll"], ["Tek el CMLL", "oh.json", "cmll"],
+        ["Roux CMLL", "roux.json", "cmll"], ["Roux EO", "roux.json", "eo"],
+        ["2x2 CLL", "cll.json", "cll"], ["2x2 EG-1", "eg.json", "eg1"], ["2x2 EG-2", "eg.json", "eg2"], ["2x2 Ortega OLL", "ortega-oll.json", "oll"], ["2x2 Ortega PBL", "ortega-pbl.json", "pbl"],
+        ["3BLD kenarlar", "bld.json", "edges"], ["3BLD köşeler", "bld.json", "corners"], ["4x4 parite", "4x4.json", "parity"],
+        ["Megaminx OLL", "megaminx.json", "oll"], ["Megaminx PLL", "megaminx.json", "pll"], ["Pyraminx L4E", "pyraminx.json", "l4e"], ["Skewb başlangıç", "skewb.json", "beginner"]
+    ];
+    var _algCache = {};
+    function loadAlgSet(i) {
+        var s = PK_ALGSETS[i]; if (!s) return Promise.reject(new Error("yok"));
+        var f = _algCache[s[1]] || (_algCache[s[1]] = fetch("/icerikler/algoritmalar/" + s[1]).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }));
+        return f.then(function (d) {
+            var groups = d && d.sets ? ((d.sets.filter(function (x) { return x.id === s[2]; })[0] || {}).groups || []) : (d && d[s[2]]) || [];
+            var lines = [];
+            groups.forEach(function (g) { (g.cases || []).forEach(function (c) { if (c.alg) lines.push([c.name || "", String(c.alg).replace(/\|/g, "/"), g.subset || ""].join(" | ").replace(/( \| )+$/, "")); }); });
+            return lines;
+        });
     }
     /* --- tema oluşturucu: hazır paletler, uyumlu palet üret, renk + HEX, yazı tipi, köşe, canlı önizleme, kontrast --- */
     var PK_PRESETS = [
@@ -963,16 +988,18 @@
         t = t || {};
         var v = { bg: hx(t.bg, "#f4f4f2"), surface: hx(t.surface, "#ffffff"), text: hx(t.text, "#111111"), accent: hx(t.accent, "#e0262b") };
         var col = function (k, l) { return '<label class="pk-col"><span>' + l + '</span><span class="pk-cin"><input type="color" data-pk="' + k + '" value="' + v[k] + '"><input type="text" class="pk-hex" data-pkhex="' + k + '" value="' + v[k] + '" maxlength="7" spellcheck="false"></span></label>'; };
+        // kısa düzen: paletler tek kayan satır, 4 renk tek satır, önizleme; yazı tipi/köşe/kontrast "Gelişmiş" altında
         return '<div class="pk-tb"><div class="pk-tb-l">' +
-            '<div class="pk-lbl">Hazır paletler</div><div class="pk-presets">' + PK_PRESETS.map(function (p, i) {
+            '<div class="pk-presets">' + PK_PRESETS.map(function (p, i) {
                 return '<button type="button" class="pk-pre" data-pkpre="' + i + '" title="' + esc(p[0]) + '"><span>' + p.slice(1).map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("") + '</span>' + esc(p[0]) + '</button>';
-            }).join("") + '</div>' +
-            '<div class="a-ctrl" style="margin:8px 0"><button type="button" class="a-btn sm" data-pkrand="0">🎲 Uyumlu palet (açık)</button><button type="button" class="a-btn sm" data-pkrand="1">🎲 Uyumlu palet (koyu)</button></div>' +
-            '<div class="pk-lbl">Renkler</div><div class="pk-cols">' + col("bg", "Zemin") + col("surface", "Kart") + col("text", "Yazı") + col("accent", "Vurgu / düğme") + '</div>' +
+            }).join("") + '<button type="button" class="pk-pre" data-pkrand="0" title="Rastgele uyumlu (açık)"><span><i style="background:conic-gradient(#f87171,#fbbf24,#34d399,#60a5fa,#a78bfa,#f87171)"></i></span>🎲 Açık</button>' +
+            '<button type="button" class="pk-pre" data-pkrand="1" title="Rastgele uyumlu (koyu)"><span><i style="background:#18181b"></i><i style="background:conic-gradient(#f87171,#fbbf24,#34d399,#60a5fa,#a78bfa,#f87171)"></i></span>🎲 Koyu</button></div>' +
+            '<div class="pk-cols">' + col("bg", "Zemin") + col("surface", "Kart") + col("text", "Yazı") + col("accent", "Vurgu") + '</div>' +
+            '<details class="pk-adv"><summary>Gelişmiş: yazı tipi, köşe, okunabilirlik</summary>' +
             '<div class="pk-row2"><label class="pk-col"><span>Yazı tipi</span><select data-pk="font">' + PK_FONTS.map(function (f) { return '<option value="' + esc(f[0]) + '"' + ((t.font || "") === f[0] ? " selected" : "") + '>' + esc(f[1]) + '</option>'; }).join("") + '</select></label>' +
-            '<label class="pk-col" style="flex:1"><span>Köşe yuvarlaklığı <b data-pkrv>' + (t.r != null ? t.r : 16) + 'px</b></span><input type="range" min="0" max="28" step="2" data-pk="r" value="' + (t.r != null ? t.r : 16) + '"></label></div>' +
-            '<div class="pk-cr" data-pkcr></div></div>' +
-            '<div class="pk-tb-r"><div class="pk-lbl">Canlı önizleme</div><div class="pk-prev" data-pkprev></div></div></div>';
+            '<label class="pk-col" style="flex:1"><span>Köşe <b data-pkrv>' + (t.r != null ? t.r : 16) + 'px</b></span><input type="range" min="0" max="28" step="2" data-pk="r" value="' + (t.r != null ? t.r : 16) + '"></label></div>' +
+            '<div class="pk-cr" data-pkcr></div></details></div>' +
+            '<div class="pk-tb-r"><div class="pk-prev" data-pkprev></div></div></div>';
     }
     function themeRead(form) {
         var g = function (k) { var e = form.querySelector('[data-pk="' + k + '"]'); return e ? e.value : ""; };
@@ -1025,7 +1052,7 @@
         var name = g("name").trim().slice(0, 40), kind = g("kind"), msg = form.querySelector("[data-pkmsg]");
         if (!name) { msg.textContent = "Ad yaz."; return; }
         var data = kind === "theme" ? themeRead(form)
-            : { algs: g("algs").split("\n").map(function (l) { var x = l.split("|").map(function (s) { return s.trim(); }); return x[1] ? { n: x[0].slice(0, 60), a: x[1].slice(0, 300), note: (x[2] || "").slice(0, 200) } : null; }).filter(Boolean).slice(0, 300) };
+            : { algs: g("algs").split("\n").map(function (l) { var x = l.split("|").map(function (s) { return s.trim(); }); return x[1] ? { n: x[0].slice(0, 60), a: x[1].slice(0, 300), note: (x[2] || "").slice(0, 200) } : null; }).filter(Boolean).slice(0, 500) };
         if (kind === "alg" && !data.algs.length) { msg.textContent = "En az bir satır yaz: Ad | algoritma"; return; }
         var id = form.getAttribute("data-edit") || (name.toLocaleLowerCase("tr").replace(/[çğıöşü]/g, function (c) { return { "ç": "c", "ğ": "g", "ı": "i", "ö": "o", "ş": "s", "ü": "u" }[c]; }).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 28) || "paket") + "-" + Date.now().toString(36).slice(-4);
         var f = { name: { stringValue: name }, kind: { stringValue: kind }, desc: { stringValue: g("desc").trim().slice(0, 300) }, data: { stringValue: JSON.stringify(data) }, ts: { timestampValue: new Date().toISOString() } };
@@ -1060,6 +1087,20 @@
             if (b.hasAttribute("data-pksave")) { packSave(b.closest(".pk-form")); return; }
             if (b.hasAttribute("data-pkpre")) { var pr = PK_PRESETS[+b.getAttribute("data-pkpre")]; if (pr) themeSet(b.closest(".pk-form"), pr.slice(1)); return; }
             if (b.hasAttribute("data-pkrand")) { themeSet(b.closest(".pk-form"), randPalette(b.getAttribute("data-pkrand") === "1")); return; }
+            if (b.hasAttribute("data-pkalg")) {
+                var fm = b.closest(".pk-form"), ai = +b.getAttribute("data-pkalg"), ta = fm.querySelector('[data-pk="algs"]');
+                if (ta.value.trim() && !confirm("Yazdığın algoritmaların yerine " + PK_ALGSETS[ai][0] + " gelsin mi?")) return;
+                b.disabled = true;
+                loadAlgSet(ai).then(function (lines) {
+                    b.disabled = false; ta.value = lines.join("\n");
+                    var nm = fm.querySelector('[data-pk="name"]'), ds = fm.querySelector('[data-pk="desc"]');
+                    if (!nm.value.trim()) nm.value = PK_ALGSETS[ai][0].replace(/\s*\(\d+\)$/, "");
+                    if (!ds.value.trim()) ds.value = lines.length + " algoritma";
+                    Array.prototype.forEach.call(fm.querySelectorAll(".pk-aset"), function (x) { x.classList.toggle("on", x === b); });
+                    algPreview(fm);
+                }, function () { b.disabled = false; alert("Set yüklenemedi."); });
+                return;
+            }
             if (b.hasAttribute("data-pkcancel")) { packsRender(); return; }
             if (b.hasAttribute("data-pkedit")) {
                 var p = _packs.filter(function (x) { return x.id === b.getAttribute("data-pkedit"); })[0]; if (!p) return;
