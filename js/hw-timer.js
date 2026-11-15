@@ -252,12 +252,15 @@
         if (!msg || msg.cmd !== 0x1003) return;
         var d = msg.data;
         if (d[0] === 1 && d[1] === 1) { // çözüm kaydı: süre (ms); aynı kayıt (aynı sıra no.) ikinci kez gelirse yok sayılır
-            if (msg.sn !== QY.lastSn) { QY.lastSn = msg.sn; GT.running = true; GT.stopped = false; btStop(u32(d, 8)); }
+            if (msg.sn !== QY.lastSn) { QY.lastSn = msg.sn; btStop(u32(d, 8)); }
             qySend(msg.ack + 1, msg.sn, 0x1003, [0x00]);
         } else if (d[0] === 4 && d[1] === 4) { // durum: 0 boşta, 1 inceleme, 2 hazır, 3 çalışıyor, 4 bitti, 5 durdu, 6 koptu
-            var s = d[4];
-            if (s === 2) emit("ready");
+            // (csTimer qiyitimer.js ile aynı): süre data[5..8], büyük sonlu, milisaniye
+            var s = d[4], ms = u32(d, 5);
+            if (s === 2) { GT.stopped = false; emit("ready"); }
+            else if (s === 1) { GT.stopped = false; emit("ready"); }
             else if (s === 3) { if (!GT.running) btStart(); }
+            else if (s === 4 || s === 5) { if (ms > 0) { GT.running = true; btStop(ms); } else if (GT.running) btStop(Math.round(now() - GT.t0)); }
             else if (s === 0) { if (!GT.running) btIdle(); }
             else if (s === 6) btLost();
         }
@@ -358,6 +361,7 @@
             return dev.watchAdvertisements(ac ? { signal: ac.signal } : undefined).then(function () { return true; }, function () { return false; });
         }, function () { return false; });
     }
+    function btDisconnect() { try { GT.dev && GT.dev.removeEventListener("gattserverdisconnected", btLost); } catch (e) {} btStopAll(); GT.name = ""; GT.batt = null; GT.last = ""; emit("status", { kind: "gan", on: false, msg: "Bağlantı kesildi." }); }
     function btStopAll() { try { GT.dev && GT.dev.gatt.connected && GT.dev.gatt.disconnect(); } catch (e) {} GT.on = false; GT.running = false; cancelAnimationFrame(GT.raf); }
 
     window.HwTimer = {
@@ -368,6 +372,7 @@
         connected: function (kind) { return kind === "gan" ? GT.on : SM.seen; },
         listening: function () { return SM.on; },
         running: function () { return SM.running || GT.running; },
+        disconnect: btDisconnect,
         info: function () { return { name: GT.name, model: GT.model, batt: GT.batt, last: GT.last }; },
         // Otomatik algılama: izin daha önce verildiyse sormadan dene
         auto: function () {
