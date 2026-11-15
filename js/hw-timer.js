@@ -221,15 +221,32 @@
         }
         return out;
     }
+    // Yazma: önce yanıtlı, olmazsa yanıtsız yazma; sonuç tanı satırına
+    function qyWrite(buf) {
+        var w = QY.w; if (!w) return Promise.reject(new Error("yazma yok"));
+        var f = w.writeValueWithResponse ? function () { return w.writeValueWithResponse(buf); } : function () { return w.writeValue(buf); };
+        return f().catch(function (e) { return w.writeValueWithoutResponse ? w.writeValueWithoutResponse(buf) : Promise.reject(e); });
+    }
     function qySend(sn, ack, cmd, data) {
         var p = Promise.resolve();
-        qyFrames(sn, ack, cmd, data).forEach(function (f) { p = p.then(function () { return QY.w && QY.w.writeValue(new Uint8Array(f).buffer); }); });
-        return p.catch(function () {});
+        qyFrames(sn, ack, cmd, data).forEach(function (f) { p = p.then(function () { return qyWrite(new Uint8Array(f).buffer); }); });
+        return p.then(function () { return true; }, function (e) { QY.err = (e && (e.message || e.name)) || "yazılamadı"; return false; });
+    }
+    function qyDiag() {
+        if (QY.rx) return;
+        GT.last = "MAC " + (QY.mac || "?") + " (" + (QY.macSrc || "?") + ") · selam " + (QY.hello || "gönderilmedi") + (QY.err ? " · hata: " + QY.err : "") + " · gelen mesaj yok";
+        info();
     }
     function qyHello(mac) {
         var d = [0, 0, 0, 0, 0, 33, 8, 0, 1, 5, 90];
         var b = mac.split(":").map(function (h) { return parseInt(h, 16) || 0; }).reverse();
-        return qySend(1, 0, 1, d.concat(b));
+        QY.hello = "gönderiliyor…"; qyDiag();
+        return qySend(1, 0, 1, d.concat(b)).then(function (ok) {
+            QY.hello = ok ? "gönderildi ✓ (" + (QY.tries || 1) + ")" : "gönderilemedi"; qyDiag();
+            // timer yanıt vermezse selamı 2 kez daha dene
+            clearTimeout(QY.retryT);
+            QY.retryT = setTimeout(function () { if (!QY.rx && GT.on && (QY.tries || 1) < 3) { QY.tries = (QY.tries || 1) + 1; qyHello(mac); } }, 5000);
+        });
     }
     // Gelen parçaları birleştir, çöz, doğrula → komut
     function qyFeed(bytes) {
@@ -269,6 +286,7 @@
     QY.log = [];
     function qyEvent(e) {
         var v = e.target.value, m = qyFeed(new Uint8Array(v.buffer, v.byteOffset, v.byteLength));
+        QY.rx = (QY.rx || 0) + 1;
         if (m) {
             var hx = m.data.slice(0, 16).map(function (b) { return (b + 0x100).toString(16).slice(1).toUpperCase(); }).join(" ");
             QY.log.push((m.cmd + 0x10000).toString(16).slice(1).toUpperCase() + ": " + hx); if (QY.log.length > 4) QY.log.shift();
@@ -297,16 +315,17 @@
             setTimeout(function () { done(""); }, 4000);
         });
         return fromAdv.then(function (mac) {
+            QY.macSrc = mac ? "yayından" : saved ? "kayıtlı" : fromName() ? "addan" : "";
             mac = mac || saved || fromName();
             if (!/^([0-9A-F]{2}:){5}[0-9A-F]{2}$/i.test(mac)) {
                 mac = (window.prompt("QiYi timer'ın MAC adresini yaz (ör. CC:A1:00:00:12:34). Timer'ın kutusunda ya da QiYi uygulamasında yazar.", "") || "").trim().toUpperCase();
             }
-            if (/^([0-9A-F]{2}:){5}[0-9A-F]{2}$/i.test(mac)) { try { localStorage.setItem(key, mac); } catch (e) {} return mac; }
+            if (/^([0-9A-F]{2}:){5}[0-9A-F]{2}$/i.test(mac)) { if (!QY.macSrc) QY.macSrc = "elle"; QY.mac = mac.toUpperCase(); try { localStorage.setItem(key, mac); } catch (e) {} return mac; }
             throw new Error("mac");
         });
     }
     function qyInit(srv, dev, mac) {
-        QY.wait = 0; QY.buf = [];
+        QY.wait = 0; QY.buf = []; QY.rx = 0; QY.tries = 1; QY.err = ""; QY.hello = "";
         return srv.getPrimaryService(QY_SVC).then(function (svc) { return svc.getCharacteristics(); }).then(function (chs) {
             var f = function (u) { return chs.filter(function (c) { return c.uuid.toLowerCase() === u; })[0]; };
             QY.w = f(QY_W); var r = f(QY_R);
@@ -373,6 +392,19 @@
         listening: function () { return SM.on; },
         running: function () { return SM.running || GT.running; },
         disconnect: btDisconnect,
+        // QiYi: MAC'i elle değiştir ve selamı hemen yeniden gönder (yeniden bağlanmadan)
+        qiyiMac: function (mac) {
+            mac = String(mac || "").trim().toUpperCase();
+            if (!/^([0-9A-F]{2}:){5}[0-9A-F]{2}$/.test(mac) || GT.model !== "qiyi" || !GT.dev) return false;
+            QY.mac = mac; QY.macSrc = "elle"; QY.tries = 1; QY.err = "";
+            try { localStorage.setItem(PREF + "-mac-" + (GT.dev.id || GT.dev.name), mac); } catch (e) {}
+            qyHello(mac); return true;
+        },
+        qiyiNameMac: function () {
+            var m = /^QY-(Timer|Adapter).*-([0-9A-F]{4})$/i.exec((GT.name || "").trim());
+            return m ? (m[1].toLowerCase() === "adapter" ? "CC:A8" : "CC:A1") + ":00:00:" + m[2].slice(0, 2).toUpperCase() + ":" + m[2].slice(2, 4).toUpperCase() : "";
+        },
+        mac: function () { return QY.mac || ""; },
         info: function () { return { name: GT.name, model: GT.model, batt: GT.batt, last: GT.last }; },
         // Otomatik algılama: izin daha önce verildiyse sormadan dene
         auto: function () {
