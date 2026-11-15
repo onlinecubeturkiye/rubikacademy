@@ -57,7 +57,26 @@
             try { localStorage.setItem("site-skin", "standart"); } catch (e) {}
             if (window.raApplySkin) raApplySkin("standart");
         }
+        mode();
     }
+    // Özel tema kendi açık/koyu modunu belirler (zemin rengine göre): sitenin karanlık mod stilleri
+    // tema renklerine karışmasın. Özel temadan çıkınca kişinin kendi açık/koyu seçimine dönülür.
+    var forced = false;
+    function mode() {
+        var d = document.documentElement, sk = d.getAttribute("data-skin") || "";
+        if (sk.indexOf("p-") === 0) {
+            var p = cache().filter(function (x) { return "p-" + x.id === sk; })[0]; if (!p) return;
+            var dark = lum(hex((p.data || {}).bg, "#f4f4f2")) < 128;
+            if (d.classList.contains("dark-mode") !== dark) d.classList.toggle("dark-mode", dark);
+            forced = true;
+            try { localStorage.setItem("ra-pack-mode", dark ? "dark" : "light"); } catch (e) {}
+        } else if (forced) {
+            forced = false;
+            var th = "dark"; try { th = localStorage.getItem("theme") || "dark"; } catch (e) {}
+            if (d.classList.contains("dark-mode") !== (th !== "light")) d.classList.toggle("dark-mode", th !== "light");
+        }
+    }
+    try { new MutationObserver(function () { mode(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-skin"] }); } catch (e) {}
     apply(cache());
 
     var cfg = window.RA_FIREBASE || {};
@@ -69,7 +88,12 @@
     }
     var busy = false;
     function sync(u) {
-        if (!u) { if (cache().length) { try { localStorage.removeItem(KEY); } catch (e) {} apply([]); render(); } return; }
+        if (!u) {
+            // oturum daha geri yükleniyorsa (sayfa açılışı) "çıkış yapıldı" sayma: paketleri silme
+            if (window.Account && Account.authPending && Account.authPending()) return;
+            if (cache().length) { try { localStorage.removeItem(KEY); localStorage.removeItem("ra-pack-css"); } catch (e) {} apply([]); render(); }
+            return;
+        }
         if (busy || !window.Account || !Account.token) return; busy = true;
         Account.token().then(function (tok) {
             var H = { headers: { Authorization: "Bearer " + tok } };

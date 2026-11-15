@@ -174,6 +174,7 @@
         // özel paketler (hesaba atanmış tema / algoritma): önbellekteki tema hemen, güncel liste packs.js ile
         var pc = ""; try { pc = localStorage.getItem("ra-pack-css") || ""; } catch (e) {}
         if (pc) { var ps = document.createElement("style"); ps.id = "raPackCss"; ps.textContent = pc; (document.head || document.documentElement).appendChild(ps); }
+        try { var sk0 = localStorage.getItem("site-skin") || "", pm = localStorage.getItem("ra-pack-mode"); if (pc && sk0.indexOf("p-") === 0 && pm) document.documentElement.classList.toggle("dark-mode", pm === "dark"); } catch (e) {}
         var pk = document.createElement("script"); pk.src = "/js/packs.js" + (v ? "?v=" + v : ""); pk.defer = true;
         (document.head || document.documentElement).appendChild(pk);
         var ad = document.createElement("script"); ad.src = "/js/ad-banner.js" + (v ? "?v=" + v : ""); ad.defer = true;
@@ -642,7 +643,8 @@ function renderSettingsMenu(target) {
     var cur = function (c) { return c ? ' aria-current="true"' : ''; };
     var html = '<div class="set-grp"><div class="set-h">' + raEsc(L.theme) + '</div>' +
         '<button class="set-opt" data-theme="dark"' + cur(th !== "light") + '>🌙 ' + raEsc(L.dark) + '</button>' +
-        '<button class="set-opt" data-theme="light"' + cur(th === "light") + '>☀️ ' + raEsc(L.light) + '</button></div>';
+        '<button class="set-opt" data-theme="light"' + cur(th === "light") + '>☀️ ' + raEsc(L.light) + '</button>' +
+        (raSkin().indexOf("p-") === 0 ? '<p style="margin:6px 4px 0;font-size:12.5px;opacity:.7">Özel tema kendi açık/koyu görünümünü kullanıyor; seçimin tema değişince geçerli olur.</p>' : '') + '</div>';
     var sk = raSkin();
     html += '<div class="set-grp"><div class="set-h">' + raEsc(L.skin || "Tema stili") + '</div>';
     RA_SKINS.forEach(function (o) {
