@@ -262,7 +262,17 @@
             else if (s === 6) btLost();
         }
     }
-    function qyEvent(e) { var v = e.target.value; GT.last = hex(v); info(); qyMsg(qyFeed(new Uint8Array(v.buffer, v.byteOffset, v.byteLength))); }
+    // Tanı: çözülen QiYi mesajları (komut + veri) son 4 tanesi ekranda gösterilir
+    QY.log = [];
+    function qyEvent(e) {
+        var v = e.target.value, m = qyFeed(new Uint8Array(v.buffer, v.byteOffset, v.byteLength));
+        if (m) {
+            var hx = m.data.slice(0, 16).map(function (b) { return (b + 0x100).toString(16).slice(1).toUpperCase(); }).join(" ");
+            QY.log.push((m.cmd + 0x10000).toString(16).slice(1).toUpperCase() + ": " + hx); if (QY.log.length > 4) QY.log.shift();
+            GT.last = QY.log.join(" / ");
+        } else if (!QY.wait) GT.last = (QY.log.length ? QY.log.join(" / ") + " / " : "") + "çözülemedi: " + hex(v);
+        info(); qyMsg(m);
+    }
     // MAC adresi: önce yayın paketindeki üretici verisi, yoksa addan (QY-Timer-XXXX → CC:A1:00:00:XX:XX), yoksa sor
     function qyMac(dev) {
         var key = PREF + "-mac-" + (dev.id || dev.name), saved = ""; try { saved = localStorage.getItem(key) || ""; } catch (e) {}
