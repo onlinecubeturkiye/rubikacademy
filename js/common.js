@@ -586,9 +586,13 @@ function renderSettingsMenu(target) {
         html += '</div>';
     }
     var opts = [["", "off"], ["pro", "pro"], ["deu", "deu"], ["rg", "rg"], ["tri", "tri"]];
-    html += '<div class="set-grp"><div class="set-h">' + raEsc(L.cvd) + '</div>';
+    // Tek seçenek: "Renk körlüğü dostu" (dengeli kırmızı-yeşil paleti). Eski 5 seçenek denemek için katlanır bölümde
+    html += '<div class="set-grp"><div class="set-h">Renk körlüğü dostu</div>' +
+        '<button class="set-opt cvd" data-cvd=""' + cur(!cvd) + '>' + cvdSwatches("") + '<span>Kapalı</span></button>' +
+        '<button class="set-opt cvd" data-cvd="rg"' + cur(!!cvd) + '>' + cvdSwatches("rg") + '<span>Açık</span></button>' +
+        '<details class="set-old"' + (cvd && cvd !== "rg" ? " open" : "") + '><summary>Eski seçenekler (deneme)</summary>';
     opts.forEach(function (o) { html += '<button class="set-opt cvd" data-cvd="' + o[0] + '"' + cur(o[0] === cvd) + '>' + cvdSwatches(o[0]) + '<span>' + raEsc(L["cvd_" + o[1]]) + '</span></button>'; });
-    html += '</div>';
+    html += '</details></div>';
     menu.innerHTML = html;
     Array.prototype.forEach.call(menu.querySelectorAll("[data-theme]"), function (b) { b.onclick = function () { raSetTheme(b.getAttribute("data-theme")); }; });
     Array.prototype.forEach.call(menu.querySelectorAll("button[data-skin]"), function (b) { b.onclick = function () { raSetSkin(b.getAttribute("data-skin"), target); }; });
