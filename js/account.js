@@ -938,11 +938,66 @@
         el.querySelector(".ra-toast-x").onclick = function () { el.remove(); };
         host.appendChild(el); setTimeout(function () { el.classList.add("go"); }, 12000);
     }
+    /* ---------- bildirim zili: duyurular burada birikir (cihazda son 20) ---------- */
+    function inboxGet() { var a = parse(lsGet("ra-inbox")); return Array.isArray(a) ? a : []; }
+    function inboxAdd(notes) {
+        var a = inboxGet(), ids = {};
+        a.forEach(function (x) { ids[x.id] = 1; });
+        notes.forEach(function (n) { if (!ids[n.id]) a.unshift({ id: n.id, t: String(n.text || "").slice(0, 600), at: Date.now(), u: 1 }); });
+        lsSet("ra-inbox", JSON.stringify(a.slice(0, 20)));
+        bellPaint();
+    }
+    function bellPaint() {
+        var b = document.getElementById("raBell"); if (!b) return;
+        var n = inboxGet().filter(function (x) { return x.u; }).length, c = b.querySelector("b");
+        c.textContent = n > 9 ? "9+" : String(n); c.hidden = !n;
+    }
+    function bellMount() {
+        if (document.getElementById("raBell") || /\/(admin|yazdir)/.test(location.pathname)) return;
+        var host = document.querySelector(".navbar .nav-right"); if (!host) return;
+        var css = document.createElement("style");
+        css.textContent = ".ra-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;border:0;background:transparent;color:var(--text);cursor:pointer;font-size:18px}" +
+            ".ra-bell b{position:absolute;top:3px;right:2px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:99px;background:#ef4444;color:#fff;font:800 10px/16px Inter,sans-serif;text-align:center}" +
+            ".ra-bell b[hidden]{display:none}" +
+            ".ra-inbox{position:fixed;top:64px;right:12px;z-index:1100;width:min(360px,calc(100% - 24px));max-height:70vh;overflow:auto;border-radius:16px;background:var(--surface);border:1px solid var(--border);box-shadow:0 18px 50px rgba(0,0,0,.3);font-family:Inter,sans-serif}" +
+            ".ra-inbox h3{margin:0;padding:12px 14px;font-size:15px;color:var(--text);border-bottom:1px solid var(--border)}" +
+            ".ra-inbox div{padding:11px 14px;border-bottom:1px solid var(--border);font-size:14px;line-height:1.5;color:var(--text)}" +
+            ".ra-inbox div small{display:block;margin-top:3px;color:var(--text-soft);font-size:12px}.ra-inbox div.u{background:var(--surface-soft)}" +
+            ".ra-inbox p{margin:0;padding:18px 14px;text-align:center;color:var(--text-soft);font-size:14px}";
+        document.head.appendChild(css);
+        var b = document.createElement("button"); b.type = "button"; b.id = "raBell"; b.className = "ra-bell ra-noico"; b.setAttribute("aria-label", "Duyurular");
+        b.innerHTML = '🔔<b hidden>0</b>';
+        host.insertBefore(b, host.firstChild);
+        var pop = null;
+        function closePop() { if (pop) { pop.remove(); pop = null; } }
+        b.onclick = function (e) {
+            e.stopPropagation();
+            if (pop) { closePop(); return; }
+            var a = inboxGet();
+            pop = document.createElement("div"); pop.className = "ra-inbox"; pop.setAttribute("role", "dialog");
+            pop.innerHTML = '<h3>Duyurular</h3>' + (a.length ? a.map(function (x) {
+                var d = new Date(x.at), p2 = function (n) { return (n < 10 ? "0" : "") + n; };
+                return '<div class="' + (x.u ? "u" : "") + '"></div>';
+            }).join("") : '<p>Henüz duyuru yok.</p>');
+            Array.prototype.forEach.call(pop.querySelectorAll("div"), function (el, i) {
+                var x = a[i], d = new Date(x.at), p2 = function (n) { return (n < 10 ? "0" : "") + n; };
+                el.textContent = x.t;
+                var s = document.createElement("small"); s.textContent = p2(d.getDate()) + "." + p2(d.getMonth() + 1) + " " + p2(d.getHours()) + ":" + p2(d.getMinutes()); el.appendChild(s);
+            });
+            pop.addEventListener("click", function (ev) { ev.stopPropagation(); });
+            document.body.appendChild(pop);
+            a.forEach(function (x) { x.u = 0; }); lsSet("ra-inbox", JSON.stringify(a)); bellPaint();
+        };
+        document.addEventListener("click", closePop);
+        bellPaint();
+    }
     function showNotes() {
+        bellMount();
         if (!enabled) return;
         fetchNotes().then(function (notes) {
             if (!notes.length) return;
-            notes.slice(0, 5).forEach(function (n) { showToast(n.text); });
+            // Duyurular ekranda kutu olarak çıkmaz; üst bardaki 🔔 zilin altında toplanır
+            inboxAdd(notes);
             if ("Notification" in window && Notification.permission === "granted" && navigator.serviceWorker) {
                 // Push aboneliği varsa sistem bildirimini gönderici yapar (çift bildirim olmasın)
                 navigator.serviceWorker.ready.then(function (reg) {
@@ -1276,7 +1331,9 @@
         ".ra-lock-b{display:flex;flex-direction:column;gap:8px}" +
         ".ra-lock-b button,.ra-lock-b a{display:block;padding:12px 14px;border-radius:13px;font:800 14.5px Inter,sans-serif;cursor:pointer;text-decoration:none;border:1px solid var(--border,#2a2f42);background:var(--surface-soft,#1c2030);color:var(--text,#eef0f7)}" +
         ".ra-lock-b .go{background:var(--ui-accent,#6c5ce7);border-color:transparent;color:var(--ui-accent-text,#fff)}" +
-        "html.ra-locked,html.ra-locked body{overflow:hidden}";
+        "html.ra-locked,html.ra-locked body{overflow:hidden}" +
+        ".ra-lnote{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:1050;display:flex;align-items:center;gap:10px;max-width:calc(100% - 32px);box-sizing:border-box;padding:10px 12px 10px 16px;border-radius:14px;background:var(--surface,#151826);border:1px solid var(--border,#2a2f42);box-shadow:0 10px 30px rgba(0,0,0,.3);font:700 14px Inter,sans-serif;color:var(--text,#eef0f7)}" +
+        ".ra-lnote button{flex:none;border:0;border-radius:10px;padding:8px 12px;font:800 13px Inter,sans-serif;cursor:pointer;background:var(--ui-accent,#6c5ce7);color:var(--ui-accent-text,#fff)}";
     (document.head || document.documentElement).appendChild(css);
 
     var box = null, pageLock = window.RA_MEMBERS_ONLY || "";
@@ -1295,6 +1352,17 @@
         document.body.appendChild(box);
     }
     function hide() { if (box) { box.remove(); box = null; } document.documentElement.classList.remove("ra-locked"); }
+    // Kapatılabilir kilitler pencere yerine kısa not: "🔒 X için giriş yap  [Giriş yap]"
+    var noteEl = null, noteT = 0;
+    function note(feature) {
+        if (noteEl) noteEl.remove();
+        var x = tx();
+        noteEl = document.createElement("div"); noteEl.className = "ra-lnote"; noteEl.setAttribute("role", "status");
+        noteEl.innerHTML = '<span>🔒 ' + esc(feature) + (x === TX.tr ? ' için giriş yap' : ': log in') + '</span><button type="button">' + esc(x === TX.tr ? "Giriş yap" : "Log in") + '</button>';
+        noteEl.querySelector("button").onclick = function () { noteEl.remove(); noteEl = null; Account.openLogin && Account.openLogin(); };
+        document.body.appendChild(noteEl);
+        clearTimeout(noteT); noteT = setTimeout(function () { if (noteEl) { noteEl.remove(); noteEl = null; } }, 4000);
+    }
     function check() {
         if (member()) { hide(); return; }
         if (pageLock && !box) show(pageLock, false);
@@ -1311,16 +1379,16 @@
         var a = t.closest("a[href]");
         if (a) {
             var h = a.getAttribute("href") || "";
-            for (var j = 0; j < LOCKED.length; j++) if (LOCKED[j][0].test(h)) { e.preventDefault(); e.stopPropagation(); show(tx()[LOCKED[j][1]], true); return; }
+            for (var j = 0; j < LOCKED.length; j++) if (LOCKED[j][0].test(h)) { e.preventDefault(); e.stopPropagation(); note(tx()[LOCKED[j][1]]); return; }
             return;
         }
-        if (t.closest(".alg-play-btn, .alg-player, .alg-sug-btn, .sg-modal")) return;
+        if (t.closest(".alg-play-btn, .alg-player, .alg-more, .alg-alt-tg")) return;
         for (var i = 0; i < GATES.length; i++) {
             if (t.closest(GATES[i][0])) {
                 // karttaki algoritma metnini seçip kopyalamak serbest
                 if (GATES[i][1] === "mark" && window.getSelection && String(window.getSelection()).length) return;
                 e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-                show(tx()[GATES[i][1]], true);
+                note(tx()[GATES[i][1]]);
                 return;
             }
         }

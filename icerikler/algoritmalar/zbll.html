@@ -378,7 +378,6 @@ Kenarlar yönlüyken (üstte artı varken) son katmanın tamamını tek algoritm
 
 
 <script src="/js/custom-algs.js?v=20270115"></script>
-<script src="/js/alg-community.js?v=20270115"></script>
 <script src="/js/alg-player.js?v=20270115"></script>
 
 <script>
@@ -502,7 +501,7 @@ function render() {
         if (!cards.length) return;
         shown += cards.length;
         var known = g.cases.filter(function (c) { return progress[g.subset + "::" + c.name] === "known"; }).length;
-        html += '<details class="coll-grp"' + (q || gi === 0 ? " open" : "") + '><summary><span class="cg-diag" dir="ltr">' + collIcon(g.cases[0], 40) + '</span>' +
+        html += '<details class="coll-grp"' + (q ? " open" : "") + '><summary><span class="cg-diag" dir="ltr">' + collIcon(g.cases[0], 40) + '</span>' +
             '<span>' + escapeHtml(g.subset) + ' <span class="cg-meta">· COLL ' + escapeHtml(g.subset) + ' · ' + known + '/' + g.cases.length + '</span></span><span class="cg-chev">▶</span></summary>' +
             '<div class="case-grid">' + cards.map(function (c) { return caseHtml(g, c, progress, t); }).join("") + '</div></details>';
     });

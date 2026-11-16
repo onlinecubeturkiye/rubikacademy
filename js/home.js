@@ -92,7 +92,7 @@
     }
 
     function init() {
-        stats(); renderMe();
+        if ($("stAlg")) stats(); renderMe();
         if (window.Account && Account.onChange) Account.onChange(function () { renderMe(); });
         document.addEventListener("account-synced", renderMe);
         document.addEventListener("site-lang-change", renderMe);
