@@ -61,7 +61,7 @@
               body: ["Küpü ters çevir, sarı yüz altta kalsın. Sağ alt öndeki köşe sarı alta bakana kadar <code>R' D' R D</code> yap.",
                      "Sonra <b>yalnız alt katmanı</b> çevirerek sıradaki köşeyi aynı yere getir ve tekrarla. Küp ara aşamada bozuk görünür, merak etme; son köşede her şey yerine oturur. 🎉"],
               demo: { alg: "R' D' R D R' D' R D", setup: "", end: true }, tip: "Bu adımda küpü döndürme; sadece alt katmanı çevir.",
-              go: [["📅 Günün karıştırmasını çöz", "/icerikler/gunluk"]] }
+              go: [["🏠 Ev yarışmasına katıl", "/icerikler/ev-yarismasi"]] }
         ] },
         { t: "Hızlanma: CFOP", d: "Başlangıç yöntemini bitirdiysen, 1 dakikanın altına ve ötesine.", lessons: [
             { id: "c1", t: "Daha iyi cross", min: 15,
@@ -102,7 +102,7 @@
               learn: ["Ortalama (Ao5) mantığı", "Günlük pratik ve yarışmalar"],
               body: ["Yarışmalarda 5 çözüm yapılır, en iyi ve en kötü atılır, kalan üçün ortalaması (<b>Ao5</b>) alınır.",
                      "Her gün <b>Günün karıştırması</b>nı çöz, ev yarışmalarına katıl, rekorlarını profilinde biriktir."],
-              go: [["📅 Günün karıştırması", "/icerikler/gunluk"], ["🏠 Ev yarışması", "/icerikler/ev-yarismasi"], ["🥇 Rekor tablosu", "/icerikler/rekorlar"]] }
+              go: [["🏠 Ev yarışması", "/icerikler/ev-yarismasi"], ["🥇 Rekor tablosu", "/icerikler/rekorlar"]] }
         ] }
     ];
     var ALL = []; COURSE.forEach(function (c, ci) { c.lessons.forEach(function (l) { l.ci = ci; ALL.push(l); }); });

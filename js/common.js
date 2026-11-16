@@ -75,7 +75,7 @@
     // uygulamaya özel parçalar (styles/app.css); renk teması sitedeki gibi Ayarlar'dan seçilir
     var ln = document.createElement("link"); ln.rel = "stylesheet"; ln.href = "/styles/app.css"; (document.head || d).appendChild(ln);
     var path = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
-    var noBar = /\/(zkttimer|sanal-kup|tekrar|ev-yayin|giris|yakinda)$|\/algoritmalar\/(antrenor|yazdir)|\/kup-arena\//.test(path);
+    var noBar = /\/(zkttimer|sanal-kup|giris)$|\/algoritmalar\/(antrenor|yazdir)|\/kup-arena\//.test(path);
     if (noBar) d.classList.add("ra-app-nobar");
     var st = document.createElement("style");
     st.textContent =
@@ -127,7 +127,7 @@
         ["/", "Ana Sayfa", ic('<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>'), /^\/$/],
         ["/icerikler", "İçerikler", ic('<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>'), /^\/icerikler$|^\/icerikler\/(algoritmalar|videolar|kup-rehberi|cozucu|akilli-kup|yol-haritasi|dersler|keyhole|sss)/],
         ["/icerikler/algoritmalar/antrenor", "Antrenör", ic('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>'), /antrenor/],
-        ["/icerikler/ev-yarismasi", "Yarışma", ic('<path d="M8 4h8v4.5a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a2.5 2.5 0 0 0 3 4M16 5.5h3a2.5 2.5 0 0 1-3 4"/><path d="M12 12.5V16M8.5 20h7M10 16h4v4h-4z"/>'), /ev-yarismasi|rekorlar|cekilis|gunluk/],
+        ["/icerikler/ev-yarismasi", "Yarışma", ic('<path d="M8 4h8v4.5a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a2.5 2.5 0 0 0 3 4M16 5.5h3a2.5 2.5 0 0 1-3 4"/><path d="M12 12.5V16M8.5 20h7M10 16h4v4h-4z"/>'), /ev-yarismasi|rekorlar|cekilis/],
         ["/icerikler/profil", "Profil", ic('<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>'), /profil|ayarlar/]
     ];
     function bar() {
@@ -212,6 +212,7 @@
         var sent = 0;
         function report(msg, src, line) {
             try {
+                var A0 = window.Account; if (!(A0 && A0.isAdmin && A0.isAdmin())) return; // hata kayıtları yalnız yöneticiden toplanır
                 var cfg = window.RA_FIREBASE; if (!cfg || !cfg.apiKey || sent >= 3 || /^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)) return;
                 msg = String(msg || "").slice(0, 300); if (!msg || /ResizeObserver loop|Script error\.?$/.test(msg)) return;
                 var key = "ra-err:" + msg.slice(0, 80) + "|" + line;
@@ -352,81 +353,8 @@ function cvdSwatches(theme) {
     }).join("") + "</span>";
 }
 
-/* =========================================================
-   10 KASIM ANMA GÖRÜNÜMÜ
-   Türkiye saatiyle 10 Kasım 00:00 – 23:59: site siyah-beyaz olur, sayfaların üstünde anma şeridi
-   (yas kurdelesi + söz) çıkar; reklam, tema ve puan pencereleri gösterilmez.
-   09.05'te bir dakikalık saygı duruşu ekranı açılır (dokununca kapanır).
-   Her yıl kendiliğinden çalışır (yalnız tarih kontrolü).
-========================================================= */
-function raMournInfo(now) {
-    now = now || Date.now();
-    var y = new Date(now).getUTCFullYear();
-    // 10 Kasım 00:00 TSİ = 9 Kasım 21:00 UTC; 23:59:59 TSİ = 10 Kasım 20:59:59 UTC
-    var from = Date.UTC(y, 10, 9, 21, 0, 0), to = Date.UTC(y, 10, 10, 21, 0, 0);
-    return { on: now >= from && now < to, year: y - 1938, from: from };
-}
-function raMourn() { return raMournInfo().on; }
-(function () {
-    if (!raMourn()) return;
-    var d = document.documentElement; d.classList.add("ra-mourn");
-    var st = document.createElement("style");
-    // Sayfanın tamamı siyah-beyaz yapılmaz (küp diyagramları ve algoritma renkleri okunur kalmalı):
-    // yalnız sitenin vurgu renkleri sade koyu griye döner, logo ve dekoratif parıltılar renksizleşir
-    st.textContent = "html.ra-mourn,html.ra-mourn body{--ui-accent:#3f3f46!important;--ui-accent-hover:#27272a!important;--ui-accent-text:#fff!important;--ui-accent-soft:rgba(113,113,122,.16)!important;" +
-            "--primary:#52525b!important;--primary-dark:#3f3f46!important;--primary-light:rgba(113,113,122,.14)!important;--btn-bg:#3f3f46!important;--btn-hover-bg:#27272a!important;--btn-text:#fff!important;" +
-            "--badge-bg:rgba(113,113,122,.16)!important;--badge-text:#52525b!important;--hero-bg:linear-gradient(135deg,#ececee 0%,#f6f6f7 100%)!important}" +
-        "html.ra-mourn.dark-mode,html.ra-mourn.dark-mode body{--ui-accent:#d4d4d8!important;--ui-accent-hover:#e4e4e7!important;--ui-accent-text:#111!important;--primary:#d4d4d8!important;--primary-dark:#e4e4e7!important;" +
-            "--btn-bg:#d4d4d8!important;--btn-hover-bg:#e4e4e7!important;--btn-text:#111!important;--badge-text:#d4d4d8!important;--hero-bg:linear-gradient(135deg,#1a1a1c 0%,#111113 100%)!important}" +
-        "html.ra-mourn .nav-logo-mark,html.ra-mourn .bg-glow,html.ra-mourn .navbar::after,html.ra-mourn .gradient-text,html.ra-mourn .badge i{filter:grayscale(1)}" +
-        "html.ra-mourn .gradient-text{background:none!important;-webkit-text-fill-color:currentColor!important;color:inherit!important}" +
-        "html.ra-mourn #raAd,html.ra-mourn #raHwAsk,html.ra-mourn #raRate{display:none!important}" +
-        ".ra-mourn-bar{position:relative;z-index:5;background:#0b0b0c;color:#f2f2f2;border-bottom:1px solid #2a2a2c;font-family:Inter,system-ui,sans-serif}" +
-        ".ra-mourn-in{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px}" +
-        ".ra-mourn-rib{flex:none;width:30px;height:42px}" +
-        // Ana sayfa: portre şeridin arka planında, sağa doğru siyaha karışır
-        ".ra-mourn-bar.home{overflow:hidden;background:#0b0b0c}" +
-        ".ra-mourn-bar.home::before{content:'';position:absolute;left:0;top:0;bottom:0;width:min(420px,48%);background:url(/img/ataturk-banner.jpg) 50% 18%/cover no-repeat;" +
-            "-webkit-mask-image:linear-gradient(90deg,#000 45%,transparent);mask-image:linear-gradient(90deg,#000 45%,transparent);opacity:.95}" +
-        ".ra-mourn-bar.home .ra-mourn-in{position:relative;min-height:210px;padding:26px 16px 26px min(380px,40%)}" +
-        ".ra-mourn-bar.home .ra-mourn-tx b{font-size:19px}.ra-mourn-bar.home .ra-mourn-tx span{font-size:14px;margin-top:4px}" +
-        ".ra-mourn-bar.home .ra-mourn-rib{width:34px;height:48px}" +
-        ".ra-mourn-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}" +
-        ".ra-mourn-tx b{font-size:14.5px;font-weight:800;letter-spacing:.2px;line-height:1.4}" +
-        ".ra-mourn-tx span{font-size:12.5px;color:#bdbdbd;font-style:italic;line-height:1.45}" +
-        "@media(max-width:600px){.ra-mourn-in{padding:10px 14px;gap:10px}.ra-mourn-rib{width:20px;height:28px}.ra-mourn-bar.home::before{width:62%;opacity:.55}.ra-mourn-bar.home .ra-mourn-in{min-height:190px;padding:20px 14px 20px 34%}.ra-mourn-bar.home .ra-mourn-tx b{font-size:14.5px;text-shadow:0 1px 6px #000}.ra-mourn-bar.home .ra-mourn-tx span{font-size:12px;color:#d0d0d0;text-shadow:0 1px 6px #000}.ra-mourn-bar.home .ra-mourn-rib{display:none}.ra-mourn-tx b{font-size:13px}.ra-mourn-tx span{font-size:11.5px}}" +
-        ".ra-silence{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.94);color:#f2f2f2;text-align:center;font-family:Inter,system-ui,sans-serif;cursor:pointer}" +
-        ".ra-silence div{max-width:520px;display:flex;flex-direction:column;align-items:center;gap:12px}" +
-        ".ra-silence b{font-size:22px;font-weight:800;line-height:1.35}.ra-silence p{margin:0;font-size:15px;color:#c8c8c8;line-height:1.6}" +
-        ".ra-silence small{font-size:12px;color:#8a8a8a}" +
-        ".ra-silence img{width:min(220px,52vw);aspect-ratio:3/4;object-fit:cover;border-radius:16px;border:2px solid #3a3a3d;box-shadow:0 18px 50px rgba(0,0,0,.6)}" +
-        "@media print{.ra-mourn-bar{display:none}}";
-    (document.head || d).appendChild(st);
-    var info = raMournInfo();
-    var ribbon = '<svg class="ra-mourn-rib" viewBox="0 0 30 42" aria-hidden="true"><path d="M15 3c-4.5 0-7 3-7 6.5 0 2.6 1.4 5 3.2 7.6L3.5 39l6.2-2.4L15 22.4l5.3 14.2 6.2 2.4-7.7-21.9c1.8-2.6 3.2-5 3.2-7.6C22 6 19.5 3 15 3zm0 4c1.8 0 3 1.2 3 2.8 0 1.4-1.2 3.5-3 5.9-1.8-2.4-3-4.5-3-5.9C12 8.2 13.2 7 15 7z" fill="#e8e8e8"/></svg>';
-    function bar() {
-        if (document.getElementById("raMourn") || !document.body || /\/(admin|yazdir|kup-arena\/baglan)/.test(location.pathname)) return;
-        var el = document.createElement("aside"); el.id = "raMourn"; el.className = "ra-mourn-bar ra-noico" + (/^\/(index(\.html)?)?$/.test(location.pathname) ? " home" : ""); el.setAttribute("aria-label", "10 Kasım anma");
-        el.innerHTML = '<div class="ra-mourn-in">' + ribbon + '<div class="ra-mourn-tx"><b>Cumhuriyetimizin kurucusu Ulu Önder Gazi Mustafa Kemal Atatürk\'ü aramızdan ayrılışının ' + info.year + '. yılında saygı, özlem ve minnetle anıyoruz.</b>' +
-            '<span>“Benim naçiz vücudum elbet bir gün toprak olacaktır, fakat Türkiye Cumhuriyeti ilelebet payidar kalacaktır.”</span></div></div>';
-        document.body.insertBefore(el, document.body.firstChild);
-    }
-    // 09.05 (TSİ): bir dakikalık saygı duruşu
-    function silence() {
-        var t = Date.now(), at = info.from + (9 * 60 + 5) * 60000; // 10 Kasım 09:05 TSİ
-        var show = function () {
-            if (document.getElementById("raSilence") || !document.body) return;
-            var s = document.createElement("div"); s.id = "raSilence"; s.className = "ra-silence ra-noico"; s.setAttribute("role", "dialog");
-            s.innerHTML = '<div><img src="/img/ataturk.jpg" alt="Mustafa Kemal Atatürk" width="220" height="293">' + ribbon.replace('class="ra-mourn-rib"', 'width="30" height="42"') + '<b>Saat 09.05 — Saygı duruşu</b><p>Ulu Önder Mustafa Kemal Atatürk\'ü saygı ve minnetle anıyoruz.</p><small>Ekran bir dakika sonra kendiliğinden kapanır.</small></div>';
-            s.onclick = function () { s.remove(); };
-            document.body.appendChild(s);
-            setTimeout(function () { s.remove(); }, Math.max(5000, at + 60000 - Date.now()));
-        };
-        if (t >= at && t < at + 60000) show();
-        else if (t < at && at - t < 24 * 3600000) setTimeout(show, at - t);
-    }
-    if (document.body) { bar(); silence(); } else document.addEventListener("DOMContentLoaded", function () { bar(); silence(); });
-})();
+/* 10 Kasım anma şeridi kaldırıldı (özel günler için yönetimden duyuru yapılır) */
+function raMourn() { return false; }
 
 document.addEventListener("DOMContentLoaded", function () {
     var btn = document.getElementById("darkModeBtn");
@@ -440,7 +368,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (raSeasonOf(raSkin()) && !raSeasonOn(raSkin())) { var prevSk = "standart"; try { if (!localStorage.getItem("ra-rated-" + raSkin())) localStorage.setItem("ra-rate-pending", raSkin()); prevSk = localStorage.getItem("ra-season-prev") || localStorage.getItem("ra-hw-prev") || "standart"; if (raSeasonOf(prevSk)) prevSk = "standart"; localStorage.setItem("site-skin", prevSk); } catch (e) {} raSavePrefs(); }
     raApplySkin(raSkin());
     setTimeout(raSeasonOffer, 1800);
-    setTimeout(raRateTheme, 2200);
+    // tema puanlama penceresi kaldırıldı
     if (cvdTheme()) applyCvd(cvdTheme());
     else if (holdSwap()) raRecolor();
     raInitSettings();
