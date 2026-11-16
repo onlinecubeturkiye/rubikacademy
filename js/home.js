@@ -28,6 +28,17 @@
         var r = json("daily-results-v1") || {};
         return Object.keys(r).some(function (k) { return k.split(":")[0] === t; });
     }
+    /* "Kaldığın yerden devam et": yalnızca algoritma sayfaları (/icerikler/algoritmalar/<set>) */
+    function contCard(last) {
+        if (!last || !last.p || !/^\/icerikler\/algoritmalar\/[^\/]+$/.test(last.p) || /\/antrenor$/.test(last.p)) return "";
+        var slug = last.p.split("/").pop(), known = 0;
+        try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && (k === "algo-progress-" + slug || k.indexOf("algo-progress-" + slug + "-") === 0)) { var o = json(k) || {}; for (var c in o) if (o[c] === "known") known++; } } } catch (e) {}
+        return '<a class="h-me-cont" href="' + esc(last.p) + '">' +
+            '<span class="hc-ic" aria-hidden="true">🧩</span>' +
+            '<span class="hc-tx"><small>' + esc(T("meContinue", "Kaldığın yerden devam et")) + '</small><b>' + esc(last.t || slug) + '</b>' +
+            (known ? '<i>✓ ' + known + ' ' + esc(T("meKnown", "bildiğin algoritma")) + '</i>' : "") + '</span>' +
+            '<span class="hc-go" aria-hidden="true">→</span></a>';
+    }
     function renderMe() {
         var box = $("hMe"); if (!box) return;
         var u = window.Account && Account.user && Account.user();
@@ -40,7 +51,7 @@
             '<a class="h-chip" href="/icerikler/algoritmalar/antrenor"><b>' + trainerSolves() + '</b><span>' + esc(T("meSolves", "antrenör çözümü")) + '</span></a>' +
             '<a class="h-chip' + (dd ? " ok" : " todo") + '" href="/icerikler/gunluk"><b>' + (dd ? "✓" : "📅") + '</b><span>' + esc(dd ? T("meDailyDone", "Günün karıştırması tamam") : T("meDailyTodo", "Günün karıştırması seni bekliyor")) + '</span></a>' +
             '</div>' +
-            (last && last.p ? '<a class="h-me-cont" href="' + esc(last.p) + '">↩ ' + esc(T("meContinue", "Kaldığın yerden devam et")) + ': <b>' + esc(last.t || last.p) + '</b></a>' : "");
+            contCard(last);
         box.hidden = false;
     }
 

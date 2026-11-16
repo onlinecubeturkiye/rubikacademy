@@ -10,6 +10,9 @@
     var el = document.getElementById("raEvHub");
     if (!el || !window.RACompShare) return;
     var mode = el.getAttribute("data-mode") || "full";
+    // ✕ ile kapatılınca 24 saat gizli kalır, sonra kendiliğinden geri gelir (Rekorlar sayfasında kapatılamaz)
+    var HIDE_KEY = "ra-evhub-hide-until", canClose = mode !== "rekor";
+    try { if (canClose && +localStorage.getItem(HIDE_KEY) > Date.now()) { el.hidden = true; el.style.display = "none"; return; } } catch (e) {}
     var S = RACompShare, fmt = S.fmt;
     function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
     function ago(t) {
@@ -18,6 +21,7 @@
     }
     var css = ".evh{border-radius:24px;padding:22px;background:linear-gradient(135deg,rgba(255,138,31,.16),rgba(232,67,147,.12) 55%,rgba(108,92,231,.14));border:2px solid rgba(255,138,31,.35);color:var(--text)}" +
         ".evh-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin-bottom:16px}" +
+        ".evh{position:relative}.evh-x{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text-soft);font:900 15px/1 Inter,sans-serif;cursor:pointer;display:grid;place-items:center;z-index:2}.evh-x:hover{color:var(--text)}[dir=rtl] .evh-x{right:auto;left:10px}.evh-top h2{padding-inline-end:34px}" +
         ".evh-top h2{margin:0;font-size:clamp(22px,3.4vw,30px);font-weight:900;letter-spacing:-.5px;flex:1 1 260px}" +
         ".evh-top h2 small{display:block;font-size:14px;font-weight:700;color:var(--text-soft);letter-spacing:0;margin-top:2px}" +
         ".evh-cta{display:flex;flex-wrap:wrap;gap:8px}" +
@@ -59,10 +63,15 @@
             return '<a class="evh-rec" href="' + (c.uid ? "/icerikler/profil?u=" + encodeURIComponent(c.uid) : "#") + '"><span class="k">' + (c.ev === "222" ? "2x2" : "3x3") + '</span><span class="n">' + esc(c.name) + '<small>' + esc(c.comp || "") + ' · ' + ago(c.ts) + '</small></span><span class="t" dir="ltr">' + (c.a == null || c.a >= 99999999 ? "DNF" : fmt(c.a)) + '</span></a>';
         }).join("") : '<div class="evh-empty">İlk şampiyon sen ol!</div>') + '</div>';
         if (mode === "rekor") recs = "";
-        el.innerHTML = '<div class="evh ' + mode + '"><div class="evh-top"><h2>🏠 Ev Yarışması & Rekorlar<small>' +
+        el.innerHTML = '<div class="evh ' + mode + '">' + (canClose ? '<button type="button" class="evh-x" aria-label="Kapat (24 saat)" title="24 saat gizle">✕</button>' : '') + '<div class="evh-top"><h2>🏠 Ev Yarışması & Rekorlar<small>' +
             (live.length ? "🔴 Şu an " + live.length + " yarışma canlı" : "Evden canlı küp yarışması: aynı karıştırma, canlı sıralama, final ve sertifika") + '</small></h2>' +
             '<div class="evh-cta"><a class="evh-btn p" href="/icerikler/ev-yarismasi">' + (live.length ? "▶ Yarışmaya katıl" : "🏠 Yarışmaya katıl") + '</a>' + (mode === "rekor" ? '' : '<a class="evh-btn" href="/icerikler/rekorlar">🥇 Rekor tablosu</a>') + '</div></div>' +
             liveHtml + '<div class="evh-grid">' + recs + champs + '</div></div>';
+        var x = el.querySelector(".evh-x");
+        if (x) x.onclick = function () {
+            try { localStorage.setItem(HIDE_KEY, String(Date.now() + 864e5)); } catch (e) {}
+            el.style.display = "none";
+        };
     }
     var pr = { s333: S.records("333", "s", 1), a5_333: S.records("333", "a5", 1), s222: S.records("222", "s", 1), a5_222: S.records("222", "a5", 1), live: S.liveComps(), champs: S.champions(4) };
     var keys = Object.keys(pr);
