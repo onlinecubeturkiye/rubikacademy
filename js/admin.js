@@ -714,7 +714,6 @@
             (rounds ? '<div class="cp-rhead"><h4>Tur sonuçları</h4>' + (window.RACompShare && R.length > 1 && !edit ? '<button class="a-btn sm" data-rall="' + esc(o.code) + '">🖼️ Tüm görseller</button>' : '') + '</div>' + rounds : '<p class="a-note">Henüz biten tur yok.</p>') +
             review +
             '<div class="a-ctrl" style="margin-top:10px"><a class="a-btn sm" href="/icerikler/ev-yarismasi?ev=' + esc(o.code) + '" target="_blank" rel="noopener">👁 Aç</a>' +
-            '<a class="a-btn sm" href="/icerikler/ev-yayin?ev=' + esc(o.code) + '" target="_blank" rel="noopener">📺 Yayın ekranı</a>' +
             (o.host ? '<a class="a-btn sm" href="/icerikler/profil?u=' + encodeURIComponent(o.host) + '" target="_blank" rel="noopener">👤 Oda sahibi</a>' : '') +
             '<button class="a-btn sm" data-rn="' + esc(o.code) + '">✏️ Adı değiştir</button>' +
             '<button class="a-btn danger sm" data-cd="' + esc(o.code) + '">🗑️ Sil</button></div></div></details>';

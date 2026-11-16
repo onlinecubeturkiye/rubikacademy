@@ -257,8 +257,8 @@
             '<div class="ak-sum"><div><b>' + fmt(r.t) + '</b><span>Süre</span></div><div><b>' + r.moves + '</b><span>Hamle</span></div><div><b>' + tps + '</b><span>TPS</span></div><div><b>' + (r.face ? r.face.replace("D", "Alt").replace("U", "Üst").replace("F", "Ön").replace("B", "Arka").replace("R", "Sağ").replace("L", "Sol") : "-") + '</b><span>Cross yüzü</span></div></div>' +
             (r.segs.length ? '<div class="ak-bar">' + bar + '</div><div class="ak-tbl"><table><thead><tr><th>Aşama</th><th>Süre</th><th>Hamle</th><th>TPS</th><th>Hamleler</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : "") +
             '<div class="ak-tip">💡 ' + adviceFor(r) + '</div>' +
-            (window.SolveReplay && SolveReplay.ok(r) ? '<div class="ak-fin-b" style="margin-top:12px"><button type="button" class="btn primary" id="akReplay">▶ Tekrar izle</button><button type="button" class="btn" id="akShareSolve">🔗 Çözümü paylaş</button></div>' : '');
-        if ($("akReplay")) { $("akReplay").onclick = function () { SolveReplay.open(r); }; $("akShareSolve").onclick = function () { SolveReplay.share(r, this); }; }
+            (window.SolveReplay && SolveReplay.ok(r) ? '<div class="ak-fin-b" style="margin-top:12px"><button type="button" class="btn primary" id="akReplay">▶ Tekrar izle</button></div>' : '');
+        if ($("akReplay")) { $("akReplay").onclick = function () { SolveReplay.open(r); }; }
     }
 
     /* ---------- geçmiş ---------- */
@@ -1654,7 +1654,6 @@
         $("cEnd").hidden = d.st !== "run";
         if ($("cFinish")) $("cFinish").hidden = !(d.st === "end" && !d.fin);
         if ($("cCloseRoom")) { $("cCloseRoom").hidden = !owner; $("cCloseRoom").disabled = false; }
-        if ($("cCast")) $("cCast").href = "/icerikler/ev-yayin?ev=" + encodeURIComponent(comp.code);
         if ($("cStream") && !$("cStream").raB) { $("cStream").raB = 1; $("cStream").onclick = function () { setStream(!streamOn()); }; }
         $("cShowRes").hidden = !hist().length;
         $("cHint").textContent = comp.watch ? "👁 İzleyici modundasın: tablo canlı güncellenir." : d.st === "lobby" ? (host ? (devRole ? "Turu başlatabilirsin (geliştirici: tek başına da olur)." : "Yarışmacılar katılınca turu başlat (en az 2 kişi).") : "Organizatörün turu başlatması bekleniyor.") : d.st === "run" ? "Herkes " + NS() + " çözümü bitirince tur kendiliğinden biter." : d.st === "prep" ? "Hazırlık: yeni katılımcılar şimdi girebilir." : (d.fin ? "Final bitti." : "Tur bitti.");

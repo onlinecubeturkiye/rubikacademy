@@ -1241,8 +1241,8 @@
         // Bakım modu kontrolü (admin oturumu çözülsün diye kısa gecikme) + giriş/çıkışta yeniden
         setTimeout(checkMaintenance, 2200);
         setTimeout(logAnon, 3500);
-        // Bildirim izni: verilmişse aboneliği tazele, verilmemişse sor
-        setTimeout(function () { ensurePush(); askPushBanner(); }, /\/cekilis/.test(location.pathname) ? 1200 : 4000);
+        // Bildirim izni: verilmişse aboneliği tazele. İzin penceresi kendiliğinden açılmaz; Ayarlar/Profil'deki düğmeyle sorulur
+        setTimeout(ensurePush, 4000);
         document.addEventListener("account-change", function () { checkMaintenance(); });
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
