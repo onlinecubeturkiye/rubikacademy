@@ -772,11 +772,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-/* Ana sayfadaki "Kaldığın yerden devam et" için son gezilen içerik sayfası */
+/* Ana sayfadaki "Kaldığın yerden devam et" için son açılan ALGORİTMA sayfası (yalnızca algoritma setleri) */
 (function () {
     try {
         var p = location.pathname.replace(/\.html$/, "").replace(/\/$/, "");
-        if (!p || !/^\/icerikler\//.test(p) || /\/(admin|profil)$/.test(p)) return;
+        if (!/^\/icerikler\/algoritmalar\/[^\/]+$/.test(p) || /\/antrenor$/.test(p)) return;
         var h = document.querySelector("h1"), t = (h && h.textContent.trim()) || document.title.split(/\s[·|–-]\s/)[0];
         localStorage.setItem("ra-last-page", JSON.stringify({ p: p, t: String(t).replace(/\s+/g, " ").slice(0, 60) }));
     } catch (e) {}
