@@ -141,6 +141,7 @@ html:not(.dark-mode) .h-glow { opacity: .55; }
     .h-stat span { font-size: 12px; }
     .h-stat i { font-size: 20px; }
 }
+.foot-soc{display:inline-block;margin-bottom:6px}.foot-soc a{color:inherit;font-weight:600;text-decoration:none}.foot-soc a:hover{text-decoration:underline}
 </style>
 
 <!-- Schema Kodu -->
@@ -243,27 +244,12 @@ html:not(.dark-mode) .h-glow { opacity: .55; }
             <p class="h-lead" data-i18n="heroP">İlk çözümünden ZBLL'e kadar her şey burada: adım adım rehberler, 1.400'den fazla algoritma, antrenörler ve her gün yeni bir karıştırma. Hadi başlayalım!</p>
             <div class="h-btns">
                 <a href="/icerikler/baslangic" class="btn btn-primary" data-i18n="heroBtn">Hemen başla →</a>
-                <a href="/icerikler/algoritmalar/antrenor" class="btn btn-secondary" data-i18n="heroBtn2">🎯 Antrenörü dene</a>
             </div>
             <div class="h-me" id="hMe" hidden></div>
         </div>
         </div>
     </div>
 </section>
-
-<!-- İSTATİSTİK -->
-<section class="h-sec" style="padding-top:10px">
-    <div class="h-wrap">
-        <div class="h-stats reveal">
-            <div class="h-stat"><i>⚡</i><b id="stAlg">1.400+</b><span data-i18n="statAlg">algoritma</span></div>
-            <div class="h-stat"><i>🧊</i><b id="stCubes">8</b><span data-i18n="statCubes">küp türü</span></div>
-            <div class="h-stat" id="stMemWrap" hidden><i>👥</i><b id="stMem">0</b><span data-i18n="statUsers">kullanıcı</span></div>
-        </div>
-    </div>
-</section>
-
-<!-- EV YARIŞMASI & REKORLAR -->
-<section class="h-sec" style="padding-top:20px;padding-bottom:20px"><div class="h-wrap"><div id="raEvHub" data-mode="full"></div></div></section>
 
 <!-- ÖZELLİKLER -->
 <section class="h-sec">
@@ -274,7 +260,6 @@ html:not(.dark-mode) .h-glow { opacity: .55; }
             <p data-i18n="featP">Öğren, antrenman yap, yarış. Hepsi ücretsiz, hepsi tarayıcında.</p>
         </div>
         <div class="h-feats">
-            <a href="/icerikler/gunluk" class="h-feat reveal"><div class="h-ic">📅</div><h3 data-i18n="f1t">Günün Karıştırması</h3><p data-i18n="f1p">Her gün herkes aynı karıştırmayı çözer. Süreni gir, sıralamada yerini al.</p><span class="h-go" data-i18n="cardGo">Keşfet →</span></a>
             <a href="/icerikler/algoritmalar/antrenor" class="h-feat reveal"><div class="h-ic">🎯</div><h3 data-i18n="f2t">Algoritma Antrenörü</h3><p data-i18n="f2p">OLL'den ZBLL'e kadar çalış; zorlandığın vakalar daha sık karşına çıksın.</p><span class="h-go" data-i18n="cardGo">Keşfet →</span></a>
             <a href="/icerikler/akilli-kup" class="h-feat reveal"><span class="h-tag" data-i18n="newTag">YENİ</span><div class="h-ic">🧊</div><h3 data-i18n="f3t">Çözüm Analizi</h3><p data-i18n="f3p">Bluetooth küpünü bağla; Cross, F2L, OLL ve PLL sürelerini tek tek gör.</p><span class="h-go" data-i18n="cardGo">Keşfet →</span></a>
             <a href="/icerikler/ev-yarismasi" class="h-feat reveal"><span class="h-tag" data-i18n="newTag">YENİ</span><div class="h-ic">🏠</div><h3 data-i18n="f4t">Ev Yarışması</h3><p data-i18n="f4p">Canlı yayında 8-16 kişilik yarışmalar: aynı karıştırma, canlı sıralama, final turu.</p><span class="h-go" data-i18n="cardGo">Keşfet →</span></a>
@@ -302,29 +287,9 @@ html:not(.dark-mode) .h-glow { opacity: .55; }
     </div>
 </section>
 
-<!-- SOSYAL + İLETİŞİM -->
-<section class="h-sec">
-    <div class="h-wrap">
-        <div class="h-head reveal">
-            <span class="h-kicker" data-i18n="socialSpan">Bizi takip et</span>
-            <h2 data-i18n="socialH2">Topluluğa katıl!</h2>
-            <p data-i18n="socialP">Yeni içerikler, ipuçları ve yarışma yayınları için takipte kal.</p>
-        </div>
-        <div class="h-social">
-            <a href="https://www.youtube.com/@rubikacademyy" target="_blank" rel="noopener noreferrer" class="h-soc reveal"><div class="h-sic" style="background:#ff0033">▶</div><div><h3>YouTube</h3><p>@rubikacademyy</p></div></a>
-            <a href="https://www.instagram.com/rubikacademyy" target="_blank" rel="noopener noreferrer" class="h-soc reveal"><div class="h-sic" style="background:linear-gradient(45deg,#f9a825,#e1306c,#833ab4)">◎</div><div><h3>Instagram</h3><p>@rubikacademyy</p></div></a>
-            <a href="https://www.tiktok.com/@rubikacademyy" target="_blank" rel="noopener noreferrer" class="h-soc reveal"><div class="h-sic" style="background:#111">♪</div><div><h3>TikTok</h3><p>@rubikacademyy</p></div></a>
-        </div>
-        <div class="h-contact reveal">
-            <div><h3 data-i18n="contactH2">Bir sorun mu var?</h3><p data-i18n="contactP">Soru, öneri ya da iş birliği için yaz, en kısa sürede dönelim.</p></div>
-            <a href="mailto:rubikacademy.iletisim@gmail.com" class="btn btn-primary">✉ rubikacademy.iletisim@gmail.com</a>
-        </div>
-    </div>
-</section>
-
-
 <!-- FOOTER -->
 <footer>
+    <span class="foot-soc"><a href="https://www.youtube.com/@rubikacademyy" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.instagram.com/rubikacademyy" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.tiktok.com/@rubikacademyy" target="_blank" rel="noopener">TikTok</a> · <a href="mailto:rubikacademy.iletisim@gmail.com">İletişim</a></span><br>
     <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
 </footer>
 

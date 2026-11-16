@@ -902,7 +902,7 @@
         var t = document.querySelector("#raToasts .ra-toast:last-child .ra-toast-tx");
         if (t) { t.style.cursor = "pointer"; t.onclick = function () { location.href = "/icerikler/gunluk"; }; }
     }
-    document.addEventListener("account-synced", function () { setTimeout(dailyNudge, 2500); });
+    // Günün karıştırması siteden kaldırıldı: akşam hatırlatması kapalı (dailyNudge kullanılmıyor)
     // Çekiliş: katıldığın çekilişin saati geldiyse (çekilişten 1 dk önce – 30 dk sonra) sitenin her sayfasında
     // 15 sn'de bir bakılır; kazandıysan hemen uyarı çıkar (onay için 2 dakikan var)
     var gwT = 0;

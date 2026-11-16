@@ -38,7 +38,6 @@
             '<div class="h-me-row">' +
             '<a class="h-chip" href="/icerikler/algoritmalar"><b>' + knownCount() + '</b><span>' + esc(T("meKnown", "bildiğin algoritma")) + '</span></a>' +
             '<a class="h-chip" href="/icerikler/algoritmalar/antrenor"><b>' + trainerSolves() + '</b><span>' + esc(T("meSolves", "antrenör çözümü")) + '</span></a>' +
-            '<a class="h-chip' + (dd ? " ok" : " todo") + '" href="/icerikler/gunluk"><b>' + (dd ? "✓" : "📅") + '</b><span>' + esc(dd ? T("meDailyDone", "Günün karıştırması tamam") : T("meDailyTodo", "Günün karıştırması seni bekliyor")) + '</span></a>' +
             '</div>' +
             (last && last.p ? '<a class="h-me-cont" href="' + esc(last.p) + '">↩ ' + esc(T("meContinue", "Kaldığın yerden devam et")) + ': <b>' + esc(last.t || last.p) + '</b></a>' : "");
         box.hidden = false;
