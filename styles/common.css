@@ -1059,6 +1059,8 @@ html[dir="rtl"] .ra-set-menu { right: auto; left: 0; }
 }
 html[dir="rtl"] .set-opt { text-align: right; }
 .set-opt:hover { background: var(--surface-soft, #f3f4f6); }
+.set-old { margin-top: 4px; }
+.set-old summary { cursor: pointer; padding: 8px 10px; font-size: 13px; font-weight: 600; opacity: .7; }
 .set-opt[aria-current="true"] { background: var(--ui-accent-soft, rgba(108,92,231,.14)); outline: 2px solid var(--ui-accent); }
 .set-opt.cvd { font-weight: 700; }
 .set-opt.cvd > span:not(.cvd-sw) { flex: 1; min-width: 0; }

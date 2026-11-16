@@ -872,9 +872,9 @@
     /* ---------- kategori sekmeleri: paneli bölümlere ayırır, yalnız seçili kategori görünür ---------- */
     var ADM_CATS = [
         ["ev", "🏠", "Ev yarışmaları", ["Ev yarışmaları"]],
-        ["users", "👥", "Kullanıcılar", ["Kullanıcılar", "En aktif kullanıcılar", "Hesapsız ziyaretçiler", "Günlük sıralama"]],
+        ["users", "👥", "Kullanıcılar", ["Kullanıcılar", "En aktif kullanıcılar", "Günlük sıralama"]],
         ["notify", "🔔", "Bildirimler", ["Bildirim gönder", "Duyuru geçmişi"]],
-        ["stats", "📊", "İstatistik", ["Genel bakış", "Site istatistikleri", "Cihaz, tarayıcı", "Firebase kullanımı"]],
+        ["stats", "📊", "İstatistik", ["Genel bakış", "Site istatistikleri", "Ayrıntılı istatistik"]],
         ["content", "🧩", "İçerik", ["Topluluk algoritma", "Puanlar ve geri bildirim", "Sponsor banner", "Özel paketler"]],
         ["system", "🛠️", "Sistem", ["Bakım modu", "Hata kayıtları"]]
     ];
@@ -1662,7 +1662,6 @@
             '<div class="a-ctrl"><button class="a-btn main" id="aRecLoad">↻ Yükle</button><label class="a-note"><input type="checkbox" id="aRecBad" checked> Yalnız şüpheliler</label></div>' +
             '<p class="a-note">Bir süreye dokun → yalnız o süre silinir, kişinin diğer rekorları kalır ve silinen süre geri gelmez. Şüpheli: 3x3 tekil 4 sn, Ao5 5,5 sn, Ao12 6 sn altı; 2x2 tekil 0,6 sn, Ao5 1 sn, Ao12 1,2 sn altı ya da ortalaması tekilinden hızlı olanlar.</p><div id="aRecList" class="a-list"></div>' +
             '<p class="a-note" style="margin-top:12px">Yarışmalar herkese açık sayfada: <a href="/icerikler/ev-yarismasi" target="_blank" rel="noopener">Ev yarışması</a> · <a href="/icerikler/rekorlar" target="_blank" rel="noopener">Rekor tablosu</a></p></div>' +
-            '<div class="box"><h2>👤 Hesapsız ziyaretçiler</h2><p class="a-note">Giriş yapmadan siteyi kullanan cihazlar (her cihaz bir kez sayılır, oturum başına güncellenir).</p><div id="aAnon" class="stat-tiles"><p class="a-note">Yükleniyor…</p></div><div id="aAnonMore"></div></div>' +
             '<div class="box"><h2>🔔 Bildirim gönder</h2>' +
             '<div class="bc-form">' +
             '<div class="bc-step"><span class="bc-lbl">1 · Mesaj</span><div class="bc-ta"><textarea id="bcText" maxlength="500" rows="3" placeholder="Ör. Bu akşam 21.00\'de ev yarışması var, kaçırma! 🏠"></textarea><span class="bc-cnt" id="bcCnt">0/500</span></div></div>' +
@@ -1680,14 +1679,16 @@
             '<div id="aUsersList"></div></div>' +
             '<div class="box"><h2>🚩 Şikayetler <span class="a-sub" id="aRepCount" style="margin:0"></span></h2><p class="a-note">Kullanıcıların uygulama içinden bildirdiği sohbet mesajları ve profiller (Google Play kullanıcı içeriği kuralı). İncele, gerekirse içeriği sil ya da hesabı askıya al, sonra kapat.</p><div class="a-ctrl"><button class="a-btn main" id="aRepLoad">↻ Yükle</button></div><div id="aRepList" class="a-list"></div></div>' +
             '<div class="box"><h2>🏅 En aktif kullanıcılar</h2><div id="aActive"><p class="a-note">Yükleniyor…</p></div></div>' +
-            '<div class="box"><h2>🖥️ Cihaz, tarayıcı &amp; tercihler</h2><p class="a-note">Her üyenin cihaz, dil, tema, renk körlüğü modu ve giriş türü bilgisini çeker (üye başına 1 okuma, biraz sürebilir).</p><button class="a-btn main" id="aDevLoad">Hesapla</button><div id="aDevBox" style="margin-top:10px"></div></div>' +
             '<div class="box"><h2>📈 Site istatistikleri</h2><div id="aSiteStats"><p class="a-note">Yükleniyor…</p></div></div>' +
+            '<div class="box"><h2>🗂️ Ayrıntılı istatistik</h2>' +
+            '<details class="a-det"><summary>👤 Hesapsız ziyaretçiler</summary><p class="a-note">Giriş yapmadan siteyi kullanan cihazlar (her cihaz bir kez sayılır, oturum başına güncellenir).</p><div id="aAnon" class="stat-tiles"><p class="a-note">Yükleniyor…</p></div><div id="aAnonMore"></div></details>' +
+            '<details class="a-det"><summary>🖥️ Cihaz, tarayıcı &amp; tercihler</summary><p class="a-note">Her üyenin cihaz, dil, tema, renk körlüğü modu ve giriş türü bilgisini çeker (üye başına 1 okuma, biraz sürebilir).</p><button class="a-btn main" id="aDevLoad">Hesapla</button><div id="aDevBox" style="margin-top:10px"></div></details>' +
+            '<details class="a-det"><summary>🔥 Firebase kullanımı</summary><button class="a-btn main" id="aUsageLoad">Hesapla</button><div id="aUsage" style="margin-top:10px"></div></details></div>' +
             '<div class="box"><h2>💡 Topluluk algoritma önerileri <span class="a-sub" id="aSugCount" style="margin:0"></span></h2>' +
             '<div class="a-ctrl"><button class="a-btn main" id="aSugLoad">↻ Yükle</button><select id="aSugSort"><option value="new">En yeni</option><option value="vote">En çok oy</option></select></div><div id="aSugList" class="a-list"></div></div>' +
             '<div class="box"><h2>🐞 Hata kayıtları <span class="a-sub" id="aErrCount" style="margin:0"></span></h2>' +
             '<p class="a-note">Ziyaretçilerin tarayıcısında oluşan JavaScript hataları (aynı hata gruplanır).</p>' +
             '<div class="a-ctrl"><button class="a-btn main" id="aErrLoad">↻ Yükle</button><button class="a-btn danger" id="aErrClear">🗑️ Tümünü sil</button></div><div id="aErrList" class="a-list"></div></div>' +
-            '<div class="box"><h2>🔥 Firebase kullanımı</h2><button class="a-btn main" id="aUsageLoad">Hesapla</button><div id="aUsage" style="margin-top:10px"></div></div>' +
             '<div class="box"><h2>⭐ Puanlar ve geri bildirim</h2><p class="a-note">Biten temalar için kullanıcıların verdiği puanlar ve yorumlar.</p><button class="a-btn main" id="aFbLoad">↻ Yükle</button><div id="aFbList" style="margin-top:8px"></div></div>' +
             '<div class="box"><h2>🎁 Özel paketler</h2><p class="a-note">Hesaplara özel tema ya da algoritma seti ata. Paket yalnız atanan kişide görünür: tema Ayarlar → Tema stili\'nde, algoritmalar profilinde "Özel paketlerim" altında. Kişi siteye girince gelir.</p><div class="a-ctrl"><button class="a-btn" id="aPackLoad">↻ Yenile</button></div><div id="aPackBox"></div></div>' +
             '<div class="box"><h2>📣 Sponsor banner\'ı</h2><p class="a-note">Sitedeki reklam alanı (ör. Minjuan küp mağazası).</p><div id="aAdBox"></div></div>' +
