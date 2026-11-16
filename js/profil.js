@@ -142,6 +142,20 @@
     }).join("") + "</div>";
   }
 
+  // Profil içeriği 3 sekmede: İstatistik · Yarışmalar · İlerleme (seçim oturumda hatırlanır)
+  function tabs(list) {
+    var cur = "s"; try { cur = sessionStorage.getItem("ra-ptab") || "s"; } catch (e) {}
+    if (!list.some(function (t) { return t[0] === cur; })) cur = "s";
+    return '<nav class="p-tabs" role="tablist">' + list.map(function (t) { return '<button type="button" role="tab" data-pt="' + t[0] + '" aria-selected="' + (t[0] === cur) + '">' + t[1] + '</button>'; }).join("") + '</nav>' +
+      list.map(function (t) { return '<div class="p-tab" data-pt="' + t[0] + '"' + (t[0] === cur ? '' : ' hidden') + '>' + t[2] + '</div>'; }).join("");
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest(".p-tabs [data-pt]"); if (!b) return;
+    var k = b.getAttribute("data-pt"); try { sessionStorage.setItem("ra-ptab", k); } catch (x) {}
+    Array.prototype.forEach.call(document.querySelectorAll(".p-tabs [data-pt]"), function (x) { x.setAttribute("aria-selected", String(x === b)); });
+    Array.prototype.forEach.call(document.querySelectorAll(".p-tab"), function (x) { x.hidden = x.getAttribute("data-pt") !== k; });
+  });
+
   function renderShared(uid, data, isMe) {
     if (!data) { root.innerHTML = '<div class="box"><h1 style="font-size:24px;font-weight:900">Profil bulunamadı</h1><p class="p-note" style="margin-top:8px">Bu profil herkese açık değil ya da hiç giriş yapılmamış.</p></div>'; return; }
     var acc = (data.stats && data.stats.accent) || "", fav = (data.stats && data.stats.fav) || "";
@@ -151,10 +165,7 @@
       (data.joined ? '<div class="p-meta">📅 ' + esc(dateStr(data.joined)) + '\'den beri üye</div>' : '') + favLine(fav) + '</div></div>' +
       (isMe ? '<div class="p-actions"><button class="p-btn" id="pShare">🔗 Paylaşım linkini kopyala</button><a class="p-btn" href="/icerikler/profil">← Kendi panona dön</a></div><div class="p-msg" id="pMsg"></div>' : '') +
       '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistikler</h2>' + statTiles(data.stats) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">🏠 Ev yarışması</h2>' + compGrid(data.stats, isMe, data.name) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerleme</h2>' + setsGrid(data.stats) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümler</h2>' + dailyGrid(data.stats) + '</div>' +
+      tabs([['s', 'İstatistik', '<div class="box">' + statTiles(data.stats) + '</div>'], ['c', 'Yarışmalar', '<div class="box">' + compGrid(data.stats, isMe, data.name) + '</div>'], ['p', 'İlerleme', '<div class="box">' + setsGrid(data.stats) + '</div>']]) +
       (!isMe && window.RAReport ? '<p class="p-note" style="text-align:center;margin:4px 0 18px"><button class="p-btn sm" id="pReport">⚑ Bu profili şikayet et</button></p>' : '');
     showRole(uid);
     if (isMe) bindShare(uid);
@@ -213,10 +224,7 @@
       '<div class="p-fld"><label>Favori küp</label><select id="pFav">' + CUBES.map(function (c) { return '<option value="' + c + '"' + ((prof.fav || "") === c ? ' selected' : '') + '>' + (c || "— Yok —") + '</option>'; }).join("") + '</select></div>' +
       '<button class="p-btn main" id="pSave" style="justify-self:start">Kaydet</button></div></div>' +
       '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İstatistiklerim</h2>' + statTiles(st) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">🏠 Ev yarışmalarım</h2>' + compGrid(st, true, name) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">İlerlemem</h2>' + setsGrid(st) + '</div>' +
-      '<div class="box"><h2 style="font-size:19px;font-weight:850;margin-bottom:12px">📅 Günlük çözümlerim</h2>' + dailyGrid(st) + '</div>' + '<div id="raPacks"></div>' + linksBox();
+      tabs([['s', 'İstatistik', '<div class="box">' + statTiles(st) + '</div>'], ['c', 'Yarışmalar', '<div class="box">' + compGrid(st, true, name) + '</div>'], ['p', 'İlerleme', '<div class="box">' + setsGrid(st) + '</div><div id="raPacks"></div>']]) + linksBox();
 
     if (window.RAPacks) RAPacks.render();
     showRole(u.uid);
