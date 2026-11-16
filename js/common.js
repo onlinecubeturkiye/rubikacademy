@@ -911,7 +911,7 @@ if ("serviceWorker" in navigator) {
     function t() { var l = "tr"; try { l = localStorage.getItem("site-lang") || "tr"; } catch (e) {} return TXT[l] || TXT.tr; }
     function ready() {
         var sum = document.getElementById("progressSummary");
-        if (!sum || document.getElementById("raMarkAll")) return;
+        if (!sum || document.getElementById("raMarkAll") || sum.closest(".ra-prog")) return;
         if (typeof window.loadProgress !== "function" || typeof window.saveProgress !== "function" || typeof window.applyState !== "function") return;
         // İlerleme kartı: sayılar + ilerleme çubuğu + "Hepsini" tuşları tek kutuda
         var css = document.createElement("style");
@@ -934,8 +934,7 @@ if ("serviceWorker" in navigator) {
         wrap.appendChild(pbar);
         var bar = document.createElement("div"); bar.id = "raMarkAll"; bar.className = "ra-markall";
         function draw() { var x = t(); bar.innerHTML = '<span>' + x.all + '</span><button type="button" data-st="known">' + x.k + '</button><button type="button" data-st="learning">' + x.l + '</button><button type="button" data-st="">' + x.c + '</button>'; }
-        draw();
-        wrap.appendChild(bar);
+        draw(); // "Hepsini: Biliyorum/Öğreniyorum/Temizle" çubuğu kaldırıldı (kartta tek dokunuş yeterli)
         // özet metnindeki sayılardan çubuğu çiz: "öğreniyorum: L" ve "biliyorum: K / T"
         function fill() {
             var n = (sum.textContent.match(/\d+/g) || []).map(Number);
@@ -973,4 +972,57 @@ if ("serviceWorker" in navigator) {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(ready, 0); });
     else setTimeout(ready, 0);
     window.addEventListener("load", ready);
+})();
+
+/* =========================================================
+   ALGORİTMA KARTLARI: sade görünüm
+   - ▶ İzle ve ✏️ Düzenle düğmeleri tek "⋯" menüsünde
+   - Alternatif algoritmalar "Alternatifler (n)" ile açılır
+========================================================= */
+(function () {
+    function setup() {
+        var wrap = document.getElementById("subsetsWrap"); if (!wrap || wrap.raCard) return; wrap.raCard = 1;
+        var css = document.createElement("style");
+        css.textContent = ".alg-menu{position:relative;display:flex;justify-content:flex-end;margin-top:6px}" +
+            ".alg-more{border:1px solid var(--border);background:var(--surface-soft);color:var(--text);border-radius:10px;width:36px;height:30px;font:900 16px Inter,sans-serif;line-height:1;cursor:pointer}" +
+            ".alg-menu-pop{position:absolute;right:0;bottom:calc(100% + 4px);z-index:20;display:flex;flex-direction:column;gap:4px;min-width:150px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:0 10px 28px rgba(0,0,0,.22)}" +
+            ".alg-menu-pop[hidden]{display:none}.alg-menu-pop>button{margin:0!important;width:100%;justify-content:flex-start;text-align:left}" +
+            ".case-alts.ra-alt-c{display:none}.case-alts.ra-alt-c.open{display:block}" +
+            ".alg-alt-tg{display:inline-block;margin-top:4px;border:0;background:none;padding:2px 0;font:700 12.5px Inter,sans-serif;color:var(--text-soft);cursor:pointer;text-decoration:underline}";
+        document.head.appendChild(css);
+        function close(except) { Array.prototype.forEach.call(wrap.querySelectorAll(".alg-menu-pop:not([hidden])"), function (p) { if (p !== except) p.hidden = true; }); }
+        function deco() {
+            Array.prototype.forEach.call(wrap.querySelectorAll(".case-card"), function (card) {
+                var btns = Array.prototype.filter.call(card.querySelectorAll(".alg-play-btn, .alg-edit-btn"), function (b) { return !b.closest(".alg-menu-pop"); });
+                if (btns.length) {
+                    var m = card.querySelector(".alg-menu");
+                    if (!m) {
+                        m = document.createElement("div"); m.className = "alg-menu";
+                        m.innerHTML = '<button type="button" class="alg-more" aria-label="Diğer işlemler" aria-haspopup="true">⋯</button><div class="alg-menu-pop" hidden></div>';
+                        (card.querySelector(".case-body") || card).appendChild(m);
+                    }
+                    var pop = m.lastChild;
+                    btns.forEach(function (b) { if (b.classList.contains("alg-play-btn")) pop.insertBefore(b, pop.firstChild); else pop.appendChild(b); });
+                }
+                var alts = card.querySelector(".case-alts");
+                if (alts && !alts.classList.contains("ra-alt-c")) {
+                    var n = alts.children.length; if (!n) return;
+                    alts.classList.add("ra-alt-c");
+                    var tg = document.createElement("button"); tg.type = "button"; tg.className = "alg-alt-tg"; tg.textContent = "Alternatifler (" + n + ")";
+                    alts.parentNode.insertBefore(tg, alts);
+                }
+            });
+        }
+        wrap.addEventListener("click", function (e) {
+            var m = e.target.closest(".alg-more"), tg = e.target.closest(".alg-alt-tg");
+            if (m) { e.stopPropagation(); e.preventDefault(); var p = m.nextSibling; var was = p.hidden; close(); p.hidden = !was; return; }
+            if (tg) { e.stopPropagation(); e.preventDefault(); var a = tg.nextSibling; if (a) { a.classList.toggle("open"); tg.textContent = (a.classList.contains("open") ? "Alternatifleri gizle" : "Alternatifler (" + a.children.length + ")"); } return; }
+            if (e.target.closest(".alg-menu-pop button")) setTimeout(close, 0);
+        }, true);
+        document.addEventListener("click", function (e) { if (!e.target.closest || !e.target.closest(".alg-menu")) close(); });
+        deco();
+        new MutationObserver(function () { deco(); }).observe(wrap, { childList: true, subtree: true });
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setup); else setup();
+    window.addEventListener("load", setup);
 })();
