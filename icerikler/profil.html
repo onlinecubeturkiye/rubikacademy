@@ -139,6 +139,9 @@
 .p-photo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .p-ava.sm { width: 56px; height: 56px; border-radius: 16px; font-size: 22px; flex-shrink: 0; }
 .p-photo label.p-btn { cursor: pointer; }
+.p-tabs { display: flex; gap: 6px; padding: 4px; margin: 0 0 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.p-tabs button { flex: 1; border: 0; background: transparent; padding: 10px 8px; border-radius: 10px; font: 700 14px Inter, sans-serif; color: var(--text-soft); cursor: pointer; }
+.p-tabs button[aria-selected="true"] { background: var(--text); color: var(--surface); }
 .p-accents { display: flex; gap: 8px; flex-wrap: wrap; }
 .p-acc { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; padding: 0; }
 .p-acc.on { outline: 2px solid var(--text); outline-offset: 2px; }

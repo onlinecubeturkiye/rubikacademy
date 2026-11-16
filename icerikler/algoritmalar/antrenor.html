@@ -502,6 +502,7 @@ html[dir="rtl"] .stat-table th { text-align: right; }
 .filter-row .case-toggle { margin: 0; font-size: 12.5px; }
 .trainer-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-bottom: 14px; }
 .trainer-top .mode-switch { margin: 0; }
+.mode-switch[hidden] { display: none !important; }
 .trainer-top .bt-wrap { margin: 0; }
 .trainer-top .bt-bar { margin: 0; padding: 5px 6px 5px 8px; gap: 8px; border-radius: 14px; max-width: 100%; }
 .trainer-top .bt-bar:not(.on) .bt-text { flex: 0 1 auto; }
@@ -670,11 +671,11 @@ details.case-group[open] > summary::before { transform: rotate(45deg); }
 
 <div class="tool-row">
 <div class="tool-tabs" id="toolTabs" role="tablist">
-    <button type="button" class="tool-tab active" data-tool="alg" role="tab" data-i18n="tool_alg">🧠 Algoritma</button>
-    <button type="button" class="tool-tab" data-tool="recog" role="tab" data-i18n="tool_recog">👁 Tanıma</button>
+    <button type="button" class="tool-tab active" data-tool="alg" data-m="cube" role="tab">🧊 Küple</button>
+    <button type="button" class="tool-tab" data-tool="alg" data-m="card" role="tab">🃏 Kart</button>
+    <button type="button" class="tool-tab" data-tool="recog" role="tab">👁 Tanıma</button>
 </div>
-<button type="button" class="cvd-open" id="cvdOpen" title="Renk şeması ve tutuş" aria-label="Renk şeması ve tutuş">🎨</button>
-<button type="button" class="cvd-open" id="prefOpen" title="Antrenör ayarları" aria-label="Antrenör ayarları">⚙️</button>
+<a class="cvd-open" href="/ayarlar#antrenor" title="Antrenör ayarları (renk, tutuş, süre)" aria-label="Antrenör ayarları">⚙️</a>
 </div>
 
 <div id="toolRecog" data-i18n-scope="tanima" data-hold-skip hidden>
@@ -739,7 +740,7 @@ details.case-group[open] > summary::before { transform: rotate(45deg); }
 <!-- ANTRENÖR -->
 <section class="box trainer" id="trainerBox">
     <div class="trainer-top">
-    <div class="mode-switch" id="modeSwitch" role="tablist">
+    <div class="mode-switch" id="modeSwitch" role="tablist" hidden>
         <button class="mode-btn" data-mode="cube" data-i18n="mode_cube">🧊 Küple çalış</button>
         <button class="mode-btn" data-mode="card" data-i18n="mode_card">🃏 Küpsüz (kart)</button>
     </div>
@@ -1537,7 +1538,6 @@ document.getElementById("manualForm").addEventListener("submit", function (e) {
     var m = document.getElementById("prefModal");
     function open() { var p = prefs(); document.getElementById("prefReveal").checked = p.reveal; document.getElementById("prefManual").checked = p.manual; m.classList.add("show"); }
     function close() { m.classList.remove("show"); }
-    document.getElementById("prefOpen").addEventListener("click", open);
     document.getElementById("prefOk").addEventListener("click", close);
     m.addEventListener("click", function (e) { if (e.target === m) close(); });
     ["prefReveal", "prefManual"].forEach(function (id) {
@@ -1727,8 +1727,7 @@ document.getElementById("holdOpts").addEventListener("click", function (e) {
 document.getElementById("cvdOk").addEventListener("click", closeCvdModal);
 document.getElementById("cvdModal").addEventListener("click", function (e) { if (e.target === this) closeCvdModal(); });
 document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.getElementById("cvdModal").classList.contains("show")) closeCvdModal(); });
-document.getElementById("cvdOpen").addEventListener("click", openCvdModal);
-try { if (!localStorage.getItem("cvd-asked") && !cvdTheme()) openCvdModal(); } catch (e) {}
+// Renk/tutuş ve süre ayarları Ayarlar sayfasında (/ayarlar#antrenor); ilk girişte pencere açılmaz
 
 /* ---------------- ARAÇ SEKMELERİ: Algoritma / Tanıma ---------------- */
 var TOOL_KEY = "trainer-tool-v1", TOOLS = { alg: "toolAlg", recog: "toolRecog" };
@@ -1739,16 +1738,24 @@ function selectTool(t) {
     tool = t;
     save(TOOL_KEY, { tool: t });
     Object.keys(TOOLS).forEach(function (k) { document.getElementById(TOOLS[k]).hidden = k !== t; });
+    paintTools();
+    if (t === "recog") RecogTrainer.start();
+}
+// Tek mod seçici: Küple · Kart (algoritma antrenörü) · Tanıma
+function paintTools() {
     Array.prototype.forEach.call(document.querySelectorAll(".tool-tab"), function (b) {
-        var on = b.getAttribute("data-tool") === t;
+        var m = b.getAttribute("data-m"), on = b.getAttribute("data-tool") === tool && (!m || m === mode);
         b.classList.toggle("active", on);
         b.setAttribute("aria-selected", on ? "true" : "false");
     });
-    if (t === "recog") RecogTrainer.start();
 }
 document.getElementById("toolTabs").addEventListener("click", function (e) {
     var b = e.target.closest(".tool-tab");
-    if (b) { selectTool(b.getAttribute("data-tool")); b.blur(); }
+    if (!b) return;
+    var m = b.getAttribute("data-m");
+    selectTool(b.getAttribute("data-tool"));
+    if (m && m !== mode && tool === "alg") { var mb = document.querySelector('.mode-btn[data-mode="' + m + '"]'); if (mb) mb.click(); }
+    paintTools(); b.blur();
 });
 // ?set=... bağlantısıyla gelindiyse algoritma sekmesi açılır
 selectTool(new URLSearchParams(location.search).get("set") ? "alg" : (new URLSearchParams(location.search).get("tool") || load(TOOL_KEY, {}).tool || "alg"));

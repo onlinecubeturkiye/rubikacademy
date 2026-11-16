@@ -1486,3 +1486,8 @@ html:not([data-skin]) .box, html:not([data-skin]) .card, html:not([data-skin]) .
 html:not([data-skin]) .h-feat:hover, html:not([data-skin]) .tr-card:hover, html:not([data-skin]) .h-step:hover { transform: none !important; border-color: var(--text-soft) !important; }
 html:not([data-skin]) .h-contact { background: var(--surface) !important; }
 html:not([data-skin]) .h-tag { background: var(--text) !important; color: var(--surface) !important; }
+
+/* Öğren bölümü: Dersler · Başlangıç rehberi · Yol haritası tek bölümün sekmeleri */
+.learn-tabs { display: flex; gap: 6px; max-width: 760px; margin: 0 auto 18px; padding: 4px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); overflow-x: auto; }
+.learn-tabs a { flex: 1 0 auto; text-align: center; padding: 9px 12px; border-radius: 10px; font: 700 14px Inter, sans-serif; color: var(--text-soft); text-decoration: none; white-space: nowrap; }
+.learn-tabs a[aria-current="page"] { background: var(--text); color: var(--surface); }

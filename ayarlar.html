@@ -66,6 +66,13 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
 
 <div class="set-card"><h2 id="hAppear">Görünüm</h2><div id="setRoot"></div></div>
 
+<div class="set-card" id="antrenor"><h2>Antrenör</h2>
+    <button type="button" class="srow" id="tHold"><span class="ico">🧊</span><span>Tutuş<small class="rsub">Karıştırmayı uygularken üstteki renk (yeşil önde)</small></span><span class="go" id="tHoldV"></span></button>
+    <button type="button" class="srow" id="tReveal"><span class="ico">👁</span><span>Çözümden sonra algoritmayı göster</span><span class="go" id="tRevealV"></span></button>
+    <button type="button" class="srow" id="tManual"><span class="ico">⌨️</span><span>Süreyi elle gir<small class="rsub">Kendi timer'ınla ölçtüğün süreyi yazarsın</small></span><span class="go" id="tManualV"></span></button>
+    <p class="about" style="margin:6px 12px 0">Renk körlüğü dostu renkler yukarıdaki Görünüm bölümünde.</p>
+</div>
+
 <div class="set-card"><h2 id="hAccount">Hesap</h2><div id="acctRoot"></div><div class="set-msg" id="acctMsg"></div></div>
 
 <div class="set-card" id="secCard" hidden><h2>Güvenlik</h2><div id="secRoot"></div><div class="set-msg" id="secMsg"></div></div>
@@ -85,7 +92,6 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
 
 <div class="set-card"><h2 id="hData">Veriler &amp; Bildirimler</h2>
     <button type="button" class="srow" id="btnNotify"><span class="ico">🔔</span><span>Bildirimlere izin ver</span><span class="go" id="notifState">→</span></button>
-    <button type="button" class="srow" id="btnRemD"><span class="ico">📅</span><span>Hatırlat: Günün karıştırması<small class="rsub">Akşam 19:00'da, henüz çözmediysen</small></span><span class="go" id="remD">Kapalı</span></button>
     <button type="button" class="srow" id="btnInstall" hidden><span class="ico">📲</span><span>Uygulama olarak yükle</span><span class="go">→</span></button>
     <button type="button" class="srow danger" id="btnReset"><span class="ico">🗑️</span><span>Tüm verilerimi sil</span></button>
     <div class="set-msg" id="dataMsg"></div>
@@ -216,6 +222,22 @@ html[dir="rtl"] .srow { text-align: right; } html[dir="rtl"] .srow .go { margin-
         });
     }
     if ($("btnRemD")) { $("btnRemD").onclick = function () { toggleRem("d"); }; if ($("btnRemC")) $("btnRemC").onclick = function () { toggleRem("c"); }; }
+    // Antrenör ayarları (antrenör sayfasıyla aynı kayıtlar: trainer-hold-v1, trainer-prefs-v1)
+    (function () {
+        function lp() { try { return JSON.parse(localStorage.getItem("trainer-prefs-v1")) || {}; } catch (e) { return {}; } }
+        function paint() {
+            var h = "y"; try { h = localStorage.getItem("trainer-hold-v1") === "w" ? "w" : "y"; } catch (e) {}
+            var p = lp();
+            $("tHoldV").textContent = h === "w" ? "Beyaz üst" : "Sarı üst";
+            $("tRevealV").textContent = p.reveal !== false ? "✓ Açık" : "Kapalı";
+            $("tManualV").textContent = p.manual ? "✓ Açık" : "Kapalı";
+        }
+        function setP(k, v) { var p = lp(); p.reveal = p.reveal !== false; p.manual = !!p.manual; p[k] = v; try { localStorage.setItem("trainer-prefs-v1", JSON.stringify(p)); } catch (e) {} paint(); }
+        $("tHold").onclick = function () { try { localStorage.setItem("trainer-hold-v1", localStorage.getItem("trainer-hold-v1") === "w" ? "y" : "w"); } catch (e) {} paint(); };
+        $("tReveal").onclick = function () { setP("reveal", !(lp().reveal !== false)); };
+        $("tManual").onclick = function () { setP("manual", !lp().manual); };
+        paint();
+    })();
     function start() { renderAppearance(); renderAccount(); notifState(); remState(); }
     if (document.readyState !== "loading") start(); else document.addEventListener("DOMContentLoaded", start);
     document.addEventListener("site-lang-change", renderAppearance);
