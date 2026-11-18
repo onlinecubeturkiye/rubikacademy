@@ -950,14 +950,21 @@
     function bellPaint() {
         var b = document.getElementById("raBell"); if (!b) return;
         var n = inboxGet().filter(function (x) { return x.u; }).length, c = b.querySelector("b");
-        c.textContent = n > 9 ? "9+" : String(n); c.hidden = !n;
+        c.textContent = n > 9 ? "9+" : String(n); c.hidden = !n; b.classList.toggle("has", !!n);
+        b.setAttribute("aria-label", n ? "Duyurular (" + n + " yeni)" : "Duyurular");
     }
     function bellMount() {
         if (document.getElementById("raBell") || /\/(admin|yazdir)/.test(location.pathname)) return;
         var host = document.querySelector(".navbar .nav-right"); if (!host) return;
         var css = document.createElement("style");
-        css.textContent = ".ra-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;border:0;background:transparent;color:var(--text);cursor:pointer;font-size:18px}" +
-            ".ra-bell b{position:absolute;top:3px;right:2px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:99px;background:#ef4444;color:#fff;font:800 10px/16px Inter,sans-serif;text-align:center}" +
+        // Site zili: ince çizgili çan, tokmağı küçük bir küp (yeni duyuru varken vurgu renginde ve bir kez sallanır)
+        css.textContent = ".ra-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border-radius:12px;border:0;background:transparent;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent}" +
+            ".ra-bell:hover,.ra-bell:active{background:color-mix(in srgb,var(--text) 7%,transparent)}" +
+            ".ra-bell svg{width:24px;height:24px;overflow:visible}.ra-bell .rb-c{fill:var(--text-soft);transition:fill .2s}" +
+            ".ra-bell.has .rb-c{fill:var(--ui-accent,#6c5ce7)}.ra-bell.has svg .rb-s{transform-origin:12px 3px;animation:raBellRing 1.1s ease-in-out 1}" +
+            "@keyframes raBellRing{0%,100%{transform:rotate(0)}15%{transform:rotate(14deg)}30%{transform:rotate(-12deg)}45%{transform:rotate(8deg)}60%{transform:rotate(-5deg)}75%{transform:rotate(2deg)}}" +
+            "@media(prefers-reduced-motion:reduce){.ra-bell.has svg .rb-s{animation:none}}" +
+            ".ra-bell b{position:absolute;top:2px;right:0;min-width:15px;height:15px;padding:0 4px;box-sizing:border-box;border-radius:99px;background:#ef4444;color:#fff;font:800 9.5px/15px Inter,sans-serif;text-align:center;box-shadow:0 0 0 2px var(--surface,#fff)}" +
             ".ra-bell b[hidden]{display:none}" +
             ".ra-inbox{position:fixed;top:64px;right:12px;z-index:1100;width:min(360px,calc(100% - 24px));max-height:70vh;overflow:auto;border-radius:16px;background:var(--surface);border:1px solid var(--border);box-shadow:0 18px 50px rgba(0,0,0,.3);font-family:Inter,sans-serif}" +
             ".ra-inbox h3{margin:0;padding:12px 14px;font-size:15px;color:var(--text);border-bottom:1px solid var(--border)}" +
@@ -966,7 +973,9 @@
             ".ra-inbox p{margin:0;padding:18px 14px;text-align:center;color:var(--text-soft);font-size:14px}";
         document.head.appendChild(css);
         var b = document.createElement("button"); b.type = "button"; b.id = "raBell"; b.className = "ra-bell ra-noico"; b.setAttribute("aria-label", "Duyurular");
-        b.innerHTML = '🔔<b hidden>0</b>';
+        b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><g class="rb-s"><path d="M12 3.2c-3.3 0-5.6 2.5-5.6 5.8v3.3c0 1.1-.5 2.1-1.3 2.9l-.6.6c-.4.4-.1 1 .4 1h14.2c.5 0 .8-.6.4-1l-.6-.6c-.8-.8-1.3-1.8-1.3-2.9V9c0-3.3-2.3-5.8-5.6-5.8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
+            '<path d="M12 1.6v1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
+            '<g stroke="currentColor" stroke-width=".9" stroke-linejoin="round"><path d="M12 17.5l2.5 1.4-2.5 1.4-2.5-1.4Z" fill="#f6c719"/><path d="M9.5 18.9l2.5 1.4v2.8l-2.5-1.4Z" fill="#e6252f"/><path d="M14.5 18.9l-2.5 1.4v2.8l2.5-1.4Z" fill="#2c6fe6"/></g></g></svg><b hidden>0</b>';
         host.insertBefore(b, host.firstChild);
         var pop = null;
         function closePop() { if (pop) { pop.remove(); pop = null; } }
