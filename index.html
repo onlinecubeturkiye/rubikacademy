@@ -68,7 +68,7 @@ html:not(.dark-mode) .h-glow { opacity: .55; }
 .h-me { margin-top: 26px; padding: 16px; border-radius: 18px; background: var(--surface); border: 1.5px solid var(--hb); box-shadow: var(--hsh); max-width: 560px; }
 .h-me[hidden] { display: none; }
 .h-me-hi { font: 800 16px Inter, sans-serif; color: var(--text); margin-bottom: 10px; }
-.h-me-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.h-me-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .h-chip { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 13px; background: color-mix(in srgb, var(--ui-accent) 7%, var(--surface-soft)); border: 1px solid var(--hb); text-decoration: none; color: var(--text); transition: transform .2s; min-width: 0; }
 .h-chip:hover { transform: translateY(-2px); }
 .h-chip b { font: 900 20px Inter, sans-serif; }
@@ -140,7 +140,6 @@ html:not(.dark-mode) .h-glow { opacity: .55; }
     .h-hero h1 { letter-spacing: -1px; }
     .h-feats, .h-path { grid-template-columns: minmax(0, 1fr); }
     .h-me-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-    .h-me-row .h-chip:last-child { grid-column: 1 / -1; }
     .h-btns .btn { flex: 1; justify-content: center; text-align: center; padding: 14px 12px; font-size: 14.5px; }
     .h-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .h-stats.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -249,7 +248,7 @@ html:not(.dark-mode) .h-glow { opacity: .55; }
                 <span class="gradient-text" data-i18n="heroTitleGradient">Hızlan.</span><br>
                 <span data-i18n="heroTitle2">Rekorunu kır.</span>
             </h1>
-            <p class="h-lead" data-i18n="heroP">İlk çözümünden ZBLL'e kadar her şey burada: adım adım rehberler, 1.400'den fazla algoritma, antrenörler ve her gün yeni bir karıştırma. Hadi başlayalım!</p>
+            <p class="h-lead" data-i18n="heroP">İlk çözümünden ZBLL'e kadar her şey burada: adım adım rehberler, 1.400'den fazla algoritma, antrenörler ve ev yarışmaları.</p>
             <div class="h-btns">
                 <a href="/icerikler/baslangic" class="btn btn-primary" data-i18n="heroBtn">Hemen başla →</a>
             </div>
