@@ -115,6 +115,65 @@
 .gw-timer { font: 900 48px "JetBrains Mono", monospace; color: #ea580c; margin: 6px 0 14px; }
 .gw-roll { font: 900 clamp(26px, 7vw, 40px) Inter, sans-serif; padding: 26px 10px; border-radius: 18px; background: var(--surface-soft); border: 2px solid var(--border); margin: 12px 0; min-height: 1.2em; }
 .gw-roll.win { color: #b45309; border-color: #f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,.2); animation: gwPop .5s ease-out; }
+
+/* ---- yeni çekiliş görünümü ---- */
+.page { padding-top: 18px; }
+.gw-top { max-width: 960px; margin: 6px auto 14px; padding: 0 16px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; align-items: center; }
+.gw-top h1 { margin: 0 0 8px; font: 800 clamp(30px, 6vw, 46px) "Plus Jakarta Sans", Inter, sans-serif; letter-spacing: -.02em; color: var(--text); }
+.gw-top p { margin: 0; color: var(--text-soft); line-height: 1.6; font-size: 15.5px; }
+.gw-top-art { position: relative; height: 170px; }
+.gw-top-art img { position: absolute; width: 62%; border-radius: 14px; border: 3px solid var(--surface); box-shadow: 0 10px 28px rgba(0,0,0,.18); }
+.gw-top-art img:nth-child(1) { left: 0; top: 18px; transform: rotate(-6deg); z-index: 1; }
+.gw-top-art img:nth-child(2) { right: 0; top: 0; transform: rotate(5deg); z-index: 2; }
+.gw-top-art img:nth-child(3) { left: 22%; top: 62px; transform: rotate(-1deg); z-index: 3; }
+@media (max-width: 640px) { .gw-top { grid-template-columns: 1fr; } .gw-top-art { height: 150px; max-width: 360px; width: 100%; margin: 0 auto; } }
+.gw-steps { max-width: 960px; margin: 0 auto 18px; padding: 0 16px; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.gw-steps li { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); }
+.gw-steps li > b { flex: none; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--ui-accent); color: #fff; font: 800 14px Inter, sans-serif; }
+.gw-steps span { font-size: 13px; line-height: 1.45; color: var(--text-soft); }
+.gw-steps strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 2px; }
+@media (max-width: 640px) { .gw-steps { grid-template-columns: 1fr; } }
+.gw-card { border-radius: 14px !important; }
+.gw-imgw { position: relative; }
+.gw-tags { position: absolute; left: 10px; bottom: 10px; display: flex; gap: 6px; }
+.gw-tag { padding: 4px 9px; border-radius: 999px; font: 800 12px Inter, sans-serif; background: rgba(0,0,0,.55); color: #fff; backdrop-filter: blur(4px); }
+.gw-tag.test { background: #f59e0b; color: #1f1300; }
+.gw-hero { border-radius: 16px !important; }
+.gw-himg { aspect-ratio: 16 / 9; max-height: 420px; }
+.gw-emptyc { grid-column: 1 / -1; display: flex; gap: 16px; align-items: center; padding: 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); }
+.gw-emptyc img { width: 180px; border-radius: 10px; flex: none; }
+.gw-emptyc b { font: 800 17px Inter, sans-serif; color: var(--text); }
+.gw-emptyc p { margin: 4px 0 0; color: var(--text-soft); font-size: 14px; line-height: 1.5; }
+@media (max-width: 520px) { .gw-emptyc { flex-direction: column; text-align: center; } .gw-emptyc img { width: 100%; } }
+.gw-try { margin-top: 18px; padding: 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); }
+.gw-try h2 { margin: 0 0 4px; font: 800 20px "Plus Jakarta Sans", Inter, sans-serif; color: var(--text); }
+.gw-try textarea { width: 100%; box-sizing: border-box; margin: 10px 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-soft); color: var(--text); font: 600 14.5px Inter, sans-serif; resize: vertical; }
+.gw-seg { display: inline-flex; gap: 6px; padding: 4px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-soft); flex-wrap: wrap; }
+.gw-seg button { border: 0; background: transparent; padding: 8px 14px; border-radius: 9px; font: 800 14px Inter, sans-serif; color: var(--text-soft); cursor: pointer; text-align: left; }
+.gw-seg button small { display: block; font-weight: 600; font-size: 11.5px; opacity: .85; }
+.gw-seg button.on { background: var(--ui-accent); color: #fff; }
+.gw-presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; }
+.gw-presets button { border: 2px solid transparent; border-radius: 10px; padding: 0; background: var(--surface); cursor: pointer; overflow: hidden; text-align: center; }
+.gw-presets img { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; }
+.gw-presets span { display: block; padding: 4px 2px; font: 700 12px Inter, sans-serif; color: var(--text); }
+.gw-presets button.on { border-color: var(--ui-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-accent) 25%, transparent); }
+.gw-check { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; border: 1px dashed #f59e0b; background: rgba(245,158,11,.08); cursor: pointer; }
+.gw-check input { margin-top: 3px; width: 18px; height: 18px; }
+.gw-check small { display: block; color: var(--text-soft); font-size: 12.5px; margin-top: 2px; line-height: 1.45; }
+.gw-mgr, .gw-mgrbox { border-color: color-mix(in srgb, var(--ui-accent) 45%, transparent) !important; background: color-mix(in srgb, var(--ui-accent) 6%, transparent) !important; border-radius: 14px !important; }
+/* çark */
+.gw-wheel { position: relative; width: min(300px, 78vw); margin: 10px auto 6px; }
+.gw-wheel svg { width: 100%; display: block; filter: drop-shadow(0 8px 18px rgba(0,0,0,.2)); }
+.gw-ptr { position: absolute; left: 50%; top: -6px; transform: translateX(-50%); width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 26px solid #15171c; z-index: 2; filter: drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
+.gw-wname { min-height: 34px; text-align: center; font: 800 22px Inter, sans-serif; color: var(--text); opacity: 0; transform: scale(.8); transition: .35s; }
+.gw-wname.on { opacity: 1; transform: none; }
+/* mini (slot) */
+.gw-slot { margin: 12px 0; padding: 24px 10px; border-radius: 14px; background: var(--surface-soft); border: 2px solid var(--border); overflow: hidden; text-align: center; }
+.gw-slot-in { font: 900 clamp(24px, 7vw, 38px) Inter, sans-serif; color: var(--text); min-height: 1.2em; }
+.gw-slot-in.tick { animation: gwTick .12s ease-out; }
+@keyframes gwTick { from { transform: translateY(-40%); opacity: .2; } }
+.gw-slot.win { border-color: #f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,.2); }
+.gw-slot.win .gw-slot-in { color: #b45309; animation: gwPop .5s ease-out; }
 </style>
 
 
@@ -160,15 +219,22 @@
     <a href="/icerikler" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
 </nav>
 
-<section class="intro">
-    <div class="badge"><i></i><span>ÇEKİLİŞ</span></div>
-    <h1>Küp <span>Çekilişi</span></h1>
-    <p>Üye ol, çekilişe katıl, küp kazan! Kayıtlar çekilişten 24 saat önce kapanır; çekiliş günü kazanan herkesin önünde rastgele seçilir. Kazanırsan <b>2 dakika içinde onaylaman</b> gerekiyor.</p>
+<section class="gw-top">
+    <div class="gw-top-tx">
+        <h1>Çekilişler</h1>
+        <p>Küp, timer, koçluk ve daha fazlası. Üye ol, tek dokunuşla katıl; kazanan herkesin önünde çarkla ya da mini çekilişle seçilir.</p>
+    </div>
+    <div class="gw-top-art" aria-hidden="true"><img src="/img/cekilis/kup.svg" alt=""><img src="/img/cekilis/timer.svg" alt=""><img src="/img/cekilis/kocluk.svg" alt=""></div>
 </section>
+<ol class="gw-steps">
+    <li><b>1</b><span><strong>Katıl</strong>Giriş yap, bildirimleri aç ve katıl.</span></li>
+    <li><b>2</b><span><strong>Bekle</strong>Çark çekilişinde kayıtlar 24 saat, mini çekilişte 10 dakika önce kapanır.</span></li>
+    <li><b>3</b><span><strong>Kazan</strong>Kazanırsan 2 dakika içinde onayla, ödül kargoyla gelsin.</span></li>
+</ol>
 
 <div class="gw-wrap">
     <div class="gw-mgr" id="gwMgr" hidden></div>
-    <div id="gwListWrap"><div class="gw-list" id="gwList"><p class="gw-empty">Yükleniyor…</p></div></div>
+    <div id="gwListWrap"><div class="gw-list" id="gwList"><p class="gw-empty">Yükleniyor…</p></div><section class="gw-try" id="gwTry"></section></div>
     <div id="gwOne" hidden></div>
 </div>
 
