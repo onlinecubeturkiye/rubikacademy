@@ -10,12 +10,13 @@
 html.ra-app .navbar { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important; border-bottom: 1px solid var(--border) !important; }
 html.ra-app .navbar::after { display: none !important; }
 html.ra-app .nav-logo-mark { border-radius: 8px !important; box-shadow: none !important; }
+html.ra-app:not([data-skin]) .navbar { border-top: 3px solid var(--ra-red, #b3212b) !important; }
 
 /* alt sekme çubuğu: düz; seçili sekme yalnız koyu yazı + üst çizgi */
 html.ra-app .ra-tabbar { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important; }
 html.ra-app .ra-tabbar a { border-radius: 0 !important; color: #8a8a8a !important; position: relative; }
-html.ra-app .ra-tabbar a.on { background: none !important; color: var(--text) !important; }
-html.ra-app .ra-tabbar a.on::before { content: ""; position: absolute; top: -6px; left: 28%; right: 28%; height: 2px; border-radius: 2px; background: var(--text); }
+html.ra-app .ra-tabbar a.on { background: none !important; color: var(--ui-accent) !important; }
+html.ra-app .ra-tabbar a.on::before { content: ""; position: absolute; top: -6px; left: 22%; right: 22%; height: 2px; border-radius: 2px; background: var(--ui-accent); }
 
 /* açılır pencereler: düz */
 html.ra-app .ra-pushmod, html.ra-app .ra-lock { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
