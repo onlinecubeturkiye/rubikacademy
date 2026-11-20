@@ -196,6 +196,25 @@
 .gw-flags span { padding: 2px 8px; border-radius: 99px; font: 700 11.5px Inter, sans-serif; }
 .gw-flags .warn { background: rgba(245,158,11,.14); color: #b45309; }
 .gw-flags .bad { background: rgba(220,38,38,.12); color: #dc2626; }
+
+.gw-req { border: 1px solid var(--border); border-radius: 14px; padding: 14px; background: var(--surface-soft); }
+.gw-req h3 { margin: 0 0 10px; font: 800 17px Inter, sans-serif; color: var(--text); }
+.gw-req ol { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.gw-req li { display: flex; gap: 10px; align-items: flex-start; padding: 10px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); }
+.gw-req li > b { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-soft); border: 2px solid var(--border); font: 800 14px Inter, sans-serif; color: var(--text-soft); }
+.gw-req li.ok { border-color: rgba(34,197,94,.45); }
+.gw-req li.ok > b { background: #16a34a; border-color: #16a34a; color: #fff; }
+.gw-req li > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.gw-req strong { font: 800 14.5px Inter, sans-serif; color: var(--text); }
+.gw-req li span { font-size: 13px; line-height: 1.5; color: var(--text-soft); }
+.gw-reqb { display: flex; flex-wrap: wrap; gap: 8px; }
+.gw-reqb label.btn { cursor: pointer; }
+.gw-yt { background: #ff0033 !important; color: #fff !important; border-color: #ff0033 !important; }
+.gw-proofp { max-width: 100%; max-height: 180px; border-radius: 10px; border: 1px solid var(--border); }
+.gw-reqbox { padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); }
+.gw-pth { flex: none; width: 46px; height: 46px; padding: 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); cursor: zoom-in; background: var(--surface-soft); }
+.gw-pth img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gw-proofbig { max-width: 100%; max-height: 60vh; border-radius: 10px; border: 1px solid var(--border); }
 </style>
 
 
@@ -249,7 +268,7 @@
     <div class="gw-top-art" aria-hidden="true"><img src="/img/cekilis/akilli-kup.svg" alt=""><img src="/img/cekilis/timer.svg" alt=""><img src="/img/cekilis/kup.svg" alt=""></div>
 </section>
 <ol class="gw-steps">
-    <li><b>1</b><span><strong>Katıl</strong>Giriş yap, bildirimleri aç ve katıl.</span></li>
+    <li><b>1</b><span><strong>Şartları tamamla</strong>Hesabın açık olsun, bildirimleri aç, istenirse kanala abone olduğunu gösteren ekran görüntüsünü yükle.</span></li>
     <li><b>2</b><span><strong>Bekle</strong>Çark çekilişinde kayıtlar 24 saat, mini çekilişte 10 dakika önce kapanır.</span></li>
     <li><b>3</b><span><strong>Kazan</strong>Kazanırsan 2 dakika içinde onayla, ödül kargoyla gelsin.</span></li>
 </ol>
