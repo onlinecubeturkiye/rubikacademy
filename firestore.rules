@@ -367,8 +367,9 @@ service cloud.firestore {
         allow read: if true;
         allow create: if request.auth != null && request.auth.uid == uid && !suspended(uid)
           && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt
-          && request.resource.data.keys().hasOnly(['name', 'ts'])
+          && request.resource.data.keys().hasOnly(['name', 'ts', 'd'])
           && request.resource.data.name is string && request.resource.data.name.size() <= 24
+          && (!('d' in request.resource.data) || (request.resource.data.d is string && request.resource.data.d.size() <= 40))
           && request.resource.data.ts == request.time;
         allow delete: if gwMgr() || (request.auth != null && request.auth.uid == uid
           && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt);

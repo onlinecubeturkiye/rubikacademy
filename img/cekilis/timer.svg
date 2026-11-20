@@ -1,7 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0f766e"/><stop offset="1" stop-color="#064e3b"/></linearGradient><radialGradient id="l" cx=".5" cy=".55" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="640" height="360" fill="url(#g)"/><circle cx="320" cy="190" r="190" fill="url(#l)"/><circle cx="603" cy="332" r="2.4" fill="#f6c719" opacity=".75"/><rect x="115" y="285" width="8.0" height="4.0" rx="1.5" fill="#2c6fe6" opacity=".75" transform="rotate(38 115 285)"/><rect x="32" y="242" width="11.1" height="5.6" rx="1.5" fill="#179e4f" opacity=".75" transform="rotate(145 32 242)"/><circle cx="543" cy="183" r="3.6" fill="#2c6fe6" opacity=".75"/><rect x="176" y="22" width="8.9" height="4.5" rx="1.5" fill="#f6c719" opacity=".75" transform="rotate(168 176 22)"/><rect x="573" y="154" width="7.3" height="3.7" rx="1.5" fill="#ff7a1a" opacity=".75" transform="rotate(32 573 154)"/><circle cx="153" cy="70" r="2.5" fill="#e6252f" opacity=".75"/><rect x="629" y="239" width="14.0" height="7.0" rx="1.5" fill="#e6252f" opacity=".75" transform="rotate(80 629 239)"/><circle cx="573" cy="134" r="3.1" fill="#ff7a1a" opacity=".75"/><rect x="606" y="65" width="11.7" height="5.9" rx="1.5" fill="#179e4f" opacity=".75" transform="rotate(83 606 65)"/><circle cx="583" cy="180" r="4.0" fill="#2c6fe6" opacity=".75"/><rect x="570" y="129" width="13.4" height="6.7" rx="1.5" fill="#ffffff" opacity=".75" transform="rotate(130 570 129)"/><rect x="113" y="319" width="12.2" height="6.1" rx="1.5" fill="#2c6fe6" opacity=".75" transform="rotate(86 113 319)"/><circle cx="525" cy="201" r="3.9" fill="#ff7a1a" opacity=".75"/><rect x="327" y="328" width="13.1" height="6.5" rx="1.5" fill="#ff7a1a" opacity=".75" transform="rotate(141 327 328)"/><circle cx="222" cy="13" r="4.9" fill="#e6252f" opacity=".75"/><rect x="366" y="27" width="7.8" height="3.9" rx="1.5" fill="#ff7a1a" opacity=".75" transform="rotate(158 366 27)"/><rect x="76" y="188" width="8.0" height="4.0" rx="1.5" fill="#2c6fe6" opacity=".75" transform="rotate(38 76 188)"/><circle cx="556" cy="154" r="4.2" fill="#ffffff" opacity=".75"/><g transform="translate(320 205)"><ellipse cx="0" cy="92" rx="190" ry="16" fill="#000" opacity=".25"/>
-<path d="M-200 60 Q-200 -10 -120 -30 L120 -30 Q200 -10 200 60 Z" fill="#1d1d22"/>
-<path d="M-185 58 Q-180 5 -115 -15 L115 -15 Q180 5 185 58 Z" fill="#2a2a31"/>
-<ellipse cx="-118" cy="22" rx="52" ry="30" fill="#3b3b44"/><ellipse cx="-118" cy="18" rx="44" ry="24" fill="#e6252f"/>
-<ellipse cx="118" cy="22" rx="52" ry="30" fill="#3b3b44"/><ellipse cx="118" cy="18" rx="44" ry="24" fill="#179e4f"/>
-<rect x="-56" y="-12" width="112" height="46" rx="8" fill="#0d1210" stroke="#444" stroke-width="3"/>
-<text x="0" y="22" text-anchor="middle" font-family="JetBrains Mono,Consolas,monospace" font-size="30" font-weight="700" fill="#5dff8b">7.42</text></g><g font-family="Plus Jakarta Sans,Inter,Arial,sans-serif" font-weight="800"><rect x="22" y="22" rx="14" width="182" height="36" fill="#000" opacity=".28"/><text x="38" y="46" font-size="17" fill="#fff" letter-spacing=".5">TIMER ÇEKİLİŞİ</text></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+<defs>
+<radialGradient id="bg" cx=".72" cy=".45" r=".85"><stop offset="0" stop-color="#10b981"/><stop offset=".55" stop-color="#0b3b2e"/><stop offset="1" stop-color="#0b0d14"/></radialGradient>
+<radialGradient id="spot" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<radialGradient id="sh" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+<linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="#0b0d14" stop-opacity=".75"/><stop offset=".55" stop-color="#0b0d14" stop-opacity="0"/></linearGradient>
+<pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" fill="#fff" opacity=".07"/></pattern>
+<defs><linearGradient id="tb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3f4b"/><stop offset="1" stop-color="#12141a"/></linearGradient>
+<linearGradient id="pr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a63"/><stop offset="1" stop-color="#b3121b"/></linearGradient>
+<linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4ade80"/><stop offset="1" stop-color="#15803d"/></linearGradient>
+<linearGradient id="lcd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1f16"/><stop offset="1" stop-color="#06120c"/></linearGradient></defs>
+</defs>
+<rect width="1280" height="720" fill="url(#bg)"/>
+<rect width="1280" height="720" fill="url(#dots)"/>
+<ellipse cx="900" cy="330" rx="420" ry="330" fill="url(#spot)"/>
+<ellipse cx="860" cy="600" rx="360" ry="46" fill="url(#sh)"/><g transform="translate(860 430) scale(.86)">
+<path d="M-400 120 C-400 -10 -330 -90 -220 -100 L220 -100 C330 -90 400 -10 400 120 Z" fill="url(#tb)"/>
+<path d="M-380 116 C-378 0 -320 -70 -222 -80 L222 -80 C320 -70 378 0 380 116 Z" fill="#20232c"/>
+<ellipse cx="-225" cy="30" rx="130" ry="78" fill="#0e1015"/><ellipse cx="-225" cy="22" rx="118" ry="68" fill="url(#pr)"/><ellipse cx="-250" cy="0" rx="60" ry="22" fill="#fff" opacity=".22"/>
+<ellipse cx="225" cy="30" rx="130" ry="78" fill="#0e1015"/><ellipse cx="225" cy="22" rx="118" ry="68" fill="url(#pg)"/><ellipse cx="200" cy="0" rx="60" ry="22" fill="#fff" opacity=".22"/>
+<rect x="-88" y="-48" width="176" height="84" rx="14" fill="#0b0c10" stroke="#3b3f4a" stroke-width="4"/>
+<rect x="-76" y="-38" width="152" height="64" rx="8" fill="url(#lcd)"/>
+<text x="0" y="12" text-anchor="middle" font-family="'DS-Digital','JetBrains Mono',Consolas,monospace" font-size="48" font-weight="700" fill="#5dff9a">8.47</text>
+<rect x="-30" y="70" width="60" height="12" rx="6" fill="#0b0c10"/></g>
+<rect width="1280" height="720" fill="url(#fade)"/>
+<g font-family="'Plus Jakarta Sans','Segoe UI',Helvetica,Arial,sans-serif">
+<rect x="72" y="408" width="54" height="6" rx="3" fill="#5dff9a"/>
+<text x="72" y="388" font-size="26" font-weight="700" fill="#fff" fill-opacity=".72" letter-spacing="4">RUBIK ACADEMY</text>
+<text x="70" y="500" font-size="84" font-weight="800" fill="#fff" letter-spacing="-1">Timer</text>
+<text x="72" y="582" font-size="84" font-weight="800" fill="#5dff9a" letter-spacing="-1">Çekilişi</text>
+<text x="72" y="640" font-size="28" font-weight="600" fill="#fff" fill-opacity=".7">Speed timer kazanma şansı</text>
+</g>
+</svg>
