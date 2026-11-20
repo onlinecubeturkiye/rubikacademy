@@ -1,4 +1,4 @@
-/* Sade tema Zeka Küpü Türkiye çizgisine geçti: eski "Klasik" (mor) temada kalanlar bir kez yeni temaya alınır */
+/* Sade tema yenilendi: eski "Klasik" (mor) temada kalanlar bir kez yeni temaya alınır */
 try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1"); if (localStorage.getItem("site-skin") === "klasik") { localStorage.setItem("site-skin", "standart"); document.documentElement.removeAttribute("data-skin"); } } } catch (e) {}
 /* =========================================================
    KİŞİSEL VERİ YALNIZ HESAPTA (her şeyden önce çalışır)
@@ -425,7 +425,7 @@ function raApplyPrefs(json) {
 })();
 /* Tema stili (renk paleti + yazı tipi): localStorage "site-skin" */
 var RA_SKINS = [
-    ["standart", ["#f5f4f0", "#b3212b", "#ffffff", "#18181b"]],
+    ["standart", ["#f5f4f0", "#2b50d6", "#ffffff", "#18181b"]],
     ["klasik", ["#f7f8fc", "#6c5ce7", "#ec4899", "#12141f"]],
     ["rubik", ["#fff8ec", "#ffd21f", "#1d5bff", "#17171f"]],
     ["neon", ["#05060b", "#22d3ee", "#d946ef", "#e8f6ff"]],
