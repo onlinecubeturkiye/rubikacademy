@@ -50,15 +50,21 @@ async function sendTo(list, payload) {
     return ok;
 }
 
+// pushed: false → true işlemle (canlı gönderici live.mjs ile aynı bildirimi iki kez göndermesin)
+async function claim(ref) {
+    try { return await db.runTransaction(async (t) => { const d = await t.get(ref); if (!d.exists || d.get("pushed") !== false) return false; t.update(ref, { pushed: true }); return true; }); }
+    catch (e) { return false; }
+}
+
 // Herkese açık duyurular
 for (const d of (await db.collection("broadcasts").where("pushed", "==", false).get()).docs) {
     const at = ms(d.get("at")) || ms(d.get("ts"));
     if (at > now) continue;   // planlı, zamanı gelmedi
     // comp-KOD: yeni ev yarışması duyurusu (oda sahibinin tarayıcısı yazar) → bildirim o yarışmayı açar
+    if (!(await claim(d.ref))) continue;
     const isComp = /^comp-[A-Z0-9]{5}$/.test(d.id), code = isComp ? d.id.slice(5) : "";
     const n = await sendTo(subs, isComp ? { title: "Yeni ev yarışması 🏠", body: d.get("text") || "", tag: "c:" + code, url: "/icerikler/ev-yarismasi?ev=" + code }
         : { title: "Rubik Academy", body: d.get("text") || "", tag: "b:" + at, url: "/" });
-    await d.ref.update({ pushed: true });
     console.log("duyuru", d.id, "→", n);
 }
 
@@ -69,31 +75,19 @@ for (const uid of Object.keys(byUid)) {
     for (const d of (await db.collection("users").doc(uid).collection("notifications").where("pushed", "==", false).get()).docs) {
         const at = ms(d.get("at")) || ms(d.get("ts"));
         if (at > now) continue;
-        const n = await sendTo(byUid[uid], { title: "Rubik Academy", body: d.get("text") || "", tag: "n:" + d.id, url: "/" });
-        await d.ref.update({ pushed: true });
+        if (!(await claim(d.ref))) continue;
+        const m = /rubikacademy\.fun(\/[^\s]*)/.exec(String(d.get("text") || ""));
+        const n = await sendTo(byUid[uid], { title: "Rubik Academy", body: d.get("text") || "", tag: "n:" + d.id, url: m ? m[1] : "/" });
         console.log("bildirim", uid, d.id, "→", n);
     }
 }
-// Hatırlatıcılar (abonelikte rem: "d" = günün karıştırması). Yeni ev yarışması artık tüm abonelere gider.
+// Yeni ev yarışması yedek duyurusu.
 // Durum config/remind belgesinde tutulur: aynı hatırlatma iki kez gitmesin
 const remRef = db.collection("config").doc("remind");
 const rem = (await remRef.get()).data() || {};
 const tr = new Date(now + 3 * 3600e3); // Türkiye saati (UTC+3)
 const today = tr.toISOString().slice(0, 10);
 const wants = (k) => subs.filter((s) => String(s.rem || "").split(",").includes(k));
-// 1) Günün karıştırması: 19:00'dan sonra, bugün henüz çözmeyen üyelere
-if (tr.getUTCHours() >= 19 && rem.d !== today) {
-    const dn = String(Math.floor(Date.UTC(tr.getUTCFullYear(), tr.getUTCMonth(), tr.getUTCDate()) / 86400000));
-    const list = wants("d").filter((s) => s.uid), byU = {};
-    list.forEach((s) => { (byU[s.uid] = byU[s.uid] || []).push(s); });
-    let n = 0;
-    for (const uid of Object.keys(byU)) {
-        const done = (await db.collection("days").doc(dn).collection("times").doc(uid).get()).exists;
-        if (!done) n += await sendTo(byU[uid], { title: "Günün karıştırması 📅", body: "Bugünkü karıştırmayı henüz çözmedin. Sıralamada yerini al!", tag: "d:" + today, url: "/icerikler/gunluk" });
-    }
-    rem.d = today;
-    console.log("günlük hatırlatma →", n);
-}
 // 2) Yeni ev yarışması (yedek): duyurusu yazılmamış, son 2 saatte açılmış odalar → herkese
 const seen = new Set(rem.c || []);
 const fresh = (await db.collection("comps").where("st", "==", "lobby").get()).docs

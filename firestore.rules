@@ -336,7 +336,7 @@ service cloud.firestore {
     // Çekilişler (/icerikler/cekilis): yönetici kurar; kayıtlar çekilişten 24 saat önce kapanır.
     // Çekilişte rastgele seçilen kişi 2 dakika içinde onaylar, sonra teslimat bilgilerini gönderir.
     match /giveaways/{gid} {
-      function gk() { return ['title', 'prize', 'desc', 'img', 'drawAt', 'closeAt', 'host', 'hName', 'st', 'w', 'wName', 'wAt', 'claimBy', 'cAt', 'x', 'n', 'ts', 'mode', 'test']; }
+      function gk() { return ['title', 'prize', 'desc', 'img', 'drawAt', 'closeAt', 'host', 'hName', 'st', 'w', 'wName', 'wAt', 'claimBy', 'cAt', 'x', 'n', 'ts', 'mode', 'test', 'yt', 'ytUrl']; }
       allow read: if true;
       allow create: if gwMgr() && gid.matches('^[A-Za-z0-9]{6,24}$')
         && request.resource.data.keys().hasOnly(gk())
@@ -349,6 +349,9 @@ service cloud.firestore {
         && request.resource.data.drawAt is timestamp && request.resource.data.drawAt > request.time
         && (!('mode' in request.resource.data) || request.resource.data.mode in ['cark', 'mini'])
         && (!('test' in request.resource.data) || request.resource.data.test is bool)
+        // katılım şartı: YouTube kanalına abonelik görseli (yt = kanal adı, ytUrl = kanal bağlantısı)
+        && (!('yt' in request.resource.data) || (request.resource.data.yt is string && request.resource.data.yt.size() <= 80))
+        && (!('ytUrl' in request.resource.data) || (request.resource.data.ytUrl is string && request.resource.data.ytUrl.size() <= 200))
         // kayıtlar: normalde çekilişten 24 saat önce, mini çekilişte 10 dakika önce, deneme çekilişinde çekiliş anına kadar açık
         && (request.resource.data.closeAt == request.resource.data.drawAt - duration.value(24, 'h')
             || (request.resource.data.get('mode', '') == 'mini' && request.resource.data.closeAt == request.resource.data.drawAt - duration.value(10, 'm'))
@@ -370,10 +373,24 @@ service cloud.firestore {
           && request.resource.data.keys().hasOnly(['name', 'ts', 'd'])
           && request.resource.data.name is string && request.resource.data.name.size() <= 24
           && (!('d' in request.resource.data) || (request.resource.data.d is string && request.resource.data.d.size() <= 40))
-          && request.resource.data.ts == request.time;
+          && request.resource.data.ts == request.time
+          // abonelik görseli istenen çekilişte görsel aynı anda (aynı toplu yazımda) yüklenmiş olmalı
+          && (get(/databases/$(database)/documents/giveaways/$(gid)).data.get('yt', '') == ''
+              || existsAfter(/databases/$(database)/documents/giveaways/$(gid)/proof/$(uid)));
         allow delete: if gwMgr() || (request.auth != null && request.auth.uid == uid
           && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt);
         allow update: if false;
+      }
+      // Katılım şartı görseli (ör. YouTube abonelik ekran görüntüsü): yalnız sahibi ve yöneticiler görür
+      match /proof/{uid} {
+        allow read: if gwMgr() || (request.auth != null && request.auth.uid == uid);
+        allow create, update: if request.auth != null && request.auth.uid == uid && !suspended(uid)
+          && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt
+          && request.resource.data.keys().hasOnly(['img', 'ts'])
+          && request.resource.data.img is string && request.resource.data.img.size() <= 400000
+          && request.resource.data.img.matches('data:image/(jpeg|png|webp);base64,.+')
+          && request.resource.data.ts == request.time;
+        allow delete: if gwMgr() || (request.auth != null && request.auth.uid == uid);
       }
       // Kazananın teslimat bilgileri: yalnız kazanan yazar (onayladıktan sonra), yalnız kazanan ve yöneticiler okur
       match /claim/{uid} {

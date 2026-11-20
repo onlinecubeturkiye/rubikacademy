@@ -1,0 +1,40 @@
+name: Canlı bildirim gönderici
+# Site kapalıyken de bildirim gitsin diye Firestore'u anlık dinleyen gönderici.
+# ~5,5 saat açık kalır ve bitmeden kendini yeniden başlatır. Zamanlanmış tetikleme yalnız yedek:
+# zincir koparsa (ör. GitHub kesintisi) birkaç saat içinde yeniden başlar. Elle başlatmak için: Actions → bu iş → Run workflow.
+# Gerekli gizli anahtarlar: FIREBASE_SERVICE_ACCOUNT, VAPID_PRIVATE_KEY
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */3 * * *"
+  push:
+    branches: [main]
+    paths: [".github/push/live.mjs", ".github/workflows/push-live.yml"]
+concurrency:
+  group: push-live
+  cancel-in-progress: false
+permissions:
+  contents: read
+  actions: write
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/push
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: .github/push/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: .github/push
+      - run: node live.mjs
+        working-directory: .github/push
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_MIN: "340"
