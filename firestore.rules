@@ -347,11 +347,11 @@ service cloud.firestore {
         && request.resource.data.desc is string && request.resource.data.desc.size() <= 1500
         && request.resource.data.img is string && request.resource.data.img.size() <= 500
         && request.resource.data.drawAt is timestamp && request.resource.data.drawAt > request.time
-        && (!('mode' in request.resource.data) || request.resource.data.mode in ['cark', 'mini'])
+        && (!('mode' in request.resource.data) || request.resource.data.mode in ['cark', 'mini', 'rastgele'])
         && (!('test' in request.resource.data) || request.resource.data.test is bool)
         // katılım şartı: YouTube kanalına abonelik görseli (yt = kanal adı, ytUrl = kanal bağlantısı)
-        && (!('yt' in request.resource.data) || (request.resource.data.yt is string && request.resource.data.yt.size() <= 80))
-        && (!('ytUrl' in request.resource.data) || (request.resource.data.ytUrl is string && request.resource.data.ytUrl.size() <= 200))
+        && (!('yt' in request.resource.data) || (request.resource.data.yt is string && request.resource.data.yt.size() <= 120))
+        && (!('ytUrl' in request.resource.data) || (request.resource.data.ytUrl is string && request.resource.data.ytUrl.size() <= 400))
         // kayıtlar: normalde çekilişten 24 saat önce, mini çekilişte 10 dakika önce, deneme çekilişinde çekiliş anına kadar açık
         && (request.resource.data.closeAt == request.resource.data.drawAt - duration.value(24, 'h')
             || (request.resource.data.get('mode', '') == 'mini' && request.resource.data.closeAt == request.resource.data.drawAt - duration.value(10, 'm'))
@@ -386,9 +386,11 @@ service cloud.firestore {
         allow read: if gwMgr() || (request.auth != null && request.auth.uid == uid);
         allow create, update: if request.auth != null && request.auth.uid == uid && !suspended(uid)
           && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt
-          && request.resource.data.keys().hasOnly(['img', 'ts'])
+          && request.resource.data.keys().hasOnly(['img', 'img2', 'ts'])
           && request.resource.data.img is string && request.resource.data.img.size() <= 400000
           && request.resource.data.img.matches('data:image/(jpeg|png|webp);base64,.+')
+          && (!('img2' in request.resource.data) || (request.resource.data.img2 is string && request.resource.data.img2.size() <= 400000
+              && request.resource.data.img2.matches('data:image/(jpeg|png|webp);base64,.+')))
           && request.resource.data.ts == request.time;
         allow delete: if gwMgr() || (request.auth != null && request.auth.uid == uid);
       }
