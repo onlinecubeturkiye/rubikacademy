@@ -183,7 +183,7 @@ var SITE_I18N = {
                 l3title: "Algoritmaları öğren",
                 l3p: "2-Look OLL/PLL ile başla, F2L ve tam OLL/PLL'e geç.",
                 l4title: "Hızını geliştir",
-                l4p: "Antrenörle tekrar et, günün karıştırmasıyla kendini ölç.",
+                l4p: "Antrenörle tekrar et, ev yarışmalarında kendini ölç.",
                 learnMap: "🗺️ Detaylı yol haritasını gör →",
                 socialSpan: "Bizi takip et",
                 socialH2: "Topluluğa katıl!",
