@@ -479,7 +479,7 @@ function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 /* Diyagram: ftoSvg.js */
-function caseSvg(c, size, set) { return ftoSvg(c.s, size); }
+function caseSvg(c, size, set, group) { return ftoSvg(c.s, size, group && group.m); }
 function renderTabs() {
     var html = "";
     DATA.sets.forEach(function (s) {
@@ -503,7 +503,7 @@ function renderSet() {
         group.cases.forEach(function (c) {
             var st = progress[c.name] || "";
             html += '<div class="case-card' + (st ? " state-" + st : "") + '" data-case="' + escapeHtml(c.name) + '" role="button" tabindex="0">' +
-                '<div class="case-diagram" dir="ltr">' + caseSvg(c, 112, set) + '</div>' +
+                '<div class="case-diagram" dir="ltr">' + caseSvg(c, 112, set, group) + '</div>' +
                 '<div class="case-body"><div class="case-name">' + escapeHtml(c.name) + (c.pos ? ' <span class="case-pos">' + escapeHtml(c.pos) + '</span>' : '') + '</div>' +
                 '<div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>' +
                 (c.alts && c.alts.length ? '<div class="case-alts" dir="ltr">' + c.alts.map(function (a) { return '<div class="case-alt-line">' + escapeHtml(a) + '</div>'; }).join("") + '</div>' : '') +
