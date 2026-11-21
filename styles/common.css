@@ -1583,3 +1583,31 @@ html:not([data-skin]) .ls-item { margin-bottom: 8px; }
 html:not([data-skin]) .page .box, html:not([data-skin]) main .box { border-radius: 18px !important;
     background: linear-gradient(170deg, color-mix(in srgb, var(--ui-accent) 5%, var(--surface)) 0%, var(--surface) 45%) !important; }
 html:not([data-skin]) .ls-item .ls-no { background: var(--tint) !important; color: #fff !important; border-color: var(--tint) !important; }
+html:not([data-skin]) .h-feat .h-ic svg { width: 26px; height: 26px; }
+/* --- renkli tarz: algoritma sayfaları, SSS, sayfa başlık kutuları --- */
+html:not([data-skin]) :is(.faq, .case-card, .gw-card, .vt-panel, .faq-sec, .tile) { --tint: var(--t1); }
+html:not([data-skin]) :is(.case-card, .faq):nth-child(6n+2) { --tint: var(--t2); }
+html:not([data-skin]) :is(.case-card, .faq):nth-child(6n+3) { --tint: var(--t3); }
+html:not([data-skin]) :is(.case-card, .faq):nth-child(6n+4) { --tint: var(--t4); }
+html:not([data-skin]) :is(.case-card, .faq):nth-child(6n+5) { --tint: var(--t5); }
+html:not([data-skin]) :is(.case-card, .faq):nth-child(6n+6) { --tint: var(--t6); }
+/* algoritma kartları: hafif tonlu zemin, renkli kenar; diyagram beyaz kutuda */
+html:not([data-skin]) .case-card { border-radius: 18px !important; border: 1px solid color-mix(in srgb, var(--tint) 22%, var(--border)) !important;
+    background: linear-gradient(160deg, color-mix(in srgb, var(--tint) 10%, var(--surface)) 0%, var(--surface) 55%) !important; overflow: hidden; }
+html:not([data-skin]) .case-card .case-diagram { background: var(--surface) !important; border-radius: 12px !important; border: 1px solid color-mix(in srgb, var(--tint) 18%, var(--border)); }
+html:not([data-skin]) .case-card.state-learning { border-color: #eab308 !important; background: linear-gradient(160deg, rgba(234,179,8,.16) 0%, var(--surface) 60%) !important; }
+html:not([data-skin]) .case-card.state-known { border-color: #22c55e !important; background: linear-gradient(160deg, rgba(34,197,94,.16) 0%, var(--surface) 60%) !important; }
+/* SSS: renkli kartlar, + düğmesi kartın renginde */
+html:not([data-skin]) .faq { border-radius: 16px !important; border: 1px solid color-mix(in srgb, var(--tint) 24%, var(--border)) !important; box-shadow: none !important;
+    background: linear-gradient(160deg, color-mix(in srgb, var(--tint) 10%, var(--surface)) 0%, var(--surface) 55%) !important; }
+html:not([data-skin]) .faq summary::after { background: var(--tint) !important; border-color: var(--tint) !important; color: #fff !important; }
+html:not([data-skin]) .faq-sec h2, html:not([data-skin]) .puz-head, html:not([data-skin]) .subset-heading { border-inline-start-color: var(--ui-accent) !important; }
+/* sayfa başlık kutuları (algoritma setleri vb.): renkli zemin ve süs daireleri */
+html:not([data-skin]) .page > .hero, html:not([data-skin]) .page > section.hero { position: relative; overflow: hidden;
+    background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--ui-accent) 16%, transparent) 0%, transparent 55%),
+                radial-gradient(90% 80% at 0% 100%, color-mix(in srgb, var(--t2) 14%, transparent) 0%, transparent 55%), var(--surface) !important;
+    border: 1px solid color-mix(in srgb, var(--ui-accent) 18%, var(--border)) !important; border-radius: 22px !important; }
+html:not([data-skin]) .page > .hero::after { content: ""; position: absolute; right: -40px; top: -40px; width: 140px; height: 140px; border-radius: 50%; border: 14px solid color-mix(in srgb, var(--ui-accent) 12%, transparent); pointer-events: none; }
+/* çekiliş kartları ve video paneli */
+html:not([data-skin]) .gw-card, html:not([data-skin]) .vt-panel { border-radius: 18px !important; border: 1px solid color-mix(in srgb, var(--tint) 22%, var(--border)) !important;
+    background: linear-gradient(160deg, color-mix(in srgb, var(--tint) 10%, var(--surface)) 0%, var(--surface) 55%) !important; }
