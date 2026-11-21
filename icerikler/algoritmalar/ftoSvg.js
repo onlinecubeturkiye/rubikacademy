@@ -9,13 +9,12 @@ function ftoSvg(s, size, m) {
   var C = { u: "#16c60c", f: "#e8ff24", r: "#6b6b6b", l: "#ff9500", d: "#2f9bff", e: "#8a2be2", i: "#e3121b", b: "#f8fafc" };
   var DARK = "#26282e", ORDER = "ufrldeib", reg = {}, out = [];
   FTO_REG.forEach(function (k) { reg[k] = 1; });
-  out.push('<polygon points="' + FTO_BODY.map(function (p) { return p.join(","); }).join(" ") + '" fill="#0d0e11" stroke="#0d0e11" stroke-width="6" stroke-linejoin="round"/>');
   ["d", "e", "i", "u", "l", "r", "f"].forEach(function (f) {
     (FTO_GEO[f] || []).forEach(function (tri, n) {
       var lab = f + (n + 1), ch = s.charAt(ORDER.indexOf(f) * 9 + n);
       var cx = (tri[0][0] + tri[1][0] + tri[2][0]) / 3, cy = (tri[0][1] + tri[1][1] + tri[2][1]) / 3;
-      var pts = tri.map(function (p) { return (cx + (p[0] - cx) * 0.94).toFixed(1) + "," + (cy + (p[1] - cy) * 0.94).toFixed(1); }).join(" ");
-      out.push('<polygon points="' + pts + '" fill="' + (C[ch] || "#666") + '" stroke="#0d0e11" stroke-width="1.6" stroke-linejoin="round"/>');
+      var pts = tri.map(function (p) { return (cx + (p[0] - cx) * 1).toFixed(1) + "," + (cy + (p[1] - cy) * 1).toFixed(1); }).join(" ");
+      out.push('<polygon points="' + pts + '" fill="' + (C[ch] || "#666") + '" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/>');
     });
   });
   return '<svg viewBox="-9.6 -15.1 297.9 327.2" width="' + size + '" height="' + size + '" aria-hidden="true">' + out.join("") + '</svg>';
