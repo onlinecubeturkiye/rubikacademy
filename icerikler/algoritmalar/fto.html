@@ -300,6 +300,16 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 .mg-nota > div { display: flex; gap: 10px; align-items: baseline; padding: 10px 12px; border-radius: 12px; background: var(--surface-soft, var(--surface)); border: 1px solid var(--border); font-size: 13.5px; color: var(--text-soft); }
 .mg-nota b { font: 800 16px 'JetBrains Mono', monospace; color: var(--text); min-width: 64px; white-space: nowrap; }
 #setTabs { display: flex !important; }
+.fto-sec { margin: 0 0 34px; scroll-margin-top: 80px; }
+.fto-h { margin: 0 0 4px; font-size: 24px; font-weight: 800; color: var(--text); }
+.fto-sec .set-desc { text-align: left; margin: 0 0 12px; }
+.fto-chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 14px; }
+.fto-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; }
+.fto-chip small { font-size: 11.5px; font-weight: 700; color: var(--text-soft); }
+.fto-chip.on { background: var(--ui-accent); border-color: var(--ui-accent); color: #fff; }
+.fto-chip.on small { color: rgba(255,255,255,.8); }
+.fto-sec h3.subset-heading { font-size: 18px; }
+#setTabs a.set-tab { text-decoration: none; }
 .subset-heading small { font-size: 14px; font-weight: 700; color: var(--text-soft); margin-left: 6px; }
 .case-pos { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 6px; background: var(--surface-soft); border: 1px solid var(--border); font: 800 11px Inter, sans-serif; color: var(--text-soft); vertical-align: middle; }
 </style>
@@ -367,11 +377,10 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
         <div><b dir="ltr">S</b><span>Tetikleyici: <b dir="ltr">Ro R' U R U' Ro'</b></span></div>
         <div><b dir="ltr">H</b><span>Tetikleyici: <b dir="ltr">R U' R' U</b></span></div>
     </div>
-    <p>Diyagramlarda ortadaki büyük sarı üçgen F yüzüdür; üstünde U (yeşil), solunda L (turuncu), sağında R (gri); köşelerde BL (mor), BR (kırmızı) ve D (mavi). Soluk parçalar bu adımda önemsizdir. Algoritmaya başlamadan önce gerekirse F ile hizala.</p>
+    <p>Diyagramlarda ortadaki büyük sarı üçgen F yüzüdür; üstünde U (yeşil), solunda L (turuncu), sağında R (gri); köşelerde BL (mor), BR (kırmızı) ve D (mavi). Algoritmaya başlamadan önce gerekirse F ile hizala.</p>
 </section>
 
 <div class="set-tabs" id="setTabs"></div>
-<p class="set-desc" id="setDesc"></p>
 
 
 
@@ -435,11 +444,11 @@ function T(key, fallback) {
     var d = p[currentLang()] || {};
     return d[key] || (p.tr && p.tr[key]) || fallback || key;
 }
-function progressKey() { return "algo-progress-" + PAGE_KEY + "-" + currentSet; }
-function loadProgress() {
-    try { var p = JSON.parse(localStorage.getItem(progressKey())); return (p && typeof p === "object") ? p : {}; } catch (e) { return {}; }
+function progressKey(setId) { return "algo-progress-" + PAGE_KEY + "-" + (setId || currentSet); }
+function loadProgress(setId) {
+    try { var p = JSON.parse(localStorage.getItem(progressKey(setId))); return (p && typeof p === "object") ? p : {}; } catch (e) { return {}; }
 }
-function saveProgress(p) { try { localStorage.setItem(progressKey(), JSON.stringify(p)); } catch (e) {} }
+function saveProgress(p, setId) { try { localStorage.setItem(progressKey(setId), JSON.stringify(p)); } catch (e) {} }
 function stateOfCard(card) {
     if (card.classList.contains("state-known")) return "known";
     if (card.classList.contains("state-learning")) return "learning";
@@ -468,10 +477,10 @@ function refreshProgressLabels() {
     updateSummary();
 }
 function cycleCard(card) {
-    var name = card.getAttribute("data-case"), p = loadProgress();
+    var name = card.getAttribute("data-case"), sid = card.getAttribute("data-set"), p = loadProgress(sid);
     var next = STATES[(STATES.indexOf(p[name] || "") + 1) % STATES.length];
     if (next) p[name] = next; else delete p[name];
-    saveProgress(p);
+    saveProgress(p, sid);
     applyState(card, next);
     updateSummary();
 }
@@ -479,53 +488,69 @@ function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 /* Diyagram: ftoSvg.js */
-function caseSvg(c, size, set, group) { return ftoSvg(c.s, size, group && group.m); }
-function renderTabs() {
-    var html = "";
-    DATA.sets.forEach(function (s) {
-        html += '<button class="set-tab' + (s.id === currentSet ? " active" : "") + '" data-set="' + s.id + '" >' + escapeHtml(SET_LBL[s.id] || s.id) + '</button>';
-    });
-    document.getElementById("setTabs").innerHTML = html;
-    var d = document.getElementById("setDesc");
-    d.textContent = SET_DESC[currentSet] || "";
+function caseSvg(c, size) { return ftoSvg(c.s, size); }
+function cardHtml(c, set, progress, t) {
+    var st = progress[c.name] || "";
+    return '<div class="case-card' + (st ? " state-" + st : "") + '" data-case="' + escapeHtml(c.name) + '" data-set="' + set.id + '" role="button" tabindex="0">' +
+        '<div class="case-diagram" dir="ltr">' + caseSvg(c, 112) + '</div>' +
+        '<div class="case-body"><div class="case-name">' + escapeHtml(c.name) + (c.pos ? ' <span class="case-pos">' + escapeHtml(c.pos) + '</span>' : '') + '</div>' +
+        '<div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>' +
+        (c.alts && c.alts.length ? '<div class="case-alts" dir="ltr">' + c.alts.map(function (a) { return '<div class="case-alt-line">' + escapeHtml(a) + '</div>'; }).join("") + '</div>' : '') +
+        '<div class="case-status">' + escapeHtml(st ? t[st] : "") + '</div></div></div>';
 }
-function renderSet() {
-    var set = DATA.sets.filter(function (s) { return s.id === currentSet; })[0] || DATA.sets[0];
-    currentSet = set.id;
-    try { localStorage.setItem("algo-set-" + PAGE_KEY, currentSet); } catch (e) {}
-    renderTabs();
-    
-    var progress = loadProgress(), t = progressText(), html = "";
-    var geom = (DATA.geoms && set.geom) ? DATA.geoms[set.geom] : DATA.geom;
-    set.groups.forEach(function (group) {
-        var key = "subset_" + group.subset;
-        html += '<div class="subset-block"><h2 class="subset-heading">' + escapeHtml(group.title || group.subset) + ' <small>' + group.cases.length + '</small></h2><div class="case-grid">';
-        group.cases.forEach(function (c) {
-            var st = progress[c.name] || "";
-            html += '<div class="case-card' + (st ? " state-" + st : "") + '" data-case="' + escapeHtml(c.name) + '" role="button" tabindex="0">' +
-                '<div class="case-diagram" dir="ltr">' + caseSvg(c, 112, set, group) + '</div>' +
-                '<div class="case-body"><div class="case-name">' + escapeHtml(c.name) + (c.pos ? ' <span class="case-pos">' + escapeHtml(c.pos) + '</span>' : '') + '</div>' +
-                '<div class="case-alg" dir="ltr">' + escapeHtml(c.alg) + '</div>' +
-                (c.alts && c.alts.length ? '<div class="case-alts" dir="ltr">' + c.alts.map(function (a) { return '<div class="case-alt-line">' + escapeHtml(a) + '</div>'; }).join("") + '</div>' : '') +
-                '<div class="case-status">' + escapeHtml(st ? t[st] : "") + '</div></div></div>';
+/* Tek sayfa: her yöntem (3-Look, 2-Look, 1-Look) bir bölüm; bölüm içinde PF / TL / LT gibi düğmelerle geçiş.
+   1-Look'ta düğmeler setlerdir (O, V, Q…); seçilen setin Çift ve Tek grupları birlikte görünür. */
+function panesOf(set) {
+    if (set.id !== "1look") return set.groups.map(function (g) { return { key: g.subset, label: g.subset, groups: [g] }; });
+    var out = [], by = {};
+    set.groups.forEach(function (g) {
+        var k = g.subset.split("·")[0].trim();
+        if (!by[k]) { by[k] = { key: k, label: k, groups: [] }; out.push(by[k]); }
+        by[k].groups.push(g);
+    });
+    return out;
+}
+function render() {
+    var t = progressText(), html = "";
+    DATA.sets.forEach(function (set) {
+        var progress = loadProgress(set.id), panes = panesOf(set), sel = "";
+        try { sel = localStorage.getItem("fto-pane-" + set.id) || ""; } catch (e) {}
+        if (!panes.some(function (p) { return p.key === sel; })) sel = panes[0].key;
+        html += '<section class="fto-sec" id="' + set.id + '"><h2 class="fto-h">' + escapeHtml(SET_LBL[set.id] || set.id) + '</h2><p class="set-desc">' + escapeHtml(SET_DESC[set.id] || "") + '</p>' +
+            '<div class="fto-chips" role="tablist">' + panes.map(function (p) {
+                var n = p.groups.reduce(function (a, g) { return a + g.cases.length; }, 0);
+                return '<button type="button" role="tab" class="fto-chip' + (p.key === sel ? " on" : "") + '" data-set="' + set.id + '" data-pane="' + escapeHtml(p.key) + '" aria-selected="' + (p.key === sel) + '">' + escapeHtml(p.label) + '<small>' + n + '</small></button>';
+            }).join("") + '</div>';
+        panes.forEach(function (p) {
+            html += '<div class="fto-pane" data-set="' + set.id + '" data-pane="' + escapeHtml(p.key) + '"' + (p.key === sel ? '' : ' hidden') + '>';
+            p.groups.forEach(function (g) {
+                html += '<div class="subset-block"><h3 class="subset-heading">' + escapeHtml(g.title || g.subset) + ' <small>' + g.cases.length + '</small></h3><div class="case-grid">' +
+                    g.cases.map(function (c) { return cardHtml(c, set, progress, t); }).join("") + '</div></div>';
+            });
+            html += '</div>';
         });
-        html += '</div></div>';
+        html += '</section>';
     });
     document.getElementById("subsetsWrap").innerHTML = html;
+    document.getElementById("setTabs").innerHTML = DATA.sets.map(function (s) { return '<a class="set-tab" href="#' + s.id + '">' + escapeHtml(SET_LBL[s.id] || s.id) + '</a>'; }).join("");
     updateSummary();
 }
 
 fetch("/icerikler/algoritmalar/fto.json?v=20270115")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
-        DATA = data;
-        var saved = null;
-        try { saved = localStorage.getItem("algo-set-" + PAGE_KEY); } catch (e) {}
-        var fromHash = (location.hash || "").replace("#", "");
-        currentSet = [fromHash, saved].filter(function (id) { return id && data.sets.some(function (s) { return s.id === id; }); })[0] || data.sets[0].id;
-        renderSet();
+        DATA = data; currentSet = data.sets[0].id;
+        render();
         var wrap = document.getElementById("subsetsWrap");
         wrap.addEventListener("click", function (e) {
+            var chip = e.target.closest(".fto-chip");
+            if (chip) {
+                var sid = chip.getAttribute("data-set"), key = chip.getAttribute("data-pane");
+                Array.prototype.forEach.call(wrap.querySelectorAll('.fto-chip[data-set="' + sid + '"]'), function (b) { var on = b === chip; b.classList.toggle("on", on); b.setAttribute("aria-selected", on); });
+                Array.prototype.forEach.call(wrap.querySelectorAll('.fto-pane[data-set="' + sid + '"]'), function (p) { p.hidden = p.getAttribute("data-pane") !== key; });
+                try { localStorage.setItem("fto-pane-" + sid, key); } catch (x) {}
+                return;
+            }
             var sel = window.getSelection ? String(window.getSelection()) : "";
             if (sel.length > 0) return;
             var card = e.target.closest(".case-card");
@@ -537,13 +562,8 @@ fetch("/icerikler/algoritmalar/fto.json?v=20270115")
             if (!card) return;
             e.preventDefault(); cycleCard(card);
         });
-        document.getElementById("setTabs").addEventListener("click", function (e) {
-            var b = e.target.closest(".set-tab");
-            if (!b) return;
-            currentSet = b.getAttribute("data-set");
-            history.replaceState(null, "", "#" + currentSet);
-            renderSet();
-        });
+        var h = (location.hash || "").slice(1);
+        if (h && document.getElementById(h)) setTimeout(function () { document.getElementById(h).scrollIntoView(); }, 50);
     })
     .catch(function (err) {
         document.getElementById("loadError").style.display = "block";
@@ -551,7 +571,7 @@ fetch("/icerikler/algoritmalar/fto.json?v=20270115")
     });
 
 // Dil değişince (common.js applyLanguage sonrası çağırır)
-function onLanguageApplied() { if (DATA) { renderTabs(); refreshProgressLabels(); } }
+function onLanguageApplied() { if (DATA) refreshProgressLabels(); }
 </script>
 
 </body>
