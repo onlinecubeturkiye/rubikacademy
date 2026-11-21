@@ -179,8 +179,7 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
         try { var sk0 = localStorage.getItem("site-skin") || "", pm = localStorage.getItem("ra-pack-mode"); if (pc && sk0.indexOf("p-") === 0 && pm) document.documentElement.classList.toggle("dark-mode", pm === "dark"); } catch (e) {}
         var pk = document.createElement("script"); pk.src = "/js/packs.js" + (v ? "?v=" + v : ""); pk.defer = true;
         (document.head || document.documentElement).appendChild(pk);
-        var ad = document.createElement("script"); ad.src = "/js/ad-banner.js" + (v ? "?v=" + v : ""); ad.defer = true;
-        (document.head || document.documentElement).appendChild(ad);
+        // sponsor (Minjuan) reklam alanı kaldırıldı
     } catch (e) {}
 })();
 (function () {
