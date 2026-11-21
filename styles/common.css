@@ -1531,3 +1531,55 @@ html:not([data-skin]) .evh [class*="col"], html:not([data-skin]) .evh-card, html
 html:not([data-skin]) .set-grp, html:not([data-skin]) .set-card, html:not([data-skin]) .item, html:not([data-skin]) .h-feat, html:not([data-skin]) .h-step { border-radius: 12px !important; }
 html:not([data-skin]) .item-logo, html:not([data-skin]) .h-feat-ic, html:not([data-skin]) .h-ic { border-radius: 10px !important; }
 @media (max-width: 600px) { html:not([data-skin]) .h-hero { background-size: 120px auto !important; background-position: right -34px bottom -34px !important; } }
+
+/* =========================================================
+   RENKLİ KUTUCUK TARZI (İçerikler sayfasındaki gibi) — bütün sitede
+   Her karta sırayla bir renk tonu (--tint) verilir: renkli ikon kutusu, hafif tonlu zemin,
+   köşede yumuşak daire. Kutuların başlıklarında renkli çizgi.
+========================================================= */
+html:not([data-skin]) { --t1: #3b82f6; --t2: #22c55e; --t3: #f97316; --t4: #8b5cf6; --t5: #ef4444; --t6: #eab308; }
+html:not([data-skin]) .h-feat, html:not([data-skin]) .h-step, html:not([data-skin]) a.set-card, html:not([data-skin]) .ls-item,
+html:not([data-skin]) .tile {
+    --tint: var(--t1); position: relative; overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--tint) 22%, var(--border)) !important; border-radius: 18px !important;
+    background: linear-gradient(160deg, color-mix(in srgb, var(--tint) 13%, var(--surface)) 0%, var(--surface) 62%) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04) !important; transition: transform .2s ease, border-color .2s ease !important; }
+html:not([data-skin]) .h-feat::after, html:not([data-skin]) .h-step::after, html:not([data-skin]) a.set-card::after {
+    content: ""; position: absolute; right: -28px; bottom: -28px; width: 96px; height: 96px; border-radius: 50%; background: color-mix(in srgb, var(--tint) 12%, transparent); pointer-events: none; }
+html:not([data-skin]) .h-feat:hover, html:not([data-skin]) .h-step:hover, html:not([data-skin]) a.set-card:hover, html:not([data-skin]) .ls-item:hover {
+    transform: translateY(-3px) !important; border-color: color-mix(in srgb, var(--tint) 45%, var(--border)) !important; }
+/* sırayla renk */
+html:not([data-skin]) :is(.h-feat, .h-step, a.set-card, .ls-item):nth-child(6n+2) { --tint: var(--t2); }
+html:not([data-skin]) :is(.h-feat, .h-step, a.set-card, .ls-item):nth-child(6n+3) { --tint: var(--t3); }
+html:not([data-skin]) :is(.h-feat, .h-step, a.set-card, .ls-item):nth-child(6n+4) { --tint: var(--t4); }
+html:not([data-skin]) :is(.h-feat, .h-step, a.set-card, .ls-item):nth-child(6n+5) { --tint: var(--t5); }
+html:not([data-skin]) :is(.h-feat, .h-step, a.set-card, .ls-item):nth-child(6n+6) { --tint: var(--t6); }
+/* ana sayfa kartları: renkli ikon kutusu, telefonda iki sütun */
+html:not([data-skin]) .h-feat .h-ic { background: var(--tint) !important; color: #fff; box-shadow: 0 6px 14px -6px var(--tint) !important; border-radius: 14px !important; }
+html:not([data-skin]) .h-feat .h-go, html:not([data-skin]) .h-step .h-n { color: color-mix(in srgb, var(--tint) 75%, var(--text)) !important; }
+@media (max-width: 600px) {
+    html:not([data-skin]) .h-feats, html:not([data-skin]) .h-path { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+    html:not([data-skin]) .h-feat, html:not([data-skin]) .h-step { padding: 14px 12px !important; }
+    html:not([data-skin]) .h-feat h3, html:not([data-skin]) .h-step h3 { font-size: 15px !important; }
+    html:not([data-skin]) .h-feat p, html:not([data-skin]) .h-step p { font-size: 12.5px !important; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    html:not([data-skin]) .h-feat .h-ic { width: 44px !important; height: 44px !important; font-size: 22px !important; }
+}
+/* algoritma setleri: diyagram kutusu beyaz, ok renkli */
+html:not([data-skin]) a.set-card .sc-diag { background: var(--surface) !important; border: 1px solid color-mix(in srgb, var(--tint) 20%, var(--border)); }
+html:not([data-skin]) a.set-card .sc-arrow { color: color-mix(in srgb, var(--tint) 75%, var(--text)) !important; }
+html:not([data-skin]) .puz-head { border-inline-start-color: var(--ui-accent) !important; }
+/* kutu başlıkları: renkli çizgi */
+html:not([data-skin]) .box > h2:first-child, html:not([data-skin]) .set-card > h2, html:not([data-skin]) .section-title h2, html:not([data-skin]) .subset-heading {
+    display: flex; align-items: center; gap: 10px; }
+html:not([data-skin]) .box > h2:first-child::before, html:not([data-skin]) .set-card > h2::before {
+    content: ""; flex: none; width: 5px; height: 20px; border-radius: 3px; background: var(--ui-accent); }
+/* ayarlar: satır ikonları renkli dairede, kutular tonlu */
+html:not([data-skin]) .srow .ico { width: 34px !important; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 17px !important;
+    background: color-mix(in srgb, var(--tint, var(--ui-accent)) 14%, var(--surface-soft)); }
+html:not([data-skin]) .set-card > h2 { text-transform: none !important; letter-spacing: 0 !important; font-size: 17px !important; color: var(--text) !important; }
+/* dersler listesi */
+html:not([data-skin]) .ls-item { margin-bottom: 8px; }
+/* genel kutular: hafif renk tonu ve yumuşak köşe */
+html:not([data-skin]) .page .box, html:not([data-skin]) main .box { border-radius: 18px !important;
+    background: linear-gradient(170deg, color-mix(in srgb, var(--ui-accent) 5%, var(--surface)) 0%, var(--surface) 45%) !important; }
+html:not([data-skin]) .ls-item .ls-no { background: var(--tint) !important; color: #fff !important; border-color: var(--tint) !important; }
