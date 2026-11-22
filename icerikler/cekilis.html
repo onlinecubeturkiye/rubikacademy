@@ -68,14 +68,15 @@
 .gw-back { border: 0; background: none; color: var(--text-soft); font: 800 14px Inter, sans-serif; cursor: pointer; padding: 6px 0; margin-bottom: 8px; }
 .gw-hero { border-radius: 24px; overflow: hidden; background: var(--surface); border: var(--card-bw, 2px) solid var(--card-border, var(--border)); box-shadow: var(--shadow); }
 .gw-himg { width: 100%; max-height: 380px; object-fit: cover; display: block; }
-.gw-hbody { padding: 18px 20px 20px; }
-.gw-hbody h2 { margin: 0 0 4px; font: 900 clamp(24px, 5vw, 34px) Inter, sans-serif; }
+.gw-hbody { padding: 0 20px 20px; }
+.gw-hhead { padding: 18px 20px 0; }
+.gw-hhead h2 { margin: 0 0 4px; font: 900 clamp(24px, 5vw, 34px) Inter, sans-serif; }
 .gw-desc { margin: 12px 0 0; line-height: 1.6; color: var(--text); }
-.gw-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 16px 0; }
+.gw-facts { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; margin: 16px 0; }
 .gw-facts div { border-radius: 14px; background: var(--surface-soft); border: 1px solid var(--border); padding: 10px; text-align: center; }
 .gw-facts b { display: block; font: 900 15px Inter, sans-serif; color: var(--text); }
 .gw-facts span { font-size: 12px; font-weight: 700; color: var(--text-soft); }
-@media (max-width: 560px) { .gw-facts { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .gw-facts { grid-auto-flow: row; grid-template-columns: 1fr; } }
 .gw-act { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
 .gw-big { width: 100%; justify-content: center; font-size: 16px; padding: 14px; }
 .gw-in { padding: 12px 14px; border-radius: 14px; background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.4); font-weight: 750; color: var(--text); }
@@ -121,12 +122,12 @@
 .gw-top { max-width: 960px; margin: 6px auto 14px; padding: 0 16px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; align-items: center; }
 .gw-top h1 { margin: 0 0 8px; font: 800 clamp(30px, 6vw, 46px) "Plus Jakarta Sans", Inter, sans-serif; letter-spacing: -.02em; color: var(--text); }
 .gw-top p { margin: 0; color: var(--text-soft); line-height: 1.6; font-size: 15.5px; }
-.gw-top-art { position: relative; height: 170px; }
+.gw-top-art { position: relative; width: 100%; max-width: 420px; margin-left: auto; aspect-ratio: 1.75; }
 .gw-top-art img { position: absolute; width: 62%; border-radius: 14px; border: 3px solid var(--surface); box-shadow: 0 10px 28px rgba(0,0,0,.18); }
-.gw-top-art img:nth-child(1) { left: 0; top: 18px; transform: rotate(-6deg); z-index: 1; }
+.gw-top-art img:nth-child(1) { left: 0; top: 10%; transform: rotate(-6deg); z-index: 1; }
 .gw-top-art img:nth-child(2) { right: 0; top: 0; transform: rotate(5deg); z-index: 2; }
-.gw-top-art img:nth-child(3) { left: 22%; top: 62px; transform: rotate(-1deg); z-index: 3; }
-@media (max-width: 640px) { .gw-top { grid-template-columns: 1fr; } .gw-top-art { height: 150px; max-width: 360px; width: 100%; margin: 0 auto; } }
+.gw-top-art img:nth-child(3) { left: 20%; top: 30%; transform: rotate(-1deg); z-index: 3; }
+@media (max-width: 640px) { .gw-top { grid-template-columns: 1fr; } .gw-top-art { max-width: 340px; margin: 0 auto; } }
 .gw-steps { max-width: 960px; margin: 0 auto 18px; padding: 0 16px; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .gw-steps li { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); }
 .gw-steps li > b { flex: none; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--ui-accent); color: #fff; font: 800 14px Inter, sans-serif; }
@@ -225,6 +226,41 @@
 .gw-prh { margin: 12px 0 6px; font: 800 14px Inter, sans-serif; }
 .gw-pth { position: relative; }
 .gw-pth i { position: absolute; right: 2px; bottom: 2px; padding: 0 5px; border-radius: 6px; background: rgba(0,0,0,.65); color: #fff; font: 800 11px/16px Inter, sans-serif; font-style: normal; }
+
+/* ---- bilgisayar düzeni ---- */
+.gw-chkf input { width: auto !important; flex: none; }
+.gw-row2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+#gwRollMsg { min-height: 2.9em; margin: 4px 0 0; }
+@media (min-width: 640px) { .gw-row2 { grid-template-columns: 1fr 1fr; } .gw-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 860px) {
+  .gw-htop { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+  .gw-imgw { min-height: 100%; }
+  .gw-htop .gw-himg { height: 100%; max-height: none; object-position: left center; }
+  .gw-hhead { padding: 24px 26px; display: flex; flex-direction: column; justify-content: center; }
+  .gw-hhead .gw-facts { grid-auto-flow: row; grid-template-columns: 1fr; margin: 14px 0 0; }
+  .gw-hhead .gw-facts div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; text-align: left; padding: 10px 14px; }
+  .gw-hhead .gw-facts b { order: 2; }
+  .gw-hbody { padding: 20px 24px 24px; border-top: 1px solid var(--border); }
+  .gw-req ol { display: grid; grid-template-columns: 1fr 1fr; }
+  .gw-req li:first-child:nth-last-child(odd) { grid-column: 1 / -1; }
+  .gw-in, .gw-note { font-size: 14.5px; }
+}
+/* çark: büyük, ışıklı, kaymasız */
+.gw-mbox:has(.gw-wheel) { width: min(580px, 100%); }
+.gw-wheel { width: min(460px, 80vw, 60vh) !important; margin: 18px auto 8px !important; }
+.gw-wheel svg { filter: drop-shadow(0 14px 30px rgba(0,0,0,.28)); }
+.gw-wg { will-change: transform; }
+.gw-ptr { top: -12px !important; border-left-width: 16px !important; border-right-width: 16px !important; border-top: 30px solid #f59e0b !important; filter: drop-shadow(0 3px 3px rgba(0,0,0,.35)); transform-origin: 50% 0; }
+.gw-wheel.spin .gw-ptr { animation: gwWob .16s ease-in-out infinite alternate; }
+@keyframes gwWob { from { transform: translateX(-50%) rotate(-7deg); } to { transform: translateX(-50%) rotate(7deg); } }
+.gw-bulb { fill: #fde68a; }
+.gw-wheel.spin .gw-bulb { animation: gwBulb .5s steps(1) infinite; }
+.gw-wheel.spin .gw-bulb.b2 { animation-delay: .25s; }
+@keyframes gwBulb { 50% { fill: #57534e; } }
+.gw-wheel.won .gw-bulb { animation: gwBulb .22s steps(1) 8; }
+.gw-wheel.won svg { animation: gwGlow 1.2s ease-out; }
+@keyframes gwGlow { 30% { filter: drop-shadow(0 0 26px rgba(245,158,11,.8)); } }
+.gw-wname { font-size: clamp(22px, 3.4vw, 28px) !important; min-height: 1.5em !important; }
 </style>
 
 
@@ -279,7 +315,7 @@
 </section>
 <ol class="gw-steps">
     <li><b>1</b><span><strong>Şartları tamamla</strong>Hesabın açık olsun, bildirimleri aç, istenirse kanala abone olduğunu gösteren ekran görüntüsünü yükle.</span></li>
-    <li><b>2</b><span><strong>Bekle</strong>Çark çekilişinde kayıtlar 24 saat, mini çekilişte 10 dakika önce kapanır.</span></li>
+    <li><b>2</b><span><strong>Bekle</strong>Kayıtlar çekiliş anına kadar açık; mini çekilişte 10 dakika önce kapanır.</span></li>
     <li><b>3</b><span><strong>Kazan</strong>Kazanırsan 2 dakika içinde onayla, ödül kargoyla gelsin.</span></li>
 </ol>
 

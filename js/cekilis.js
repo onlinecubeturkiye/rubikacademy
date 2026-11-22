@@ -1,7 +1,7 @@
 /* =========================================================
    ÇEKİLİŞ (/icerikler/cekilis) — cekilis.js
    - Admin / Geliştirici rolündekiler (ve site yöneticisi) sitede çekiliş kurar
-   - Üyeler katılır; kayıtlar çekilişten 24 saat önce kapanır
+   - Üyeler katılır; kayıtlar çekiliş anına kadar açık (mini: 10 dk önce kapanır)
    - Çekiliş saatinde rastgele bir katılımcı seçilir (sayfa açık olan yönetici yapar; herkes canlı görür)
    - Kazanana bildirim gider; 2 dakika içinde onaylamazsa yeni kişi çekilir
    - Onaylayan kazanan teslimat bilgilerini gönderir; bilgiler yalnız yöneticilere gelir (+ kurana bildirim)
@@ -10,7 +10,7 @@
 (function () {
     var cfg = window.RA_FIREBASE || {};
     var ROOT = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents";
-    var CLAIM_MS = 2 * 60000, CLOSE_MS = 24 * 3600000;
+    var CLAIM_MS = 2 * 60000;
     var TS = { drawAt: 1, closeAt: 1, wAt: 1, claimBy: 1, cAt: 1, ts: 1 };
     function $(id) { return document.getElementById(id); }
     function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
@@ -68,7 +68,7 @@
     function badges(g) {
         return '<span class="gw-tag ' + modeOf(g) + '">' + MODE_LBL[modeOf(g)] + '</span>' + (g.test ? '<span class="gw-tag test">🧪 Deneme</span>' : '');
     }
-    var CLOSE = { cark: CLOSE_MS, mini: 10 * 60000, rastgele: CLOSE_MS };
+    var CLOSE = { cark: 0, mini: 10 * 60000, rastgele: 0 };
     // varsayılan katılım şartı: bu kanala abone olduğunu gösteren ekran görüntüsü (oluştururken değiştirilebilir)
     var YT_DEF = [["Mert Sağdınç", "https://www.youtube.com/@AlgoMert"], ["Rubik Academy", "https://www.youtube.com/@rubikacademyy"]];
     // g.yt = "Kanal 1|Kanal 2", g.ytUrl = "url1|url2": her kanal için ayrı abonelik görseli istenir (en çok 2)
@@ -182,14 +182,14 @@
         else if (p === "drawn") act = iWon ? '<button type="button" class="btn primary gw-big" id="gwClaimOpen">🎉 Kazandın! Onaylamak için dokun</button>' : '<div class="gw-note">Kazananın onayı bekleniyor (' + left(g.claimBy - now) + ').</div>';
         else if (p === "claimed") act = iWon ? '<button type="button" class="btn primary" id="gwAddr">📦 Teslimat bilgilerim</button>' : '';
         $("gwOne").innerHTML = '<button type="button" class="gw-back" id="gwBack">← Tüm çekilişler</button>' +
-            '<div class="gw-hero"><div class="gw-imgw"><img class="gw-himg" src="' + esc(imgOf(g)) + '" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/cekilis/kup.svg\'"><div class="gw-tags">' + badges(g) + '</div></div>' +
-            '<div class="gw-hbody"><h2>' + esc(g.title) + '</h2><div class="gw-prize big">🏆 ' + esc(g.prize || "") + '</div>' + stLabel(g) +
+            '<div class="gw-hero"><div class="gw-htop"><div class="gw-imgw"><img class="gw-himg" src="' + esc(imgOf(g)) + '" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/cekilis/kup.svg\'"><div class="gw-tags">' + badges(g) + '</div></div>' +
+            '<div class="gw-hhead"><h2>' + esc(g.title) + '</h2><div class="gw-prize big">🏆 ' + esc(g.prize || "") + '</div>' + stLabel(g) +
             (g.desc ? '<p class="gw-desc">' + esc(g.desc).replace(/\n/g, "<br>") + '</p>' : '') +
-            '<div class="gw-facts"><div><b id="gwCnt">' + S.count + '</b><span>katılımcı</span></div><div><b>' + esc(dt(g.closeAt)) + '</b><span>kayıtların kapanışı</span></div><div><b>' + esc(dt(g.drawAt)) + '</b><span>çekiliş</span></div></div>' +
-            '<div class="gw-act">' + act + '</div><div class="gw-msg" id="gwMsg"></div></div></div>' +
+            '<div class="gw-facts"><div><b id="gwCnt">' + S.count + '</b><span>katılımcı</span></div>' + (g.closeAt < g.drawAt ? '<div><b>' + esc(dt(g.closeAt)) + '</b><span>kayıtların kapanışı</span></div>' : '') + '<div><b>' + esc(dt(g.drawAt)) + '</b><span>çekiliş</span></div></div></div></div>' +
+            '<div class="gw-hbody"><div class="gw-act">' + act + '</div><div class="gw-msg" id="gwMsg"></div></div></div>' +
             '<section class="gw-ppl"><h3>👥 Katılanlar <span id="gwPplN">' + S.count + '</span></h3><div class="gw-pplc" id="gwPplList"><p class="gw-note">Yükleniyor…</p></div></section>' +
             (S.mgr ? '<div class="gw-mgrbox" id="gwMgrOne"></div>' : '') +
-            '<p class="gw-rules">Kurallar: Yalnız site üyeleri katılabilir, herkesin tek hakkı vardır. ' + (g.test ? 'Bu bir deneme çekilişidir; ödül verilmez. ' : modeOf(g) === "mini" ? 'Mini çekilişte kayıtlar çekilişten 10 dakika önce kapanır. ' : 'Kayıtlar çekilişten 24 saat önce kapanır. ') + 'Kazanan rastgele seçilir ve 2 dakika içinde onaylamazsa yeni bir kişi çekilir. Teslimat bilgileri yalnız çekilişi düzenleyenlerle paylaşılır.</p>';
+            '<p class="gw-rules">Kurallar: Yalnız site üyeleri katılabilir, herkesin tek hakkı vardır. ' + (g.test ? 'Bu bir deneme çekilişidir; ödül verilmez. ' : modeOf(g) === "mini" ? 'Mini çekilişte kayıtlar çekilişten 10 dakika önce kapanır. ' : 'Kayıtlar çekiliş anına kadar açıktır. ') + 'Kazanan rastgele seçilir ve 2 dakika içinde onaylamazsa yeni bir kişi çekilir. Teslimat bilgileri yalnız çekilişi düzenleyenlerle paylaşılır.</p>';
         $("gwBack").onclick = backToList;
         if ($("gwLogin")) $("gwLogin").onclick = function () { Account.openLogin && Account.openLogin(); };
         if ($("gwJoin")) $("gwJoin").onclick = function () { join(false); };
@@ -365,10 +365,16 @@
     /* ---------- yönetici ---------- */
     function renderMgrOne() {
         var g = S.g, box = $("gwMgrOne"); if (!box) return;
+        // eski 24 saat kuralıyla açılmış çark/rastgele çekilişlerini yöneticide kendiliğinden yeniden aç
+        // katılan yokken yanlışlıkla çekilip "boş" kalan çekilişi de yeniden aç
+        if (g.drawAt > Date.now() && !S.fixing && ((g.st === "open" && !g.test && modeOf(g) !== "mini" && g.closeAt < g.drawAt) || g.st === "empty")) {
+            S.fixing = 1;
+            patch("/giveaways/" + g.id, g.st === "empty" ? { st: "open", closeAt: modeOf(g) === "mini" && !g.test ? g.drawAt - 10 * 60000 : g.drawAt } : { closeAt: g.drawAt }).then(function (r) { S.fixing = 0; if (r.ok) return fetchOne(g.id).then(renderOne); }, function () { S.fixing = 0; });
+        }
         var p = phase(g);
         box.innerHTML = '<h3>🛡 Yönetici</h3><div class="gw-mrow">' +
             (p === "closed" || p === "drawing" || (g.test && p === "open") ? '<button type="button" class="btn primary sm" id="gwDraw">' + MODE_LBL[modeOf(g)].split(" ")[0] + ' Şimdi çek</button>' : '') +
-            (p === "drawn" || p === "expired" || p === "claimed" ? '<button type="button" class="btn sm" id="gwRedraw">🔁 Yeniden çek</button>' : '') +
+            (p === "drawn" || p === "expired" || p === "claimed" || p === "empty" ? '<button type="button" class="btn sm" id="gwRedraw">🔁 Yeniden çek</button>' : '') +
             '<button type="button" class="btn sm gw-del" id="gwDel">🗑 Çekilişi sil</button></div>' +
             '<p class="gw-note">Çekilişi sen başlatırsın (kayıtlar kapandıktan sonra <b>Şimdi çek</b>). Kazanan 2 dakika içinde onaylamazsa bu sayfa açıkken sıradaki kişi kendiliğinden çekilir.</p>' +
             (skipNames(g).length ? '<p class="gw-note">Onaylamayan / iptal edilenler: <b>' + skipNames(g).map(esc).join(" → ") + '</b></p>' : '') +
@@ -397,6 +403,8 @@
         var g = S.g; if (!g || S.busy) return; S.busy = true;
         listEntries(g.id).then(function (l) {
             S.entries = l;
+            // katılan yokken çekiliş yapılmaz: hiçbir şey yazmadan uyar
+            if (!l.length) { alert("Henüz katılan yok, çekiliş yapılamaz."); return; }
             // x: onaylamayan / iptal edilen kazananlar ("uid|isim,uid|isim"), tekrar çekilmezler
             var skip = String(g.x || "").split(",").filter(Boolean);
             if (redo && g.w) skip.push(g.w + "|" + String(g.wName || "").replace(/[,|]/g, " ").slice(0, 24));
@@ -447,7 +455,9 @@
     function checkPeople() {
         var g = S.g, box = $("gwChk"); if (!g || !box) return;
         listEntries(g.id).then(function (l) {
-            S.entries = l; S.entriesFor = g.id; S.entriesN = l.length;
+            S.entries = l;
+            // katılan yokken çekiliş yapılmaz: hiçbir şey yazmadan uyar
+            if (!l.length) { alert("Henüz katılan yok, çekiliş yapılamaz."); return; } S.entriesFor = g.id; S.entriesN = l.length;
             var jobs = l.map(function (x) { return x; }), out = {}, k = 0;
             function worker() {
                 if (k >= jobs.length) return Promise.resolve();
@@ -547,10 +557,10 @@
         var owner = !!(window.Account && Account.isAdmin && Account.isAdmin());
         var pick = "kup", mode = "cark";
         box.innerHTML = '<details class="gw-new"><summary>➕ Yeni çekiliş oluştur</summary><form id="gwNew" class="gw-form">' +
-            '<div class="gw-f"><span>Çekiliş türü</span><div class="gw-seg" id="gnMode"><button type="button" data-m="cark" class="on">🎡 Çark<small>Kayıtlar 24 saat önce kapanır, çark döner</small></button><button type="button" data-m="mini">⚡ Mini<small>Kısa çekiliş: kayıtlar 10 dk önce kapanır</small></button><button type="button" data-m="rastgele">🎲 Rastgele<small>Katılanlar arasından ışık gezer, bir kişide durur</small></button></div></div>' +
+            '<div class="gw-f"><span>Çekiliş türü</span><div class="gw-seg" id="gnMode"><button type="button" data-m="cark" class="on">🎡 Çark<small>Kayıtlar çekilişe kadar açık, çark döner</small></button><button type="button" data-m="mini">⚡ Mini<small>Kısa çekiliş: kayıtlar 10 dk önce kapanır</small></button><button type="button" data-m="rastgele">🎲 Rastgele<small>Katılanlar arasından ışık gezer, bir kişide durur</small></button></div></div>' +
             '<div class="gw-f"><span>Görsel</span><div class="gw-presets" id="gnPre">' + PRESETS.map(function (p) { return '<button type="button" data-p="' + p[0] + '"' + (p[0] === pick ? ' class="on"' : '') + '><img src="/img/cekilis/' + p[0] + '.svg" alt="" loading="lazy"><span>' + esc(p[1]) + '</span></button>'; }).join("") + '</div></div>' +
-            '<label class="gw-f"><span>Başlık *</span><input id="gnTitle" maxlength="80" required placeholder="Küp çekilişi"></label>' +
-            '<label class="gw-f"><span>Ödül *</span><input id="gnPrize" maxlength="120" required placeholder="3x3 manyetik speed küp"></label>' +
+            '<div class="gw-row2"><label class="gw-f"><span>Başlık *</span><input id="gnTitle" maxlength="80" required placeholder="Küp çekilişi"></label>' +
+            '<label class="gw-f"><span>Ödül *</span><input id="gnPrize" maxlength="120" required placeholder="3x3 manyetik speed küp"></label></div>' +
             // açıklama ve kendi görsel bağlantısı yalnız site sahibinin hesabında görünür
             (owner ? '<label class="gw-f"><span>Açıklama</span><textarea id="gnDesc" maxlength="1500" rows="3" placeholder="Şartlar, sponsor, notlar…"></textarea></label>' +
             '<label class="gw-f"><span>Kendi görsel bağlantın (isteğe bağlı, hazır görselin yerine)</span><input id="gnImg" maxlength="500" placeholder="https://…jpg"></label>' : '') +
@@ -564,7 +574,7 @@
             '<button type="submit" class="btn primary">Oluştur</button><div class="gw-msg" id="gnMsg"></div></form></details>';
         function info() {
             var t = $("gnTest").checked;
-            $("gnInfo").textContent = t ? "Deneme: kayıtlar çekiliş saatine kadar açık; Şimdi çek ile hemen çekebilirsin." : mode === "mini" ? "Mini: kayıtlar çekilişten 10 dakika önce kapanır." : mode === "rastgele" ? "Rastgele: kayıtlar çekilişten 24 saat önce kapanır; kazanan katılımcı listesinden rastgele seçilir." : "Çark: kayıtlar çekilişten 24 saat önce kapanır.";
+            $("gnInfo").textContent = t ? "Deneme: kayıtlar çekiliş saatine kadar açık; Şimdi çek ile hemen çekebilirsin." : mode === "mini" ? "Mini: kayıtlar çekilişten 10 dakika önce kapanır." : mode === "rastgele" ? "Rastgele: kayıtlar çekiliş anına kadar açık; kazanan katılımcı listesinden rastgele seçilir." : "Çark: kayıtlar çekiliş anına kadar açık.";
         }
         function suggest() {
             var p = PRESETS.filter(function (x) { return x[0] === pick; })[0];
@@ -584,7 +594,7 @@
             var test = $("gnTest").checked, close = test ? 0 : CLOSE[mode];
             var at = new Date($("gnAt").value).getTime(), img = $("gnImg") ? $("gnImg").value.trim() : "";
             if (!at || at <= Date.now() + 60000) { $("gnMsg").textContent = "En az 1 dakika sonrası için bir tarih seç."; return; }
-            if (!test && at - close < Date.now() && !confirm("Çekilişe " + (mode === "mini" ? "10 dakikadan" : "24 saatten") + " az var: kayıtlar hemen kapalı olur. Yine de oluşturulsun mu?")) return;
+            if (!test && close && at - close < Date.now() && !confirm("Çekilişe 10 dakikadan az var: kayıtlar hemen kapalı olur. Yine de oluşturulsun mu?")) return;
             if (img && !/^https:\/\//.test(img)) { $("gnMsg").textContent = "Görsel bağlantısı https:// ile başlamalı."; return; }
             var ycs = [], bad = "";
             Array.prototype.forEach.call(document.querySelectorAll(".gw-ych"), function (row) {
@@ -641,11 +651,15 @@
                 return '<path d="M150,150 L' + p(a0, R) + ' A' + R + ',' + R + ' 0 ' + (seg > 180 ? 1 : 0) + ',1 ' + p(a1, R) + ' Z" fill="' + col + '" stroke="#fff" stroke-width="2"/>' +
                     '<text x="150" y="150" transform="rotate(' + (mid - 90) + ' 150 150) translate(' + (R - 12) + ' 0)" text-anchor="end" dominant-baseline="middle" font-size="' + (n > 16 ? 10 : n > 10 ? 12 : 14) + '" font-weight="800" fill="' + (dark ? "#15171c" : "#fff") + '" font-family="Inter,sans-serif">' + esc(label) + '</text>';
             }).join("");
-            el.innerHTML = '<div class="gw-wheel"><div class="gw-ptr"></div><svg viewBox="0 0 300 300"><g class="gw-wg">' + sl + '</g><circle cx="150" cy="150" r="20" fill="#fff" stroke="#15171c" stroke-width="4"/><circle cx="150" cy="150" r="7" fill="#15171c"/></svg></div><div class="gw-wname" id="gwWName"></div>';
+            var bulbs = ""; for (var k = 0; k < 24; k++) bulbs += '<circle class="gw-bulb' + (k % 2 ? ' b2' : '') + '" cx="' + p(k * 15, 146).split(",")[0] + '" cy="' + p(k * 15, 146).split(",")[1] + '" r="2.6"/>';
+            el.innerHTML = '<div class="gw-wheel"><div class="gw-ptr"></div><svg viewBox="0 0 300 300"><defs><radialGradient id="gwHub" cx="40%" cy="35%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e5e7eb"/></radialGradient><radialGradient id="gwShade" cx="50%" cy="50%" r="50%"><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></radialGradient></defs>' +
+                '<circle cx="150" cy="150" r="150" fill="#15171c"/><g class="gw-wg">' + sl + '</g><circle cx="150" cy="150" r="140" fill="url(#gwShade)" pointer-events="none"/>' + bulbs +
+                '<circle cx="150" cy="150" r="26" fill="url(#gwHub)" stroke="#15171c" stroke-width="4"/><image href="/RubikAcademyLogo.png" x="134" y="134" width="32" height="32"/></svg></div><div class="gw-wname" id="gwWName"></div>';
             var g = el.querySelector(".gw-wg"), target = 360 * 6 - (wi * seg + seg / 2) + (rnd(60) - 30) / 100 * seg;
             g.style.transformOrigin = "150px 150px"; g.style.transform = "rotate(0deg)";
+            var wh = el.querySelector(".gw-wheel"); wh.classList.add("spin");
             requestAnimationFrame(function () { requestAnimationFrame(function () { g.style.transition = "transform 6s cubic-bezier(.12,.62,.08,1)"; g.style.transform = "rotate(" + target + "deg)"; }); });
-            setTimeout(function () { var w = el.querySelector(".gw-wname"); if (w) { w.textContent = "🏆 " + winner; w.classList.add("on"); } if (done) done(); }, 6200);
+            setTimeout(function () { wh.classList.remove("spin"); wh.classList.add("won"); var w = el.querySelector(".gw-wname"); if (w) { w.textContent = "🏆 " + winner; w.classList.add("on"); } if (done) done(); }, 6200);
         },
         mini: function (el, names, winner, done) {
             el.innerHTML = '<div class="gw-slot"><div class="gw-slot-in" id="gwSlotIn"></div></div>';
