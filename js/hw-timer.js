@@ -1,14 +1,12 @@
 /* =========================================================
    DONANIM TIMER (hw-timer.js) — csTimer'daki gibi
-   1) Kablolu timer (Stackmat / SpeedStacks / QiYi / YJ): timer'ın veri çıkışı, ses kablosuyla
+   1) Kablolu timer (Stackmat / SpeedStacks / YJ): timer'ın veri çıkışı, ses kablosuyla
       telefonun / bilgisayarın mikrofon girişine bağlanır. Sinyal 1200 baud seri veridir:
       paket = durum harfi + 5 (Gen 3) ya da 6 (Gen 4/5) rakam + sağlama + "\n\r".
       Sağlama = 64 + rakamların toplamı. Kutup (ters/düz) kendiliğinden bulunur.
    2) Akıllı timer'lar (Bluetooth), seçilen cihazın adına göre:
       - GAN Smart Timer / Halo: servis 0xFFF0, durum 0xFFF5; paket 0xFE, uzunluk, ?, durum, [dk, sn, ms(2)], crc16.
         Durumlar: 1 hazırlan, 2 eller kalktı, 3 çalışıyor, 4 durdu (süre), 5 boşta, 6 eller üstte, 7 bitti
-      - QiYi Smart Timer (QY-Timer / QY-Adapter): servis 0xFD50; AES-128 ile şifreli, parçalı paketler,
-        CRC16/MODBUS; bağlanınca MAC adresiyle "merhaba" gönderilir, her süre kaydı onaylanır.
       (Protokoller csTimer ve açık kaynak topluluk çalışmalarındaki belgelere göre bağımsız yazıldı.)
    Olaylar: cb(type, data) → "status" {kind, on, msg}, "ready", "start", "tick" ms, "stop" ms, "reset"
    Otomatik algılama:
@@ -135,9 +133,8 @@
         } catch (e) { return Promise.resolve(false); }
     }
 
-    /* ---------------- Akıllı timer'lar (Bluetooth): GAN Smart Timer / Halo, QiYi Smart Timer ---------------- */
+    /* ---------------- Akıllı timer (Bluetooth): GAN Smart Timer / Halo ---------------- */
     var GAN_SVC = "0000fff0-0000-1000-8000-00805f9b34fb", GAN_STATE = "0000fff5-0000-1000-8000-00805f9b34fb";
-    var QY_SVC = "0000fd50-0000-1000-8000-00805f9b34fb", QY_W = "00000001-0000-1001-8001-00805f9b07d0", QY_R = "00000002-0000-1001-8001-00805f9b07d0", QY_CIC = 0x0504;
     var GT = { dev: null, on: false, running: false, t0: 0, raf: 0, model: "", stopped: false, name: "", batt: null, last: "", lastMs: -1, lastAt: 0 };
     function info() { emit("info", { name: GT.name, model: GT.model, batt: GT.batt, last: GT.last }); }
     function hex(dv) { var o = []; for (var i = 0; i < dv.byteLength && i < 20; i++) o.push((dv.getUint8(i) + 0x100).toString(16).slice(1).toUpperCase()); return o.join(" "); }
@@ -178,192 +175,14 @@
         }).catch(function () {});
     }
 
-    // --- QiYi: AES-128 (ECB, anahtar 16 × 0x77) ile şifreli, parçalı paketler; CRC16/MODBUS
-    function crc16modbus(a) { var c = 0xFFFF; for (var i = 0; i < a.length; i++) { c ^= a[i]; for (var j = 0; j < 8; j++) c = c & 1 ? (c >>> 1) ^ 0xA001 : c >>> 1; } return c; }
-    function makeAes(key) {
-        var S = new Array(256), Si = new Array(256), i;
-        var xt = function (a) { return ((a << 1) ^ (a & 0x80 ? 0x1b : 0)) & 0xff; };
-        var mul = function (a, b) { var r = 0; while (b) { if (b & 1) r ^= a; a = xt(a); b >>= 1; } return r; };
-        for (i = 0; i < 256; i++) {
-            var inv = 0; if (i) for (var j = 1; j < 256; j++) if (mul(i, j) === 1) { inv = j; break; }
-            var sv = inv, r = inv; for (var k = 0; k < 4; k++) { r = ((r << 1) | (r >> 7)) & 0xff; sv ^= r; }
-            S[i] = sv ^ 0x63; Si[S[i]] = i;
-        }
-        var w = key.slice(), rc = 1;
-        for (i = 16; i < 176; i += 4) {
-            var t = w.slice(i - 4, i);
-            if (i % 16 === 0) { t = [S[t[1]] ^ rc, S[t[2]], S[t[3]], S[t[0]]]; rc = xt(rc); }
-            for (var q = 0; q < 4; q++) w[i + q] = w[i - 16 + q] ^ t[q];
-        }
-        function addKey(b, n) { for (var i = 0; i < 16; i++) b[i] ^= w[n * 16 + i]; }
-        function shift(b, inv) { var c = b.slice(); for (var r = 1; r < 4; r++) for (var col = 0; col < 4; col++) b[r + 4 * col] = c[r + 4 * ((col + (inv ? 4 - r : r)) % 4)]; }
-        function mix(b, inv) {
-            var m = inv ? [14, 11, 13, 9] : [2, 3, 1, 1];
-            for (var c = 0; c < 4; c++) { var a = b.slice(4 * c, 4 * c + 4); for (var r = 0; r < 4; r++) b[4 * c + r] = mul(a[r], m[0]) ^ mul(a[(r + 1) % 4], m[1]) ^ mul(a[(r + 2) % 4], m[2]) ^ mul(a[(r + 3) % 4], m[3]); }
-        }
-        return {
-            encrypt: function (b) { addKey(b, 0); for (var n = 1; n <= 10; n++) { for (var i = 0; i < 16; i++) b[i] = S[b[i]]; shift(b, false); if (n < 10) mix(b, false); addKey(b, n); } return b; },
-            decrypt: function (b) { addKey(b, 10); for (var n = 9; n >= 0; n--) { shift(b, true); for (var i = 0; i < 16; i++) b[i] = Si[b[i]]; addKey(b, n); if (n > 0) mix(b, true); } return b; }
-        };
-    }
-    var QY = { aes: null, w: null, wait: 0, len: 0, buf: [], mac: "", lastSn: -1 };
-    function qyAes() { return QY.aes || (QY.aes = makeAes([0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77])); }
-    function be(n, k) { var o = []; for (var i = k - 1; i >= 0; i--) o.push((n >>> (8 * i)) & 0xff); return o; }
-    // Mesaj → şifreli parçalar (her parça: başlık + 16 bayt)
-    function qyFrames(sn, ack, cmd, data) {
-        var m = be(sn, 4).concat(be(ack, 4), be(cmd, 2), be(data.length, 2), data), c = crc16modbus(m);
-        m.push(c >> 8, c & 0xff);
-        var out = [];
-        for (var i = 0; i < m.length; i += 16) {
-            var blk = m.slice(i, i + 16); while (blk.length < 16) blk.push(1);
-            qyAes().encrypt(blk);
-            out.push((i === 0 ? [0x00, m.length + 2, 0x40, 0x00] : [i >> 4]).concat(blk));
-        }
-        return out;
-    }
-    // Yazma: önce yanıtlı, olmazsa yanıtsız yazma; sonuç tanı satırına
-    function qyWrite(buf) {
-        var w = QY.w; if (!w) return Promise.reject(new Error("yazma yok"));
-        var f = w.writeValueWithResponse ? function () { return w.writeValueWithResponse(buf); } : function () { return w.writeValue(buf); };
-        return f().catch(function (e) { return w.writeValueWithoutResponse ? w.writeValueWithoutResponse(buf) : Promise.reject(e); });
-    }
-    function qySend(sn, ack, cmd, data) {
-        var p = Promise.resolve();
-        qyFrames(sn, ack, cmd, data).forEach(function (f) { p = p.then(function () { return qyWrite(new Uint8Array(f).buffer); }); });
-        return p.then(function () { return true; }, function (e) { QY.err = (e && (e.message || e.name)) || "yazılamadı"; return false; });
-    }
-    // MAC adayları: şu anki, addan (QY-Timer…-XXXX → CC:A1:00:00:XX:XX, QY-Adapter → CC:A8…)
-    function qyCands() {
-        var out = [], add = function (m) { if (m && out.indexOf(m) < 0) out.push(m); };
-        add(QY.mac);
-        var m = /^QY-(Timer|Adapter).*-([0-9A-F]{4})$/i.exec((GT.name || "").trim());
-        if (m) { var t = m[2].toUpperCase(); add((m[1].toLowerCase() === "adapter" ? "CC:A8" : "CC:A1") + ":00:00:" + t.slice(0, 2) + ":" + t.slice(2, 4)); add("CC:A1:00:01:" + t.slice(0, 2) + ":" + t.slice(2, 4)); }
-        return out;
-    }
-    function qyDiag() {
-        if (QY.rx) return;
-        GT.last = "MAC " + (QY.mac || "?") + " (" + (QY.macSrc || "?") + ") · selam " + (QY.hello || "gönderilmedi") + (QY.err ? " · hata: " + QY.err : "") + " · gelen mesaj yok";
-        info();
-    }
-    function qyHello(mac) {
-        var d = [0, 0, 0, 0, 0, 33, 8, 0, 1, 5, 90];
-        var b = mac.split(":").map(function (h) { return parseInt(h, 16) || 0; }).reverse();
-        QY.hello = "gönderiliyor…"; qyDiag();
-        return qySend(1, 0, 1, d.concat(b)).then(function (ok) {
-            QY.hello = ok ? "gönderildi ✓ (" + (QY.tries || 1) + ")" : "gönderilemedi"; qyDiag();
-            // Timer yanıt vermezse: aynı MAC'le bir kez daha, sonra addan çıkan MAC adaylarını sırayla dene
-            // (Zkt-Timer'daki küp sürücüsünün yöntemi). Yanıt veren MAC kaydedilir.
-            clearTimeout(QY.retryT);
-            QY.retryT = setTimeout(function () {
-                if (QY.rx || !GT.on) return;
-                var c = qyCands(), i = c.indexOf(QY.mac), next = (QY.tries || 1) % 2 === 1 ? QY.mac : c[(i + 1) % c.length];
-                if ((QY.tries || 1) >= 6) { QY.hello = "yanıt yok — MAC yanlış olabilir, MAC değiştir'e bas"; qyDiag(); return; }
-                QY.tries = (QY.tries || 1) + 1;
-                if (next && next !== QY.mac) { QY.mac = next; QY.macSrc = "aday"; }
-                qyHello(QY.mac);
-            }, 3000);
-        });
-    }
-    // Gelen parçaları birleştir, çöz, doğrula → komut
-    function qyFeed(bytes) {
-        var m = Array.prototype.slice.call(bytes);
-        if (m[0] !== QY.wait) { QY.wait = 0; QY.buf = []; if (m[0] !== 0) return null; }
-        if (m[0] === 0) { QY.len = m[1] - 2; m = m.slice(4); } else m = m.slice(1);
-        for (var i = 0; i < m.length; i += 16) {
-            var blk = m.slice(i, i + 16);
-            if (blk.length < 16) { QY.wait = 0; QY.buf = []; return null; }
-            QY.buf = QY.buf.concat(qyAes().decrypt(blk));
-        }
-        if (QY.buf.length < QY.len) { QY.wait++; return null; }
-        var d = QY.buf.slice(0, QY.len); QY.wait = 0; QY.buf = [];
-        var len = d[10] << 8 | d[11];
-        if (d.length < len + 14 || crc16modbus(d.slice(0, len + 12)) !== (d[len + 12] << 8 | d[len + 13])) return null;
-        return { sn: (d[0] << 24 | d[1] << 16 | d[2] << 8 | d[3]) >>> 0, ack: (d[4] << 24 | d[5] << 16 | d[6] << 8 | d[7]) >>> 0, cmd: d[8] << 8 | d[9], data: d.slice(12, 12 + len) };
-    }
-    function u32(a, i) { return (a[i] << 24 | a[i + 1] << 16 | a[i + 2] << 8 | a[i + 3]) >>> 0; }
-    function qyMsg(msg) {
-        if (!msg || msg.cmd !== 0x1003) return;
-        var d = msg.data;
-        if (d[0] === 1 && d[1] === 1) { // çözüm kaydı: süre (ms); aynı kayıt (aynı sıra no.) ikinci kez gelirse yok sayılır
-            if (msg.sn !== QY.lastSn) { QY.lastSn = msg.sn; btStop(u32(d, 8)); }
-            qySend(msg.ack + 1, msg.sn, 0x1003, [0x00]);
-        } else if (d[0] === 4 && d[1] === 4) { // durum: 0 boşta, 1 inceleme, 2 hazır, 3 çalışıyor, 4 bitti, 5 durdu, 6 koptu
-            // (csTimer qiyitimer.js ile aynı): süre data[5..8], büyük sonlu, milisaniye
-            var s = d[4], ms = u32(d, 5);
-            if (s === 2) { GT.stopped = false; emit("ready"); }
-            else if (s === 1) { GT.stopped = false; emit("ready"); }
-            else if (s === 3) { if (!GT.running) btStart(); }
-            else if (s === 4 || s === 5) { if (ms > 0) { GT.running = true; btStop(ms); } else if (GT.running) btStop(Math.round(now() - GT.t0)); }
-            else if (s === 0) { if (!GT.running) btIdle(); }
-            else if (s === 6) btLost();
-        }
-    }
-    // Tanı: çözülen QiYi mesajları (komut + veri) son 4 tanesi ekranda gösterilir
-    QY.log = [];
-    function qyEvent(e) {
-        var v = e.target.value, m = qyFeed(new Uint8Array(v.buffer, v.byteOffset, v.byteLength));
-        if (!QY.rx && m && QY.mac && GT.dev) { try { localStorage.setItem(PREF + "-mac-" + (GT.dev.id || GT.dev.name), QY.mac); } catch (x) {} }
-        QY.rx = (QY.rx || 0) + 1;
-        if (m) {
-            var hx = m.data.slice(0, 16).map(function (b) { return (b + 0x100).toString(16).slice(1).toUpperCase(); }).join(" ");
-            QY.log.push((m.cmd + 0x10000).toString(16).slice(1).toUpperCase() + ": " + hx); if (QY.log.length > 4) QY.log.shift();
-            GT.last = QY.log.join(" / ");
-        } else if (!QY.wait) GT.last = (QY.log.length ? QY.log.join(" / ") + " / " : "") + "çözülemedi: " + hex(v);
-        info(); qyMsg(m);
-    }
-    // MAC adresi: önce yayın paketindeki üretici verisi, yoksa addan (QY-Timer-XXXX → CC:A1:00:00:XX:XX), yoksa sor
-    function qyMac(dev) {
-        var key = PREF + "-mac-" + (dev.id || dev.name), saved = ""; try { saved = localStorage.getItem(key) || ""; } catch (e) {}
-        var fromName = function () {
-            var m = /^QY-(Timer|Adapter).*-([0-9A-F]{4})$/i.exec((dev.name || "").trim());
-            return m ? (m[1].toLowerCase() === "adapter" ? "CC:A8" : "CC:A1") + ":00:00:" + m[2].slice(0, 2).toUpperCase() + ":" + m[2].slice(2, 4).toUpperCase() : "";
-        };
-        var fromAdv = new Promise(function (res) {
-            if (!dev.watchAdvertisements || !window.AbortController) return res("");
-            var ac = new AbortController(), done = function (v) { try { ac.abort(); } catch (e) {} dev.removeEventListener("advertisementreceived", on); res(v); };
-            var on = function (ev) {
-                var md = ev.manufacturerData; if (!md || !md.size) return;
-                var dv = md.get(QY_CIC); if (!dv || dv.byteLength < 6) return;
-                var mac = []; for (var i = 5; i >= 0; i--) mac.push((dv.getUint8(i) + 0x100).toString(16).slice(1).toUpperCase());
-                done(mac.join(":"));
-            };
-            dev.addEventListener("advertisementreceived", on);
-            dev.watchAdvertisements({ signal: ac.signal }).catch(function () { done(""); });
-            setTimeout(function () { done(""); }, 4000);
-        });
-        return fromAdv.then(function (mac) {
-            QY.macSrc = mac ? "yayından" : saved ? "kayıtlı" : fromName() ? "addan" : "";
-            mac = mac || saved || fromName();
-            if (mac) QY.mac = mac.toUpperCase();
-            if (!/^([0-9A-F]{2}:){5}[0-9A-F]{2}$/i.test(mac)) {
-                mac = (window.prompt("QiYi timer'ın MAC adresini yaz (ör. CC:A1:00:00:12:34). Timer'ın kutusunda ya da QiYi uygulamasında yazar.", "") || "").trim().toUpperCase();
-            }
-            if (/^([0-9A-F]{2}:){5}[0-9A-F]{2}$/i.test(mac)) { if (!QY.macSrc) QY.macSrc = "elle"; QY.mac = mac.toUpperCase(); try { localStorage.setItem(key, mac); } catch (e) {} return mac; }
-            throw new Error("mac");
-        });
-    }
-    function qyInit(srv, dev, mac) {
-        QY.wait = 0; QY.buf = []; QY.rx = 0; QY.tries = 1; QY.err = ""; QY.hello = "";
-        return srv.getPrimaryService(QY_SVC).then(function (svc) { return svc.getCharacteristics(); }).then(function (chs) {
-            var f = function (u) { return chs.filter(function (c) { return c.uuid.toLowerCase() === u; })[0]; };
-            QY.w = f(QY_W); var r = f(QY_R);
-            if (!QY.w || !r) throw new Error("chr");
-            r.addEventListener("characteristicvaluechanged", qyEvent);
-            return r.startNotifications();
-        }).then(function () { return qyHello(mac); });
-    }
-
     // --- ortak bağlanma
-    function btModel(dev) { return /^QY-/i.test(dev.name || "") ? "qiyi" : "gan"; }
+    function btModel() { return "gan"; }
     function btAttach(dev) {
         GT.dev = dev; GT.model = btModel(dev); GT.name = dev.name || ""; GT.batt = null; GT.last = "";
         dev.removeEventListener("gattserverdisconnected", btLost); dev.addEventListener("gattserverdisconnected", btLost);
-        var label = (GT.model === "qiyi" ? "QiYi" : "GAN") + " (" + (dev.name || "timer") + ")";
+        var label = "GAN (" + (dev.name || "timer") + ")";
         emit("status", { kind: "gan", on: false, msg: "Bağlanıyor… " + label });
-        var macP = GT.model === "qiyi" ? qyMac(dev) : Promise.resolve("");
-        return macP.then(function (mac) {
-            return dev.gatt.connect().then(function (srv) { return (GT.model === "qiyi" ? qyInit(srv, dev, mac) : ganInit(srv)).then(function () { battInit(srv); }); });
-        }).then(function () {
+        return dev.gatt.connect().then(function (srv) { return ganInit(srv).then(function () { battInit(srv); }); }).then(function () {
             GT.on = true;
             try { localStorage.setItem(PREF + "-gan", dev.id || "1"); } catch (e) {}
             emit("status", { kind: "gan", on: true, msg: "Akıllı timer bağlı: " + label }); emit("detected", "gan");
@@ -372,14 +191,10 @@
     }
     function btConnect() {
         if (!navigator.bluetooth) { emit("status", { kind: "gan", on: false, msg: "Bu tarayıcı Bluetooth desteklemiyor (Android/masaüstü Chrome kullan; iPhone'da Bluefy)." }); return Promise.resolve(false); }
-        var opts = { filters: [{ namePrefix: "GAN" }, { namePrefix: "Gan" }, { namePrefix: "gan" }, { namePrefix: "QY-Timer" }, { namePrefix: "QY-Adapter" }], optionalServices: [GAN_SVC, QY_SVC, "battery_service"], optionalManufacturerData: [QY_CIC] };
+        var opts = { filters: [{ namePrefix: "GAN" }, { namePrefix: "Gan" }, { namePrefix: "gan" }], optionalServices: [GAN_SVC, "battery_service"] };
         if (!/Bluefy/i.test(navigator.userAgent || "")) opts.filters.push({ services: [GAN_SVC] });
-        return navigator.bluetooth.requestDevice(opts).catch(function (e) {
-            // eski tarayıcı optionalManufacturerData'yı tanımıyorsa onsuz dene
-            if (e && e.name === "TypeError") { delete opts.optionalManufacturerData; return navigator.bluetooth.requestDevice(opts); }
-            throw e;
-        }).then(btAttach)
-            .catch(function (e) { emit("status", { kind: "gan", on: false, msg: e && e.name === "NotFoundError" ? "Timer seçilmedi." : e && e.message === "mac" ? "QiYi timer için MAC adresi gerekli." : "Akıllı timer'a bağlanılamadı." }); return false; });
+        return navigator.bluetooth.requestDevice(opts).then(btAttach)
+            .catch(function (e) { emit("status", { kind: "gan", on: false, msg: e && e.name === "NotFoundError" ? "Timer seçilmedi." : "Akıllı timer'a bağlanılamadı." }); return false; });
     }
     // Daha önce izin verilmiş timer'ı sessizce bul (Chrome: getDevices + watchAdvertisements)
     function btAuto() {
@@ -387,7 +202,7 @@
         var had = false; try { had = !!localStorage.getItem(PREF + "-gan"); } catch (e) {}
         if (!had) return Promise.resolve(false);
         return navigator.bluetooth.getDevices().then(function (list) {
-            var dev = list.filter(function (d) { return /^(gan|qy-timer|qy-adapter)/i.test(d.name || ""); })[0];
+            var dev = list.filter(function (d) { return /^gan/i.test(d.name || ""); })[0];
             if (!dev) return false;
             if (!dev.watchAdvertisements) return btAttach(dev).catch(function () { return false; });
             var ac = window.AbortController ? new AbortController() : null;
@@ -410,19 +225,6 @@
         listening: function () { return SM.on; },
         running: function () { return SM.running || GT.running; },
         disconnect: btDisconnect,
-        // QiYi: MAC'i elle değiştir ve selamı hemen yeniden gönder (yeniden bağlanmadan)
-        qiyiMac: function (mac) {
-            mac = String(mac || "").trim().toUpperCase();
-            if (!/^([0-9A-F]{2}:){5}[0-9A-F]{2}$/.test(mac) || GT.model !== "qiyi" || !GT.dev) return false;
-            QY.mac = mac; QY.macSrc = "elle"; QY.tries = 1; QY.err = "";
-            try { localStorage.setItem(PREF + "-mac-" + (GT.dev.id || GT.dev.name), mac); } catch (e) {}
-            qyHello(mac); return true;
-        },
-        qiyiNameMac: function () {
-            var m = /^QY-(Timer|Adapter).*-([0-9A-F]{4})$/i.exec((GT.name || "").trim());
-            return m ? (m[1].toLowerCase() === "adapter" ? "CC:A8" : "CC:A1") + ":00:00:" + m[2].slice(0, 2).toUpperCase() + ":" + m[2].slice(2, 4).toUpperCase() : "";
-        },
-        mac: function () { return QY.mac || ""; },
         info: function () { return { name: GT.name, model: GT.model, batt: GT.batt, last: GT.last }; },
         // Otomatik algılama: izin daha önce verildiyse sormadan dene
         auto: function () {
@@ -431,6 +233,6 @@
             return used ? micGranted().then(function (ok) { return ok ? smStart(true) : false; }) : Promise.resolve(false);
         },
         supported: function () { return { stackmat: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia), gan: !!navigator.bluetooth }; },
-        _feed: smFeed, _parse: parsePkt, _gan: ganEvent, _qy: { box: QY, frames: qyFrames, feed: qyFeed, msg: qyMsg, aes: makeAes, crc: crc16modbus, state: GT }, _reset: function () { SM.decs = null; SM.seen = false; SM.running = false; SM.lastMs = -1; SM.lastSt = ""; }
+        _feed: smFeed, _parse: parsePkt, _gan: ganEvent, _reset: function () { SM.decs = null; SM.seen = false; SM.running = false; SM.lastMs = -1; SM.lastSt = ""; }
     };
 })();

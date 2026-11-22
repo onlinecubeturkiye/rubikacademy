@@ -1047,19 +1047,13 @@
         if (dv) {
             dv.hidden = !(k === "gan" && on);
             if (!dv.hidden) {
-                dv.innerHTML = '<span class="c-hw-dot"></span><span class="c-hw-di"><b>' + esc(inf.name || "Akıllı timer") + '</b><small>' + (inf.model === "qiyi" ? "QiYi Smart Timer" : "GAN Smart Timer") + (inf.batt != null ? " · 🔋 %" + inf.batt : "") + ' · bağlı</small></span><span class="c-hw-btns">' + (inf.model === "qiyi" ? '<button type="button" class="c-hw-off" id="cHwMac">MAC değiştir</button>' : '') + '<button type="button" class="c-hw-off" id="cHwOff">Bağlantıyı kes</button></span>';
+                dv.innerHTML = '<span class="c-hw-dot"></span><span class="c-hw-di"><b>' + esc(inf.name || "Akıllı timer") + '</b><small>' + "GAN Smart Timer" + (inf.batt != null ? " · 🔋 %" + inf.batt : "") + ' · bağlı</small></span><span class="c-hw-btns">' + '<button type="button" class="c-hw-off" id="cHwOff">Bağlantıyı kes</button></span>';
                 $("cHwOff").onclick = function () { HwTimer.disconnect && HwTimer.disconnect(); hwPaint(); };
-                if ($("cHwMac")) $("cHwMac").onclick = function () {
-                    var sug = (HwTimer.qiyiNameMac && HwTimer.qiyiNameMac()) || (HwTimer.mac && HwTimer.mac()) || "";
-                    var v = window.prompt("QiYi timer'ın MAC adresi (şu an: " + ((HwTimer.mac && HwTimer.mac()) || "?") + ").\nTimer'ın adından önerilen: " + (sug || "—") + "\nTimer'ın kutusunda ya da QiYi uygulamasında da yazar.", sug);
-                    if (v == null) return;
-                    if (!HwTimer.qiyiMac(v)) alert("Geçersiz MAC. Örnek: CC:A1:00:00:BE:88");
-                };
             }
         }
-        $("cHwHelp").innerHTML = k === "gan" && on ? '<span class="c-hw-sig">Son sinyal: <code>' + esc(inf.last || "henüz yok (timer'ı başlatıp durdur)") + '</code></span>' : (k === "gan" ? "Desteklenenler: <b>GAN Smart Timer</b>, <b>GAN Halo</b>, <b>QiYi Smart Timer</b>. Timer'ı aç, <b>Bağlan</b>'a dokun ve listeden seç. Bir kez eşleştikten sonra sonraki girişlerde kendiliğinden bağlanır; timer durunca süre otomatik kaydedilir. " +
-                "<br>Bluetooth için Android'de ya da bilgisayarda <b>Chrome</b> gerekir (iPhone'da Safari desteklemez, <b>Bluefy</b> tarayıcısı kullan). MoYu ve diğer markalar Bluetooth protokollerini yayımlamadığı için bu listede yok: timer'ında <b>veri çıkışı</b> varsa <b>Kablolu timer</b> seçeneğiyle bağla."
-            : "Veri çıkışı olan her timer çalışır (SpeedStacks Gen 2–5, QiYi, MoYu, YJ ve Stackmat uyumlu diğerleri). Timer'ın <b>veri çıkışını</b> (3,5 mm) ses kablosuyla telefonun ya da bilgisayarın <b>mikrofon girişine</b> tak (telefonda 4 kutuplu TRRS adaptör gerekir). Mikrofon izni ver; timer açılınca kendiliğinden algılanır, durunca süre otomatik kaydedilir.");
+        $("cHwHelp").innerHTML = k === "gan" && on ? '<span class="c-hw-sig">Son sinyal: <code>' + esc(inf.last || "henüz yok (timer'ı başlatıp durdur)") + '</code></span>' : (k === "gan" ? "Desteklenenler: <b>GAN Smart Timer</b>, <b>GAN Halo</b>. Timer'ı aç, <b>Bağlan</b>'a dokun ve listeden seç. Bir kez eşleştikten sonra sonraki girişlerde kendiliğinden bağlanır; timer durunca süre otomatik kaydedilir. " +
+                "<br>Bluetooth için Android'de ya da bilgisayarda <b>Chrome</b> gerekir (iPhone'da Safari desteklemez, <b>Bluefy</b> tarayıcısı kullan). MoYu, QiYi ve diğer markalar Bluetooth protokollerini yayımlamadığı için bu listede yok: timer'ında <b>veri çıkışı</b> varsa <b>Kablolu timer</b> seçeneğiyle bağla."
+            : "Veri çıkışı olan her timer çalışır (SpeedStacks Gen 2–5, MoYu, YJ ve Stackmat uyumlu diğerleri). Timer'ın <b>veri çıkışını</b> (3,5 mm) ses kablosuyla telefonun ya da bilgisayarın <b>mikrofon girişine</b> tak (telefonda 4 kutuplu TRRS adaptör gerekir). Mikrofon izni ver; timer açılınca kendiliğinden algılanır, durunca süre otomatik kaydedilir.");
     }
     function hwEvent(type, d) {
         if (type === "status") { hw.st[d.kind] = d; hwPaint(); return; }
