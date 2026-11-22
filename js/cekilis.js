@@ -70,7 +70,7 @@
     }
     var CLOSE = { cark: CLOSE_MS, mini: 10 * 60000, rastgele: CLOSE_MS };
     // varsayılan katılım şartı: bu kanala abone olduğunu gösteren ekran görüntüsü (oluştururken değiştirilebilir)
-    var YT_DEF = [["Mert Sağdınç", "https://www.youtube.com/results?search_query=Mert+Sa%C4%9Fd%C4%B1n%C3%A7"], ["Rubik Academy", "https://www.youtube.com/@rubikacademyy"]];
+    var YT_DEF = [["Mert Sağdınç", "https://www.youtube.com/@AlgoMert"], ["Rubik Academy", "https://www.youtube.com/@rubikacademyy"]];
     // g.yt = "Kanal 1|Kanal 2", g.ytUrl = "url1|url2": her kanal için ayrı abonelik görseli istenir (en çok 2)
     function chans(g) { var n = String(g.yt || "").split("|"), u = String(g.ytUrl || "").split("|"); return n.map(function (x, i) { return { name: x.trim(), url: (u[i] || "").trim() }; }).filter(function (c) { return c.name; }).slice(0, 2); }
     var PF = ["img", "img2"];
