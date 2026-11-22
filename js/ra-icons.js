@@ -31,7 +31,8 @@
         /* --- rozetler (altıgen) --- */
         owner: badge("raGOwn", CROWN),
         mod: badge("raGMod", SHIELD),
-        ra: badge("raGBrand", CUBE),
+        // küp: yeni ikon setiyle aynı çizgi tarzı (eski renkli altıgen küp yerine)
+        ra: line('<path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5"/><path d="M12 12v9"/>'),
         trophy: badge("raGOwn", '<path d="M9 7h6v3.4a3 3 0 0 1-6 0z" fill="#fff"/><path d="M9 8H7.4a1.8 1.8 0 0 0 1.9 2.4M15 8h1.6a1.8 1.8 0 0 1-1.9 2.4" fill="none" stroke="#fff" stroke-width="1.2"/><rect x="11.2" y="13" width="1.6" height="2.4" fill="#fff"/><rect x="9" y="15.6" width="6" height="1.6" rx=".8" fill="#fff"/>'),
         party: badge("raGParty", '<path d="M7.5 17.5l2.6-7.6 5 5z" fill="#fff"/><circle cx="15.5" cy="7.5" r="1" fill="#fff"/><circle cx="17.5" cy="11" r=".9" fill="#fff"/><path d="M12.5 8.5c.3-1.4 1.4-2 2.6-1.9M14.8 12.4c1-.6 2.2-.4 2.9.4" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>'),
         star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="url(#raGOwn)" stroke="rgba(255,255,255,.5)" stroke-width=".8" stroke-linejoin="round"/></svg>',

@@ -14,7 +14,7 @@ function ftoSvg(s, size, m) {
       var lab = f + (n + 1), ch = s.charAt(ORDER.indexOf(f) * 9 + n);
       var cx = (tri[0][0] + tri[1][0] + tri[2][0]) / 3, cy = (tri[0][1] + tri[1][1] + tri[2][1]) / 3;
       var pts = tri.map(function (p) { return (cx + (p[0] - cx) * 1).toFixed(1) + "," + (cy + (p[1] - cy) * 1).toFixed(1); }).join(" ");
-      out.push('<polygon points="' + pts + '" fill="' + (C[ch] || "#666") + '" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/>');
+      out.push('<polygon points="' + pts + '" fill="' + (!m || (m === "pf" ? ch === "f" : "fulr".indexOf(ch) >= 0) ? (C[ch] || "#666") : DARK) + '" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/>');
     });
   });
   return '<svg viewBox="-9.6 -15.1 297.9 327.2" width="' + size + '" height="' + size + '" aria-hidden="true">' + out.join("") + '</svg>';
