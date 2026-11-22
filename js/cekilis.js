@@ -222,8 +222,7 @@
         return '<div class="gw-req"><h3>Katılma şartları</h3><ol>' +
             row(r.acc, 1, "Rubik Academy hesabın açık olsun", r.acc ? '<span>' + esc(myName()) + ' olarak giriş yaptın</span>' : '<button type="button" class="btn sm primary" id="gwLogin">Giriş yap / Üye ol</button>') +
             row(r.push, 2, "Bildirimler açık olsun", r.push ? '<span>Kazanırsan telefonuna anında bildirim gelir; site kapalı olsa bile.</span>'
-                : r.ps === "default" || r.ps === "stuck" ? '<span>Kazanırsan 2 dakika içinde onaylaman gerekiyor; haberin olsun diye şart.</span><button type="button" class="btn sm primary" id="gwPush">🔔 Bildirimleri aç</button>'
-                : '<span>' + (Account.pushHelpHtml ? Account.pushHelpHtml(r.ps) : "Tarayıcı ayarlarından bildirimlere izin ver.") + '</span>') +
+                : '<span>' + (r.ps === "denied" ? 'Bildirimler bu tarayıcıda kapalı. Düğmeye dokun, nasıl açılacağını adım adım gösterelim.' : 'Kazanırsan 2 dakika içinde onaylaman gerekiyor; haberin olsun diye şart.') + '</span><button type="button" class="btn sm primary" id="gwPush">🔔 Bildirimleri aç</button>') +
             r.ch.map(function (c, i) {
                 var p = r.proofs[i] || "";
                 return row(!!p, 3 + i, esc(c.name) + " kanalına abone ol", '<span>Abone olduktan sonra kanal sayfasında <b>Abone olundu</b> yazısı görünecek şekilde ekran görüntüsü al ve yükle. Görseli yalnız çekilişi düzenleyenler görür.</span>' +
@@ -237,7 +236,7 @@
     function bindReq(g) {
         if ($("gwPush")) $("gwPush").onclick = function () {
             var b = this; b.disabled = true;
-            Account.enablePush().then(function (p) { renderOne(); if (p !== "granted") msg("Bildirim izni verilmedi. Tarayıcı ya da telefon ayarlarından izin ver.", 1); }, function () { b.disabled = false; });
+            Account.enablePush().then(function (p) { renderOne(); if (p !== "granted") pushHelp(p); else msg("Bildirimler açıldı ✓"); }, function () { b.disabled = false; pushHelp("denied"); });
         };
         Array.prototype.forEach.call(document.querySelectorAll(".gwProof"), function (inp) { inp.onchange = function () {
             var f = this.files && this.files[0], idx = +this.getAttribute("data-i"); if (!f) return;
@@ -249,6 +248,21 @@
             }, function () { msg("Görsel okunamadı, başka bir görsel dene.", 1); });
         }; });
     }
+    // izin verilmediyse: nasıl açılacağını adım adım göster, geri dönünce kendiliğinden yenile
+    function pushHelp(st) {
+        var app = !!window.RA_APP, ios = st === "ios", uns = st === "unsupported";
+        var steps = ios || uns ? '<p>' + (Account.pushHelpHtml ? Account.pushHelpHtml(st) : "") + '</p>'
+            : app ? '<ol class="gw-steps2"><li>Telefonun <b>Ayarlar</b> uygulamasını aç</li><li><b>Uygulamalar → Rubik Academy</b></li><li><b>Bildirimler</b> → aç</li><li>Buraya geri dön</li></ol>'
+            : '<ol class="gw-steps2"><li>Adres çubuğunun solundaki <b>kilit / ayar</b> simgesine dokun</li><li><b>İzinler</b> ya da <b>Site ayarları</b>na gir</li><li><b>Bildirimler</b> → <b>İzin ver</b></li><li>Aşağıdaki <b>Sayfayı yenile</b>ye dokun</li></ol>';
+        modal('<div class="gw-confetti">🔔</div><h3>Bildirimleri aç</h3><p>Tarayıcı izin penceresini göstermedi; bildirimler daha önce engellenmiş. Şöyle açabilirsin:</p>' + steps +
+            '<div class="gw-act">' + (ios || uns ? '' : '<button type="button" class="btn primary gw-big" id="gwPushRe">🔄 Sayfayı yenile</button>') + '<button type="button" class="btn" id="gwPushX">Kapat</button></div>');
+        if ($("gwPushRe")) $("gwPushRe").onclick = function () { location.reload(); };
+        $("gwPushX").onclick = closeModal;
+    }
+    document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState !== "visible" || !S.g || $("gwOne").hidden || pushOk() || phase(S.g) !== "open" || S.joined) return;
+        renderOne(); if (pushOk()) { closeModal(); msg("Bildirimler açıldı ✓"); }
+    });
     // ekran görüntüsünü küçült: en uzun kenar 1000 px, JPEG; 380 KB'ı geçmeyecek şekilde
     function shrink(file) {
         return new Promise(function (res, rej) {
