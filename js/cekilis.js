@@ -229,14 +229,12 @@
     function reqHtml(g) {
         var r = reqState(g), u = me();
         var row = function (ok, n, title, body) { return '<li class="' + (ok ? "ok" : "") + '"><b>' + (ok ? "✓" : n) + '</b><div><strong>' + title + '</strong>' + (body || "") + '</div></li>'; };
-        var all = r.acc && r.push && r.yt;
+        var all = r.acc && r.yt; // bildirim artık şart değil
         return '<div class="gw-req"><h3>Katılma şartları</h3><ol>' +
             row(r.acc, 1, "Rubik Academy hesabın açık olsun", r.acc ? '<span>' + esc(myName()) + ' olarak giriş yaptın</span>' : '<button type="button" class="btn sm primary" id="gwLogin">Giriş yap / Üye ol</button>') +
-            row(r.push, 2, "Bildirimler açık olsun", r.push ? '<span>Kazanırsan telefonuna anında bildirim gelir; site kapalı olsa bile.</span>'
-                : '<span>' + (r.ps === "denied" ? 'Bildirimler bu tarayıcıda kapalı. Düğmeye dokun, nasıl açılacağını adım adım gösterelim.' : 'Kazanırsan 2 dakika içinde onaylaman gerekiyor; haberin olsun diye şart.') + '</span><button type="button" class="btn sm primary" id="gwPush">🔔 Bildirimleri aç</button>') +
             r.ch.map(function (c, i) {
                 var p = r.proofs[i] || "";
-                return row(!!p, 3 + i, esc(c.name) + " kanalına abone ol", '<span>Abone olduktan sonra kanal sayfasında <b>Abone olundu</b> yazısı görünecek şekilde ekran görüntüsü al ve yükle. Görseli yalnız çekilişi düzenleyenler görür.</span>' +
+                return row(!!p, 2 + i, esc(c.name) + " kanalına abone ol", '<span>Abone olduktan sonra kanal sayfasında <b>Abone olundu</b> yazısı görünecek şekilde ekran görüntüsü al ve yükle. Görseli yalnız çekilişi düzenleyenler görür.</span>' +
                     '<div class="gw-reqb">' + (c.url ? '<a class="btn sm gw-yt" href="' + esc(c.url) + '" target="_blank" rel="noopener">▶ Kanala git</a>' : '') +
                     '<label class="btn sm' + (p ? '' : ' primary') + '">📸 ' + (p ? "Görseli değiştir" : "Ekran görüntüsü yükle") + '<input type="file" accept="image/*" class="gwProof" data-i="' + i + '" hidden' + (r.acc ? '' : ' disabled') + '></label></div>' +
                     (p ? '<img class="gw-proofp" src="' + p + '" alt="Yüklenen görsel">' : ''));
@@ -297,11 +295,8 @@
     }
     function join(skipPush) {
         var u = me(), g = S.g; if (!u || !g) return;
-        if (!skipPush && !pushOk()) {
-            var st = Account.pushState();
-            if (st === "default") { $("gwJoin").disabled = true; Account.enablePush().then(function (p) { if ($("gwJoin")) $("gwJoin").disabled = false; if (p === "granted") join(true); else { renderOne(); msg("Katılmak için bildirimlere izin vermelisin.", 1); } }); return; }
-            renderOne(); return;
-        }
+        // bildirim şart değil: izin sorulmamışsa katılırken bir kez sor, beklemeden devam et
+        if (!skipPush && window.Account && Account.pushState && Account.pushState() === "default") try { Account.enablePush(); } catch (e) {}
         $("gwJoin").disabled = true;
         var r0 = reqState(g);
         if (!r0.yt) { msg("Önce abonelik ekran görüntülerini yükle.", 1); return; }
