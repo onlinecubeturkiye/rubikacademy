@@ -3,11 +3,20 @@
   {
    "name": "projects/rubikacademydb/databases/(default)/documents/giveaways/hGpY44ACawRH",
    "fields": {
-    "st": {
-     "stringValue": "open"
+    "drawAt": {
+     "timestampValue": "2026-11-24T18:00:00Z"
     },
-    "mode": {
-     "stringValue": "mini"
+    "wa": {
+     "stringValue": ""
+    },
+    "hName": {
+     "stringValue": "Muhammed Eren Yalçın"
+    },
+    "closeAt": {
+     "timestampValue": "2026-11-24T17:50:00Z"
+    },
+    "prize": {
+     "stringValue": "Ömer Eymen Akar'dan 3x3 Koçluk"
     },
     "title": {
      "stringValue": "3x3 Koçluk"
@@ -15,69 +24,51 @@
     "host": {
      "stringValue": "H1P3VYy0TVcbTVxBC4E8o1bmWHI3"
     },
-    "test": {
-     "booleanValue": false
-    },
-    "n": {
-     "integerValue": "0"
-    },
-    "ytUrl": {
-     "stringValue": "https://www.youtube.com/@rubikacademyy"
-    },
-    "hName": {
-     "stringValue": "Muhammed Eren Yalçın"
-    },
     "img": {
      "stringValue": "/img/cekilis/kocluk.svg"
     },
-    "prize": {
-     "stringValue": "Ömer Eymen Akar'dan 3x3 Koçluk"
-    },
-    "drawAt": {
-     "timestampValue": "2026-11-23T18:00:00Z"
-    },
-    "yt": {
-     "stringValue": "Rubik Academy"
-    },
-    "closeAt": {
-     "timestampValue": "2026-11-23T17:50:00Z"
-    },
-    "x": {
+    "waUrl": {
      "stringValue": ""
-    },
-    "desc": {
-     "stringValue": "Ömer Eymen Akar'dan 15 günlük whatsapp grup koçluğu kazanacaksınız."
-    },
-    "ts": {
-     "timestampValue": "2026-11-22T19:42:19.336Z"
-    }
-   },
-   "createTime": "2026-11-22T19:42:19.872647Z",
-   "updateTime": "2026-11-22T19:42:19.872647Z"
-  },
-  {
-   "name": "projects/rubikacademydb/databases/(default)/documents/giveaways/qwMysMZBwFkq",
-   "fields": {
-    "ytUrl": {
-     "stringValue": "https://www.youtube.com/@AlgoMert|https://www.youtube.com/@rubikacademyy"
-    },
-    "hName": {
-     "stringValue": "Mert Sağdınç"
-    },
-    "desc": {
-     "stringValue": ""
-    },
-    "drawAt": {
-     "timestampValue": "2026-12-03T18:00:00Z"
-    },
-    "wa": {
-     "stringValue": "Mert Sağdınç"
     },
     "st": {
      "stringValue": "open"
     },
-    "img": {
-     "stringValue": "/img/cekilis/kup.svg"
+    "yt": {
+     "stringValue": "Rubik Academy"
+    },
+    "test": {
+     "booleanValue": false
+    },
+    "x": {
+     "stringValue": ""
+    },
+    "ytUrl": {
+     "stringValue": "https://www.youtube.com/@rubikacademyy"
+    },
+    "n": {
+     "integerValue": "0"
+    },
+    "ts": {
+     "timestampValue": "2026-11-22T19:42:19.336Z"
+    },
+    "mode": {
+     "stringValue": "mini"
+    },
+    "desc": {
+     "stringValue": "Ömer Eymen Akar'dan 15 günlük whatsapp grup koçluğu kazanacaksınız."
+    }
+   },
+   "createTime": "2026-11-22T19:42:19.872647Z",
+   "updateTime": "2026-11-23T17:49:43.120646Z"
+  },
+  {
+   "name": "projects/rubikacademydb/databases/(default)/documents/giveaways/qwMysMZBwFkq",
+   "fields": {
+    "closeAt": {
+     "timestampValue": "2026-12-03T18:00:00Z"
+    },
+    "ts": {
+     "timestampValue": "2026-11-22T20:47:46.921Z"
     },
     "title": {
      "stringValue": "AlgoMert İmzalı WeilLong W11 çekilişi"
@@ -85,35 +76,50 @@
     "pin": {
      "integerValue": "1795440248867"
     },
-    "x": {
-     "stringValue": ""
+    "img": {
+     "stringValue": "/img/cekilis/kup.svg"
+    },
+    "prize": {
+     "stringValue": "Weilong W11"
+    },
+    "hName": {
+     "stringValue": "Mert Sağdınç"
+    },
+    "test": {
+     "booleanValue": false
     },
     "waUrl": {
      "stringValue": "https://chat.whatsapp.com/KSXO1ioliga2iQ4Cf4bfDr?s=cl&p=a&iam=2"
     },
-    "test": {
+    "onlyOk": {
      "booleanValue": false
     },
     "host": {
      "stringValue": "QXnjLnQRBlWsg5SXrPGEx3KzZTB3"
     },
+    "x": {
+     "stringValue": ""
+    },
+    "ytUrl": {
+     "stringValue": "https://www.youtube.com/@AlgoMert|https://www.youtube.com/@rubikacademyy"
+    },
+    "st": {
+     "stringValue": "open"
+    },
     "yt": {
      "stringValue": "Mert Sağdınç|Rubik Academy"
-    },
-    "onlyOk": {
-     "booleanValue": false
     },
     "mode": {
      "stringValue": "cark"
     },
-    "closeAt": {
+    "desc": {
+     "stringValue": ""
+    },
+    "wa": {
+     "stringValue": "Mert Sağdınç"
+    },
+    "drawAt": {
      "timestampValue": "2026-12-03T18:00:00Z"
-    },
-    "ts": {
-     "timestampValue": "2026-11-22T20:47:46.921Z"
-    },
-    "prize": {
-     "stringValue": "Weilong W11"
     },
     "n": {
      "integerValue": "0"
