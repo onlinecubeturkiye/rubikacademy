@@ -16,6 +16,22 @@
     function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
     function me() { return window.Account && Account.user && Account.user(); }
     function myName() { var u = me(); var p = window.Account && Account.localProfile ? Account.localProfile() : {}; return String((p && p.name) || (u && (u.displayName || (u.email || "").split("@")[0])) || "Cuber").slice(0, 24); }
+    // veritabanı kotası/yoğunluğu (429, 503): birkaç kez bekleyip yeniden dene
+    var _fetch = window.fetch.bind(window);
+    function fetch(url, o) {
+        var n = 0;
+        return (function go() {
+            return _fetch(url, o).then(function (r) {
+                if ((r.status === 429 || r.status === 503) && n < 4) { var w = [400, 1200, 2500, 5000][n++]; return new Promise(function (res) { setTimeout(res, w + Math.random() * 400); }).then(go); }
+                if (r.status === 429) S.quota = true;
+                return r;
+            });
+        })();
+    }
+    var _bk = null;
+    function backup() { return _bk || (_bk = _fetch("/data/cekilis-yedek.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; })); }
+    function cacheSet(k, v) { try { localStorage.setItem("ra-gw-c:" + k, JSON.stringify(v)); } catch (e) {} }
+    function cacheGet(k) { try { return JSON.parse(localStorage.getItem("ra-gw-c:" + k) || "null"); } catch (e) { return null; } }
     function req(path, opts) {
         opts = opts || {};
         var u = me(), url = ROOT + path;
@@ -144,7 +160,13 @@
 
     /* ---------- liste ---------- */
     function loadList() {
-        return req("/giveaways?pageSize=60").then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+        // çekiliş listesi herkese açık: oturum anahtarı beklenmeden doğrudan okunur
+        var url = ROOT + "/giveaways?pageSize=60&key=" + encodeURIComponent(cfg.apiKey);
+        return fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) { cacheSet("list", d); return d; }, function (e) {
+            var c = cacheGet("list"); if (c) { S.stale = true; return c; }
+            // veritabanı kotası dolduysa sitedeki yedek liste
+            return backup().then(function (b) { if (b) { S.stale = true; return b; } throw e; });
+        }).then(function (d) {
             S.list = ((d && d.documents) || []).map(dec).sort(function (a, b) {
                 // yöneticinin sabitlediği çekiliş en üstte (herkese etiketsiz görünür)
                 var qa = +a.pin || 0, qb = +b.pin || 0; if (qa || qb) return qb - qa;
@@ -152,7 +174,7 @@
                 return pa - pb || (pa ? b.drawAt - a.drawAt : a.drawAt - b.drawAt);
             });
             S.listLoaded = true; renderList();
-        }).catch(function (e) { $("gwList").innerHTML = '<p class="gw-empty">Çekilişler yüklenemedi (' + esc(e && e.message || "bağlantı") + '). Sayfayı yenile ya da biraz sonra tekrar dene.</p>'; });
+        }).catch(function (e) { $("gwList").innerHTML = '<p class="gw-empty">' + (String(e && e.message) === "429" ? "Site şu an çok yoğun, çekilişler birazdan yüklenecek. Lütfen biraz sonra sayfayı yenile." : "Çekilişler yüklenemedi (" + esc(e && e.message || "bağlantı") + "). Sayfayı yenile.") + '</p>'; setTimeout(loadList, 15000); });
     }
     function card(g) {
         var p = phase(g);
@@ -177,7 +199,7 @@
             b.onclick = function (e) { e.preventDefault(); e.stopPropagation(); var g = S.list.filter(function (x) { return x.id === b.getAttribute("data-share"); })[0]; if (g) share(g, b); };
         });
         // açık çekilişlerin katılımcı sayısı
-        S.list.forEach(function (g) { var p = phase(g); if (p !== "open" && p !== "closed") return; countEntries(g.id).then(function (n) { var e = box.querySelector('.gw-cn[data-n="' + g.id + '"]'); if (e) e.textContent = n; }); });
+        S.list.forEach(function (g) { var p = phase(g); if (p !== "open" && p !== "closed") return; countEntries(g.id).then(function (n) { var e = box.querySelector('.gw-cn[data-n="' + g.id + '"]'); if (e && n != null) e.textContent = n; }); });
         fillHosts(box); updCd();
         Array.prototype.forEach.call(box.querySelectorAll("[data-pin]"), function (b) {
             b.onclick = function (e) {
@@ -204,12 +226,13 @@
     function fetchOne(id) {
         var u = me();
         return Promise.all([
-            req("/giveaways/" + id).then(function (r) { return r.ok ? r.json() : null; }),
-            u ? req("/giveaways/" + id + "/e/" + u.uid).then(function (r) { return r.ok ? r.json() : null; }) : Promise.resolve(null),
+            fetch(ROOT + "/giveaways/" + id + "?key=" + encodeURIComponent(cfg.apiKey)).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (d) { cacheSet("g:" + id, d); return d; }, function () { return cacheGet("g:" + id) || backup().then(function (b) { return b && (b.documents || []).filter(function (x) { return x.name.split("/").pop() === id; })[0] || null; }); }),
+            // kendi katılımım: herkese açık belge, oturum beklenmeden okunur
+            u ? fetch(ROOT + "/giveaways/" + id + "/e/" + u.uid + "?key=" + encodeURIComponent(cfg.apiKey)).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }) : Promise.resolve(null),
             countEntries(id)
         ]).then(function (res) {
-            if (!res[0]) { S.g = null; return; }
-            var prev = S.g; S.g = dec(res[0]); S.joined = !!res[1]; S.myBonus = !!(res[1] && dec(res[1]).b); S.count = res[2];
+            if (!res[0]) { if (!S.g || S.g.id !== id) S.g = null; return; }
+            var prev = S.g; S.g = dec(res[0]); S.joined = !!res[1] || (prev && prev.id === S.g.id && S.joined && res[1] === undefined); S.myBonus = !!(res[1] && dec(res[1]).b); if (res[2] != null) S.count = res[2];
             if (S.joined) remember(S.g);
             if (prev && prev.id === S.g.id && S.g.w && S.g.w !== prev.w && S.g.st === "drawn") {
                 if (me() && me().uid === S.g.w) S.winShown = 1; // onay penceresini animasyon sonunda aç
@@ -219,9 +242,9 @@
     }
     function countEntries(id) {
         var body = { structuredAggregationQuery: { structuredQuery: { from: [{ collectionId: "e" }] }, aggregations: [{ alias: "n", count: {} }] } };
-        return req("/giveaways/" + id + ":runAggregationQuery", { method: "POST", body: JSON.stringify(body) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
-            var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n; return x ? +x.integerValue : 0;
-        }, function () { return 0; });
+        return fetch(ROOT + "/giveaways/" + id + ":runAggregationQuery?key=" + encodeURIComponent(cfg.apiKey), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
+            var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n; return x ? +x.integerValue : (a && a.length ? 0 : null);
+        }, function () { return null; });
     }
     // yönetici inceleme sonuçları: { uid: "ok" | "no" }
     function listRev(id) {
@@ -257,7 +280,7 @@
     function listEntries(id) {
         var out = [];
         function page(tok) {
-            return req("/giveaways/" + id + "/e?pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+            return fetch(ROOT + "/giveaways/" + id + "/e?pageSize=300&key=" + encodeURIComponent(cfg.apiKey) + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
                 (d.documents || []).forEach(function (x) { var o = dec(x); out.push({ uid: o.id, name: o.name || "Cuber", d: o.d || "", ts: o.ts || 0, b: !!o.b }); });
                 return d.nextPageToken && out.length < 20000 ? page(d.nextPageToken) : out;
             });
@@ -1076,11 +1099,11 @@
         var waitClaim = S.mgr && g.st === "claimed" && S.claimSeen !== g.id + g.w;
         var now = Date.now(), near = (now > g.drawAt - 90000 && now < g.drawAt + 1800000) || g.st === "drawn" || waitClaim;
         // çekiliş yaklaşırken animasyon için katılımcı adlarını önceden al
-        if (near && !S.entries && S.count) listEntries(g.id).then(function (l) { S.entries = l; }).catch(function () {});
+
         S.pollT = setTimeout(function () {
             var sig = function () { return JSON.stringify([S.g, S.joined, S.count]); }, before = sig();
             fetchOne(g.id).then(function () { if (S.g) { if (sig() !== before) renderOne(); else if (waitClaim && S.g.st === "claimed" && $("gwClaim")) loadClaim(S.g); autoMgr(); schedule(); } });
-        }, near ? 3000 : 20000);
+        }, document.hidden ? 60000 : near ? 4000 : 60000);
     }
     function tick() {
         updCd();
@@ -1104,7 +1127,9 @@
     function start() {
         $("gwModal").onclick = function (e) { if (e.target === $("gwModal") && !$("gwModal").querySelector("#gwOk,#gwForm")) closeModal(); };
         var id = (/[?&]id=([^&]+)/.exec(location.search) || [])[1];
-        checkRole().then(function () { if (id) openOne(decodeURIComponent(id), true); else loadList(); });
+        // liste/çekiliş hesaptan bağımsız hemen yüklenir; rol öğrenilince yönetim araçları eklenir
+        if (id) openOne(decodeURIComponent(id), true); else loadList();
+        try { checkRole().then(function () { if (S.g) renderOne(); else if (S.listLoaded) renderList(); }, function () {}); } catch (e) {}
         clearInterval(S.tickT); S.tickT = setInterval(tick, 1000);
         window.addEventListener("popstate", function () { var i = (/[?&]id=([^&]+)/.exec(location.search) || [])[1]; if (i) openOne(decodeURIComponent(i), true); else { $("gwOne").hidden = true; $("gwListWrap").hidden = false; loadList(); } });
         if (Account.onChange) Account.onChange(function () { checkRole().then(function () { if (S.g) fetchOne(S.g.id).then(renderOne); else renderList(); }); });
