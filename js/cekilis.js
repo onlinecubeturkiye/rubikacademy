@@ -31,6 +31,18 @@
     }
     var _bk = null;
     function backup() { return _bk || (_bk = _fetch("/data/cekilis-yedek.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; })); }
+    // kaydedilen değişikliği hemen göster (veritabanı okunamasa bile): sayfadaki, önbellekteki ve listedeki kayıt güncellenir
+    function applyLocal(id, o, only) {
+        var f = enc(o);
+        if (S.g && S.g.id === id) Object.keys(o).forEach(function (k) { S.g[k] = o[k]; });
+        if (only) return;
+        var d = cacheGet("g:" + id);
+        if (!d && S.g && S.g.id === id) { var o2 = {}; Object.keys(S.g).forEach(function (k) { if (k !== "id" && k.charAt(0) !== "_" && S.g[k] != null) o2[k] = S.g[k]; }); d = { name: docName("/giveaways/" + id), fields: enc(o2) }; }
+        if (d && d.fields) { Object.assign(d.fields, f); cacheSet("g:" + id, d); }
+        var l = cacheGet("list"); if (!l && S.list && S.list.length) { l = { documents: S.list.map(function (x) { var o3 = {}; Object.keys(x).forEach(function (k) { if (k !== "id" && k.charAt(0) !== "_" && x[k] != null) o3[k] = x[k]; }); return { name: docName("/giveaways/" + x.id), fields: enc(o3) }; }) }; }
+        if (l && l.documents) { l.documents.forEach(function (x) { if (x.name.split("/").pop() === id) Object.assign(x.fields, f); }); cacheSet("list", l); }
+        (S.list || []).forEach(function (x) { if (x.id === id) Object.keys(o).forEach(function (k) { x[k] = o[k]; }); });
+    }
     function cacheSet(k, v) { try { localStorage.setItem("ra-gw-c:" + k, JSON.stringify(v)); } catch (e) {} }
     function cacheGet(k) { try { return JSON.parse(localStorage.getItem("ra-gw-c:" + k) || "null"); } catch (e) { return null; } }
     function req(path, opts) {
@@ -556,7 +568,7 @@
                 if (!r.ok) throw new Error(r.status);
                 // çekilişi kurana bildirim (belge adı = çekiliş kodu: tek bildirim)
                 patch("/users/" + g.host + "/notifications/" + g.id, { text: "📦 “" + g.title + "” çekilişinin kazananı " + o.name + " teslimat bilgilerini gönderdi. Çekiliş sayfasından görebilirsin.", ts: Date.now(), pushed: false }).catch(function () {});
-                modal('<div class="gw-confetti">📦</div><h3>Bilgilerin iletildi</h3><p>Teşekkürler! Ödülün en kısa sürede kargolanacak. Bir sorun olursa seninle iletişime geçeceğiz.</p><button type="button" class="btn primary" id="gwDone">Tamam</button>');
+                modal('<div class="gw-confetti">📦</div><h3>Bilgilerin iletildi</h3><p>Teşekkürler! Çekilişi düzenleyen kişi ödülün için seninle iletişime geçecek.</p><button type="button" class="btn primary" id="gwDone">Tamam</button>');
                 $("gwDone").onclick = closeModal;
             }).catch(function () { b.disabled = false; $("gwFMsg").textContent = "Gönderilemedi, tekrar dene."; });
         };
@@ -974,7 +986,8 @@
             var b = this.querySelector("button[type=submit]"); b.disabled = true;
             patch("/giveaways/" + g.id, o).then(function (r) {
                 if (!r.ok) throw new Error(r.status);
-                closeModal(); return fetchOne(g.id).then(function () { renderOne(); msg("Çekiliş güncellendi ✓"); });
+                closeModal(); applyLocal(g.id, o);
+                return fetchOne(g.id).then(function () { applyLocal(g.id, o, true); renderOne(); msg("Çekiliş güncellendi ✓"); });
             }).catch(function (er) { b.disabled = false; $("geMsg").textContent = "Kaydedilemedi (" + er.message + ")."; });
         };
     }
