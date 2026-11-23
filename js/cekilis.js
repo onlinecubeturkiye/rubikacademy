@@ -228,7 +228,7 @@
         return Promise.all([
             fetch(ROOT + "/giveaways/" + id + "?key=" + encodeURIComponent(cfg.apiKey)).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (d) { cacheSet("g:" + id, d); return d; }, function () { return cacheGet("g:" + id) || backup().then(function (b) { return b && (b.documents || []).filter(function (x) { return x.name.split("/").pop() === id; })[0] || null; }); }),
             // kendi katılımım: herkese açık belge, oturum beklenmeden okunur
-            u ? fetch(ROOT + "/giveaways/" + id + "/e/" + u.uid + "?key=" + encodeURIComponent(cfg.apiKey)).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }) : Promise.resolve(null),
+            u ? fetch(ROOT + "/giveaways/" + id + "/e/" + u.uid + "?key=" + encodeURIComponent(cfg.apiKey)).then(function (r) { return r.ok ? r.json() : r.status === 404 ? null : (localJoined(id) ? { fields: {} } : null); }, function () { return localJoined(id) ? { fields: {} } : null; }) : Promise.resolve(null),
             countEntries(id)
         ]).then(function (res) {
             if (!res[0]) { if (!S.g || S.g.id !== id) S.g = null; return; }
@@ -292,6 +292,7 @@
         try { var d = localStorage.getItem("ra-dev"); if (!d || !/^[a-z0-9]{16}$/.test(d)) { var c = "abcdefghijklmnopqrstuvwxyz0123456789"; d = ""; for (var i = 0; i < 16; i++) d += c[rnd(c.length)]; localStorage.setItem("ra-dev", d); } return d; } catch (e) { return ""; }
     }
     function remember(g) { try { var j = JSON.parse(localStorage.getItem("ra-gw-joined") || "{}") || {}; j[g.id] = g.drawAt; localStorage.setItem("ra-gw-joined", JSON.stringify(j)); } catch (e) {} }
+    function localJoined(id) { try { return !!(JSON.parse(localStorage.getItem("ra-gw-joined") || "{}") || {})[id]; } catch (e) { return false; } }
     function forget(g) { try { var j = JSON.parse(localStorage.getItem("ra-gw-joined") || "{}") || {}; delete j[g.id]; localStorage.setItem("ra-gw-joined", JSON.stringify(j)); } catch (e) {} }
 
     function dtS(ms) { try { return new Date(ms).toLocaleString("tr-TR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; } }
