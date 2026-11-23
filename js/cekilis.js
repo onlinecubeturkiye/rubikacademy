@@ -22,8 +22,9 @@
         var n = 0;
         return (function go() {
             return _fetch(url, o).then(function (r) {
-                if ((r.status === 429 || r.status === 503) && n < 4) { var w = [400, 1200, 2500, 5000][n++]; return new Promise(function (res) { setTimeout(res, w + Math.random() * 400); }).then(go); }
-                if (r.status === 429) S.quota = true;
+                // kota doluysa bekletme: bir kez kısa dene, sonra hemen yedeğe geç
+                if ((r.status === 429 || r.status === 503) && !S.quota && n < 1) { n++; return new Promise(function (res) { setTimeout(res, 300); }).then(go); }
+                if (r.status === 429) S.quota = true; else if (r.ok) S.quota = false;
                 return r;
             });
         })();
