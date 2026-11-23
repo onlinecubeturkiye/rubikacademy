@@ -723,6 +723,13 @@
             };
         });
     }
+    // inceleme penceresi açıkken klavye: 1 = uygun değil, 2 = onayla, boşluk = atla, Esc = kapat
+    document.addEventListener("keydown", function (e) {
+        var m = $("gwModal"); if (!m || !m.classList.contains("open") || !$("gwRvOk") || e.ctrlKey || e.metaKey || e.altKey) return;
+        if (/^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || "")) return;
+        var id = e.key === "1" ? "gwRvNo" : e.key === "2" ? "gwRvOk" : e.key === " " ? "gwRvSkip" : e.key === "Escape" ? "gwRvX" : "";
+        if (!id || !$(id)) return; e.preventDefault(); if (e.repeat) return; $(id).click();
+    });
     // görselleri sırayla incele: büyük görseller, Onayla / Uygun değil / Atla, sonra sıradaki kişi
     function review(start) {
         var l = S.entries || []; if (!l.length) return;
@@ -745,7 +752,8 @@
                 '<div class="gw-rvimgs">' + ch.map(function (c, k) { return '<figure><figcaption>' + esc(c.name) + '</figcaption>' + (prs[k] ? '<img src="' + prs[k] + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') + '</figure>'; }).join("") +
                 (hasB ? '<figure class="gw-rvb"><figcaption>⭐ Bonus: ' + esc(waLabel(S.g)) + '</figcaption>' + (prs[2] ? '<img src="' + prs[2] + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') +
                     '<div class="gw-rvbb"><button type="button" class="gw-qb ok' + (vb === "ok" ? " on" : "") + '" id="gwRvBOk" title="Bonus geçerli">✓</button><span>' + (vb === "no" ? "Bonus geçersiz" : vb === "ok" ? "Bonus geçerli (×2)" : "Bonus bekliyor") + '</span><button type="button" class="gw-qb no' + (vb === "no" ? " on" : "") + '" id="gwRvBNo" title="Bonus geçersiz">✗</button></div></figure>' : '') + '</div>' +
-                '<div class="gw-rvact"><button type="button" class="btn gw-rvno" id="gwRvNo">✗ Uygun değil</button><button type="button" class="btn" id="gwRvSkip">Atla</button><button type="button" class="btn gw-rvok" id="gwRvOk">✓ Onayla</button></div>' +
+                '<div class="gw-rvact"><button type="button" class="btn gw-rvno" id="gwRvNo"><kbd>1</kbd> ✗ Uygun değil</button><button type="button" class="btn" id="gwRvSkip">Atla</button><button type="button" class="btn gw-rvok" id="gwRvOk"><kbd>2</kbd> ✓ Onayla</button></div>' +
+                '<p class="gw-rvkeys">Klavye: <kbd>1</kbd> uygun değil · <kbd>2</kbd> onayla · <kbd>Boşluk</kbd> atla · <kbd>Esc</kbd> kapat</p>' +
                 '<button type="button" class="gw-rvout" id="gwRvOut">🗑 Çekilişten çıkar</button>');
             Array.prototype.forEach.call(document.querySelectorAll(".gw-rvimgs img"), function (im) { im.onclick = function () { im.closest(".gw-rvimgs").classList.toggle("zoom"); }; });
             var next = function () { i++; show(); };
