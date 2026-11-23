@@ -352,6 +352,31 @@
 .gw-req li.gw-rq > .gw-proofp { flex: none; width: 44px; height: 62px; max-height: none !important; object-fit: cover; object-position: top; border-radius: 8px; margin-left: auto; }
 .gw-pchint { margin: 0 0 8px !important; font-size: 12px !important; }
 @media (hover: none) { .gw-pchint { display: block !important; } .gw-pch2 { display: none; } }
+/* tam ekran çekiliş sahnesi (canlı yayın) */
+.gw-modal.gw-full { background: radial-gradient(80% 70% at 50% 40%, rgba(22,34,92,.94), rgba(3,5,14,.99)); backdrop-filter: blur(6px); padding: 0; }
+.gw-modal.gw-full .gw-mbox { width: 100%; max-width: none; height: 100%; max-height: none; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; overflow: hidden; color: #fff; animation: none; }
+.gw-fs { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6vh; padding: 3vh 16px; box-sizing: border-box; }
+.gw-fsx { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: #fff; font-size: 17px; cursor: pointer; z-index: 3; }
+.gw-fst { text-align: center; }
+.gw-fst small { font: 800 13px Inter, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: #f6c719; }
+.gw-fst h2 { margin: 6px 0 4px; font: 900 clamp(24px, 4.2vh, 44px)/1.1 "Plus Jakarta Sans", Inter, sans-serif; color: #fff; }
+.gw-fst p { margin: 0; font: 800 clamp(15px, 2.4vh, 24px) Inter, sans-serif; color: #c7d2fe; }
+.gw-modal.gw-full .gw-wheel { width: min(64vh, 90vw, 760px) !important; margin: 0 auto !important; }
+.gw-modal.gw-full .gw-wheel svg { filter: drop-shadow(0 20px 60px rgba(0,0,0,.6)) drop-shadow(0 0 40px rgba(59,99,255,.35)); }
+.gw-modal.gw-full .gw-ptr { border-left-width: 22px !important; border-right-width: 22px !important; border-top-width: 42px !important; top: -16px !important; }
+.gw-modal.gw-full .gw-wname { display: none; }
+.gw-modal.gw-full .gw-slot, .gw-modal.gw-full .gw-grid { width: min(900px, 92vw); margin: 0 auto; }
+.gw-modal.gw-full .gw-slot { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.2); }
+.gw-modal.gw-full .gw-slot-in { color: #fff; font-size: clamp(32px, 8vh, 80px); }
+.gw-modal.gw-full .gw-grid span { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.15); color: #fff; }
+.gw-fsw { min-height: 13vh; text-align: center; opacity: 0; transform: translateY(16px) scale(.96); transition: .5s cubic-bezier(.2,.9,.3,1.2); }
+.gw-fsw.on { opacity: 1; transform: none; }
+.gw-fsw small { display: block; font: 800 clamp(14px, 2.2vh, 20px) Inter, sans-serif; color: #f6c719; letter-spacing: .06em; }
+.gw-fsw b { display: block; font: 900 clamp(34px, 7vh, 76px)/1.05 "Plus Jakarta Sans", Inter, sans-serif; color: #fff; text-shadow: 0 0 30px rgba(246,199,25,.55); }
+.gw-fsw span { display: block; margin-top: 6px; font: 650 clamp(13px, 1.8vh, 17px) Inter, sans-serif; color: #c7d2fe; }
+.gw-conf { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 2; }
+.gw-conf i { position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 2px; opacity: .95; animation: gwFall linear forwards; }
+@keyframes gwFall { to { top: 105%; transform: rotate(720deg) translateX(40px); opacity: .8; } }
 /* WhatsApp bonusu */
 .gw-req li.gw-bonus { border-style: dashed; border-color: rgba(234,179,8,.6); background: linear-gradient(160deg, rgba(234,179,8,.1), var(--surface) 60%); }
 .gw-req li.gw-bonus > b { background: #eab308; border-color: #eab308; color: #fff; }
