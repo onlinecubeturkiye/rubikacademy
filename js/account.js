@@ -480,7 +480,8 @@
     function startSync() {
         // tam senkron (tüm kayıtları buluttan çekme) 5 dakikada bir; arada yalnız değişenler gönderilir
         var meta = loadMeta();
-        if (meta.uid === user.uid && !every("sync", 5 * 60000)) {
+        // ücretsiz veritabanı kotası için: tam senkron 6 saatte bir (arada değişenler yine gönderilir)
+        if (meta.uid === user.uid && !every("sync", 6 * 3600000)) {
             synced1 = true;
             try { document.dispatchEvent(new CustomEvent("account-synced", { detail: { applied: 0, quick: true } })); } catch (e) {}
         } else fullSync();
@@ -870,11 +871,20 @@
     // Ana sayfadaki üye sayısı (herkese açık config/site.members; admin paneli günceller)
     function setMemberCount(n, field) { if (!isAdmin()) return Promise.resolve(false); field = field || "members"; var f = {}; f[field] = { integerValue: String(n) }; return api("/config/site?updateMask.fieldPaths=" + field, { method: "PATCH", body: JSON.stringify({ fields: f }) }).then(function (r) { return r.ok; }, function () { return false; }); }
     function setMaintenance(on, msg) { if (!isAdmin()) return Promise.resolve(false); return api("/config/site?updateMask.fieldPaths=maintenance&updateMask.fieldPaths=msg", { method: "PATCH", body: JSON.stringify({ fields: { maintenance: { booleanValue: !!on }, msg: { stringValue: String(msg || "").slice(0, 300) } } }) }).then(function (r) { return r.ok; }); }
+    // En yeni duyurular (sıralı ve sınırlı sorgu: tüm koleksiyonu okumaz)
+    function latestBroadcasts(n) {
+        var q = { structuredQuery: { from: [{ collectionId: "broadcasts" }], orderBy: [{ field: { fieldPath: "ts" }, direction: "DESCENDING" }], limit: n } };
+        return fetch(pubUrl(":runQuery"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(q) })
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .then(function (a) { return (a || []).map(function (x) { return x.document; }).filter(Boolean); })
+            .catch(function () { return []; });
+    }
     // Bildirim oku (yeni broadcast + kendi okunmamış bildirimlerim)
     function fetchNotes() {
         var out = [], seenB = 0; try { seenB = +(lsGet("ra-bcast-seen") || 0); } catch (e) {}
-        var pB = !every("bcast", 5 * 60000) ? Promise.resolve() : pubList("/broadcasts").then(function (docs) { docs.forEach(function (d) { var f = d.fields || {}, ts = effTs(f), txt = (f.text && f.text.stringValue) || ""; if (ts > seenB && ts <= Date.now() && txt) out.push({ id: "b:" + ts, text: txt, ts: ts }); }); });
-        var pN = user && every("notes", 5 * 60000) ? api("/users/" + user.uid + "/notifications?pageSize=50", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        // ücretsiz veritabanı kotası için: yalnız en yeni 8 duyuru, 30 dakikada bir
+        var pB = !every("bcast", 30 * 60000) ? Promise.resolve() : latestBroadcasts(8).then(function (docs) { docs.forEach(function (d) { var f = d.fields || {}, ts = effTs(f), txt = (f.text && f.text.stringValue) || ""; if (ts > seenB && ts <= Date.now() && txt) out.push({ id: "b:" + ts, text: txt, ts: ts }); }); });
+        var pN = user && every("notes", 30 * 60000) ? api("/users/" + user.uid + "/notifications?pageSize=20", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var seen = {}; try { (JSON.parse(lsGet("ra-note-seen")) || []).forEach(function (x) { seen[x] = 1; }); } catch (e) {}
             ((d && d.documents) || []).forEach(function (x) { var id = x.name.split("/").pop(), f = x.fields || {}, txt = (f.text && f.text.stringValue) || "", ts = effTs(f); if (!seen[id] && txt && ts <= Date.now()) out.push({ id: "n:" + id, text: txt, ts: ts }); });
         }).catch(function () {}) : Promise.resolve();
