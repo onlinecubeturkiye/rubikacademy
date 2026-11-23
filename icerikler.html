@@ -451,5 +451,24 @@ html[dir="rtl"] .item-go { transform: scaleX(-1); }
 
 
 
+<script>
+// Izgaradaki son satır boş kalmasın: son satırdaki kartlar boşluğu doldurana kadar genişler (tablet ve bilgisayar)
+(function () {
+    function fill() {
+        document.querySelectorAll(".items").forEach(function (g) {
+            var it = Array.prototype.filter.call(g.children, function (x) { return x.classList.contains("item"); });
+            it.forEach(function (x, i) { x.style.gridColumn = ""; });
+            var cols = getComputedStyle(g).gridTemplateColumns.split(" ").filter(Boolean).length; if (cols < 2) return;
+            var span = it.map(function (x, i) { return i === 0 ? Math.min(2, cols) : 1; }), used = 0, row = [];
+            span.forEach(function (s, i) { if (used + s > cols) { used = 0; row = []; } used += s; row.push(i); if (used === cols) { used = 0; row = []; } });
+            if (!row.length) return;
+            var free = cols - row.reduce(function (a, i) { return a + span[i]; }, 0);
+            for (var k = row.length - 1; free > 0; k = (k - 1 + row.length) % row.length) { span[row[k]]++; free--; }
+            row.forEach(function (i) { it[i].style.gridColumn = "span " + span[i]; });
+        });
+    }
+    fill(); window.addEventListener("resize", fill);
+})();
+</script>
 </body>
 </html>

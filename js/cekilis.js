@@ -110,7 +110,9 @@
     }
     function card(g) {
         return '<a class="gw-card" href="/icerikler/cekilis?id=' + encodeURIComponent(g.id) + '" data-id="' + esc(g.id) + '">' +
-            '<div class="gw-imgw"><img class="gw-img" src="' + esc(imgOf(g)) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/cekilis/kup.svg\'"><div class="gw-tags">' + badges(g) + '</div></div>' +
+            '<div class="gw-imgw"><img class="gw-img" src="' + esc(imgOf(g)) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/cekilis/kup.svg\'"><div class="gw-tags">' + badges(g) + '</div>' +
+            // yalnız yetkililer görür: listeden de sabitle / kaldır
+            (S.mgr ? '<button type="button" class="gw-pinb' + (g.pin ? ' on' : '') + '" data-pin="' + esc(g.id) + '" title="' + (g.pin ? 'Sabitlemeyi kaldır' : 'En üste sabitle') + '">📌 ' + (g.pin ? 'Sabitli' : 'Sabitle') + '</button>' : '') + '</div>' +
             '<div class="gw-cbody"><b>' + esc(g.title) + '</b><span class="gw-prize">🏆 ' + esc(g.prize || "") + '</span>' + stLabel(g) +
             '<small>Çekiliş: ' + esc(dt(g.drawAt)) + '</small></div></a>';
     }
@@ -119,6 +121,13 @@
         box.innerHTML = S.list.length ? S.list.map(card).join("") : '<div class="gw-emptyc"><img src="/img/cekilis/kup.svg" alt=""><div><b>Şu an açık çekiliş yok</b><p>Yeni çekilişler burada ve bildirimlerde duyurulur. Takipte kal!</p></div></div>';
         Array.prototype.forEach.call(box.querySelectorAll(".gw-card"), function (a) {
             a.onclick = function (e) { e.preventDefault(); openOne(a.getAttribute("data-id")); };
+        });
+        Array.prototype.forEach.call(box.querySelectorAll("[data-pin]"), function (b) {
+            b.onclick = function (e) {
+                e.preventDefault(); e.stopPropagation(); b.disabled = true;
+                var g = S.list.filter(function (x) { return x.id === b.getAttribute("data-pin"); })[0]; if (!g) return;
+                patch("/giveaways/" + g.id, { pin: g.pin ? 0 : Date.now() }).then(function (r) { if (!r.ok) throw 0; return loadList(); }).catch(function () { b.disabled = false; alert("Sabitlenemedi."); });
+            };
         });
     }
 
@@ -728,8 +737,8 @@
     function checkRole() {
         var u = me(); S.mgr = false;
         if (!u) { createForm(); return Promise.resolve(); }
-        if (Account.isAdmin && Account.isAdmin()) { S.mgr = true; createForm(); return Promise.resolve(); }
-        return Account.getRole(u.uid).then(function (r) { S.mgr = r === "admin" || r === "gelistirici"; createForm(); }, function () { createForm(); });
+        if (Account.isAdmin && Account.isAdmin()) { S.mgr = true; createForm(); if (S.list && !$("gwListWrap").hidden) renderList(); return Promise.resolve(); }
+        return Account.getRole(u.uid).then(function (r) { S.mgr = r === "admin" || r === "gelistirici"; createForm(); if (S.mgr && S.list && !$("gwListWrap").hidden) renderList(); }, function () { createForm(); });
     }
     document.addEventListener("ra-push-change", function () { if (S.g) renderOne(); });
     function start() {
