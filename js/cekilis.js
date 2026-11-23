@@ -223,14 +223,15 @@
         var out = {};
         function page(tok) {
             return req("/giveaways/" + id + "/rev?pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
-                (d.documents || []).forEach(function (x) { var o = dec(x); out[o.id] = { v: o.v || "", b: o.b || "" }; });
+                (d.documents || []).forEach(function (x) { var o = dec(x); out[o.id] = { v: o.v || "", b: o.b || "", ts: o.ts || 0 }; });
                 return d.nextPageToken ? page(d.nextPageToken) : out;
             });
         }
         return page().catch(function () { return out; });
     }
-    function revOf(uid) { return ((S.rev || {})[uid] || {}).v || ""; }
-    function revB(uid) { return ((S.rev || {})[uid] || {}).b || ""; }
+    function changedAfter(uid) { var r = (S.rev || {})[uid], c = (S.chk || {})[uid]; return !!(r && c && c.pts && r.ts && c.pts > r.ts + 1000); }
+    function revOf(uid) { return changedAfter(uid) ? "" : ((S.rev || {})[uid] || {}).v || ""; }
+    function revB(uid) { return changedAfter(uid) ? "" : ((S.rev || {})[uid] || {}).b || ""; }
     // bonus sayılır mı: görsel yüklenmiş ve yönetici "geçersiz" dememiş
     function bonusOk(x, rv) { var r = (rv || S.rev || {})[x.uid] || {}; return !!(x.b && S.g && S.g.wa && r.b !== "no"); }
     function setRev(uid, v) {
@@ -242,9 +243,11 @@
         return req("/giveaways/" + S.g.id + "/rev/" + uid, { method: "DELETE" }).then(function (r) { if (!r.ok) throw 0; }).catch(function () { S.rev[uid] = old; alert("Geri alınamadı."); paintCheck(); });
     }
     function setRevF(uid, k, v) {
-        S.rev = S.rev || {}; var old = S.rev[uid]; S.rev[uid] = Object.assign({}, old || {}); S.rev[uid][k] = v;
+        // görseller incelemeden sonra değiştiyse eski kararın diğer yarısı da silinir (yeniden incelensin)
+        var stale = changedAfter(uid), other = k === "v" ? "b" : "v";
+        S.rev = S.rev || {}; var old = S.rev[uid]; S.rev[uid] = Object.assign({}, old || {}); S.rev[uid][k] = v; S.rev[uid].ts = Date.now(); if (stale) delete S.rev[uid][other];
         var o = { ts: Date.now() }; o[k] = v;
-        return patch("/giveaways/" + S.g.id + "/rev/" + uid, o).then(function (r) { if (!r.ok) throw 0; }).catch(function () { S.rev[uid] = old; alert("Kaydedilemedi, tekrar dene."); paintCheck(); });
+        return req("/giveaways/" + S.g.id + "/rev/" + uid + "?" + mask(o) + (stale ? "&updateMask.fieldPaths=" + other : ""), { method: "PATCH", body: JSON.stringify({ fields: enc(o) }) }).then(function (r) { if (!r.ok) throw 0; }).catch(function () { S.rev[uid] = old; alert("Kaydedilemedi, tekrar dene."); paintCheck(); });
     }
     function listEntries(id) {
         var out = [];
@@ -685,7 +688,7 @@
                     var u = res[0] ? dec(res[0]) : null, st = {};
                     try { st = u && u.stats ? JSON.parse(u.stats) : {}; } catch (e) {}
                     var pd = res[2] ? dec(res[2]) : {};
-                    out[x.uid] = { u: u, role: res[1], st: st || {}, proofs: PF.map(function (k) { return pd[k] || ""; }) };
+                    out[x.uid] = { u: u, role: res[1], st: st || {}, proofs: PF.map(function (k) { return pd[k] || ""; }), pts: pd.ts || 0 };
                 }).then(worker);
             }
             var ws = []; for (var i = 0; i < 8; i++) ws.push(worker());
@@ -700,6 +703,7 @@
         if (x.d) { var n = all.filter(function (y) { return y.d === x.d; }).length; if (n > 1) f.push(["bad", "📱 Aynı cihaz ×" + n]); }
         var nm = String(x.name || "").toLocaleLowerCase("tr").trim(), sn = all.filter(function (y) { return String(y.name || "").toLocaleLowerCase("tr").trim() === nm; }).length;
         if (sn > 1) f.push(["warn", "👯 Aynı isim ×" + sn]);
+        if (changedAfter(x.uid)) f.unshift(["new", "🔄 Görselini güncelledi"]);
         if (x.b && S.g && S.g.wa) f.push([revB(x.uid) === "no" ? "bad" : "star", revB(x.uid) === "no" ? "⭐ Bonus geçersiz" : revB(x.uid) === "ok" ? "⭐ Bonus onaylı (×2)" : "⭐ Bonus bekliyor (×2)"]);
         if (!u) f.push(["warn", "❓ Profil yok"]);
         else {
@@ -713,28 +717,31 @@
         var g = S.g, box = $("gwChk"); if (!g || !box) return;
         var l = S.entries || [], tab = S.tab || "all";
         var rows = l.map(function (x) { return { x: x, f: flagsOf(x, l).filter(function (t) { return t[0] !== "star"; }), s: flagsOf(x, l).filter(function (t) { return t[0] === "star"; }), v: revOf(x.uid) }; });
-        var n = { all: rows.length, wait: 0, ok: 0, no: 0, sus: 0 };
-        rows.forEach(function (r) { n[r.v || "wait"]++; if (r.f.length) n.sus++; });
+        var n = { all: rows.length, wait: 0, ok: 0, no: 0, sus: 0, wa: 0, wawait: 0 };
+        rows.forEach(function (r) { n[r.v || "wait"]++; if (r.f.some(function (t) { return t[0] !== "new"; })) n.sus++; if (r.x.b && g.wa) { n.wa++; if (!revB(r.x.uid)) n.wawait++; } });
         var groups = {}; l.forEach(function (x) { if (x.d) (groups[x.d] = groups[x.d] || []).push(x); });
         var extra = []; Object.keys(groups).forEach(function (d) { var a = groups[d].slice().sort(function (p, q) { return (p.ts || 0) - (q.ts || 0); }); extra = extra.concat(a.slice(1)); });
-        var list = rows.filter(function (r) { return tab === "all" || (tab === "sus" ? r.f.length : (r.v || "wait") === tab); })
-            .sort(function (a, b) { return (a.v ? 1 : 0) - (b.v ? 1 : 0) || b.f.length - a.f.length || (a.x.ts || 0) - (b.x.ts || 0); });
+        var list = rows.filter(function (r) { return tab === "all" || (tab === "sus" ? r.f.some(function (t) { return t[0] !== "new"; }) : tab === "wa" ? r.x.b && g.wa : (r.v || "wait") === tab); })
+            // bekleyenler önce; onlar içinde görselini güncelleyen ve en yeni katılan en üstte
+            .sort(function (a, b) { return (a.v ? 1 : 0) - (b.v ? 1 : 0) || (changedAfter(b.x.uid) ? 1 : 0) - (changedAfter(a.x.uid) ? 1 : 0) || (b.x.ts || 0) - (a.x.ts || 0); });
         if ($("gwmOk")) $("gwmOk").textContent = n.ok + "/" + n.all;
-        var TABS = [["all", "Tümü"], ["wait", "⏳ Bekleyen"], ["ok", "✅ Onaylı"], ["no", "❌ Uygun değil"], ["sus", "⚠️ İşaretli"]];
+        var TABS = [["all", "Tümü"], ["wait", "⏳ Bekleyen"], ["ok", "✅ Onaylı"], ["no", "❌ Uygun değil"]].concat(g.wa ? [["wa", "💬 WhatsApp"]] : []).concat([["sus", "⚠️ İşaretli"]]);
         var ST = { ok: '<span class="gw-rvst ok">✅ Onaylı</span>', no: '<span class="gw-rvst no">❌ Uygun değil</span>', "": '<span class="gw-rvst">⏳ Bekliyor</span>' };
         box.innerHTML = '<h4>🔍 Katılımcılar ve görseller <span class="gw-sub">' + n.all + ' kişi</span></h4>' +
-            (g.yt && n.all ? '<button type="button" class="btn primary gw-big gw-rvgo" id="gwRev">🔎 Görselleri sırayla incele' + (n.wait ? ' · ' + n.wait + ' bekleyen' : ' · hepsi incelendi ✓') + '</button>' : '') +
+            (n.all && (g.yt || g.wa) ? '<div class="gw-rvgos">' + (g.yt ? '<button type="button" class="btn primary gw-big gw-rvgo" id="gwRev">📺 YouTube görselleri<small>' + (n.wait ? n.wait + ' bekleyen' : 'hepsi incelendi ✓') + '</small></button>' : '') +
+                (g.wa ? '<button type="button" class="btn gw-big gw-rvgo gw-rvwa" id="gwRevWa">💬 WhatsApp görselleri<small>' + (n.wa ? (n.wawait ? n.wawait + ' bekleyen · ' : 'hepsi incelendi ✓ · ') + n.wa + ' kişi ×2' : 'henüz yükleyen yok') + '</small></button>' : '') + '</div>' : '') +
             '<div class="gw-tabs">' + TABS.map(function (t) { return '<button type="button" data-tab="' + t[0] + '"' + (tab === t[0] ? ' class="on"' : '') + '>' + t[1] + ' <b>' + n[t[0]] + '</b></button>'; }).join("") + '</div>' +
             '<div class="gw-mrow">' + (extra.length ? '<button type="button" class="btn sm gw-del" id="gwDupOut">📱 Aynı cihaz fazlalarını çıkar (' + extra.length + ')</button>' : '') +
             '<button type="button" class="btn sm" id="gwReChk">↻ Yenile</button></div>' +
             '<div class="gw-plist">' + (list.map(function (r) {
                 var x = r.x, prs = (((S.chk || {})[x.uid] || {}).proofs || []).filter(Boolean), vb = revB(x.uid), any = r.v || vb;
                 var stt = r.v === "ok" ? '<b class="ok">✅ Onaylı</b>' : r.v === "no" ? '<b class="no">❌ Uygun değil</b>' : '<b>⏳ Bekliyor</b>';
-                var warn = r.f.map(function (t) { return t[1]; }), bad = r.f.some(function (t) { return t[0] === "bad"; });
+                var upd = r.f.some(function (t) { return t[0] === "new"; }), ff = r.f.filter(function (t) { return t[0] !== "new"; });
+                var warn = ff.map(function (t) { return t[1]; }), bad = ff.some(function (t) { return t[0] === "bad"; });
                 return '<div class="gw-prow' + (r.v === "ok" ? " okd" : r.v === "no" ? " nod" : "") + '">' +
                     '<button type="button" class="gw-pth" data-proof="' + esc(x.uid) + '" title="Görselleri incele">' + (prs.length ? '<img src="' + prs[0] + '" alt="">' + (prs.length > 1 ? '<i>' + prs.length + '</i>' : '') : '📷') + '</button>' +
                     '<div class="gw-pn"><div class="gw-pl1"><a href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener">' + esc(x.name) + '</a>' + (x.b && S.g.wa ? '<i class="gw-star" title="' + (vb === "no" ? "Bonus geçersiz" : "WhatsApp bonusu") + '">' + (vb === "no" ? "⭐✗" : "⭐×2") + '</i>' : '') + '</div>' +
-                    '<div class="gw-pl2">' + stt + (warn.length ? '<span class="' + (bad ? "bad" : "warn") + '" title="' + esc(warn.join(" · ")) + '">⚠️ ' + esc(warn.join(" · ")) + '</span>' : '') + '</div></div>' +
+                    '<div class="gw-pl2">' + stt + (upd ? '<span class="new">🔄 Görselini güncelledi</span>' : '') + (warn.length ? '<span class="' + (bad ? "bad" : "warn") + '" title="' + esc(warn.join(" · ")) + '">⚠️ ' + esc(warn.join(" · ")) + '</span>' : '') + '</div></div>' +
                     '<div class="gw-pact">' + (any ? '<button type="button" class="gw-qb rst" data-rst="' + esc(x.uid) + '" title="Beklemeye geri al">↺</button>' : '') +
                     '<button type="button" class="gw-qb ok' + (r.v === "ok" ? " on" : "") + '" data-rv="ok" data-u="' + esc(x.uid) + '" title="Onayla">✓</button><button type="button" class="gw-qb no' + (r.v === "no" ? " on" : "") + '" data-rv="no" data-u="' + esc(x.uid) + '" title="Uygun değil">✗</button>' +
                     '<button type="button" class="gw-qb out" data-out="' + esc(x.uid) + '" title="Çekilişten çıkar">🗑</button></div></div>';
@@ -745,7 +752,8 @@
         Array.prototype.forEach.call(box.querySelectorAll("[data-rv]"), function (b) {
             b.onclick = function () { var u = b.getAttribute("data-u"), v = b.getAttribute("data-rv"); if (revOf(u) === v) clearRev(u); else setRev(u, v); paintCheck(); };
         });
-        if ($("gwRev")) $("gwRev").onclick = function () { review(); };
+        if ($("gwRev")) $("gwRev").onclick = function () { review(null, "yt"); };
+        if ($("gwRevWa")) $("gwRevWa").onclick = function () { review(null, "wa"); };
         $("gwReChk").onclick = checkPeople;
         if ($("gwDupOut")) $("gwDupOut").onclick = function () {
             if (!confirm(extra.length + " hesap çıkarılsın mı? (Her cihazdan ilk katılan kalır)")) return;
@@ -766,10 +774,15 @@
         if (!id || !$(id)) return; e.preventDefault(); if (e.repeat) return; $(id).click();
     });
     // görselleri sırayla incele: büyük görseller, Onayla / Uygun değil / Atla, sonra sıradaki kişi
-    function review(start) {
+    function review(start, mode) {
         var l = S.entries || []; if (!l.length) return;
-        var pend = l.filter(function (x) { return !revOf(x.uid); }).map(function (x) { return x.uid; });
-        var q = start ? [start].concat(pend.filter(function (u) { return u !== start; })) : pend.length ? pend : l.map(function (x) { return x.uid; });
+        var hasWa = function (x) { return !!(x.b && S.g.wa); };
+        var pool = mode === "wa" ? l.filter(hasWa) : l;
+        if (!pool.length) { alert("WhatsApp görseli yükleyen kimse yok."); return; }
+        var isPend = function (x) { return mode === "wa" ? !revB(x.uid) : mode === "yt" ? !revOf(x.uid) : !revOf(x.uid) || (hasWa(x) && !revB(x.uid)); };
+        var newest = function (a, b) { return (changedAfter(b.uid) ? 1 : 0) - (changedAfter(a.uid) ? 1 : 0) || (b.ts || 0) - (a.ts || 0); };
+        var pend = pool.filter(isPend).sort(newest).map(function (x) { return x.uid; });
+        var q = start ? [start].concat(pend.filter(function (u) { return u !== start; })) : pend.length ? pend : pool.slice().sort(newest).map(function (x) { return x.uid; });
         var i = 0, ch = chans(S.g);
         function done() {
             var n = { ok: 0, no: 0, wait: 0 }; l.forEach(function (x) { n[revOf(x.uid) || "wait"]++; });
@@ -782,13 +795,13 @@
             var x = null; while (i < q.length && !(x = l.filter(function (y) { return y.uid === q[i]; })[0])) i++;
             if (!x) return done();
             var prs = ((S.chk || {})[x.uid] || {}).proofs || [], f = flagsOf(x, l).filter(function (t) { return t[0] !== "star"; }), v = revOf(x.uid), hasB = !!(x.b && S.g.wa), vb = revB(x.uid);
-            var items = ch.map(function (c, k) { return { k: k, cap: "📺 " + c.name + " kanalı", img: prs[k], kind: "ch" }; });
-            if (hasB) items.push({ k: 2, cap: "⭐ WhatsApp: " + waLabel(S.g), img: prs[2], kind: "wa" });
+            var items = mode === "wa" ? [] : ch.map(function (c, k) { return { k: k, cap: "📺 " + c.name + " kanalı", img: prs[k], kind: "ch" }; });
+            if (hasB && mode !== "yt") items.push({ k: 2, cap: "⭐ WhatsApp: " + waLabel(S.g), img: prs[2], kind: "wa" });
             if (!items.length) { i++; st = 0; return show(); }
             if (st >= items.length) st = 0;
             var cur = items[st];
             var dots = items.map(function (it, n) { return '<span class="' + (n < st ? "ok" : n === st ? "on" : "") + '">' + (n < st ? "✓" : n + 1) + '</span>'; }).join("");
-            modal('<div class="gw-rvtop"><span>Kişi ' + (i + 1) + ' / ' + q.length + '</span><button type="button" class="gw-rvx" id="gwRvX" aria-label="Kapat">✕</button></div>' +
+            modal('<div class="gw-rvtop"><span>' + (mode === "wa" ? "💬 WhatsApp · " : mode === "yt" ? "📺 YouTube · " : "") + 'Kişi ' + (i + 1) + ' / ' + q.length + '</span><button type="button" class="gw-rvx" id="gwRvX" aria-label="Kapat">✕</button></div>' +
                 '<h3 class="gw-rvname">' + esc(x.name) + '</h3>' +
                 (v || vb ? '<p>' + (v === "ok" ? '<span class="gw-rvst ok">✅ Kanallar onaylı</span>' : v === "no" ? '<span class="gw-rvst no">❌ Uygun değil</span>' : '') + (vb === "ok" ? '<span class="gw-rvst ok">⭐ Bonus onaylı</span>' : vb === "no" ? '<span class="gw-rvst no">⭐ Bonus geçersiz</span>' : '') + '</p>' : '') +
                 (f.length ? '<div class="gw-flags" style="justify-content:center">' + f.map(function (t) { return '<span class="' + t[0] + '">' + esc(t[1]) + '</span>'; }).join("") + '</div>' : '') +

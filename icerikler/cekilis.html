@@ -332,6 +332,12 @@
 .gw-req li.drop { border: 2px dashed var(--ui-accent) !important; background: color-mix(in srgb, var(--ui-accent) 8%, var(--surface)) !important; }
 @media (hover: hover) { .gw-req li[data-slot] { cursor: copy; } .gw-req li.tgt { box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-accent) 35%, transparent); } }
 .gw-proofp { max-height: 110px !important; }
+/* YouTube / WhatsApp inceleme düğmeleri */
+.gw-rvgos { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin: 8px 0 4px; }
+.gw-rvgos .gw-rvgo { margin: 0; flex-direction: column; gap: 2px; }
+.gw-rvgos small { font: 650 12px Inter, sans-serif; opacity: .9; }
+.gw-rvwa { background: #25d366 !important; border-color: #25d366 !important; color: #fff !important; }
+.gw-pl2 span.new, .gw-flags .new { color: var(--ui-accent); }
 /* WhatsApp bonusu */
 .gw-req li.gw-bonus { border-style: dashed; border-color: rgba(234,179,8,.6); background: linear-gradient(160deg, rgba(234,179,8,.1), var(--surface) 60%); }
 .gw-req li.gw-bonus > b { background: #eab308; border-color: #eab308; color: #fff; }
