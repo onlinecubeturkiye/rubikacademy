@@ -458,7 +458,8 @@
                 return req("/giveaways/" + g.id).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
                     var cur = d ? dec(d) : null;
                     if (!cur || cur.st !== g.st || (cur.w || "") !== (g.w || "")) return { ok: false };
-                    return patch("/giveaways/" + g.id, o);
+                    // okuma ile yazma arasında başka biri (ikinci yönetici / onaylayan kazanan) değiştirdiyse yazma
+                    return patch("/giveaways/" + g.id, o, d.updateTime ? "&currentDocument.updateTime=" + encodeURIComponent(d.updateTime) : "");
                 }).then(function (r) {
                     if (!r.ok) return;
                     if (o.st === "drawn") patch("/users/" + o.w + "/notifications/" + newId(), { text: "🎉 Tebrikler! “" + g.title + "” çekilişini kazandın! 2 dakika içinde onaylamak için çekiliş sayfasını aç: rubikacademy.fun/icerikler/cekilis?id=" + g.id, ts: Date.now(), pushed: false }).catch(function () {});
