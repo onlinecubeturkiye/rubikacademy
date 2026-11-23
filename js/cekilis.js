@@ -244,8 +244,14 @@
     function countEntries(id) {
         var body = { structuredAggregationQuery: { structuredQuery: { from: [{ collectionId: "e" }] }, aggregations: [{ alias: "n", count: {} }] } };
         return fetch(ROOT + "/giveaways/" + id + ":runAggregationQuery?key=" + encodeURIComponent(cfg.apiKey), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
-            var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n; return x ? +x.integerValue : (a && a.length ? 0 : null);
-        }, function () { return null; });
+            var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n;
+            if (x) { cacheSet("n:" + id, +x.integerValue); return +x.integerValue; }
+            throw 0;
+        }).catch(function () {
+            // kota doluyken: bilinen son sayı (bu cihazdaki kayıt ya da sitedeki yedek); bu cihazda katıldıysan en az o kadar
+            var c = cacheGet("n:" + id);
+            return backup().then(function (b) { var n = Math.max(c || 0, (b && b._n && b._n[id]) || 0); return n ? n + (localJoined(id) && c == null ? 1 : 0) : null; });
+        });
     }
     // yönetici inceleme sonuçları: { uid: "ok" | "no" }
     function listRev(id) {
@@ -281,7 +287,7 @@
     function listEntries(id) {
         var out = [];
         function page(tok) {
-            return fetch(ROOT + "/giveaways/" + id + "/e?pageSize=300&key=" + encodeURIComponent(cfg.apiKey) + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+            return fetch(ROOT + "/giveaways/" + id + "/e?pageSize=300&key=" + encodeURIComponent(cfg.apiKey) + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
                 (d.documents || []).forEach(function (x) { var o = dec(x); out.push({ uid: o.id, name: o.name || "Cuber", d: o.d || "", ts: o.ts || 0, b: !!o.b }); });
                 return d.nextPageToken && out.length < 20000 ? page(d.nextPageToken) : out;
             });
@@ -471,7 +477,7 @@
         if (g.yt || (g.wa && r0.bonus)) w.writes.unshift({ update: { name: docName("/giveaways/" + g.id + "/proof/" + u.uid), fields: proofFields(g, r0) }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }] });
         req(":commit", { method: "POST", body: JSON.stringify(w) }).then(function (r) {
             if (!r.ok) throw new Error(r.status);
-            S.joined = true; S.count++; remember(g); renderOne(); msg("Katıldın, bol şans! 🍀");
+            S.joined = true; S.count++; cacheSet("n:" + g.id, S.count); remember(g); renderOne(); msg("Katıldın, bol şans! 🍀");
         }).catch(function (e) { if ($("gwJoin")) $("gwJoin").disabled = false; msg(String(e.message) === "403" ? "Katılınamadı: kayıtlar kapanmış olabilir." : "Katılınamadı, tekrar dene.", 1); });
     }
     function tooBig(r0) { return r0.proofs.concat([r0.bonus]).reduce(function (a, x) { return a + String(x || "").length; }, 0) > 1000000; }
@@ -716,7 +722,10 @@
             Array.prototype.forEach.call(pgEl.querySelectorAll("[data-pg]"), function (x) { x.onclick = function () { S.pplPage = +x.getAttribute("data-pg"); paint(l); }; });
         };
         if (S.entries && S.entriesFor === g.id && S.entriesN === S.count) { paint(S.entries); return; }
-        listEntries(g.id).then(function (l) { S.entries = l; S.entriesFor = g.id; S.entriesN = l.length; paint(l); }).catch(function () {});
+        listEntries(g.id).then(function (l) { S.entries = l; S.entriesFor = g.id; S.entriesN = l.length; paint(l); }).catch(function () {
+            var b = $("gwPplList"); if (b) b.innerHTML = '<p class="gw-note">Site şu an çok yoğun; katılımcı listesi birazdan görünecek. Katılımlar kaydediliyor.</p>';
+            if ($("gwPplN")) $("gwPplN").textContent = S.count || "…";
+        });
     }
     function age(ms) { var d = Math.floor(ms / 86400000); return d >= 1 ? d + " gün" : Math.max(1, Math.floor(ms / 3600000)) + " sa"; }
     function checkPeople() {
