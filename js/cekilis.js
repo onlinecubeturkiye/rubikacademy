@@ -735,8 +735,13 @@
         };
         if (S.entries && S.entriesFor === g.id && S.entriesN === S.count) { paint(S.entries); return; }
         listEntries(g.id).then(function (l) { S.entries = l; S.entriesFor = g.id; S.entriesN = l.length; paint(l); }).catch(function () {
-            var b = $("gwPplList"); if (b) b.innerHTML = '<p class="gw-note">Site şu an çok yoğun; katılımcı listesi birazdan görünecek. Katılımlar kaydediliyor.</p>';
-            if ($("gwPplN")) $("gwPplN").textContent = S.count || "…";
+            // kota doluyken: sitedeki yedekteki son katılımcı listesi
+            backup().then(function (bk) {
+                var e = bk && bk._e && bk._e[g.id];
+                if (e && e.length) { paint(e.map(function (x) { return { uid: x.uid, name: x.name, ts: Date.parse(x.ts) || 0, b: !!x.b }; })); if ($("gwPplN")) $("gwPplN").textContent = Math.max(S.count || 0, e.length); return; }
+                var b = $("gwPplList"); if (b) b.innerHTML = '<p class="gw-note">Site şu an çok yoğun; katılımcı listesi birazdan görünecek. Katılımlar kaydediliyor.</p>';
+                if ($("gwPplN")) $("gwPplN").textContent = S.count || "…";
+            });
         });
     }
     function age(ms) { var d = Math.floor(ms / 86400000); return d >= 1 ? d + " gün" : Math.max(1, Math.floor(ms / 3600000)) + " sa"; }
