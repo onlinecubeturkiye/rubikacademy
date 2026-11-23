@@ -21,7 +21,11 @@
         var u = me(), url = ROOT + path;
         var h = { "Content-Type": "application/json" };
         if (!u || !Account.token) return fetch(url + (url.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey), { method: opts.method || "GET", headers: h, body: opts.body });
-        return Account.token().then(function (t) { h.Authorization = "Bearer " + t; return fetch(url, { method: opts.method || "GET", headers: h, body: opts.body }); });
+        var pub = function () { return fetch(url + (url.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey), { method: "GET", headers: { "Content-Type": "application/json" } }); };
+        var get = !opts.method || opts.method === "GET";
+        return Account.token().then(function (t) { h.Authorization = "Bearer " + t; return fetch(url, { method: opts.method || "GET", headers: h, body: opts.body }); }, function (e) { if (get) return pub(); throw e; })
+            // oturum anahtarı geçersiz/eskiyse herkese açık okumayı girişsiz yeniden dene (liste boş görünmesin)
+            .then(function (r) { if (get && (r.status === 401 || r.status === 403) && !/\/(proof|claim|rev)(\/|\?|$)/.test(path)) return pub().then(function (r2) { return r2.ok ? r2 : r; }); return r; });
     }
     function dec(d) {
         var f = (d && d.fields) || {}, o = {};
@@ -140,15 +144,15 @@
 
     /* ---------- liste ---------- */
     function loadList() {
-        return req("/giveaways?pageSize=60").then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+        return req("/giveaways?pageSize=60").then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
             S.list = ((d && d.documents) || []).map(dec).sort(function (a, b) {
                 // yöneticinin sabitlediği çekiliş en üstte (herkese etiketsiz görünür)
                 var qa = +a.pin || 0, qb = +b.pin || 0; if (qa || qb) return qb - qa;
                 var pa = phase(a) === "claimed" || phase(a) === "empty" ? 1 : 0, pb = phase(b) === "claimed" || phase(b) === "empty" ? 1 : 0;
                 return pa - pb || (pa ? b.drawAt - a.drawAt : a.drawAt - b.drawAt);
             });
-            renderList();
-        }).catch(function () { $("gwList").innerHTML = '<p class="gw-empty">Çekilişler yüklenemedi. Biraz sonra tekrar dene.</p>'; });
+            S.listLoaded = true; renderList();
+        }).catch(function (e) { $("gwList").innerHTML = '<p class="gw-empty">Çekilişler yüklenemedi (' + esc(e && e.message || "bağlantı") + '). Sayfayı yenile ya da biraz sonra tekrar dene.</p>'; });
     }
     function card(g) {
         var p = phase(g);
@@ -164,6 +168,7 @@
     }
     function renderList() {
         var box = $("gwList");
+        if (!S.listLoaded) { box.innerHTML = '<p class="gw-empty">Yükleniyor…</p>'; return; }
         box.innerHTML = S.list.length ? S.list.map(card).join("") : '<div class="gw-emptyc"><img src="/img/cekilis/kup.svg" alt=""><div><b>Şu an açık çekiliş yok</b><p>Yeni çekilişler burada ve bildirimlerde duyurulur. Takipte kal!</p></div></div>';
         Array.prototype.forEach.call(box.querySelectorAll(".gw-card"), function (a) {
             a.onclick = function (e) { e.preventDefault(); openOne(a.getAttribute("data-id")); };
