@@ -327,25 +327,23 @@
     }
     function reqHtml(g) {
         var r = reqState(g), u = me();
-        var row = function (ok, n, title, body) { return '<li class="' + (ok ? "ok" : "") + '"><b>' + (ok ? "✓" : n) + '</b><div><strong>' + title + '</strong>' + (body || "") + '</div></li>'; };
+        // sıkı satır: numara · başlık + kısa not + küçük düğmeler · sağda küçük önizleme
+        var row = function (ok, n, title, body, thumb, cls) { return '<li class="gw-rq' + (ok ? " ok" : "") + (cls ? " " + cls : "") + '"><b>' + (ok ? "✓" : n) + '</b><div><strong>' + title + '</strong>' + (body || "") + '</div>' + (thumb ? '<img class="gw-proofp" src="' + thumb + '" alt="Yüklenen görsel" title="Yüklenen görsel">' : '') + '</li>'; };
+        var up = function (i, p, lbl) { return '<label class="btn sm' + (p ? '' : ' primary') + '">📸 ' + (p ? "Değiştir" : lbl) + '<input type="file" accept="image/*" class="gwProof" data-i="' + i + '" hidden' + (r.acc ? '' : ' disabled') + '></label>'; };
         var all = r.acc && r.yt; // bildirim artık şart değil
         var ed = !!S.editing;
-        return '<div class="gw-req"><h3>' + (ed ? "📸 Görsellerimi düzenle" : "Katılma şartları") + '</h3>' + (u ? '<p class="gw-pchint">💡 Bilgisayarda: görseli kutuya <b>sürükle</b> ya da kopyalayıp kutuya tıkla, <b>Ctrl+V</b> ile yapıştır.</p>' : '') + '<ol>' +
-            row(r.acc, 1, "Rubik Academy hesabın açık olsun", r.acc ? '<span>' + esc(myName()) + ' olarak giriş yaptın</span>' : '<button type="button" class="btn sm primary" id="gwLogin">Giriş yap / Üye ol</button>') +
+        return '<div class="gw-req"><h3>' + (ed ? "📸 Görsellerimi düzenle" : "Katılma şartları") + '</h3>' +
+            (u && (r.ch.length || g.wa) ? '<p class="gw-pchint">💡 Ekran görüntülerinde <b>Abone olundu</b> yazısı görünmeli; yalnız düzenleyenler görür.<span class="gw-pch2"> Bilgisayarda görseli kutuya <b>sürükle</b> ya da kutuya tıklayıp <b>Ctrl+V</b> ile yapıştır.</span></p>' : '') + '<ol>' +
+            row(r.acc, 1, "Rubik Academy hesabın açık olsun", r.acc ? '<span>' + esc(myName()) + ' olarak giriş yaptın</span>' : '<div class="gw-reqb"><button type="button" class="btn sm primary" id="gwLogin">Giriş yap / Üye ol</button></div>') +
             r.ch.map(function (c, i) {
                 var p = r.proofs[i] || "";
-                return row(!!p, 2 + i, esc(c.name) + " kanalına abone ol", '<span>Abone olduktan sonra kanal sayfasında <b>Abone olundu</b> yazısı görünecek şekilde ekran görüntüsü al ve yükle. Görseli yalnız çekilişi düzenleyenler görür.</span>' +
-                    '<div class="gw-reqb">' + (c.url ? '<a class="btn sm gw-yt" href="' + esc(c.url) + '" target="_blank" rel="noopener">▶ Kanala git</a>' : '') +
-                    '<label class="btn sm' + (p ? '' : ' primary') + '">📸 ' + (p ? "Görseli değiştir" : "Ekran görüntüsü yükle") + '<input type="file" accept="image/*" class="gwProof" data-i="' + i + '" hidden' + (r.acc ? '' : ' disabled') + '></label></div>' +
-                    (p ? '<img class="gw-proofp" src="' + p + '" alt="Yüklenen görsel">' : ''));
+                return row(!!p, 2 + i, esc(c.name) + " kanalına abone ol", '<div class="gw-reqb">' + (c.url ? '<a class="btn sm gw-yt" href="' + esc(c.url) + '" target="_blank" rel="noopener">▶ Kanala git</a>' : '') + up(i, p, "Görüntü yükle") + '</div>', p);
             }).join("") +
             (g.wa ? (function () {
                 var wl = waList(g), p = r.bonus;
-                return '<li class="gw-bonus' + (p ? ' ok' : '') + '"><b>' + (p ? "✓" : "⭐") + '</b><div><strong>Bonus: ' + esc(waLabel(g)) + ' <em>isteğe bağlı</em></strong><span>' + (wl.length > 1 ? 'Bu topluluklardan birindeysen' : 'Bu topluluktaysan') + ' bunu gösteren bir ekran görüntüsü yükle; <b>çarkta adın 2 kez yazılır</b>, kazanma şansın 2 katına çıkar.</span>' +
-                    '<div class="gw-reqb">' + wl.map(function (c) { return c.url ? '<a class="btn sm gw-wa" href="' + esc(c.url) + '" target="_blank" rel="noopener">💬 ' + esc(c.name) + ' topluluğu</a>' : ''; }).join("") +
-                    '<label class="btn sm' + (p ? '' : ' primary') + '">📸 ' + (p ? "Görseli değiştir" : "Topluluk görüntüsü yükle") + '<input type="file" accept="image/*" class="gwProof" data-i="2" hidden' + (r.acc ? '' : ' disabled') + '></label>' +
-                    (p ? '<button type="button" class="btn sm" id="gwBonusX">Kaldır</button>' : '') + '</div>' +
-                    (p ? '<img class="gw-proofp" src="' + p + '" alt="Bonus görseli">' : '') + '</div></li>';
+                return row(!!p, "⭐", "Bonus: " + esc(waLabel(g)) + ' <em>isteğe bağlı · çarkta 2×</em>',
+                    '<div class="gw-reqb">' + wl.map(function (c) { return c.url ? '<a class="btn sm gw-wa" href="' + esc(c.url) + '" target="_blank" rel="noopener">💬 ' + esc(c.name) + '</a>' : ''; }).join("") + up(2, p, "Görüntü yükle") +
+                    (p ? '<button type="button" class="btn sm" id="gwBonusX">Kaldır</button>' : '') + '</div>', p, "gw-bonus");
             })() : '') +
             '</ol>' + (ed ? '<div class="gw-edact"><button type="button" class="btn primary gw-big" id="gwEdSave"' + (all ? '' : ' disabled') + '>💾 Değişiklikleri kaydet</button><button type="button" class="btn" id="gwEdX">Vazgeç</button></div>'
                 : u ? '<button type="button" class="btn primary gw-big" id="gwJoin"' + (all ? '' : ' disabled') + '>🎟 Çekilişe katıl</button>' : '') +
