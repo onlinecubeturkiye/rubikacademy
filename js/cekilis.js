@@ -100,6 +100,8 @@
     function loadList() {
         return req("/giveaways?pageSize=60").then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
             S.list = ((d && d.documents) || []).map(dec).sort(function (a, b) {
+                // yöneticinin sabitlediği çekiliş en üstte (herkese etiketsiz görünür)
+                var qa = +a.pin || 0, qb = +b.pin || 0; if (qa || qb) return qb - qa;
                 var pa = phase(a) === "claimed" || phase(a) === "empty" ? 1 : 0, pb = phase(b) === "claimed" || phase(b) === "empty" ? 1 : 0;
                 return pa - pb || (pa ? b.drawAt - a.drawAt : a.drawAt - b.drawAt);
             });
@@ -385,14 +387,28 @@
             S.fixing = 1;
             patch("/giveaways/" + g.id, g.st === "empty" ? { st: "open", closeAt: modeOf(g) === "mini" && !g.test ? g.drawAt - 10 * 60000 : g.drawAt } : { closeAt: g.drawAt }).then(function (r) { S.fixing = 0; if (r.ok) return fetchOne(g.id).then(renderOne); }, function () { S.fixing = 0; });
         }
-        var p = phase(g);
-        box.innerHTML = '<h3>🛡 Yönetici</h3><div class="gw-mrow">' +
-            (p === "closed" || p === "drawing" || (g.test && p === "open") ? '<button type="button" class="btn primary sm" id="gwDraw">' + MODE_LBL[modeOf(g)].split(" ")[0] + ' Şimdi çek</button>' : '') +
-            (p === "drawn" || p === "expired" || p === "claimed" || p === "empty" ? '<button type="button" class="btn sm" id="gwRedraw">🔁 Yeniden çek</button>' : '') +
-            '<button type="button" class="btn sm gw-del" id="gwDel">🗑 Çekilişi sil</button></div>' +
-            '<p class="gw-note">Çekilişi sen başlatırsın (kayıtlar kapandıktan sonra <b>Şimdi çek</b>). Kazanan 2 dakika içinde onaylamazsa bu sayfa açıkken sıradaki kişi kendiliğinden çekilir.</p>' +
+        var p = phase(g), now = Date.now(), canDraw = p === "closed" || p === "drawing" || (g.test && p === "open"), reDraw = p === "drawn" || p === "expired" || p === "claimed" || p === "empty";
+        var sl = function (ms) { var m = Math.max(0, Math.floor(ms / 60000)), d = Math.floor(m / 1440), h = Math.floor(m % 1440 / 60); return d ? d + " gün" : h ? h + " sa" : (m % 60) + " dk"; }, left = sl;
+        var when = p === "open" ? [left(g.closeAt - now), g.closeAt < g.drawAt ? "kayıt kapanışına" : "çekilişe"] : p === "closed" ? [left(g.drawAt - now), "çekilişe"] : p === "drawn" ? [left(g.claimBy - now), "onay süresi"] : ["—", p === "claimed" ? "onaylandı" : "bitti"];
+        box.innerHTML = '<div class="gwm-head"><div class="gwm-ic">🛡</div><div><h3>Yönetim</h3><small>Bu bölümü yalnız yetkililer görür</small></div></div>' +
+            '<div class="gwm-stats"><div><b>' + S.count + '</b><span>katılımcı</span></div><div><b id="gwmSus">…</b><span>işaretli</span></div><div><b>' + esc(when[0]) + '</b><span>' + when[1] + '</span></div></div>' +
+            (canDraw || reDraw ? '<div class="gwm-main">' + (canDraw ? '<button type="button" class="btn primary gw-big" id="gwDraw">' + MODE_LBL[modeOf(g)].split(" ")[0] + ' Şimdi çek</button>' : '') +
+                (reDraw ? '<button type="button" class="btn gw-big" id="gwRedraw">🔁 Yeniden çek</button>' : '') + '</div>' : '') +
+            '<div class="gwm-acts"><button type="button" class="gwm-a' + (g.pin ? ' on' : '') + '" id="gwPin"><i>📌</i><span>' + (g.pin ? 'Sabitlendi<small>Kaldırmak için dokun</small>' : 'En üste sabitle<small>Listede ilk sırada görünür</small>') + '</span></button>' +
+            '<button type="button" class="gwm-a" id="gwLink"><i>🔗</i><span>Bağlantıyı kopyala<small>Paylaşmak için</small></span></button>' +
+            '<button type="button" class="gwm-a del" id="gwDel"><i>🗑</i><span>Çekilişi sil<small>Geri alınamaz</small></span></button></div>' +
+            '<details class="gwm-help"><summary>Nasıl çalışır?</summary><p>Kayıtlar kapanınca <b>Şimdi çek</b>e dokun; herkes çarkı aynı anda görür. Kazanan 2 dakika içinde onaylamazsa bu sayfa açıkken sıradaki kişi kendiliğinden çekilir. Sabitlenen çekiliş listede en üstte durur, katılımcılar bunu görmez.</p></details>' +
             (skipNames(g).length ? '<p class="gw-note">Onaylamayan / iptal edilenler: <b>' + skipNames(g).map(esc).join(" → ") + '</b></p>' : '') +
             '<div id="gwClaim"></div><div class="gw-chk" id="gwChk"><h4>🔍 Katılımcı kontrolü</h4><p class="gw-note">Yükleniyor…</p></div>';
+        $("gwPin").onclick = function () {
+            var b = this; b.disabled = true;
+            patch("/giveaways/" + g.id, { pin: g.pin ? 0 : Date.now() }).then(function (r) { if (!r.ok) throw 0; return fetchOne(g.id).then(renderOne); }).catch(function () { b.disabled = false; alert("Sabitlenemedi."); });
+        };
+        $("gwLink").onclick = function () {
+            var u = "https://rubikacademy.fun/icerikler/cekilis?id=" + encodeURIComponent(g.id), b = this;
+            var ok = function () { b.querySelector("span").innerHTML = 'Kopyalandı ✓<small>' + esc(u.replace("https://", "")) + '</small>'; };
+            try { navigator.clipboard.writeText(u).then(ok, function () { prompt("Bağlantı:", u); }); } catch (e) { prompt("Bağlantı:", u); }
+        };
         if ($("gwDraw")) $("gwDraw").onclick = function () { if (confirm("Kazanan şimdi çekilsin mi?")) draw(false); };
         if ($("gwRedraw")) $("gwRedraw").onclick = function () { if (confirm("Mevcut kazanan iptal edilip yeni kişi çekilsin mi?")) draw(true); };
         checkPeople();
@@ -469,9 +485,7 @@
     function checkPeople() {
         var g = S.g, box = $("gwChk"); if (!g || !box) return;
         listEntries(g.id).then(function (l) {
-            S.entries = l;
-            // katılan yokken çekiliş yapılmaz: hiçbir şey yazmadan uyar
-            if (!l.length) { alert("Henüz katılan yok, çekiliş yapılamaz."); return; } S.entriesFor = g.id; S.entriesN = l.length;
+            S.entries = l; S.entriesFor = g.id; S.entriesN = l.length;
             var jobs = l.map(function (x) { return x; }), out = {}, k = 0;
             function worker() {
                 if (k >= jobs.length) return Promise.resolve();
@@ -511,8 +525,9 @@
         var groups = {}; l.forEach(function (x) { if (x.d) (groups[x.d] = groups[x.d] || []).push(x); });
         var extra = []; Object.keys(groups).forEach(function (d) { var a = groups[d].slice().sort(function (p, q) { return (p.ts || 0) - (q.ts || 0); }); extra = extra.concat(a.slice(1)); });
         var list = (onlySus ? sus : rows).sort(function (a, b) { return b.f.length - a.f.length || (a.x.ts || 0) - (b.x.ts || 0); });
+        if ($("gwmSus")) $("gwmSus").textContent = sus.length;
         box.innerHTML = '<h4>🔍 Katılımcı kontrolü <span class="gw-sub">' + l.length + ' kişi · ' + sus.length + ' işaretli</span></h4>' +
-            '<p class="gw-note">Aynı cihazdan birden çok hesap, aynı isim, yeni açılmış ya da sitede hiç etkinliği olmayan hesaplar işaretlenir. Askıya alınmış hesaplar kendiliğinden çekilmez. Şüphelendiğini <b>Çıkar</b> ile listeden çıkarabilirsin.</p>' +
+            '<p class="gw-note">Aynı cihaz, aynı isim, yeni ya da etkinliği olmayan hesaplar ve eksik görseller işaretlenir. Şüphelendiğini <b>Çıkar</b> ile çıkar.</p>' +
             '<div class="gw-mrow"><label class="gw-chkf"><input type="checkbox" id="gwOnlySus"' + (onlySus ? " checked" : "") + '> Yalnız işaretliler</label>' +
             (extra.length ? '<button type="button" class="btn sm gw-del" id="gwDupOut">📱 Aynı cihaz fazlalarını çıkar (' + extra.length + ')</button>' : '') +
             '<button type="button" class="btn sm" id="gwReChk">↻ Yenile</button></div>' +
