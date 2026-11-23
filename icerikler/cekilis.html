@@ -232,6 +232,22 @@
 /* listede sabitle düğmesi (yalnız yetkililer) */
 .gw-pinb { position: absolute; left: 10px; top: 10px; padding: 5px 10px; border-radius: 999px; border: 0; background: rgba(0,0,0,.55); color: #fff; font: 800 12px Inter, sans-serif; cursor: pointer; backdrop-filter: blur(4px); }
 .gw-pinb.on { background: var(--ui-accent); }
+/* WhatsApp bonusu */
+.gw-req li.gw-bonus { border-style: dashed; border-color: rgba(234,179,8,.6); background: linear-gradient(160deg, rgba(234,179,8,.1), var(--surface) 60%); }
+.gw-req li.gw-bonus > b { background: #eab308; border-color: #eab308; color: #fff; }
+.gw-req li.gw-bonus.ok > b { background: #16a34a; border-color: #16a34a; }
+.gw-req li.gw-bonus em { font-style: normal; font: 700 11px Inter, sans-serif; color: #a16207; background: rgba(234,179,8,.18); padding: 2px 7px; border-radius: 999px; margin-left: 4px; vertical-align: middle; }
+.gw-wa { background: #25d366 !important; color: #fff !important; border-color: #25d366 !important; }
+.gw-star { font-style: normal; font-size: 11px; font-weight: 800; color: #a16207; }
+.gw-flags .star { background: rgba(234,179,8,.16); color: #a16207; }
+.gw-edact { display: flex; flex-direction: column; gap: 8px; }
+.gw-in small { display: block; margin-top: 6px; font-weight: 650; color: #a16207; }
+.gw-wab { border-bottom: 0 !important; }
+.gw-wab > input { width: 100%; box-sizing: border-box; margin: 6px 0; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 600 13.5px Inter, sans-serif; }
+.gw-rvb { border-color: rgba(234,179,8,.6) !important; background: rgba(234,179,8,.08) !important; }
+.gw-rvbb { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 6px; font: 750 12.5px Inter, sans-serif; color: var(--text); }
+.gwm-acts { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+@media (min-width: 640px) { .gwm-acts { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; } }
 /* görsel inceleme */
 .gw-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 8px; margin: 6px 0 2px; scrollbar-width: none; }
 .gw-tabs::-webkit-scrollbar { display: none; }
