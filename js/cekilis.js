@@ -1,79 +1,47 @@
 /* =========================================================
    ÇEKİLİŞ (/icerikler/cekilis) — cekilis.js
-- Admin / Geliştirici rolündekiler (ve site yöneticisi) sitede çekiliş kurar
-- Üyeler katılır; kayıtlar çekiliş anına kadar açık (mini: 10 dk önce kapanır)
-- Çekiliş saatinde rastgele bir katılımcı seçilir (sayfa açık olan yönetici yapar; herkes canlı görür)
-- Kazanana bildirim gider; 2 dakika içinde onaylamazsa yeni kişi çekilir
-- Onaylayan kazanan teslimat bilgilerini gönderir; bilgiler yalnız yöneticilere gelir (+ kurana bildirim)
+   - Admin / Geliştirici rolündekiler (ve site yöneticisi) sitede çekiliş kurar
+   - Üyeler katılır; kayıtlar çekiliş anına kadar açık (mini: 10 dk önce kapanır)
+   - Çekiliş saatinde rastgele bir katılımcı seçilir (sayfa açık olan yönetici yapar; herkes canlı görür)
+   - Kazanana bildirim gider; 2 dakika içinde onaylamazsa yeni kişi çekilir
+   - Onaylayan kazanan teslimat bilgilerini gönderir; bilgiler yalnız yöneticilere gelir (+ kurana bildirim)
    Firestore: giveaways/{id}, giveaways/{id}/e/{uid} (katılımcı), giveaways/{id}/claim/{uid} (teslimat)
 ========================================================= */
 (function () {
     var cfg = window.RA_FIREBASE || {};
-    var BACKUP_CFG = {
-        apiKey: "AIzaSyAoAu72Q8O2486ejUwNuuIJqVATM-Xq1Rk",
-        authDomain: "rubikacademyyan.firebaseapp.com",
-        projectId: "rubikacademyyan",
-        storageBucket: "rubikacademyyan.firebasestorage.app",
-        messagingSenderId: "1011957924913",
-        appId: "1:1011957924913:web:2aa1bd81cd246d39154110"
-    };
-    var useBackup = false;
-    function activeCfg() { return useBackup || !cfg.projectId ? BACKUP_CFG : cfg; }
-    function rootOf(c) {
-        var x = c || activeCfg();
-        return ((x.emulator && x.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + x.projectId + "/databases/(default)/documents";
-    }
-    var ROOT = rootOf(cfg);
+    var ROOT = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents";
     var CLAIM_MS = 2 * 60000;
     var TS = { drawAt: 1, closeAt: 1, wAt: 1, claimBy: 1, cAt: 1, ts: 1 };
     function $(id) { return document.getElementById(id); }
     function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
     function me() { return window.Account && Account.user && Account.user(); }
     function myName() { var u = me(); var p = window.Account && Account.localProfile ? Account.localProfile() : {}; return String((p && p.name) || (u && (u.displayName || (u.email || "").split("@")[0])) || "Cuber").slice(0, 24); }
-    function shouldFallback(r) {
-        return !r || r.status === 429 || r.status === 503 || r.status === 404;
+    // veritabanı kotası/yoğunluğu (429, 503): birkaç kez bekleyip yeniden dene
+    var _fetch = window.fetch.bind(window);
+    function fetch(url, o) {
+        var n = 0;
+        return (function go() {
+            return _fetch(url, o).then(function (r) {
+                if ((r.status === 429 || r.status === 503) && n < 4) { var w = [400, 1200, 2500, 5000][n++]; return new Promise(function (res) { setTimeout(res, w + Math.random() * 400); }).then(go); }
+                if (r.status === 429) S.quota = true;
+                return r;
+            });
+        })();
     }
-    function doFetch(c, path, opts, withAuth) {
-        opts = opts || {};
-        var url = rootOf(c) + path;
-        var h = { "Content-Type": "application/json" };
-        if (!withAuth || !me() || !Account.token || c === BACKUP_CFG) {
-            return fetch(url + (url.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(c.apiKey), { method: opts.method || "GET", headers: h, body: opts.body });
-        }
-        return Account.token().then(function (t) {
-            h.Authorization = "Bearer " + t;
-            return fetch(url, { method: opts.method || "GET", headers: h, body: opts.body });
-        }, function () {
-            return fetch(url + (url.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(c.apiKey), { method: "GET", headers: { "Content-Type": "application/json" } });
-        });
-    }
+    var _bk = null;
+    function backup() { return _bk || (_bk = _fetch("/data/cekilis-yedek.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; })); }
+    function cacheSet(k, v) { try { localStorage.setItem("ra-gw-c:" + k, JSON.stringify(v)); } catch (e) {} }
+    function cacheGet(k) { try { return JSON.parse(localStorage.getItem("ra-gw-c:" + k) || "null"); } catch (e) { return null; } }
     function req(path, opts) {
         opts = opts || {};
-        var primary = activeCfg();
+        var u = me(), url = ROOT + path;
+        var h = { "Content-Type": "application/json" };
+        if (!u || !Account.token) return fetch(url + (url.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey), { method: opts.method || "GET", headers: h, body: opts.body });
+        var pub = function () { return fetch(url + (url.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey), { method: "GET", headers: { "Content-Type": "application/json" } }); };
         var get = !opts.method || opts.method === "GET";
-        return doFetch(primary, path, opts, true)
-            .then(function (r) {
-                if (get && me() && (r.status === 401 || r.status === 403) && !/\/(proof|claim|rev)(\/|\?|$)/.test(path)) {
-                    return doFetch(primary, path, { method: "GET" }, false).then(function (r2) { return r2.ok ? r2 : r; });
-                }
-                return r;
-            })
-            .then(function (r) {
-                if (!useBackup && primary !== BACKUP_CFG && shouldFallback(r)) {
-                    useBackup = true;
-                    ROOT = rootOf(BACKUP_CFG);
-                    return doFetch(BACKUP_CFG, path, opts, false);
-                }
-                return r;
-            })
-            .catch(function (err) {
-                if (!useBackup && primary !== BACKUP_CFG) {
-                    useBackup = true;
-                    ROOT = rootOf(BACKUP_CFG);
-                    return doFetch(BACKUP_CFG, path, opts, false);
-                }
-                throw err;
-            });
+        return Account.token().then(function (t) { h.Authorization = "Bearer " + t; return fetch(url, { method: opts.method || "GET", headers: h, body: opts.body }); }, function (e) { if (get) return pub(); throw e; })
+            // oturum anahtarı geçersiz/eskiyse herkese açık okumayı girişsiz yeniden dene (liste boş görünmesin)
+            .then(function (r) { if (get && (r.status === 401 || r.status === 403) && !/\/(proof|claim|rev)(\/|\?|$)/.test(path)) return pub().then(function (r2) { return r2.ok ? r2 : r; }); return r; });
     }
     function dec(d) {
         var f = (d && d.fields) || {}, o = {};
@@ -98,7 +66,7 @@
     }
     function mask(o) { return Object.keys(o).map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&"); }
     function patch(path, o, extra) { return req(path + "?" + mask(o) + (extra || ""), { method: "PATCH", body: JSON.stringify({ fields: enc(o) }) }); }
-    function docName(path) { return "projects/" + activeCfg().projectId + "/databases/(default)/documents" + path; }
+    function docName(path) { return "projects/" + cfg.projectId + "/databases/(default)/documents" + path; }
     function left(ms) {
         if (ms <= 0) return "şimdi";
         var s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60;
@@ -159,6 +127,7 @@
             '<div class="gw-orgt"><b data-hname="' + esc(g.host || "") + '">' + esc(g.hName || "Rubik Academy") + '</b><small>Çekilişi düzenleyen</small></div>' +
             (big && g.host ? '<a class="btn sm gw-orgp" href="/icerikler/profil?u=' + encodeURIComponent(g.host) + '" target="_blank" rel="noopener">Profil</a>' : '') + '</div>';
     }
+    // düzenleyenin profil fotoğrafı ve adı (herkese açık profil)
     function fillHosts(root) {
         Array.prototype.forEach.call((root || document).querySelectorAll("[data-host]"), function (el) {
             var uid = el.getAttribute("data-host"); if (!uid) return;
@@ -191,19 +160,27 @@
 
     /* ---------- liste ---------- */
     function loadList() {
-        return req("/giveaways?pageSize=60").then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+        // çekiliş listesi herkese açık: oturum anahtarı beklenmeden doğrudan okunur
+        var url = ROOT + "/giveaways?pageSize=60&key=" + encodeURIComponent(cfg.apiKey);
+        return fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) { cacheSet("list", d); return d; }, function (e) {
+            var c = cacheGet("list"); if (c) { S.stale = true; return c; }
+            // veritabanı kotası dolduysa sitedeki yedek liste
+            return backup().then(function (b) { if (b) { S.stale = true; return b; } throw e; });
+        }).then(function (d) {
             S.list = ((d && d.documents) || []).map(dec).sort(function (a, b) {
+                // yöneticinin sabitlediği çekiliş en üstte (herkese etiketsiz görünür)
                 var qa = +a.pin || 0, qb = +b.pin || 0; if (qa || qb) return qb - qa;
                 var pa = phase(a) === "claimed" || phase(a) === "empty" ? 1 : 0, pb = phase(b) === "claimed" || phase(b) === "empty" ? 1 : 0;
                 return pa - pb || (pa ? b.drawAt - a.drawAt : a.drawAt - b.drawAt);
             });
             S.listLoaded = true; renderList();
-        }).catch(function (e) { $("gwList").innerHTML = '<p class="gw-empty">Çekilişler yüklenemedi (' + esc(e && e.message || "bağlantı") + '). Sayfayı yenile ya da biraz sonra tekrar dene.</p>'; });
+        }).catch(function (e) { $("gwList").innerHTML = '<p class="gw-empty">' + (String(e && e.message) === "429" ? "Site şu an çok yoğun, çekilişler birazdan yüklenecek. Lütfen biraz sonra sayfayı yenile." : "Çekilişler yüklenemedi (" + esc(e && e.message || "bağlantı") + "). Sayfayı yenile.") + '</p>'; setTimeout(loadList, 15000); });
     }
     function card(g) {
         var p = phase(g);
         return '<a class="gw-card" href="/icerikler/cekilis?id=' + encodeURIComponent(g.id) + '" data-id="' + esc(g.id) + '">' + orgHtml(g, false) +
             '<div class="gw-imgw"><img class="gw-img" src="' + esc(imgOf(g)) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/cekilis/kup.svg\'"><div class="gw-tags">' + badges(g) + '</div>' +
+            // yalnız yetkililer görür: listeden de sabitle / kaldır
             (S.mgr ? '<button type="button" class="gw-pinb' + (g.pin ? ' on' : '') + '" data-pin="' + esc(g.id) + '" title="' + (g.pin ? 'Sabitlemeyi kaldır' : 'En üste sabitle') + '">📌 ' + (g.pin ? 'Sabitli' : 'Sabitle') + '</button>' : '') + '</div>' +
             '<div class="gw-cbody"><b>' + esc(g.title) + '</b>' +
             '<div class="gw-cstats"><div><span>Katılımcı</span><b class="gw-cn" data-n="' + esc(g.id) + '">' + (p === "open" || p === "closed" ? "…" : (g.n || 0)) + '</b></div><div><span>Ödül</span><b class="gw-prize">' + esc(g.prize || "") + '</b></div></div>' +
@@ -221,7 +198,8 @@
         Array.prototype.forEach.call(box.querySelectorAll("[data-share]"), function (b) {
             b.onclick = function (e) { e.preventDefault(); e.stopPropagation(); var g = S.list.filter(function (x) { return x.id === b.getAttribute("data-share"); })[0]; if (g) share(g, b); };
         });
-        S.list.forEach(function (g) { var p = phase(g); if (p !== "open" && p !== "closed") return; countEntries(g.id).then(function (n) { var e = box.querySelector('.gw-cn[data-n="' + g.id + '"]'); if (e) e.textContent = n; }); });
+        // açık çekilişlerin katılımcı sayısı
+        S.list.forEach(function (g) { var p = phase(g); if (p !== "open" && p !== "closed") return; countEntries(g.id).then(function (n) { var e = box.querySelector('.gw-cn[data-n="' + g.id + '"]'); if (e && n != null) e.textContent = n; }); });
         fillHosts(box); updCd();
         Array.prototype.forEach.call(box.querySelectorAll("[data-pin]"), function (b) {
             b.onclick = function (e) {
@@ -248,25 +226,27 @@
     function fetchOne(id) {
         var u = me();
         return Promise.all([
-            req("/giveaways/" + id).then(function (r) { return r.ok ? r.json() : null; }),
-            u ? req("/giveaways/" + id + "/e/" + u.uid).then(function (r) { return r.ok ? r.json() : null; }) : Promise.resolve(null),
+            fetch(ROOT + "/giveaways/" + id + "?key=" + encodeURIComponent(cfg.apiKey)).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (d) { cacheSet("g:" + id, d); return d; }, function () { return cacheGet("g:" + id) || backup().then(function (b) { return b && (b.documents || []).filter(function (x) { return x.name.split("/").pop() === id; })[0] || null; }); }),
+            // kendi katılımım: herkese açık belge, oturum beklenmeden okunur
+            u ? fetch(ROOT + "/giveaways/" + id + "/e/" + u.uid + "?key=" + encodeURIComponent(cfg.apiKey)).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }) : Promise.resolve(null),
             countEntries(id)
         ]).then(function (res) {
-            if (!res[0]) { S.g = null; return; }
-            var prev = S.g; S.g = dec(res[0]); S.joined = !!res[1]; S.myBonus = !!(res[1] && dec(res[1]).b); S.count = res[2];
+            if (!res[0]) { if (!S.g || S.g.id !== id) S.g = null; return; }
+            var prev = S.g; S.g = dec(res[0]); S.joined = !!res[1] || (prev && prev.id === S.g.id && S.joined && res[1] === undefined); S.myBonus = !!(res[1] && dec(res[1]).b); if (res[2] != null) S.count = res[2];
             if (S.joined) remember(S.g);
             if (prev && prev.id === S.g.id && S.g.w && S.g.w !== prev.w && S.g.st === "drawn") {
-                if (me() && me().uid === S.g.w) S.winShown = 1;
+                if (me() && me().uid === S.g.w) S.winShown = 1; // onay penceresini animasyon sonunda aç
                 reveal(S.g);
             }
         }).catch(function () {});
     }
     function countEntries(id) {
         var body = { structuredAggregationQuery: { structuredQuery: { from: [{ collectionId: "e" }] }, aggregations: [{ alias: "n", count: {} }] } };
-        return req("/giveaways/" + id + ":runAggregationQuery", { method: "POST", body: JSON.stringify(body) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
-            var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n; return x ? +x.integerValue : 0;
-        }, function () { return 0; });
+        return fetch(ROOT + "/giveaways/" + id + ":runAggregationQuery?key=" + encodeURIComponent(cfg.apiKey), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
+            var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n; return x ? +x.integerValue : (a && a.length ? 0 : null);
+        }, function () { return null; });
     }
+    // yönetici inceleme sonuçları: { uid: "ok" | "no" }
     function listRev(id) {
         var out = {};
         function page(tok) {
@@ -280,13 +260,18 @@
     function changedAfter(uid) { var r = (S.rev || {})[uid], c = (S.chk || {})[uid]; return !!(r && c && c.pts && r.ts && c.pts > r.ts + 1000); }
     function revOf(uid) { return changedAfter(uid) ? "" : ((S.rev || {})[uid] || {}).v || ""; }
     function revB(uid) { return changedAfter(uid) ? "" : ((S.rev || {})[uid] || {}).b || ""; }
+    // bonus sayılır mı: görsel yüklenmiş ve yönetici "geçersiz" dememiş
     function bonusOk(x, rv) { var r = (rv || S.rev || {})[x.uid] || {}; return !!(x.b && S.g && S.g.wa && r.b === "ok"); }
-    function setRev(uid, v) { return setRevF(uid, "v", v); }
+    function setRev(uid, v) {
+        return setRevF(uid, "v", v);
+    }
+    // onay/ret kaldırılır: kişi yeniden "bekliyor" olur
     function clearRev(uid) {
         S.rev = S.rev || {}; var old = S.rev[uid]; delete S.rev[uid];
         return req("/giveaways/" + S.g.id + "/rev/" + uid, { method: "DELETE" }).then(function (r) { if (!r.ok) throw 0; }).catch(function () { S.rev[uid] = old; alert("Geri alınamadı."); paintCheck(); });
     }
     function setRevF(uid, k, v) {
+        // görseller incelemeden sonra değiştiyse eski kararın diğer yarısı da silinir (yeniden incelensin)
         var stale = changedAfter(uid), other = k === "v" ? "b" : "v";
         S.rev = S.rev || {}; var old = S.rev[uid]; S.rev[uid] = Object.assign({}, old || {}); S.rev[uid][k] = v; S.rev[uid].ts = Date.now(); if (stale) delete S.rev[uid][other];
         var o = { ts: Date.now() }; o[k] = v;
@@ -295,13 +280,14 @@
     function listEntries(id) {
         var out = [];
         function page(tok) {
-            return req("/giveaways/" + id + "/e?pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+            return fetch(ROOT + "/giveaways/" + id + "/e?pageSize=300&key=" + encodeURIComponent(cfg.apiKey) + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
                 (d.documents || []).forEach(function (x) { var o = dec(x); out.push({ uid: o.id, name: o.name || "Cuber", d: o.d || "", ts: o.ts || 0, b: !!o.b }); });
                 return d.nextPageToken && out.length < 20000 ? page(d.nextPageToken) : out;
             });
         }
         return page();
     }
+    // cihaz kimliği: aynı cihazdan birden çok hesapla katılımı yöneticiye göstermek için (kişisel bilgi değil, rastgele)
     function devId() {
         try { var d = localStorage.getItem("ra-dev"); if (!d || !/^[a-z0-9]{16}$/.test(d)) { var c = "abcdefghijklmnopqrstuvwxyz0123456789"; d = ""; for (var i = 0; i < 16; i++) d += c[rnd(c.length)]; localStorage.setItem("ra-dev", d); } return d; } catch (e) { return ""; }
     }
@@ -351,6 +337,7 @@
         if ($("gwAddr")) $("gwAddr").onclick = function () { addrModal(g); };
         if (S.mgr) renderMgrOne();
         loadPeople();
+        // kazandıysan ve süre varsa onay penceresini kendiliğinden aç
         if (iWon && p === "drawn" && !S.winShown) { S.winShown = g.w + g.wAt; winModal(g); }
         if (iWon && p === "claimed" && !S.addrChecked) {
             S.addrChecked = 1;
@@ -358,7 +345,9 @@
         }
     }
     function msg(t, bad) { var m = $("gwMsg"); if (m) { m.textContent = t || ""; m.className = "gw-msg" + (bad ? " bad" : ""); } }
+    // Katılmak için bildirim izni şart (kazanınca 2 dakikada haber alabilmek için)
     function pushOk() { return !window.Account || !Account.pushState || Account.pushState() === "granted"; }
+    /* ---------- katılım şartları: 1) hesap 2) bildirimler 3) (istenirse) YouTube abonelik görseli ---------- */
     function reqState(g) {
         var u = me(), ps = window.Account && Account.pushState ? Account.pushState() : "granted";
         var pr = S.proof && S.proof.id === g.id ? S.proof.imgs : [], ch = chans(g);
@@ -366,9 +355,10 @@
     }
     function reqHtml(g) {
         var r = reqState(g), u = me();
+        // sıkı satır: numara · başlık + kısa not + küçük düğmeler · sağda küçük önizleme
         var row = function (ok, n, title, body, thumb, cls) { return '<li class="gw-rq' + (ok ? " ok" : "") + (cls ? " " + cls : "") + '"><b>' + (ok ? "✓" : n) + '</b><div><strong>' + title + '</strong>' + (body || "") + '</div>' + (thumb ? '<img class="gw-proofp" src="' + thumb + '" alt="Yüklenen görsel" title="Yüklenen görsel">' : '') + '</li>'; };
         var up = function (i, p, lbl) { return '<label class="btn sm' + (p ? '' : ' primary') + '">📸 ' + (p ? "Değiştir" : lbl) + '<input type="file" accept="image/*" class="gwProof" data-i="' + i + '" hidden' + (r.acc ? '' : ' disabled') + '></label>'; };
-        var all = r.acc && r.yt;
+        var all = r.acc && r.yt; // bildirim artık şart değil
         var ed = !!S.editing;
         return '<div class="gw-req"><h3>' + (ed ? "📸 Görsellerimi düzenle" : "Katılma şartları") + '</h3>' +
             (u && (r.ch.length || g.wa) ? '<p class="gw-pchint">💡 Ekran görüntülerinde <b>Abone olundu</b> yazısı görünmeli; yalnız düzenleyenler görür.<span class="gw-pch2"> Bilgisayarda görseli kutuya <b>sürükle</b> ya da kutuya tıklayıp <b>Ctrl+V</b> ile yapıştır.</span></p>' : '') + '<ol>' +
@@ -399,6 +389,7 @@
             var idx = +inp.getAttribute("data-i"), li = inp.closest("li");
             inp.onchange = function () { useFile(this.files && this.files[0], idx, g); };
             if (!li) return;
+            // bilgisayarda: kutuya sürükle-bırak; kutuya tıklayınca yapıştırma (Ctrl+V) hedefi olur
             li.setAttribute("data-slot", idx);
             li.ondragover = function (e) { e.preventDefault(); li.classList.add("drop"); };
             li.ondragleave = function () { li.classList.remove("drop"); };
@@ -414,11 +405,13 @@
         shrink(f).then(function (img) {
             if (!S.proof || S.proof.id !== g.id) S.proof = { id: g.id, imgs: [] };
             S.proof.imgs[idx] = img;
+            // sıradaki boş kutu yapıştırma hedefi olsun
             var nx = [0, 1, 2].filter(function (k) { return document.querySelector('.gw-req li[data-slot="' + k + '"]') && !S.proof.imgs[k]; })[0];
             S.pasteSlot = nx == null ? idx : nx;
             renderOne(); msg(S.editing ? "Görsel hazır ✓ — kaydetmeyi unutma" : "Görsel hazır ✓");
         }, function () { msg("Görsel okunamadı, başka bir görsel dene.", 1); });
     }
+    // Ctrl+V: panodaki ekran görüntüsünü seçili (ya da ilk boş) kutuya koy
     document.addEventListener("paste", function (e) {
         var g = S.g; if (!g || !document.querySelector(".gw-req li[data-slot]") || /^(INPUT|TEXTAREA)$/.test((e.target && e.target.tagName) || "")) return;
         var it = Array.prototype.filter.call((e.clipboardData && e.clipboardData.items) || [], function (x) { return /^image\//.test(x.type); })[0]; if (!it) return;
@@ -428,6 +421,7 @@
         if (idx == null) idx = 0;
         useFile(it.getAsFile(), idx, g);
     });
+    // izin verilmediyse: nasıl açılacağını adım adım göster, geri dönünce kendiliğinden yenile
     function pushHelp(st) {
         var app = !!window.RA_APP, ios = st === "ios", uns = st === "unsupported";
         var steps = ios || uns ? '<p>' + (Account.pushHelpHtml ? Account.pushHelpHtml(st) : "") + '</p>'
@@ -442,6 +436,7 @@
         if (document.visibilityState !== "visible" || !S.g || $("gwOne").hidden || pushOk() || phase(S.g) !== "open" || S.joined) return;
         renderOne(); if (pushOk()) { closeModal(); msg("Bildirimler açıldı ✓"); }
     });
+    // ekran görüntüsünü küçült: en uzun kenar 1000 px, JPEG; 380 KB'ı geçmeyecek şekilde
     function shrink(file) {
         return new Promise(function (res, rej) {
             var url = URL.createObjectURL(file), im = new Image();
@@ -453,7 +448,7 @@
                     c.width = Math.round(w * k); c.height = Math.round(h * k);
                     var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
                     var d = c.toDataURL("image/jpeg", tries < 3 ? 0.72 : 0.6);
-                    if (d.length <= 300000) return res(d);
+                    if (d.length <= 300000) return res(d); // 3 görsel tek belgeye sığsın (1 MB sınırı)
                     max = Math.round(max * 0.8);
                 }
                 rej(new Error("big"));
@@ -464,6 +459,7 @@
     }
     function join(skipPush) {
         var u = me(), g = S.g; if (!u || !g) return;
+        // bildirim şart değil: izin sorulmamışsa katılırken bir kez sor, beklemeden devam et
         if (!skipPush && window.Account && Account.pushState && Account.pushState() === "default") try { Account.enablePush(); } catch (e) {}
         $("gwJoin").disabled = true;
         var r0 = reqState(g);
@@ -478,6 +474,7 @@
     }
     function tooBig(r0) { return r0.proofs.concat([r0.bonus]).reduce(function (a, x) { return a + String(x || "").length; }, 0) > 1000000; }
     function proofFields(g, r0) { var o = {}; r0.ch.forEach(function (c, i) { o[PF[i]] = { stringValue: r0.proofs[i] }; }); if (g.wa && r0.bonus) o.img3 = { stringValue: r0.bonus }; return o; }
+    // katıldıktan sonra görselleri değiştir: önce kendi görsellerini getir
     function editProofs() {
         var u = me(), g = S.g; if (!u || !g) return;
         msg("Görsellerin yükleniyor…");
@@ -529,7 +526,7 @@
                 clearInterval(winT); S.g.st = "claimed"; addrModal(g); renderOne();
             }).catch(function () { b.disabled = false; $("gwWinMsg").textContent = "Onaylanamadı (süre dolmuş olabilir). Tekrar dene."; });
         };
-        m.onclick = function (e) { if (e.target === m) {} };
+        m.onclick = function (e) { if (e.target === m) { /* dışına dokununca kapanmasın: süre önemli */ } };
     }
     function addrModal(g) {
         var u = me(); if (!u) return;
@@ -549,6 +546,7 @@
             var b = this.querySelector("button"); b.disabled = true;
             patch("/giveaways/" + g.id + "/claim/" + u.uid, o).then(function (r) {
                 if (!r.ok) throw new Error(r.status);
+                // çekilişi kurana bildirim (belge adı = çekiliş kodu: tek bildirim)
                 patch("/users/" + g.host + "/notifications/" + g.id, { text: "📦 “" + g.title + "” çekilişinin kazananı " + o.name + " teslimat bilgilerini gönderdi. Çekiliş sayfasından görebilirsin.", ts: Date.now(), pushed: false }).catch(function () {});
                 modal('<div class="gw-confetti">📦</div><h3>Bilgilerin iletildi</h3><p>Teşekkürler! Ödülün en kısa sürede kargolanacak. Bir sorun olursa seninle iletişime geçeceğiz.</p><button type="button" class="btn primary" id="gwDone">Tamam</button>');
                 $("gwDone").onclick = closeModal;
@@ -562,6 +560,7 @@
         for (var k = 0; k < 90; k++) h += '<i style="left:' + rnd(100) + '%;background:' + C[k % C.length] + ';animation-delay:' + (rnd(900) / 1000) + 's;animation-duration:' + (2.2 + rnd(1600) / 1000) + 's;transform:rotate(' + rnd(360) + 'deg)"></i>';
         var d = document.createElement("div"); d.className = "gw-conf"; d.innerHTML = h; el.appendChild(d);
     }
+    // canlı yayına uygun tam ekran sahne: ekran kararır, çark ortada büyük döner, kazanan büyük yazılır
     function reveal(g) {
         var key = "ra-gw-rev:" + g.id + ":" + g.w; try { if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, "1"); } catch (e) {}
         if (Date.now() - g.wAt > 10 * 60000) return;
@@ -586,6 +585,8 @@
     /* ---------- yönetici ---------- */
     function renderMgrOne() {
         var g = S.g, box = $("gwMgrOne"); if (!box) return;
+        // eski 24 saat kuralıyla açılmış çark/rastgele çekilişlerini yöneticide kendiliğinden yeniden aç
+        // katılan yokken yanlışlıkla çekilip "boş" kalan çekilişi de yeniden aç
         if (g.drawAt > Date.now() && !S.fixing && ((g.st === "open" && !g.test && modeOf(g) !== "mini" && g.closeAt < g.drawAt) || g.st === "empty")) {
             S.fixing = 1;
             patch("/giveaways/" + g.id, g.st === "empty" ? { st: "open", closeAt: modeOf(g) === "mini" && !g.test ? g.drawAt - 10 * 60000 : g.drawAt } : { closeAt: g.drawAt }).then(function (r) { S.fixing = 0; if (r.ok) return fetchOne(g.id).then(renderOne); }, function () { S.fixing = 0; });
@@ -639,6 +640,7 @@
         });
     }
 
+    // çarkta görünecek adlar (en çok 40): kazananın tüm kopyaları + rastgele diğerleri
     function wheelNames(pool, w) {
         var win = pool.filter(function (x) { return x.uid === w.uid; }).map(function (x) { return x.name; });
         var oth = pool.filter(function (x) { return x.uid !== w.uid; }).map(function (x) { return x.name; });
@@ -649,19 +651,25 @@
         var g = S.g; if (!g || S.busy) return; S.busy = true;
         listEntries(g.id).then(function (l) {
             S.entries = l;
+            // katılan yokken çekiliş yapılmaz: hiçbir şey yazmadan uyar
             if (!l.length) { alert("Henüz katılan yok, çekiliş yapılamaz."); return; }
+            // x: onaylamayan / iptal edilen kazananlar ("uid|isim,uid|isim"), tekrar çekilmezler
             var skip = String(g.x || "").split(",").filter(Boolean);
             if (redo && g.w) skip.push(g.w + "|" + String(g.wName || "").replace(/[,|]/g, " ").slice(0, 24));
             var skipU = skip.map(function (x) { return x.split("|")[0]; });
             var pool = l.filter(function (x) { return skipU.indexOf(x.uid) < 0; });
+            // askıya alınmış / silinmiş hesaplar çekilmez: seçileni kontrol et, uygunsa kabul et
             function pick() {
                 if (!pool.length) return Promise.resolve(null);
                 var i = rnd(pool.length), w = pool[i];
                 return roleOf(w.uid).then(function (r) { if (r === "askida" || r === "silindi") { pool = pool.filter(function (y) { return y.uid !== w.uid; }); return pick(); } return w; });
             }
+            // yönetici incelemesi: "uygun değil" işaretlenenler hiç çekilmez; istenirse yalnız onaylananlar arasından
             return listRev(g.id).then(function (rv) {
                 S.rev = rv;
+                // görsel istenen çekilişte yalnız onaylananlar çekilir; reddedilen ve bekleyen asla
                 pool = pool.filter(function (x) { var v = (rv[x.uid] || {}).v; return g.yt ? v === "ok" : v !== "no"; });
+                // WhatsApp topluluğu bonusu: geçerli bonusu olanın adı çarkta 2 kez → 2 kat şans
                 pool = pool.reduce(function (a, x) { a.push(x); if (bonusOk(x, rv)) a.push(x); return a; }, []);
                 if (!pool.length && !redo) { alert(g.yt ? "Onaylanmış katılımcı yok. Önce görselleri incele ve onayla." : "Çekilebilecek katılımcı yok."); return "stop"; }
                 return pick();
@@ -670,9 +678,11 @@
                 var now = Date.now(), o;
                 if (!w) o = { st: "empty", x: skip.join(",").slice(0, 20000), n: l.length };
                 else o = { st: "drawn", w: w.uid, wName: w.name, wAt: now, claimBy: now + CLAIM_MS + 5000, x: skip.join(",").slice(0, 20000), n: l.length, wn: wheelNames(pool, w) };
+                // aynı anda iki yöneticinin çekmesini önle: yazmadan hemen önce belge hâlâ aynı mı bak
                 return req("/giveaways/" + g.id).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
                     var cur = d ? dec(d) : null;
                     if (!cur || cur.st !== g.st || (cur.w || "") !== (g.w || "")) return { ok: false };
+                    // okuma ile yazma arasında başka biri (ikinci yönetici / onaylayan kazanan) değiştirdiyse yazma
                     return patch("/giveaways/" + g.id, o, d.updateTime ? "&currentDocument.updateTime=" + encodeURIComponent(d.updateTime) : "");
                 }).then(function (r) {
                     if (!r.ok) return;
@@ -754,9 +764,11 @@
         var groups = {}; l.forEach(function (x) { if (x.d) (groups[x.d] = groups[x.d] || []).push(x); });
         var extra = []; Object.keys(groups).forEach(function (d) { var a = groups[d].slice().sort(function (p, q) { return (p.ts || 0) - (q.ts || 0); }); extra = extra.concat(a.slice(1)); });
         var list = rows.filter(function (r) { return tab === "all" || (tab === "sus" ? r.f.some(function (t) { return t[0] !== "new"; }) : tab === "wa" ? r.x.b && g.wa : (r.v || "wait") === tab); })
+            // bekleyenler önce; onlar içinde görselini güncelleyen ve en yeni katılan en üstte
             .sort(function (a, b) { return (a.v ? 1 : 0) - (b.v ? 1 : 0) || (changedAfter(b.x.uid) ? 1 : 0) - (changedAfter(a.x.uid) ? 1 : 0) || (b.x.ts || 0) - (a.x.ts || 0); });
         if ($("gwmOk")) $("gwmOk").textContent = n.ok + "/" + n.all;
         var TABS = [["all", "Tümü"], ["wait", "⏳ Bekleyen"], ["ok", "✅ Onaylı"], ["no", "❌ Uygun değil"]].concat(g.wa ? [["wa", "💬 WhatsApp"]] : []).concat([["sus", "⚠️ İşaretli"]]);
+        var ST = { ok: '<span class="gw-rvst ok">✅ Onaylı</span>', no: '<span class="gw-rvst no">❌ Uygun değil</span>', "": '<span class="gw-rvst">⏳ Bekliyor</span>' };
         box.innerHTML = '<h4>🔍 Katılımcılar ve görseller <span class="gw-sub">' + n.all + ' kişi</span></h4>' +
             (n.all && (g.yt || g.wa) ? '<div class="gw-rvgos">' + (g.yt ? '<button type="button" class="btn primary gw-big gw-rvgo" id="gwRev">📺 YouTube görselleri<small>' + (n.wait ? n.wait + ' bekleyen' : 'hepsi incelendi ✓') + '</small></button>' : '') +
                 (g.wa ? '<button type="button" class="btn gw-big gw-rvgo gw-rvwa" id="gwRevWa">💬 WhatsApp görselleri<small>' + (n.wa ? (n.wawait ? n.wawait + ' bekleyen · ' : 'hepsi incelendi ✓ · ') + n.wa + ' kişi ×2' : 'henüz yükleyen yok') + '</small></button>' : '') + '</div>' : '') +
@@ -796,12 +808,14 @@
             };
         });
     }
+    // inceleme penceresi açıkken klavye: 1 = uygun değil, 2 = onayla, boşluk = atla, Esc = kapat
     document.addEventListener("keydown", function (e) {
         var m = $("gwModal"); if (!m || !m.classList.contains("open") || !$("gwRvOk") || e.ctrlKey || e.metaKey || e.altKey) return;
         if (/^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || "")) return;
         var id = e.key === "1" ? "gwRvNo" : e.key === "2" ? "gwRvOk" : e.key === " " ? "gwRvSkip" : e.key === "Escape" ? "gwRvX" : "";
         if (!id || !$(id)) return; e.preventDefault(); if (e.repeat) return; $(id).click();
     });
+    // görselleri sırayla incele: büyük görseller, Onayla / Uygun değil / Atla, sonra sıradaki kişi
     function review(start, mode) {
         var l = S.entries || []; if (!l.length) return;
         var hasWa = function (x) { return !!(x.b && S.g.wa); };
@@ -817,6 +831,7 @@
             modal('<div class="gw-confetti">✅</div><h3>İnceleme bitti</h3><p><b>' + n.ok + '</b> onaylı · <b>' + n.no + '</b> uygun değil · <b>' + n.wait + '</b> bekleyen</p><button type="button" class="btn primary gw-big" id="gwRvEnd">Tamam</button>');
             $("gwRvEnd").onclick = function () { closeModal(); paintCheck(); };
         }
+        // her kişi için adım adım: her kanal ayrı onaylanır, varsa WhatsApp topluluğu da ayrı onaylanır
         var st = 0;
         function show() {
             var x = null; while (i < q.length && !(x = l.filter(function (y) { return y.uid === q[i]; })[0])) i++;
@@ -843,11 +858,11 @@
             var nextPerson = function () { i++; st = 0; show(); };
             $("gwRvOk").onclick = function () {
                 if (cur.kind === "wa") setRevF(x.uid, "b", "ok");
-                else if (!items.slice(st + 1).some(function (it) { return it.kind === "ch"; })) setRev(x.uid, "ok");
+                else if (!items.slice(st + 1).some(function (it) { return it.kind === "ch"; })) setRev(x.uid, "ok"); // son kanal da onaylandı
                 st++; if (st >= items.length) nextPerson(); else show();
             };
             $("gwRvNo").onclick = function () {
-                if (cur.kind === "wa") setRevF(x.uid, "b", "no"); else setRev(x.uid, "no");
+                if (cur.kind === "wa") setRevF(x.uid, "b", "no"); else setRev(x.uid, "no"); // kanal reddi: kişi uygun değil
                 nextPerson();
             };
             $("gwRvSkip").onclick = nextPerson;
@@ -871,6 +886,8 @@
     function autoMgr() {
         var g = S.g; if (!S.mgr || !g || S.busy) return;
         var p = phase(g);
+        // birden çok yönetici açıksa çakışmasın diye kısa rastgele gecikme
+        // çekilişi yetkili elle başlatır; kazanan süresinde onaylamazsa sıradaki kişi kendiliğinden çekilir
         if (p === "expired" && !S.autoT) S.autoT = setTimeout(function () {
             S.autoT = 0; if (S.g && phase(S.g) === "expired") draw(true);
         }, 400 + rnd(2500));
@@ -895,6 +912,7 @@
         if (bad) return { err: bad };
         return { wa: ns.join("|"), waUrl: us.some(Boolean) ? us.join("|") : "" };
     }
+    // yönetici: çekilişi sonradan düzenle
     function editGw() {
         var g = S.g; if (!g || !S.mgr) return;
         var owner = !!(window.Account && Account.isAdmin && Account.isAdmin()), p = phase(g), canDate = p === "open" || p === "closed", m0 = modeOf(g), ch = chans(g);
@@ -959,6 +977,7 @@
             '<div class="gw-f"><span>Görsel</span><div class="gw-presets" id="gnPre">' + PRESETS.map(function (p) { return '<button type="button" data-p="' + p[0] + '"' + (p[0] === pick ? ' class="on"' : '') + '><img src="/img/cekilis/' + p[0] + '.svg" alt="" loading="lazy"><span>' + esc(p[1]) + '</span></button>'; }).join("") + '</div></div>' +
             '<div class="gw-row2"><label class="gw-f"><span>Başlık *</span><input id="gnTitle" maxlength="80" required placeholder="Küp çekilişi"></label>' +
             '<label class="gw-f"><span>Ödül *</span><input id="gnPrize" maxlength="120" required placeholder="3x3 manyetik speed küp"></label></div>' +
+            // açıklama ve kendi görsel bağlantısı yalnız site sahibinin hesabında görünür
             (owner ? '<label class="gw-f"><span>Açıklama</span><textarea id="gnDesc" maxlength="1500" rows="3" placeholder="Şartlar, sponsor, notlar…"></textarea></label>' +
             '<label class="gw-f"><span>Kendi görsel bağlantın (isteğe bağlı, hazır görselin yerine)</span><input id="gnImg" maxlength="500" placeholder="https://…jpg"></label>' : '') +
             '<label class="gw-f"><span>Çekiliş tarihi ve saati *</span><input id="gnAt" type="datetime-local" required></label>' +
@@ -1018,6 +1037,7 @@
     var Draw = {
         COLORS: ["#2b50d6", "#e6252f", "#f6c719", "#179e4f", "#ff7a1a", "#7c3aed", "#0ea5e9", "#db2777"],
         run: function (el, mode, names, winner, done) { if (!el) return; return mode === "mini" ? this.mini(el, names, winner, done) : mode === "rastgele" ? this.grid(el, names, winner, done) : this.wheel(el, names, winner, done); },
+        // rastgele: katılımcı kutuları arasında ışık gezer, yavaşlayıp kazananda durur
         grid: function (el, names, winner, done) {
             var others = names.filter(function (n) { return n !== winner; });
             for (var i = others.length - 1; i > 0; i--) { var j = rnd(i + 1), t = others[i]; others[i] = others[j]; others[j] = t; }
@@ -1034,6 +1054,7 @@
             })();
         },
         wheel: function (el, names, winner, done) {
+            // en fazla 24 dilim: kalabalıkta kazanan + rastgele 23 kişi gösterilir
             var others = names.filter(function (n, i) { return n !== winner || names.indexOf(winner) !== i; }).filter(function (n) { return n !== winner; });
             for (var i = others.length - 1; i > 0; i--) { var j = rnd(i + 1), t = others[i]; others[i] = others[j]; others[j] = t; }
             var wn = Math.max(1, names.filter(function (n) { return n === winner; }).length), list = others.slice(0, 24 - wn);
@@ -1074,16 +1095,19 @@
     function schedule() {
         clearTimeout(S.pollT);
         var g = S.g; if (!g) return;
+        // yönetici, kazanan teslimat bilgilerini gönderene kadar sık yoklar (sayfayı yenilemeden görsün)
         var waitClaim = S.mgr && g.st === "claimed" && S.claimSeen !== g.id + g.w;
         var now = Date.now(), near = (now > g.drawAt - 90000 && now < g.drawAt + 1800000) || g.st === "drawn" || waitClaim;
-        if (near && !S.entries && S.count) listEntries(g.id).then(function (l) { S.entries = l; }).catch(function () {});
+        // çekiliş yaklaşırken animasyon için katılımcı adlarını önceden al
+
         S.pollT = setTimeout(function () {
             var sig = function () { return JSON.stringify([S.g, S.joined, S.count]); }, before = sig();
             fetchOne(g.id).then(function () { if (S.g) { if (sig() !== before) renderOne(); else if (waitClaim && S.g.st === "claimed" && $("gwClaim")) loadClaim(S.g); autoMgr(); schedule(); } });
-        }, near ? 3000 : 20000);
+        }, document.hidden ? 60000 : near ? 4000 : 60000);
     }
     function tick() {
         updCd();
+        // geri sayımlar
         if (S.g && !$("gwOne").hidden) {
             var g = S.g, ch = $("gwOne").querySelector(".gw-chip"); if (ch) ch.outerHTML = stLabel(g);
             var p = phase(g); if (p !== S.lastP) { S.lastP = p; renderOne(); autoMgr(); }
@@ -1103,17 +1127,14 @@
     function start() {
         $("gwModal").onclick = function (e) { if (e.target === $("gwModal") && !$("gwModal").querySelector("#gwOk,#gwForm")) closeModal(); };
         var id = (/[?&]id=([^&]+)/.exec(location.search) || [])[1];
-        checkRole().then(function () { if (id) openOne(decodeURIComponent(id), true); else loadList(); });
+        // liste/çekiliş hesaptan bağımsız hemen yüklenir; rol öğrenilince yönetim araçları eklenir
+        if (id) openOne(decodeURIComponent(id), true); else loadList();
+        try { checkRole().then(function () { if (S.g) renderOne(); else if (S.listLoaded) renderList(); }, function () {}); } catch (e) {}
         clearInterval(S.tickT); S.tickT = setInterval(tick, 1000);
         window.addEventListener("popstate", function () { var i = (/[?&]id=([^&]+)/.exec(location.search) || [])[1]; if (i) openOne(decodeURIComponent(i), true); else { $("gwOne").hidden = true; $("gwListWrap").hidden = false; loadList(); } });
         if (Account.onChange) Account.onChange(function () { checkRole().then(function () { if (S.g) fetchOne(S.g.id).then(renderOne); else renderList(); }); });
     }
     if (window.Account) start(); else document.addEventListener("DOMContentLoaded", start);
-    window.Cekilis = {
-        _s: S,
-        draw: draw,
-        Draw: Draw,
-        useBackup: function (on) { useBackup = on !== false; ROOT = rootOf(useBackup ? BACKUP_CFG : cfg); return useBackup; },
-        refresh: function () { return checkRole().then(function () { if (S.g) return fetchOne(S.g.id).then(renderOne); return loadList(); }); }
-    };
+    // test / geliştirme: hesap değişince yeniden yükle
+    window.Cekilis = { _s: S, draw: draw, Draw: Draw, refresh: function () { return checkRole().then(function () { if (S.g) return fetchOne(S.g.id).then(renderOne); return loadList(); }); } };
 })();
