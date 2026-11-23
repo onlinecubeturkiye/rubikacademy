@@ -294,6 +294,10 @@
 .gw-detail .gw-hhead h2 { font-size: clamp(22px, 5vw, 26px) !important; line-height: 1.2; }
 .gw-detail .gw-hhead { padding: 16px 16px 0 !important; }
 .gw-detail .gw-hbody { padding: 14px 16px 16px !important; border-top: 0 !important; }
+.gw-rvact kbd, .gw-rvkeys kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; margin-right: 6px; border-radius: 6px; font: 800 12px "JetBrains Mono", Inter, monospace; border: 1px solid currentColor; opacity: .85; }
+.gw-rvkeys { margin: 8px 0 0; font-size: 12px; color: var(--text-soft); text-align: center; }
+.gw-rvkeys kbd { margin: 0 2px; border-color: var(--border); color: var(--text); }
+@media (hover: none) { .gw-rvkeys, .gw-rvact kbd { display: none; } }
 /* WhatsApp bonusu */
 .gw-req li.gw-bonus { border-style: dashed; border-color: rgba(234,179,8,.6); background: linear-gradient(160deg, rgba(234,179,8,.1), var(--surface) 60%); }
 .gw-req li.gw-bonus > b { background: #eab308; border-color: #eab308; color: #fff; }
