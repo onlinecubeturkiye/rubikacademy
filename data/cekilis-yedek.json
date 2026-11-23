@@ -130,7 +130,7 @@
   }
  ],
  "_n": {
-  "qwMysMZBwFkq": 51,
+  "qwMysMZBwFkq": 53,
   "hGpY44ACawRH": 15
  },
  "_e": {
@@ -187,6 +187,12 @@
     "uid": "8roxYaUPIFUv5qiWAw1fOmSnVtD2",
     "name": "Hayriye Arslandagi",
     "ts": "2026-11-23T15:40:11.886Z",
+    "b": true
+   },
+   {
+    "uid": "9W3TxkCJubZM0wyNmhDqnH8QGO73",
+    "name": "talha bora Somsur",
+    "ts": "2026-11-23T18:39:57.363Z",
     "b": true
    },
    {
@@ -310,6 +316,12 @@
     "b": true
    },
    {
+    "uid": "WBEStMpJjcVknwinH01xAKwnN4P2",
+    "name": "Ahmet Enes",
+    "ts": "2026-11-23T18:27:22.321Z",
+    "b": true
+   },
+   {
     "uid": "X7AprD5y39hmXos82Bjn8m5XflO2",
     "name": "Muhammet İhsan Kaya",
     "ts": "2026-11-23T14:26:59.508Z",
@@ -382,10 +394,10 @@
     "b": false
    },
    {
-    "uid": "pdePnbrMr9e6U4ZLp6OwZTw6VTG2",
-    "name": "Mehmet Umut",
-    "ts": "2026-11-23T14:59:55.361Z",
-    "b": false
+    "uid": "oTg9LRgxNkV6OCa73O7S2Oe8iEq1",
+    "name": "Benkupcu",
+    "ts": "2026-11-23T18:28:02.763Z",
+    "b": true
    },
    {
     "uid": "pljp7o3to9Zj1oVrnW8rpSPCpyn1",
