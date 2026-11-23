@@ -236,6 +236,11 @@
     function setRev(uid, v) {
         return setRevF(uid, "v", v);
     }
+    // onay/ret kaldırılır: kişi yeniden "bekliyor" olur
+    function clearRev(uid) {
+        S.rev = S.rev || {}; var old = S.rev[uid]; delete S.rev[uid];
+        return req("/giveaways/" + S.g.id + "/rev/" + uid, { method: "DELETE" }).then(function (r) { if (!r.ok) throw 0; }).catch(function () { S.rev[uid] = old; alert("Geri alınamadı."); paintCheck(); });
+    }
     function setRevF(uid, k, v) {
         S.rev = S.rev || {}; var old = S.rev[uid]; S.rev[uid] = Object.assign({}, old || {}); S.rev[uid][k] = v;
         var o = { ts: Date.now() }; o[k] = v;
@@ -322,7 +327,7 @@
         var row = function (ok, n, title, body) { return '<li class="' + (ok ? "ok" : "") + '"><b>' + (ok ? "✓" : n) + '</b><div><strong>' + title + '</strong>' + (body || "") + '</div></li>'; };
         var all = r.acc && r.yt; // bildirim artık şart değil
         var ed = !!S.editing;
-        return '<div class="gw-req"><h3>' + (ed ? "📸 Görsellerimi düzenle" : "Katılma şartları") + '</h3><ol>' +
+        return '<div class="gw-req"><h3>' + (ed ? "📸 Görsellerimi düzenle" : "Katılma şartları") + '</h3>' + (u ? '<p class="gw-pchint">💡 Bilgisayarda: görseli kutuya <b>sürükle</b> ya da kopyalayıp kutuya tıkla, <b>Ctrl+V</b> ile yapıştır.</p>' : '') + '<ol>' +
             row(r.acc, 1, "Rubik Academy hesabın açık olsun", r.acc ? '<span>' + esc(myName()) + ' olarak giriş yaptın</span>' : '<button type="button" class="btn sm primary" id="gwLogin">Giriş yap / Üye ol</button>') +
             r.ch.map(function (c, i) {
                 var p = r.proofs[i] || "";
@@ -351,16 +356,42 @@
             var b = this; b.disabled = true;
             Account.enablePush().then(function (p) { renderOne(); if (p !== "granted") pushHelp(p); else msg("Bildirimler açıldı ✓"); }, function () { b.disabled = false; pushHelp("denied"); });
         };
-        Array.prototype.forEach.call(document.querySelectorAll(".gwProof"), function (inp) { inp.onchange = function () {
-            var f = this.files && this.files[0], idx = +this.getAttribute("data-i"); if (!f) return;
-            if (!/^image\//.test(f.type)) { msg("Lütfen bir görsel seç.", 1); return; }
-            msg("Görsel hazırlanıyor…");
-            shrink(f).then(function (img) {
-                if (!S.proof || S.proof.id !== g.id) S.proof = { id: g.id, imgs: [] };
-                S.proof.imgs[idx] = img; renderOne(); msg(S.editing ? "Görsel hazır ✓ — kaydetmeyi unutma" : "Görsel hazır ✓");
-            }, function () { msg("Görsel okunamadı, başka bir görsel dene.", 1); });
-        }; });
+        Array.prototype.forEach.call(document.querySelectorAll(".gwProof"), function (inp) {
+            var idx = +inp.getAttribute("data-i"), li = inp.closest("li");
+            inp.onchange = function () { useFile(this.files && this.files[0], idx, g); };
+            if (!li) return;
+            // bilgisayarda: kutuya sürükle-bırak; kutuya tıklayınca yapıştırma (Ctrl+V) hedefi olur
+            li.setAttribute("data-slot", idx);
+            li.ondragover = function (e) { e.preventDefault(); li.classList.add("drop"); };
+            li.ondragleave = function () { li.classList.remove("drop"); };
+            li.ondrop = function (e) { e.preventDefault(); li.classList.remove("drop"); var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; useFile(f, idx, g); };
+            li.onclick = function (e) { if (e.target.closest("a,button,label")) return; S.pasteSlot = idx; Array.prototype.forEach.call(document.querySelectorAll(".gw-req li[data-slot]"), function (x) { x.classList.toggle("tgt", x === li); }); };
+            if (S.pasteSlot === idx) li.classList.add("tgt");
+        });
     }
+    function useFile(f, idx, g) {
+        if (!f) return;
+        if (!/^image\//.test(f.type)) { msg("Lütfen bir görsel seç.", 1); return; }
+        msg("Görsel hazırlanıyor…");
+        shrink(f).then(function (img) {
+            if (!S.proof || S.proof.id !== g.id) S.proof = { id: g.id, imgs: [] };
+            S.proof.imgs[idx] = img;
+            // sıradaki boş kutu yapıştırma hedefi olsun
+            var nx = [0, 1, 2].filter(function (k) { return document.querySelector('.gw-req li[data-slot="' + k + '"]') && !S.proof.imgs[k]; })[0];
+            S.pasteSlot = nx == null ? idx : nx;
+            renderOne(); msg(S.editing ? "Görsel hazır ✓ — kaydetmeyi unutma" : "Görsel hazır ✓");
+        }, function () { msg("Görsel okunamadı, başka bir görsel dene.", 1); });
+    }
+    // Ctrl+V: panodaki ekran görüntüsünü seçili (ya da ilk boş) kutuya koy
+    document.addEventListener("paste", function (e) {
+        var g = S.g; if (!g || !document.querySelector(".gw-req li[data-slot]") || /^(INPUT|TEXTAREA)$/.test((e.target && e.target.tagName) || "")) return;
+        var it = Array.prototype.filter.call((e.clipboardData && e.clipboardData.items) || [], function (x) { return /^image\//.test(x.type); })[0]; if (!it) return;
+        e.preventDefault();
+        var imgs = (S.proof && S.proof.id === g.id ? S.proof.imgs : []) || [];
+        var idx = S.pasteSlot != null && document.querySelector('.gw-req li[data-slot="' + S.pasteSlot + '"]') ? S.pasteSlot : [0, 1, 2].filter(function (k) { return document.querySelector('.gw-req li[data-slot="' + k + '"]') && !imgs[k]; })[0];
+        if (idx == null) idx = 0;
+        useFile(it.getAsFile(), idx, g);
+    });
     // izin verilmediyse: nasıl açılacağını adım adım göster, geri dönünce kendiliğinden yenile
     function pushHelp(st) {
         var app = !!window.RA_APP, ios = st === "ios", uns = st === "unsupported";
@@ -697,18 +728,22 @@
             '<div class="gw-mrow">' + (extra.length ? '<button type="button" class="btn sm gw-del" id="gwDupOut">📱 Aynı cihaz fazlalarını çıkar (' + extra.length + ')</button>' : '') +
             '<button type="button" class="btn sm" id="gwReChk">↻ Yenile</button></div>' +
             '<div class="gw-plist">' + (list.map(function (r) {
-                var x = r.x, prs = (((S.chk || {})[x.uid] || {}).proofs || []).filter(Boolean);
-                return '<div class="gw-prow' + (r.v === "ok" ? " okd" : r.v === "no" ? " bad" : r.f.some(function (t) { return t[0] === "bad"; }) ? " bad" : r.f.length ? " warn" : "") + '">' +
+                var x = r.x, prs = (((S.chk || {})[x.uid] || {}).proofs || []).filter(Boolean), vb = revB(x.uid), any = r.v || vb;
+                var stt = r.v === "ok" ? '<b class="ok">✅ Onaylı</b>' : r.v === "no" ? '<b class="no">❌ Uygun değil</b>' : '<b>⏳ Bekliyor</b>';
+                var warn = r.f.map(function (t) { return t[1]; }), bad = r.f.some(function (t) { return t[0] === "bad"; });
+                return '<div class="gw-prow' + (r.v === "ok" ? " okd" : r.v === "no" ? " nod" : "") + '">' +
                     '<button type="button" class="gw-pth" data-proof="' + esc(x.uid) + '" title="Görselleri incele">' + (prs.length ? '<img src="' + prs[0] + '" alt="">' + (prs.length > 1 ? '<i>' + prs.length + '</i>' : '') : '📷') + '</button>' +
-                    '<div class="gw-pn"><a href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener">' + esc(x.name) + '</a>' + ST[r.v] +
-                    '<div class="gw-flags">' + r.s.concat(r.f).map(function (t) { return '<span class="' + t[0] + '">' + esc(t[1]) + '</span>'; }).join("") + '</div></div>' +
-                    '<div class="gw-pact"><button type="button" class="gw-qb ok' + (r.v === "ok" ? " on" : "") + '" data-rv="ok" data-u="' + esc(x.uid) + '" title="Onayla">✓</button><button type="button" class="gw-qb no' + (r.v === "no" ? " on" : "") + '" data-rv="no" data-u="' + esc(x.uid) + '" title="Uygun değil">✗</button>' +
+                    '<div class="gw-pn"><div class="gw-pl1"><a href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener">' + esc(x.name) + '</a>' + (x.b && S.g.wa ? '<i class="gw-star" title="' + (vb === "no" ? "Bonus geçersiz" : "WhatsApp bonusu") + '">' + (vb === "no" ? "⭐✗" : "⭐×2") + '</i>' : '') + '</div>' +
+                    '<div class="gw-pl2">' + stt + (warn.length ? '<span class="' + (bad ? "bad" : "warn") + '" title="' + esc(warn.join(" · ")) + '">⚠️ ' + esc(warn.join(" · ")) + '</span>' : '') + '</div></div>' +
+                    '<div class="gw-pact">' + (any ? '<button type="button" class="gw-qb rst" data-rst="' + esc(x.uid) + '" title="Beklemeye geri al">↺</button>' : '') +
+                    '<button type="button" class="gw-qb ok' + (r.v === "ok" ? " on" : "") + '" data-rv="ok" data-u="' + esc(x.uid) + '" title="Onayla">✓</button><button type="button" class="gw-qb no' + (r.v === "no" ? " on" : "") + '" data-rv="no" data-u="' + esc(x.uid) + '" title="Uygun değil">✗</button>' +
                     '<button type="button" class="gw-qb out" data-out="' + esc(x.uid) + '" title="Çekilişten çıkar">🗑</button></div></div>';
             }).join("") || '<p class="gw-note">' + (n.all ? "Bu bölümde kimse yok." : "Henüz katılımcı yok.") + '</p>') + '</div>';
         Array.prototype.forEach.call(box.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { S.tab = b.getAttribute("data-tab"); paintCheck(); }; });
         Array.prototype.forEach.call(box.querySelectorAll("[data-proof]"), function (b) { b.onclick = function () { review(b.getAttribute("data-proof")); }; });
+        Array.prototype.forEach.call(box.querySelectorAll("[data-rst]"), function (b) { b.onclick = function () { clearRev(b.getAttribute("data-rst")); paintCheck(); }; });
         Array.prototype.forEach.call(box.querySelectorAll("[data-rv]"), function (b) {
-            b.onclick = function () { var u = b.getAttribute("data-u"), v = b.getAttribute("data-rv"); setRev(u, revOf(u) === v ? (v === "ok" ? "no" : "ok") : v); paintCheck(); };
+            b.onclick = function () { var u = b.getAttribute("data-u"), v = b.getAttribute("data-rv"); if (revOf(u) === v) clearRev(u); else setRev(u, v); paintCheck(); };
         });
         if ($("gwRev")) $("gwRev").onclick = function () { review(); };
         $("gwReChk").onclick = checkPeople;
@@ -761,7 +796,8 @@
                 '<div class="gw-rvimgs">' + items.map(function (it, n) { return '<figure class="' + (it.kind === "wa" ? "gw-rvb " : "") + (n === st ? "cur" : n < st ? "done" : "dim") + '"><figcaption>' + (n < st ? "✓ " : "") + esc(it.cap) + '</figcaption>' + (it.img ? '<img src="' + it.img + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') + '</figure>'; }).join("") + '</div>' +
                 '<div class="gw-rvact"><button type="button" class="btn gw-rvno" id="gwRvNo"><kbd>1</kbd> ✗ ' + (cur.kind === "wa" ? "Bonus geçersiz" : "Uygun değil") + '</button><button type="button" class="btn" id="gwRvSkip">Atla</button><button type="button" class="btn gw-rvok" id="gwRvOk"><kbd>2</kbd> ✓ Onayla' + (st < items.length - 1 ? ' → sonraki görsel' : '') + '</button></div>' +
                 '<p class="gw-rvkeys">Klavye: <kbd>1</kbd> reddet · <kbd>2</kbd> onayla · <kbd>Boşluk</kbd> kişiyi atla · <kbd>Esc</kbd> kapat</p>' +
-                '<button type="button" class="gw-rvout" id="gwRvOut">🗑 Çekilişten çıkar</button>');
+                '<div class="gw-rvlinks">' + (v || vb ? '<button type="button" class="gw-rvrst" id="gwRvRst">↺ Beklemeye geri al</button>' : '') + '<button type="button" class="gw-rvout" id="gwRvOut">🗑 Çekilişten çıkar</button></div>');
+            if ($("gwRvRst")) $("gwRvRst").onclick = function () { clearRev(x.uid); st = 0; show(); };
             Array.prototype.forEach.call(document.querySelectorAll(".gw-rvimgs img"), function (im) { im.onclick = function () { im.closest(".gw-rvimgs").classList.toggle("zoom"); }; });
             var c = document.querySelector(".gw-rvimgs figure.cur"); if (c && c.scrollIntoView) c.scrollIntoView({ block: "nearest" });
             var nextPerson = function () { i++; st = 0; show(); };
