@@ -298,6 +298,18 @@
 .gw-rvkeys { margin: 8px 0 0; font-size: 12px; color: var(--text-soft); text-align: center; }
 .gw-rvkeys kbd { margin: 0 2px; border-color: var(--border); color: var(--text); }
 @media (hover: none) { .gw-rvkeys, .gw-rvact kbd { display: none; } }
+/* adım adım inceleme */
+.gw-rvstep { margin: 6px 0 8px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--ui-accent) 8%, var(--surface)); border: 1px solid color-mix(in srgb, var(--ui-accent) 30%, var(--border)); }
+.gw-rvstep > b { display: block; font: 800 15px Inter, sans-serif; color: var(--text); }
+.gw-rvstep small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--text-soft); }
+.gw-rvdots { display: flex; justify-content: center; gap: 6px; margin-bottom: 6px; }
+.gw-rvdots span { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 800 12px Inter, sans-serif; border: 2px solid var(--border); color: var(--text-soft); background: var(--surface); }
+.gw-rvdots span.on { border-color: var(--ui-accent); color: var(--ui-accent); }
+.gw-rvdots span.ok { border-color: #16a34a; background: #16a34a; color: #fff; }
+.gw-rvimgs figure.cur { outline: 3px solid var(--ui-accent); outline-offset: 2px; }
+.gw-rvimgs figure.dim { opacity: .4; }
+.gw-rvimgs figure.done { opacity: .55; border-color: rgba(34,197,94,.5); }
+.gw-rvimgs { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important; }
 /* WhatsApp bonusu */
 .gw-req li.gw-bonus { border-style: dashed; border-color: rgba(234,179,8,.6); background: linear-gradient(160deg, rgba(234,179,8,.1), var(--surface) 60%); }
 .gw-req li.gw-bonus > b { background: #eab308; border-color: #eab308; color: #fff; }

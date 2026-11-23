@@ -741,28 +741,40 @@
             modal('<div class="gw-confetti">✅</div><h3>İnceleme bitti</h3><p><b>' + n.ok + '</b> onaylı · <b>' + n.no + '</b> uygun değil · <b>' + n.wait + '</b> bekleyen</p><button type="button" class="btn primary gw-big" id="gwRvEnd">Tamam</button>');
             $("gwRvEnd").onclick = function () { closeModal(); paintCheck(); };
         }
+        // her kişi için adım adım: her kanal ayrı onaylanır, varsa WhatsApp topluluğu da ayrı onaylanır
+        var st = 0;
         function show() {
             var x = null; while (i < q.length && !(x = l.filter(function (y) { return y.uid === q[i]; })[0])) i++;
             if (!x) return done();
             var prs = ((S.chk || {})[x.uid] || {}).proofs || [], f = flagsOf(x, l).filter(function (t) { return t[0] !== "star"; }), v = revOf(x.uid), hasB = !!(x.b && S.g.wa), vb = revB(x.uid);
-            modal('<div class="gw-rvtop"><span>' + (i + 1) + ' / ' + q.length + '</span><button type="button" class="gw-rvx" id="gwRvX" aria-label="Kapat">✕</button></div>' +
-                '<h3 class="gw-rvname">' + esc(x.name) + '</h3>' + (v ? '<p>' + (v === "ok" ? '<span class="gw-rvst ok">✅ Onaylı</span>' : '<span class="gw-rvst no">❌ Uygun değil</span>') + '</p>' : '') +
+            var items = ch.map(function (c, k) { return { k: k, cap: "📺 " + c.name + " kanalı", img: prs[k], kind: "ch" }; });
+            if (hasB) items.push({ k: 2, cap: "⭐ WhatsApp: " + waLabel(S.g), img: prs[2], kind: "wa" });
+            if (!items.length) { i++; st = 0; return show(); }
+            if (st >= items.length) st = 0;
+            var cur = items[st];
+            var dots = items.map(function (it, n) { return '<span class="' + (n < st ? "ok" : n === st ? "on" : "") + '">' + (n < st ? "✓" : n + 1) + '</span>'; }).join("");
+            modal('<div class="gw-rvtop"><span>Kişi ' + (i + 1) + ' / ' + q.length + '</span><button type="button" class="gw-rvx" id="gwRvX" aria-label="Kapat">✕</button></div>' +
+                '<h3 class="gw-rvname">' + esc(x.name) + '</h3>' +
+                (v || vb ? '<p>' + (v === "ok" ? '<span class="gw-rvst ok">✅ Kanallar onaylı</span>' : v === "no" ? '<span class="gw-rvst no">❌ Uygun değil</span>' : '') + (vb === "ok" ? '<span class="gw-rvst ok">⭐ Bonus onaylı</span>' : vb === "no" ? '<span class="gw-rvst no">⭐ Bonus geçersiz</span>' : '') + '</p>' : '') +
                 (f.length ? '<div class="gw-flags" style="justify-content:center">' + f.map(function (t) { return '<span class="' + t[0] + '">' + esc(t[1]) + '</span>'; }).join("") + '</div>' : '') +
-                '<p class="gw-note">Her görselde kanal adı ve <b>Abone olundu</b> yazısı görünmeli.</p>' +
-                '<div class="gw-rvimgs">' + ch.map(function (c, k) { return '<figure><figcaption>' + esc(c.name) + '</figcaption>' + (prs[k] ? '<img src="' + prs[k] + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') + '</figure>'; }).join("") +
-                (hasB ? '<figure class="gw-rvb"><figcaption>⭐ Bonus: ' + esc(waLabel(S.g)) + '</figcaption>' + (prs[2] ? '<img src="' + prs[2] + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') +
-                    '<div class="gw-rvbb"><button type="button" class="gw-qb ok' + (vb === "ok" ? " on" : "") + '" id="gwRvBOk" title="Bonus geçerli">✓</button><span>' + (vb === "no" ? "Bonus geçersiz" : vb === "ok" ? "Bonus geçerli (×2)" : "Bonus bekliyor") + '</span><button type="button" class="gw-qb no' + (vb === "no" ? " on" : "") + '" id="gwRvBNo" title="Bonus geçersiz">✗</button></div></figure>' : '') + '</div>' +
-                '<div class="gw-rvact"><button type="button" class="btn gw-rvno" id="gwRvNo"><kbd>1</kbd> ✗ Uygun değil</button><button type="button" class="btn" id="gwRvSkip">Atla</button><button type="button" class="btn gw-rvok" id="gwRvOk"><kbd>2</kbd> ✓ Onayla</button></div>' +
-                '<p class="gw-rvkeys">Klavye: <kbd>1</kbd> uygun değil · <kbd>2</kbd> onayla · <kbd>Boşluk</kbd> atla · <kbd>Esc</kbd> kapat</p>' +
+                '<div class="gw-rvstep"><div class="gw-rvdots">' + dots + '</div><b>Adım ' + (st + 1) + ' / ' + items.length + ': ' + esc(cur.cap) + '</b><small>' + (cur.kind === "wa" ? "Görselde topluluk adı ve üyelik görünmeli." : "Görselde kanal adı ve <b>Abone olundu</b> yazısı görünmeli.") + '</small></div>' +
+                '<div class="gw-rvimgs">' + items.map(function (it, n) { return '<figure class="' + (it.kind === "wa" ? "gw-rvb " : "") + (n === st ? "cur" : n < st ? "done" : "dim") + '"><figcaption>' + (n < st ? "✓ " : "") + esc(it.cap) + '</figcaption>' + (it.img ? '<img src="' + it.img + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') + '</figure>'; }).join("") + '</div>' +
+                '<div class="gw-rvact"><button type="button" class="btn gw-rvno" id="gwRvNo"><kbd>1</kbd> ✗ ' + (cur.kind === "wa" ? "Bonus geçersiz" : "Uygun değil") + '</button><button type="button" class="btn" id="gwRvSkip">Atla</button><button type="button" class="btn gw-rvok" id="gwRvOk"><kbd>2</kbd> ✓ Onayla' + (st < items.length - 1 ? ' → sonraki görsel' : '') + '</button></div>' +
+                '<p class="gw-rvkeys">Klavye: <kbd>1</kbd> reddet · <kbd>2</kbd> onayla · <kbd>Boşluk</kbd> kişiyi atla · <kbd>Esc</kbd> kapat</p>' +
                 '<button type="button" class="gw-rvout" id="gwRvOut">🗑 Çekilişten çıkar</button>');
             Array.prototype.forEach.call(document.querySelectorAll(".gw-rvimgs img"), function (im) { im.onclick = function () { im.closest(".gw-rvimgs").classList.toggle("zoom"); }; });
-            var next = function () { i++; show(); };
-            if ($("gwRvBOk")) $("gwRvBOk").onclick = function () { setRevF(x.uid, "b", "ok"); show(); };
-            if ($("gwRvBNo")) $("gwRvBNo").onclick = function () { setRevF(x.uid, "b", "no"); show(); };
-            // Onayla: bonus görseli de varsa ve "geçersiz" denmediyse onu da onayla
-            $("gwRvOk").onclick = function () { setRev(x.uid, "ok"); if (hasB && !revB(x.uid)) setRevF(x.uid, "b", "ok"); next(); };
-            $("gwRvNo").onclick = function () { setRev(x.uid, "no"); next(); };
-            $("gwRvSkip").onclick = next;
+            var c = document.querySelector(".gw-rvimgs figure.cur"); if (c && c.scrollIntoView) c.scrollIntoView({ block: "nearest" });
+            var nextPerson = function () { i++; st = 0; show(); };
+            $("gwRvOk").onclick = function () {
+                if (cur.kind === "wa") setRevF(x.uid, "b", "ok");
+                else if (!items.slice(st + 1).some(function (it) { return it.kind === "ch"; })) setRev(x.uid, "ok"); // son kanal da onaylandı
+                st++; if (st >= items.length) nextPerson(); else show();
+            };
+            $("gwRvNo").onclick = function () {
+                if (cur.kind === "wa") setRevF(x.uid, "b", "no"); else setRev(x.uid, "no"); // kanal reddi: kişi uygun değil
+                nextPerson();
+            };
+            $("gwRvSkip").onclick = nextPerson;
             $("gwRvX").onclick = function () { closeModal(); paintCheck(); };
             $("gwRvOut").onclick = function () { if (confirm(x.name + " çekilişten çıkarılsın mı?")) { closeModal(); removeMany([x.uid]); } };
         }
