@@ -74,8 +74,9 @@
     // g.yt = "Kanal 1|Kanal 2", g.ytUrl = "url1|url2": her kanal için ayrı abonelik görseli istenir (en çok 2)
     function chans(g) { var n = String(g.yt || "").split("|"), u = String(g.ytUrl || "").split("|"); return n.map(function (x, i) { return { name: x.trim(), url: (u[i] || "").trim() }; }).filter(function (c) { return c.name; }).slice(0, 2); }
     var PF = ["img", "img2", "img3"]; // img3: WhatsApp topluluğu bonus görseli
-    var WA_DEF = ["Mert Sağdınç", "Rubik Academy"];
-    function waUrls(g) { return String(g.waUrl || "").split("|").map(function (x) { return x.trim(); }); }
+    var WA_DEF = [["Mert Sağdınç", ""], ["Rubik Academy", ""]];
+    function waList(g) { var n = String(g.wa || "").split("|"), u = String(g.waUrl || "").split("|"); return n.map(function (x, i) { return { name: x.trim(), url: (u[i] || "").trim() }; }).filter(function (c) { return c.name; }).slice(0, 2); }
+    function waLabel(g) { return waList(g).map(function (c) { return c.name; }).join(" veya ") + " WhatsApp topluluğu"; }
 
     var S = { list: [], g: null, mgr: false, joined: false, count: 0, entries: null, pollT: 0, tickT: 0, busy: false, seenW: {} };
     function phase(g, now) {
@@ -213,7 +214,7 @@
         var p = phase(g), u = me(), now = Date.now(), iWon = u && g.w === u.uid;
         var act = "";
         if (p !== "open") S.editing = false;
-        if (p === "open") act = S.joined && !S.editing ? '<div class="gw-in">✅ Çekilişe katıldın. Çekiliş günü sayfada ol: kazanırsan 2 dakika içinde onaylaman gerekiyor.' + (g.wa && !S.myBonus ? '<br><small>⭐ Bonus: ' + esc(g.wa) + ' görselini ekleyerek çarkta adını 2 kez yazdırabilirsin.</small>' : '') + '</div>' +
+        if (p === "open") act = S.joined && !S.editing ? '<div class="gw-in">✅ Çekilişe katıldın. Çekiliş günü sayfada ol: kazanırsan 2 dakika içinde onaylaman gerekiyor.' + (g.wa && !S.myBonus ? '<br><small>⭐ Bonus: ' + esc(waLabel(g)) + ' görselini ekleyerek çarkta adını 2 kez yazdırabilirsin.</small>' : '') + '</div>' +
                 '<div class="gw-mrow">' + (g.yt || g.wa ? '<button type="button" class="btn sm" id="gwEdit">📸 Görsellerimi düzenle</button>' : '') + '<button type="button" class="btn sm" id="gwLeave">Katılımı geri al</button></div>'
             : reqHtml(g);
         else if (p === "closed" || p === "drawing") act = S.joined ? '<div class="gw-in">✅ Katıldın. Çekiliş ' + (p === "drawing" ? "şimdi yapılıyor…" : esc(dt(g.drawAt)) + "'de") + ' — sayfada kal!</div>' : '<div class="gw-note">Kayıtlar kapandı.</div>';
@@ -269,9 +270,9 @@
                     (p ? '<img class="gw-proofp" src="' + p + '" alt="Yüklenen görsel">' : ''));
             }).join("") +
             (g.wa ? (function () {
-                var urls = waUrls(g), p = r.bonus;
-                return '<li class="gw-bonus' + (p ? ' ok' : '') + '"><b>' + (p ? "✓" : "⭐") + '</b><div><strong>Bonus: ' + esc(g.wa) + ' <em>isteğe bağlı</em></strong><span>Toplulukta olduğunu gösteren bir ekran görüntüsü yükle; <b>çarkta adın 2 kez yazılır</b>, kazanma şansın 2 katına çıkar.</span>' +
-                    '<div class="gw-reqb">' + urls.map(function (x, i) { return x ? '<a class="btn sm gw-wa" href="' + esc(x) + '" target="_blank" rel="noopener">💬 ' + esc(WA_DEF[i] || "Topluluk") + ' topluluğu</a>' : ''; }).join("") +
+                var wl = waList(g), p = r.bonus;
+                return '<li class="gw-bonus' + (p ? ' ok' : '') + '"><b>' + (p ? "✓" : "⭐") + '</b><div><strong>Bonus: ' + esc(waLabel(g)) + ' <em>isteğe bağlı</em></strong><span>' + (wl.length > 1 ? 'Bu topluluklardan birindeysen' : 'Bu topluluktaysan') + ' bunu gösteren bir ekran görüntüsü yükle; <b>çarkta adın 2 kez yazılır</b>, kazanma şansın 2 katına çıkar.</span>' +
+                    '<div class="gw-reqb">' + wl.map(function (c) { return c.url ? '<a class="btn sm gw-wa" href="' + esc(c.url) + '" target="_blank" rel="noopener">💬 ' + esc(c.name) + ' topluluğu</a>' : ''; }).join("") +
                     '<label class="btn sm' + (p ? '' : ' primary') + '">📸 ' + (p ? "Görseli değiştir" : "Topluluk görüntüsü yükle") + '<input type="file" accept="image/*" class="gwProof" data-i="2" hidden' + (r.acc ? '' : ' disabled') + '></label>' +
                     (p ? '<button type="button" class="btn sm" id="gwBonusX">Kaldır</button>' : '') + '</div>' +
                     (p ? '<img class="gw-proofp" src="' + p + '" alt="Bonus görseli">' : '') + '</div></li>';
@@ -674,7 +675,7 @@
                 (f.length ? '<div class="gw-flags" style="justify-content:center">' + f.map(function (t) { return '<span class="' + t[0] + '">' + esc(t[1]) + '</span>'; }).join("") + '</div>' : '') +
                 '<p class="gw-note">Her görselde kanal adı ve <b>Abone olundu</b> yazısı görünmeli.</p>' +
                 '<div class="gw-rvimgs">' + ch.map(function (c, k) { return '<figure><figcaption>' + esc(c.name) + '</figcaption>' + (prs[k] ? '<img src="' + prs[k] + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') + '</figure>'; }).join("") +
-                (hasB ? '<figure class="gw-rvb"><figcaption>⭐ Bonus: ' + esc(S.g.wa) + '</figcaption>' + (prs[2] ? '<img src="' + prs[2] + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') +
+                (hasB ? '<figure class="gw-rvb"><figcaption>⭐ Bonus: ' + esc(waLabel(S.g)) + '</figcaption>' + (prs[2] ? '<img src="' + prs[2] + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') +
                     '<div class="gw-rvbb"><button type="button" class="gw-qb ok' + (vb === "ok" ? " on" : "") + '" id="gwRvBOk" title="Bonus geçerli">✓</button><span>' + (vb === "no" ? "Bonus geçersiz" : vb === "ok" ? "Bonus geçerli (×2)" : "Bonus bekliyor") + '</span><button type="button" class="gw-qb no' + (vb === "no" ? " on" : "") + '" id="gwRvBNo" title="Bonus geçersiz">✗</button></div></figure>' : '') + '</div>' +
                 '<div class="gw-rvact"><button type="button" class="btn gw-rvno" id="gwRvNo">✗ Uygun değil</button><button type="button" class="btn" id="gwRvSkip">Atla</button><button type="button" class="btn gw-rvok" id="gwRvOk">✓ Onayla</button></div>' +
                 '<button type="button" class="gw-rvout" id="gwRvOut">🗑 Çekilişten çıkar</button>');
@@ -712,19 +713,25 @@
             S.autoT = 0; if (S.g && phase(S.g) === "expired") draw(true);
         }, 400 + rnd(2500));
     }
-    var WA_LBL = "Mert Sağdınç veya Rubik Academy WhatsApp topluluğu";
-    function waFormHtml(px, g, on) {
-        var u = waUrls(g);
-        return '<div class="gw-ych gw-wab"><label class="gw-chkf"><input type="checkbox" id="' + px + 'Wa"' + (on ? ' checked' : '') + '> ⭐ <b>Bonus: WhatsApp topluluğu</b> — üyesi olanın adı çarkta 2 kez yazılır</label>' +
-            '<input id="' + px + 'WaName" maxlength="80" value="' + esc(g.wa || WA_LBL) + '" aria-label="Bonus metni">' +
-            '<div class="gw-row"><input id="' + px + 'WaU0" maxlength="200" value="' + esc(u[0] || "") + '" placeholder="Mert Sağdınç topluluk bağlantısı (isteğe bağlı)"><input id="' + px + 'WaU1" maxlength="200" value="' + esc(u[1] || "") + '" placeholder="Rubik Academy topluluk bağlantısı (isteğe bağlı)"></div>' +
-            '<p class="gw-note" style="margin:4px 0 0">Katılımcıdan toplulukta olduğunu gösteren ekran görüntüsü istenir; zorunlu değildir.</p></div>';
+    function waFormHtml(px, g, isNew) {
+        var cur = waList(g);
+        return '<div class="gw-wabox"><p class="gw-wah">⭐ <b>Bonus: WhatsApp topluluğu</b> — üyesi olanın adı çarkta 2 kez yazılır (isteğe bağlı, görsel istenir)</p>' +
+            [0, 1].map(function (i) {
+                var c = cur[i] || { name: WA_DEF[i][0], url: WA_DEF[i][1] }, on = isNew ? true : !!cur[i];
+                return '<div class="gw-ych gw-wab"><label class="gw-chkf"><input type="checkbox" class="' + px + 'WaC"' + (on ? ' checked' : '') + '> WhatsApp topluluğu: <b>' + esc(c.name) + '</b></label>' +
+                    '<div class="gw-row"><input class="' + px + 'WaN" maxlength="40" value="' + esc(c.name) + '" aria-label="Topluluk adı"><input class="' + px + 'WaU" maxlength="200" value="' + esc(c.url) + '" placeholder="https://chat.whatsapp.com/…" aria-label="Topluluk bağlantısı"></div></div>';
+            }).join("") + '<p class="gw-note" style="margin:6px 0 0">İşaretli topluluklar katılımcıya gösterilir; birinde olması bonus için yeterli. Hiçbiri işaretli değilse bonus kapalıdır.</p></div>';
     }
     function waFormRead(px) {
-        if (!$(px + "Wa") || !$(px + "Wa").checked) return { wa: "", waUrl: "" };
-        var n = $(px + "WaName").value.replace(/\|/g, " ").trim() || WA_LBL, us = [$(px + "WaU0").value.trim(), $(px + "WaU1").value.trim()].map(function (x) { return x.replace(/\|/g, ""); });
-        if (us.some(function (x) { return x && !/^https:\/\//.test(x); })) return { err: "Topluluk bağlantısı https:// ile başlamalı." };
-        return { wa: n.slice(0, 80), waUrl: us.join("|").replace(/^\|$/, "") };
+        var ns = [], us = [], bad = "";
+        Array.prototype.forEach.call(document.querySelectorAll("." + px + "WaC"), function (cb) {
+            if (!cb.checked) return; var row = cb.closest(".gw-wab");
+            var n = row.querySelector("." + px + "WaN").value.replace(/\|/g, " ").trim(), u = row.querySelector("." + px + "WaU").value.replace(/\|/g, "").trim();
+            if (!n) bad = "Topluluk adını yaz."; else if (u && !/^https:\/\//.test(u)) bad = "Topluluk bağlantısı https:// ile başlamalı.";
+            ns.push(n.slice(0, 40)); us.push(u);
+        });
+        if (bad) return { err: bad };
+        return { wa: ns.join("|"), waUrl: us.some(Boolean) ? us.join("|") : "" };
     }
     // yönetici: çekilişi sonradan düzenle
     function editGw() {
@@ -740,7 +747,7 @@
             '<div class="gw-f"><span>Çekiliş türü</span><div class="gw-seg" id="geMode">' + ["cark", "mini", "rastgele"].map(function (k) { return '<button type="button" data-m="' + k + '"' + (k === m0 ? ' class="on"' : '') + '>' + MODE_LBL[k] + '</button>'; }).join("") + '</div></div>' +
             '<label class="gw-f"><span>Çekiliş tarihi ve saati *' + (canDate ? '' : ' (çekiliş yapıldı, değiştirilemez)') + '</span><input id="geAt" type="datetime-local" value="' + loc(g.drawAt) + '"' + (canDate ? '' : ' disabled') + '></label>' +
             '<div class="gw-f"><span>Katılma şartları</span><div class="gw-reqbox">' + [0, 1].map(function (i) { var c = ch[i] || { name: YT_DEF[i][0], url: YT_DEF[i][1] }; return '<div class="gw-ych"><label class="gw-chkf"><input type="checkbox" class="geYt"' + (ch[i] ? ' checked' : '') + '> YouTube aboneliği</label><div class="gw-row"><input class="geYtName" maxlength="40" value="' + esc(c.name) + '" aria-label="Kanal adı"><input class="geYtUrl" maxlength="120" value="' + esc(c.url) + '" aria-label="Kanal bağlantısı"></div></div>'; }).join("") +
-            waFormHtml("ge", g, !!g.wa) + '</div></div>' +
+            waFormHtml("ge", g, false) + '</div></div>' +
             '<p class="gw-note">Şartları değiştirirsen daha önce katılanların görselleri yeni şartlara uymayabilir; kontrol listesinde görünür.</p>' +
             '<div class="gw-act"><button type="submit" class="btn primary gw-big">💾 Kaydet</button><button type="button" class="btn" id="geX">Vazgeç</button></div><div class="gw-msg" id="geMsg"></div></form>');
         var pick = null, mode = m0;
@@ -798,7 +805,7 @@
             '<div class="gw-f"><span>Katılma şartları</span><div class="gw-reqbox"><p class="gw-note" style="margin:0 0 8px">Her çekilişte: hesap açık ve bildirimler açık olmalı.</p>' +
             YT_DEF.map(function (c, i) { return '<div class="gw-ych"><label class="gw-chkf"><input type="checkbox" class="gnYt" data-i="' + i + '" checked> YouTube aboneliği: <b>' + esc(c[0]) + '</b></label>' +
                 '<div class="gw-row"><input class="gnYtName" maxlength="40" value="' + esc(c[0]) + '" aria-label="Kanal adı"><input class="gnYtUrl" maxlength="120" value="' + esc(c[1]) + '" placeholder="https://www.youtube.com/@kanal" aria-label="Kanal bağlantısı"></div></div>'; }).join("") +
-            '<p class="gw-note" style="margin:6px 0 0">İşaretli her kanal için katılımcıdan ayrı bir abonelik ekran görüntüsü istenir.</p>' + waFormHtml("gn", { wa: WA_LBL }, true) + '</div></div>' +
+            '<p class="gw-note" style="margin:6px 0 0">İşaretli her kanal için katılımcıdan ayrı bir abonelik ekran görüntüsü istenir.</p>' + waFormHtml("gn", {}, true) + '</div></div>' +
             '<label class="gw-check"><input type="checkbox" id="gnTest"> <span><b>🧪 Deneme çekilişi</b><small>Ödül verilmez, kartında "Deneme" yazar. Herkes katılabilir; katılanların adı kendiliğinden listeye gelir. Kayıtlar çekiliş anına kadar açık kalır, istediğin an çekebilirsin.</small></span></label>' +
             '<p class="gw-note" id="gnInfo"></p>' +
             '<button type="submit" class="btn primary">Oluştur</button><div class="gw-msg" id="gnMsg"></div></form></details>';
