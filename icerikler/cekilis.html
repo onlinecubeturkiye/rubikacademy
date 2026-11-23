@@ -229,6 +229,9 @@
 
 /* tek çekiliş sayfasında "Yeni çekiliş oluştur" görünmesin */
 .gw-wrap:has(#gwOne:not([hidden])) #gwMgr { display: none !important; }
+/* listede sabitle düğmesi (yalnız yetkililer) */
+.gw-pinb { position: absolute; left: 10px; top: 10px; padding: 5px 10px; border-radius: 999px; border: 0; background: rgba(0,0,0,.55); color: #fff; font: 800 12px Inter, sans-serif; cursor: pointer; backdrop-filter: blur(4px); }
+.gw-pinb.on { background: var(--ui-accent); }
 /* yönetim paneli */
 .gw-mgrbox { border: 1px solid var(--border) !important; border-style: solid !important; background: var(--surface) !important; border-radius: 16px !important; padding: 0 !important; overflow: hidden; box-shadow: var(--shadow-sm); }
 .gw-mgrbox > *:not(.gwm-head) { margin-left: 16px; margin-right: 16px; }
@@ -263,7 +266,7 @@
 @media (min-width: 640px) { .gw-row2 { grid-template-columns: 1fr 1fr; } .gw-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 860px) {
   .gw-htop { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
-  .gw-imgw { min-height: 100%; }
+  .gw-htop .gw-imgw { min-height: 100%; }
   .gw-htop .gw-himg { height: 100%; max-height: none; object-position: left center; }
   .gw-hhead { padding: 24px 26px; display: flex; flex-direction: column; justify-content: center; }
   .gw-hhead .gw-facts { grid-auto-flow: row; grid-template-columns: 1fr; margin: 14px 0 0; }
