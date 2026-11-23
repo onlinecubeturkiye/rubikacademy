@@ -227,6 +227,32 @@
 .gw-pth { position: relative; }
 .gw-pth i { position: absolute; right: 2px; bottom: 2px; padding: 0 5px; border-radius: 6px; background: rgba(0,0,0,.65); color: #fff; font: 800 11px/16px Inter, sans-serif; font-style: normal; }
 
+/* tek çekiliş sayfasında "Yeni çekiliş oluştur" görünmesin */
+.gw-wrap:has(#gwOne:not([hidden])) #gwMgr { display: none !important; }
+/* yönetim paneli */
+.gw-mgrbox { border: 1px solid var(--border) !important; border-style: solid !important; background: var(--surface) !important; border-radius: 16px !important; padding: 0 !important; overflow: hidden; box-shadow: var(--shadow-sm); }
+.gw-mgrbox > *:not(.gwm-head) { margin-left: 16px; margin-right: 16px; }
+.gwm-head { display: flex; gap: 12px; align-items: center; padding: 14px 16px; margin-bottom: 14px; background: linear-gradient(120deg, color-mix(in srgb, var(--ui-accent) 16%, transparent), color-mix(in srgb, #7c3aed 12%, transparent)); border-bottom: 1px solid var(--border); }
+.gwm-ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--ui-accent); color: #fff; font-size: 20px; flex: none; }
+.gwm-head h3 { margin: 0; font: 800 18px "Plus Jakarta Sans", Inter, sans-serif; color: var(--text); }
+.gwm-head small { color: var(--text-soft); font-weight: 650; font-size: 12.5px; }
+.gwm-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.gwm-stats div { padding: 10px 8px; border-radius: 12px; background: var(--surface-soft); border: 1px solid var(--border); text-align: center; }
+.gwm-stats b { display: block; font: 900 18px Inter, sans-serif; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gwm-stats span { font: 700 11.5px Inter, sans-serif; color: var(--text-soft); }
+.gwm-main { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.gwm-acts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.gwm-a { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; text-align: center; font: 800 13px Inter, sans-serif; transition: background .15s, border-color .15s, transform .1s; }
+.gwm-a:hover { background: var(--surface-soft); } .gwm-a:active { transform: scale(.97); }
+.gwm-a i { font-style: normal; font-size: 22px; line-height: 1; }
+.gwm-a small { display: block; margin-top: 2px; font: 600 11px Inter, sans-serif; color: var(--text-soft); }
+.gwm-a.on { border-color: var(--ui-accent); background: color-mix(in srgb, var(--ui-accent) 10%, var(--surface)); }
+.gwm-a.del { color: #dc2626; } .gwm-a.del:hover { background: rgba(220,38,38,.06); border-color: rgba(220,38,38,.4); }
+.gwm-help { margin-bottom: 12px; padding: 10px 12px; border-radius: 12px; background: var(--surface-soft); border: 1px solid var(--border); }
+.gwm-help summary { cursor: pointer; font: 800 13.5px Inter, sans-serif; color: var(--text); }
+.gwm-help p { margin: 8px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--text-soft); }
+.gw-mgrbox .gw-chk { margin-top: 0; padding: 14px 0 16px; border-top: 1px solid var(--border); }
+@media (max-width: 420px) { .gwm-a small { display: none; } }
 /* bildirim yardımı */
 .gw-steps2 { text-align: left; margin: 10px 0 14px; padding-left: 22px; line-height: 1.6; font-size: 15px; }
 .gw-steps2 li { margin: 4px 0; }
