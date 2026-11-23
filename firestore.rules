@@ -336,7 +336,7 @@ service cloud.firestore {
     // Çekilişler (/icerikler/cekilis): yönetici kurar; kayıtlar çekiliş anına kadar açık (mini: 10 dk önce kapanır).
     // Çekilişte rastgele seçilen kişi 2 dakika içinde onaylar, sonra teslimat bilgilerini gönderir.
     match /giveaways/{gid} {
-      function gk() { return ['title', 'prize', 'desc', 'img', 'drawAt', 'closeAt', 'host', 'hName', 'st', 'w', 'wName', 'wAt', 'claimBy', 'cAt', 'x', 'n', 'ts', 'mode', 'test', 'yt', 'ytUrl', 'pin']; }
+      function gk() { return ['title', 'prize', 'desc', 'img', 'drawAt', 'closeAt', 'host', 'hName', 'st', 'w', 'wName', 'wAt', 'claimBy', 'cAt', 'x', 'n', 'ts', 'mode', 'test', 'yt', 'ytUrl', 'pin', 'onlyOk']; }
       allow read: if true;
       allow create: if gwMgr() && gid.matches('^[A-Za-z0-9]{6,24}$')
         && request.resource.data.keys().hasOnly(gk())
@@ -394,6 +394,12 @@ service cloud.firestore {
               && request.resource.data.img2.matches('data:image/(jpeg|png|webp);base64,.+')))
           && request.resource.data.ts == request.time;
         allow delete: if gwMgr() || (request.auth != null && request.auth.uid == uid);
+      }
+      // Yönetici incelemesi: abonelik görselleri onaylandı mı (ok) / uygun değil mi (no) — yalnız yöneticiler
+      match /rev/{uid} {
+        allow read, delete: if gwMgr();
+        allow create, update: if gwMgr() && request.resource.data.keys().hasOnly(['v', 'ts'])
+          && request.resource.data.v in ['ok', 'no'];
       }
       // Kazananın teslimat bilgileri: yalnız kazanan yazar (onayladıktan sonra), yalnız kazanan ve yöneticiler okur
       match /claim/{uid} {

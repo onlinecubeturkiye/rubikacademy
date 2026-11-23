@@ -166,6 +166,22 @@
             var x = a && a[0] && a[0].result && a[0].result.aggregateFields && a[0].result.aggregateFields.n; return x ? +x.integerValue : 0;
         }, function () { return 0; });
     }
+    // yönetici inceleme sonuçları: { uid: "ok" | "no" }
+    function listRev(id) {
+        var out = {};
+        function page(tok) {
+            return req("/giveaways/" + id + "/rev?pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+                (d.documents || []).forEach(function (x) { var o = dec(x); out[o.id] = o.v; });
+                return d.nextPageToken ? page(d.nextPageToken) : out;
+            });
+        }
+        return page().catch(function () { return out; });
+    }
+    function revOf(uid) { return (S.rev || {})[uid] || ""; }
+    function setRev(uid, v) {
+        S.rev = S.rev || {}; var old = S.rev[uid]; S.rev[uid] = v;
+        return patch("/giveaways/" + S.g.id + "/rev/" + uid, { v: v, ts: Date.now() }).then(function (r) { if (!r.ok) throw 0; }).catch(function () { S.rev[uid] = old; alert("Kaydedilemedi, tekrar dene."); paintCheck(); });
+    }
     function listEntries(id) {
         var out = [];
         function page(tok) {
@@ -395,18 +411,23 @@
         var sl = function (ms) { var m = Math.max(0, Math.floor(ms / 60000)), d = Math.floor(m / 1440), h = Math.floor(m % 1440 / 60); return d ? d + " gün" : h ? h + " sa" : (m % 60) + " dk"; }, left = sl;
         var when = p === "open" ? [left(g.closeAt - now), g.closeAt < g.drawAt ? "kayıt kapanışına" : "çekilişe"] : p === "closed" ? [left(g.drawAt - now), "çekilişe"] : p === "drawn" ? [left(g.claimBy - now), "onay süresi"] : ["—", p === "claimed" ? "onaylandı" : "bitti"];
         box.innerHTML = '<div class="gwm-head"><div class="gwm-ic">🛡</div><div><h3>Yönetim</h3><small>Bu bölümü yalnız yetkililer görür</small></div></div>' +
-            '<div class="gwm-stats"><div><b>' + S.count + '</b><span>katılımcı</span></div><div><b id="gwmSus">…</b><span>işaretli</span></div><div><b>' + esc(when[0]) + '</b><span>' + when[1] + '</span></div></div>' +
+            '<div class="gwm-stats"><div><b>' + S.count + '</b><span>katılımcı</span></div><div><b id="gwmOk">…</b><span>onaylı</span></div><div><b>' + esc(when[0]) + '</b><span>' + when[1] + '</span></div></div>' +
             (canDraw || reDraw ? '<div class="gwm-main">' + (canDraw ? '<button type="button" class="btn primary gw-big" id="gwDraw">' + MODE_LBL[modeOf(g)].split(" ")[0] + ' Şimdi çek</button>' : '') +
                 (reDraw ? '<button type="button" class="btn gw-big" id="gwRedraw">🔁 Yeniden çek</button>' : '') + '</div>' : '') +
+            (g.yt ? '<label class="gwm-sw"><input type="checkbox" id="gwOnlyOk"' + (g.onlyOk ? ' checked' : '') + '><span><b>Yalnız onaylananlar arasından çek</b><small>“Uygun değil” işaretlenenler hiçbir zaman çekilmez</small></span></label>' : '') +
             '<div class="gwm-acts"><button type="button" class="gwm-a' + (g.pin ? ' on' : '') + '" id="gwPin"><i>📌</i><span>' + (g.pin ? 'Sabitlendi<small>Kaldırmak için dokun</small>' : 'En üste sabitle<small>Listede ilk sırada görünür</small>') + '</span></button>' +
             '<button type="button" class="gwm-a" id="gwLink"><i>🔗</i><span>Bağlantıyı kopyala<small>Paylaşmak için</small></span></button>' +
             '<button type="button" class="gwm-a del" id="gwDel"><i>🗑</i><span>Çekilişi sil<small>Geri alınamaz</small></span></button></div>' +
-            '<details class="gwm-help"><summary>Nasıl çalışır?</summary><p>Kayıtlar kapanınca <b>Şimdi çek</b>e dokun; herkes çarkı aynı anda görür. Kazanan 2 dakika içinde onaylamazsa bu sayfa açıkken sıradaki kişi kendiliğinden çekilir. Sabitlenen çekiliş listede en üstte durur, katılımcılar bunu görmez.</p></details>' +
+            '<details class="gwm-help"><summary>Nasıl çalışır?</summary><p>Kayıtlar kapanınca <b>Şimdi çek</b>e dokun; herkes çarkı aynı anda görür. Kazanan 2 dakika içinde onaylamazsa bu sayfa açıkken sıradaki kişi kendiliğinden çekilir. Sabitlenen çekiliş listede en üstte durur, katılımcılar bunu görmez. <b>Görselleri sırayla incele</b> ile her kişinin abonelik görsellerini büyük açıp onaylayabilirsin; “Uygun değil” denenler hiç çekilmez.</p></details>' +
             (skipNames(g).length ? '<p class="gw-note">Onaylamayan / iptal edilenler: <b>' + skipNames(g).map(esc).join(" → ") + '</b></p>' : '') +
             '<div id="gwClaim"></div><div class="gw-chk" id="gwChk"><h4>🔍 Katılımcı kontrolü</h4><p class="gw-note">Yükleniyor…</p></div>';
         $("gwPin").onclick = function () {
             var b = this; b.disabled = true;
             patch("/giveaways/" + g.id, { pin: g.pin ? 0 : Date.now() }).then(function (r) { if (!r.ok) throw 0; return fetchOne(g.id).then(renderOne); }).catch(function () { b.disabled = false; alert("Sabitlenemedi."); });
+        };
+        if ($("gwOnlyOk")) $("gwOnlyOk").onchange = function () {
+            var c = this, v = c.checked; c.disabled = true;
+            patch("/giveaways/" + g.id, { onlyOk: v }).then(function (r) { if (!r.ok) throw 0; g.onlyOk = v; S.g.onlyOk = v; c.disabled = false; }).catch(function () { c.checked = !v; c.disabled = false; alert("Kaydedilemedi."); });
         };
         $("gwLink").onclick = function () {
             var u = "https://rubikacademy.fun/icerikler/cekilis?id=" + encodeURIComponent(g.id), b = this;
@@ -420,7 +441,10 @@
             if (!confirm("Çekiliş silinsin mi? Bu geri alınamaz.")) return;
             req("/giveaways/" + g.id, { method: "DELETE" }).then(function (r) { if (r.ok) backToList(); else alert("Silinemedi."); });
         };
-        if (p === "claimed") req("/giveaways/" + g.id + "/claim/" + g.w).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        if (p === "claimed") loadClaim(g);
+    }
+    function loadClaim(g) {
+        req("/giveaways/" + g.id + "/claim/" + g.w).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var c = $("gwClaim"); if (!c) return;
             if (!d) {
                 c.innerHTML = '<div class="gw-wait"><p><b>' + esc(g.wName) + '</b> onayladı ama teslimat bilgilerini henüz göndermedi' + (g.cAt ? ' (' + left(Date.now() - g.cAt).replace("şimdi", "az önce") + ' önce onayladı)' : '') + '.</p>' +
@@ -428,11 +452,13 @@
                 $("gwNoInfo").onclick = function () { if (confirm(g.wName + " iptal edilip yeni bir kişi rastgele çekilsin mi?")) draw(true); };
                 return;
             }
+            S.claimSeen = g.id + g.w;
             var o = dec(d), rows = [["Ad soyad", o.name], ["Telefon", o.phone], ["E-posta", o.email], ["İl / ilçe", o.city + " / " + o.district], ["Adres", o.address], ["Posta kodu", o.zip], ["Not", o.note], ["Gönderim", dt(o.ts)]];
             c.innerHTML = '<h4>📦 Teslimat bilgileri</h4><div class="gw-claim">' + rows.map(function (x) { return '<div><span>' + x[0] + '</span><b>' + esc(x[1] || "—") + '</b></div>'; }).join("") + '</div><button type="button" class="btn sm" id="gwCopy">📋 Kopyala</button>';
             $("gwCopy").onclick = function () { var t = rows.map(function (x) { return x[0] + ": " + (x[1] || "-"); }).join("\n"); try { navigator.clipboard.writeText(t); this.textContent = "Kopyalandı ✓"; } catch (e) { prompt("Bilgiler:", t); } };
         });
     }
+
     function draw(redo) {
         var g = S.g; if (!g || S.busy) return; S.busy = true;
         listEntries(g.id).then(function (l) {
@@ -450,7 +476,14 @@
                 var i = rnd(pool.length), w = pool[i];
                 return roleOf(w.uid).then(function (r) { if (r === "askida" || r === "silindi") { pool.splice(i, 1); return pick(); } return w; });
             }
-            return pick().then(function (w) {
+            // yönetici incelemesi: "uygun değil" işaretlenenler hiç çekilmez; istenirse yalnız onaylananlar arasından
+            return listRev(g.id).then(function (rv) {
+                S.rev = rv;
+                pool = pool.filter(function (x) { return rv[x.uid] !== "no" && (!g.onlyOk || rv[x.uid] === "ok"); });
+                if (!pool.length && !redo) { alert(g.onlyOk ? "Onaylanmış katılımcı yok. Önce görselleri incele ya da \"Yalnız onaylananlar\" seçeneğini kapat." : "Çekilebilecek katılımcı yok."); return "stop"; }
+                return pick();
+            }).then(function (w) {
+                if (w === "stop") return;
                 var now = Date.now(), o;
                 if (!w) o = { st: "empty", x: skip.join(",").slice(0, 20000), n: l.length };
                 else o = { st: "drawn", w: w.uid, wName: w.name, wAt: now, claimBy: now + CLAIM_MS + 5000, x: skip.join(",").slice(0, 20000), n: l.length };
@@ -458,7 +491,8 @@
                 return req("/giveaways/" + g.id).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
                     var cur = d ? dec(d) : null;
                     if (!cur || cur.st !== g.st || (cur.w || "") !== (g.w || "")) return { ok: false };
-                    return patch("/giveaways/" + g.id, o);
+                    // okuma ile yazma arasında başka biri (ikinci yönetici / onaylayan kazanan) değiştirdiyse yazma
+                    return patch("/giveaways/" + g.id, o, d.updateTime ? "&currentDocument.updateTime=" + encodeURIComponent(d.updateTime) : "");
                 }).then(function (r) {
                     if (!r.ok) return;
                     if (o.st === "drawn") patch("/users/" + o.w + "/notifications/" + newId(), { text: "🎉 Tebrikler! “" + g.title + "” çekilişini kazandın! 2 dakika içinde onaylamak için çekiliş sayfasını aç: rubikacademy.fun/icerikler/cekilis?id=" + g.id, ts: Date.now(), pushed: false }).catch(function () {});
@@ -503,6 +537,7 @@
                 }).then(worker);
             }
             var ws = []; for (var i = 0; i < 8; i++) ws.push(worker());
+            ws.push(listRev(g.id).then(function (rv) { S.rev = rv; }));
             return Promise.all(ws).then(function () { S.chk = out; paintCheck(); });
         }).catch(function () { box.innerHTML = '<h4>🔍 Katılımcı kontrolü</h4><p class="gw-note">Yüklenemedi.</p>'; });
     }
@@ -523,34 +558,37 @@
     }
     function paintCheck() {
         var g = S.g, box = $("gwChk"); if (!g || !box) return;
-        var l = S.entries || [], onlySus = !!S.onlySus;
-        var rows = l.map(function (x) { return { x: x, f: flagsOf(x, l) }; });
-        var sus = rows.filter(function (r) { return r.f.length; });
+        var l = S.entries || [], tab = S.tab || "all";
+        var rows = l.map(function (x) { return { x: x, f: flagsOf(x, l), v: revOf(x.uid) }; });
+        var n = { all: rows.length, wait: 0, ok: 0, no: 0, sus: 0 };
+        rows.forEach(function (r) { n[r.v || "wait"]++; if (r.f.length) n.sus++; });
         var groups = {}; l.forEach(function (x) { if (x.d) (groups[x.d] = groups[x.d] || []).push(x); });
         var extra = []; Object.keys(groups).forEach(function (d) { var a = groups[d].slice().sort(function (p, q) { return (p.ts || 0) - (q.ts || 0); }); extra = extra.concat(a.slice(1)); });
-        var list = (onlySus ? sus : rows).sort(function (a, b) { return b.f.length - a.f.length || (a.x.ts || 0) - (b.x.ts || 0); });
-        if ($("gwmSus")) $("gwmSus").textContent = sus.length;
-        box.innerHTML = '<h4>🔍 Katılımcı kontrolü <span class="gw-sub">' + l.length + ' kişi · ' + sus.length + ' işaretli</span></h4>' +
-            '<p class="gw-note">Aynı cihaz, aynı isim, yeni ya da etkinliği olmayan hesaplar ve eksik görseller işaretlenir. Şüphelendiğini <b>Çıkar</b> ile çıkar.</p>' +
-            '<div class="gw-mrow"><label class="gw-chkf"><input type="checkbox" id="gwOnlySus"' + (onlySus ? " checked" : "") + '> Yalnız işaretliler</label>' +
-            (extra.length ? '<button type="button" class="btn sm gw-del" id="gwDupOut">📱 Aynı cihaz fazlalarını çıkar (' + extra.length + ')</button>' : '') +
+        var list = rows.filter(function (r) { return tab === "all" || (tab === "sus" ? r.f.length : (r.v || "wait") === tab); })
+            .sort(function (a, b) { return (a.v ? 1 : 0) - (b.v ? 1 : 0) || b.f.length - a.f.length || (a.x.ts || 0) - (b.x.ts || 0); });
+        if ($("gwmOk")) $("gwmOk").textContent = n.ok + "/" + n.all;
+        var TABS = [["all", "Tümü"], ["wait", "⏳ Bekleyen"], ["ok", "✅ Onaylı"], ["no", "❌ Uygun değil"], ["sus", "⚠️ İşaretli"]];
+        var ST = { ok: '<span class="gw-rvst ok">✅ Onaylı</span>', no: '<span class="gw-rvst no">❌ Uygun değil</span>', "": '<span class="gw-rvst">⏳ Bekliyor</span>' };
+        box.innerHTML = '<h4>🔍 Katılımcılar ve görseller <span class="gw-sub">' + n.all + ' kişi</span></h4>' +
+            (g.yt && n.all ? '<button type="button" class="btn primary gw-big gw-rvgo" id="gwRev">🔎 Görselleri sırayla incele' + (n.wait ? ' · ' + n.wait + ' bekleyen' : ' · hepsi incelendi ✓') + '</button>' : '') +
+            '<div class="gw-tabs">' + TABS.map(function (t) { return '<button type="button" data-tab="' + t[0] + '"' + (tab === t[0] ? ' class="on"' : '') + '>' + t[1] + ' <b>' + n[t[0]] + '</b></button>'; }).join("") + '</div>' +
+            '<div class="gw-mrow">' + (extra.length ? '<button type="button" class="btn sm gw-del" id="gwDupOut">📱 Aynı cihaz fazlalarını çıkar (' + extra.length + ')</button>' : '') +
             '<button type="button" class="btn sm" id="gwReChk">↻ Yenile</button></div>' +
             '<div class="gw-plist">' + (list.map(function (r) {
-                var x = r.x;
-                var prs = (((S.chk || {})[x.uid] || {}).proofs || []).filter(Boolean);
-                return '<div class="gw-prow' + (r.f.some(function (t) { return t[0] === "bad"; }) ? " bad" : r.f.length ? " warn" : "") + '">' + (prs.length ? '<button type="button" class="gw-pth" data-proof="' + esc(x.uid) + '" title="Abonelik görselleri"><img src="' + prs[0] + '" alt="">' + (prs.length > 1 ? '<i>' + prs.length + '</i>' : '') + '</button>' : '') + '<div class="gw-pn"><a href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener">' + esc(x.name) + '</a>' +
-                    '<small>' + (x.ts ? esc(dt(x.ts)) : "") + '</small><div class="gw-flags">' + r.f.map(function (t) { return '<span class="' + t[0] + '">' + esc(t[1]) + '</span>'; }).join("") + '</div></div>' +
-                    '<button type="button" class="btn sm gw-del" data-out="' + esc(x.uid) + '">Çıkar</button></div>';
-            }).join("") || '<p class="gw-note">' + (onlySus ? "İşaretli katılımcı yok ✓" : "Henüz katılımcı yok.") + '</p>') + '</div>';
-        $("gwOnlySus").onchange = function () { S.onlySus = this.checked; paintCheck(); };
-        Array.prototype.forEach.call(box.querySelectorAll("[data-proof]"), function (b) {
-            b.onclick = function () {
-                var uid = b.getAttribute("data-proof"), x = l.filter(function (y) { return y.uid === uid; })[0], prs = (S.chk[uid] || {}).proofs || [], ch = chans(S.g);
-                var m = modal('<h3>📸 ' + esc(x ? x.name : "") + '</h3><p class="gw-note">Her görselde kanalın <b>Abone olundu</b> göründüğünü kontrol et.</p>' + ch.map(function (c, i) { return '<h4 class="gw-prh">' + esc(c.name) + '</h4>' + (prs[i] ? '<img class="gw-proofbig" src="' + prs[i] + '" alt="">' : '<p class="gw-note">Görsel yok</p>'); }).join("") + '<div class="gw-mrow" style="justify-content:center;margin-top:10px"><button type="button" class="btn sm" id="gwPrOk">Tamam</button><button type="button" class="btn sm gw-del" id="gwPrOut">Uygun değil — çıkar</button></div>');
-                $("gwPrOk").onclick = closeModal;
-                $("gwPrOut").onclick = function () { closeModal(); removeMany([uid]); };
-            };
+                var x = r.x, prs = (((S.chk || {})[x.uid] || {}).proofs || []).filter(Boolean);
+                return '<div class="gw-prow' + (r.v === "ok" ? " okd" : r.v === "no" ? " bad" : r.f.some(function (t) { return t[0] === "bad"; }) ? " bad" : r.f.length ? " warn" : "") + '">' +
+                    '<button type="button" class="gw-pth" data-proof="' + esc(x.uid) + '" title="Görselleri incele">' + (prs.length ? '<img src="' + prs[0] + '" alt="">' + (prs.length > 1 ? '<i>' + prs.length + '</i>' : '') : '📷') + '</button>' +
+                    '<div class="gw-pn"><a href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener">' + esc(x.name) + '</a>' + ST[r.v] +
+                    '<div class="gw-flags">' + r.f.map(function (t) { return '<span class="' + t[0] + '">' + esc(t[1]) + '</span>'; }).join("") + '</div></div>' +
+                    '<div class="gw-pact"><button type="button" class="gw-qb ok' + (r.v === "ok" ? " on" : "") + '" data-rv="ok" data-u="' + esc(x.uid) + '" title="Onayla">✓</button><button type="button" class="gw-qb no' + (r.v === "no" ? " on" : "") + '" data-rv="no" data-u="' + esc(x.uid) + '" title="Uygun değil">✗</button>' +
+                    '<button type="button" class="gw-qb out" data-out="' + esc(x.uid) + '" title="Çekilişten çıkar">🗑</button></div></div>';
+            }).join("") || '<p class="gw-note">' + (n.all ? "Bu bölümde kimse yok." : "Henüz katılımcı yok.") + '</p>') + '</div>';
+        Array.prototype.forEach.call(box.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { S.tab = b.getAttribute("data-tab"); paintCheck(); }; });
+        Array.prototype.forEach.call(box.querySelectorAll("[data-proof]"), function (b) { b.onclick = function () { review(b.getAttribute("data-proof")); }; });
+        Array.prototype.forEach.call(box.querySelectorAll("[data-rv]"), function (b) {
+            b.onclick = function () { var u = b.getAttribute("data-u"), v = b.getAttribute("data-rv"); setRev(u, revOf(u) === v ? (v === "ok" ? "no" : "ok") : v); paintCheck(); };
         });
+        if ($("gwRev")) $("gwRev").onclick = function () { review(); };
         $("gwReChk").onclick = checkPeople;
         if ($("gwDupOut")) $("gwDupOut").onclick = function () {
             if (!confirm(extra.length + " hesap çıkarılsın mı? (Her cihazdan ilk katılan kalır)")) return;
@@ -562,6 +600,38 @@
                 if (confirm((x ? x.name : "Bu kişi") + " çekilişten çıkarılsın mı?")) removeMany([uid]);
             };
         });
+    }
+    // görselleri sırayla incele: büyük görseller, Onayla / Uygun değil / Atla, sonra sıradaki kişi
+    function review(start) {
+        var l = S.entries || []; if (!l.length) return;
+        var pend = l.filter(function (x) { return !revOf(x.uid); }).map(function (x) { return x.uid; });
+        var q = start ? [start].concat(pend.filter(function (u) { return u !== start; })) : pend.length ? pend : l.map(function (x) { return x.uid; });
+        var i = 0, ch = chans(S.g);
+        function done() {
+            var n = { ok: 0, no: 0, wait: 0 }; l.forEach(function (x) { n[revOf(x.uid) || "wait"]++; });
+            modal('<div class="gw-confetti">✅</div><h3>İnceleme bitti</h3><p><b>' + n.ok + '</b> onaylı · <b>' + n.no + '</b> uygun değil · <b>' + n.wait + '</b> bekleyen</p><button type="button" class="btn primary gw-big" id="gwRvEnd">Tamam</button>');
+            $("gwRvEnd").onclick = function () { closeModal(); paintCheck(); };
+        }
+        function show() {
+            var x = null; while (i < q.length && !(x = l.filter(function (y) { return y.uid === q[i]; })[0])) i++;
+            if (!x) return done();
+            var prs = ((S.chk || {})[x.uid] || {}).proofs || [], f = flagsOf(x, l), v = revOf(x.uid);
+            modal('<div class="gw-rvtop"><span>' + (i + 1) + ' / ' + q.length + '</span><button type="button" class="gw-rvx" id="gwRvX" aria-label="Kapat">✕</button></div>' +
+                '<h3 class="gw-rvname">' + esc(x.name) + '</h3>' + (v ? '<p>' + (v === "ok" ? '<span class="gw-rvst ok">✅ Onaylı</span>' : '<span class="gw-rvst no">❌ Uygun değil</span>') + '</p>' : '') +
+                (f.length ? '<div class="gw-flags" style="justify-content:center">' + f.map(function (t) { return '<span class="' + t[0] + '">' + esc(t[1]) + '</span>'; }).join("") + '</div>' : '') +
+                '<p class="gw-note">Her görselde kanal adı ve <b>Abone olundu</b> yazısı görünmeli.</p>' +
+                '<div class="gw-rvimgs">' + ch.map(function (c, k) { return '<figure><figcaption>' + esc(c.name) + '</figcaption>' + (prs[k] ? '<img src="' + prs[k] + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') + '</figure>'; }).join("") + '</div>' +
+                '<div class="gw-rvact"><button type="button" class="btn gw-rvno" id="gwRvNo">✗ Uygun değil</button><button type="button" class="btn" id="gwRvSkip">Atla</button><button type="button" class="btn gw-rvok" id="gwRvOk">✓ Onayla</button></div>' +
+                '<button type="button" class="gw-rvout" id="gwRvOut">🗑 Çekilişten çıkar</button>');
+            Array.prototype.forEach.call(document.querySelectorAll(".gw-rvimgs img"), function (im) { im.onclick = function () { im.closest(".gw-rvimgs").classList.toggle("zoom"); }; });
+            var next = function () { i++; show(); };
+            $("gwRvOk").onclick = function () { setRev(x.uid, "ok"); next(); };
+            $("gwRvNo").onclick = function () { setRev(x.uid, "no"); next(); };
+            $("gwRvSkip").onclick = next;
+            $("gwRvX").onclick = function () { closeModal(); paintCheck(); };
+            $("gwRvOut").onclick = function () { if (confirm(x.name + " çekilişten çıkarılsın mı?")) { closeModal(); removeMany([x.uid]); } };
+        }
+        show();
     }
     function removeMany(uids) {
         var g = S.g; if (!g) return;
@@ -710,12 +780,14 @@
     function schedule() {
         clearTimeout(S.pollT);
         var g = S.g; if (!g) return;
-        var now = Date.now(), near = (now > g.drawAt - 90000 && now < g.drawAt + 1800000) || g.st === "drawn";
+        // yönetici, kazanan teslimat bilgilerini gönderene kadar sık yoklar (sayfayı yenilemeden görsün)
+        var waitClaim = S.mgr && g.st === "claimed" && S.claimSeen !== g.id + g.w;
+        var now = Date.now(), near = (now > g.drawAt - 90000 && now < g.drawAt + 1800000) || g.st === "drawn" || waitClaim;
         // çekiliş yaklaşırken animasyon için katılımcı adlarını önceden al
         if (near && !S.entries && S.count) listEntries(g.id).then(function (l) { S.entries = l; }).catch(function () {});
         S.pollT = setTimeout(function () {
             var sig = function () { return JSON.stringify([S.g, S.joined, S.count]); }, before = sig();
-            fetchOne(g.id).then(function () { if (S.g) { if (sig() !== before) renderOne(); autoMgr(); schedule(); } });
+            fetchOne(g.id).then(function () { if (S.g) { if (sig() !== before) renderOne(); else if (waitClaim && S.g.st === "claimed" && $("gwClaim")) loadClaim(S.g); autoMgr(); schedule(); } });
         }, near ? 3000 : 20000);
     }
     function tick() {
