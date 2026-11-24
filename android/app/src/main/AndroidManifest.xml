@@ -50,7 +50,7 @@
         <!-- Sertifika/görsel paylaşma -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="fun.rubikacademy.app.files"
+            android:authorities="${applicationId}.files"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />

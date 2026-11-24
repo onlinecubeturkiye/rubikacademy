@@ -338,7 +338,7 @@ public class MainActivity extends Activity {
                 if (!dir.exists()) dir.mkdirs();
                 File f = new File(dir, name);
                 try (FileOutputStream out = new FileOutputStream(f)) { out.write(data); }
-                Uri uri = FileProvider.getUriForFile(MainActivity.this, "fun.rubikacademy.app.files", f);
+                Uri uri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".files", f);
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType(o.optString("mime", "image/png"));
                 i.putExtra(Intent.EXTRA_STREAM, uri);
