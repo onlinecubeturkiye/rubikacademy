@@ -374,10 +374,11 @@ service cloud.firestore {
         allow read: if true;
         allow create: if request.auth != null && request.auth.uid == uid && !suspended(uid)
           && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt
-          && request.resource.data.keys().hasOnly(['name', 'ts', 'd', 'b'])
+          && request.resource.data.keys().hasOnly(['name', 'ts', 'd', 'b', 'b2'])
           && request.resource.data.name is string && request.resource.data.name.size() <= 24
           && (!('d' in request.resource.data) || (request.resource.data.d is string && request.resource.data.d.size() <= 40))
           && (!('b' in request.resource.data) || request.resource.data.b is bool)
+          && (!('b2' in request.resource.data) || request.resource.data.b2 is bool)
           && request.resource.data.ts == request.time
           // abonelik görseli istenen çekilişte görsel aynı anda (aynı toplu yazımda) yüklenmiş olmalı
           && (get(/databases/$(database)/documents/giveaways/$(gid)).data.get('yt', '') == ''
@@ -391,11 +392,12 @@ service cloud.firestore {
               && request.resource.data.ts == request.time);
         allow delete: if gwMgr() || (request.auth != null && request.auth.uid == uid
           && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt);
-        // katılımcı yalnız WhatsApp bonusu işaretini (b) kayıtlar açıkken değiştirebilir
+        // katılımcı yalnız WhatsApp bonusu işaretlerini (b: 1. topluluk, b2: 2. topluluk) kayıtlar açıkken değiştirebilir
         allow update: if request.auth != null && request.auth.uid == uid && !suspended(uid)
           && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['b'])
-          && request.resource.data.b is bool
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['b', 'b2'])
+          && (!('b' in request.resource.data) || request.resource.data.b is bool)
+          && (!('b2' in request.resource.data) || request.resource.data.b2 is bool)
           // yalnız site sahibi herhangi bir katılımcıya 2× şans verir / kaldırır
           || (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['x2'])
               && request.resource.data.x2 is bool);
@@ -405,7 +407,10 @@ service cloud.firestore {
         allow read: if gwMgr() || (request.auth != null && request.auth.uid == uid);
         allow create, update: if request.auth != null && request.auth.uid == uid && !suspended(uid)
           && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt
-          && request.resource.data.keys().hasOnly(['img', 'img2', 'img3', 'ts'])
+          && request.resource.data.keys().hasOnly(['img', 'img2', 'img3', 'img4', 'ts'])
+          // img4: 2. WhatsApp topluluğu bonus görseli (isteğe bağlı)
+          && (!('img4' in request.resource.data) || (request.resource.data.img4 is string && request.resource.data.img4.size() <= 400000
+              && request.resource.data.img4.matches('data:image/(jpeg|png|webp);base64,.+')))
           && (!('img' in request.resource.data) || (request.resource.data.img is string && request.resource.data.img.size() <= 400000
               && request.resource.data.img.matches('data:image/(jpeg|png|webp);base64,.+')))
           // img3: WhatsApp topluluğu bonus görseli (isteğe bağlı)
@@ -419,9 +424,10 @@ service cloud.firestore {
       // Yönetici incelemesi: abonelik görselleri onaylandı mı (ok) / uygun değil mi (no) — yalnız yöneticiler
       match /rev/{uid} {
         allow read, delete: if gwMgr();
-        allow create, update: if gwMgr() && request.resource.data.keys().hasOnly(['v', 'b', 'ts'])
+        allow create, update: if gwMgr() && request.resource.data.keys().hasOnly(['v', 'b', 'b2', 'ts'])
           && (!('v' in request.resource.data) || request.resource.data.v in ['ok', 'no'])
-          && (!('b' in request.resource.data) || request.resource.data.b in ['ok', 'no']);
+          && (!('b' in request.resource.data) || request.resource.data.b in ['ok', 'no'])
+          && (!('b2' in request.resource.data) || request.resource.data.b2 in ['ok', 'no']);
       }
       // Kazananın bilgileri: yalnız kazanan yazar (onayladıktan sonra), yalnız kazanan ve yöneticiler okur.
       // Hangi alanların zorunlu olduğunu çekilişin "ask" ayarı belirler (yoksa eski davranış: ad, telefon, e-posta, adres).

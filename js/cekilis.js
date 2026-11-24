@@ -113,7 +113,7 @@
     var YT_DEF = [["Mert Sağdınç", "https://www.youtube.com/@AlgoMert"], ["Rubik Academy", "https://www.youtube.com/@rubikacademyy"]];
     // g.yt = "Kanal 1|Kanal 2", g.ytUrl = "url1|url2": her kanal için ayrı abonelik görseli istenir (en çok 2)
     function chans(g) { var n = String(g.yt || "").split("|"), u = String(g.ytUrl || "").split("|"); return n.map(function (x, i) { return { name: x.trim(), url: (u[i] || "").trim() }; }).filter(function (c) { return c.name; }).slice(0, 2); }
-    var PF = ["img", "img2", "img3"]; // img3: WhatsApp topluluğu bonus görseli
+    var PF = ["img", "img2", "img3", "img4"]; // img3 / img4: 1. ve 2. WhatsApp topluluğu bonus görseli
     var WA_DEF = [["Mert Sağdınç", ""], ["Rubik Academy", ""]];
     function waList(g) { var n = String(g.wa || "").split("|"), u = String(g.waUrl || "").split("|"); return n.map(function (x, i) { return { name: x.trim(), url: (u[i] || "").trim() }; }).filter(function (c) { return c.name; }).slice(0, 2); }
     function waLabel(g) { return waList(g).map(function (c) { return c.name; }).join(" veya ") + " WhatsApp topluluğu"; }
@@ -320,7 +320,7 @@
         ]).then(function (res) {
             if (light) res[1] = undefined;
             if (!res[0]) { if (!S.g || S.g.id !== id) S.g = null; return; }
-            var prev = S.g; S.g = dec(res[0]); S.joined = !!res[1] || (prev && prev.id === S.g.id && S.joined && res[1] === undefined); S.myBonus = !!(res[1] && dec(res[1]).b); if (res[2] != null) S.count = res[2];
+            var prev = S.g; S.g = dec(res[0]); S.joined = !!res[1] || (prev && prev.id === S.g.id && S.joined && res[1] === undefined); S.myBonus = res[1] ? (function (e) { return (e.b ? 1 : 0) + (e.b2 ? 1 : 0); })(dec(res[1])) : 0; if (res[2] != null) S.count = res[2];
             if (S.joined) remember(S.g);
             if (prev && prev.id === S.g.id && S.g.w && S.g.w !== prev.w && !S.g.man && (S.g.st === "drawn" || (S.g.st === "claimed" && isM(S.g.w)))) {
                 if (me() && me().uid === S.g.w) S.winShown = 1; // onay penceresini animasyon sonunda aç
@@ -349,7 +349,7 @@
         var out = {};
         function page(tok) {
             return req("/giveaways/" + id + "/rev?pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
-                (d.documents || []).forEach(function (x) { var o = dec(x); out[o.id] = { v: o.v || "", b: o.b || "", ts: o.ts || 0 }; });
+                (d.documents || []).forEach(function (x) { var o = dec(x); out[o.id] = { v: o.v || "", b: o.b || "", b2: o.b2 || "", ts: o.ts || 0 }; });
                 return d.nextPageToken ? page(d.nextPageToken) : out;
             });
         }
@@ -357,9 +357,18 @@
     }
     function changedAfter(uid) { var r = (S.rev || {})[uid], c = (S.chk || {})[uid]; return !!(r && c && c.pts && r.ts && c.pts > r.ts + 1000); }
     function revOf(uid) { return changedAfter(uid) ? "" : ((S.rev || {})[uid] || {}).v || ""; }
-    function revB(uid) { return changedAfter(uid) ? "" : ((S.rev || {})[uid] || {}).b || ""; }
-    // bonus sayılır mı: görsel yüklenmiş ve yönetici "geçersiz" dememiş
-    function bonusOk(x, rv) { var r = (rv || S.rev || {})[x.uid] || {}; return !!(x.x2 || (x.b && S.g && S.g.wa && r.b === "ok")); }
+    function revB(uid, k) { return changedAfter(uid) ? "" : ((S.rev || {})[uid] || {})[k || "b"] || ""; }
+    // WhatsApp bonusu: her topluluk ayrı görsel + ayrı onay. Bir topluluk 2×, iki topluluk 3×.
+    // b = 1. topluluk görseli (img3), b2 = 2. topluluk görseli (img4); onaylar rev.b / rev.b2
+    var BK = ["b", "b2"];
+    function waN(g) { return g && g.wa ? waList(g).length : 0; }
+    function hasBk(x, i) { return !!(x[BK[i]] && i < waN(S.g)); }
+    function bonusCnt(x, rv) { var r = (rv || S.rev || {})[x.uid] || {}; return [0, 1].filter(function (i) { return hasBk(x, i) && r[BK[i]] === "ok"; }).length; }
+    // çarktaki ağırlık: 1 + onaylı bonus sayısı (+ site sahibinin verdiği ×2), en çok 3
+    function weightOf(x, rv) { return 1 + Math.min(2, bonusCnt(x, rv) + (x.x2 ? 1 : 0)); }
+    function bonusOk(x, rv) { return weightOf(x, rv) > 1; }
+    // yüklenen (henüz incelenmemiş olabilir) bonus görsel sayısı
+    function bonusUp(x) { return [0, 1].filter(function (i) { return hasBk(x, i); }).length; }
     function setRev(uid, v) {
         return setRevF(uid, "v", v);
     }
@@ -370,16 +379,16 @@
     }
     function setRevF(uid, k, v) {
         // görseller incelemeden sonra değiştiyse eski kararın diğer yarısı da silinir (yeniden incelensin)
-        var stale = changedAfter(uid), other = k === "v" ? "b" : "v";
-        S.rev = S.rev || {}; var old = S.rev[uid]; S.rev[uid] = Object.assign({}, old || {}); S.rev[uid][k] = v; S.rev[uid].ts = Date.now(); if (stale) delete S.rev[uid][other];
+        var stale = changedAfter(uid), others = ["v", "b", "b2"].filter(function (x) { return x !== k; });
+        S.rev = S.rev || {}; var old = S.rev[uid]; S.rev[uid] = Object.assign({}, old || {}); S.rev[uid][k] = v; S.rev[uid].ts = Date.now(); if (stale) others.forEach(function (x) { delete S.rev[uid][x]; });
         var o = { ts: Date.now() }; o[k] = v;
-        return req("/giveaways/" + S.g.id + "/rev/" + uid + "?" + mask(o) + (stale ? "&updateMask.fieldPaths=" + other : ""), { method: "PATCH", body: JSON.stringify({ fields: enc(o) }) }).then(function (r) { if (!r.ok) throw 0; }).catch(function () { S.rev[uid] = old; alert("Kaydedilemedi, tekrar dene."); paintCheck(); });
+        return req("/giveaways/" + S.g.id + "/rev/" + uid + "?" + mask(o) + (stale ? others.map(function (x) { return "&updateMask.fieldPaths=" + x; }).join("") : ""), { method: "PATCH", body: JSON.stringify({ fields: enc(o) }) }).then(function (r) { if (!r.ok) throw 0; }).catch(function () { S.rev[uid] = old; alert("Kaydedilemedi, tekrar dene."); paintCheck(); });
     }
     function listEntries(id) {
         var out = [];
         function page(tok) {
             return fetch(ROOT + "/giveaways/" + id + "/e?pageSize=300&key=" + encodeURIComponent(cfg.apiKey) + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
-                (d.documents || []).forEach(function (x) { var o = dec(x); out.push({ uid: o.id, name: o.name || "Cuber", d: o.d || "", ts: o.ts || 0, b: !!o.b, m: !!o.m, x2: !!o.x2 }); });
+                (d.documents || []).forEach(function (x) { var o = dec(x); out.push({ uid: o.id, name: o.name || "Cuber", d: o.d || "", ts: o.ts || 0, b: !!o.b, b2: !!o.b2, m: !!o.m, x2: !!o.x2 }); });
                 return d.nextPageToken && out.length < 20000 ? page(d.nextPageToken) : out;
             });
         }
@@ -406,7 +415,7 @@
         var p = phase(g), u = me(), now = Date.now(), iWon = u && g.w === u.uid;
         var act = "";
         if (p !== "open") S.editing = false;
-        if (p === "open") act = S.joined && !S.editing ? '<div class="gw-in">✅ Çekilişe katıldın. Çekiliş günü sayfada ol: kazanırsan 2 dakika içinde onaylaman gerekiyor.' + (g.wa && !S.myBonus ? '<br><small>⭐ Bonus: ' + esc(waLabel(g)) + ' görselini ekleyerek çarkta adını 2 kez yazdırabilirsin.</small>' : '') + '</div>' +
+        if (p === "open") act = S.joined && !S.editing ? '<div class="gw-in">✅ Çekilişe katıldın. Çekiliş günü sayfada ol: kazanırsan 2 dakika içinde onaylaman gerekiyor.' + (g.wa && (S.myBonus || 0) < waN(g) ? '<br><small>⭐ Bonus: WhatsApp topluluğu görseli ekle; ' + (waN(g) > 1 ? 'bir topluluk 2×, iki topluluk 3× şans' : 'çarkta adın 2 kez yazılır') + '. <b>Görsellerimi düzenle</b>ye dokun.</small>' : '') + '</div>' +
                 '<div class="gw-mrow">' + (g.yt || g.wa ? '<button type="button" class="btn sm" id="gwEdit">📸 Görsellerimi düzenle</button>' : '') + '<button type="button" class="btn sm" id="gwLeave">Katılımı geri al</button></div>'
             : reqHtml(g);
         else if (p === "closed" || p === "drawing") act = S.joined ? '<div class="gw-in">✅ Katıldın. Çekiliş ' + (p === "drawing" ? "şimdi yapılıyor…" : esc(dt(g.drawAt)) + "'de") + ' — sayfada kal!</div>' : '<div class="gw-note">Kayıtlar kapandı.</div>';
@@ -450,7 +459,7 @@
     function reqState(g) {
         var u = me(), ps = window.Account && Account.pushState ? Account.pushState() : "granted";
         var pr = S.proof && S.proof.id === g.id ? S.proof.imgs : [], ch = chans(g);
-        return { acc: !!u, push: pushOk(), ps: ps, yt: ch.every(function (c, i) { return !!pr[i]; }), proofs: pr, ch: ch, bonus: pr[2] || "" };
+        return { acc: !!u, push: pushOk(), ps: ps, yt: ch.every(function (c, i) { return !!pr[i]; }), proofs: pr, ch: ch, bonus: pr[2] || "", bonus2: pr[3] || "" };
     }
     function reqHtml(g) {
         var r = reqState(g), u = me();
@@ -466,18 +475,18 @@
                 var p = r.proofs[i] || "";
                 return row(!!p, 2 + i, esc(c.name) + " kanalına abone ol", '<div class="gw-reqb">' + (c.url ? '<a class="btn sm gw-yt" href="' + esc(c.url) + '" target="_blank" rel="noopener">▶ Kanala git</a>' : '') + up(i, p, "Görüntü yükle") + '</div>', p);
             }).join("") +
-            (g.wa ? (function () {
-                var wl = waList(g), p = r.bonus;
-                return row(!!p, "⭐", "Bonus: " + esc(waLabel(g)) + ' <em>isteğe bağlı · çarkta 2×</em>',
-                    '<div class="gw-reqb">' + wl.map(function (c) { return c.url ? '<a class="btn sm gw-wa" href="' + esc(c.url) + '" target="_blank" rel="noopener">💬 ' + esc(c.name) + '</a>' : ''; }).join("") + up(2, p, "Görüntü yükle") +
-                    (p ? '<button type="button" class="btn sm" id="gwBonusX">Kaldır</button>' : '') + '</div>', p, "gw-bonus");
-            })() : '') +
+            (g.wa ? waList(g).map(function (c, i, wl) {
+                var p = i ? r.bonus2 : r.bonus;
+                return row(!!p, "⭐", "Bonus: " + esc(c.name) + ' WhatsApp topluluğu <em>isteğe bağlı · ' + (wl.length > 1 ? 'biri 2×, ikisi 3× şans' : 'çarkta 2×') + '</em>',
+                    '<div class="gw-reqb">' + (c.url ? '<a class="btn sm gw-wa" href="' + esc(c.url) + '" target="_blank" rel="noopener">💬 Topluluğa git</a>' : '') + up(2 + i, p, "Görüntü yükle") +
+                    (p ? '<button type="button" class="btn sm" data-bx="' + (2 + i) + '">Kaldır</button>' : '') + '</div>', p, "gw-bonus");
+            }).join("") : '') +
             '</ol>' + (ed ? '<div class="gw-edact"><button type="button" class="btn primary gw-big" id="gwEdSave"' + (all ? '' : ' disabled') + '>💾 Değişiklikleri kaydet</button><button type="button" class="btn" id="gwEdX">Vazgeç</button></div>'
                 : u ? '<button type="button" class="btn primary gw-big" id="gwJoin"' + (all ? '' : ' disabled') + '>🎟 Çekilişe katıl</button>' : '') +
             (u && !all ? '<p class="gw-note" style="text-align:center">' + (ed ? "Abonelik görselleri olmadan kaydedilemez." : "Şartların hepsi tamamlanınca katılabilirsin.") + '</p>' : '') + '</div>';
     }
     function bindReq(g) {
-        if ($("gwBonusX")) $("gwBonusX").onclick = function () { if (S.proof) S.proof.imgs[2] = ""; renderOne(); };
+        Array.prototype.forEach.call(document.querySelectorAll("[data-bx]"), function (b) { b.onclick = function () { if (S.proof) S.proof.imgs[+b.getAttribute("data-bx")] = ""; renderOne(); }; });
         if ($("gwEdX")) $("gwEdX").onclick = function () { S.editing = false; S.proof = null; renderOne(); };
         if ($("gwEdSave")) $("gwEdSave").onclick = function () { saveProofs(g, this); };
         if ($("gwPush")) $("gwPush").onclick = function () {
@@ -505,7 +514,7 @@
             if (!S.proof || S.proof.id !== g.id) S.proof = { id: g.id, imgs: [] };
             S.proof.imgs[idx] = img;
             // sıradaki boş kutu yapıştırma hedefi olsun
-            var nx = [0, 1, 2].filter(function (k) { return document.querySelector('.gw-req li[data-slot="' + k + '"]') && !S.proof.imgs[k]; })[0];
+            var nx = [0, 1, 2, 3].filter(function (k) { return document.querySelector('.gw-req li[data-slot="' + k + '"]') && !S.proof.imgs[k]; })[0];
             S.pasteSlot = nx == null ? idx : nx;
             renderOne(); msg(S.editing ? "Görsel hazır ✓ — kaydetmeyi unutma" : "Görsel hazır ✓");
         }, function () { msg("Görsel okunamadı, başka bir görsel dene.", 1); });
@@ -516,7 +525,7 @@
         var it = Array.prototype.filter.call((e.clipboardData && e.clipboardData.items) || [], function (x) { return /^image\//.test(x.type); })[0]; if (!it) return;
         e.preventDefault();
         var imgs = (S.proof && S.proof.id === g.id ? S.proof.imgs : []) || [];
-        var idx = S.pasteSlot != null && document.querySelector('.gw-req li[data-slot="' + S.pasteSlot + '"]') ? S.pasteSlot : [0, 1, 2].filter(function (k) { return document.querySelector('.gw-req li[data-slot="' + k + '"]') && !imgs[k]; })[0];
+        var idx = S.pasteSlot != null && document.querySelector('.gw-req li[data-slot="' + S.pasteSlot + '"]') ? S.pasteSlot : [0, 1, 2, 3].filter(function (k) { return document.querySelector('.gw-req li[data-slot="' + k + '"]') && !imgs[k]; })[0];
         if (idx == null) idx = 0;
         useFile(it.getAsFile(), idx, g);
     });
@@ -547,7 +556,7 @@
                     c.width = Math.round(w * k); c.height = Math.round(h * k);
                     var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
                     var d = c.toDataURL("image/jpeg", tries < 3 ? 0.72 : 0.6);
-                    if (d.length <= 300000) return res(d); // 3 görsel tek belgeye sığsın (1 MB sınırı)
+                    if (d.length <= 230000) return res(d); // 4 görsel tek belgeye sığsın (1 MB sınırı)
                     max = Math.round(max * 0.8);
                 }
                 rej(new Error("big"));
@@ -564,15 +573,15 @@
         var r0 = reqState(g);
         if (!r0.yt) { msg("Önce abonelik ekran görüntülerini yükle.", 1); return; }
         if (tooBig(r0)) { $("gwJoin").disabled = false; msg("Görseller çok büyük; birini yeniden yükle.", 1); return; }
-        var w = { writes: [{ update: { name: docName("/giveaways/" + g.id + "/e/" + u.uid), fields: (function () { var f = { name: { stringValue: myName() }, d: { stringValue: devId() } }; if (g.wa && r0.bonus) f.b = { booleanValue: true }; return f; })() }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }], currentDocument: { exists: false } }] };
-        if (g.yt || (g.wa && r0.bonus)) w.writes.unshift({ update: { name: docName("/giveaways/" + g.id + "/proof/" + u.uid), fields: proofFields(g, r0) }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }] });
+        var w = { writes: [{ update: { name: docName("/giveaways/" + g.id + "/e/" + u.uid), fields: (function () { var f = { name: { stringValue: myName() }, d: { stringValue: devId() } }; if (g.wa && r0.bonus) f.b = { booleanValue: true }; if (waN(g) > 1 && r0.bonus2) f.b2 = { booleanValue: true }; return f; })() }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }], currentDocument: { exists: false } }] };
+        if (g.yt || (g.wa && (r0.bonus || r0.bonus2))) w.writes.unshift({ update: { name: docName("/giveaways/" + g.id + "/proof/" + u.uid), fields: proofFields(g, r0) }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }] });
         req(":commit", { method: "POST", body: JSON.stringify(w) }).then(function (r) {
             if (!r.ok) throw new Error(r.status);
             S.joined = true; S.count++; cacheSet("n:" + g.id, S.count); remember(g); renderOne(); msg("Katıldın, bol şans! 🍀");
         }).catch(function (e) { if ($("gwJoin")) $("gwJoin").disabled = false; msg(String(e.message) === "403" ? "Katılınamadı: kayıtlar kapanmış olabilir." : "Katılınamadı, tekrar dene.", 1); });
     }
-    function tooBig(r0) { return r0.proofs.concat([r0.bonus]).reduce(function (a, x) { return a + String(x || "").length; }, 0) > 1000000; }
-    function proofFields(g, r0) { var o = {}; r0.ch.forEach(function (c, i) { o[PF[i]] = { stringValue: r0.proofs[i] }; }); if (g.wa && r0.bonus) o.img3 = { stringValue: r0.bonus }; return o; }
+    function tooBig(r0) { return r0.proofs.slice(0, 4).reduce(function (a, x) { return a + String(x || "").length; }, 0) > 1000000; }
+    function proofFields(g, r0) { var o = {}; r0.ch.forEach(function (c, i) { o[PF[i]] = { stringValue: r0.proofs[i] }; }); if (g.wa && r0.bonus) o.img3 = { stringValue: r0.bonus }; if (waN(g) > 1 && r0.bonus2) o.img4 = { stringValue: r0.bonus2 }; return o; }
     // katıldıktan sonra görselleri değiştir: önce kendi görsellerini getir
     function editProofs() {
         var u = me(), g = S.g; if (!u || !g) return;
@@ -587,7 +596,7 @@
         b.disabled = true;
         if (tooBig(r0)) { b.disabled = false; msg("Görseller çok büyük; birini yeniden yükle.", 1); return; }
         var w = { writes: [{ update: { name: docName("/giveaways/" + g.id + "/proof/" + u.uid), fields: proofFields(g, r0) }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }] }] };
-        if (g.wa) w.writes.push({ update: { name: docName("/giveaways/" + g.id + "/e/" + u.uid), fields: { b: { booleanValue: !!r0.bonus } } }, updateMask: { fieldPaths: ["b"] }, currentDocument: { exists: true } });
+        if (g.wa) w.writes.push({ update: { name: docName("/giveaways/" + g.id + "/e/" + u.uid), fields: { b: { booleanValue: !!r0.bonus }, b2: { booleanValue: waN(g) > 1 && !!r0.bonus2 } } }, updateMask: { fieldPaths: ["b", "b2"] }, currentDocument: { exists: true } });
         req(":commit", { method: "POST", body: JSON.stringify(w) }).then(function (r) {
             if (!r.ok) throw new Error(r.status);
             S.editing = false; S.proof = null; renderOne(); msg("Görsellerin güncellendi ✓");
@@ -730,7 +739,7 @@
             '<button type="button" class="gwm-a" id="gwEditGw"><i>✏️</i><span>Düzenle<small>Başlık, ödül, tarih, şartlar</small></span></button>' +
             '<button type="button" class="gwm-a" id="gwLink"><i>🔗</i><span>Bağlantıyı kopyala<small>Paylaşmak için</small></span></button>' +
             '<button type="button" class="gwm-a del" id="gwDel"><i>🗑</i><span>Çekilişi sil<small>Geri alınamaz</small></span></button></div>' +
-            '<details class="gwm-help"><summary>Nasıl çalışır?</summary><p>Kayıtlar kapanınca <b>Şimdi çek</b>e dokun; herkes çarkı aynı anda görür. Kazanan 2 dakika içinde onaylamazsa sıradaki kişi kendiliğinden çekilmez: <b>Sıradaki kişiyi çek</b>e sen dokunursun. Sabitlenen çekiliş listede en üstte durur, katılımcılar bunu görmez. Görselleri incele: <b>yalnız onayladığın kişiler çekilir</b>; reddedilen ve bekleyenler çekilmez. WhatsApp bonusu da onaylanırsa çarkta 2 kez sayılır.</p></details>' +
+            '<details class="gwm-help"><summary>Nasıl çalışır?</summary><p>Kayıtlar kapanınca <b>Şimdi çek</b>e dokun; herkes çarkı aynı anda görür. Kazanan 2 dakika içinde onaylamazsa sıradaki kişi kendiliğinden çekilmez: <b>Sıradaki kişiyi çek</b>e sen dokunursun. Sabitlenen çekiliş listede en üstte durur, katılımcılar bunu görmez. Görselleri incele: <b>yalnız onayladığın kişiler çekilir</b>; reddedilen ve bekleyenler çekilmez. WhatsApp bonusu: onaylanan her topluluk çarkta +1 sayılır (bir topluluk 2×, iki topluluk 3×).</p></details>' +
             (skipNames(g).length ? '<p class="gw-note">Onaylamayan / iptal edilenler: <b>' + skipNames(g).map(esc).join(" → ") + '</b></p>' : '') +
             (isOwner() && (p === "open" || p === "closed" || p === "drawing") ? '<form class="gw-madd" id="gwMAdd" autocomplete="off"><h4>✋ Elle katılımcı ekle</h4><p class="gw-note">Hesabı olan birini adıyla ya da profil bağlantısıyla bul, ya da hesabı olmayan birini adıyla ekle. Onaylı sayılır, görsel istenmez. Yalnız sen görürsün.</p>' +
                 '<div class="gw-maddr"><input id="gwMName" maxlength="200" placeholder="Ad veya profil bağlantısı" required><label class="gw-mx2"><input type="checkbox" id="gwMX2"> ×2 şans</label><button type="submit" class="btn sm primary" id="gwMBtn">Ara</button></div><div class="gw-mres" id="gwMRes"></div><p class="gw-msg" id="gwMMsg"></p></form>' : '') +
@@ -848,8 +857,8 @@
                 S.rev = rv;
                 // görsel istenen çekilişte yalnız onaylananlar çekilir; reddedilen ve bekleyen asla
                 pool = pool.filter(function (x) { var v = (rv[x.uid] || {}).v; return g.yt ? v === "ok" : v !== "no"; });
-                // WhatsApp topluluğu bonusu: geçerli bonusu olanın adı çarkta 2 kez → 2 kat şans
-                pool = pool.reduce(function (a, x) { a.push(x); if (bonusOk(x, rv)) a.push(x); return a; }, []);
+                // WhatsApp topluluğu bonusu: onaylı her topluluk +1 (biri 2×, ikisi 3×); site sahibinin ×2'si de +1 (en çok 3×)
+                pool = pool.reduce(function (a, x) { for (var k = weightOf(x, rv); k > 0; k--) a.push(x); return a; }, []);
                 if (!pool.length && !redo) { alert(g.yt ? "Onaylanmış katılımcı yok. Önce görselleri incele ve onayla." : "Çekilebilecek katılımcı yok."); return "stop"; }
                 return pick();
             }).then(function (w) {
@@ -889,7 +898,7 @@
             var shown = l.slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }), per = 12, pages = Math.max(1, Math.ceil(shown.length / per));
             S.pplPage = Math.min(S.pplPage || 0, pages - 1); var pg = S.pplPage;
             b.innerHTML = l.length ? shown.slice(pg * per, pg * per + per).map(function (x) {
-                return '<div class="gw-prow2' + (me() && me().uid === x.uid ? ' me' : '') + '"><a' + (isM(x.uid) ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '><b class="gw-pnm">' + esc(x.name) + '</b>' + (x.x2 ? '<i class="gw-star" title="Çarkta 2 kez">×2</i>' : x.b && g.wa ? '<i class="gw-star" title="WhatsApp bonusu: çarkta 2 kez">⭐×2</i>' : '') + '</a><span>🕒 ' + esc(dtS(x.ts)) + '</span></div>';
+                return '<div class="gw-prow2' + (me() && me().uid === x.uid ? ' me' : '') + '"><a' + (isM(x.uid) ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '><b class="gw-pnm">' + esc(x.name) + '</b>' + (function () { var n = Math.min(2, bonusUp(x) + (x.x2 ? 1 : 0)); return n ? '<i class="gw-star" title="Çarkta ' + (n + 1) + ' kez">' + (bonusUp(x) ? '⭐' : '') + '×' + (n + 1) + '</i>' : ''; })() + '</a><span>🕒 ' + esc(dtS(x.ts)) + '</span></div>';
             }).join("") : '<p class="gw-note">Henüz katılan yok. İlk sen katıl!</p>';
             var pgEl = $("gwPg"); if (!pgEl) return;
             pgEl.innerHTML = pages > 1 ? '<button type="button" data-pg="' + (pg - 1) + '"' + (pg ? '' : ' disabled') + '>‹</button>' + Array.apply(null, Array(pages)).map(function (_, i) { return i < 7 || i === pages - 1 ? '<button type="button" data-pg="' + i + '"' + (i === pg ? ' class="on"' : '') + '>' + (i + 1) + '</button>' : i === 7 ? '<span>…</span>' : ''; }).join("") + '<button type="button" data-pg="' + (pg + 1) + '"' + (pg < pages - 1 ? '' : ' disabled') + '>›</button>' : '';
@@ -917,7 +926,7 @@
                 var x = jobs[k++];
                 if (x.m) { out[x.uid] = { u: null, role: "", st: {}, proofs: [], pts: 0, m: 1 }; return worker(); }
                 return Promise.all([req("/users/" + x.uid).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }), roleOf(x.uid),
-                    g.yt ? req("/giveaways/" + g.id + "/proof/" + x.uid).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }) : Promise.resolve(null)]).then(function (res) {
+                    g.yt || g.wa ? req("/giveaways/" + g.id + "/proof/" + x.uid).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }) : Promise.resolve(null)]).then(function (res) {
                     var u = res[0] ? dec(res[0]) : null, st = {};
                     try { st = u && u.stats ? JSON.parse(u.stats) : {}; } catch (e) {}
                     var pd = res[2] ? dec(res[2]) : {};
@@ -939,7 +948,11 @@
         var nm = String(x.name || "").toLocaleLowerCase("tr").trim(), sn = all.filter(function (y) { return String(y.name || "").toLocaleLowerCase("tr").trim() === nm; }).length;
         if (sn > 1) f.push(["warn", "👯 Aynı isim ×" + sn]);
         if (changedAfter(x.uid)) f.unshift(["new", "🔄 Görselini güncelledi"]);
-        if (x.b && S.g && S.g.wa) f.push([revB(x.uid) === "no" ? "bad" : "star", revB(x.uid) === "no" ? "⭐ Bonus geçersiz" : revB(x.uid) === "ok" ? "⭐ Bonus onaylı (×2)" : "⭐ Bonus bekliyor (×2)"]);
+        [0, 1].forEach(function (i) {
+            if (!hasBk(x, i)) return; var v = revB(x.uid, BK[i]), nm = waList(S.g)[i].name;
+            f.push([v === "no" ? "bad" : "star", "⭐ " + nm + ": " + (v === "no" ? "bonus geçersiz" : v === "ok" ? "bonus onaylı" : "bonus bekliyor")]);
+        });
+        if (bonusUp(x)) f.push(["star", "🎡 Çarkta " + weightOf(x) + "×"]);
         if (!u) f.push(["warn", "❓ Profil yok"]);
         else {
             if (u.joined && x.ts && x.ts - u.joined < 3 * 86400000) f.push(["warn", "🆕 Yeni hesap (" + age(Math.max(0, x.ts - u.joined)) + ")"]);
@@ -953,10 +966,10 @@
         var l = S.entries || [], tab = S.tab || "all";
         var rows = l.map(function (x) { return { x: x, f: flagsOf(x, l).filter(function (t) { return t[0] !== "star"; }), s: flagsOf(x, l).filter(function (t) { return t[0] === "star"; }), v: revOf(x.uid) }; });
         var n = { all: rows.length, wait: 0, ok: 0, no: 0, sus: 0, wa: 0, wawait: 0 };
-        rows.forEach(function (r) { n[r.v || "wait"]++; if (r.f.some(function (t) { return t[0] !== "new"; })) n.sus++; if (r.x.b && g.wa) { n.wa++; if (!revB(r.x.uid)) n.wawait++; } });
+        rows.forEach(function (r) { n[r.v || "wait"]++; if (r.f.some(function (t) { return t[0] !== "new"; })) n.sus++; if (bonusUp(r.x)) { n.wa++; if ([0, 1].some(function (i) { return hasBk(r.x, i) && !revB(r.x.uid, BK[i]); })) n.wawait++; } });
         var groups = {}; l.forEach(function (x) { if (x.d) (groups[x.d] = groups[x.d] || []).push(x); });
         var extra = []; Object.keys(groups).forEach(function (d) { var a = groups[d].slice().sort(function (p, q) { return (p.ts || 0) - (q.ts || 0); }); extra = extra.concat(a.slice(1)); });
-        var list = rows.filter(function (r) { return tab === "all" || (tab === "sus" ? r.f.some(function (t) { return t[0] !== "new"; }) : tab === "wa" ? r.x.b && g.wa : (r.v || "wait") === tab); })
+        var list = rows.filter(function (r) { return tab === "all" || (tab === "sus" ? r.f.some(function (t) { return t[0] !== "new"; }) : tab === "wa" ? bonusUp(r.x) > 0 : (r.v || "wait") === tab); })
             // bekleyenler önce; onlar içinde görselini güncelleyen ve en yeni katılan en üstte
             .sort(function (a, b) { return (a.v ? 1 : 0) - (b.v ? 1 : 0) || (changedAfter(b.x.uid) ? 1 : 0) - (changedAfter(a.x.uid) ? 1 : 0) || (b.x.ts || 0) - (a.x.ts || 0); });
         if ($("gwmOk")) $("gwmOk").textContent = n.ok + "/" + n.all;
@@ -964,18 +977,18 @@
         var ST = { ok: '<span class="gw-rvst ok">✅ Onaylı</span>', no: '<span class="gw-rvst no">❌ Uygun değil</span>', "": '<span class="gw-rvst">⏳ Bekliyor</span>' };
         box.innerHTML = '<h4>🔍 Katılımcılar ve görseller <span class="gw-sub">' + n.all + ' kişi</span></h4>' +
             (n.all && (g.yt || g.wa) ? '<div class="gw-rvgos">' + (g.yt ? '<button type="button" class="btn primary gw-big gw-rvgo" id="gwRev">📺 YouTube görselleri<small>' + (n.wait ? n.wait + ' bekleyen' : 'hepsi incelendi ✓') + '</small></button>' : '') +
-                (g.wa ? '<button type="button" class="btn gw-big gw-rvgo gw-rvwa" id="gwRevWa">💬 WhatsApp görselleri<small>' + (n.wa ? (n.wawait ? n.wawait + ' bekleyen · ' : 'hepsi incelendi ✓ · ') + n.wa + ' kişi ×2' : 'henüz yükleyen yok') + '</small></button>' : '') + '</div>' : '') +
+                (g.wa ? '<button type="button" class="btn gw-big gw-rvgo gw-rvwa" id="gwRevWa">💬 WhatsApp görselleri<small>' + (n.wa ? (n.wawait ? n.wawait + ' bekleyen · ' : 'hepsi incelendi ✓ · ') + n.wa + ' kişi' : 'henüz yükleyen yok') + '</small></button>' : '') + '</div>' : '') +
             '<div class="gw-tabs">' + TABS.map(function (t) { return '<button type="button" data-tab="' + t[0] + '"' + (tab === t[0] ? ' class="on"' : '') + '>' + t[1] + ' <b>' + n[t[0]] + '</b></button>'; }).join("") + '</div>' +
             '<div class="gw-mrow">' + (extra.length ? '<button type="button" class="btn sm gw-del" id="gwDupOut">📱 Aynı cihaz fazlalarını çıkar (' + extra.length + ')</button>' : '') +
             '<button type="button" class="btn sm" id="gwReChk">↻ Yenile</button></div>' +
             '<div class="gw-plist">' + (list.map(function (r) {
-                var x = r.x, prs = (((S.chk || {})[x.uid] || {}).proofs || []).filter(Boolean), vb = revB(x.uid), any = r.v || vb;
+                var x = r.x, prs = (((S.chk || {})[x.uid] || {}).proofs || []).filter(Boolean), vb = revB(x.uid) || revB(x.uid, "b2"), any = r.v || vb, wt = weightOf(x);
                 var stt = r.v === "ok" ? '<b class="ok">✅ Onaylı</b>' : r.v === "no" ? '<b class="no">❌ Uygun değil</b>' : '<b>⏳ Bekliyor</b>';
                 var upd = r.f.some(function (t) { return t[0] === "new"; }), ff = r.f.filter(function (t) { return t[0] !== "new"; });
                 var warn = ff.map(function (t) { return t[1]; }), bad = ff.some(function (t) { return t[0] === "bad"; });
                 return '<div class="gw-prow' + (r.v === "ok" ? " okd" : r.v === "no" ? " nod" : "") + '">' +
                     '<button type="button" class="gw-pth" data-proof="' + esc(x.uid) + '" title="Görselleri incele">' + (prs.length ? '<img src="' + prs[0] + '" alt="">' + (prs.length > 1 ? '<i>' + prs.length + '</i>' : '') : '📷') + '</button>' +
-                    '<div class="gw-pn"><div class="gw-pl1"><a' + (isM(x.uid) ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + '</a>' + (x.m ? '<i class="gw-star" title="' + (isM(x.uid) ? "Elle eklendi (hesapsız)" : "Elle eklendi") + '">✋</i>' : '') + (x.x2 ? '<i class="gw-star" title="Çarkta 2 kez">×2</i>' : '') + (x.b && S.g.wa ? '<i class="gw-star" title="' + (vb === "no" ? "Bonus geçersiz" : "WhatsApp bonusu") + '">' + (vb === "no" ? "⭐✗" : "⭐×2") + '</i>' : '') + '</div>' +
+                    '<div class="gw-pn"><div class="gw-pl1"><a' + (isM(x.uid) ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + '</a>' + (x.m ? '<i class="gw-star" title="' + (isM(x.uid) ? "Elle eklendi (hesapsız)" : "Elle eklendi") + '">✋</i>' : '') + (x.x2 ? '<i class="gw-star" title="Site sahibi verdi">×2</i>' : '') + (bonusUp(x) ? '<i class="gw-star" title="WhatsApp bonusu: ' + bonusUp(x) + ' görsel, ' + bonusCnt(x) + ' onaylı">⭐' + bonusCnt(x) + '/' + bonusUp(x) + '</i>' : '') + (wt > 1 ? '<i class="gw-star" title="Çarkta ' + wt + ' kez">🎡×' + wt + '</i>' : '') + '</div>' +
                     '<div class="gw-pl2">' + stt + (upd ? '<span class="new">🔄 Görselini güncelledi</span>' : '') + (warn.length ? '<span class="' + (bad ? "bad" : "warn") + '" title="' + esc(warn.join(" · ")) + '">⚠️ ' + esc(warn.join(" · ")) + '</span>' : '') + '</div></div>' +
                     '<div class="gw-pact">' + (isOwner() ? '<button type="button" class="gw-qb x2' + (x.x2 ? " on" : "") + '" data-x2="' + esc(x.uid) + '" title="' + (x.x2 ? "2× şansı kaldır" : "2× şans ver") + '">×2</button>' : '') + (x.m ? '' : any ? '<button type="button" class="gw-qb rst" data-rst="' + esc(x.uid) + '" title="Beklemeye geri al">↺</button>' : '') +
                     (x.m ? '' : '<button type="button" class="gw-qb ok' + (r.v === "ok" ? " on" : "") + '" data-rv="ok" data-u="' + esc(x.uid) + '" title="Onayla">✓</button><button type="button" class="gw-qb no' + (r.v === "no" ? " on" : "") + '" data-rv="no" data-u="' + esc(x.uid) + '" title="Uygun değil">✗</button>') +
@@ -1018,10 +1031,11 @@
     // görselleri sırayla incele: büyük görseller, Onayla / Uygun değil / Atla, sonra sıradaki kişi
     function review(start, mode) {
         var l = S.entries || []; if (!l.length) return;
-        var hasWa = function (x) { return !!(x.b && S.g.wa); };
+        var hasWa = function (x) { return bonusUp(x) > 0; };
+        var waPend = function (x) { return [0, 1].some(function (k) { return hasBk(x, k) && !revB(x.uid, BK[k]); }); };
         var pool = mode === "wa" ? l.filter(hasWa) : l;
         if (!pool.length) { alert("WhatsApp görseli yükleyen kimse yok."); return; }
-        var isPend = function (x) { return mode === "wa" ? !revB(x.uid) : mode === "yt" ? !revOf(x.uid) : !revOf(x.uid) || (hasWa(x) && !revB(x.uid)); };
+        var isPend = function (x) { return mode === "wa" ? waPend(x) : mode === "yt" ? !revOf(x.uid) : !revOf(x.uid) || waPend(x); };
         var newest = function (a, b) { return (changedAfter(b.uid) ? 1 : 0) - (changedAfter(a.uid) ? 1 : 0) || (b.ts || 0) - (a.ts || 0); };
         var pend = pool.filter(isPend).sort(newest).map(function (x) { return x.uid; });
         var q = start ? [start].concat(pend.filter(function (u) { return u !== start; })) : pend.length ? pend : pool.slice().sort(newest).map(function (x) { return x.uid; });
@@ -1036,33 +1050,34 @@
         function show() {
             var x = null; while (i < q.length && !(x = l.filter(function (y) { return y.uid === q[i]; })[0])) i++;
             if (!x) return done();
-            var prs = ((S.chk || {})[x.uid] || {}).proofs || [], f = flagsOf(x, l).filter(function (t) { return t[0] !== "star"; }), v = revOf(x.uid), hasB = !!(x.b && S.g.wa), vb = revB(x.uid);
+            var prs = ((S.chk || {})[x.uid] || {}).proofs || [], f = flagsOf(x, l).filter(function (t) { return t[0] !== "star"; }), v = revOf(x.uid), vb = revB(x.uid), vb2 = revB(x.uid, "b2");
             var items = mode === "wa" ? [] : ch.map(function (c, k) { return { k: k, cap: "📺 " + c.name + " kanalı", img: prs[k], kind: "ch" }; });
-            if (hasB && mode !== "yt") items.push({ k: 2, cap: "⭐ WhatsApp: " + waLabel(S.g), img: prs[2], kind: "wa" });
+            if (mode !== "yt") [0, 1].forEach(function (k) { if (hasBk(x, k)) items.push({ k: 2 + k, cap: "⭐ WhatsApp: " + waList(S.g)[k].name, img: prs[2 + k], kind: "wa", bk: BK[k] }); });
             if (!items.length) { i++; st = 0; return show(); }
             if (st >= items.length) st = 0;
             var cur = items[st];
             var dots = items.map(function (it, n) { return '<span class="' + (n < st ? "ok" : n === st ? "on" : "") + '">' + (n < st ? "✓" : n + 1) + '</span>'; }).join("");
             modal('<div class="gw-rvtop"><span>' + (mode === "wa" ? "💬 WhatsApp · " : mode === "yt" ? "📺 YouTube · " : "") + 'Kişi ' + (i + 1) + ' / ' + q.length + '</span><button type="button" class="gw-rvx" id="gwRvX" aria-label="Kapat">✕</button></div>' +
                 '<h3 class="gw-rvname">' + esc(x.name) + '</h3>' +
-                (v || vb ? '<p>' + (v === "ok" ? '<span class="gw-rvst ok">✅ Kanallar onaylı</span>' : v === "no" ? '<span class="gw-rvst no">❌ Uygun değil</span>' : '') + (vb === "ok" ? '<span class="gw-rvst ok">⭐ Bonus onaylı</span>' : vb === "no" ? '<span class="gw-rvst no">⭐ Bonus geçersiz</span>' : '') + '</p>' : '') +
+                (v || vb || vb2 ? '<p>' + (v === "ok" ? '<span class="gw-rvst ok">✅ Kanallar onaylı</span>' : v === "no" ? '<span class="gw-rvst no">❌ Uygun değil</span>' : '') + [vb, vb2].map(function (z, k) { return !z || !hasBk(x, k) ? '' : '<span class="gw-rvst ' + z + '">⭐ ' + esc(waList(S.g)[k].name) + (z === "ok" ? ' onaylı' : ' geçersiz') + '</span>'; }).join("") + '</p>' : '') +
                 (f.length ? '<div class="gw-flags" style="justify-content:center">' + f.map(function (t) { return '<span class="' + t[0] + '">' + esc(t[1]) + '</span>'; }).join("") + '</div>' : '') +
                 '<div class="gw-rvstep"><div class="gw-rvdots">' + dots + '</div><b>Adım ' + (st + 1) + ' / ' + items.length + ': ' + esc(cur.cap) + '</b><small>' + (cur.kind === "wa" ? "Görselde topluluk adı ve üyelik görünmeli." : "Görselde kanal adı ve <b>Abone olundu</b> yazısı görünmeli.") + '</small></div>' +
                 '<div class="gw-rvimgs">' + items.map(function (it, n) { return '<figure class="' + (it.kind === "wa" ? "gw-rvb " : "") + (n === st ? "cur" : n < st ? "done" : "dim") + '"><figcaption>' + (n < st ? "✓ " : "") + esc(it.cap) + '</figcaption>' + (it.img ? '<img src="' + it.img + '" alt="" title="Büyütmek için dokun">' : '<div class="gw-rvnone">Görsel yok</div>') + '</figure>'; }).join("") + '</div>' +
                 '<div class="gw-rvact"><button type="button" class="btn gw-rvno" id="gwRvNo"><kbd>1</kbd> ✗ ' + (cur.kind === "wa" ? "Bonus geçersiz" : "Uygun değil") + '</button><button type="button" class="btn" id="gwRvSkip">Atla</button><button type="button" class="btn gw-rvok" id="gwRvOk"><kbd>2</kbd> ✓ Onayla' + (st < items.length - 1 ? ' → sonraki görsel' : '') + '</button></div>' +
                 '<p class="gw-rvkeys">Klavye: <kbd>1</kbd> reddet · <kbd>2</kbd> onayla · <kbd>Boşluk</kbd> kişiyi atla · <kbd>Esc</kbd> kapat</p>' +
-                '<div class="gw-rvlinks">' + (v || vb ? '<button type="button" class="gw-rvrst" id="gwRvRst">↺ Beklemeye geri al</button>' : '') + '<button type="button" class="gw-rvout" id="gwRvOut">🗑 Çekilişten çıkar</button></div>');
+                '<div class="gw-rvlinks">' + (v || vb || vb2 ? '<button type="button" class="gw-rvrst" id="gwRvRst">↺ Beklemeye geri al</button>' : '') + '<button type="button" class="gw-rvout" id="gwRvOut">🗑 Çekilişten çıkar</button></div>');
             if ($("gwRvRst")) $("gwRvRst").onclick = function () { clearRev(x.uid); st = 0; show(); };
             Array.prototype.forEach.call(document.querySelectorAll(".gw-rvimgs img"), function (im) { im.onclick = function () { im.closest(".gw-rvimgs").classList.toggle("zoom"); }; });
             var c = document.querySelector(".gw-rvimgs figure.cur"); if (c && c.scrollIntoView) c.scrollIntoView({ block: "nearest" });
             var nextPerson = function () { i++; st = 0; show(); };
             $("gwRvOk").onclick = function () {
-                if (cur.kind === "wa") setRevF(x.uid, "b", "ok");
+                if (cur.kind === "wa") setRevF(x.uid, cur.bk, "ok");
                 else if (!items.slice(st + 1).some(function (it) { return it.kind === "ch"; })) setRev(x.uid, "ok"); // son kanal da onaylandı
                 st++; if (st >= items.length) nextPerson(); else show();
             };
             $("gwRvNo").onclick = function () {
-                if (cur.kind === "wa") setRevF(x.uid, "b", "no"); else setRev(x.uid, "no"); // kanal reddi: kişi uygun değil
+                if (cur.kind === "wa") { setRevF(x.uid, cur.bk, "no"); st++; if (st >= items.length) nextPerson(); else show(); return; } // bonus reddi yalnız o bonusu düşürür
+                setRev(x.uid, "no"); // kanal reddi: kişi uygun değil
                 nextPerson();
             };
             $("gwRvSkip").onclick = nextPerson;
@@ -1093,12 +1108,12 @@
     }
     function waFormHtml(px, g, isNew) {
         var cur = waList(g);
-        return '<div class="gw-wabox"><p class="gw-wah">⭐ <b>Bonus: WhatsApp topluluğu</b> — üyesi olanın adı çarkta 2 kez yazılır (isteğe bağlı, görsel istenir)</p>' +
+        return '<div class="gw-wabox"><p class="gw-wah">⭐ <b>Bonus: WhatsApp topluluğu</b> — bir topluluğun üyesi 2×, iki topluluğun üyesi 3× şans (isteğe bağlı, her topluluk için ayrı görsel)</p>' +
             [0, 1].map(function (i) {
                 var c = cur[i] || { name: WA_DEF[i][0], url: WA_DEF[i][1] }, on = isNew ? true : !!cur[i];
                 return '<div class="gw-ych gw-wab"><label class="gw-chkf"><input type="checkbox" class="' + px + 'WaC"' + (on ? ' checked' : '') + '> WhatsApp topluluğu: <b>' + esc(c.name) + '</b></label>' +
                     '<div class="gw-row"><input class="' + px + 'WaN" maxlength="40" value="' + esc(c.name) + '" aria-label="Topluluk adı"><input class="' + px + 'WaU" maxlength="200" value="' + esc(c.url) + '" placeholder="https://chat.whatsapp.com/…" aria-label="Topluluk bağlantısı"></div></div>';
-            }).join("") + '<p class="gw-note" style="margin:6px 0 0">İşaretli topluluklar katılımcıya gösterilir; birinde olması bonus için yeterli. Hiçbiri işaretli değilse bonus kapalıdır.</p></div>';
+            }).join("") + '<p class="gw-note" style="margin:6px 0 0">İşaretli topluluklar katılımcıya gösterilir. Her topluluğun görseli ayrı incelenir: onaylı her topluluk çarkta +1 sayılır. Hiçbiri işaretli değilse bonus kapalıdır.</p></div>';
     }
     function waFormRead(px) {
         var ns = [], us = [], bad = "";
@@ -1381,5 +1396,5 @@
     }
     if (window.Account) start(); else document.addEventListener("DOMContentLoaded", start);
     // test / geliştirme: hesap değişince yeniden yükle
-    window.Cekilis = { _s: S, draw: draw, Draw: Draw, refresh: function () { return checkRole().then(function () { if (S.g) return fetchOne(S.g.id).then(renderOne); return loadList(); }); } };
+    window.Cekilis = { _s: S, draw: draw, Draw: Draw, weight: weightOf, refresh: function () { return checkRole().then(function () { if (S.g) return fetchOne(S.g.id).then(renderOne); return loadList(); }); } };
 })();
