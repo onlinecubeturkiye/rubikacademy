@@ -17,6 +17,7 @@ Ekranlar yeniden kaydedilmesin istersen başına `KAYIT=0` ekle (`klipler/` içi
 | `sahne.html` | Sahneler, yazılar, telefon çerçevesi, geçişler (her kare `render(t)` ile çizilir) |
 | `muzik.py` | Özgün müzik: kodla sentezlenir (120 BPM), telif hakkı sorunu yok |
 | `uret.mjs` | Hepsini çalıştırır, kareleri çizer, ffmpeg ile MP4 yapar |
+| `kucuk-resim.mjs` | YouTube küçük resmi (1280×720 JPG): `node play-store/video/kucuk-resim.mjs ~/kucuk-resim.jpg` |
 
 Kayıt kuralları (`kaydet.mjs`): rekor tablosunun Firestore yanıtı hayali adlarla taklit edilir; antrenördeki "Akıllı küp bağla" (Bluetooth) gizlenir; ana sayfada Bluetooth'tan söz eden "Çözüm Analizi" kartına kaydırılmaz. Antrenör sayfası, giriş bilgisi kullanılmadan üye görünümüyle açılır.
 
