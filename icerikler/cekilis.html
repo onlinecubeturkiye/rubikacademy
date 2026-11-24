@@ -273,7 +273,9 @@
     background: linear-gradient(90deg, color-mix(in srgb, var(--ui-accent) 10%, var(--surface)), var(--surface)); }
 .gw-prow2.me { border-color: var(--ui-accent); }
 .gw-pplc .gw-prow2 a, .gw-pplc .gw-prow2 span { padding: 0; border: 0; background: none; border-radius: 0; }
-.gw-prow2 a { min-width: 0; color: var(--text) !important; font: 800 13.5px Inter, sans-serif; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gw-prow2 a { display: flex; align-items: center; gap: 6px; min-width: 0; color: var(--text) !important; font: 800 13.5px Inter, sans-serif; text-decoration: none; white-space: nowrap; }
+.gw-prow2 .gw-pnm { min-width: 0; font: inherit; overflow: hidden; text-overflow: ellipsis; }
+.gw-prow2 .gw-star { flex: none; }
 .gw-prow2 > span { flex: none; color: var(--text-soft); font: 650 12px Inter, sans-serif; }
 .gw-pg { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
 .gw-pg button { min-width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 800 13px Inter, sans-serif; cursor: pointer; }
@@ -585,6 +587,6 @@
 <script src="/js/common.js?v=20270115"></script>
 <script src="/js/firebase-config.js?v=20270115"></script>
 <script src="/js/account.js?v=20270115"></script>
-<script src="/js/cekilis.js?v=20261124b"></script>
+<script src="/js/cekilis.js?v=20261124d"></script>
 </body>
 </html>
