@@ -225,11 +225,11 @@ function pairSvg(c) { return ortegaSvg(c.pattern_u, "full", 60) + ortegaSvg(c.pa
 function key(k) { return function (data) { return flat(data[k]); }; }
 
 var GROUPS = [
-    { label: "3x3", ids: ["2look-2lo", "2look-2lp", "oll", "pll", "coll", "wv"] },
-    { label: "2x2", ids: ["ortega-oll", "ortega-pbl", "cll", "eg1", "eg2"] },
+    { label: "3x3", ids: ["ileri-f2l-stuck", "ileri-f2l-back", "2look-2lo", "2look-2lp", "oll", "pll", "coll", "wv"] },
+    { label: "2x2", ids: ["ortega-oll", "ortega-pbl", "cll", "eg1", "eg2", "tcll-plus", "tcll-minus"] },
     { label: "Pyraminx", ids: ["l3e", "l4e"] },
     { label: "Skewb", ids: ["sk-beginner", "sk-intermediate", "sk-advanced"] },
-    { label: "3x3 Roux", ids: ["roux-cmll", "roux-eo"] }
+    { label: "3x3 Roux", ids: ["roux-cmll", "roux-eo", "roux-lse"] }
 ];
 var SHEETS = {
     "2look-2lo": { file: "2look.json", page: "twolook_algos", title: "2-Look OLL", tab: "2-Look OLL", cases: multiSet("2lo"), cols: 3, rows: 4, diag: 30, name: 11, alg: 9.5, sub: true, poly: true, geom: "ll" },
@@ -258,6 +258,13 @@ var SHEETS = {
     "sk-intermediate": { file: "skewb.json", page: "skewb_algos", title: "Skewb Sarah Intermediate", tab: "Intermediate", cases: multiSet("intermediate"), cols: 3, rows: 5, diag: 30, name: 10, alg: 9.5, sub: true, poly: true },
     "roux-cmll": { file: "roux.json", page: "roux_algos", title: "Roux CMLL", tab: "CMLL", cases: multiSet("cmll"), cols: 4, rows: 11, diag: 17, name: 8, alg: 6.8, poly: true, geom: "ll" },
     "roux-eo": { file: "roux.json", page: "roux_algos", title: "Roux EO (4a)", tab: "EO", cases: multiSet("eo"), cols: 3, rows: 4, diag: 36, name: 11, alg: 10, sub: true, poly: true, geom: "iso" },
+    "ileri-f2l-stuck": { file: "ileri-f2l.json", page: "adv_f2l", title: "İleri F2L · Sıkışmış parçalar", tab: "İleri F2L", cases: multiSet("stuck"), cols: 4, rows: 5, diag: 30, name: 9.5, alg: 7.8, sub: true, poly: true, geom: "iso" },
+    "ileri-f2l-back": { file: "ileri-f2l.json", page: "adv_f2l", title: "İleri F2L · Arka slotlar", tab: "Arka slotlar", cases: multiSet("back"), cols: 4, rows: 4, diag: 32, name: 10, alg: 8.2, sub: true, poly: true, geom: "iso" },
+    "roux-lse": { file: "roux.json", page: "roux_algos", title: "Roux LSE (4b + 4c)", tab: "LSE", cases: multiSet("lse"), cols: 5, rows: 4, diag: 46, name: 9, alg: 7.6, sub: true, poly: true, geom: "lse" },
+    "tcll-plus": { file: "tcll.json", page: "tcll", title: "TCLL+ (2x2)", tab: "TCLL+", cases: key("tcllp"), cols: 3, rows: 15, diag: 13.5, pair: true, name: 7.5, alg: 6.3,
+             draw: function (x) { return pairSvg(x.c); } },
+    "tcll-minus": { file: "tcll.json", page: "tcll", title: "TCLL− (2x2)", tab: "TCLL−", cases: key("tcllm"), cols: 3, rows: 15, diag: 13.5, pair: true, name: 7.5, alg: 6.3,
+             draw: function (x) { return pairSvg(x.c); } },
     "sk-advanced": { file: "skewb.json", page: "skewb_algos", title: "Skewb Sarah Advanced", tab: "Advanced", cases: multiSet("advanced"), cols: 5, rows: 14, diag: 15, name: 7.4, alg: 6.8, poly: true }
 };
 var cache = {}, curSet = null;
@@ -313,7 +320,7 @@ function render() {
                 '<div class="sheet-grid" style="grid-template-columns:repeat(' + cfg.cols + ',minmax(0,1fr));grid-template-rows:repeat(' + cfg.rows + ',minmax(0,1fr))">' +
                 chunk.map(function (x) {
                     var s = cfg.sub ? '<div class="g" style="font-size:' + Math.max(5, cfg.name - 1.6) + 'pt">' + esc(pageText(cfg.page, "subset_" + x.subset) || x.subset) + '</div>' : "";
-                    return '<div class="cell"><div class="d" style="width:' + dw + 'mm;height:' + cfg.diag + 'mm">' + (cfg.poly ? polySvg(data, x.c, cfg.geom) : cfg.draw(x)) + '</div>' +
+                    return '<div class="cell"><div class="d" style="width:' + dw + 'mm;height:' + cfg.diag + 'mm">' + (cfg.poly ? polySvg(data, x.c, x.c.geom || cfg.geom) : cfg.draw(x)) + '</div>' +
                         '<div class="tx"><div class="n" style="font-size:' + cfg.name + 'pt">' + esc(x.c.name) + '</div>' + s +
                         '<div class="a" style="font-size:' + cfg.alg + 'pt">' + esc(algOf(cfg, x.c)) + '</div></div></div>';
                 }).join("") + '</div></div>';

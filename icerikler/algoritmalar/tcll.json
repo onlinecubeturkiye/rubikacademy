@@ -1,0 +1,124 @@
+{
+  "tcllp": [
+    {"subset": "p3", "cases": [
+      {"name":"T+ 1","alg":"R' U2 R' F' R2 U2 F' R'","alts":["R' U2 R U2 R2 F R2 F' R'","R' U2 R' F' U2 F R2 U2 R"],"pattern_u":"URUUBLUFBFLR","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 2","alg":"R' F' U2 R' U2 R U' F","alts":["F' R' U2 F2 R' F' U2 F'","R U F U' F' U' R' U2 F"],"pattern_u":"UFUULRUBFLRB","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 3","alg":"F' R F' U' R' U' R F2","alts":["R F U2 F' U2 F' R U R2","F2 U2 F U2 R U R' U2 F"],"pattern_u":"BUUUFFBRULRL","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 4","alg":"R2 F' U F U R' U' R","alts":["R2 F' U' R' U' R F R'","F' U' R F2 R' F2 R' F"],"pattern_u":"UUURBULFBFLR","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 5","alg":"R' U R2 U' R2 U R' U2 R","alts":["R U' R' U2 F2 R U R' F","R' U R' F U F2 R2 U' F'"],"pattern_u":"UURUFRBBLLFU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 6","alg":"R2 F' U' F R U R' U' R2","alts":["F' U R2 U' F U R2 U F","F2 U R' F2 R U F2 U F"],"pattern_u":"ULUUFFURRBBL","pattern_d":"DDDRFDRFBBLL"}
+    ]},
+    {"subset": "p2a", "cases": [
+      {"name":"T+ 7","alg":"R U' R' F' U' F","alts":["R2 F R F' R2 U' R2","F2 U' F2 R' F R F2"],"pattern_u":"UUBRUBLUFFRL","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 8","alg":"R U' R' U2 R U2 R'","alts":["R2 U R2 U' R' U R'","F' U F' U' F2 U F2"],"pattern_u":"UFULLFRURUBB","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 9","alg":"R F' U F R' U2 R'","alts":[],"pattern_u":"RULUUFBRBLUF","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 10","alg":"R' F' R2 U2 F' R U R2","alts":["R U R' U R F' U F R2","R F' U' R' U R' U2 F' R"],"pattern_u":"LUFUUBRLFBUR","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 11","alg":"R2 U R2 U' R2 U' F' U F","alts":["R2 U R2 U' F R F' U' R2","F U2 R F' U2 R U' F R2"],"pattern_u":"UUFBULRULBFR","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 12","alg":"R2 F U' R2 U F R' U F2","alts":["R2 F R2 F R' U R F2 R'","F' R2 F' R2 F R2 F' U F"],"pattern_u":"UURFURLUBFLB","pattern_d":"DDDRFDRFBBLL"}
+    ]},
+    {"subset": "p2d", "cases": [
+      {"name":"T+ 13","alg":"F' U2 F' R U R' F","alts":["R' U' R' F' U F2 R F'"],"pattern_u":"RUUFFRBUBLUL","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 14","alg":"R U2 R U' R U R' U R2","alts":["R' U2 R' U2 R U' R U R'","R' U' R U R' U R2 U' R2"],"pattern_u":"UBFUURLBLUFR","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 15","alg":"R' U R F R' F' R U' R2","alts":["R' U R U' R U' F R F' R","R2 U R' U R U2 F' U' F R'"],"pattern_u":"BUULBFFULRUR","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 16","alg":"R U' R' U R F R' F' R'","alts":["R F U R2 U' R F' U2 R'","R U' R' U F' R' F' R F"],"pattern_u":"UBFUULLFRUBR","pattern_d":"DDDRFDRFBBLL"}
+    ]},
+    {"subset": "p1a", "cases": [
+      {"name":"T+ 17","alg":"F' U' F U F' U' F","alts":["F' U2 F' U' F U F2"],"pattern_u":"LUFFLRRUUBBU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 18","alg":"R2 F' U F U2 F R' F'","alts":["R2 U R' U' R2 U F' U' F","R2 U2 F' U F U2 R' U' R2"],"pattern_u":"UFBFRURLBULU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 19","alg":"R2 U R2 U F U2 R2 F","alts":["R U2 F2 R' U R F2 U R","R2 U R2 U F R2 F' U2 R2"],"pattern_u":"URRLFUBBLUFU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 20","alg":"F U2 R2 F R' F R F' R2","alts":["R' F' R' F' U2 R F R2 U' R","R F' U F2 U' R U F2 U2 R'"],"pattern_u":"UBFRLULFRUBU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 21","alg":"R U' R' F2 R' U2 R F2 R'","alts":["R' F R F R' U2 R F2 R'","F U2 F' U F' R U2 R' F2"],"pattern_u":"ULLBBUFRFURU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 22","alg":"F2 U2 R' U' R' U' F2 U R'","alts":["F2 R' U' R' U' R2 F2 U R'","F' U2 R F R U F' U R'"],"pattern_u":"BLFUULUFUBRR","pattern_d":"DDDRFDRFBBLL"}
+    ]},
+    {"subset": "p1b", "cases": [
+      {"name":"T+ 23","alg":"F' U2 F U' R U' R'","alts":[],"pattern_u":"ULFFLRUURBBU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 24","alg":"F U' R U F2 R2 U2 R","alts":["F U' R U' R2 U2 F2 R'","F U' R U R2 U2 R2 F2 R'"],"pattern_u":"RLULBUFBUUFR","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 25","alg":"R' F' R U2 R U R' F2","alts":["R F R F' U F' U F R2","R' F' R F' R' F R U2 F'"],"pattern_u":"LBRUFBULFRUU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 26","alg":"F R' F' R' U R2 U' R2","alts":["F2 R U R2 F2 R U2 F","F2 R' F2 R2 U' R' U2 F"],"pattern_u":"UBRBFLUULRFU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 27","alg":"R F2 U2 R U F2 U F2","alts":["F R' U F R2 U R2 U2 F","F R' U F R2 U' F' U2 R2"],"pattern_u":"LURFUUFLURBB","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 28","alg":"R2 F R' F' U' R2 U' R","alts":["R2 F U F' R2 F' U' F'","R U' R2 U' R' F' U F R"],"pattern_u":"LURRUULFUFBB","pattern_d":"DDDRFDRFBBLL"}
+    ]},
+    {"subset": "p1c", "cases": [
+      {"name":"T+ 29","alg":"R U' R' U R U' R'","alts":["R U' R2 U' R' U R","R2 U R U' R' U2 R'"],"pattern_u":"URBFUUULRFBL","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 30","alg":"R U F R F' U R'","alts":["F' R' U2 R' U2 F' R","R F' R' U R F U2 R'"],"pattern_u":"URRFUUULBFLB","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 31","alg":"F' U' F U' R U2 R'","alts":[],"pattern_u":"RLLUBRFBUUFU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 32","alg":"R' U F R F' R2 U2 R","alts":["R' U F R' U2 R2 F R'","R2 U' F' U' F U2 R' U2 R'"],"pattern_u":"BUBFRUFLLRUU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 33","alg":"F2 R' U2 R F' R F' R'","alts":["R U2 F R' F2 U F R2","F2 R' U2 F' U R F' U R'"],"pattern_u":"BBRUFLLFUURU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 34","alg":"R' U2 R' F' U F R' U2 R","alts":["R' F R F' R' U2 R' U2 R","R' U R' F' U2 F U2 R' U2 R'"],"pattern_u":"UBFLUUUBLRFR","pattern_d":"DDDRFDRFBBLL"}
+    ]},
+    {"subset": "p0a", "cases": [
+      {"name":"T+ 35","alg":"F2 R U R' U2 F","alts":[],"pattern_u":"BRRLUFUULFUB","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 36","alg":"R U' R2 F R F'","alts":["R U2 F' U F R2"],"pattern_u":"BFRFUURLLUUB","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 37","alg":"R F R2 F' U R'","alts":[],"pattern_u":"LBFBULUUFRUR","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 38","alg":"F R F2 R2 U2 F' R","alts":["F R' U2 F2 R2 F R","F R U2 F2 R2 U2 F R"],"pattern_u":"FLLRBBFURUUU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 39","alg":"R U' F2 U' R' U F' R2","alts":["R U2 R2 F' R F' U' F2","R' F R2 U2 R' F' U' F2"],"pattern_u":"BRLRUUBFLUUF","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 40","alg":"F' R' F U2 R' U2 R F'","alts":["F U F' U2 R U2 R' U' F2","F' R U' F2 R' F U F R2"],"pattern_u":"BLRRUUFFLUUB","pattern_d":"DDDRFDRFBBLL"}
+    ]},
+    {"subset": "p0b", "cases": [
+      {"name":"T+ 41","alg":"F U2 R' U' R2 U' R F2 R'","alts":["F' U R' U2 R' F2 U2 R' F'","R2 U' F' U R2 U2 F2 U' F"],"pattern_u":"BLFRLUUFUBRU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 42","alg":"R' F' U' F R2 U' R U2 R","alts":["R F R F' R2 U2 R U2 R","R F R' U2 R2 F R' U2 R"],"pattern_u":"LFBRRUUFULBU","pattern_d":"DDDRFDRFBBLL"},
+      {"name":"T+ 43","alg":"R' U R F R2 F2 U' F U R'","alts":["R' U R F' U F2 R2 F' U R'","R U2 F2 R2 U R F' U F' R"],"pattern_u":"LBFRLUUFURBU","pattern_d":"DDDRFDRFBBLL"}
+    ]}
+  ],
+  "tcllm": [
+    {"subset": "m3", "cases": [
+      {"name":"T− 1","alg":"R F U2 R2 F R U2 R","alts":["F R U2 F U2 F' U R'","F' U' R' U R U F U2 R'"],"pattern_u":"UUFUUBRLLBFR","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 2","alg":"F' U R' U2 R U2 F R","alts":["F2 R' U R2 U R2 U' R F","R F U R' F U' R' F' R2"],"pattern_u":"UUULBFFUBRLR","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 3","alg":"F2 R' U R U F R' F","alts":["R' U' F2 R U R F2 U2 F'","R' U' F2 R U' F2 U2 R' F"],"pattern_u":"UBUUFFLRRUBL","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 4","alg":"R F' R' U R U F R2","alts":["R' U R U' F' U' F R2","R F' U2 F R2 U R' U' R"],"pattern_u":"FUUUFBRLRBUL","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 5","alg":"R' U2 R U' R2 U R2 U' R","alts":["F U' F R' U' R2 F2 U R","F2 U' F2 U R' U2 R F2 R'"],"pattern_u":"UFUULLRFRUBB","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 6","alg":"R2 U R U' R' F' U F R2","alts":["R U' R' U R U F' U F R2","R U' F R F' R U R U' R2"],"pattern_u":"RUUUFFBRBLUL","pattern_d":"DDDFFRRDBBLL"}
+    ]},
+    {"subset": "m2a", "cases": [
+      {"name":"T− 7","alg":"F' U F R U R'","alts":["R2 U R2 F R' F' R2","F2 R' F' R F2 U F2"],"pattern_u":"UBULRUUBLRFF","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 8","alg":"R U2 R' U2 R U R'","alts":["R U' R U R2 U' R2","F2 U' F2 U F U' F"],"pattern_u":"UUFRLURFBBLU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 9","alg":"F' R U' R' F U2 F","alts":[],"pattern_u":"LRUUBLUFUFBR","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 10","alg":"R2 U' R' F U2 R2 F R","alts":["F U R U R2 F R2 U' R'","F U R U' R2 F' R2 U R'"],"pattern_u":"FURUFBRLUBLU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 11","alg":"R2 U R' F R F' R' U' R","alts":["R' U2 F' R U2 F' U R' F2","F2 U' F2 U F2 U R U' R'"],"pattern_u":"UFUBLUURFLRB","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 12","alg":"R F2 R' U' R F' R2 F' R2","alts":["F2 U' R F' U' R2 U F' R2","R2 U R' F R2 U R2 U' R F'"],"pattern_u":"UUBRRULFBFLU","pattern_d":"DDDFFRRDBBLL"}
+    ]},
+    {"subset": "m2d", "cases": [
+      {"name":"T− 13","alg":"R U2 R F' U' F R'","alts":["F U F R U' R2 F' R"],"pattern_u":"LUUFBUFLURBR","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 14","alg":"R U' R' U R' U2 R U2 R","alts":["R2 U R2 U' R U' R' U R","R2 U' R U' R' U R' U2 R'"],"pattern_u":"LUURFURFUBBL","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 15","alg":"R' U2 F R2 F' U R' U R2","alts":["F U2 R' F U' R2 U F2 R","R U2 F' R2 U2 F' U R' U R2"],"pattern_u":"UBRUFBULLRFU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 16","alg":"R F R F' R' U' R U R'","alts":["R U2 F R' U R2 U' F' R'","F' R' F R F U' R U R'"],"pattern_u":"ULRUFLUFRBBU","pattern_d":"DDDFFRRDBBLL"}
+    ]},
+    {"subset": "m1a", "cases": [
+      {"name":"T− 17","alg":"R U R' U' R U R'","alts":["R U2 R U R' U' R2"],"pattern_u":"FLULBUFBRUUR","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 18","alg":"F2 R U' R' U2 R' F R","alts":["F' R2 U2 F' R U' R U' R2","F2 U' F U F2 U' R U R'"],"pattern_u":"UBFFLRLURUBU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 19","alg":"F2 U' F2 U' R' U2 F2 R'","alts":["R U' R2 F U2 F' U2 F' R'","F' U2 R2 U' R2 F' U' R F'"],"pattern_u":"ULLRBBFUFURU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 20","alg":"R2 F R' F' R F' R2 U2 F'","alts":["R' U R2 F' R' U2 F R F R","F' R2 U' R' F2 R U' R F' R'"],"pattern_u":"LBFUUBULFRUR","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 21","alg":"R' U2 R U2 R F R' F' R","alts":["R' U2 R F' U' F R U2 R","R' F2 R U' F2 R U2 R' F"],"pattern_u":"BRRUULUFLFUB","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 22","alg":"R U' F2 U R U R U2 F2","alts":["R U' F2 U R U' F2 U2 R'","R U' F2 R2 U R U R F2"],"pattern_u":"FRULFUBBRUUL","pattern_d":"DDDFFRRDBBLL"}
+    ]},
+    {"subset": "m1b", "cases": [
+      {"name":"T− 23","alg":"R U2 R' U F' U F","alts":[],"pattern_u":"UFRFUURLBULB","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 24","alg":"R F2 U2 R2 U R' U F'","alts":["R' U2 R2 F2 U' R' U F'","F R' F' R F R' F' R"],"pattern_u":"UFBFUURLRUBL","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 25","alg":"F R F' U2 F' U' F R2","alts":["F U2 R2 F R' U' R2 U' R","F' R' F' R U' R U' R' F2"],"pattern_u":"RLBUURFBUUFL","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 26","alg":"R F' R2 U2 R F' U' R","alts":["R' U2 R2 F R' F' U' R","R U2 R U' F R2 F' U' R"],"pattern_u":"BBLUUFLRUURF","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 27","alg":"F' R2 U2 F' U' R2 U' R2","alts":["R' U' F2 R' U' R F2 U2 R'","R' F2 R U' R U2 R' U2 F"],"pattern_u":"RLUFFRUUBBUL","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 28","alg":"F2 R' U' R F2 R U R","alts":["F2 R' F R U F2 U F'","F' U F2 U R' U' F' U R"],"pattern_u":"FBUBFLUURRUL","pattern_d":"DDDFFRRDBBLL"}
+    ]},
+    {"subset": "m1c", "cases": [
+      {"name":"T− 29","alg":"F' U F U' F' U F","alts":["F' U F2 U F U' F'","F2 U' F' U F U2 F"],"pattern_u":"URBLUFUURFBL","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 30","alg":"R U R' U F' U2 F","alts":[],"pattern_u":"LRRUFBBLFUUU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 31","alg":"R U' F R' F' U' R'","alts":["R U R' U2 F' U F","R' F U2 R U2 R F"],"pattern_u":"LUFLUURBFBUR","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 32","alg":"R2 U R2 U' R F R F'","alts":["F' U2 R U R2 F2 R F2","F' U2 R' F2 R2 U' R' F2"],"pattern_u":"FUBBUULRRFUL","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 33","alg":"R F R' F R' U2 R F2","alts":["R F R' F R' F2 U2 R' F2","F' R F2 R' U2 F R U' F2"],"pattern_u":"RRUBFLBUUUFL","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 34","alg":"R F2 R' U2 R F2 R U R'","alts":["F R2 U F' R F2 U' R F'","F2 R U2 R' F U' F U2 F'"],"pattern_u":"FRUBRLBUUULF","pattern_d":"DDDFFRRDBBLL"}
+    ]},
+    {"subset": "m0a", "cases": [
+      {"name":"T− 35","alg":"R F2 R' U R2 U R U2 F'","alts":["F2 U R U R2 U2 F2 U' R'","F2 U R U' F2 U2 R2 U R'"],"pattern_u":"BFRLUFRULUUB","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 36","alg":"R' U2 R' U R2 F' U F R","alts":["R' U2 R F' R2 U2 R F' R'","R' U2 R' U2 R2 F R' F' R'"],"pattern_u":"BLRFURFULUUB","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 37","alg":"R U' F R2 F2 U' F R' U' R","alts":["R U' F' U F2 R2 F' R' U' R","R' F U' F R' U R2 F2 U2 R"],"pattern_u":"BRLFURBULUUF","pattern_d":"DDDFFRRDBBLL"}
+    ]},
+    {"subset": "m0b", "cases": [
+      {"name":"T− 38","alg":"R U' F R2 F' R'","alts":["R U2 R' F' U2 F"],"pattern_u":"BRBFRUULLFUU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 39","alg":"F R' F' R2 U R'","alts":[],"pattern_u":"LBRLFUUBFRUU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 40","alg":"F' U2 R U' R' F2","alts":["F' U F2 R' F' R"],"pattern_u":"BLFFLRUUUBRU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 41","alg":"R' F U2 R2 F2 R' F'","alts":["R' F' R2 F2 U2 R F'","R U2 R2 F R F2 U2 F"],"pattern_u":"FRRLFUBBUULU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 42","alg":"R2 F U' R U F2 U R'","alts":["R2 U R F2 R U R' F R2","R U F U2 F' U2 R2 F' R"],"pattern_u":"RRLFBUULBFUU","pattern_d":"DDDFFRRDBBLL"},
+      {"name":"T− 43","alg":"F R' U2 R U2 F' R F","alts":["F' R' U' F R2 U' R' F2 R'","F R' F2 U2 R' U2 F R F"],"pattern_u":"LLBRRUFFUUBU","pattern_d":"DDDFFRRDBBLL"}
+    ]}
+  ]
+}
