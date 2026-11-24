@@ -302,10 +302,6 @@ a.set-tab { text-decoration: none; }
 @media (max-width: 520px) { .nota-moves { gap: 6px; } .nota-move { width: 66px; padding: 4px; } .nota-move small { font-size: 10px; } .set-tab { padding: 8px 12px; font-size: 14px; } }
 /* Set seçimi Algoritmalar sayfasından yapılır; sayfa içinde başka sete geçiş yok */
 #setTabs { display: none; }
-/* uzun tanıtım yazısı gizli: sayfa doğrudan algoritmalarla başlar */
-.hero .hero-text > p, .hero .badge { display: none !important; }
-.hero { padding: 18px 22px !important; min-height: 0 !important; margin-bottom: 18px !important; }
-.hero h1 { margin: 0 !important; font-size: clamp(24px, 5.5vw, 38px) !important; line-height: 1.15 !important; }
 </style>
 
 <!-- Google tag (gtag.js) -->
@@ -365,11 +361,6 @@ a.set-tab { text-decoration: none; }
 </div>
 </section>
 
-<section class="nota-box">
-    <h2 data-i18n="not_title">Notasyon</h2>
-    <p data-i18n="not_p">M: orta dikey katman, L ile aynı yönde döner. r: sağ iki katman (R + M'). R, U, F, L, D dış katmanlardır; ' ters yön, 2 yarım tur demektir. Roux'da önce iki yan blok (F2B, 1x2x3) kurulur; CMLL algoritmaları bu blokları bozmaz.</p>
-    <p data-i18n="view_note">CMLL diyagramı üstten bakıştır (kenarlar gri: önemsiz). EO diyagramı küpün üst, ön ve sağ yüzünü gösterir; kenarlarda sadece sarı/beyaz etiketler görünür.</p>
-</section>
 
 <div class="set-tabs" id="setTabs"></div>
 <p class="set-desc" id="setDesc"></p>
