@@ -911,6 +911,8 @@ var SETS = [
     { id: "cross", grp: "a",      label: "Cross",      gen: "cross", progress: "algo-progress-cross", keyFmt: "name", page: "", puzzle: "cfop", cube: "3x3", draw: crossDraw },
     { id: "xcross", grp: "a",     label: "X-Cross",    gen: "xcross", progress: "algo-progress-xcross", keyFmt: "name", page: "", puzzle: "cfop", cube: "3x3", draw: xcrossDraw },
     { id: "f2l", grp: "a",        label: "F2L", file: "f2l.json", multi: "f2l", progress: "algo-progress-f2l", keyFmt: "name", page: "f2l", puzzle: "cfop", cube: "3x3", draw: polyDraw },
+    { id: "f2l-stuck", grp: "a",  label: "İleri F2L", file: "ileri-f2l.json", multi: "stuck", progress: "algo-progress-ileri-f2l-stuck", keyFmt: "name", page: "adv_f2l", puzzle: "cfop", cube: "3x3", draw: polyDraw },
+    { id: "f2l-back", grp: "a",   label: "Arka slotlar", file: "ileri-f2l.json", multi: "back", progress: "algo-progress-ileri-f2l-back", keyFmt: "name", page: "adv_f2l", puzzle: "cfop", cube: "3x3", draw: polyDraw },
     { id: "2look-2lo", grp: "a",  label: "2-Look OLL", file: "2look.json", multi: "2lo", progress: "algo-progress-2look-2lo", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
     { id: "2look-2lp", grp: "a",  label: "2-Look PLL", file: "2look.json", multi: "2lp", progress: "algo-progress-2look-2lp", keyFmt: "name", page: "twolook_algos", puzzle: "cfop", cube: "3x3", draw: polyDraw },
     { id: "oll", grp: "b",        label: "OLL",        file: "oll-pll.json",    dataKey: "oll",  progress: "algo-progress-oll",        keyFmt: "name",   page: "oll",        puzzle: "cfop", cube: "3x3", draw: function (c, s) { return llSvg(c.pattern, "oll", s); } },
@@ -925,8 +927,11 @@ var SETS = [
     { id: "ortega-pbl", label: "Ortega PBL", file: "ortega-pbl.json", dataKey: "pbl",  progress: "algo-progress-ortega-pbl", keyFmt: "subset", page: "ortega-pbl", puzzle: "2x2", cube: "2x2", draw: function (c, s) { return ortegaSvg(c.pattern_u, "full", s); } },
     { id: "eg1",        label: "EG-1",       file: "eg.json",         dataKey: "eg1",  progress: "algo-progress-eg1",        keyFmt: "subset", page: "eg1",        puzzle: "2x2", cube: "2x2", draw: drawPair },
     { id: "eg2",        label: "EG-2",       file: "eg.json",         dataKey: "eg2",  progress: "algo-progress-eg2",        keyFmt: "subset", page: "eg2",        puzzle: "2x2", cube: "2x2", draw: drawPair },
+    { id: "tcll-plus",  label: "TCLL+",      file: "tcll.json",       dataKey: "tcllp", progress: "algo-progress-tcll-plus",  keyFmt: "subset", page: "tcll",       puzzle: "2x2", cube: "2x2", draw: drawPair },
+    { id: "tcll-minus", label: "TCLL−",      file: "tcll.json",       dataKey: "tcllm", progress: "algo-progress-tcll-minus", keyFmt: "subset", page: "tcll",       puzzle: "2x2", cube: "2x2", draw: drawPair },
     { id: "roux-cmll",  label: "CMLL", file: "roux.json", multi: "cmll", progress: "algo-progress-roux-cmll", keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", draw: polyDraw },
     { id: "roux-eo",    label: "EO",   file: "roux.json", multi: "eo",   progress: "algo-progress-roux-eo",   keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", draw: polyDraw },
+    { id: "roux-lse",   label: "LSE",  file: "roux.json", multi: "lse",  progress: "algo-progress-roux-lse",  keyFmt: "name", page: "roux_algos", puzzle: "roux", cube: "3x3", draw: polyDraw },
     { id: "oh-cmll",    label: "CMLL", file: "oh.json", multi: "cmll", scrFrom: "roux-cmll", progress: "algo-progress-oh-cmll", keyFmt: "name", page: "oh_algos", puzzle: "oh", cube: "3x3", draw: polyDraw },
     { id: "pyra-l3e",   label: "L3E",  file: "pyraminx.json", multi: "l3e", progress: "algo-progress-pyraminx-l3e", keyFmt: "name", page: "pyra_algos", puzzle: "pyra", cube: "pyra", draw: polyDraw },
     { id: "pyra-l4e",   label: "L4E",  file: "pyraminx.json", multi: "l4e", progress: "algo-progress-pyraminx-l4e", keyFmt: "name", page: "pyra_algos", puzzle: "pyra", cube: "pyra", draw: polyDraw },
@@ -1005,7 +1010,7 @@ function crossScramble(l) {
 var PUZ_KEY = "trainer-puzzle-sets-v1"; // bulmaca -> son seçilen set
 /* Pyraminx, Skewb, 4x4, 5x5 ve Roux: veri dosyasındaki çokgen geometrisiyle çiz (algoritma sayfalarıyla aynı) */
 function polyDraw(c, size) {
-    var json = this.json, g = (json.geoms && this.geomName) ? json.geoms[this.geomName] : json.geom;
+    var json = this.json, gn = c.geom || this.geomName, g = (json.geoms && gn) ? json.geoms[gn] : json.geom;
     var v = g.view, w = size, h = size;
     if (v[2] / v[3] < 0.7) { h = Math.round(size * 1.5); w = Math.round(h * v[2] / v[3]); }
     var sw = (v[2] / 160).toFixed(3), out = '<svg viewBox="' + v.join(" ") + '" width="' + w + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">';
@@ -1132,7 +1137,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json", "xcross.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261124b").then(function (r) {
+        return fetch(BASE + f + "?v=20261124c").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });

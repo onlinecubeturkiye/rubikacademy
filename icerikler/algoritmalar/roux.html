@@ -16,7 +16,7 @@
   })();
 </script>
 
-<title>Rubik Academy - Roux Algoritmaları (CMLL, EO)</title>
+<title>Rubik Academy - Roux Algoritmaları (CMLL, EO, LSE)</title>
 <link rel="icon" href="/icons/favicon-48.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -296,7 +296,7 @@ a.set-tab { text-decoration: none; }
 .nota-box p { font-size: 13.5px; color: var(--text-soft); line-height: 1.6; margin: 6px 0 0; }
 .case-diagram svg { width: 96px; height: 96px; }
 .case-diagram:has(svg.tall) { width: auto; height: auto; padding: 6px 10px; }
-.case-diagram svg.tall { width: 62px; height: 144px; }
+.case-diagram svg.tall { width: 70px; height: 178px; }
 .case-diagram:has(svg.iso) { width: 112px; height: 112px; }
 .case-diagram svg.iso { width: 104px; height: 104px; }
 @media (max-width: 520px) { .nota-moves { gap: 6px; } .nota-move { width: 66px; padding: 4px; } .nota-move small { font-size: 10px; } .set-tab { padding: 8px 12px; font-size: 14px; } }
@@ -377,7 +377,7 @@ a.set-tab { text-decoration: none; }
 <section class="bottom reveal">
 <h3 data-i18n="bottom_title">🧩 Pratik zamanı</h3>
 <p data-i18n="bottom_p">Roux setlerini antrenörde süreyle çalış.</p>
-<a class="print-link" href="/icerikler/algoritmalar/antrenor?set=cmll" style="margin-top:12px" data-i18n="go_trainer">⏱️ Antrenörde çalış</a>
+<a class="print-link" id="trainLink" href="/icerikler/algoritmalar/antrenor?set=cmll" style="margin-top:12px" data-i18n="go_trainer">⏱️ Antrenörde çalış</a>
 </section>
 
 </div>
@@ -494,6 +494,7 @@ function renderSet() {
     try { localStorage.setItem("algo-set-" + PAGE_KEY, currentSet); } catch (e) {}
     renderTabs();
     document.getElementById("printLink").href = "/icerikler/algoritmalar/yazdir?set=roux-" + currentSet;
+    document.getElementById("trainLink").href = "/icerikler/algoritmalar/antrenor?set=roux-" + currentSet;
     var progress = loadProgress(), t = progressText(), html = "";
     var geom = (DATA.geoms && set.geom) ? DATA.geoms[set.geom] : DATA.geom;
     set.groups.forEach(function (group) {
@@ -514,7 +515,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/roux.json?v=20261124c")
+fetch("/icerikler/algoritmalar/roux.json?v=20261124d")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
@@ -550,6 +551,7 @@ fetch("/icerikler/algoritmalar/roux.json?v=20261124c")
     });
 
 // Dil değişince (common.js applyLanguage sonrası çağırır)
+window.addEventListener("hashchange", function () { var h = (location.hash || "").replace("#", ""); if (DATA && DATA.sets.some(function (s) { return s.id === h; })) { currentSet = h; renderSet(); } });
 function onLanguageApplied() { if (DATA) { renderTabs(); refreshProgressLabels(); } }
 </script>
 

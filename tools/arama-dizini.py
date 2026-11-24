@@ -62,6 +62,11 @@ SETS = [  # (dosya, anahtar, sayfa adresi, i18n sayfası, görünen ad, adrestek
     ('skewb.json', 'advanced', '/icerikler/algoritmalar/skewb', 'skewb_algos', 'Skewb Advanced', 'advanced'),
     ('4x4.json', 'parity', '/icerikler/algoritmalar/4x4', 'alg4', '4x4 Parity', 'parity'),
     ('5x5.json', 'parity', '/icerikler/algoritmalar/5x5', 'alg5', '5x5 Parity', 'parity'),
+    ('ileri-f2l.json', 'stuck', '/icerikler/algoritmalar/ileri-f2l', 'adv_f2l', 'İleri F2L', 'stuck'),
+    ('ileri-f2l.json', 'back', '/icerikler/algoritmalar/ileri-f2l', 'adv_f2l', 'İleri F2L arka slot', 'back'),
+    ('roux.json', 'lse', '/icerikler/algoritmalar/roux', 'roux_algos', 'Roux LSE', 'lse'),
+    ('tcll.json', 'tcllp', '/icerikler/algoritmalar/tcll', 'tcll', 'TCLL+', ''),
+    ('tcll.json', 'tcllm', '/icerikler/algoritmalar/tcll', 'tcll', 'TCLL−', 'eksi'),
 ]
 from urllib.parse import quote
 for fn, key, url, page, label, hashset in SETS:

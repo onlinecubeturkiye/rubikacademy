@@ -28,6 +28,8 @@ var PRECACHE = [
     "/icerikler/algoritmalar/ortega-pbl.html",
     "/icerikler/algoritmalar/eg1.html",
     "/icerikler/algoritmalar/eg2.html",
+    "/icerikler/algoritmalar/tcll.html",
+    "/icerikler/algoritmalar/ileri-f2l.html",
     "/icerikler/algoritmalar/4x4.html",
     "/icerikler/algoritmalar/5x5.html",
     "/icerikler/algoritmalar/pyraminx.html",
