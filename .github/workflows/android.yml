@@ -3,6 +3,11 @@
 name: Android derlemesi
 on:
   workflow_dispatch:
+    inputs:
+      version_name:
+        description: "Sürüm adı (site sürümü, ör. 13.0.7). Boşsa build.gradle'daki varsayılan."
+        required: false
+        default: ""
   push:
     branches: [main]
     paths: ["android/**", ".github/workflows/android.yml"]
@@ -22,7 +27,11 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" > /dev/null
       - name: Derle (APK + AAB)
-        run: export RA_VERSION_CODE=$((GITHUB_RUN_NUMBER + 10)) && echo "versionCode=$RA_VERSION_CODE" && gradle -p android --no-daemon assembleRelease bundleRelease
+        env:
+          RA_VERSION_NAME: ${{ inputs.version_name }}
+        run: |
+          [ -n "$RA_VERSION_NAME" ] || unset RA_VERSION_NAME
+          export RA_VERSION_CODE=$((GITHUB_RUN_NUMBER + 10)) && echo "versionCode=$RA_VERSION_CODE versionName=${RA_VERSION_NAME:-varsayılan}" && gradle -p android --no-daemon assembleRelease bundleRelease
       - name: Çıktıları topla
         run: |
           BT="$ANDROID_HOME/build-tools/36.0.0"
