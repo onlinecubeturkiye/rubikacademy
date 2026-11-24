@@ -11,6 +11,7 @@ Bu klasör, uygulamayı Google Play'de yayınlamak için gereken her şeyi topla
 | `gorseller/uygulama-simgesi-512.png` | 512×512 uygulama simgesi |
 | `gorseller/one-cikan-grafik-1024x500.png` | 1024×500 öne çıkan grafik |
 | `gorseller/ekran-goruntuleri/*.png` | 7 telefon ekran görüntüsü (1080×1920) |
+| [video/](video/README.md) | Tanıtım videosunu üreten kod (36 sn, 1920×1080; MP4 repoda değil) |
 
 **Herkese açık sayfalar** (Play Console'a girilecek bağlantılar):
 
