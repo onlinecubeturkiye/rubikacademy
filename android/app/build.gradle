@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "fun.rubikacademy.app"
-        minSdk 23
+        minSdk 24 // Play "otomatik koruma" için en az 24 (Android 7.0)
         targetSdk 36
         def vc = (System.getenv("RA_VERSION_CODE") ?: "4") as int
         versionCode vc
