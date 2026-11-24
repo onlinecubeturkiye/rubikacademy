@@ -1,5 +1,5 @@
 // Google Play mağaza görsellerini üretir (ekran görüntüleri 1080×1920 + öne çıkan grafik 1024×500).
-// Kaynak: ham/*.png (uygulamanın gerçek ekran görüntüleri). Çalıştır: node play-store/gorseller/uret.mjs
+// Kaynak: ham/*.png (uygulamanın gerçek ekran görüntüleri; açık tema, uygulama modu, 360×640 @3x; rekor adları hayali). Çalıştır: node play-store/gorseller/uret.mjs
 import { createRequire } from "node:module";
 import { readFileSync, mkdirSync } from "node:fs";
 const { chromium } = createRequire(import.meta.url)("playwright");
@@ -13,12 +13,12 @@ const ICON = img("uygulama-simgesi-512.png");
 // Her ekran: tek fayda, kısa başlık. Sıra = mağazadaki sıra (en güçlüsü önce).
 const SHOTS = [
   { src: "01-ana-sayfa.png", out: "01-kupu-cozmeyi-ogren.png", bg: ["#7c5cff", "#4f2bd9"], kicker: "SIFIRDAN İLERİ SEVİYEYE", title: "Küpü çözmeyi<br><em>adım adım</em> öğren", c: "#ffd43b" },
-  { src: "03-pll-algoritmalari.png", out: "02-algoritmalar.png", bg: ["#ff8a1f", "#f0490f"], kicker: "OLL · PLL · F2L · ZBLL", title: "<em>1.400+</em> algoritma<br>tek yerde", c: "#fff3bf" },
-  { src: "05-rekorlar.png", out: "03-ev-yarismalari.png", bg: ["#ff4f8b", "#c81d63"], kicker: "CANLI · HER HAFTA", title: "Evden <em>canlı</em><br>yarışmalara katıl", c: "#ffe066" },
-  { src: "04-ogrenme-yolu.png", out: "04-ogrenme-yolu.png", bg: ["#16b36e", "#0b7d4b"], kicker: "KİŞİSEL YOL HARİTASI", title: "Sırada ne var,<br><em>hep bil</em>", c: "#d3f9d8" },
-  { src: "06-profil.png", out: "05-gelisimini-gor.png", bg: ["#2f80ff", "#1546c9"], kicker: "REKOR · Ao5 · SERTİFİKA", title: "Gelişimini<br><em>gör</em>, rekorunu kır", c: "#a5f3fc" },
-  { src: "07-sanal-kup.png", out: "06-sanal-kup.png", bg: ["#ffc61a", "#f59f00"], kicker: "KÜP YANINDA DEĞİL Mİ?", title: "Sanal <em>3D küple</em><br>pratik yap", c: "#b33c00", dark: true },
-  { src: "02-icerikler.png", out: "07-her-sey-burada.png", bg: ["#13141f", "#2b1f5c"], kicker: "TÜRKÇE · ÜCRETSİZ", title: "Ders, rehber, antrenör:<br><em>hepsi burada</em>", c: "#b197fc" },
+  { src: "02-pll.png", out: "02-algoritmalar.png", bg: ["#ff8a1f", "#f0490f"], kicker: "OLL · PLL · F2L · ZBLL", title: "<em>1.400+</em> algoritma<br>tek yerde", c: "#fff3bf" },
+  { src: "03-antrenor.png", out: "03-antrenor.png", bg: ["#16b36e", "#0b7d4b"], kicker: "SÜRE · TEKRAR · GELİŞİM", title: "Antrenörle<br><em>ezberle</em>, hızlan", c: "#d3f9d8" },
+  { src: "04-rekorlar.png", out: "04-ev-yarismalari.png", bg: ["#ff4f8b", "#c81d63"], kicker: "CANLI · HER HAFTA", title: "Evden yarış,<br><em>rekorunu</em> kır", c: "#ffe066" },
+  { src: "05-yol-haritasi.png", out: "05-yol-haritasi.png", bg: ["#2f80ff", "#1546c9"], kicker: "KİŞİSEL YOL HARİTASI", title: "Sırada ne var,<br><em>hep bil</em>", c: "#a5f3fc" },
+  { src: "06-sanal-kup.png", out: "06-sanal-kup.png", bg: ["#ffc61a", "#f59f00"], kicker: "KÜP YANINDA DEĞİL Mİ?", title: "Sanal <em>3D küple</em><br>pratik yap", c: "#b33c00", dark: true },
+  { src: "07-icerikler.png", out: "07-her-sey-burada.png", bg: ["#13141f", "#2b1f5c"], kicker: "TÜRKÇE · ÜCRETSİZ", title: "Ders, rehber, antrenör:<br><em>hepsi burada</em>", c: "#b197fc" },
 ];
 
 const CSS = `
@@ -56,12 +56,12 @@ function shotHtml(s, i) {
   </style></head><body>
   <div class="bg"></div><div class="dots">${stickers(i * 17 + 3, 1080, 1920, 16, 50, 130, (x) => x > 90 && x < 960) /* yalnız kenarlarda */}</div><div class="glow"></div>
   <div class="head"><div class="kick">${s.kicker}</div><h1>${s.title}</h1></div>
-  <div class="phone"><div class="scr"><img src="${img("ham/" + s.src)}"></div><div class="notch"></div></div>
+  <div class="phone"><div class="scr"><img src="${img("ham/" + s.src)}"></div></div>
   </body></html>`;
 }
 
 function featureHtml() {
-  const a = img("ham/03-pll-algoritmalari.png"), b = img("ham/01-ana-sayfa.png"), c = img("ham/05-rekorlar.png");
+  const a = img("ham/02-pll.png"), b = img("ham/01-ana-sayfa.png"), c = img("ham/03-antrenor.png");
   return `<!doctype html><html><head><meta charset="utf-8"><style>${CSS}
   html,body{width:1024px;height:500px;overflow:hidden}
   .bg{position:absolute;inset:0;background:linear-gradient(115deg,#5b2bff 0%,#9b2cff 38%,#ff4f8b 72%,#ff8a1f 100%)}
