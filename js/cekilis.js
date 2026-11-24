@@ -397,7 +397,7 @@
     function winsHtml(g) {
         var p = phase(g), past = skipNames(g);
         var win = g.w && (p === "drawn" || p === "claimed" || p === "expired") ? '<div class="gw-winr' + (p === "claimed" ? " ok" : "") + '"><span class="gw-wava">' + esc(initials(g.wName)) + '</span><div><b>' + esc(g.wName) + '</b><small>' +
-            (p === "claimed" ? "✅ Ödülü onayladı" : p === "drawn" ? "⏳ Onay bekleniyor (" + left(g.claimBy - Date.now()) + ")" : "⌛ Onay süresi doldu") + '</small></div></div>' : '';
+            (p === "claimed" ? "✅ Ödülü onayladı" : p === "drawn" ? "⏳ Onay bekleniyor (<span data-left=\"" + g.claimBy + "\">" + left(g.claimBy - Date.now()) + "</span>)" : "⌛ Onay süresi doldu") + '</small></div></div>' : '';
         if (!win && p !== "empty") return '<div class="gw-winfo">ℹ️ Bu çekiliş henüz sonuçlanmadı. Çekiliş yapılınca kazanan burada görünür.</div>';
         return (win || '<div class="gw-winfo">Çekilebilecek katılımcı kalmadı.</div>') + (past.length ? '<p class="gw-note">Onaylamayan: ' + past.map(esc).join(", ") + '</p>' : '');
     }
@@ -410,7 +410,7 @@
                 '<div class="gw-mrow">' + (g.yt || g.wa ? '<button type="button" class="btn sm" id="gwEdit">📸 Görsellerimi düzenle</button>' : '') + '<button type="button" class="btn sm" id="gwLeave">Katılımı geri al</button></div>'
             : reqHtml(g);
         else if (p === "closed" || p === "drawing") act = S.joined ? '<div class="gw-in">✅ Katıldın. Çekiliş ' + (p === "drawing" ? "şimdi yapılıyor…" : esc(dt(g.drawAt)) + "'de") + ' — sayfada kal!</div>' : '<div class="gw-note">Kayıtlar kapandı.</div>';
-        else if (p === "drawn") act = iWon ? '<button type="button" class="btn primary gw-big" id="gwClaimOpen">🎉 Kazandın! Onaylamak için dokun</button>' : '<div class="gw-note">Kazananın onayı bekleniyor (' + left(g.claimBy - now) + ').</div>';
+        else if (p === "drawn") act = iWon ? '<button type="button" class="btn primary gw-big" id="gwClaimOpen">🎉 Kazandın! Onaylamak için dokun</button>' : '<div class="gw-note">Kazananın onayı bekleniyor (<span data-left="' + g.claimBy + '">' + left(g.claimBy - now) + '</span>).</div>';
         else if (p === "claimed") act = iWon ? (needInfo(g) ? '<button type="button" class="btn primary" id="gwAddr">' + (askL(g).indexOf("address") >= 0 ? "📦 Teslimat bilgilerim" : "📝 Bilgilerim") + '</button>' : '<div class="gw-in">✅ Onayladın. Çekilişi düzenleyen kişi ödülün için seninle iletişime geçecek.</div>') : '';
         $("gwOne").innerHTML = '<button type="button" class="gw-back" id="gwBack">← Tüm çekilişler</button>' +
             '<div class="gw-detail"><div class="gw-hero">' + orgHtml(g, true) +
@@ -723,7 +723,7 @@
         var sl = function (ms) { var m = Math.max(0, Math.floor(ms / 60000)), d = Math.floor(m / 1440), h = Math.floor(m % 1440 / 60); return d ? d + " gün" : h ? h + " sa" : (m % 60) + " dk"; }, left = sl;
         var when = p === "open" ? [left(g.closeAt - now), g.closeAt < g.drawAt ? "kayıt kapanışına" : "çekilişe"] : p === "closed" ? [left(g.drawAt - now), "çekilişe"] : p === "drawn" ? [left(g.claimBy - now), "onay süresi"] : ["—", p === "claimed" ? "onaylandı" : "bitti"];
         box.innerHTML = '<div class="gwm-head"><div class="gwm-ic">🛡</div><div><h3>Yönetim</h3><small>Bu bölümü yalnız yetkililer görür</small></div></div>' +
-            '<div class="gwm-stats"><div><b>' + S.count + '</b><span>katılımcı</span></div><div><b id="gwmOk">…</b><span>onaylı</span></div><div><b>' + esc(when[0]) + '</b><span>' + when[1] + '</span></div></div>' +
+            '<div class="gwm-stats"><div><b>' + S.count + '</b><span>katılımcı</span></div><div><b id="gwmOk">…</b><span>onaylı</span></div><div><b' + (p === "drawn" ? ' data-left="' + g.claimBy + '"' : p === "open" ? ' data-left="' + g.closeAt + '"' : p === "closed" ? ' data-left="' + g.drawAt + '"' : '') + '>' + esc(when[0]) + '</b><span>' + when[1] + '</span></div></div>' +
             (canDraw || reDraw ? '<div class="gwm-main">' + (canDraw ? '<button type="button" class="btn primary gw-big" id="gwDraw">' + MODE_LBL[modeOf(g)].split(" ")[0] + ' Şimdi çek</button>' : '') +
                 (reDraw ? '<button type="button" class="btn gw-big' + (p === "expired" ? ' primary' : '') + '" id="gwRedraw">' + (p === "expired" ? '🔁 Sıradaki kişiyi çek' : '🔁 Yeniden çek') + '</button>' : '') + '</div>' : '') +
             '<div class="gwm-acts"><button type="button" class="gwm-a' + (g.pin ? ' on' : '') + '" id="gwPin"><i>📌</i><span>' + (g.pin ? 'Sabitlendi<small>Kaldırmak için dokun</small>' : 'En üste sabitle<small>Listede ilk sırada görünür</small>') + '</span></button>' +
@@ -806,7 +806,7 @@
         req("/giveaways/" + g.id + "/claim/" + g.w).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var c = $("gwClaim"); if (!c) return;
             if (!d) {
-                c.innerHTML = '<div class="gw-wait"><p><b>' + esc(g.wName) + '</b> onayladı ama bilgilerini henüz göndermedi' + (g.cAt ? ' (' + left(Date.now() - g.cAt).replace("şimdi", "az önce") + ' önce onayladı)' : '') + '.</p>' +
+                c.innerHTML = '<div class="gw-wait"><p><b>' + esc(g.wName) + '</b> onayladı ama bilgilerini henüz göndermedi' + (g.cAt ? ' (<span data-ago="' + g.cAt + '">' + left(Date.now() - g.cAt).replace("şimdi", "az önce") + '</span> önce onayladı)' : '') + '.</p>' +
                     '<button type="button" class="btn sm gw-del" id="gwNoInfo">🔁 Bilgi girmedi — yeni kişi çek</button></div>';
                 $("gwNoInfo").onclick = function () { if (confirm(g.wName + " iptal edilip yeni bir kişi rastgele çekilsin mi?")) draw(true); };
                 return;
@@ -1325,13 +1325,33 @@
         S.pollN = (S.pollN || 0) + 1;
         var light = near || S.pollN % 5 !== 0;
 
-        S.pollT = setTimeout(function () {
-            var sig = function () { return JSON.stringify([S.g, S.joined, S.count]); }, before = sig();
-            fetchOne(g.id, light).then(function () { if (S.g) { if (sig() !== before) renderOne(); else if (waitClaim && S.g.st === "claimed" && $("gwClaim")) loadClaim(S.g); autoMgr(); schedule(); } });
-        }, document.hidden ? 120000 : near ? 5000 : 60000);
+        S.pollT = setTimeout(function () { pollNow(light, waitClaim); }, document.hidden ? 120000 : near ? 5000 : 60000);
     }
+    function pollNow(light, waitClaim) {
+        var g = S.g; if (!g) return;
+        clearTimeout(S.pollT);
+        var sig = function () { return JSON.stringify([S.g, S.joined, S.count]); }, before = sig();
+        fetchOne(g.id, light).then(function () {
+            if (!S.g) return;
+            try { if (sig() !== before) renderOne(); else if (waitClaim && S.g.st === "claimed" && $("gwClaim")) loadClaim(S.g); autoMgr(); }
+            finally { schedule(); } // çizimde hata olsa da yoklama durmasın
+        });
+    }
+    // telefonda başka uygulamaya geçip dönünce (sayfa arka planda 2 dakikada bir yokluyordu) hemen güncelle
+    function wake() {
+        if (!S.g || document.hidden || $("gwOne").hidden) return;
+        var t = Date.now(); if (t - (S.lastWake || 0) < 4000) return; S.lastWake = t;
+        var g = S.g, waitClaim = S.mgr && g.st === "claimed" && !isM(g.w) && needInfo(g) && S.claimSeen !== g.id + g.w;
+        pollNow(true, waitClaim);
+    }
+    document.addEventListener("visibilitychange", wake);
+    window.addEventListener("focus", wake);
+    window.addEventListener("pageshow", wake);
     function tick() {
         updCd();
+        var tn = Date.now();
+        Array.prototype.forEach.call(document.querySelectorAll("[data-left]"), function (el) { var v = left(+el.getAttribute("data-left") - tn); if (el.textContent !== v) el.textContent = v; });
+        Array.prototype.forEach.call(document.querySelectorAll("[data-ago]"), function (el) { var v = left(tn - +el.getAttribute("data-ago")); if (el.textContent !== v) el.textContent = v; });
         // geri sayımlar
         if (S.g && !$("gwOne").hidden) {
             var g = S.g, ch = $("gwOne").querySelector(".gw-chip"); if (ch) ch.outerHTML = stLabel(g);
