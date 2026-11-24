@@ -518,7 +518,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/oh.json?v=20270115")
+fetch("/icerikler/algoritmalar/oh.json?v=20261124c")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
