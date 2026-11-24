@@ -333,6 +333,23 @@ html[dir="rtl"] .tr-go { transform: scaleX(-1); }
 
 /* ===== Algoritma kütüphanesi: küp bölümleri + doğrudan set kartları ===== */
 .tool-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0 0 26px; }
+/* Set isteği: tek satırlık çubuk; form küçük pencerede açılır */
+.req-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; margin: 0 auto 22px; padding: 8px 8px 8px 16px; max-width: max-content; border-radius: 999px; border: var(--card-bw) solid var(--ink); background: var(--surface); box-shadow: var(--shadow-sm); }
+.req-bar-t { font-size: 14px; font-weight: 700; color: var(--text-soft); }
+.req-open { padding: 8px 14px; border-radius: 999px; border: 0; background: var(--ui-accent); color: var(--ui-accent-text); font: 850 14px Inter, sans-serif; cursor: pointer; }
+.req-open:hover { filter: brightness(1.08); }
+.req-inb { background: var(--surface-soft); color: var(--text); border: 1.5px solid var(--border); }
+.req-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(8,10,18,.6); backdrop-filter: blur(3px); }
+.req-modal[hidden], .req-modal .req-form[hidden], .req-modal .req-head[hidden], .req-inbox[hidden] { display: none; }
+.req-modal .req-box { position: relative; width: min(560px, 100%); max-height: 92vh; overflow: auto; margin: 0; box-sizing: border-box; }
+.req-x { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--surface-soft); color: var(--text); font-size: 15px; cursor: pointer; }
+.req-modal .req-head { padding-right: 40px; }
+.req-inbox { display: grid; gap: 8px; }
+.req-item { padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface-soft); font-size: 13.5px; color: var(--text); }
+.req-item b { font-size: 15px; } .req-item small { display: block; color: var(--text-soft); margin-top: 3px; word-break: break-word; }
+.req-item p { margin: 6px 0 0; white-space: pre-wrap; word-break: break-word; }
+.req-item button { margin-top: 8px; padding: 5px 10px; border-radius: 9px; border: 1.5px solid var(--border); background: var(--surface); color: var(--cube-red); font: 800 12.5px Inter, sans-serif; cursor: pointer; }
+@media (max-width: 520px) { .req-bar { border-radius: 18px; padding: 10px 12px; } }
 .tool-link { padding: 9px 14px; border-radius: 12px; border: var(--card-bw) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 800; font-size: 14px; text-decoration: none; box-shadow: var(--shadow-sm); }
 .tool-link:hover { background: var(--ui-accent); color: var(--ui-accent-text); }
 .jump { position: sticky; top: 8px; z-index: 20; display: flex; gap: 8px; overflow-x: auto; padding: 8px; margin: 0 auto 26px; max-width: max-content;
@@ -506,8 +523,10 @@ html[dir="rtl"] .tr-go { transform: scaleX(-1); }
     </a>
 </section>
 
-<div class="tool-links">
-    <a href="#istek" class="tool-link" data-i18n="link_req">💡 Algoritma seti iste</a>
+<div class="req-bar">
+    <span class="req-bar-t" data-i18n="req_bar">Aradığın set sitede yok mu?</span>
+    <button type="button" class="req-open" id="reqOpen" data-i18n="link_req">💡 Algoritma seti iste</button>
+    <button type="button" class="req-open req-inb" id="reqInbOpen" hidden>📥 <span data-i18n="req_inbox">Gelen istekler</span></button>
 </div>
 
 <nav class="jump" aria-label="Küpler"><a href="#p3">3x3 · CFOP</a><a href="#proux">3x3 · Roux</a><a href="#pbld">3x3 · 3BLD</a><a href="#p2">2x2</a><a href="#ppyra">Pyraminx</a><a href="#pskewb">Skewb</a><a href="#p4">4x4</a><a href="#p5">5x5</a><a href="#pmega">Megaminx</a><a href="#psq1">Square-1</a><a href="#pfto">FTO</a></nav>
@@ -787,11 +806,13 @@ html[dir="rtl"] .tr-go { transform: scaleX(-1); }
 </section>
 
 <!-- İSTEK ALGORİTMA SETİ: form verisi FormSubmit ile site e-postasına gelir -->
-<section class="req-box" id="istek">
+<div class="req-modal" id="istek" hidden>
+<section class="req-box" role="dialog" aria-modal="true" aria-labelledby="reqTitle">
+    <button type="button" class="req-x" id="reqClose" aria-label="Kapat">✕</button>
     <div class="req-head">
         <span class="req-icon" aria-hidden="true">💡</span>
         <div>
-            <h3 data-i18n="req_title">Algoritma seti isteği</h3>
+            <h3 id="reqTitle" data-i18n="req_title">Algoritma seti isteği</h3>
             <p data-i18n="req_p">Sitede görmek istediğin bir set mi var? (ör. ZBLL, OLLCP, Megaminx PLL) Yaz, ekleyelim.</p>
         </div>
     </div>
@@ -818,7 +839,9 @@ html[dir="rtl"] .tr-go { transform: scaleX(-1); }
             <span class="req-msg" id="reqMsg" role="status" aria-live="polite"></span>
         </div>
     </form>
+    <div class="req-inbox" id="reqInbox" hidden></div>
 </section>
+</div>
 
 <!-- DİĞERLERİ YAKINDA -->
 <div class="category-block">
@@ -869,70 +892,75 @@ html[dir="rtl"] .tr-go { transform: scaleX(-1); }
 })();
 </script>
 <script>
-/* İstek formu: FormSubmit (formsubmit.co) üzerinden site e-postasına gönderir */
+/* Algoritma seti isteği: istek Firestore'a (algreq) yazılır; yalnız site sahibi okur.
+   Üstteki tek satırlık çubuktan küçük pencerede açılır; site sahibi "Gelen istekler"i aynı pencerede görür. */
 (function () {
-    var form = document.getElementById("reqForm");
-    if (!form) return;
-    var REQ_TO = "rubikacademy.iletisim@gmail.com";
+    var form = document.getElementById("reqForm"), modal = document.getElementById("istek");
+    if (!form || !modal) return;
+    function $(id) { return document.getElementById(id); }
     function T(k, fb) {
         var p = (window.SITE_I18N && SITE_I18N.pages.algoritmalar) || {}, l = localStorage.getItem("site-lang") || "tr";
         return (p[l] && p[l][k]) || (p.tr && p.tr[k]) || fb;
     }
-    // Yer tutucu metni dile göre (common.js dil uygulayınca bunu çağırır)
-    window.onLanguageApplied = function () {
-        var n = document.getElementById("reqNote");
-        if (n) n.placeholder = T("req_note_ph", n.placeholder);
-    };
+    function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+    // firebase-config.js bu betikten sonra yüklenir: ayarları kullanırken oku
+    var cfg = {}, BASE = "";
+    function conf() { cfg = window.RA_FIREBASE || {}; BASE = "https://firestore.googleapis.com/v1/projects/" + cfg.projectId + "/databases/(default)/documents"; }
+    window.onLanguageApplied = function () { var n = $("reqNote"); if (n) n.placeholder = T("req_note_ph", n.placeholder); };
+    function open(inbox) {
+        modal.hidden = false; document.documentElement.style.overflow = "hidden";
+        form.hidden = !!inbox; $("reqInbox").hidden = !inbox;
+        modal.querySelector(".req-head").hidden = !!inbox;
+        if (inbox) loadInbox(); else setTimeout(function () { $("reqSet").focus(); }, 50);
+    }
+    function close() { modal.hidden = true; document.documentElement.style.overflow = ""; if (location.hash === "#istek") history.replaceState(null, "", location.pathname + location.search); }
+    $("reqOpen").onclick = function () { open(false); };
+    $("reqClose").onclick = close;
+    modal.addEventListener("click", function (e) { if (e.target === modal) close(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) close(); });
+    if (location.hash === "#istek") open(false);
+    // site sahibi: gelen istekler
+    function isOwner() { return !!(window.Account && Account.isAdmin && Account.isAdmin()); }
+    function ownerBtn() { $("reqInbOpen").hidden = !isOwner(); }
+    $("reqInbOpen").onclick = function () { open(true); };
+    if (window.Account && Account.onChange) Account.onChange(ownerBtn); setTimeout(ownerBtn, 1500);
+    function loadInbox() {
+        conf(); var box = $("reqInbox"); box.innerHTML = '<p class="req-msg">Yükleniyor…</p>';
+        Account.token().then(function (t) {
+            return fetch(BASE + "/algreq?pageSize=100&orderBy=ts%20desc", { headers: { Authorization: "Bearer " + t } });
+        }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+            var l = (d.documents || []).map(function (x) { var f = x.fields || {}, o = { name: x.name }; Object.keys(f).forEach(function (k) { o[k] = f[k].stringValue != null ? f[k].stringValue : f[k].timestampValue; }); return o; });
+            box.innerHTML = '<h3 style="margin:0 0 4px">📥 Gelen istekler (' + l.length + ')</h3>' + (l.length ? l.map(function (o, i) {
+                return '<div class="req-item"><b>' + esc(o.set) + '</b> · ' + esc(o.kup) + '<small>' + esc(new Date(o.ts).toLocaleString("tr-TR")) + (o.contact ? ' · ' + esc(o.contact) : '') + (o.by ? ' · üye' : ' · ziyaretçi') + '</small>' +
+                    (o.note ? '<p>' + esc(o.note) + '</p>' : '') + '<button type="button" data-del="' + i + '">Sil</button></div>';
+            }).join("") : '<p class="req-msg">Henüz istek yok.</p>');
+            Array.prototype.forEach.call(box.querySelectorAll("[data-del]"), function (b) {
+                b.onclick = function () {
+                    if (!confirm("Bu istek silinsin mi?")) return; b.disabled = true;
+                    Account.token().then(function (t) { return fetch("https://firestore.googleapis.com/v1/" + l[+b.getAttribute("data-del")].name, { method: "DELETE", headers: { Authorization: "Bearer " + t } }); })
+                        .then(function (r) { if (!r.ok) throw 0; b.closest(".req-item").remove(); }).catch(function () { b.disabled = false; alert("Silinemedi."); });
+                };
+            });
+        }).catch(function (e) { box.innerHTML = '<p class="req-msg err">İstekler yüklenemedi (' + esc(e && e.message) + ').</p>'; });
+    }
     form.addEventListener("submit", function (e) {
         e.preventDefault();
-        var msg = document.getElementById("reqMsg"), btn = document.getElementById("reqBtn");
-        var set = form.set.value.trim();
+        var msg = $("reqMsg"), btn = $("reqBtn"), set = form.set.value.trim();
         msg.className = "req-msg";
         if (!set) { msg.className = "req-msg err"; msg.textContent = T("req_need_set", "Set adını yaz."); form.set.focus(); return; }
         if (form._honey.value) return; // bot
-        btn.disabled = true; msg.textContent = T("req_sending", "Gönderiliyor…");
-        var data = {
-            Kup: form.kup.value,
-            Set: set,
-            Not: form.not.value.trim() || "-",
-            Iletisim: form.iletisim.value.trim() || "-",
-            Dil: localStorage.getItem("site-lang") || "tr",
-            Sayfa: location.href
-        };
-        var subject = "Rubik Academy: algoritma seti isteği (" + data.Kup + " · " + set + ")";
-        // Gönderilemezse kullanıcının e-posta uygulamasıyla aynı bilgiyi yolla
-        function mailtoLink() {
-            var body = Object.keys(data).map(function (k) { return k + ": " + data[k]; }).join("\n");
-            return "mailto:" + REQ_TO + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-        }
-        function fail(detail) {
-            msg.className = "req-msg err";
-            msg.innerHTML = "";
-            msg.appendChild(document.createTextNode(T("req_err", "Gönderilemedi.") + " "));
-            var a = document.createElement("a");
-            a.href = mailtoLink(); a.className = "req-mail"; a.textContent = T("req_mail", "📧 E-postayla gönder");
-            msg.appendChild(a);
-            if (detail) { var d = document.createElement("small"); d.className = "req-detail"; d.textContent = detail; msg.appendChild(d); }
-        }
-        var payload = Object.assign({ _subject: subject, _template: "table", _captcha: "false" }, data);
-        fetch("https://formsubmit.co/ajax/" + REQ_TO, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Accept": "application/json" },
-            body: JSON.stringify(payload)
+        conf(); btn.disabled = true; msg.textContent = T("req_sending", "Gönderiliyor…");
+        var u = window.Account && Account.user && Account.user();
+        var o = { kup: form.kup.value.slice(0, 30), set: set.slice(0, 80), note: form.not.value.trim().slice(0, 1000), contact: form.iletisim.value.trim().slice(0, 120), lang: (localStorage.getItem("site-lang") || "tr").slice(0, 5), by: u ? u.uid : "" };
+        var fields = {}; Object.keys(o).forEach(function (k) { fields[k] = { stringValue: o[k] }; });
+        var body = JSON.stringify({ writes: [{ update: { name: "projects/" + cfg.projectId + "/databases/(default)/documents/algreq/" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10), fields: fields }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }], currentDocument: { exists: false } }] });
+        (u && Account.token ? Account.token().then(function (t) { return { Authorization: "Bearer " + t }; }, function () { return {}; }) : Promise.resolve({})).then(function (h) {
+            h["Content-Type"] = "application/json";
+            return fetch(BASE + ":commit" + (h.Authorization ? "" : "?key=" + encodeURIComponent(cfg.apiKey)), { method: "POST", headers: h, body: body });
         }).then(function (r) {
-            return r.json().catch(function () { return {}; }).then(function (j) {
-                var ok = r.ok && String(j.success) === "true";
-                if (ok) {
-                    msg.className = "req-msg ok"; msg.textContent = T("req_ok", "Teşekkürler! İsteğin bize ulaştı.");
-                    form.reset();
-                } else if (/activat/i.test(j.message || "")) {
-                    // FormSubmit ilk kullanımda site e-postasına "Activate Form" onayı yollar; onaylanana kadar istekler iletilmez
-                    fail(T("req_activate", "Form henüz etkinleştirilmedi (site sahibinin onayı bekleniyor)."));
-                } else {
-                    fail(j.message || ("HTTP " + r.status));
-                }
-            });
-        }).catch(function (err) { fail(err && err.message); })
+            if (!r.ok) throw new Error(r.status === 429 ? "Site şu an çok yoğun, biraz sonra tekrar dene." : "HTTP " + r.status);
+            msg.className = "req-msg ok"; msg.textContent = T("req_ok", "Teşekkürler! İsteğin bize ulaştı."); form.reset();
+        }).catch(function (err) { msg.className = "req-msg err"; msg.textContent = T("req_err", "Gönderilemedi.") + " " + (err && err.message || ""); })
           .then(function () { btn.disabled = false; });
     });
 })();
