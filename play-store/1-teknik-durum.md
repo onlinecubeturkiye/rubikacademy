@@ -8,7 +8,7 @@ Uygulama siteyi (https://rubikacademy.fun) **kendi içindeki WebView'de** açar;
 
 | Konu | Değer | Durum |
 |---|---|---|
-| Paket adı | `app.rubikacademy.fun` (Play Console; eski APK `fun.rubikacademy.app`) | ✓ |
+| Paket adı | `fun.rubikacademy.app` | ✓ |
 | Kütüphaneler | AndroidX Core, Firebase Messaging, AndroidX Credentials + Google ID | ✓ |
 | Android Gradle Plugin | 8.10.1, Java 17 | ✓ |
 | compileSdk / targetSdk | 36 / 36 (Google Play şartı: API 36) | ✓ |
