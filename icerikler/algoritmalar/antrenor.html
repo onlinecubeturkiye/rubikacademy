@@ -876,7 +876,7 @@ details.case-group[open] > summary::before { transform: rotate(45deg); }
 </footer>
 
 <script src="/icerikler/algoritmalar/mgSvg.js?v=20270115"></script>
-<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261124"></script>
+<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261124b"></script>
 <script src="/icerikler/algoritmalar/ll.js"></script>
 <script src="/icerikler/algoritmalar/cllSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
@@ -968,7 +968,7 @@ function crossDraw(c, size) {
         '<text x="16" y="19.5" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900" font-size="' + (n.length > 1 ? 7 : 9) + '" fill="#17171f">' + n + '</text></svg>';
 }
 function mgDraw(c, size) { return mgSvg(c.p, this.mode || "pll", size); }
-function sqDraw(c, size) { return sq1Svg(c.p, Math.round(size * 0.62)); }
+function sqDraw(c, size) { return sq1Svg(c.p, Math.round(size * 0.62), { horizontal: true }); }
 /* X-Cross seti: case = en kısa X-Cross uzunluğu; karıştırmalar önceden çözülmüş bankadan (xcross.json) gelir */
 var XC_LEVELS = [{ id: "easy", min: 0, max: 6 }, { id: "mid", min: 7, max: 7 }, { id: "hard", min: 8, max: 20 }];
 var XC_BANK = null;
@@ -1132,7 +1132,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json", "xcross.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20261124").then(function (r) {
+        return fetch(BASE + f + "?v=20261124b").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });
