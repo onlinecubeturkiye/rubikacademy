@@ -369,24 +369,29 @@ service cloud.firestore {
       // Katılımcılar: üye kendini ekler/çıkarır (kayıtlar kapanana kadar); herkes sayıyı görür
       match /e/{uid} {
         allow read: if true;
-        // GEÇİCİ (ücretsiz kota doluyken katılım çalışsın): kurallarda get()/exists() okuması yok.
-        // Kapanış saatini sayfa, görsel şartını yönetici onayı, askıdaki hesabı çekiliş anı denetler.
-        allow create: if request.auth != null && request.auth.uid == uid
+        allow create: if request.auth != null && request.auth.uid == uid && !suspended(uid)
+          && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt
           && request.resource.data.keys().hasOnly(['name', 'ts', 'd', 'b'])
           && request.resource.data.name is string && request.resource.data.name.size() <= 24
           && (!('d' in request.resource.data) || (request.resource.data.d is string && request.resource.data.d.size() <= 40))
           && (!('b' in request.resource.data) || request.resource.data.b is bool)
-          && request.resource.data.ts == request.time;
-        allow delete: if (request.auth != null && request.auth.uid == uid) || gwMgr();
-        // katılımcı yalnız WhatsApp bonusu işaretini (b) değiştirebilir
-        allow update: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.ts == request.time
+          // abonelik görseli istenen çekilişte görsel aynı anda (aynı toplu yazımda) yüklenmiş olmalı
+          && (get(/databases/$(database)/documents/giveaways/$(gid)).data.get('yt', '') == ''
+              || existsAfter(/databases/$(database)/documents/giveaways/$(gid)/proof/$(uid)));
+        allow delete: if gwMgr() || (request.auth != null && request.auth.uid == uid
+          && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt);
+        // katılımcı yalnız WhatsApp bonusu işaretini (b) kayıtlar açıkken değiştirebilir
+        allow update: if request.auth != null && request.auth.uid == uid && !suspended(uid)
+          && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['b'])
           && request.resource.data.b is bool;
       }
       // Katılım şartı görseli (ör. YouTube abonelik ekran görüntüsü): yalnız sahibi ve yöneticiler görür
       match /proof/{uid} {
         allow read: if gwMgr() || (request.auth != null && request.auth.uid == uid);
-        allow create, update: if request.auth != null && request.auth.uid == uid
+        allow create, update: if request.auth != null && request.auth.uid == uid && !suspended(uid)
+          && request.time < get(/databases/$(database)/documents/giveaways/$(gid)).data.closeAt
           && request.resource.data.keys().hasOnly(['img', 'img2', 'img3', 'ts'])
           && (!('img' in request.resource.data) || (request.resource.data.img is string && request.resource.data.img.size() <= 400000
               && request.resource.data.img.matches('data:image/(jpeg|png|webp);base64,.+')))
@@ -396,7 +401,7 @@ service cloud.firestore {
           && (!('img2' in request.resource.data) || (request.resource.data.img2 is string && request.resource.data.img2.size() <= 400000
               && request.resource.data.img2.matches('data:image/(jpeg|png|webp);base64,.+')))
           && request.resource.data.ts == request.time;
-        allow delete: if (request.auth != null && request.auth.uid == uid) || gwMgr();
+        allow delete: if gwMgr() || (request.auth != null && request.auth.uid == uid);
       }
       // Yönetici incelemesi: abonelik görselleri onaylandı mı (ok) / uygun değil mi (no) — yalnız yöneticiler
       match /rev/{uid} {
