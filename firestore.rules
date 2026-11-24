@@ -379,8 +379,8 @@ service cloud.firestore {
           // abonelik görseli istenen çekilişte görsel aynı anda (aynı toplu yazımda) yüklenmiş olmalı
           && (get(/databases/$(database)/documents/giveaways/$(gid)).data.get('yt', '') == ''
               || existsAfter(/databases/$(database)/documents/giveaways/$(gid)/proof/$(uid)))
-          // site sahibi hesabı olmayan birini elle ekleyebilir (kimlik "m_" ile başlar, m == true); x2: çarkta 2 kez
-          || (isAdmin() && uid.matches('^m_[A-Za-z0-9]{8,24}$')
+          // site sahibi birini elle ekleyebilir: hesabı olan (kendi kimliğiyle) ya da hesabı olmayan ("m_" ile başlar); m == true; x2: çarkta 2 kez
+          || (isAdmin() && (uid.matches('^m_[A-Za-z0-9]{8,24}$') || uid.matches('^[A-Za-z0-9]{20,40}$'))
               && request.resource.data.keys().hasOnly(['name', 'ts', 'm', 'x2'])
               && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 24
               && request.resource.data.m == true

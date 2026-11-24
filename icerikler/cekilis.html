@@ -418,6 +418,14 @@
 .gw-maddr input[type=text], .gw-maddr #gwMName { flex: 1 1 160px; min-width: 0; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg, transparent); color: var(--text); font: 600 14px Inter, sans-serif; }
 .gw-mx2 { display: inline-flex; gap: 6px; align-items: center; font-weight: 700; font-size: 13.5px; white-space: nowrap; cursor: pointer; }
 .gw-madd .gw-msg { margin: 6px 0 0; min-height: 0; }
+.gw-mres { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.gw-mres:empty { display: none; }
+.gw-mres .gw-note { width: 100%; margin: 0; }
+.gw-mpick { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg, transparent); color: var(--text); cursor: pointer; font: 700 14px Inter, sans-serif; text-align: left; max-width: 100%; }
+.gw-mpick small { font-weight: 600; font-size: 11.5px; color: var(--text-soft); }
+.gw-mpick:hover:not([disabled]) { border-color: var(--ui-accent, #2b50d6); }
+.gw-mpick.nm { border-style: dashed; }
+.gw-mpick[disabled] { opacity: .55; cursor: default; }
 .gw-qb.ok:hover { border-color: #16a34a; color: #16a34a; } .gw-qb.no:hover, .gw-qb.out:hover { border-color: #dc2626; color: #dc2626; }
 .gw-pth { display: grid; place-items: center; font-size: 18px; }
 .gw-mbox:has(.gw-rvimgs) { width: min(760px, 100%); }
@@ -577,6 +585,6 @@
 <script src="/js/common.js?v=20270115"></script>
 <script src="/js/firebase-config.js?v=20270115"></script>
 <script src="/js/account.js?v=20270115"></script>
-<script src="/js/cekilis.js?v=20261124"></script>
+<script src="/js/cekilis.js?v=20261124b"></script>
 </body>
 </html>
