@@ -627,11 +627,10 @@
             '<button type="button" class="gwm-a del" id="gwDel"><i>🗑</i><span>Çekilişi sil<small>Geri alınamaz</small></span></button></div>' +
             '<details class="gwm-help"><summary>Nasıl çalışır?</summary><p>Kayıtlar kapanınca <b>Şimdi çek</b>e dokun; herkes çarkı aynı anda görür. Kazanan 2 dakika içinde onaylamazsa bu sayfa açıkken sıradaki kişi kendiliğinden çekilir. Sabitlenen çekiliş listede en üstte durur, katılımcılar bunu görmez. Görselleri incele: <b>yalnız onayladığın kişiler çekilir</b>; reddedilen ve bekleyenler çekilmez. WhatsApp bonusu da onaylanırsa çarkta 2 kez sayılır.</p></details>' +
             (skipNames(g).length ? '<p class="gw-note">Onaylamayan / iptal edilenler: <b>' + skipNames(g).map(esc).join(" → ") + '</b></p>' : '') +
-            (isOwner() && (p === "open" || p === "closed" || p === "drawing") ? '<form class="gw-madd" id="gwMAdd" autocomplete="off"><h4>✋ Elle katılımcı ekle</h4><p class="gw-note">Hesabı olmayan birini ekle. Onaylı sayılır, görsel istenmez. Yalnız sen görürsün.</p>' +
-                '<div class="gw-maddr"><input id="gwMName" maxlength="24" placeholder="Ad soyad" required><label class="gw-mx2"><input type="checkbox" id="gwMX2"> ×2 şans</label><button type="submit" class="btn sm primary" id="gwMBtn">Ekle</button></div><p class="gw-msg" id="gwMMsg"></p></form>' : '') +
+            (isOwner() && (p === "open" || p === "closed" || p === "drawing") ? '<form class="gw-madd" id="gwMAdd" autocomplete="off"><h4>✋ Elle katılımcı ekle</h4><p class="gw-note">Hesabı olan birini adıyla ya da profil bağlantısıyla bul, ya da hesabı olmayan birini adıyla ekle. Onaylı sayılır, görsel istenmez. Yalnız sen görürsün.</p>' +
+                '<div class="gw-maddr"><input id="gwMName" maxlength="200" placeholder="Ad veya profil bağlantısı" required><label class="gw-mx2"><input type="checkbox" id="gwMX2"> ×2 şans</label><button type="submit" class="btn sm primary" id="gwMBtn">Ara</button></div><div class="gw-mres" id="gwMRes"></div><p class="gw-msg" id="gwMMsg"></p></form>' : '') +
             '<div id="gwClaim"></div><div class="gw-chk" id="gwChk"><h4>🔍 Katılımcı kontrolü</h4><p class="gw-note">Yükleniyor…</p></div>';
-        if ($("gwMAdd")) $("gwMAdd").onsubmit = function (e) { e.preventDefault(); addManual(g); };
-        if ($("gwMAdd")) $("gwMAdd").onsubmit = function (e) { e.preventDefault(); addManual(g); };
+        if ($("gwMAdd")) $("gwMAdd").onsubmit = function (e) { e.preventDefault(); findPerson(g); };
         $("gwPin").onclick = function () {
             var b = this; b.disabled = true;
             patch("/giveaways/" + g.id, { pin: g.pin ? 0 : Date.now() }).then(function (r) { if (!r.ok) throw 0; return fetchOne(g.id).then(renderOne); }).catch(function () { b.disabled = false; alert("Sabitlenemedi."); });
@@ -651,23 +650,48 @@
         };
         if (p === "claimed") loadClaim(g);
     }
-    function addManual(g) {
-        var nm = $("gwMName").value.trim().replace(/\s+/g, " ").slice(0, 24), x2 = $("gwMX2").checked, b = $("gwMBtn"), m = $("gwMMsg");
+    // site sahibi: hesabı olanı ada / profil bağlantısına göre bul (az okuma: önek araması, en çok 6 sonuç)
+    function findPerson(g) {
+        var q = $("gwMName").value.trim().replace(/\s+/g, " "), box = $("gwMRes"), m = $("gwMMsg"), b = $("gwMBtn");
+        if (!q) return;
+        m.textContent = ""; m.className = "gw-msg"; box.innerHTML = '<p class="gw-note">Aranıyor…</p>'; b.disabled = true;
+        var idm = q.match(/[?&]u=([A-Za-z0-9]{20,40})/) || (/^[A-Za-z0-9]{20,40}$/.test(q) ? [0, q] : null);
+        var find = idm ? req("/users/" + idm[1]).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { return d ? [dec(d)] : []; })
+            : Promise.all([q, q.charAt(0).toLocaleUpperCase("tr") + q.slice(1)].filter(function (x, i, a) { return a.indexOf(x) === i; }).map(function (v) {
+                var body = { structuredQuery: { from: [{ collectionId: "users" }], where: { compositeFilter: { op: "AND", filters: [
+                    { fieldFilter: { field: { fieldPath: "name" }, op: "GREATER_THAN_OR_EQUAL", value: { stringValue: v } } },
+                    { fieldFilter: { field: { fieldPath: "name" }, op: "LESS_THAN", value: { stringValue: v + "\uf8ff" } } }] } }, limit: 6 } };
+                return req(":runQuery", { method: "POST", body: JSON.stringify(body) }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) { return (a || []).filter(function (x) { return x.document; }).map(function (x) { return dec(x.document); }); }, function () { return []; });
+            })).then(function (ls) { var seen = {}, out = []; ls.forEach(function (l) { l.forEach(function (u) { if (!seen[u.id]) { seen[u.id] = 1; out.push(u); } }); }); return out.slice(0, 8); });
+        find.then(function (us) {
+            b.disabled = false;
+            var have = {}; (S.entries || []).forEach(function (y) { have[y.uid] = 1; });
+            box.innerHTML = us.map(function (u) {
+                var nm = String(u.name || "Cuber").slice(0, 24);
+                return '<button type="button" class="gw-mpick" data-uid="' + esc(u.id) + '" data-nm="' + esc(nm) + '"' + (have[u.id] ? ' disabled' : '') + '><b>' + esc(nm) + '</b><small>' + (have[u.id] ? "zaten katılıyor" : "hesabı var · ekle") + '</small></button>';
+            }).join("") + (idm ? "" : '<button type="button" class="gw-mpick nm" data-uid="" data-nm="' + esc(q.slice(0, 24)) + '"><b>' + esc(q.slice(0, 24)) + '</b><small>hesapsız olarak ekle</small></button>') +
+                (!us.length ? '<p class="gw-note">' + (idm ? "Bu bağlantıyla hesap bulunamadı." : "Bu adla başlayan hesap bulunamadı (büyük/küçük harf önemli).") + '</p>' : "");
+            Array.prototype.forEach.call(box.querySelectorAll(".gw-mpick"), function (x) { x.onclick = function () { addManual(g, x.getAttribute("data-uid"), x.getAttribute("data-nm")); }; });
+        }, function () { b.disabled = false; box.innerHTML = ""; m.textContent = "Aranamadı, tekrar dene."; m.className = "gw-msg bad"; });
+    }
+    function addManual(g, uid, nm) {
+        nm = String(nm || "").trim().slice(0, 24); var x2 = $("gwMX2").checked, b = $("gwMBtn"), m = $("gwMMsg");
         if (!nm) return;
-        if ((S.entries || []).some(function (y) { return String(y.name).toLocaleLowerCase("tr") === nm.toLocaleLowerCase("tr"); }) && !confirm("“" + nm + "” adında biri zaten var. Yine de eklensin mi?")) return;
-        var id = "m_" + newId(); b.disabled = true; m.textContent = ""; m.className = "gw-msg";
+        if (!uid && (S.entries || []).some(function (y) { return String(y.name).toLocaleLowerCase("tr") === nm.toLocaleLowerCase("tr"); }) && !confirm("“" + nm + "” adında biri zaten var. Yine de eklensin mi?")) return;
+        var id = uid || "m_" + newId(); b.disabled = true; m.textContent = ""; m.className = "gw-msg";
         var w = { writes: [
             { update: { name: docName("/giveaways/" + g.id + "/e/" + id), fields: { name: { stringValue: nm }, m: { booleanValue: true }, x2: { booleanValue: x2 } } }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }], currentDocument: { exists: false } },
             { update: { name: docName("/giveaways/" + g.id + "/rev/" + id), fields: enc({ v: "ok", ts: Date.now() }) } }] };
         req(":commit", { method: "POST", body: JSON.stringify(w) }).then(function (r) {
             if (!r.ok) throw new Error(r.status);
+            if ($("gwMRes")) $("gwMRes").innerHTML = "";
             S.count = (S.count || 0) + 1; S.rev = S.rev || {}; S.rev[id] = { v: "ok", b: "", ts: Date.now() };
             (S.entries = S.entries || []).push({ uid: id, name: nm, d: "", ts: Date.now(), b: false, m: true, x2: x2 });
             $("gwMName").value = ""; $("gwMX2").checked = false; b.disabled = false;
             m.textContent = "✓ " + nm + " eklendi" + (x2 ? " (×2)" : ""); m.className = "gw-msg";
             if ($("gwPplN")) $("gwPplN").textContent = S.count;
             paintCheck(); loadPeople();
-        }).catch(function (e) { b.disabled = false; m.textContent = String(e && e.message) === "403" ? "Eklenemedi: yetki yok." : "Eklenemedi, tekrar dene."; m.className = "gw-msg bad"; });
+        }).catch(function (e) { b.disabled = false; m.textContent = String(e && e.message) === "403" ? "Eklenemedi: yetki yok." : String(e && e.message) === "400" || String(e && e.message) === "409" ? "Bu kişi zaten katılıyor." : "Eklenemedi, tekrar dene."; m.className = "gw-msg bad"; });
     }
     function loadClaim(g) {
         if (isM(g.w)) { var c0 = $("gwClaim"); if (c0) c0.innerHTML = '<div class="gw-wait"><p>✋ <b>' + esc(g.wName) + '</b> elle eklenen bir katılımcı (hesabı yok). Ödülün teslimatını kendin ayarla.</p></div>'; return; }
@@ -755,7 +779,7 @@
             var shown = l.slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }), per = 12, pages = Math.max(1, Math.ceil(shown.length / per));
             S.pplPage = Math.min(S.pplPage || 0, pages - 1); var pg = S.pplPage;
             b.innerHTML = l.length ? shown.slice(pg * per, pg * per + per).map(function (x) {
-                return '<div class="gw-prow2' + (me() && me().uid === x.uid ? ' me' : '') + '"><a' + (x.m ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + (x.x2 ? ' <i class="gw-star" title="Çarkta 2 kez">×2</i>' : x.b && g.wa ? ' <i class="gw-star" title="WhatsApp bonusu: çarkta 2 kez">⭐×2</i>' : '') + '</a><span>🕒 ' + esc(dtS(x.ts)) + '</span></div>';
+                return '<div class="gw-prow2' + (me() && me().uid === x.uid ? ' me' : '') + '"><a' + (isM(x.uid) ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + (x.x2 ? ' <i class="gw-star" title="Çarkta 2 kez">×2</i>' : x.b && g.wa ? ' <i class="gw-star" title="WhatsApp bonusu: çarkta 2 kez">⭐×2</i>' : '') + '</a><span>🕒 ' + esc(dtS(x.ts)) + '</span></div>';
             }).join("") : '<p class="gw-note">Henüz katılan yok. İlk sen katıl!</p>';
             var pgEl = $("gwPg"); if (!pgEl) return;
             pgEl.innerHTML = pages > 1 ? '<button type="button" data-pg="' + (pg - 1) + '"' + (pg ? '' : ' disabled') + '>‹</button>' + Array.apply(null, Array(pages)).map(function (_, i) { return i < 7 || i === pages - 1 ? '<button type="button" data-pg="' + i + '"' + (i === pg ? ' class="on"' : '') + '>' + (i + 1) + '</button>' : i === 7 ? '<span>…</span>' : ''; }).join("") + '<button type="button" data-pg="' + (pg + 1) + '"' + (pg < pages - 1 ? '' : ' disabled') + '>›</button>' : '';
@@ -797,7 +821,7 @@
     }
     function flagsOf(x, all) {
         var c = (S.chk || {})[x.uid] || {}, u = c.u, f = [];
-        if (x.m) return [["star", "✋ Elle eklendi"]].concat(x.x2 ? [["star", "×2 şans"]] : []);
+        if (x.m) return [["star", isM(x.uid) ? "✋ Elle eklendi (hesapsız)" : "✋ Elle eklendi"]].concat(x.x2 ? [["star", "×2 şans"]] : []);
         if (x.x2) f.push(["star", "×2 şans (site sahibi verdi)"]);
         if (c.role === "askida" || c.role === "silindi") f.push(["bad", "⛔ Askıda: çekilmez"]);
         if (S.g && S.g.yt && S.chk) chans(S.g).forEach(function (ch, i) { if (!(c.proofs || [])[i]) f.push(["bad", "📸 " + ch.name + " görseli yok"]); });
@@ -841,7 +865,7 @@
                 var warn = ff.map(function (t) { return t[1]; }), bad = ff.some(function (t) { return t[0] === "bad"; });
                 return '<div class="gw-prow' + (r.v === "ok" ? " okd" : r.v === "no" ? " nod" : "") + '">' +
                     '<button type="button" class="gw-pth" data-proof="' + esc(x.uid) + '" title="Görselleri incele">' + (prs.length ? '<img src="' + prs[0] + '" alt="">' + (prs.length > 1 ? '<i>' + prs.length + '</i>' : '') : '📷') + '</button>' +
-                    '<div class="gw-pn"><div class="gw-pl1"><a' + (x.m ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + '</a>' + (x.m ? '<i class="gw-star" title="Elle eklendi">✋</i>' : '') + (x.x2 ? '<i class="gw-star" title="Çarkta 2 kez">×2</i>' : '') + (x.b && S.g.wa ? '<i class="gw-star" title="' + (vb === "no" ? "Bonus geçersiz" : "WhatsApp bonusu") + '">' + (vb === "no" ? "⭐✗" : "⭐×2") + '</i>' : '') + '</div>' +
+                    '<div class="gw-pn"><div class="gw-pl1"><a' + (isM(x.uid) ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + '</a>' + (x.m ? '<i class="gw-star" title="' + (isM(x.uid) ? "Elle eklendi (hesapsız)" : "Elle eklendi") + '">✋</i>' : '') + (x.x2 ? '<i class="gw-star" title="Çarkta 2 kez">×2</i>' : '') + (x.b && S.g.wa ? '<i class="gw-star" title="' + (vb === "no" ? "Bonus geçersiz" : "WhatsApp bonusu") + '">' + (vb === "no" ? "⭐✗" : "⭐×2") + '</i>' : '') + '</div>' +
                     '<div class="gw-pl2">' + stt + (upd ? '<span class="new">🔄 Görselini güncelledi</span>' : '') + (warn.length ? '<span class="' + (bad ? "bad" : "warn") + '" title="' + esc(warn.join(" · ")) + '">⚠️ ' + esc(warn.join(" · ")) + '</span>' : '') + '</div></div>' +
                     '<div class="gw-pact">' + (isOwner() ? '<button type="button" class="gw-qb x2' + (x.x2 ? " on" : "") + '" data-x2="' + esc(x.uid) + '" title="' + (x.x2 ? "2× şansı kaldır" : "2× şans ver") + '">×2</button>' : '') + (x.m ? '' : any ? '<button type="button" class="gw-qb rst" data-rst="' + esc(x.uid) + '" title="Beklemeye geri al">↺</button>' : '') +
                     (x.m ? '' : '<button type="button" class="gw-qb ok' + (r.v === "ok" ? " on" : "") + '" data-rv="ok" data-u="' + esc(x.uid) + '" title="Onayla">✓</button><button type="button" class="gw-qb no' + (r.v === "no" ? " on" : "") + '" data-rv="no" data-u="' + esc(x.uid) + '" title="Uygun değil">✗</button>') +
