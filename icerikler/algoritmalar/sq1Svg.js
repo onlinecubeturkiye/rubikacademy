@@ -46,12 +46,13 @@ function sq1Svg(pattern, size, opts) {
   // corner second halves that wrap around (slot 0 = "d") are drawn from slot 11
   var gap = 92, h = 92;
   layer(0, 46, 46, false);
-  layer(12, 46 + gap, 46, true);
+  if (!opts.topOnly) layer(12, 46 + gap, 46, true);
   // slice line (front-back, 15 degrees)
-  [[46, false], [46 + gap, true]].forEach(function (c) {
+  (opts.topOnly ? [[46, false]] : [[46, false], [46 + gap, true]]).forEach(function (c) {
     var p = P(c[0], 46, 15, rC + 4), q = P(c[0], 46, 195, rC + 4);
     out.push('<line x1="' + p[0].toFixed(2) + '" y1="' + p[1].toFixed(2) + '" x2="' + q[0].toFixed(2) + '" y2="' + q[1].toFixed(2) + '" stroke="#e11d48" stroke-width="1.1" stroke-dasharray="2.5 2" opacity="0.85"/>');
   });
   var w = size * 2, hh = size;
+  if (opts.topOnly) return '<svg viewBox="-3 -3 98 98" width="' + size + '" height="' + size + '" aria-hidden="true">' + out.join("") + "</svg>";
   return '<svg viewBox="0 0 ' + (gap + h) + " " + h + '" width="' + w + '" height="' + hh + '" aria-hidden="true">' + out.join("") + "</svg>";
 }

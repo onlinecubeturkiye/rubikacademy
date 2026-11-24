@@ -876,7 +876,7 @@ details.case-group[open] > summary::before { transform: rotate(45deg); }
 </footer>
 
 <script src="/icerikler/algoritmalar/mgSvg.js?v=20270115"></script>
-<script src="/icerikler/algoritmalar/sq1Svg.js?v=20270115"></script>
+<script src="/icerikler/algoritmalar/sq1Svg.js?v=20261124"></script>
 <script src="/icerikler/algoritmalar/ll.js"></script>
 <script src="/icerikler/algoritmalar/cllSvg.js"></script>
 <script src="/icerikler/algoritmalar/ortegaSvg.js"></script>
@@ -940,10 +940,8 @@ var SETS = [
     { id: "mg-oll-full", label: "Tam OLL", file: "megaminx.json", multi: "oll-full", mode: "oll", progress: "algo-progress-megaminx-oll-full", keyFmt: "name", page: "megaminx_algos", puzzle: "mega", cube: "mega", draw: mgDraw },
     { id: "mg-pll-full", label: "Tam PLL", file: "megaminx.json", multi: "pll-full", mode: "pll", progress: "algo-progress-megaminx-pll-full", keyFmt: "name", page: "megaminx_algos", puzzle: "mega", cube: "mega", draw: mgDraw },
     { id: "sq-shape", label: "Cubeshape", file: "square1.json", multi: "shape", progress: "algo-progress-square1-shape", keyFmt: "name", page: "sq1_algos", puzzle: "sq1", cube: "sq1", draw: sqDraw },
-    { id: "sq-co", label: "CO", file: "square1.json", multi: "co", progress: "algo-progress-square1-co", keyFmt: "name", page: "sq1_algos", puzzle: "sq1", cube: "sq1", draw: sqDraw },
-    { id: "sq-eo", label: "EO", file: "square1.json", multi: "eo", progress: "algo-progress-square1-eo", keyFmt: "name", page: "sq1_algos", puzzle: "sq1", cube: "sq1", draw: sqDraw },
-    { id: "sq-cp", label: "CP", file: "square1.json", multi: "cp", progress: "algo-progress-square1-cp", keyFmt: "name", page: "sq1_algos", puzzle: "sq1", cube: "sq1", draw: sqDraw },
-    { id: "sq-ep", label: "EP", file: "square1.json", multi: "ep", progress: "algo-progress-square1-ep", keyFmt: "name", page: "sq1_algos", puzzle: "sq1", cube: "sq1", draw: sqDraw }
+    { id: "sq-co", label: "CO · EO", file: "square1.json", multi: "co", progress: "algo-progress-square1-co", keyFmt: "name", page: "sq1_algos", puzzle: "sq1", cube: "sq1", draw: sqDraw },
+    { id: "sq-cp", label: "CP · EP", file: "square1.json", multi: "cp", progress: "algo-progress-square1-cp", keyFmt: "name", page: "sq1_algos", puzzle: "sq1", cube: "sq1", draw: sqDraw }
 ];
 var PUZZLES = [
     { id: "cfop",  label: "3x3 · CFOP" },
@@ -1132,7 +1130,7 @@ function loadAll() {
     SETS.forEach(function (s) { if (!s.gen) files[s.file] = true; });
     var names = Object.keys(files).concat(["antrenor-karistirmalar.json", "xcross.json"]);
     return Promise.all(names.map(function (f) {
-        return fetch(BASE + f + "?v=20270115").then(function (r) {
+        return fetch(BASE + f + "?v=20261124").then(function (r) {
             if (!r.ok) throw new Error(f + " HTTP " + r.status);
             return r.json();
         });

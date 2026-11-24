@@ -299,7 +299,7 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 .mg-nota { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 6px 0 12px; }
 .mg-nota > div { display: flex; gap: 10px; align-items: baseline; padding: 10px 12px; border-radius: 12px; background: var(--surface-soft, var(--surface)); border: 1px solid var(--border); font-size: 13.5px; color: var(--text-soft); }
 .mg-nota b { font: 800 16px 'JetBrains Mono', monospace; color: var(--text); min-width: 64px; white-space: nowrap; flex-shrink: 0; }
-#setTabs { display: flex !important; }
+
 .fto-sec { margin: 0 0 34px; scroll-margin-top: 80px; }
 .fto-h { margin: 0 0 4px; font-size: 24px; font-weight: 800; color: var(--text); }
 .fto-sec .set-desc { text-align: left; margin: 0 0 12px; }
@@ -312,6 +312,10 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 #setTabs a.set-tab { text-decoration: none; }
 .subset-heading small { font-size: 14px; font-weight: 700; color: var(--text-soft); margin-left: 6px; }
 .case-pos { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 6px; background: var(--surface-soft); border: 1px solid var(--border); font: 800 11px Inter, sans-serif; color: var(--text-soft); vertical-align: middle; }
+/* uzun tanıtım yazısı gizli: sayfa doğrudan algoritmalarla başlar */
+.hero .hero-text > p, .hero .badge { display: none !important; }
+.hero { padding: 18px 22px !important; min-height: 0 !important; margin-bottom: 18px !important; }
+.hero h1 { margin: 0 !important; font-size: clamp(24px, 5.5vw, 38px) !important; line-height: 1.15 !important; }
 </style>
 
 <!-- Google tag (gtag.js) -->
