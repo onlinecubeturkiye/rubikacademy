@@ -19,14 +19,17 @@ const ms = (t) => (t && t.toMillis ? t.toMillis() : 0);
 
 // Okuma kotası: önce gönderilecek bir şey var mı bak (boş sorgu 1 okuma); aboneler yalnız gerekirse okunur
 const pendB = (await db.collection("broadcasts").where("pushed", "==", false).get()).docs;
-const pendN = (await db.collectionGroup("notifications").where("pushed", "==", false).get()).docs;
+// tek sorgu için koleksiyon-grubu dizini gerekir; yoksa (null) abonelerin kutuları tek tek okunur
+let pendN = null;
+try { pendN = (await db.collectionGroup("notifications").where("pushed", "==", false).get()).docs; }
+catch (e) { console.log("koleksiyon-grubu dizini yok, kişi kişi okunacak:", String(e.message || "").slice(0, 80)); }
 const remRef = db.collection("config").doc("remind");
 const rem = (await remRef.get()).data() || {};
 const seen = new Set(rem.c || []);
 const fresh = (await db.collection("comps").where("st", "==", "lobby").get()).docs
     .filter((d) => !seen.has(d.id) && now - ms(d.get("ts")) < 2 * 3600e3);
 const due = (d) => (ms(d.get("at")) || ms(d.get("ts"))) <= now;
-if (!pendB.some(due) && !pendN.some(due) && !fresh.length) { console.log("gönderilecek bir şey yok"); process.exit(0); }
+if (!pendB.some(due) && pendN && !pendN.some(due) && !fresh.length) { console.log("gönderilecek bir şey yok"); process.exit(0); }
 const subs = (await db.collection("pushsubs").get()).docs.map((d) => {
     let sub = null; try { sub = JSON.parse(d.get("sub") || "null"); } catch (e) {}
     return { ref: d.ref, sub, uid: d.get("uid") || "", rem: d.get("rem") || "" };
@@ -81,6 +84,10 @@ for (const d of pendB) {
 // Kişisel bildirimler (yalnız aboneliği olan kullanıcılar)
 const byUid = {};
 subs.forEach((s) => { if (s.uid) (byUid[s.uid] = byUid[s.uid] || []).push(s); });
+if (!pendN) {
+    pendN = [];
+    for (const uid of Object.keys(byUid)) pendN.push(...(await db.collection("users").doc(uid).collection("notifications").where("pushed", "==", false).get()).docs);
+}
 for (const d of pendN) {
     const uid = d.ref.parent.parent ? d.ref.parent.parent.id : "";
     {
