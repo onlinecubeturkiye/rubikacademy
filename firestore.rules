@@ -336,7 +336,7 @@ service cloud.firestore {
     // Çekilişler (/icerikler/cekilis): yönetici kurar; kayıtlar çekiliş anına kadar açık (mini: 10 dk önce kapanır).
     // Çekilişte rastgele seçilen kişi 2 dakika içinde onaylar, sonra teslimat bilgilerini gönderir.
     match /giveaways/{gid} {
-      function gk() { return ['title', 'prize', 'desc', 'img', 'drawAt', 'closeAt', 'host', 'hName', 'st', 'w', 'wName', 'wAt', 'claimBy', 'cAt', 'x', 'n', 'ts', 'mode', 'test', 'yt', 'ytUrl', 'pin', 'onlyOk', 'wa', 'waUrl', 'wn', 'man']; }
+      function gk() { return ['title', 'prize', 'desc', 'img', 'drawAt', 'closeAt', 'host', 'hName', 'st', 'w', 'wName', 'wAt', 'claimBy', 'cAt', 'x', 'n', 'ts', 'mode', 'test', 'yt', 'ytUrl', 'pin', 'onlyOk', 'wa', 'waUrl', 'wn', 'man', 'ask', 'askQ']; }
       allow read: if true;
       allow create: if gwMgr() && gid.matches('^[A-Za-z0-9]{6,24}$')
         && request.resource.data.keys().hasOnly(gk())
@@ -352,6 +352,9 @@ service cloud.firestore {
         // katılım şartı: YouTube kanalına abonelik görseli (yt = kanal adı, ytUrl = kanal bağlantısı)
         && (!('yt' in request.resource.data) || (request.resource.data.yt is string && request.resource.data.yt.size() <= 120))
         && (!('ytUrl' in request.resource.data) || (request.resource.data.ytUrl is string && request.resource.data.ytUrl.size() <= 400))
+        // kazanandan istenecek bilgiler (ask: "name,phone,email,address" alt kümesi; boş = hiçbir şey) ve isteğe bağlı özel soru
+        && (!('ask' in request.resource.data) || (request.resource.data.ask is string && request.resource.data.ask.size() <= 60))
+        && (!('askQ' in request.resource.data) || (request.resource.data.askQ is string && request.resource.data.askQ.size() <= 80))
         // kayıtlar: çekiliş anına kadar açık; mini çekilişte 10 dakika önce kapanır
         && (request.resource.data.closeAt == request.resource.data.drawAt
             || request.resource.data.closeAt == request.resource.data.drawAt - duration.value(24, 'h')
@@ -420,22 +423,33 @@ service cloud.firestore {
           && (!('v' in request.resource.data) || request.resource.data.v in ['ok', 'no'])
           && (!('b' in request.resource.data) || request.resource.data.b in ['ok', 'no']);
       }
-      // Kazananın teslimat bilgileri: yalnız kazanan yazar (onayladıktan sonra), yalnız kazanan ve yöneticiler okur
+      // Kazananın bilgileri: yalnız kazanan yazar (onayladıktan sonra), yalnız kazanan ve yöneticiler okur.
+      // Hangi alanların zorunlu olduğunu çekilişin "ask" ayarı belirler (yoksa eski davranış: ad, telefon, e-posta, adres).
       match /claim/{uid} {
+        function gw() { return get(/databases/$(database)/documents/giveaways/$(gid)).data; }
+        function askL() { return gw().get('ask', 'name,phone,email,address').split(','); }
+        function d() { return request.resource.data; }
         allow read: if gwMgr() || (request.auth != null && request.auth.uid == uid);
         allow create, update: if request.auth != null && request.auth.uid == uid
-          && get(/databases/$(database)/documents/giveaways/$(gid)).data.w == uid
-          && get(/databases/$(database)/documents/giveaways/$(gid)).data.st == 'claimed'
-          && request.resource.data.keys().hasOnly(['name', 'phone', 'email', 'city', 'district', 'address', 'zip', 'note', 'ts'])
-          && request.resource.data.name is string && request.resource.data.name.size() > 1 && request.resource.data.name.size() <= 80
-          && request.resource.data.phone is string && request.resource.data.phone.size() >= 7 && request.resource.data.phone.size() <= 25
-          && request.resource.data.email is string && request.resource.data.email.size() <= 120
-          && request.resource.data.city is string && request.resource.data.city.size() <= 40
-          && request.resource.data.district is string && request.resource.data.district.size() <= 60
-          && request.resource.data.address is string && request.resource.data.address.size() > 5 && request.resource.data.address.size() <= 400
-          && request.resource.data.zip is string && request.resource.data.zip.size() <= 10
-          && request.resource.data.note is string && request.resource.data.note.size() <= 300
-          && request.resource.data.ts is timestamp;
+          && gw().w == uid && gw().st == 'claimed'
+          && d().keys().hasOnly(['name', 'phone', 'email', 'city', 'district', 'address', 'zip', 'note', 'extra', 'ts'])
+          && (!('name' in d()) || (d().name is string && d().name.size() <= 80))
+          && (!('phone' in d()) || (d().phone is string && d().phone.size() <= 25))
+          && (!('email' in d()) || (d().email is string && d().email.size() <= 120))
+          && (!('city' in d()) || (d().city is string && d().city.size() <= 40))
+          && (!('district' in d()) || (d().district is string && d().district.size() <= 60))
+          && (!('address' in d()) || (d().address is string && d().address.size() <= 400))
+          && (!('zip' in d()) || (d().zip is string && d().zip.size() <= 10))
+          && (!('note' in d()) || (d().note is string && d().note.size() <= 300))
+          && (!('extra' in d()) || (d().extra is string && d().extra.size() <= 200))
+          // istenen alanlar dolu olmalı
+          && (!('name' in askL()) || (d().get('name', '') is string && d().get('name', '').size() > 1))
+          && (!('phone' in askL()) || (d().get('phone', '') is string && d().get('phone', '').size() >= 7))
+          && (!('email' in askL()) || (d().get('email', '') is string && d().get('email', '').size() >= 5))
+          && (!('address' in askL()) || (d().get('address', '') is string && d().get('address', '').size() > 5
+              && d().get('city', '') is string && d().get('city', '').size() > 0 && d().get('district', '') is string && d().get('district', '').size() > 0))
+          && (gw().get('askQ', '') == '' || (d().get('extra', '') is string && d().get('extra', '').size() > 0))
+          && d().ts is timestamp;
         allow delete: if gwMgr();
       }
     }
