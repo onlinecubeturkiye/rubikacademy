@@ -1,0 +1,149 @@
+<!doctype html>
+<!-- Tanıtım videosunun sahneleri. uret.mjs bu sayfayı açar ve her kare için window.render(t) çağırır. -->
+<html lang="tr"><head><meta charset="utf-8"><title>Rubik Academy tanıtım</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#13141f;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#root{position:absolute;inset:0;perspective:2600px;overflow:hidden}
+.sc{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;visibility:hidden;transform-style:flat}
+.bg{position:absolute;inset:0}
+.glow{position:absolute;width:1200px;height:1200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.30),rgba(255,255,255,0) 62%)}
+.dots i{position:absolute;border-radius:22%}
+.txt{position:absolute;top:0;bottom:0;width:900px;display:flex;flex-direction:column;justify-content:center;color:#fff}
+.kick{align-self:flex-start;font:800 30px Inter;letter-spacing:4px;padding:14px 28px;border-radius:999px;background:rgba(255,255,255,.2);margin-bottom:34px}
+.dark .kick{background:rgba(0,0,0,.12)}
+h1{font:900 122px/1.02 Inter;letter-spacing:-4px}
+h1 .ln{display:block}
+h1 em{font-style:normal;display:inline-block}
+.sub{margin-top:34px;font:700 40px/1.3 Inter;opacity:.95}
+.brand{display:flex;align-items:center;gap:22px;font:900 50px Inter;letter-spacing:-1px;margin-bottom:34px}
+.brand img{width:104px;height:104px;border-radius:26px;background:#fff;padding:8px;box-shadow:0 16px 40px rgba(0,0,0,.25)}
+.phone{position:absolute;top:70px;width:530px;height:942px;border-radius:70px;background:#0d0e14;padding:15px;box-shadow:0 50px 110px rgba(0,0,0,.45),0 0 0 3px rgba(255,255,255,.18) inset}
+.scr{width:100%;height:100%;border-radius:56px;overflow:hidden;background:#f4f2ee}
+.scr img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+/* kapanış */
+.end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center}
+.end .logo{width:250px;height:250px;border-radius:60px;background:#fff;padding:18px;box-shadow:0 30px 80px rgba(30,0,60,.45)}
+.end h2{margin-top:44px;font:900 88px/1.05 Inter;letter-spacing:-3px}
+.end .pills{margin-top:26px;font:800 44px Inter;color:#ffe066;letter-spacing:.5px}
+.end .gp{margin-top:46px;display:inline-flex;align-items:center;gap:20px;padding:26px 54px;border-radius:999px;background:#0d0e14;font:900 46px Inter;box-shadow:0 24px 60px rgba(20,0,40,.45)}
+.end .gp b{display:inline-block;width:0;height:0;border-left:34px solid #ffe066;border-top:21px solid transparent;border-bottom:21px solid transparent;margin-right:4px}
+.sphone{position:absolute;top:170px;width:400px;height:711px;border-radius:54px;background:#0d0e14;padding:11px;box-shadow:0 40px 90px rgba(30,0,60,.45)}
+.sphone div{width:100%;height:100%;border-radius:44px;overflow:hidden}.sphone img{width:100%;display:block}
+</style></head><body><div id="root"></div>
+<script>
+const W = 1920, H = 1080, TR = 0.5; // geçiş süresi
+const ICON = "/play-store/gorseller/uygulama-simgesi-512.png", HAM = (f) => "/play-store/gorseller/ham/" + f;
+// Sahneler (120 BPM: sınırlar vuruşlara denk gelir). seg: telefonda oynayan gerçek kayıt parçaları
+const S = [
+  { end: 4.5, bg: ["#7c5cff", "#4f2bd9"], c: "#ffd43b", side: "L", tr: "cube", brand: true,
+    kicker: "SIFIRDAN İLERİ SEVİYEYE", lines: ["Küpü çöz.", "<em>Hızlan.</em>"], sub: "Dersler, algoritmalar ve antrenörler<br>tek uygulamada",
+    seg: [{ clip: "ana-sayfa", at: -1, from: 0, speed: 1 }] },
+  { end: 9.5, bg: ["#ff8a1f", "#f0490f"], c: "#fff3bf", side: "R", tr: "push",
+    kicker: "OLL · PLL · F2L · ZBLL", lines: ["<em>1.400+</em> algoritma", "tek yerde"], sub: "Her case 3D oynatıcıda<br>adım adım",
+    seg: [{ clip: "pll", at: -0.5, from: 0.1, speed: 1.4 }] },
+  { end: 14.5, bg: ["#16b36e", "#0b7d4b"], c: "#d3f9d8", side: "L", tr: "cube",
+    kicker: "SÜRE · TEKRAR · GELİŞİM", lines: ["Antrenörle", "<em>ezberle</em>, hızlan"], sub: "Karıştır, çöz, süreni gör",
+    seg: [{ clip: "antrenor", at: -0.5, from: 0.2, speed: 1.3 }] },
+  { end: 20, bg: ["#ff4f8b", "#c81d63"], c: "#ffe066", side: "R", tr: "circle",
+    kicker: "CANLI · HER HAFTA", lines: ["Evden <em>canlı</em>", "yarışmalara katıl"], sub: "Kodla katıl, rekor tablosunda<br>yerini al",
+    seg: [{ clip: "ev-yarismasi", at: -0.5, from: 0.1, speed: 1.1 }, { clip: "rekorlar", at: 2.0, from: 0.5, speed: 1.1 }] },
+  { end: 24.5, bg: ["#2f80ff", "#1546c9"], c: "#a5f3fc", side: "L", tr: "cube",
+    kicker: "KİŞİSEL YOL HARİTASI", lines: ["Sırada ne var,", "<em>hep bil</em>"], sub: "Başlangıçtan ileri seviyeye<br>adım adım",
+    seg: [{ clip: "yol-haritasi", at: -0.5, from: 0, speed: 1.05 }] },
+  { end: 29.5, bg: ["#ffc61a", "#f59f00"], c: "#b33c00", side: "R", tr: "cubeV", dark: true,
+    kicker: "KÜP YANINDA DEĞİL Mİ?", lines: ["Sanal <em>3D küple</em>", "pratik yap"], sub: "Karıştır, çevir, döndür",
+    seg: [{ clip: "sanal-kup", at: -0.5, from: 0.6, speed: 2.4 }] },
+  { end: 36, final: true },
+];
+let st = 0; for (const s of S) { s.start = st; st = s.end; }
+window.DURATION = st;
+let COUNTS = {};
+const cl = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const eo = (p) => 1 - Math.pow(1 - cl(p), 3);
+const eio = (p) => { p = cl(p); return p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; };
+const eb = (p) => { p = cl(p); const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); };
+function stickers(seed, n, avoid) {
+  const cols = ["#ff4d4f", "#ffd43b", "#40c057", "#339af0", "#ff922b", "#ffffff"]; let s = seed; const out = [];
+  const r = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  for (let i = 0; i < n; i++) { const size = 50 + r() * 90, x = r() * W, y = r() * H, rot = r() * 50 - 25, op = .2 + r() * .25, sp = r() * 2 - 1;
+    if (avoid(x, y)) continue; out.push({ size, x, y, rot, op, sp, c: cols[i % 6] }); }
+  return out;
+}
+const root = document.getElementById("root");
+S.forEach((s, i) => {
+  const el = document.createElement("div"); el.className = "sc" + (s.dark ? " dark" : ""); s.el = el;
+  if (s.final) {
+    el.innerHTML = `<div class="bg" style="background:linear-gradient(115deg,#5b2bff 0%,#9b2cff 38%,#ff4f8b 72%,#ff8a1f 100%)"></div><div class="dots"></div>
+      <div class="glow" style="left:360px;top:-80px"></div>
+      <div class="sphone" id="spL" style="left:-70px"><div><img src="${HAM("02-pll.png")}"></div></div>
+      <div class="sphone" id="spR" style="right:-70px"><div><img src="${HAM("03-antrenor.png")}"></div></div>
+      <div class="end"><img class="logo" src="${ICON}"><h2>Rubik Academy: Küp Öğren</h2><div class="pills">Ücretsiz · Türkçe</div><div class="gp"><b></b>Şimdi Google Play'de</div></div>`;
+    s.st = stickers(91, 26, (x, y) => x > 300 && x < 1620);
+  } else {
+    const L = s.side === "L", ink = s.dark ? "#1b1300" : "#fff";
+    el.innerHTML = `<div class="bg" style="background:radial-gradient(120% 120% at ${L ? 15 : 85}% 0%, ${s.bg[0]} 0%, ${s.bg[1]} 80%)"></div><div class="dots"></div>
+      <div class="glow" style="left:${L ? 830 : -110}px;top:-60px"></div>
+      <div class="txt" style="${L ? "left:130px" : "right:110px"};color:${ink}">
+        ${s.brand ? `<div class="brand"><img src="${ICON}">Rubik Academy</div>` : ""}
+        <div class="kick">${s.kicker}</div><h1>${s.lines.map((l) => `<span class="ln">${l}</span>`).join("")}</h1><div class="sub">${s.sub}</div></div>
+      <div class="phone" style="left:${L ? 1250 : 150}px"><div class="scr"><img></div></div>`;
+    el.querySelectorAll("em").forEach((e) => (e.style.color = s.c));
+    s.st = stickers(i * 17 + 3, 34, (x, y) => (L ? (x > 60 && x < 1100) || (x > 1180 && x < 1840 && y > 20) : (x > 820 && x < 1860) || (x > 80 && x < 740 && y > 20)));
+    s.img = el.querySelector(".scr img"); s.phone = el.querySelector(".phone");
+  }
+  el.querySelector(".dots").innerHTML = s.st.map((d) => `<i style="left:${d.x}px;top:${d.y}px;width:${d.size}px;height:${d.size}px;background:${d.c};opacity:${d.op}"></i>`).join("");
+  s.dots = [...el.querySelectorAll(".dots i")];
+  root.appendChild(el);
+});
+function trans(s, p, incoming) { // p: 0→1
+  const e = eio(p);
+  switch (s) {
+    case "push": return { tf: `translateX(${incoming ? (1 - e) * W : -e * W * 0.35}px)`, f: incoming ? "" : `brightness(${1 - .3 * e})` };
+    case "cube": return { tf: `translateZ(-960px) rotateY(${incoming ? 90 * (1 - e) : -90 * e}deg) translateZ(960px)`, f: `brightness(${incoming ? .6 + .4 * e : 1 - .4 * e})` };
+    case "cubeV": return { tf: `translateZ(-540px) rotateX(${incoming ? -90 * (1 - e) : 90 * e}deg) translateZ(540px)`, f: `brightness(${incoming ? .6 + .4 * e : 1 - .4 * e})` };
+    case "circle": return incoming ? { clip: `circle(${e * 2300}px at ${960}px 540px)` } : { tf: `scale(${1 + .12 * e})` };
+  }
+  return {};
+}
+async function animScene(s, lt, t) {
+  s.dots.forEach((d, k) => { const o = s.st[k]; d.style.transform = `translateY(${Math.sin(t * 1.3 + k) * 10}px) rotate(${o.rot + t * 14 * o.sp}deg) scale(${eb((lt + .3 - k * .01) / .6)})`; });
+  if (s.final) {
+    const q = (a, d = .55) => cl((lt - a) / d);
+    const logo = s.el.querySelector(".logo"); logo.style.transform = `scale(${eb(q(0, .6))}) rotate(${(1 - eo(q(0, .7))) * -25}deg)`; logo.style.opacity = q(0, .2);
+    [[".end h2", .25], [".pills", .45], [".gp", .65]].forEach(([sel, a]) => { const x = s.el.querySelector(sel); x.style.opacity = q(a, .3); x.style.transform = `translateY(${(1 - eo(q(a))) * 60}px)`; });
+    const gp = s.el.querySelector(".gp"); if (lt > 1.4) gp.style.transform = `scale(${1 + .035 * Math.sin((lt - 1.4) * Math.PI * 2)})`;
+    s.el.querySelector("#spL").style.transform = `translateX(${(1 - eo(q(.1, .8))) * -600}px) rotate(-10deg) translateY(${Math.sin(t * 1.6) * 10}px)`;
+    s.el.querySelector("#spR").style.transform = `translateX(${(1 - eo(q(.1, .8))) * 600}px) rotate(10deg) translateY(${Math.cos(t * 1.6) * 10}px)`;
+    return;
+  }
+  const L = s.side === "L", k0 = s.brand ? -0.75 : -0.25; // ilk sahne: ilk karede yazı hazır
+  const set = (x, a, dy = 50) => { if (!x) return; const p = eo((lt - a) / .4); x.style.opacity = cl((lt - a) / .25); x.style.transform = `translateY(${(1 - p) * dy}px)`; };
+  set(s.el.querySelector(".brand"), k0 - .1); set(s.el.querySelector(".kick"), k0);
+  s.el.querySelectorAll(".ln").forEach((ln, j) => set(ln, k0 + .1 + j * .1, 80));
+  s.el.querySelectorAll("em").forEach((e) => { const p = cl((lt - k0 - .4) / .45); e.style.transform = `scale(${1 + .18 * Math.sin(p * Math.PI)})`; });
+  set(s.el.querySelector(".sub"), k0 + .45);
+  const pp = eb((lt + .45) / .8);
+  s.phone.style.transform = `translateY(${(1 - pp) * 500 + Math.sin(t * 1.8) * 9}px) rotate(${(1 - pp) * (L ? 9 : -9) + Math.sin(t * 1.1) * .6}deg)`;
+  // telefondaki gerçek kayıt
+  let g = s.seg[0]; for (const x of s.seg) if (lt >= x.at) g = x;
+  const n = COUNTS[g.clip] || 1, f = Math.round(cl((g.from + Math.max(0, lt - g.at) * g.speed) * 30, 0, n - 1));
+  const src = `klipler/${g.clip}/${String(f).padStart(4, "0")}.jpg`;
+  if (s.img.getAttribute("src") !== src) { s.img.setAttribute("src", src); await s.img.decode().catch(() => {}); }
+}
+window.render = async (t, counts) => {
+  if (counts) COUNTS = counts;
+  const jobs = [];
+  S.forEach((s, i) => {
+    const pre = i === 0 ? 0 : TR, vis = t >= s.start - pre && t < s.end;
+    s.el.style.visibility = vis ? "visible" : "hidden";
+    if (!vis) return;
+    let tf = "", f = "", clip = "", z = 1;
+    if (i > 0 && t < s.start) { const r = trans(S[i - 1].tr, (t - (s.start - TR)) / TR, true); tf = r.tf || ""; f = r.f || ""; clip = r.clip || ""; z = 2; }
+    else if (S[i + 1] && t >= s.end - TR) { const r = trans(s.tr, (t - (s.end - TR)) / TR, false); tf = r.tf || ""; f = r.f || ""; }
+    Object.assign(s.el.style, { transform: tf, filter: f, clipPath: clip, zIndex: z });
+    jobs.push(animScene(s, t - s.start, t));
+  });
+  await Promise.all(jobs);
+};
+</script></body></html>
