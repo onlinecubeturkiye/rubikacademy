@@ -509,7 +509,7 @@ function render() {
     refreshProgressLabels();
 }
 
-fetch("/icerikler/algoritmalar/zbll.json?v=20270115")
+fetch("/icerikler/algoritmalar/zbll.json?v=20261124c")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data.zbll;
