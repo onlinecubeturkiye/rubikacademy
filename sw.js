@@ -4,7 +4,7 @@
    - Görseller/fontlar: önbellekten hemen ver, arka planda güncelle
    - Algoritma sayfaları ve antrenör kurulumda önceden indirilir (çevrimdışı açılsın diye)
    Sürüm (VERSION) değişince eski önbellek silinir. */
-var VERSION = "ra-20270115";
+var VERSION = "ra-20270116";
 var PRECACHE = [
     "/",
     "/icerikler.html",
@@ -44,7 +44,7 @@ var PRECACHE = [
     "/js/recog-trainer.js?v=20270115",
     "/styles/common.css?v=20270115",
     "/js/i18n.js?v=20270115",
-    "/js/common.js?v=20270115",
+    "/js/common.js?v=20270116",
     "/js/ra-icons.js?v=20270115",
     "/js/ad-banner.js?v=20270115",
     "/js/custom-algs.js?v=20270115",
