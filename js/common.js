@@ -1027,3 +1027,55 @@ if ("serviceWorker" in navigator) {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setup); else setup();
     window.addEventListener("load", setup);
 })();
+
+/* ---------- Çekiliş: kaçırılan çark ----------
+   Katıldığın bir çekilişin sonucu açıklandığında çekiliş sayfasında değilsen, sitede hangi sayfaya
+   girersen gir çark önüne açılır ("… önce çevrildi" yazısıyla). Okuma tasarrufu: yalnız bu tarayıcıda
+   katıldığın, saati gelmiş ve sonucunu henüz görmediğin çekiliş için, en fazla 5 dakikada bir 1 belge okunur. */
+(function () {
+    try { if (window.top !== window) return; } catch (e) { return; }
+    if (/^\/icerikler\/cekilis(\.html)?$/.test(location.pathname) && /[?&]id=/.test(location.search)) return; // açık çekiliş sayfası kendisi gösterir
+    function get(k) { try { return JSON.parse(localStorage.getItem(k) || "{}") || {}; } catch (e) { return {}; } }
+    function set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    function open(id) {
+        if (document.getElementById("raGwOv")) return;
+        var ov = document.createElement("div"); ov.id = "raGwOv";
+        ov.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:radial-gradient(80% 70% at 50% 40%,rgba(22,34,92,.94),rgba(3,5,14,.99));display:flex;align-items:center;justify-content:center";
+        ov.innerHTML = '<div style="color:#c7d2fe;font:800 15px Inter,sans-serif">🎡 Çekiliş sonucu yükleniyor…</div>' +
+            '<iframe title="Çekiliş sonucu" src="/icerikler/cekilis?id=' + encodeURIComponent(id) + '&izle=1" style="position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent" allow="clipboard-write"></iframe>' +
+            '<button type="button" aria-label="Kapat" style="position:absolute;top:14px;left:14px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:17px;cursor:pointer;z-index:2;display:none">✕</button>';
+        var close = function () { if (ov.parentNode) ov.parentNode.removeChild(ov); document.documentElement.style.overflow = ""; };
+        var xb = ov.querySelector("button"), shown = false;
+        xb.onclick = close;
+        // çark açılırsa içindeki ✕ kullanılır; 8 sn içinde açılmazsa (bağlantı sorunu) dıştaki ✕ görünür
+        setTimeout(function () { if (!shown) xb.style.display = ""; }, 8000);
+        window.addEventListener("message", function (e) {
+            if (e.origin !== location.origin || !e.data) return;
+            if (e.data.raGw === "close") close(); else if (e.data.raGw === "shown") { shown = true; xb.style.display = "none"; }
+        });
+        document.documentElement.style.overflow = "hidden";
+        document.body.appendChild(ov);
+    }
+    function check() {
+        var cfg = window.RA_FIREBASE; if (!cfg || !cfg.apiKey || !cfg.projectId) return;
+        var joined = get("ra-gw-joined"), seen = get("ra-gw-seen"), chk = get("ra-gw-chk"), now = Date.now(), W = 7 * 86400000;
+        // eski kayıtları temizle
+        Object.keys(joined).forEach(function (id) { if (!(joined[id] > now - W)) { delete joined[id]; delete chk[id]; } });
+        set("ra-gw-joined", joined);
+        var ids = Object.keys(joined).filter(function (id) { return joined[id] <= now && !seen[id] && !(chk[id] > now - 300000); });
+        if (!ids.length) { set("ra-gw-chk", chk); return; }
+        var id = ids[0]; chk[id] = now; set("ra-gw-chk", chk);
+        var root = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents";
+        fetch(root + "/giveaways/" + encodeURIComponent(id) + "?key=" + encodeURIComponent(cfg.apiKey) + "&mask.fieldPaths=st&mask.fieldPaths=w&mask.fieldPaths=wAt")
+            .then(function (r) { if (r.status === 404) { var j = get("ra-gw-joined"); delete j[id]; set("ra-gw-joined", j); return null; } return r.ok ? r.json() : null; })
+            .then(function (d) {
+                var f = (d && d.fields) || {}, st = f.st && f.st.stringValue, w = f.w && f.w.stringValue;
+                var wAt = f.wAt ? Date.parse(f.wAt.timestampValue || "") || +(f.wAt.integerValue || 0) : 0;
+                if (!w || !(st === "drawn" || st === "claimed") || !(wAt > now - 3 * 86400000)) return;
+                if (get("ra-gw-seen")[id] === w) return;
+                open(id);
+            }).catch(function () {});
+    }
+    function later() { setTimeout(check, 1500); }
+    if (document.readyState === "complete") later(); else window.addEventListener("load", later);
+})();
