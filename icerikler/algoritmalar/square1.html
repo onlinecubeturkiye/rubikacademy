@@ -23,9 +23,9 @@
 <meta name="theme-color" content="#0b0d14">
 
 <link rel="canonical" href="https://rubikacademy.fun/icerikler/algoritmalar/square1">
-<meta name="description" content="Square-1 için tüm adımlar: 89 cubeshape durumu, köşe/kenar yönlendirme (CO, EO), köşe ve kenar dizme (CP, EP), parite ve orta katman. Simülasyonla bulunup doğrulanmış algoritmalar.">
+<meta name="description" content="Square-1 için tüm adımlar: 169 cubeshape durumu, köşe/kenar yönlendirme (CO, EO), köşe ve kenar dizme (CP, EP), parite ve orta katman. Simülasyonla bulunup doğrulanmış algoritmalar.">
 <meta property="og:title" content="Rubik Academy - Square-1 Algoritmaları (Cubeshape, CO, EO, CP, EP)">
-<meta property="og:description" content="Square-1 için tüm adımlar: 89 cubeshape durumu, köşe/kenar yönlendirme (CO, EO), köşe ve kenar dizme (CP, EP), parite ve orta katman. Simülasyonla bulunup doğrulanmış algoritmalar.">
+<meta property="og:description" content="Square-1 için tüm adımlar: 169 cubeshape durumu, köşe/kenar yönlendirme (CO, EO), köşe ve kenar dizme (CP, EP), parite ve orta katman. Simülasyonla bulunup doğrulanmış algoritmalar.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rubikacademy.fun/icerikler/algoritmalar/square1">
 <meta property="og:image" content="https://rubikacademy.fun/og/square1.png?v=20270115">
@@ -298,8 +298,9 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 .mg-nota { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 6px 0 12px; }
 .mg-nota > div { display: flex; gap: 10px; align-items: baseline; padding: 10px 12px; border-radius: 12px; background: var(--surface-soft, var(--surface)); border: 1px solid var(--border); font-size: 13.5px; color: var(--text-soft); }
 .mg-nota b { font: 800 16px 'JetBrains Mono', monospace; color: var(--text); min-width: 64px; white-space: nowrap; }
-.case-diagram { width: 132px !important; }
-.case-diagram svg { width: 128px !important; height: 64px !important; }
+.case-diagram { width: 196px !important; height: 104px !important; }
+.case-diagram svg { width: 188px !important; height: 94px !important; }
+@media (max-width: 520px) { .case-diagram { width: 152px !important; height: 82px !important; } .case-diagram svg { width: 146px !important; height: 73px !important; } }
 #setTabs { display: flex !important; }
 </style>
 
@@ -513,7 +514,7 @@ function renderSet() {
     updateSummary();
 }
 
-fetch("/icerikler/algoritmalar/square1.json?v=20270115")
+fetch("/icerikler/algoritmalar/square1.json?v=20261124")
     .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
     .then(function (data) {
         DATA = data;
