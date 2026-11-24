@@ -39,6 +39,15 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
         native: true, call: call,
         info: function () { try { return JSON.parse(N.info()) || {}; } catch (e) { return {}; } }
     };
+    // Uygulamada Google girişi yoksa (google-services.json eksik derleme) Google düğmesini ve "veya" çizgisini gizle
+    try {
+        if (window.RAApp.info().google === false) {
+            document.documentElement.classList.add("ra-nogoogle");
+            var ng = document.createElement("style");
+            ng.textContent = "html.ra-nogoogle .auth-google,html.ra-nogoogle .auth-or,html.ra-nogoogle .acc-google,html.ra-nogoogle .acc-or{display:none!important}";
+            (document.head || document.documentElement).appendChild(ng);
+        }
+    } catch (e) {}
     // Yazdır / PDF: WebView window.print desteklemiyor → Android yazdırma
     window.print = function () { call("print"); };
     // Paylaş: WebView'de navigator.share yok → Android paylaşım menüsü (yalnız metin/bağlantı)
