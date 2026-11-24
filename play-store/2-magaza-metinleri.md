@@ -10,10 +10,10 @@ Rubik Academy: Küp Öğren
 
 Alternatif (marka riskini azaltmak için): `Küp Akademi: Rubik Küp Öğren` — "Rubik" kelimesi yine geçer; tamamen kaçınmak istersen `Küp Akademi`.
 
-## Kısa açıklama (77/80)
+## Kısa açıklama (72/80)
 
 ```
-Rubik küpü öğren: algoritmalar, antrenör, akıllı küp ve canlı ev yarışmaları.
+Rubik küpü öğren: 1.400+ algoritma, antrenörler ve canlı ev yarışmaları.
 ```
 
 ## Uzun açıklama (2182/4000)
