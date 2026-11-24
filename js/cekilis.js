@@ -300,7 +300,7 @@
     function openOne(id, noPush) {
         if (!noPush) try { history.pushState(null, "", "/icerikler/cekilis?id=" + encodeURIComponent(id)); } catch (e) {}
         $("gwListWrap").hidden = true; $("gwOne").hidden = false; $("gwOne").innerHTML = '<p class="gw-empty">Yükleniyor…</p>';
-        S.g = null; S.entries = null;
+        S.g = null; S.entries = null; S.pplSeen = 0;
         fetchOne(id).then(function () { if (!S.g) { $("gwOne").innerHTML = '<p class="gw-empty">Çekiliş bulunamadı. <a href="/icerikler/cekilis">Tüm çekilişler</a></p>'; return; } renderOne(); schedule(); });
         try { window.scrollTo(0, 0); } catch (e) {}
     }
@@ -905,7 +905,20 @@
             Array.prototype.forEach.call(pgEl.querySelectorAll("[data-pg]"), function (x) { x.onclick = function () { S.pplPage = +x.getAttribute("data-pg"); paint(l); }; });
         };
         if (S.entries && S.entriesFor === g.id && S.entriesN === S.count) { paint(S.entries); return; }
-        listEntries(g.id).then(function (l) { S.entries = l; S.entriesFor = g.id; S.entriesN = l.length; paint(l); }).catch(function () {
+        // okuma tasarrufu: liste her katılımcı için 1 okuma demek. Bu tarayıcıda son 10 dakikada okunduysa
+        // ve katılımcı sayısı değişmediyse önbellekten çiz; okumayı da yalnız liste ekrana yaklaşınca yap
+        var ck = cacheGet("ppl:" + g.id);
+        if (ck && ck.n === S.count && Date.now() - ck.t < 600000 && ck.l) { paint(ck.l); return; }
+        if (EMBED) return;
+        if (!S.pplSeen && window.IntersectionObserver) {
+            if (S.pplObs) S.pplObs.disconnect();
+            S.pplObs = new IntersectionObserver(function (en) { if (en.some(function (x) { return x.isIntersecting; })) { S.pplObs.disconnect(); S.pplSeen = 1; loadPeople(); } }, { rootMargin: "400px" });
+            S.pplObs.observe(box); return;
+        }
+        listEntries(g.id).then(function (l) {
+            S.entries = l; S.entriesFor = g.id; S.entriesN = l.length; paint(l);
+            cacheSet("ppl:" + g.id, { t: Date.now(), n: l.length, l: l.map(function (x) { return { uid: x.uid, name: x.name, ts: x.ts, b: x.b, b2: x.b2, x2: x.x2, m: x.m }; }) });
+        }).catch(function () {
             // kota doluyken: sitedeki yedekteki son katılımcı listesi
             backup().then(function (bk) {
                 var e = bk && bk._e && bk._e[g.id];
@@ -1340,7 +1353,10 @@
         S.pollN = (S.pollN || 0) + 1;
         var light = near || S.pollN % 5 !== 0;
 
-        S.pollT = setTimeout(function () { pollNow(light, waitClaim); }, document.hidden ? 120000 : near ? 5000 : 60000);
+        // okuma tasarrufu: sık yoklama yalnız yönetici ve kazanan için 5 sn; diğer izleyiciler 15 sn
+        // (sonuç geldiğinde çark animasyonu zaten oynar, birkaç saniyelik gecikme fark edilmez)
+        var fast = S.mgr || iWin || waitClaim;
+        S.pollT = setTimeout(function () { pollNow(light, waitClaim); }, document.hidden ? 120000 : near ? (fast ? 5000 : 15000) : 60000);
     }
     function pollNow(light, waitClaim) {
         var g = S.g; if (!g) return;
