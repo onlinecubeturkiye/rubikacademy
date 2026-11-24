@@ -300,10 +300,6 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 .mg-nota > div { display: flex; gap: 10px; align-items: baseline; padding: 10px 12px; border-radius: 12px; background: var(--surface-soft, var(--surface)); border: 1px solid var(--border); font-size: 13.5px; color: var(--text-soft); }
 .mg-nota b { font: 800 16px 'JetBrains Mono', monospace; color: var(--text); min-width: 64px; white-space: nowrap; }
 
-/* uzun tanıtım yazısı gizli: sayfa doğrudan algoritmalarla başlar */
-.hero .hero-text > p, .hero .badge { display: none !important; }
-.hero { padding: 18px 22px !important; min-height: 0 !important; margin-bottom: 18px !important; }
-.hero h1 { margin: 0 !important; font-size: clamp(24px, 5.5vw, 38px) !important; line-height: 1.15 !important; }
 </style>
 
 <!-- Google tag (gtag.js) -->
@@ -361,16 +357,6 @@ html.dark-mode .bottom h3 { color: #60a5fa; }
 <h1><span data-i18n="hero_title1">Megaminx</span> <span data-i18n="hero_titleAccent">Son Katman</span></h1>
 <p data-i18n="hero_p">F2L bittikten sonra son katmanı dört adımda çöz: önce kenarları, sonra köşeleri yönlendir (2-Look OLL), ardından köşeleri, en son kenarları yerine diz (2-Look PLL). Her algoritma megaminx simülasyonunda tek tek doğrulandı.</p>
 </div>
-</section>
-<section class="nota-box">
-    <h2 data-i18n="not_title">Notasyon</h2>
-    <div class="mg-nota">
-        <div><b dir="ltr">U</b><span data-i18n="not_U">Üst yüzü saat yönünde 72° (beşte bir tur) çevir.</span></div>
-        <div><b dir="ltr">U2</b><span data-i18n="not_U2">144° (iki adım). U2' ters yönde 144°.</span></div>
-        <div><b dir="ltr">R F L</b><span data-i18n="not_RFL">Sağ, ön ve sol yüzler; yüze dışarıdan bakarken saat yönünde.</span></div>
-        <div><b dir="ltr">'</b><span data-i18n="not_prime">Ters yön (saat yönünün tersi).</span></div>
-    </div>
-    <p data-i18n="view_note">Diyagramlar üstten bakıştır: alttaki kenar öndür (yeşil). 2-Look OLL'de sarı alanlar üst yüz rengini, PLL'de renkler yan yüzleri gösterir; gri parçalar o adımda önemsizdir. AUF: algoritmadan önce üst yüzü (U) çevirerek diyagramla eşleştir.</p>
 </section>
 
 <div class="set-tabs" id="setTabs"></div>
