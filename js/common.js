@@ -172,14 +172,12 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
         var hasIcons = window.RAIcons || document.querySelector('script[src*="/js/ra-icons.js"]');
         var me = document.currentScript && document.currentScript.src || "", v = (/[?&]v=([^&]+)/.exec(me) || [])[1] || "";
         if (!hasIcons) { var sc = document.createElement("script"); sc.src = "/js/ra-icons.js" + (v ? "?v=" + v : ""); sc.defer = true; (document.head || document.documentElement).appendChild(sc); }
-        // sponsor banner'ı (içerik admin panelinden)
         // özel paketler (hesaba atanmış tema / algoritma): önbellekteki tema hemen, güncel liste packs.js ile
         var pc = ""; try { pc = localStorage.getItem("ra-pack-css") || ""; } catch (e) {}
         if (pc) { var ps = document.createElement("style"); ps.id = "raPackCss"; ps.textContent = pc; (document.head || document.documentElement).appendChild(ps); }
         try { var sk0 = localStorage.getItem("site-skin") || "", pm = localStorage.getItem("ra-pack-mode"); if (pc && sk0.indexOf("p-") === 0 && pm) document.documentElement.classList.toggle("dark-mode", pm === "dark"); } catch (e) {}
         var pk = document.createElement("script"); pk.src = "/js/packs.js" + (v ? "?v=" + v : ""); pk.defer = true;
         (document.head || document.documentElement).appendChild(pk);
-        // sponsor (Minjuan) reklam alanı kaldırıldı
     } catch (e) {}
 })();
 (function () {

@@ -46,7 +46,6 @@ var PRECACHE = [
     "/js/i18n.js?v=20270115",
     "/js/common.js?v=20270115",
     "/js/ra-icons.js?v=20270115",
-    "/js/ad-banner.js?v=20270115",
     "/js/custom-algs.js?v=20270115",
     "/darkmode.js",
     "/icerikler/algoritmalar/ll.js",
