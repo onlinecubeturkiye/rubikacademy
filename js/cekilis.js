@@ -239,14 +239,16 @@
         try { history.pushState(null, "", "/icerikler/cekilis"); } catch (e) {}
         $("gwOne").hidden = true; $("gwListWrap").hidden = false; loadList();
     }
-    function fetchOne(id) {
-        var u = me();
+    // light: yalnız çekiliş belgesi (1 okuma); katılımım ve kişi sayısı önceki değerinde kalır
+    function fetchOne(id, light) {
+        var u = light ? null : me();
         return Promise.all([
             fetch(ROOT + "/giveaways/" + id + "?key=" + encodeURIComponent(cfg.apiKey)).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (d) { cacheSet("g:" + id, d); return d; }, function () { return cacheGet("g:" + id) || backup().then(function (b) { return b && (b.documents || []).filter(function (x) { return x.name.split("/").pop() === id; })[0] || null; }); }),
             // kendi katılımım: herkese açık belge, oturum beklenmeden okunur
             u ? fetch(ROOT + "/giveaways/" + id + "/e/" + u.uid + "?key=" + encodeURIComponent(cfg.apiKey)).then(function (r) { return r.ok ? r.json() : r.status === 404 ? null : (localJoined(id) ? { fields: {} } : null); }, function () { return localJoined(id) ? { fields: {} } : null; }) : Promise.resolve(null),
-            countEntries(id)
+            light ? Promise.resolve(null) : countEntries(id)
         ]).then(function (res) {
+            if (light) res[1] = undefined;
             if (!res[0]) { if (!S.g || S.g.id !== id) S.g = null; return; }
             var prev = S.g; S.g = dec(res[0]); S.joined = !!res[1] || (prev && prev.id === S.g.id && S.joined && res[1] === undefined); S.myBonus = !!(res[1] && dec(res[1]).b); if (res[2] != null) S.count = res[2];
             if (S.joined) remember(S.g);
@@ -1188,13 +1190,18 @@
         var g = S.g; if (!g) return;
         // yönetici, kazanan teslimat bilgilerini gönderene kadar sık yoklar (sayfayı yenilemeden görsün)
         var waitClaim = S.mgr && g.st === "claimed" && !isM(g.w) && S.claimSeen !== g.id + g.w;
-        var now = Date.now(), near = (now > g.drawAt - 90000 && now < g.drawAt + 1800000) || g.st === "drawn" || waitClaim;
-        // çekiliş yaklaşırken animasyon için katılımcı adlarını önceden al
+        // okuma tasarrufu: sık yoklama yalnız sonuç beklenirken (çekilişten önce / çekiliş anında);
+        // sonuç çıktıktan sonra yalnız yönetici ve kazanan sık yoklar, diğer izleyiciler dakikada bir
+        var now = Date.now(), waitDraw = (g.st === "open" || !g.st) && now > g.drawAt - 90000 && now < g.drawAt + 1800000;
+        var iWin = !!(me() && me().uid === g.w), near = waitDraw || (g.st === "drawn" && (S.mgr || iWin || S.joined)) || waitClaim; // katılan, yeniden çekilişte kendisi seçilebilir
+        // sık yoklamada yalnız çekiliş belgesi okunur; tam yenileme (katılımım + sayı) 5 dakikada bir
+        S.pollN = (S.pollN || 0) + 1;
+        var light = near || S.pollN % 5 !== 0;
 
         S.pollT = setTimeout(function () {
             var sig = function () { return JSON.stringify([S.g, S.joined, S.count]); }, before = sig();
-            fetchOne(g.id).then(function () { if (S.g) { if (sig() !== before) renderOne(); else if (waitClaim && S.g.st === "claimed" && $("gwClaim")) loadClaim(S.g); autoMgr(); schedule(); } });
-        }, document.hidden ? 60000 : near ? 4000 : 60000);
+            fetchOne(g.id, light).then(function () { if (S.g) { if (sig() !== before) renderOne(); else if (waitClaim && S.g.st === "claimed" && $("gwClaim")) loadClaim(S.g); autoMgr(); schedule(); } });
+        }, document.hidden ? 120000 : near ? 5000 : 60000);
     }
     function tick() {
         updCd();

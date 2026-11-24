@@ -780,10 +780,10 @@
     function compPoll() {
         if (!comp) return;
         if (comp.live) {
-            // Canlı dinleme bazen (özellikle iPhone Safari'de) hata vermeden donuyor: oda belgesini 5 sn'de bir,
-            // yarışmacıları 12 sn'de bir doğrudan oku; canlı veriden farklıysa ona geç ve dinlemeyi yeniden kur
-            var now = Date.now(), wantP = now - (comp.chkP || 0) > 12000;
-            if (now - (comp.chk || 0) < 5000) { applyComp(comp.doc, comp.players); return; }
+            // Canlı dinleme bazen (özellikle iPhone Safari'de) hata vermeden donuyor: oda belgesini 20 sn'de bir,
+            // yarışmacıları 60 sn'de bir doğrudan oku (okuma kotası için seyrek); canlı veriden farklıysa ona geç ve dinlemeyi yeniden kur
+            var now = Date.now(), wantP = now - (comp.chkP || 0) > 60000;
+            if (now - (comp.chk || 0) < 20000) { applyComp(comp.doc, comp.players); return; }
             comp.chk = now; if (wantP) comp.chkP = now;
             var code0 = comp.code;
             Promise.all([apiAny(cPath(), { method: "GET" }), wantP ? apiAny(cPath("/p?pageSize=50"), { method: "GET" }) : null]).then(function (rs) {
@@ -803,12 +803,22 @@
             }).catch(function () { if (comp) applyComp(comp.doc, comp.players); });
             return;
         }
-        Promise.all([apiAny(cPath(), { method: "GET" }), apiAny(cPath("/p?pageSize=50"), { method: "GET" })]).then(function (rs) {
-            if (!rs[0].ok) throw new Error(rs[0].status);
-            return Promise.all([rs[0].json(), rs[1].ok ? rs[1].json() : {}]);
-        }).then(function (res) {
-            if (!comp || comp.live) return;
-            applyComp(parseDoc(res[0]), parsePlayers(res[1]));
+        // canlı dinleme yoksa: oda belgesi her yoklamada (1 okuma); yarışmacı listesi (kişi başı 1 okuma)
+        // yalnız oda belgesi değiştiyse ya da 20 sn geçtiyse okunur
+        var code1 = comp.code;
+        apiAny(cPath(), { method: "GET" }).then(function (r0) {
+            if (!r0.ok) throw new Error(r0.status);
+            return r0.json();
+        }).then(function (d0) {
+            if (!comp || comp.live || comp.code !== code1) return;
+            var t = Date.now(), changed = d0.updateTime !== comp.docUT;
+            comp.docUT = d0.updateTime;
+            if (!changed && comp.players && t - (comp.pT || 0) < 20000) { applyComp(parseDoc(d0), comp.players); return; }
+            comp.pT = t;
+            return apiAny(cPath("/p?pageSize=50"), { method: "GET" }).then(function (r1) { return r1.ok ? r1.json() : {}; }).then(function (pd) {
+                if (!comp || comp.live || comp.code !== code1) return;
+                applyComp(parseDoc(d0), parsePlayers(pd));
+            });
         }).catch(function () {});
     }
     function applyComp(d, players) {
@@ -820,7 +830,7 @@
             // sunucuda daha fazla süre varsa (ör. süre dolunca yazılan DNF) yerel kopyayı bırak
             var mp = myP(); if (comp.local && mp && timesOf(mp).length >= comp.local.t.length) comp.local = null;
             // izleyici sayısı (ucuz sayım sorgusu) ve oda yöneticisi için bağlantı durumu: 30 sn'de bir
-            if (!comp.wT || Date.now() - comp.wT > 15000) {
+            if (!comp.wT || Date.now() - comp.wT > 30000) {
                 comp.wT = Date.now();
                 countFresh(comp.code).then(function (n) {
                     if (!comp) return; n = Math.max(0, n - comp.players.length);
@@ -1729,7 +1739,7 @@
     }
     function initComp() {
         initCompRole();
-        loadLive(); clearInterval(liveT); liveT = setInterval(function () { if (!comp && document.visibilityState === "visible") loadLive(); }, 60000);
+        loadLive(); clearInterval(liveT); liveT = setInterval(function () { if (!comp && document.visibilityState === "visible") loadLive(); }, 180000); // 15 okuma: 3 dakikada bir
         $("cCreate").onclick = createComp;
         if ($("cCapR")) $("cCapR").oninput = function () { $("cCapV").textContent = this.value; };
         $("cJoin").onclick = function () { joinComp($("cJoinIn").value); };
