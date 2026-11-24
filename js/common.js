@@ -1066,12 +1066,12 @@ if ("serviceWorker" in navigator) {
         if (!ids.length) { set("ra-gw-chk", chk); return; }
         var id = ids[0]; chk[id] = now; set("ra-gw-chk", chk);
         var root = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents";
-        fetch(root + "/giveaways/" + encodeURIComponent(id) + "?key=" + encodeURIComponent(cfg.apiKey) + "&mask.fieldPaths=st&mask.fieldPaths=w&mask.fieldPaths=wAt")
+        fetch(root + "/giveaways/" + encodeURIComponent(id) + "?key=" + encodeURIComponent(cfg.apiKey) + "&mask.fieldPaths=st&mask.fieldPaths=w&mask.fieldPaths=wAt&mask.fieldPaths=man")
             .then(function (r) { if (r.status === 404) { var j = get("ra-gw-joined"); delete j[id]; set("ra-gw-joined", j); return null; } return r.ok ? r.json() : null; })
             .then(function (d) {
                 var f = (d && d.fields) || {}, st = f.st && f.st.stringValue, w = f.w && f.w.stringValue;
                 var wAt = f.wAt ? Date.parse(f.wAt.timestampValue || "") || +(f.wAt.integerValue || 0) : 0;
-                if (!w || !(st === "drawn" || st === "claimed") || !(wAt > now - 3 * 86400000)) return;
+                if (!w || (f.man && f.man.booleanValue) || !(st === "drawn" || st === "claimed") || !(wAt > now - 3 * 86400000)) return;
                 if (get("ra-gw-seen")[id] === w) return;
                 open(id);
             }).catch(function () {});

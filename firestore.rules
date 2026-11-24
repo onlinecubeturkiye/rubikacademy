@@ -336,7 +336,7 @@ service cloud.firestore {
     // Çekilişler (/icerikler/cekilis): yönetici kurar; kayıtlar çekiliş anına kadar açık (mini: 10 dk önce kapanır).
     // Çekilişte rastgele seçilen kişi 2 dakika içinde onaylar, sonra teslimat bilgilerini gönderir.
     match /giveaways/{gid} {
-      function gk() { return ['title', 'prize', 'desc', 'img', 'drawAt', 'closeAt', 'host', 'hName', 'st', 'w', 'wName', 'wAt', 'claimBy', 'cAt', 'x', 'n', 'ts', 'mode', 'test', 'yt', 'ytUrl', 'pin', 'onlyOk', 'wa', 'waUrl', 'wn']; }
+      function gk() { return ['title', 'prize', 'desc', 'img', 'drawAt', 'closeAt', 'host', 'hName', 'st', 'w', 'wName', 'wAt', 'claimBy', 'cAt', 'x', 'n', 'ts', 'mode', 'test', 'yt', 'ytUrl', 'pin', 'onlyOk', 'wa', 'waUrl', 'wn', 'man']; }
       allow read: if true;
       allow create: if gwMgr() && gid.matches('^[A-Za-z0-9]{6,24}$')
         && request.resource.data.keys().hasOnly(gk())
