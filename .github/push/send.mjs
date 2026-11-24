@@ -17,6 +17,16 @@ const db = admin.firestore();
 const now = Date.now();
 const ms = (t) => (t && t.toMillis ? t.toMillis() : 0);
 
+// Okuma kotası: önce gönderilecek bir şey var mı bak (boş sorgu 1 okuma); aboneler yalnız gerekirse okunur
+const pendB = (await db.collection("broadcasts").where("pushed", "==", false).get()).docs;
+const pendN = (await db.collectionGroup("notifications").where("pushed", "==", false).get()).docs;
+const remRef = db.collection("config").doc("remind");
+const rem = (await remRef.get()).data() || {};
+const seen = new Set(rem.c || []);
+const fresh = (await db.collection("comps").where("st", "==", "lobby").get()).docs
+    .filter((d) => !seen.has(d.id) && now - ms(d.get("ts")) < 2 * 3600e3);
+const due = (d) => (ms(d.get("at")) || ms(d.get("ts"))) <= now;
+if (!pendB.some(due) && !pendN.some(due) && !fresh.length) { console.log("gönderilecek bir şey yok"); process.exit(0); }
 const subs = (await db.collection("pushsubs").get()).docs.map((d) => {
     let sub = null; try { sub = JSON.parse(d.get("sub") || "null"); } catch (e) {}
     return { ref: d.ref, sub, uid: d.get("uid") || "", rem: d.get("rem") || "" };
@@ -57,7 +67,7 @@ async function claim(ref) {
 }
 
 // Herkese açık duyurular
-for (const d of (await db.collection("broadcasts").where("pushed", "==", false).get()).docs) {
+for (const d of pendB) {
     const at = ms(d.get("at")) || ms(d.get("ts"));
     if (at > now) continue;   // planlı, zamanı gelmedi
     // comp-KOD: yeni ev yarışması duyurusu (oda sahibinin tarayıcısı yazar) → bildirim o yarışmayı açar
@@ -71,11 +81,14 @@ for (const d of (await db.collection("broadcasts").where("pushed", "==", false).
 // Kişisel bildirimler (yalnız aboneliği olan kullanıcılar)
 const byUid = {};
 subs.forEach((s) => { if (s.uid) (byUid[s.uid] = byUid[s.uid] || []).push(s); });
-for (const uid of Object.keys(byUid)) {
-    for (const d of (await db.collection("users").doc(uid).collection("notifications").where("pushed", "==", false).get()).docs) {
+for (const d of pendN) {
+    const uid = d.ref.parent.parent ? d.ref.parent.parent.id : "";
+    {
         const at = ms(d.get("at")) || ms(d.get("ts"));
         if (at > now) continue;
         if (!(await claim(d.ref))) continue;
+        // aboneliği olmayanın bildirimi de "gönderildi" sayılır: bekleyenler birikip her çalışmada yeniden okunmasın
+        if (!uid || !byUid[uid]) continue;
         const m = /rubikacademy\.fun(\/[^\s]*)/.exec(String(d.get("text") || ""));
         const n = await sendTo(byUid[uid], { title: "Rubik Academy", body: d.get("text") || "", tag: "n:" + d.id, url: m ? m[1] : "/" });
         console.log("bildirim", uid, d.id, "→", n);
@@ -83,15 +96,10 @@ for (const uid of Object.keys(byUid)) {
 }
 // Yeni ev yarışması yedek duyurusu.
 // Durum config/remind belgesinde tutulur: aynı hatırlatma iki kez gitmesin
-const remRef = db.collection("config").doc("remind");
-const rem = (await remRef.get()).data() || {};
 const tr = new Date(now + 3 * 3600e3); // Türkiye saati (UTC+3)
 const today = tr.toISOString().slice(0, 10);
 const wants = (k) => subs.filter((s) => String(s.rem || "").split(",").includes(k));
 // 2) Yeni ev yarışması (yedek): duyurusu yazılmamış, son 2 saatte açılmış odalar → herkese
-const seen = new Set(rem.c || []);
-const fresh = (await db.collection("comps").where("st", "==", "lobby").get()).docs
-    .filter((d) => !seen.has(d.id) && now - ms(d.get("ts")) < 2 * 3600e3);
 for (const d of fresh) {
     seen.add(d.id);
     const bRef = db.collection("broadcasts").doc("comp-" + d.id);
