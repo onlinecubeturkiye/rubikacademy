@@ -87,6 +87,9 @@
     }
     function dt(ms) { try { return new Date(ms).toLocaleString("tr-TR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; } }
     function rnd(n) { var a = new Uint32Array(1); (window.crypto || window.msCrypto).getRandomValues(a); return a[0] % n; }
+    // elle eklenen katılımcı (hesabı yok): kimliği "m_" ile başlar; yalnız site sahibi ekler
+    function isM(uid) { return /^m_/.test(String(uid || "")); }
+    function isOwner() { return !!(window.Account && Account.isAdmin && Account.isAdmin()); }
     function newId() { var c = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789", s = ""; for (var i = 0; i < 12; i++) s += c[rnd(c.length)]; return s; }
 
     // Hazır çekiliş görselleri (/img/cekilis/*.svg): tür seçilince başlık/ödül önerisi de gelir
@@ -247,7 +250,7 @@
             if (!res[0]) { if (!S.g || S.g.id !== id) S.g = null; return; }
             var prev = S.g; S.g = dec(res[0]); S.joined = !!res[1] || (prev && prev.id === S.g.id && S.joined && res[1] === undefined); S.myBonus = !!(res[1] && dec(res[1]).b); if (res[2] != null) S.count = res[2];
             if (S.joined) remember(S.g);
-            if (prev && prev.id === S.g.id && S.g.w && S.g.w !== prev.w && S.g.st === "drawn") {
+            if (prev && prev.id === S.g.id && S.g.w && S.g.w !== prev.w && (S.g.st === "drawn" || (S.g.st === "claimed" && isM(S.g.w)))) {
                 if (me() && me().uid === S.g.w) S.winShown = 1; // onay penceresini animasyon sonunda aç
                 reveal(S.g);
             }
@@ -280,7 +283,7 @@
     function revOf(uid) { return changedAfter(uid) ? "" : ((S.rev || {})[uid] || {}).v || ""; }
     function revB(uid) { return changedAfter(uid) ? "" : ((S.rev || {})[uid] || {}).b || ""; }
     // bonus sayılır mı: görsel yüklenmiş ve yönetici "geçersiz" dememiş
-    function bonusOk(x, rv) { var r = (rv || S.rev || {})[x.uid] || {}; return !!(x.b && S.g && S.g.wa && r.b === "ok"); }
+    function bonusOk(x, rv) { var r = (rv || S.rev || {})[x.uid] || {}; return !!(x.x2 || (x.b && S.g && S.g.wa && r.b === "ok")); }
     function setRev(uid, v) {
         return setRevF(uid, "v", v);
     }
@@ -300,7 +303,7 @@
         var out = [];
         function page(tok) {
             return fetch(ROOT + "/giveaways/" + id + "/e?pageSize=300&key=" + encodeURIComponent(cfg.apiKey) + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
-                (d.documents || []).forEach(function (x) { var o = dec(x); out.push({ uid: o.id, name: o.name || "Cuber", d: o.d || "", ts: o.ts || 0, b: !!o.b }); });
+                (d.documents || []).forEach(function (x) { var o = dec(x); out.push({ uid: o.id, name: o.name || "Cuber", d: o.d || "", ts: o.ts || 0, b: !!o.b, m: !!o.m, x2: !!o.x2 }); });
                 return d.nextPageToken && out.length < 20000 ? page(d.nextPageToken) : out;
             });
         }
@@ -624,7 +627,11 @@
             '<button type="button" class="gwm-a del" id="gwDel"><i>🗑</i><span>Çekilişi sil<small>Geri alınamaz</small></span></button></div>' +
             '<details class="gwm-help"><summary>Nasıl çalışır?</summary><p>Kayıtlar kapanınca <b>Şimdi çek</b>e dokun; herkes çarkı aynı anda görür. Kazanan 2 dakika içinde onaylamazsa bu sayfa açıkken sıradaki kişi kendiliğinden çekilir. Sabitlenen çekiliş listede en üstte durur, katılımcılar bunu görmez. Görselleri incele: <b>yalnız onayladığın kişiler çekilir</b>; reddedilen ve bekleyenler çekilmez. WhatsApp bonusu da onaylanırsa çarkta 2 kez sayılır.</p></details>' +
             (skipNames(g).length ? '<p class="gw-note">Onaylamayan / iptal edilenler: <b>' + skipNames(g).map(esc).join(" → ") + '</b></p>' : '') +
+            (isOwner() && (p === "open" || p === "closed" || p === "drawing") ? '<form class="gw-madd" id="gwMAdd" autocomplete="off"><h4>✋ Elle katılımcı ekle</h4><p class="gw-note">Hesabı olmayan birini ekle. Onaylı sayılır, görsel istenmez. Yalnız sen görürsün.</p>' +
+                '<div class="gw-maddr"><input id="gwMName" maxlength="24" placeholder="Ad soyad" required><label class="gw-mx2"><input type="checkbox" id="gwMX2"> ×2 şans</label><button type="submit" class="btn sm primary" id="gwMBtn">Ekle</button></div><p class="gw-msg" id="gwMMsg"></p></form>' : '') +
             '<div id="gwClaim"></div><div class="gw-chk" id="gwChk"><h4>🔍 Katılımcı kontrolü</h4><p class="gw-note">Yükleniyor…</p></div>';
+        if ($("gwMAdd")) $("gwMAdd").onsubmit = function (e) { e.preventDefault(); addManual(g); };
+        if ($("gwMAdd")) $("gwMAdd").onsubmit = function (e) { e.preventDefault(); addManual(g); };
         $("gwPin").onclick = function () {
             var b = this; b.disabled = true;
             patch("/giveaways/" + g.id, { pin: g.pin ? 0 : Date.now() }).then(function (r) { if (!r.ok) throw 0; return fetchOne(g.id).then(renderOne); }).catch(function () { b.disabled = false; alert("Sabitlenemedi."); });
@@ -644,7 +651,26 @@
         };
         if (p === "claimed") loadClaim(g);
     }
+    function addManual(g) {
+        var nm = $("gwMName").value.trim().replace(/\s+/g, " ").slice(0, 24), x2 = $("gwMX2").checked, b = $("gwMBtn"), m = $("gwMMsg");
+        if (!nm) return;
+        if ((S.entries || []).some(function (y) { return String(y.name).toLocaleLowerCase("tr") === nm.toLocaleLowerCase("tr"); }) && !confirm("“" + nm + "” adında biri zaten var. Yine de eklensin mi?")) return;
+        var id = "m_" + newId(); b.disabled = true; m.textContent = ""; m.className = "gw-msg";
+        var w = { writes: [
+            { update: { name: docName("/giveaways/" + g.id + "/e/" + id), fields: { name: { stringValue: nm }, m: { booleanValue: true }, x2: { booleanValue: x2 } } }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }], currentDocument: { exists: false } },
+            { update: { name: docName("/giveaways/" + g.id + "/rev/" + id), fields: enc({ v: "ok", ts: Date.now() }) } }] };
+        req(":commit", { method: "POST", body: JSON.stringify(w) }).then(function (r) {
+            if (!r.ok) throw new Error(r.status);
+            S.count = (S.count || 0) + 1; S.rev = S.rev || {}; S.rev[id] = { v: "ok", b: "", ts: Date.now() };
+            (S.entries = S.entries || []).push({ uid: id, name: nm, d: "", ts: Date.now(), b: false, m: true, x2: x2 });
+            $("gwMName").value = ""; $("gwMX2").checked = false; b.disabled = false;
+            m.textContent = "✓ " + nm + " eklendi" + (x2 ? " (×2)" : ""); m.className = "gw-msg";
+            if ($("gwPplN")) $("gwPplN").textContent = S.count;
+            paintCheck(); loadPeople();
+        }).catch(function (e) { b.disabled = false; m.textContent = String(e && e.message) === "403" ? "Eklenemedi: yetki yok." : "Eklenemedi, tekrar dene."; m.className = "gw-msg bad"; });
+    }
     function loadClaim(g) {
+        if (isM(g.w)) { var c0 = $("gwClaim"); if (c0) c0.innerHTML = '<div class="gw-wait"><p>✋ <b>' + esc(g.wName) + '</b> elle eklenen bir katılımcı (hesabı yok). Ödülün teslimatını kendin ayarla.</p></div>'; return; }
         req("/giveaways/" + g.id + "/claim/" + g.w).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var c = $("gwClaim"); if (!c) return;
             if (!d) {
@@ -682,7 +708,7 @@
             function pick() {
                 if (!pool.length) return Promise.resolve(null);
                 var i = rnd(pool.length), w = pool[i];
-                return roleOf(w.uid).then(function (r) { if (r === "askida" || r === "silindi") { pool = pool.filter(function (y) { return y.uid !== w.uid; }); return pick(); } return w; });
+                return (isM(w.uid) ? Promise.resolve("") : roleOf(w.uid)).then(function (r) { if (r === "askida" || r === "silindi") { pool = pool.filter(function (y) { return y.uid !== w.uid; }); return pick(); } return w; });
             }
             // yönetici incelemesi: "uygun değil" işaretlenenler hiç çekilmez; istenirse yalnız onaylananlar arasından
             return listRev(g.id).then(function (rv) {
@@ -697,7 +723,9 @@
                 if (w === "stop") return;
                 var now = Date.now(), o;
                 if (!w) o = { st: "empty", x: skip.join(",").slice(0, 20000), n: l.length };
-                else o = { st: "drawn", w: w.uid, wName: w.name, wAt: now, claimBy: now + CLAIM_MS + 5000, x: skip.join(",").slice(0, 20000), n: l.length, wn: wheelNames(pool, w) };
+                else o = { st: isM(w.uid) ? "claimed" : "drawn", w: w.uid, wName: w.name, wAt: now, claimBy: now + CLAIM_MS + 5000, x: skip.join(",").slice(0, 20000), n: l.length, wn: wheelNames(pool, w) };
+                // elle eklenen kazananın hesabı yok: onay beklenmez, teslimatı yönetici kendisi ayarlar
+                if (w && isM(w.uid)) o.cAt = now;
                 // aynı anda iki yöneticinin çekmesini önle: yazmadan hemen önce belge hâlâ aynı mı bak
                 return req("/giveaways/" + g.id).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
                     var cur = d ? dec(d) : null;
@@ -727,7 +755,7 @@
             var shown = l.slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }), per = 12, pages = Math.max(1, Math.ceil(shown.length / per));
             S.pplPage = Math.min(S.pplPage || 0, pages - 1); var pg = S.pplPage;
             b.innerHTML = l.length ? shown.slice(pg * per, pg * per + per).map(function (x) {
-                return '<div class="gw-prow2' + (me() && me().uid === x.uid ? ' me' : '') + '"><a href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener">' + esc(x.name) + (x.b && g.wa ? ' <i class="gw-star" title="WhatsApp bonusu: çarkta 2 kez">⭐×2</i>' : '') + '</a><span>🕒 ' + esc(dtS(x.ts)) + '</span></div>';
+                return '<div class="gw-prow2' + (me() && me().uid === x.uid ? ' me' : '') + '"><a' + (x.m ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + (x.x2 ? ' <i class="gw-star" title="Çarkta 2 kez">×2</i>' : x.b && g.wa ? ' <i class="gw-star" title="WhatsApp bonusu: çarkta 2 kez">⭐×2</i>' : '') + '</a><span>🕒 ' + esc(dtS(x.ts)) + '</span></div>';
             }).join("") : '<p class="gw-note">Henüz katılan yok. İlk sen katıl!</p>';
             var pgEl = $("gwPg"); if (!pgEl) return;
             pgEl.innerHTML = pages > 1 ? '<button type="button" data-pg="' + (pg - 1) + '"' + (pg ? '' : ' disabled') + '>‹</button>' + Array.apply(null, Array(pages)).map(function (_, i) { return i < 7 || i === pages - 1 ? '<button type="button" data-pg="' + i + '"' + (i === pg ? ' class="on"' : '') + '>' + (i + 1) + '</button>' : i === 7 ? '<span>…</span>' : ''; }).join("") + '<button type="button" data-pg="' + (pg + 1) + '"' + (pg < pages - 1 ? '' : ' disabled') + '>›</button>' : '';
@@ -753,6 +781,7 @@
             function worker() {
                 if (k >= jobs.length) return Promise.resolve();
                 var x = jobs[k++];
+                if (x.m) { out[x.uid] = { u: null, role: "", st: {}, proofs: [], pts: 0, m: 1 }; return worker(); }
                 return Promise.all([req("/users/" + x.uid).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }), roleOf(x.uid),
                     g.yt ? req("/giveaways/" + g.id + "/proof/" + x.uid).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }) : Promise.resolve(null)]).then(function (res) {
                     var u = res[0] ? dec(res[0]) : null, st = {};
@@ -768,6 +797,8 @@
     }
     function flagsOf(x, all) {
         var c = (S.chk || {})[x.uid] || {}, u = c.u, f = [];
+        if (x.m) return [["star", "✋ Elle eklendi"]].concat(x.x2 ? [["star", "×2 şans"]] : []);
+        if (x.x2) f.push(["star", "×2 şans (site sahibi verdi)"]);
         if (c.role === "askida" || c.role === "silindi") f.push(["bad", "⛔ Askıda: çekilmez"]);
         if (S.g && S.g.yt && S.chk) chans(S.g).forEach(function (ch, i) { if (!(c.proofs || [])[i]) f.push(["bad", "📸 " + ch.name + " görseli yok"]); });
         if (x.d) { var n = all.filter(function (y) { return y.d === x.d; }).length; if (n > 1) f.push(["bad", "📱 Aynı cihaz ×" + n]); }
@@ -810,14 +841,21 @@
                 var warn = ff.map(function (t) { return t[1]; }), bad = ff.some(function (t) { return t[0] === "bad"; });
                 return '<div class="gw-prow' + (r.v === "ok" ? " okd" : r.v === "no" ? " nod" : "") + '">' +
                     '<button type="button" class="gw-pth" data-proof="' + esc(x.uid) + '" title="Görselleri incele">' + (prs.length ? '<img src="' + prs[0] + '" alt="">' + (prs.length > 1 ? '<i>' + prs.length + '</i>' : '') : '📷') + '</button>' +
-                    '<div class="gw-pn"><div class="gw-pl1"><a href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener">' + esc(x.name) + '</a>' + (x.b && S.g.wa ? '<i class="gw-star" title="' + (vb === "no" ? "Bonus geçersiz" : "WhatsApp bonusu") + '">' + (vb === "no" ? "⭐✗" : "⭐×2") + '</i>' : '') + '</div>' +
+                    '<div class="gw-pn"><div class="gw-pl1"><a' + (x.m ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + '</a>' + (x.m ? '<i class="gw-star" title="Elle eklendi">✋</i>' : '') + (x.x2 ? '<i class="gw-star" title="Çarkta 2 kez">×2</i>' : '') + (x.b && S.g.wa ? '<i class="gw-star" title="' + (vb === "no" ? "Bonus geçersiz" : "WhatsApp bonusu") + '">' + (vb === "no" ? "⭐✗" : "⭐×2") + '</i>' : '') + '</div>' +
                     '<div class="gw-pl2">' + stt + (upd ? '<span class="new">🔄 Görselini güncelledi</span>' : '') + (warn.length ? '<span class="' + (bad ? "bad" : "warn") + '" title="' + esc(warn.join(" · ")) + '">⚠️ ' + esc(warn.join(" · ")) + '</span>' : '') + '</div></div>' +
-                    '<div class="gw-pact">' + (any ? '<button type="button" class="gw-qb rst" data-rst="' + esc(x.uid) + '" title="Beklemeye geri al">↺</button>' : '') +
-                    '<button type="button" class="gw-qb ok' + (r.v === "ok" ? " on" : "") + '" data-rv="ok" data-u="' + esc(x.uid) + '" title="Onayla">✓</button><button type="button" class="gw-qb no' + (r.v === "no" ? " on" : "") + '" data-rv="no" data-u="' + esc(x.uid) + '" title="Uygun değil">✗</button>' +
+                    '<div class="gw-pact">' + (isOwner() ? '<button type="button" class="gw-qb x2' + (x.x2 ? " on" : "") + '" data-x2="' + esc(x.uid) + '" title="' + (x.x2 ? "2× şansı kaldır" : "2× şans ver") + '">×2</button>' : '') + (x.m ? '' : any ? '<button type="button" class="gw-qb rst" data-rst="' + esc(x.uid) + '" title="Beklemeye geri al">↺</button>' : '') +
+                    (x.m ? '' : '<button type="button" class="gw-qb ok' + (r.v === "ok" ? " on" : "") + '" data-rv="ok" data-u="' + esc(x.uid) + '" title="Onayla">✓</button><button type="button" class="gw-qb no' + (r.v === "no" ? " on" : "") + '" data-rv="no" data-u="' + esc(x.uid) + '" title="Uygun değil">✗</button>') +
                     '<button type="button" class="gw-qb out" data-out="' + esc(x.uid) + '" title="Çekilişten çıkar">🗑</button></div></div>';
             }).join("") || '<p class="gw-note">' + (n.all ? "Bu bölümde kimse yok." : "Henüz katılımcı yok.") + '</p>') + '</div>';
         Array.prototype.forEach.call(box.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { S.tab = b.getAttribute("data-tab"); paintCheck(); }; });
         Array.prototype.forEach.call(box.querySelectorAll("[data-proof]"), function (b) { b.onclick = function () { review(b.getAttribute("data-proof")); }; });
+        Array.prototype.forEach.call(box.querySelectorAll("[data-x2]"), function (b) {
+            b.onclick = function () {
+                var uid = b.getAttribute("data-x2"), x = l.filter(function (y) { return y.uid === uid; })[0]; if (!x) return;
+                var v = !x.x2; b.disabled = true;
+                patch("/giveaways/" + g.id + "/e/" + uid, { x2: v }, "&currentDocument.exists=true").then(function (r) { if (!r.ok) throw 0; x.x2 = v; paintCheck(); }).catch(function () { b.disabled = false; alert("Kaydedilemedi."); });
+            };
+        });
         Array.prototype.forEach.call(box.querySelectorAll("[data-rst]"), function (b) { b.onclick = function () { clearRev(b.getAttribute("data-rst")); paintCheck(); }; });
         Array.prototype.forEach.call(box.querySelectorAll("[data-rv]"), function (b) {
             b.onclick = function () { var u = b.getAttribute("data-u"), v = b.getAttribute("data-rv"); if (revOf(u) === v) clearRev(u); else setRev(u, v); paintCheck(); };
@@ -1125,7 +1163,7 @@
         clearTimeout(S.pollT);
         var g = S.g; if (!g) return;
         // yönetici, kazanan teslimat bilgilerini gönderene kadar sık yoklar (sayfayı yenilemeden görsün)
-        var waitClaim = S.mgr && g.st === "claimed" && S.claimSeen !== g.id + g.w;
+        var waitClaim = S.mgr && g.st === "claimed" && !isM(g.w) && S.claimSeen !== g.id + g.w;
         var now = Date.now(), near = (now > g.drawAt - 90000 && now < g.drawAt + 1800000) || g.st === "drawn" || waitClaim;
         // çekiliş yaklaşırken animasyon için katılımcı adlarını önceden al
 

@@ -277,6 +277,10 @@ details.coll-grp > summary .cg-chev { margin-left: auto; transition: transform .
 details.coll-grp[open] > summary .cg-chev { transform: rotate(90deg); }
 details.coll-grp[open] > summary { margin-bottom: 14px; }
 .z-empty { max-width: 1250px; margin: 0 auto; color: var(--text-soft); font-size: 14px; }
+/* uzun tanıtım yazısı gizli: sayfa doğrudan algoritmalarla başlar */
+.hero .hero-text > p, .hero .badge { display: none !important; }
+.hero { padding: 18px 22px !important; min-height: 0 !important; margin-bottom: 18px !important; }
+.hero h1 { margin: 0 !important; font-size: clamp(24px, 5.5vw, 38px) !important; line-height: 1.15 !important; }
 </style>
 
 <!-- Google tag (gtag.js) -->
