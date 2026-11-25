@@ -6,6 +6,15 @@
 ========================================================= */
 /* Renkler ve sade tema: styles/common.css sonundaki SADE TEMA bölümü (bütün sitede). Burada yalnız uygulamaya özel parçalar. */
 
+/* İLK ÇİZİM: <head>'deki kısa betik html.ra-app sınıfını ve bu dosyayı sayfa çizilmeden önce yükler.
+   js/common.js sayfa sonunda çalıştığı için, site görünümünün bir an görünmemesi adına temel kurallar burada da var. */
+html.ra-app .nav-links, html.ra-app .nav-bar, html.ra-app #accWrap, html.ra-app footer,
+html.ra-app #btnInstall, html.ra-app .pwa-install, html.ra-app [data-install] { display: none !important; }
+html.ra-app .navbar { min-height: 0; padding-bottom: 8px; justify-content: center; position: sticky; padding-top: max(env(safe-area-inset-top, 0px), 10px); }
+html.ra-native .navbar { padding-top: 10px; }
+html.ra-app .nav-logo { gap: 10px; margin: 0 auto; }
+html.ra-app .nav-right { position: absolute; right: 12px; bottom: 8px; }
+
 /* üst bar: düz, ince alt çizgi */
 html.ra-app .navbar { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important; border-bottom: 1px solid var(--border) !important; }
 html.ra-app .navbar::after { display: none !important; }

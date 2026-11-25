@@ -9,7 +9,7 @@
 ========================================================= */
 import { initializeApp, initializeAuth, inMemoryPersistence, browserSessionPersistence, browserPopupRedirectResolver,
     setPersistence, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut }
-    from "/js/vendor/firebase/firebase-auth.js?v=20270115";
+    from "/js/vendor/firebase/firebase-auth.js?v=20270117";
 
 const $ = (id) => document.getElementById(id);
 const cfg = window.RA_FIREBASE || {};

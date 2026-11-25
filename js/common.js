@@ -75,10 +75,15 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
     if (!on) return;
     var d = document.documentElement; d.classList.add("ra-app");
     // uygulamaya özel parçalar (styles/app.css); renk teması sitedeki gibi Ayarlar'dan seçilir
-    var ln = document.createElement("link"); ln.rel = "stylesheet"; ln.href = "/styles/app.css"; (document.head || d).appendChild(ln);
+    // sayfanın <head>'i app.css'i erken yüklediyse (ilk açılışta site görünümü yanıp sönmesin) tekrar ekleme
+    if (!document.querySelector('link[href^="/styles/app.css"]')) { var ln = document.createElement("link"); ln.rel = "stylesheet"; ln.href = "/styles/app.css"; (document.head || d).appendChild(ln); }
     var path = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
     var noBar = /\/(zkttimer|sanal-kup|giris)$|\/algoritmalar\/yazdir|\/kup-arena\//.test(path);
     if (noBar) d.classList.add("ra-app-nobar");
+    // Android uygulaması (RAAppNative) sistem çubuklarının boşluğunu zaten kendisi bırakıyor (MainActivity);
+    // WebView env(safe-area-inset-*) değerini yine de verdiği için boşluk iki kat oluyordu → uygulamada 0
+    var nat = !!window.RAAppNative;
+    function sa(side) { return nat ? "0px" : "env(safe-area-inset-" + side + ",0px)"; }
     var st = document.createElement("style");
     st.textContent =
         "html.ra-app{-webkit-tap-highlight-color:transparent}" +
@@ -107,11 +112,11 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
         "html.ra-app .nav-links{display:none!important}" +
         // hesap/profil alttaki "Profil" sekmesinde; üstte ikinci kez görünmesin (sekme çubuğu olmayan sayfalarda kalır)
         "html.ra-app #accWrap{display:none!important}" +
-        "html.ra-app .navbar{padding-top:max(env(safe-area-inset-top),10px)}" +
+        "html.ra-app .navbar{padding-top:max(" + sa("top") + ",10px)}" +
         "html.ra-app footer{display:none!important}" +
         "html.ra-app #btnInstall,html.ra-app .pwa-install,html.ra-app [data-install]{display:none!important}" +
-        "html.ra-app:not(.ra-app-nobar) body{padding-bottom:calc(74px + env(safe-area-inset-bottom))}" +
-        ".ra-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:900;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(6px + env(safe-area-inset-bottom));" +
+        "html.ra-app:not(.ra-app-nobar) body{padding-bottom:calc(74px + " + sa("bottom") + ")}" +
+        ".ra-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:900;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(6px + " + sa("bottom") + ");" +
             "background:color-mix(in srgb,var(--surface,#fff) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--border,#e5e7eb);box-shadow:0 -6px 20px rgba(0,0,0,.08)}" +
         ".ra-tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;border-radius:14px;color:var(--text-soft,#6b7280);text-decoration:none;font:800 11px Inter,system-ui,sans-serif;letter-spacing:.1px}" +
         ".ra-tabbar a svg{width:24px;height:24px}" +
@@ -119,7 +124,7 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
         ".ra-tabbar a:active{transform:scale(.94)}" +
         "html.ra-app-nobar .ra-tabbar{display:none}" +
         ".ra-tabbar.six{grid-template-columns:repeat(6,1fr)}.ra-tabbar.six a{font-size:10px}@media(min-width:900px){.ra-tabbar.six{width:640px}}" +
-        "html.ra-app:not(.ra-app-nobar) .ra-pushask{bottom:calc(86px + env(safe-area-inset-bottom))}" +
+        "html.ra-app:not(.ra-app-nobar) .ra-pushask{bottom:calc(86px + " + sa("bottom") + ")}" +
         "body.c-in-room .ra-tabbar{display:none}" +
         "@media(min-width:900px){.ra-tabbar{left:50%;right:auto;transform:translateX(-50%);width:560px;bottom:12px;border-radius:22px;border:1px solid var(--border,#e5e7eb);padding:6px}html.ra-app:not(.ra-app-nobar) body{padding-bottom:96px}}" +
         "@media print{.ra-tabbar{display:none}}";

@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20270115";
+    var V = "20270117";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -102,8 +102,14 @@
         if (window.RAApp && RAApp.native) {
             return RAApp.call("googleSignIn").then(function (r) {
                 if (r && r.token) return m.signInWithCredential(auth, m.GoogleAuthProvider.credential(r.token));
-                var e = new Error((r && r.msg) || "Google girişi yapılamadı");
-                e.code = r && r.err === "cancel" ? "auth/popup-closed-by-user" : r && r.err === "unavailable" ? "auth/operation-not-supported-in-this-environment" : "auth/internal-error";
+                var msg = (r && r.msg) || "";
+                var e = new Error(msg || "Google girişi yapılamadı");
+                // Hesap seçildikten sonra gelen "iptal" çoğu zaman gerçek iptal değildir: uygulamanın imza
+                // parmak izi (SHA-1) Firebase'de kayıtlı değilse Google "[16] Account reauth failed" döner
+                // ve bu iptal gibi görünür. Gerçek iptal değilse kullanıcıya hata göster, sessizce yutma.
+                var realCancel = r && r.err === "cancel" && !/\[\d+\]|reauth|developer|config/i.test(msg);
+                e.code = realCancel ? "auth/popup-closed-by-user" : r && r.err === "unavailable" ? "auth/operation-not-supported-in-this-environment" : "auth/app-google-" + ((r && r.err) || "fail");
+                try { console.warn("Android Google girişi:", r); } catch (x) {}
                 throw e;
             });
         }
@@ -225,6 +231,7 @@
         if (/network-request-failed/.test(c)) return t("e_net");
         if (/popup-blocked/.test(c)) return t("e_popup");
         if (/unauthorized-domain/.test(c)) return t("e_domain");
+        if (/^auth\/app-google-/.test(c)) return t("e_gen") + " (" + c.slice(5) + (err.message ? ": " + err.message : "") + ")";
         return t("e_gen") + (c ? " (" + c + ")" : "");
     }
     function buildModal() {
@@ -1310,6 +1317,8 @@
         if (lsGet(SIGNED_KEY) === "1" || window.RA_ACCOUNT_EAGER) loadSDK().catch(function () {});
         document.addEventListener("site-lang-change", function () { renderNav(); if (modal && modal.classList.contains("open")) renderModal(); });
         // Duyurular/bildirimler: herkese açık broadcast'leri her sayfada, kişisel bildirimleri girişten sonra göster
+        // Zil hemen görünsün (cihazdaki okunmamış sayısıyla); sunucudan yeni duyuru çekme gecikmeli kalır
+        try { bellMount(); } catch (e) {}
         setTimeout(showNotes, 1800);
         document.addEventListener("account-synced", function () { setTimeout(showNotes, 400); });
         // Bakım modu kontrolü (admin oturumu çözülsün diye kısa gecikme) + giriş/çıkışta yeniden
@@ -1351,7 +1360,7 @@
         ".ra-lock-b button,.ra-lock-b a{display:block;padding:12px 14px;border-radius:13px;font:800 14.5px Inter,sans-serif;cursor:pointer;text-decoration:none;border:1px solid var(--border,#2a2f42);background:var(--surface-soft,#1c2030);color:var(--text,#eef0f7)}" +
         ".ra-lock-b .go{background:var(--ui-accent,#6c5ce7);border-color:transparent;color:var(--ui-accent-text,#fff)}" +
         "html.ra-locked,html.ra-locked body{overflow:hidden}" +
-        ".ra-lnote{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:1050;display:flex;align-items:center;gap:10px;max-width:calc(100% - 32px);box-sizing:border-box;padding:10px 12px 10px 16px;border-radius:14px;background:var(--surface,#151826);border:1px solid var(--border,#2a2f42);box-shadow:0 10px 30px rgba(0,0,0,.3);font:700 14px Inter,sans-serif;color:var(--text,#eef0f7)}" +
+        ".ra-lnote{position:fixed;left:50%;bottom:calc(84px + " + (window.RAAppNative ? "0px" : "env(safe-area-inset-bottom,0px)") + ");transform:translateX(-50%);z-index:1050;display:flex;align-items:center;gap:10px;max-width:calc(100% - 32px);box-sizing:border-box;padding:10px 12px 10px 16px;border-radius:14px;background:var(--surface,#151826);border:1px solid var(--border,#2a2f42);box-shadow:0 10px 30px rgba(0,0,0,.3);font:700 14px Inter,sans-serif;color:var(--text,#eef0f7)}" +
         ".ra-lnote button{flex:none;border:0;border-radius:10px;padding:8px 12px;font:800 13px Inter,sans-serif;cursor:pointer;background:var(--ui-accent,#6c5ce7);color:var(--ui-accent-text,#fff)}";
     (document.head || document.documentElement).appendChild(css);
 
