@@ -62,13 +62,14 @@ import java.util.List;
 public class MainActivity extends Activity {
     static final String HOST = "rubikacademy.fun";
     static final String HOME = "https://" + HOST + "/?source=app";
-    static final int RQ_FILE = 11, RQ_PERM = 12, RQ_NOTIF = 13;
+    static final int RQ_FILE = 11, RQ_PERM = 12, RQ_NOTIF = 13, RQ_BLE = 14;
 
     WebView web;
     FrameLayout root;
     ValueCallback<Uri[]> fileCb;
     PermissionRequest pendingPerm;
     String pendingPushId;
+    Ble ble;
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     @Override
@@ -113,6 +114,7 @@ public class MainActivity extends Activity {
         s.setUserAgentString(s.getUserAgentString() + " RubikAcademyApp/" + versionName());
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(web, true);
+        ble = new Ble(this);
         web.addJavascriptInterface(new Bridge(), "RAAppNative");
 
         web.setWebViewClient(new WebViewClient() {
@@ -215,6 +217,7 @@ public class MainActivity extends Activity {
     public void onRequestPermissionsResult(int code, String[] perms, int[] res) {
         super.onRequestPermissionsResult(code, perms, res);
         if (code == RQ_PERM && pendingPerm != null) { grantMedia(pendingPerm); pendingPerm = null; }
+        if (code == RQ_BLE) ble.onPerm();
         if (code == RQ_NOTIF && pendingPushId != null) { reply(pendingPushId, JSONObject.quote(pushStatus())); pendingPushId = null; }
     }
 
@@ -259,7 +262,13 @@ public class MainActivity extends Activity {
         runOnUiThread(() -> web.evaluateJavascript(js, null));
     }
 
+    void js(String s) { runOnUiThread(() -> web.evaluateJavascript(s, null)); }
+
     class Bridge {
+        // Bluetooth LE (akıllı küp / akıllı timer): bkz. Ble.java
+        @JavascriptInterface
+        public void ble(String id, String arg) { ble.handle(id, arg); }
+
         @JavascriptInterface
         public String info() {
             try {
