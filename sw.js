@@ -4,7 +4,7 @@
    - Görseller/fontlar: önbellekten hemen ver, arka planda güncelle
    - Algoritma sayfaları ve antrenör kurulumda önceden indirilir (çevrimdışı açılsın diye)
    Sürüm (VERSION) değişince eski önbellek silinir. */
-var VERSION = "ra-20270121";
+var VERSION = "ra-20270122";
 var PRECACHE = [
     "/",
     "/icerikler.html",
@@ -20,8 +20,8 @@ var PRECACHE = [
     "/icerikler/algoritmalar/zbll.html",
     "/icerikler/algoritmalar/megaminx.html",
     "/icerikler/algoritmalar/square1.html",
-    "/icerikler/algoritmalar/mgSvg.js?v=20270121",
-    "/icerikler/algoritmalar/sq1Svg.js?v=20270121",
+    "/icerikler/algoritmalar/mgSvg.js?v=20270122",
+    "/icerikler/algoritmalar/sq1Svg.js?v=20270122",
     "/icerikler/algoritmalar/wv.html",
     "/icerikler/algoritmalar/cll.html",
     "/icerikler/algoritmalar/ortega-oll.html",
@@ -39,44 +39,44 @@ var PRECACHE = [
     "/icerikler/algoritmalar/2look-pll.html",
     "/icerikler/algoritmalar/antrenor.html",
     "/icerikler/algoritmalar/yazdir.html",
-    "/icerikler/algoritmalar/tanima-pll.json?v=20270121",
-    "/js/cross-solver.js?v=20270121",
-    "/js/recog-trainer.js?v=20270121",
-    "/styles/common.css?v=20270121",
-    "/js/i18n.js?v=20270121",
-    "/js/common.js?v=20270121",
-    "/js/ra-icons.js?v=20270121",
-    "/js/ad-banner.js?v=20270121",
-    "/js/custom-algs.js?v=20270121",
+    "/icerikler/algoritmalar/tanima-pll.json?v=20270122",
+    "/js/cross-solver.js?v=20270122",
+    "/js/recog-trainer.js?v=20270122",
+    "/styles/common.css?v=20270122",
+    "/js/i18n.js?v=20270122",
+    "/js/common.js?v=20270122",
+    "/js/ra-icons.js?v=20270122",
+    "/js/ad-banner.js?v=20270122",
+    "/js/custom-algs.js?v=20270122",
     "/darkmode.js",
     "/icerikler/algoritmalar/ll.js",
     "/icerikler/algoritmalar/cllSvg.js",
     "/icerikler/algoritmalar/ortegaSvg.js",
     "/icerikler/algoritmalar/ortegaOllSvg.js",
-    "/icerikler/algoritmalar/antrenor-bt.js?v=20270121",
+    "/icerikler/algoritmalar/antrenor-bt.js?v=20270122",
     "/icons/icon-192.png",
     "/icons/favicon-48.png",
     "/manifest.webmanifest",
     "/icerikler/algoritmalar/oll-pll.json",
-    "/icerikler/algoritmalar/oll-pll.json?v=20270121",
+    "/icerikler/algoritmalar/oll-pll.json?v=20270122",
     "/icerikler/algoritmalar/coll.json",
-    "/icerikler/algoritmalar/coll.json?v=20270121",
+    "/icerikler/algoritmalar/coll.json?v=20270122",
     "/icerikler/algoritmalar/wv.json",
-    "/icerikler/algoritmalar/wv.json?v=20270121",
+    "/icerikler/algoritmalar/wv.json?v=20270122",
     "/icerikler/algoritmalar/cll.json",
-    "/icerikler/algoritmalar/cll.json?v=20270121",
+    "/icerikler/algoritmalar/cll.json?v=20270122",
     "/icerikler/algoritmalar/ortega-oll.json",
-    "/icerikler/algoritmalar/ortega-oll.json?v=20270121",
+    "/icerikler/algoritmalar/ortega-oll.json?v=20270122",
     "/icerikler/algoritmalar/ortega-pbl.json",
-    "/icerikler/algoritmalar/ortega-pbl.json?v=20270121",
+    "/icerikler/algoritmalar/ortega-pbl.json?v=20270122",
     "/icerikler/algoritmalar/eg.json",
-    "/icerikler/algoritmalar/eg.json?v=20270121",
-    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20270121",
-    "/icerikler/algoritmalar/4x4.json?v=20270121",
-    "/icerikler/algoritmalar/5x5.json?v=20270121",
-    "/icerikler/algoritmalar/pyraminx.json?v=20270121",
+    "/icerikler/algoritmalar/eg.json?v=20270122",
+    "/icerikler/algoritmalar/antrenor-karistirmalar.json?v=20270122",
+    "/icerikler/algoritmalar/4x4.json?v=20270122",
+    "/icerikler/algoritmalar/5x5.json?v=20270122",
+    "/icerikler/algoritmalar/pyraminx.json?v=20270122",
     "/icerikler/algoritmalar/roux.json",
-    "/icerikler/algoritmalar/skewb.json?v=20270121"
+    "/icerikler/algoritmalar/skewb.json?v=20270122"
 ];
 
 self.addEventListener("install", function (event) {
@@ -135,8 +135,26 @@ self.addEventListener("fetch", function (event) {
         return;
     }
 
-    // CSS/JS/JSON: ÖNCE AĞ (sunucuya "değişti mi?" diye sorulur, değişmediyse 304 ile hızlı döner).
-    // Böylece her değişiklikte ?v= sürüm numarası değiştirmek gerekmez; çevrimdışıysa önbellekteki kopya.
+    // Sürümlü CSS/JS (?v=…) ve Firebase kütüphaneleri (/js/vendor/): ÖNBELLEKTEN HEMEN ver, arka planda tazele.
+    // Eskiden her sayfa geçişinde her dosya için sunucuya soruluyordu (mobil veride saniyeler sürüyordu).
+    // ?v= değişince adres değiştiği için yeni dosya doğrudan ağdan gelir; değişmeden güncellenen dosya bir sonraki açılışta gelir.
+    var isAsset = /\.(css|js|mjs)$/i.test(url.pathname);
+    if (isAsset && (url.searchParams.has("v") || url.pathname.indexOf("/js/vendor/") === 0)) {
+        event.respondWith(caches.open(VERSION).then(function (cache) {
+            return cache.match(req).then(function (hit) {
+                var net = fetch(req, { cache: "no-cache" }).then(function (res) {
+                    if (res && res.ok) cache.put(req, res.clone());
+                    return res;
+                });
+                if (hit) { event.waitUntil(net.catch(function () {})); return hit; }
+                return net.catch(function () { return fromCache(req); });
+            });
+        }));
+        return;
+    }
+
+    // Diğer CSS/JS/JSON: ÖNCE AĞ (sunucuya "değişti mi?" diye sorulur, değişmediyse 304 ile hızlı döner);
+    // çevrimdışıysa önbellekteki kopya.
     if (!/\.(png|jpe?g|webp|gif|svg|ico|woff2?|ttf|mp3|mp4)$/i.test(url.pathname)) {
         event.respondWith(fetch(req, { cache: "no-cache" }).then(function (res) {
             if (res && res.ok) { var copy = res.clone(); caches.open(VERSION).then(function (c) { c.put(req, copy); }); return res; }

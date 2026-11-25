@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20270121";
+    var V = "20270122";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -1273,7 +1273,9 @@
             }).catch(function () { return "uye"; });
         },
         token: token,
-        onChange: function (f) { listeners.push(f); if (sdkP) f(user); },
+        // Oturum geri yüklenirken (bu cihazda giriş yapılmış, Firebase henüz yanıt vermedi) "kullanıcı yok" diye
+        // hemen çağırma: sayfalar bir an giriş ekranı gösteriyordu. Yanıt gelince onAuthStateChanged çağırır.
+        onChange: function (f) { listeners.push(f); if (authResolved || (sdkP && lsGet(SIGNED_KEY) !== "1")) f(user); },
         openLogin: openLogin,
         googleSignIn: doGoogle,
         emailAuth: doEmail,
@@ -1292,7 +1294,8 @@
         },
         syncNow: function () { return pushChanged(false); },
         load: loadSDK,
-        isPending: function () { return lsGet(SIGNED_KEY) === "1" && !sdkP; },
+        // SDK yüklenmeye başlamış olsa da oturum yanıtı gelene kadar "bekleniyor" sayılır
+        isPending: function () { return lsGet(SIGNED_KEY) === "1" && !authResolved; },
         // Bu cihazda giriş yapılmış ama oturum henüz geri yüklenmedi (üye sayılır; kilit gösterilmez)
         authPending: function () { return lsGet(SIGNED_KEY) === "1" && !authResolved; },
         sendNotif: sendNotif, sendBroadcast: sendBroadcast, showNotes: showNotes,
