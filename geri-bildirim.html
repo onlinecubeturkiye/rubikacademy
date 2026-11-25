@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<script>try{document.documentElement.setAttribute("data-cvd",localStorage.getItem("cvd-theme")||"");if((localStorage.getItem("theme")||"dark")==="dark")document.documentElement.classList.add("dark-mode");}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="only light">
+
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") { document.documentElement.classList.add("dark-mode"); }
+    var savedLang = localStorage.getItem("site-lang") || "tr";
+    document.documentElement.setAttribute("lang", savedLang);
+    document.documentElement.setAttribute("dir", savedLang === "ar" ? "rtl" : "ltr");
+  })();
+</script>
+
+<title>Rubik Academy - Geri Bildirim</title>
+<link rel="icon" href="/icons/favicon-48.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0b0d14">
+
+<link rel="canonical" href="https://rubikacademy.fun/geri-bildirim">
+<meta name="description" content="Rubik Academy için hata bildir, öneri yap ya da ne düşündüğünü söyle. Her mesajı okuyoruz.">
+<meta property="og:title" content="Rubik Academy - Geri Bildirim">
+<meta property="og:description" content="Rubik Academy için hata bildir, öneri yap ya da ne düşündüğünü söyle. Her mesajı okuyoruz.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rubikacademy.fun/geri-bildirim">
+<meta property="og:image" content="https://rubikacademy.fun/og/gizlilik.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://rubikacademy.fun/og/gizlilik.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/common.css?v=20270119">
+<script>try{if(window.RAAppNative||/[?&]source=(twa|pwa|app)\b/.test(location.search)||sessionStorage.getItem("ra-app")==="1"||matchMedia("(display-mode: standalone)").matches){var h=document.documentElement;h.classList.add("ra-app");if(window.RAAppNative)h.classList.add("ra-native");document.write('<link rel="stylesheet" href="/styles/app.css?v=20270119">')}}catch(e){}</script>
+<script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
+
+<style>
+.wrap { max-width: 640px; margin: 0 auto; }
+.intro { text-align: center; margin: 0 auto 22px; }
+.intro .badge { margin-bottom: 14px; }
+.intro h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.05; letter-spacing: -1.4px; font-weight: 900; color: var(--text); margin-bottom: 12px; }
+.intro h1 span + span { color: var(--primary); }
+.intro p { color: var(--text-soft); font-size: 16px; line-height: 1.65; }
+.fb-card { background: var(--surface); border: var(--card-bw) solid var(--card-border); border-radius: 24px; box-shadow: var(--shadow); padding: 22px; }
+.fb-step + .fb-step { margin-top: 22px; }
+.fb-q { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 15px; font-weight: 850; color: var(--text); margin-bottom: 10px; }
+.fb-q small { font-weight: 600; font-size: 12.5px; color: var(--text-soft); }
+.fb-kinds { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.fb-kind { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px; border-radius: 16px; border: 2px solid var(--border); background: var(--surface); color: var(--text-soft); font: 800 12.5px Inter, sans-serif; cursor: pointer; transition: border-color .15s, background .15s, transform .1s; -webkit-tap-highlight-color: transparent; }
+.fb-kind span { font-size: 26px; line-height: 1; }
+.fb-kind:active { transform: scale(.96); }
+.fb-kind[aria-pressed="true"] { border-color: var(--ui-accent, #6c5ce7); background: color-mix(in srgb, var(--ui-accent, #6c5ce7) 12%, transparent); color: var(--text); }
+.fb-moods { display: flex; justify-content: space-between; gap: 6px; }
+.fb-mood { flex: 1; height: 54px; border-radius: 16px; border: 2px solid var(--border); background: var(--surface); font-size: 28px; cursor: pointer; filter: grayscale(1); opacity: .55; transition: filter .15s, opacity .15s, transform .1s, border-color .15s; -webkit-tap-highlight-color: transparent; }
+.fb-mood:hover { opacity: .85; }
+.fb-mood[aria-pressed="true"] { filter: none; opacity: 1; border-color: var(--ui-accent, #6c5ce7); transform: scale(1.06); }
+.fb-moodlbl { text-align: center; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--text-soft); min-height: 18px; }
+.fb-in { width: 100%; box-sizing: border-box; padding: 13px 14px; border-radius: 14px; border: 2px solid var(--border); background: var(--surface); color: var(--text); font: 600 15px Inter, sans-serif; }
+.fb-in:focus { outline: none; border-color: var(--ui-accent, #6c5ce7); }
+textarea.fb-in { min-height: 140px; resize: vertical; line-height: 1.55; }
+.fb-count { text-align: right; font-size: 12px; color: var(--text-soft); margin-top: 6px; }
+.fb-dev { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: var(--surface-soft); font-size: 13.5px; color: var(--text-soft); line-height: 1.5; cursor: pointer; }
+.fb-dev input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--ui-accent, #6c5ce7); flex: none; }
+.fb-dev b { color: var(--text); }
+.fb-dev code { font-family: "JetBrains Mono", monospace; font-size: 12px; word-break: break-all; }
+.fb-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.fb-send { width: 100%; margin-top: 20px; padding: 15px; border: 0; border-radius: 16px; background: var(--ui-accent, #6c5ce7); color: var(--ui-accent-text, #fff); font: 900 16px Inter, sans-serif; cursor: pointer; transition: opacity .15s, transform .1s; }
+.fb-send:active { transform: scale(.98); }
+.fb-send:disabled { opacity: .45; cursor: default; transform: none; }
+.fb-err { margin-top: 12px; text-align: center; color: #ef4444; font-weight: 700; font-size: 14px; min-height: 0; }
+.fb-done { text-align: center; padding: 26px 8px 10px; }
+.fb-done .big { font-size: 58px; line-height: 1; margin-bottom: 14px; animation: fbPop .5s cubic-bezier(.2, 1.6, .4, 1); }
+.fb-done h2 { font-size: 26px; font-weight: 900; color: var(--text); margin-bottom: 8px; letter-spacing: -.5px; }
+.fb-done p { color: var(--text-soft); font-size: 15px; line-height: 1.6; }
+.fb-done .row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+.fb-btn2 { padding: 11px 16px; border-radius: 14px; border: 2px solid var(--border); background: var(--surface); color: var(--text); font: 800 14px Inter, sans-serif; cursor: pointer; text-decoration: none; }
+@keyframes fbPop { 0% { transform: scale(.3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.fb-foot { text-align: center; margin-top: 16px; font-size: 13.5px; color: var(--text-soft); line-height: 1.6; }
+.fb-foot a { color: var(--primary); font-weight: 700; }
+@media (max-width: 480px) {
+  .fb-card { padding: 18px 14px; border-radius: 20px; }
+  .fb-kind { padding: 10px 2px; font-size: 11px; border-radius: 14px; }
+  .fb-kind span { font-size: 23px; }
+  .fb-mood { height: 48px; font-size: 24px; border-radius: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .fb-done .big { animation: none; } }
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7KXWC8B5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F7KXWC8B5N');
+</script>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="navbar">
+    <a href="/" class="nav-logo">
+        <img class="nav-logo-mark" src="/RubikAcademyLogo.png" alt="Rubik Academy">
+        <span class="nav-logo-text">Rubik Academy</span>
+    </a>
+
+    <div class="nav-right">
+        <nav class="nav-links">
+            <a href="/" data-i18n="navHome">Ana Sayfa</a>
+            <a href="/icerikler" data-i18n="navContent">İçerikler</a>
+        </nav>
+
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-switch-btn" id="langSwitchBtn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Dili değiştir">
+                <span class="lang-globe">🌐</span>
+                <span id="langLabel">TR</span>
+            </button>
+            <div class="lang-menu" id="langMenu" role="menu"></div>
+        </div>
+
+        <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+</header>
+
+<div class="page">
+<div class="wrap">
+<nav class="nav-bar">
+    <a href="/" class="back-btn" data-i18n="back_btn">← Geri Dön</a>
+</nav>
+<section class="intro">
+    <div class="badge"><i></i><span>GERİ BİLDİRİM</span></div>
+    <h1><span>Fikrin</span> <span>önemli.</span></h1>
+    <p>Bir hata mı buldun, aklına bir özellik mi geldi, yoksa sadece bir şey mi söylemek istiyorsun? Her mesajı tek tek okuyoruz.</p>
+</section>
+
+<section class="fb-card" id="fbCard">
+  <form id="fbForm" novalidate>
+    <div class="fb-step">
+      <div class="fb-q">Ne hakkında?</div>
+      <div class="fb-kinds" role="group" aria-label="Geri bildirim türü">
+        <button type="button" class="fb-kind" data-k="hata" aria-pressed="false"><span>🐞</span>Hata</button>
+        <button type="button" class="fb-kind" data-k="oneri" aria-pressed="false"><span>💡</span>Öneri</button>
+        <button type="button" class="fb-kind" data-k="tasarim" aria-pressed="false"><span>🎨</span>Görünüm</button>
+        <button type="button" class="fb-kind" data-k="ovgu" aria-pressed="false"><span>💜</span>Beğendim</button>
+        <button type="button" class="fb-kind" data-k="diger" aria-pressed="false"><span>💬</span>Diğer</button>
+      </div>
+    </div>
+
+    <div class="fb-step">
+      <div class="fb-q">Rubik Academy'yi nasıl buldun? <small>isteğe bağlı</small></div>
+      <div class="fb-moods ra-noico" role="group" aria-label="Memnuniyet">
+        <button type="button" class="fb-mood" data-r="1" aria-pressed="false" aria-label="Hiç beğenmedim">😞</button>
+        <button type="button" class="fb-mood" data-r="2" aria-pressed="false" aria-label="Pek beğenmedim">😕</button>
+        <button type="button" class="fb-mood" data-r="3" aria-pressed="false" aria-label="Fena değil">😐</button>
+        <button type="button" class="fb-mood" data-r="4" aria-pressed="false" aria-label="Beğendim">🙂</button>
+        <button type="button" class="fb-mood" data-r="5" aria-pressed="false" aria-label="Bayıldım">😍</button>
+      </div>
+      <div class="fb-moodlbl" id="fbMoodLbl"></div>
+    </div>
+
+    <div class="fb-step">
+      <label class="fb-q" for="fbText">Anlat bakalım</label>
+      <textarea class="fb-in" id="fbText" maxlength="1500" placeholder="Önce yukarıdan bir tür seç…"></textarea>
+      <div class="fb-count"><span id="fbCount">0</span> / 1500</div>
+    </div>
+
+    <div class="fb-step">
+      <label class="fb-q" for="fbMail">Sana dönüş yapalım mı? <small>isteğe bağlı</small></label>
+      <input class="fb-in" id="fbMail" type="email" inputmode="email" autocomplete="email" maxlength="120" placeholder="E-posta adresin">
+      <label class="fb-dev"><input type="checkbox" id="fbDevOn" checked><span><b>Cihaz bilgisini ekle</b> (hatayı bulmamıza yardım eder): <code id="fbDev">…</code></span></label>
+    </div>
+
+    <div class="fb-hp" aria-hidden="true"><input id="fbHp" tabindex="-1" autocomplete="off"></div>
+    <button type="submit" class="fb-send" id="fbSend" disabled>Gönder</button>
+    <div class="fb-err" id="fbErr" role="alert"></div>
+  </form>
+</section>
+
+<p class="fb-foot">Acil bir durum ya da hesabınla ilgili bir istek için: <a href="mailto:rubikacademy.iletisim@gmail.com">rubikacademy.iletisim@gmail.com</a></p>
+</div>
+</div>
+
+<footer>
+    <span data-i18n="footer">© 2026 Rubik Academy. Tüm hakları saklıdır.</span>
+</footer>
+
+<script>var PAGE_ID = "geri-bildirim";</script>
+<script src="/js/i18n.js?v=20270119"></script>
+<script src="/js/common.js?v=20270119"></script>
+<script src="/js/firebase-config.js?v=20270119"></script>
+<script src="/js/account.js?v=20270119"></script>
+<script>
+(function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var kind = "", mood = 0, WAIT_KEY = "ra-fb-last";
+    var PH = {
+        hata: "Ne oldu? Hangi sayfadaydın, neye dokundun, ne bekliyordun ve ne oldu? Ne kadar ayrıntı, o kadar hızlı çözüm 🙏",
+        oneri: "Hangi özelliği görmek istersin? Sana nasıl yardımcı olurdu?",
+        tasarim: "Göze batan, kayan, okunmayan ya da daha güzel olabilecek ne var?",
+        ovgu: "En çok neyi sevdin? Bunu duymak bizi çok mutlu eder 💜",
+        diger: "Aklındaki her şeyi yazabilirsin."
+    };
+    var MOODS = ["", "Üzgünüz, düzeltmek için anlat 😔", "Daha iyisini yapabiliriz", "Fena değil, daha da iyi olacak", "Sevindik! 🙌", "Harika, çok teşekkürler! 💜"];
+
+    // Hangi sayfadan gelindi (?sayfa=… ya da yönlendiren adres); hata bildirimine eklenir
+    var from = "";
+    try {
+        var q = new URLSearchParams(location.search).get("sayfa");
+        if (q) from = q;
+        else if (document.referrer && new URL(document.referrer).host === location.host) from = new URL(document.referrer).pathname;
+    } catch (e) {}
+
+    function devInfo() {
+        var ua = navigator.userAgent || "", parts = [];
+        var app = null; try { app = window.RAApp && RAApp.native ? RAApp.info() : null; } catch (e) {}
+        if (app) parts.push("Android uygulaması " + (app.v || "?"));
+        else if (window.RA_APP) parts.push("Ana ekran uygulaması");
+        else parts.push("Tarayıcı");
+        var an = ua.match(/Android [\d.]+/), ios = ua.match(/iPhone OS [\d_]+|iPad; CPU OS [\d_]+/), model = ua.match(/Android [\d.]+; ([^;)]+)/);
+        if (an) parts.push(an[0] + (model && !/^wv$|^K$/.test(model[1].trim()) ? " · " + model[1].trim() : ""));
+        else if (ios) parts.push(ios[0].replace(/_/g, "."));
+        else if (/Windows/.test(ua)) parts.push("Windows"); else if (/Mac OS X/.test(ua)) parts.push("macOS"); else if (/Linux/.test(ua)) parts.push("Linux");
+        var br = ua.match(/(Chrome|Firefox|Edg|SamsungBrowser|Version)\/(\d+)/); if (br) parts.push((br[1] === "Version" ? "Safari" : br[1] === "Edg" ? "Edge" : br[1]) + " " + br[2]);
+        parts.push(screen.width + "×" + screen.height);
+        try { parts.push((localStorage.getItem("site-lang") || "tr").toUpperCase()); } catch (e) {}
+        return parts.join(" · ").slice(0, 300);
+    }
+    var dev = devInfo(); $("fbDev").textContent = dev + (from ? " · " + from : "");
+
+    function valid() { return kind && $("fbText").value.trim().length >= 5; }
+    function refresh() { $("fbSend").disabled = !valid(); $("fbCount").textContent = $("fbText").value.length; }
+    Array.prototype.forEach.call(document.querySelectorAll(".fb-kind"), function (b) {
+        b.onclick = function () {
+            kind = b.getAttribute("data-k");
+            Array.prototype.forEach.call(document.querySelectorAll(".fb-kind"), function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+            $("fbText").placeholder = PH[kind]; refresh();
+            if (!$("fbText").value) $("fbText").focus({ preventScroll: true });
+        };
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".fb-mood"), function (b) {
+        b.onclick = function () {
+            var r = +b.getAttribute("data-r"); mood = mood === r ? 0 : r;
+            Array.prototype.forEach.call(document.querySelectorAll(".fb-mood"), function (x) { x.setAttribute("aria-pressed", +x.getAttribute("data-r") === mood ? "true" : "false"); });
+            $("fbMoodLbl").textContent = MOODS[mood];
+        };
+    });
+    $("fbText").addEventListener("input", refresh);
+    // ?tur=hata gibi bir bağlantıyla gelinirse türü önceden seç
+    try { var t0 = new URLSearchParams(location.search).get("tur"); var b0 = t0 && document.querySelector('.fb-kind[data-k="' + t0 + '"]'); if (b0) b0.onclick(); } catch (e) {}
+
+    // Giriş yapmışsa e-postayı doldur
+    function fillMail(u) { if (u && u.email && !$("fbMail").value) $("fbMail").value = u.email; }
+    try { if (window.Account) { if (Account.user) fillMail(Account.user()); if (Account.onChange) Account.onChange(fillMail); } } catch (e) {}
+
+    function err(m) { $("fbErr").textContent = m || ""; }
+    $("fbForm").onsubmit = function (e) {
+        e.preventDefault(); err("");
+        if (!valid()) return;
+        if ($("fbHp").value) { done(); return; } // bot
+        var last = 0; try { last = +localStorage.getItem(WAIT_KEY) || 0; } catch (x) {}
+        if (Date.now() - last < 30000) { err("Biraz önce gönderdin; birkaç saniye bekleyip tekrar dene."); return; }
+        var mail = $("fbMail").value.trim();
+        if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { err("E-posta adresi geçerli görünmüyor (boş da bırakabilirsin)."); return; }
+        var cfg = window.RA_FIREBASE; if (!cfg || !cfg.projectId) { err("Şu an gönderilemiyor. E-postayla yazabilirsin."); return; }
+        var btn = $("fbSend"); btn.disabled = true; btn.textContent = "Gönderiliyor…";
+        var u = ""; try { u = window.Account && Account.user && Account.user() ? Account.user().uid : ""; } catch (x) {}
+        var id = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+        var D = "projects/" + cfg.projectId + "/databases/(default)/documents";
+        var useDev = $("fbDevOn").checked;
+        var app = ""; try { app = window.RAApp && RAApp.native ? String(RAApp.info().v || "") : ""; } catch (x) {}
+        var f = { k: { stringValue: kind }, r: { integerValue: String(mood) }, text: { stringValue: $("fbText").value.trim().slice(0, 1500) },
+            mail: { stringValue: mail.slice(0, 120) }, p: { stringValue: from.slice(0, 200) }, dev: { stringValue: useDev ? dev : "" },
+            v: { stringValue: app.slice(0, 20) }, u: { stringValue: u } };
+        var body = { writes: [{ update: { name: D + "/appfb/" + id, fields: f }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }], currentDocument: { exists: false } }] };
+        var tk = u && window.Account && Account.token ? Account.token().catch(function () { return ""; }) : Promise.resolve("");
+        tk.then(function (t) {
+            if (!t) f.u.stringValue = "";
+            var h = { "Content-Type": "application/json" }; if (t) h.Authorization = "Bearer " + t;
+            return fetch(((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/" + D + ":commit?key=" + encodeURIComponent(cfg.apiKey), { method: "POST", headers: h, body: JSON.stringify(body) });
+        }).then(function (r) {
+            if (!r.ok) throw new Error(r.status);
+            try { localStorage.setItem(WAIT_KEY, String(Date.now())); } catch (x) {}
+            done();
+        }).catch(function (x) {
+            btn.disabled = false; btn.textContent = "Gönder";
+            err(navigator.onLine === false ? "İnternet bağlantın yok gibi görünüyor. Bağlanınca tekrar dene." : "Gönderilemedi (" + (x && x.message || "hata") + "). Tekrar dene ya da e-postayla yaz.");
+        });
+    };
+    function done() {
+        var msg = { hata: "Hatayı inceleyip en kısa sürede düzelteceğiz.", oneri: "Önerini listemize ekledik.", tasarim: "Görünümle ilgili notunu aldık.", ovgu: "Bu bizi gerçekten çok mutlu etti!", diger: "Mesajını aldık." }[kind] || "Mesajını aldık.";
+        $("fbCard").innerHTML = '<div class="fb-done"><div class="big">' + (kind === "ovgu" ? "💜" : "🧩") + '</div><h2>Teşekkürler!</h2><p>' + msg + ($("fbMail") && $("fbMail").value ? "" : "") + ' Geri bildirimin Rubik Academy\'yi daha iyi yapıyor.</p>' +
+            '<div class="row"><a class="fb-btn2" href="/">Ana sayfaya dön</a><button type="button" class="fb-btn2" onclick="location.reload()">Bir tane daha yaz</button></div></div>';
+        try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (x) {}
+    }
+    refresh();
+})();
+</script>
+</body>
+</html>

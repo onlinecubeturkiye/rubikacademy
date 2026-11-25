@@ -493,6 +493,24 @@ service cloud.firestore {
         && request.resource.data.ts == request.time;
     }
 
+    // Uygulama / site geri bildirimi (/geri-bildirim, kapalı test): herkes ekler (girişsiz de), yalnız admin okur/siler
+    match /appfb/{id} {
+      allow read, delete: if isAdmin();
+      allow update: if false;
+      allow create: if id.matches('^[a-z0-9]{8,24}$')
+        && request.resource.data.keys().hasOnly(['k', 'r', 'text', 'mail', 'p', 'dev', 'v', 'u', 'ts'])
+        && request.resource.data.k in ['hata', 'oneri', 'tasarim', 'ovgu', 'diger']
+        && request.resource.data.r is int && request.resource.data.r >= 0 && request.resource.data.r <= 5
+        && request.resource.data.text is string && request.resource.data.text.size() >= 5 && request.resource.data.text.size() <= 1500
+        && request.resource.data.mail is string && request.resource.data.mail.size() <= 120
+        && request.resource.data.p is string && request.resource.data.p.size() <= 200
+        && request.resource.data.dev is string && request.resource.data.dev.size() <= 300
+        && request.resource.data.v is string && request.resource.data.v.size() <= 20
+        && request.resource.data.u is string
+        && (request.resource.data.u == '' || (request.auth != null && request.resource.data.u == request.auth.uid))
+        && request.resource.data.ts == request.time;
+    }
+
     // Admin paneli: tüm algoritma önerilerini tek sorguda listeler (koleksiyon grubu "s")
     match /{path=**}/s/{sid} {
       allow read: if isAdmin();
