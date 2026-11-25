@@ -1317,6 +1317,8 @@
         if (lsGet(SIGNED_KEY) === "1" || window.RA_ACCOUNT_EAGER) loadSDK().catch(function () {});
         document.addEventListener("site-lang-change", function () { renderNav(); if (modal && modal.classList.contains("open")) renderModal(); });
         // Duyurular/bildirimler: herkese açık broadcast'leri her sayfada, kişisel bildirimleri girişten sonra göster
+        // Zil hemen görünsün (cihazdaki okunmamış sayısıyla); sunucudan yeni duyuru çekme gecikmeli kalır
+        try { bellMount(); } catch (e) {}
         setTimeout(showNotes, 1800);
         document.addEventListener("account-synced", function () { setTimeout(showNotes, 400); });
         // Bakım modu kontrolü (admin oturumu çözülsün diye kısa gecikme) + giriş/çıkışta yeniden

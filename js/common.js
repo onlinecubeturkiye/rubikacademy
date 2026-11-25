@@ -75,7 +75,8 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
     if (!on) return;
     var d = document.documentElement; d.classList.add("ra-app");
     // uygulamaya özel parçalar (styles/app.css); renk teması sitedeki gibi Ayarlar'dan seçilir
-    var ln = document.createElement("link"); ln.rel = "stylesheet"; ln.href = "/styles/app.css"; (document.head || d).appendChild(ln);
+    // sayfanın <head>'i app.css'i erken yüklediyse (ilk açılışta site görünümü yanıp sönmesin) tekrar ekleme
+    if (!document.querySelector('link[href^="/styles/app.css"]')) { var ln = document.createElement("link"); ln.rel = "stylesheet"; ln.href = "/styles/app.css"; (document.head || d).appendChild(ln); }
     var path = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
     var noBar = /\/(zkttimer|sanal-kup|giris)$|\/algoritmalar\/yazdir|\/kup-arena\//.test(path);
     if (noBar) d.classList.add("ra-app-nobar");
