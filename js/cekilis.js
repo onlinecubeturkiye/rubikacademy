@@ -951,27 +951,46 @@
         });
     }
     function age(ms) { var d = Math.floor(ms / 86400000); return d >= 1 ? d + " gün" : Math.max(1, Math.floor(ms / 3600000)) + " sa"; }
-    function checkPeople() {
+    // Firestore toplu okuma (tek istekte 100 belgeye kadar); izin hatasında tek tek okumaya düşer
+    function batchGet(paths) {
+        var pre = "projects/" + cfg.projectId + "/databases/(default)/documents", out = {}, ch = [];
+        for (var i = 0; i < paths.length; i += 100) ch.push(paths.slice(i, i + 100));
+        return Promise.all(ch.map(function (c) {
+            return req(":batchGet", { method: "POST", body: JSON.stringify({ documents: c.map(function (p) { return pre + p; }) }) })
+                .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+                .then(function (a) { (a || []).forEach(function (x) { if (x.found) out[x.found.name.slice(pre.length)] = x.found; }); })
+                .catch(function () {
+                    return Promise.all(c.map(function (p) { return req(p).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) out[p] = d; }, function () {}); }));
+                });
+        })).then(function () { return out; });
+    }
+    // Katılımcı kontrolü: bir kez yüklenen kişiler hafızada kalır; yeniden çizimde yalnız yeni katılanlar okunur
+    // (Firebase okuma kotası için). "Yenile" (force) hepsini baştan okur.
+    function checkPeople(force) {
         var g = S.g, box = $("gwChk"); if (!g || !box) return;
-        listEntries(g.id).then(function (l) {
-            S.entries = l; S.entriesFor = g.id; S.entriesN = l.length;
-            var jobs = l.map(function (x) { return x; }), out = {}, k = 0;
-            function worker() {
-                if (k >= jobs.length) return Promise.resolve();
-                var x = jobs[k++];
-                if (x.m) { out[x.uid] = { u: null, role: "", st: {}, proofs: [], pts: 0, m: 1 }; return worker(); }
-                return Promise.all([req("/users/" + x.uid).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }), roleOf(x.uid),
-                    g.yt || g.wa ? req("/giveaways/" + g.id + "/proof/" + x.uid).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }) : Promise.resolve(null)]).then(function (res) {
-                    var u = res[0] ? dec(res[0]) : null, st = {};
+        var cached = S.chkFor === g.id && S.chk && S.entries;
+        // elde bu çekilişin güncel listesi varsa (sayı değişmemiş) yeniden okuma; yalnız eksik kişileri tamamla
+        var useList = cached && !force && S.entriesFor === g.id && S.entries.length === S.count;
+        if (useList) { paintCheck(); if (S.entries.every(function (x) { return S.chk[x.uid]; })) return; }
+        if (force || !cached) { S.chk = {}; S.chkFor = g.id; }
+        if (S.chkBusy === g.id) return; S.chkBusy = g.id;
+        Promise.all([useList ? S.entries : listEntries(g.id), useList ? (S.rev || {}) : listRev(g.id)]).then(function (res) {
+            var l = res[0], out = S.chk;
+            S.rev = res[1]; S.entries = l; S.entriesFor = g.id; S.entriesN = l.length;
+            var need = l.filter(function (x) { if (x.m) out[x.uid] = { u: null, role: "", st: {}, proofs: [], pts: 0, m: 1 }; return !x.m && !out[x.uid]; });
+            var paths = [];
+            need.forEach(function (x) { paths.push("/users/" + x.uid); if (ROLE[x.uid] === undefined) paths.push("/roles/" + x.uid); if (g.yt || g.wa) paths.push("/giveaways/" + g.id + "/proof/" + x.uid); });
+            return (paths.length ? batchGet(paths) : Promise.resolve({})).then(function (d) {
+                need.forEach(function (x) {
+                    var ud = d["/users/" + x.uid], u = ud ? dec(ud) : null, st = {}, pd = d["/giveaways/" + g.id + "/proof/" + x.uid];
+                    if (ROLE[x.uid] === undefined) { var rd = d["/roles/" + x.uid]; ROLE[x.uid] = rd ? (dec(rd).role || "") : ""; }
                     try { st = u && u.stats ? JSON.parse(u.stats) : {}; } catch (e) {}
-                    var pd = res[2] ? dec(res[2]) : {};
-                    out[x.uid] = { u: u, role: res[1], st: st || {}, proofs: PF.map(function (k) { return pd[k] || ""; }), pts: pd.ts || 0 };
-                }).then(worker);
-            }
-            var ws = []; for (var i = 0; i < 8; i++) ws.push(worker());
-            ws.push(listRev(g.id).then(function (rv) { S.rev = rv; }));
-            return Promise.all(ws).then(function () { S.chk = out; paintCheck(); });
-        }).catch(function () { box.innerHTML = '<h4>🔍 Katılımcı kontrolü</h4><p class="gw-note">Yüklenemedi.</p>'; });
+                    pd = pd ? dec(pd) : {};
+                    out[x.uid] = { u: u, role: ROLE[x.uid], st: st || {}, proofs: PF.map(function (k) { return pd[k] || ""; }), pts: pd.ts || 0 };
+                });
+                S.chkBusy = null; if (S.g && S.g.id === g.id) paintCheck();
+            });
+        }).catch(function () { S.chkBusy = null; if (!S.chk || !Object.keys(S.chk).length) box.innerHTML = '<h4>🔍 Katılımcı kontrolü</h4><p class="gw-note">Yüklenemedi. <button type="button" class="btn sm" id="gwReChk2">↻ Tekrar dene</button></p>'; if ($("gwReChk2")) $("gwReChk2").onclick = function () { checkPeople(true); }; });
     }
     function flagsOf(x, all) {
         var c = (S.chk || {})[x.uid] || {}, u = c.u, f = [];
@@ -1052,7 +1071,7 @@
         });
         if ($("gwRev")) $("gwRev").onclick = function () { review(null, "yt"); };
         if ($("gwRevWa")) $("gwRevWa").onclick = function () { review(null, "wa"); };
-        $("gwReChk").onclick = checkPeople;
+        $("gwReChk").onclick = function () { this.disabled = true; this.textContent = "Yenileniyor…"; checkPeople(true); };
         if ($("gwDupOut")) $("gwDupOut").onclick = function () {
             var nm = function (y, cls, tag) { return '<div class="' + cls + '"><span class="gw-tag">' + tag + '</span><b>' + esc(y.name || "Cuber") + '</b><small>' + esc(dtS(y.ts)) + '</small></div>'; };
             askBox("📱 Aynı cihazdan katılım", '<p class="gw-note">Bu hesaplar aynı cihazdan katılmış. Her cihazdan <b>ilk katılan kalır</b>, diğerleri çekilişten çıkarılır.</p><div class="gw-dups">' +
