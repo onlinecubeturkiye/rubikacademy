@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270129";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270130";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -1829,7 +1829,10 @@
     }
     function init() {
         SOLVED_STR = new Cube().asString();
-        if (!supported()) { $("akNoBt").hidden = false; $("akConnect").disabled = true; }
+        if (!supported()) {
+            $("akNoBt").hidden = false; $("akConnect").disabled = true;
+            if (window.RA_BT_UPDATE) $("akNoBt").textContent = "Uygulaman Bluetooth'u desteklemeyen eski bir sürüm. Akıllı küp için Rubik Academy uygulamasını Play Store'dan güncelle.";
+        }
         $("akConnect").onclick = connect;
         $("akDisc").onclick = disconnect;
         $("akReset").onclick = resetModel;

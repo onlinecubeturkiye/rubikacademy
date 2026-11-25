@@ -17,6 +17,11 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
 import android.os.Build;
 import android.os.ParcelUuid;
 import android.util.Base64;
@@ -42,7 +47,10 @@ class Ble {
     final BluetoothAdapter ad;
     final Map<String, BluetoothGatt> gatts = new HashMap<>();
     final Map<String, String> connIds = new HashMap<>();
+    final Map<String, Integer> tries = new HashMap<>();
     final ArrayDeque<Runnable> q = new ArrayDeque<>();
+    final Handler h = new Handler(Looper.getMainLooper());
+    final Runnable scanStop = this::stopScan;
     ScanCallback scb;
     String opId, permId;
     boolean busy;
@@ -63,7 +71,53 @@ class Ble {
     void onPerm() {
         Runnable r = afterPerm; afterPerm = null;
         if (r == null) return;
-        if (hasPerms()) r.run(); else a.reply(permId, err("NotAllowedError"));
+        if (hasPerms()) r.run();
+        else a.reply(permId, err(permanentlyDenied() ? "PermDenied" : "NotAllowedError"));
+    }
+
+    // "Bir daha sorma" denmişse Android izin penceresini artık göstermez: ayarlara yönlendirilir
+    boolean permanentlyDenied() {
+        for (String p : perms()) if (!a.has(p) && !a.shouldShowRequestPermissionRationale(p)) return true;
+        return false;
+    }
+    // Android 11 ve öncesinde BLE taraması için konum servisi açık olmalı
+    boolean locationOff() {
+        if (Build.VERSION.SDK_INT >= 31) return false;
+        try {
+            LocationManager lm = (LocationManager) a.getSystemService(Context.LOCATION_SERVICE);
+            if (lm == null) return false;
+            if (Build.VERSION.SDK_INT >= 28) return !lm.isLocationEnabled();
+            return !lm.isProviderEnabled(LocationManager.GPS_PROVIDER) && !lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception e) { return false; }
+    }
+    String state() {
+        try {
+            JSONObject o = new JSONObject();
+            o.put("supported", ad != null);
+            o.put("on", ad != null && ad.isEnabled());
+            o.put("perm", hasPerms());
+            o.put("loc", !locationOff());
+            return o.toString();
+        } catch (Exception e) { return "{}"; }
+    }
+    void open(String what) {
+        try {
+            Intent i;
+            if ("app".equals(what)) i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", a.getPackageName(), null));
+            else if ("location".equals(what)) i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            else i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            a.startActivity(i);
+        } catch (Exception e) {
+            try { a.startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)); } catch (Exception e2) {}
+        }
+    }
+    // Sayfa yenilenince / uygulama kapanınca açık bağlantılar ve tarama kapanır (küp başka yerden bağlanabilsin)
+    void closeAll() {
+        a.runOnUiThread(() -> {
+            stopScan();
+            for (BluetoothGatt g : gatts.values()) { try { g.disconnect(); g.close(); } catch (Exception e) {} }
+            gatts.clear(); connIds.clear(); tries.clear(); q.clear(); busy = false; opId = null;
+        });
     }
 
     static String err(String n) { return "{\"err\":" + JSONObject.quote(n) + "}"; }
@@ -75,18 +129,27 @@ class Ble {
             try {
                 JSONObject o = new JSONObject(arg);
                 String op = o.getString("op");
+                if (op.equals("state")) { a.reply(id, state()); return; }
+                if (op.equals("open")) { open(o.optString("what")); a.reply(id, "true"); return; }
                 if (ad == null) { a.reply(id, err("NotSupportedError")); return; }
-                if (!hasPerms()) { afterPerm = () -> handle(id, arg); permId = id; a.requestPermissions(perms(), MainActivity.RQ_BLE); return; }
-                if (!ad.isEnabled() && !op.equals("stopScan") && !op.equals("disconnect")) {
-                    try { a.startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)); } catch (Exception e) {}
+                if (op.equals("stopScan") || op.equals("disconnect")) { /* izin/Bluetooth gerekmez */ }
+                else if (!hasPerms()) {
+                    if (afterPerm != null && permId != null) a.reply(permId, err("NotAllowedError"));
+                    afterPerm = () -> handle(id, arg); permId = id; a.requestPermissions(perms(), MainActivity.RQ_BLE); return;
+                } else if (!ad.isEnabled()) {
+                    open("bt");
                     a.reply(id, err("BluetoothOff")); return;
+                } else if (op.equals("scan") && locationOff()) {
+                    a.reply(id, err("LocationOff")); return;
                 }
                 switch (op) {
-                    case "scan": scan(); a.reply(id, "true"); break;
+                    case "scan": a.reply(id, scan() ? "true" : err("ScanFailed")); break;
                     case "stopScan": stopScan(); a.reply(id, "true"); break;
                     case "connect": connect(id, o.getString("id")); break;
                     case "disconnect": {
-                        BluetoothGatt g = gatts.remove(o.getString("id"));
+                        String addr = o.getString("id");
+                        BluetoothGatt g = gatts.remove(addr);
+                        connIds.remove(addr); tries.remove(addr);
                         if (g != null) { g.disconnect(); g.close(); }
                         a.reply(id, "true"); break;
                     }
@@ -96,8 +159,11 @@ class Ble {
         });
     }
 
-    void scan() {
-        if (scb != null || ad.getBluetoothLeScanner() == null) return;
+    boolean scan() {
+        // Tarama 2 dakikada kendiliğinden durur (pil); sayfa yeniden isterse süre uzar
+        h.removeCallbacks(scanStop); h.postDelayed(scanStop, 120000);
+        if (scb != null) return true;
+        if (ad.getBluetoothLeScanner() == null) return false;
         scb = new ScanCallback() {
             @Override
             public void onScanResult(int type, ScanResult r) {
@@ -117,21 +183,47 @@ class Ble {
                     ev(o);
                 } catch (Exception e) {}
             }
+            @Override
+            public void onScanFailed(int code) {
+                scb = null;
+                try { JSONObject o = new JSONObject(); o.put("t", "scanfail"); o.put("code", code); ev(o); } catch (Exception e) {}
+            }
         };
-        ad.getBluetoothLeScanner().startScan(null, new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build(), scb);
+        try {
+            ad.getBluetoothLeScanner().startScan(null, new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build(), scb);
+            return true;
+        } catch (Exception e) { scb = null; return false; }
     }
 
     void stopScan() {
+        h.removeCallbacks(scanStop);
         if (scb == null) return;
         try { ad.getBluetoothLeScanner().stopScan(scb); } catch (Exception e) {}
         scb = null;
     }
 
     void connect(String rid, String addr) {
+        // Bağlanırken tarama açıksa kapat: birçok telefonda tarama sürerken bağlantı 133 hatası verir
+        stopScan();
         BluetoothGatt old = gatts.remove(addr);
-        if (old != null) old.close();
+        if (old != null) { try { old.disconnect(); } catch (Exception e) {} old.close(); }
         connIds.put(addr, rid);
-        gatts.put(addr, ad.getRemoteDevice(addr).connectGatt(a, false, cb, BluetoothDevice.TRANSPORT_LE));
+        tries.put(addr, 0);
+        openGatt(addr);
+        // 15 sn içinde servisler gelmezse vazgeç
+        h.postDelayed(() -> {
+            if (!rid.equals(connIds.get(addr))) return;
+            connIds.remove(addr); tries.remove(addr);
+            BluetoothGatt g = gatts.remove(addr);
+            if (g != null) { try { g.disconnect(); } catch (Exception e) {} g.close(); }
+            a.reply(rid, err("TimeoutError"));
+        }, 15000);
+    }
+    void openGatt(String addr) {
+        BluetoothDevice d = ad.getRemoteDevice(addr);
+        gatts.put(addr, Build.VERSION.SDK_INT >= 26
+                ? d.connectGatt(a, false, cb, BluetoothDevice.TRANSPORT_LE, BluetoothDevice.PHY_LE_1M_MASK, h)
+                : d.connectGatt(a, false, cb, BluetoothDevice.TRANSPORT_LE));
     }
 
     void gattOp(String rid, JSONObject o) throws Exception {
@@ -185,9 +277,24 @@ class Ble {
         @Override
         public void onConnectionStateChange(BluetoothGatt g, int st, int ns) {
             String addr = g.getDevice().getAddress();
-            if (ns == BluetoothProfile.STATE_CONNECTED && st == BluetoothGatt.GATT_SUCCESS) { g.discoverServices(); return; }
+            if (ns == BluetoothProfile.STATE_CONNECTED && st == BluetoothGatt.GATT_SUCCESS) {
+                // Hamleler gecikmesiz gelsin
+                try { g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH); } catch (Exception e) {}
+                // Bazı telefonlarda bağlanır bağlanmaz servis aramak başarısız olur: kısa bekle
+                h.postDelayed(() -> { if (gatts.get(addr) == g) g.discoverServices(); }, 300);
+                return;
+            }
             if (ns != BluetoothProfile.STATE_DISCONNECTED && st == BluetoothGatt.GATT_SUCCESS) return;
             a.runOnUiThread(() -> {
+                // Bağlanırken gelen anlık hata (çoğunlukla 133): 2 kez daha dene
+                Integer n = tries.get(addr);
+                if (connIds.containsKey(addr) && gatts.get(addr) == g && n != null && n < 2) {
+                    tries.put(addr, n + 1);
+                    g.close();
+                    h.postDelayed(() -> { if (connIds.containsKey(addr)) openGatt(addr); }, 400 + 400 * n);
+                    return;
+                }
+                tries.remove(addr);
                 String rid = connIds.remove(addr);
                 if (rid != null) a.reply(rid, err("NetworkError"));
                 if (gatts.get(addr) == g) gatts.remove(addr);
@@ -200,6 +307,7 @@ class Ble {
         @Override
         public void onServicesDiscovered(BluetoothGatt g, int st) {
             String rid = connIds.remove(g.getDevice().getAddress());
+            tries.remove(g.getDevice().getAddress());
             if (rid == null) return;
             if (st != BluetoothGatt.GATT_SUCCESS) { a.reply(rid, err("NetworkError")); return; }
             try {

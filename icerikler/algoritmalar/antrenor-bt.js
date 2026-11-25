@@ -11,7 +11,7 @@
      (gunluk.js) aynı global'leri sağlayarak bu modülü kullanır.
    ============================================================ */
 (function () {
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270129";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270130";
     var MAC_KEY = "trainer-bt-mac-v1";
     // Karıştırma ve ipucu kutuları (günün karıştırması sayfası kendi kimliklerini verir)
     var SCR_ID = (window.BT_IDS && BT_IDS.scramble) || "scramble", HINT_ID = (window.BT_IDS && BT_IDS.hint) || "timerHint";
@@ -330,6 +330,7 @@
         bt_title: "Bluetooth akıllı küp", bt_connect: "Bağlan", bt_reset: "Küpüm çözülmüş", bt_disconnect: "Bağlantıyı kes",
         bt_hint: "GAN (i, i2, i3, i Carry, ui…), MoYu, QiYi, GoCube veya Giiker akıllı küpünü bağla: karıştırma takip edilir, süre kendiliğinden başlar ve case çözülünce durur.",
         bt_unsupported: "Bu tarayıcı Bluetooth desteklemiyor. Akıllı küp için Chrome veya Edge kullan (Android, Windows, Mac).",
+        bt_unsup_app: "Uygulaman Bluetooth'u desteklemeyen eski bir sürüm. Akıllı küp için Rubik Academy uygulamasını Play Store'dan güncelle.",
         bt_unsup_ios: "iPad ve iPhone'daki tarayıcılar (Safari, Chrome) Bluetooth desteklemiyor. Akıllı küp için bu sayfayı App Store'daki Bluefy tarayıcısıyla aç.",
         bt_only3x3: "Bluetooth sadece 3x3 ve 2x2 setlerinde çalışır",
         bt_title222: "2x2 akıllı küp", bt_hint222: "2x2 akıllı küp (GAN 251 ui) bağlayabilirsin.",
@@ -419,7 +420,7 @@
         if (!supported()) {
             el("btConnect").style.display = "none";
             bar.classList.add("has-msg");
-            st.textContent = txt(isIOS() ? "bt_unsup_ios" : "bt_unsupported");
+            st.textContent = txt(window.RA_BT_UPDATE ? "bt_unsup_app" : isIOS() ? "bt_unsup_ios" : "bt_unsupported");
             return;
         }
         if (connecting) bar.classList.add("has-msg");

@@ -122,6 +122,12 @@ public class MainActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
                 return handleUrl(req.getUrl());
             }
+            // Yeni sayfa açılınca önceki sayfanın Bluetooth bağlantıları kapanır (küp yeni sayfada tekrar bağlanabilsin)
+            @Override
+            public void onPageStarted(WebView view, String url, android.graphics.Bitmap icon) {
+                super.onPageStarted(view, url, icon);
+                if (ble != null) ble.closeAll();
+            }
         });
         web.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -212,6 +218,12 @@ public class MainActivity extends Activity {
     }
 
     boolean has(String p) { return ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_GRANTED; }
+
+    @Override
+    protected void onDestroy() {
+        if (ble != null) ble.closeAll();
+        super.onDestroy();
+    }
 
     @Override
     public void onRequestPermissionsResult(int code, String[] perms, int[] res) {
