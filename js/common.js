@@ -266,6 +266,7 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
         var n = document.createElement("nav"); n.id = "raTabbar"; n.className = "ra-tabbar ra-noico"; n.setAttribute("aria-label", "Uygulama menüsü");
         n.innerHTML = TABS.map(function (t) { var cur = t[3].test(path); return '<a href="' + t[0] + '"' + (cur ? ' class="on" aria-current="page"' : '') + '>' + t[2] + '<span>' + t[1] + '</span></a>'; }).join("");
         document.body.appendChild(n);
+        admTab();
     }
     if (document.body) bar(); else document.addEventListener("DOMContentLoaded", bar);
     // Ana sekmeler dışındaki sayfalarda üst barda geri oku (sayfadaki "Geri Dön" gizli)
@@ -284,14 +285,20 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
     // Yönetim sekmesi: yalnız site yöneticisinde (giriş doğrulanınca); hata/oturum yoksa hiç görünmez
     var ADM = ["/icerikler/admin", "Yönetim", ic('<path d="M12 3.5 19 6v5.5c0 4.3-3 7.7-7 9-4-1.3-7-4.7-7-9V6z"/><path d="m9 12 2 2 4-4"/>'), /\/admin$/];
     function admTab() {
-        var n = document.getElementById("raTabbar"); if (!n) return;
-        var on = false; try { on = !!(window.Account && Account.user && Account.user() && Account.isAdmin && Account.isAdmin()); } catch (e) {}
+        var n = document.getElementById("raTabbar"); if (!n || !ADM) return;
+        // Oturum geri yüklenene kadar son oturumdaki bilgiyle göster (sayfa geçişlerinde sekme kaybolup gelmesin)
+        var on = false;
+        try {
+            if (window.Account && Account.adminHint) on = !!Account.adminHint();
+            else on = localStorage.getItem("ra-auth-v1") === "1" && !!(JSON.parse(localStorage.getItem("ra-acc-hint-v1") || "{}") || {}).a;
+        } catch (e) {}
         var a = document.getElementById("raTabAdm");
         if (on && !a) {
             a = document.createElement("a"); a.id = "raTabAdm"; a.href = ADM[0]; if (ADM[3].test(path)) { a.className = "on"; a.setAttribute("aria-current", "page"); }
             a.innerHTML = ADM[2] + "<span>" + ADM[1] + "</span>"; n.insertBefore(a, n.lastChild); n.classList.add("six");
         } else if (!on && a) { a.remove(); n.classList.remove("six"); }
     }
+    admTab();
     document.addEventListener("account-change", admTab);
     document.addEventListener("DOMContentLoaded", function () { setTimeout(admTab, 0); });
 })();
