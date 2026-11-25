@@ -1811,7 +1811,7 @@
             else if (window.Account.isPending()) root.innerHTML = '<div class="box"><p class="a-note">Yükleniyor…</p></div>';
             else renderGate("login");
         });
-        if (window.Account.isPending()) window.Account.load();
+        if (window.Account.isPending()) { root.innerHTML = '<div class="box"><p class="a-note">Yükleniyor…</p></div>'; window.Account.load(); }
     }
     if (document.readyState !== "loading") start(); else document.addEventListener("DOMContentLoaded", start);
 })();
