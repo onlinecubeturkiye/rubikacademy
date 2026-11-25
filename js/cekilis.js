@@ -322,7 +322,7 @@
             if (!res[0]) { if (!S.g || S.g.id !== id) S.g = null; return; }
             var prev = S.g; S.g = dec(res[0]); S.joined = !!res[1] || (prev && prev.id === S.g.id && S.joined && res[1] === undefined); S.myBonus = res[1] ? (function (e) { return (e.b ? 1 : 0) + (e.b2 ? 1 : 0); })(dec(res[1])) : 0; if (res[2] != null) S.count = res[2];
             if (S.joined) remember(S.g);
-            if (prev && prev.id === S.g.id && S.g.w && S.g.w !== prev.w && !S.g.man && (S.g.st === "drawn" || (S.g.st === "claimed" && isM(S.g.w)))) {
+            if (prev && prev.id === S.g.id && S.g.w && S.g.w !== prev.w && !S.g.man && (S.g.st === "drawn" || (S.g.st === "claimed" && (isM(S.g.w) || S.g.cAt === S.g.wAt)))) {
                 if (me() && me().uid === S.g.w) S.winShown = 1; // onay penceresini animasyon sonunda aç
                 reveal(S.g);
             } else if ((!prev || prev.id !== S.g.id) && missed(S.g)) {
@@ -388,7 +388,7 @@
         var out = [];
         function page(tok) {
             return fetch(ROOT + "/giveaways/" + id + "/e?pageSize=300&key=" + encodeURIComponent(cfg.apiKey) + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
-                (d.documents || []).forEach(function (x) { var o = dec(x); out.push({ uid: o.id, name: o.name || "Cuber", d: o.d || "", ts: o.ts || 0, b: !!o.b, b2: !!o.b2, m: !!o.m, x2: !!o.x2 }); });
+                (d.documents || []).forEach(function (x) { var o = dec(x); out.push({ uid: o.id, name: o.name || "Cuber", d: o.d || "", ts: o.ts || 0, b: !!o.b, b2: !!o.b2, m: !!o.m, x2: !!o.x2, oc: !!o.oc }); });
                 return d.nextPageToken && out.length < 20000 ? page(d.nextPageToken) : out;
             });
         }
@@ -428,7 +428,7 @@
             '<div class="gw-dstats"><div><span>Katılımcı</span><b id="gwCnt">' + S.count + '</b></div><div><span>Tür</span><b>' + MODE_LBL[modeOf(g)] + '</b></div><div><span>Çekiliş</span><b>' + esc(dtS(g.drawAt)) + '</b></div></div>' +
             '<div class="gw-pbox"><span>Ödül</span><b class="gw-prize big">🏆 ' + esc(g.prize || "") + '</b></div>' +
             '<div class="gw-stl">' + stLabel(g) + '</div>' + (cdTarget(g) ? cdHtml(g) : '') + '</div>' +
-            '<div class="gw-hbody"><div class="gw-act">' + act + '</div><div class="gw-msg" id="gwMsg"></div><button type="button" class="btn gw-big gw-sharebtn" id="gwShare">↗ Çekilişi paylaş</button></div></div>' +
+            '<div class="gw-hbody"><div class="gw-act">' + topDrawHtml(g, p) + act + '</div><div class="gw-msg" id="gwMsg"></div><button type="button" class="btn gw-big gw-sharebtn" id="gwShare">↗ Çekilişi paylaş</button></div></div>' +
             '<section class="gw-ppl"><h3>👥 Katılımcılar <span id="gwPplN">' + S.count + '</span></h3><div class="gw-pplc" id="gwPplList"><p class="gw-note">Yükleniyor…</p></div><div class="gw-pg" id="gwPg"></div></section>' +
             '<section class="gw-wins"><h3>🏆 Kazananlar</h3>' + winsHtml(g) + '</section></div>' +
             (S.mgr ? '<div class="gw-mgrbox" id="gwMgrOne"></div>' : '') +
@@ -443,7 +443,7 @@
         if ($("gwEdit")) $("gwEdit").onclick = editProofs;
         if ($("gwClaimOpen")) $("gwClaimOpen").onclick = function () { winModal(g); };
         if ($("gwAddr")) $("gwAddr").onclick = function () { addrModal(g); };
-        if (S.mgr) renderMgrOne();
+        if (S.mgr) renderMgrOne(); else bindDraw(g);
         loadPeople();
         // kazandıysan ve süre varsa onay penceresini kendiliğinden aç
         if (iWon && p === "drawn" && !S.winShown) { S.winShown = g.w + g.wAt; winModal(g); }
@@ -618,6 +618,28 @@
         return m;
     }
     function closeModal() { clearInterval(winT); $("gwModal").classList.remove("open"); embedClose(); }
+    // site içi onay penceresi (tarayıcının confirm'ü yerine)
+    function askBox(title, body, okTxt, danger) {
+        return new Promise(function (res) {
+            modal('<h3>' + title + '</h3>' + body + '<div class="gw-askb"><button type="button" class="btn gw-big ' + (danger ? 'gw-dangerbtn' : 'primary') + '" id="gwAskOk">' + okTxt + '</button><button type="button" class="btn" id="gwAskNo">Vazgeç</button></div>');
+            var end = function (v) { closeModal(); res(v); };
+            $("gwAskOk").onclick = function () { end(true); }; $("gwAskNo").onclick = function () { end(false); };
+        });
+    }
+    // çekiliş zamanı gelince (ya da kazanan onaylamayınca) çekme düğmesi yöneticiye sayfanın en üstünde görünür
+    function topDrawHtml(g, p) {
+        if (!S.mgr) return "";
+        if (p === "drawing") return '<button type="button" class="btn primary gw-big gw-drawtop" id="gwDraw">' + MODE_LBL[modeOf(g)].split(" ")[0] + ' Şimdi çek</button>';
+        if (p === "expired") return '<button type="button" class="btn primary gw-big gw-drawtop" id="gwRedraw">🔁 Sıradaki kişiyi çek</button>';
+        return "";
+    }
+    function bindDraw(g) {
+        if ($("gwDraw")) $("gwDraw").onclick = function () { askBox("🎡 Kazanan şimdi çekilsin mi?", '<p>Herkes çarkı aynı anda görür.</p>', "Şimdi çek").then(function (ok) { if (ok) draw(false); }); };
+        if ($("gwRedraw")) $("gwRedraw").onclick = function () {
+            var ex = phase(S.g || g) === "expired";
+            askBox(ex ? "🔁 Sıradaki kişi çekilsin mi?" : "🔁 Yeniden çekilsin mi?", '<p>' + (ex ? "Kazanan süresinde onaylamadı." : "Mevcut kazanan iptal edilip yeni kişi çekilir.") + '</p>', ex ? "Sıradakini çek" : "Yeniden çek", !ex).then(function (ok) { if (ok) draw(true); });
+        };
+    }
     function winModal(g) {
         var m = modal('<div class="gw-confetti">🎉</div><h3>Tebrikler, kazandın!</h3><p>“' + esc(g.title) + '” çekilişinin ödülü <b>' + esc(g.prize) + '</b> senin. Ödülü almak için onayla:</p>' +
             '<div class="gw-timer" id="gwWinT">2:00</div><button type="button" class="btn primary gw-big" id="gwOk">✅ Onaylıyorum</button><div class="gw-msg" id="gwWinMsg"></div>');
@@ -728,13 +750,13 @@
             S.fixing = 1;
             patch("/giveaways/" + g.id, g.st === "empty" ? { st: "open", closeAt: modeOf(g) === "mini" && !g.test ? g.drawAt - 10 * 60000 : g.drawAt } : { closeAt: g.drawAt }).then(function (r) { S.fixing = 0; if (r.ok) return fetchOne(g.id).then(renderOne); }, function () { S.fixing = 0; });
         }
-        var p = phase(g), now = Date.now(), canDraw = p === "closed" || p === "drawing" || (g.test && p === "open"), reDraw = p === "drawn" || p === "expired" || p === "claimed" || p === "empty";
+        var top, p = phase(g), now = Date.now(), canDraw = p === "closed" || p === "drawing" || (g.test && p === "open"), reDraw = p === "drawn" || p === "expired" || p === "claimed" || p === "empty";
         var sl = function (ms) { var m = Math.max(0, Math.floor(ms / 60000)), d = Math.floor(m / 1440), h = Math.floor(m % 1440 / 60); return d ? d + " gün" : h ? h + " sa" : (m % 60) + " dk"; }, left = sl;
         var when = p === "open" ? [left(g.closeAt - now), g.closeAt < g.drawAt ? "kayıt kapanışına" : "çekilişe"] : p === "closed" ? [left(g.drawAt - now), "çekilişe"] : p === "drawn" ? [left(g.claimBy - now), "onay süresi"] : ["—", p === "claimed" ? "onaylandı" : "bitti"];
         box.innerHTML = '<div class="gwm-head"><div class="gwm-ic">🛡</div><div><h3>Yönetim</h3><small>Bu bölümü yalnız yetkililer görür</small></div></div>' +
             '<div class="gwm-stats"><div><b>' + S.count + '</b><span>katılımcı</span></div><div><b id="gwmOk">…</b><span>onaylı</span></div><div><b' + (p === "drawn" ? ' data-left="' + g.claimBy + '"' : p === "open" ? ' data-left="' + g.closeAt + '"' : p === "closed" ? ' data-left="' + g.drawAt + '"' : '') + '>' + esc(when[0]) + '</b><span>' + when[1] + '</span></div></div>' +
-            (canDraw || reDraw ? '<div class="gwm-main">' + (canDraw ? '<button type="button" class="btn primary gw-big" id="gwDraw">' + MODE_LBL[modeOf(g)].split(" ")[0] + ' Şimdi çek</button>' : '') +
-                (reDraw ? '<button type="button" class="btn gw-big' + (p === "expired" ? ' primary' : '') + '" id="gwRedraw">' + (p === "expired" ? '🔁 Sıradaki kişiyi çek' : '🔁 Yeniden çek') + '</button>' : '') + '</div>' : '') +
+            (top = p === "drawing" || p === "expired", canDraw && !top || reDraw && !top ? '<div class="gwm-main">' + (canDraw && !top ? '<button type="button" class="btn primary gw-big" id="gwDraw">' + MODE_LBL[modeOf(g)].split(" ")[0] + ' Şimdi çek</button>' : '') +
+                (reDraw && !top ? '<button type="button" class="btn gw-big' + (p === "expired" ? ' primary' : '') + '" id="gwRedraw">' + (p === "expired" ? '🔁 Sıradaki kişiyi çek' : '🔁 Yeniden çek') + '</button>' : '') + '</div>' : '') +
             '<div class="gwm-acts"><button type="button" class="gwm-a' + (g.pin ? ' on' : '') + '" id="gwPin"><i>📌</i><span>' + (g.pin ? 'Sabitlendi<small>Kaldırmak için dokun</small>' : 'En üste sabitle<small>Listede ilk sırada görünür</small>') + '</span></button>' +
             '<button type="button" class="gwm-a" id="gwEditGw"><i>✏️</i><span>Düzenle<small>Başlık, ödül, tarih, şartlar</small></span></button>' +
             '<button type="button" class="gwm-a" id="gwLink"><i>🔗</i><span>Bağlantıyı kopyala<small>Paylaşmak için</small></span></button>' +
@@ -754,11 +776,10 @@
         $("gwEditGw").onclick = editGw;
         $("gwLink").onclick = function () {
             var u = "https://rubikacademy.fun/icerikler/cekilis?id=" + encodeURIComponent(g.id), b = this;
-            var ok = function () { b.querySelector("span").innerHTML = 'Kopyalandı ✓<small>' + esc(u.replace("https://", "")) + '</small>'; };
+            var ok = function () { var sp = b.lastElementChild; sp.innerHTML = 'Kopyalandı<small>' + esc(u.replace("https://", "")) + '</small>'; b.classList.add("on"); setTimeout(function () { b.classList.remove("on"); sp.innerHTML = 'Bağlantıyı kopyala<small>Paylaşmak için</small>'; }, 2500); };
             try { navigator.clipboard.writeText(u).then(ok, function () { prompt("Bağlantı:", u); }); } catch (e) { prompt("Bağlantı:", u); }
         };
-        if ($("gwDraw")) $("gwDraw").onclick = function () { if (confirm("Kazanan şimdi çekilsin mi?")) draw(false); };
-        if ($("gwRedraw")) $("gwRedraw").onclick = function () { if (confirm(phase(S.g || g) === "expired" ? "Kazanan süresinde onaylamadı. Sıradaki kişi çekilsin mi?" : "Mevcut kazanan iptal edilip yeni kişi çekilsin mi?")) draw(true); };
+        bindDraw(g);
         checkPeople();
         $("gwDel").onclick = function () {
             if (!confirm("Çekiliş silinsin mi? Bu geri alınamaz.")) return;
@@ -865,9 +886,10 @@
                 if (w === "stop") return;
                 var now = Date.now(), o;
                 if (!w) o = { st: "empty", x: skip.join(",").slice(0, 20000), n: l.length };
-                else o = { st: isM(w.uid) ? "claimed" : "drawn", w: w.uid, wName: w.name, wAt: now, claimBy: now + CLAIM_MS + 5000, x: skip.join(",").slice(0, 20000), n: l.length, wn: wheelNames(pool, w) };
+                else o = { st: isM(w.uid) || w.oc ? "claimed" : "drawn", w: w.uid, wName: w.name, wAt: now, claimBy: now + CLAIM_MS + 5000, x: skip.join(",").slice(0, 20000), n: l.length, wn: wheelNames(pool, w) };
                 // elle eklenen kazananın hesabı yok: onay beklenmez, teslimatı yönetici kendisi ayarlar
-                if (w && isM(w.uid)) o.cAt = now;
+                // yönetimin "onaysız" seçtiği kişi de onay beklemeden kazanır (cAt == wAt)
+                if (w && (isM(w.uid) || w.oc)) o.cAt = now;
                 if (g.man) o.man = false;
                 // aynı anda iki yöneticinin çekmesini önle: yazmadan hemen önce belge hâlâ aynı mı bak
                 return req("/giveaways/" + g.id).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
@@ -981,8 +1003,8 @@
         var n = { all: rows.length, wait: 0, ok: 0, no: 0, sus: 0, wa: 0, wawait: 0 };
         rows.forEach(function (r) { n[r.v || "wait"]++; if (r.f.some(function (t) { return t[0] !== "new"; })) n.sus++; if (bonusUp(r.x)) { n.wa++; if ([0, 1].some(function (i) { return hasBk(r.x, i) && !revB(r.x.uid, BK[i]); })) n.wawait++; } });
         var groups = {}; l.forEach(function (x) { if (x.d) (groups[x.d] = groups[x.d] || []).push(x); });
-        var extra = [], dupTxt = []; Object.keys(groups).forEach(function (d) { var a = groups[d].slice().sort(function (p, q) { return (p.ts || 0) - (q.ts || 0); }); extra = extra.concat(a.slice(1));
-            if (a.length > 1) dupTxt.push("• Kalır: " + (a[0].name || "Cuber") + "\n   Çıkar: " + a.slice(1).map(function (y) { return y.name || "Cuber"; }).join(", ")); });
+        var extra = [], dupG = []; Object.keys(groups).forEach(function (d) { var a = groups[d].slice().sort(function (p, q) { return (p.ts || 0) - (q.ts || 0); }); extra = extra.concat(a.slice(1));
+            if (a.length > 1) dupG.push(a); });
         var list = rows.filter(function (r) { return tab === "all" || (tab === "sus" ? r.f.some(function (t) { return t[0] !== "new"; }) : tab === "wa" ? bonusUp(r.x) > 0 : (r.v || "wait") === tab); })
             // bekleyenler önce; onlar içinde görselini güncelleyen ve en yeni katılan en üstte
             .sort(function (a, b) { return (a.v ? 1 : 0) - (b.v ? 1 : 0) || (changedAfter(b.x.uid) ? 1 : 0) - (changedAfter(a.x.uid) ? 1 : 0) || (b.x.ts || 0) - (a.x.ts || 0); });
@@ -1002,9 +1024,9 @@
                 var warn = ff.map(function (t) { return t[1]; }), bad = ff.some(function (t) { return t[0] === "bad"; });
                 return '<div class="gw-prow' + (r.v === "ok" ? " okd" : r.v === "no" ? " nod" : "") + '">' +
                     '<button type="button" class="gw-pth" data-proof="' + esc(x.uid) + '" title="Görselleri incele">' + (prs.length ? '<img src="' + prs[0] + '" alt="">' + (prs.length > 1 ? '<i>' + prs.length + '</i>' : '') : '📷') + '</button>' +
-                    '<div class="gw-pn"><div class="gw-pl1"><a' + (isM(x.uid) ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + '</a>' + (x.m ? '<i class="gw-star" title="' + (isM(x.uid) ? "Elle eklendi (hesapsız)" : "Elle eklendi") + '">✋</i>' : '') + (x.x2 ? '<i class="gw-star" title="Site sahibi verdi">×2</i>' : '') + (bonusUp(x) ? '<i class="gw-star" title="WhatsApp bonusu: ' + bonusUp(x) + ' görsel, ' + bonusCnt(x) + ' onaylı">⭐' + bonusCnt(x) + '/' + bonusUp(x) + '</i>' : '') + (wt > 1 ? '<i class="gw-star" title="Çarkta ' + wt + ' kez">🎡×' + wt + '</i>' : '') + '</div>' +
+                    '<div class="gw-pn"><div class="gw-pl1"><a' + (isM(x.uid) ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + '</a>' + (x.m ? '<i class="gw-star" title="' + (isM(x.uid) ? "Elle eklendi (hesapsız)" : "Elle eklendi") + '">✋</i>' : '') + (x.x2 ? '<i class="gw-star" title="Site sahibi verdi">×2</i>' : '') + (x.oc ? '<i class="gw-star" title="Kazanırsa onay beklenmez">⚡ onaysız</i>' : '') + (bonusUp(x) ? '<i class="gw-star" title="WhatsApp bonusu: ' + bonusUp(x) + ' görsel, ' + bonusCnt(x) + ' onaylı">⭐' + bonusCnt(x) + '/' + bonusUp(x) + '</i>' : '') + (wt > 1 ? '<i class="gw-star" title="Çarkta ' + wt + ' kez">🎡×' + wt + '</i>' : '') + '</div>' +
                     '<div class="gw-pl2">' + stt + (upd ? '<span class="new">🔄 Görselini güncelledi</span>' : '') + (warn.length ? '<span class="' + (bad ? "bad" : "warn") + '" title="' + esc(warn.join(" · ")) + '">⚠️ ' + esc(warn.join(" · ")) + '</span>' : '') + '</div></div>' +
-                    '<div class="gw-pact">' + (isOwner() ? '<button type="button" class="gw-qb x2' + (x.x2 ? " on" : "") + '" data-x2="' + esc(x.uid) + '" title="' + (x.x2 ? "2× şansı kaldır" : "2× şans ver") + '">×2</button>' : '') + (x.m ? '' : any ? '<button type="button" class="gw-qb rst" data-rst="' + esc(x.uid) + '" title="Beklemeye geri al">↺</button>' : '') +
+                    '<div class="gw-pact">' + (isOwner() ? '<button type="button" class="gw-qb x2' + (x.x2 ? " on" : "") + '" data-x2="' + esc(x.uid) + '" title="' + (x.x2 ? "2× şansı kaldır" : "2× şans ver") + '">×2</button><button type="button" class="gw-qb oc' + (x.oc ? " on" : "") + '" data-oc="' + esc(x.uid) + '" title="' + (x.oc ? "Onaysız kazanmayı kaldır" : "Kazanırsa onay beklenmesin") + '">⚡</button>' : '') + (x.m ? '' : any ? '<button type="button" class="gw-qb rst" data-rst="' + esc(x.uid) + '" title="Beklemeye geri al">↺</button>' : '') +
                     (x.m ? '' : '<button type="button" class="gw-qb ok' + (r.v === "ok" ? " on" : "") + '" data-rv="ok" data-u="' + esc(x.uid) + '" title="Onayla">✓</button><button type="button" class="gw-qb no' + (r.v === "no" ? " on" : "") + '" data-rv="no" data-u="' + esc(x.uid) + '" title="Uygun değil">✗</button>') +
                     '<button type="button" class="gw-qb out" data-out="' + esc(x.uid) + '" title="Çekilişten çıkar">🗑</button></div></div>';
             }).join("") || '<p class="gw-note">' + (n.all ? "Bu bölümde kimse yok." : "Henüz katılımcı yok.") + '</p>') + '</div>';
@@ -1017,6 +1039,13 @@
                 patch("/giveaways/" + g.id + "/e/" + uid, { x2: v }, "&currentDocument.exists=true").then(function (r) { if (!r.ok) throw 0; x.x2 = v; paintCheck(); }).catch(function () { b.disabled = false; alert("Kaydedilemedi."); });
             };
         });
+        Array.prototype.forEach.call(box.querySelectorAll("[data-oc]"), function (b) {
+            b.onclick = function () {
+                var uid = b.getAttribute("data-oc"), x = l.filter(function (y) { return y.uid === uid; })[0]; if (!x) return;
+                var v = !x.oc; b.disabled = true;
+                patch("/giveaways/" + g.id + "/e/" + uid, { oc: v }, "&currentDocument.exists=true").then(function (r) { if (!r.ok) throw 0; x.oc = v; paintCheck(); }).catch(function () { b.disabled = false; alert("Kaydedilemedi."); });
+            };
+        });
         Array.prototype.forEach.call(box.querySelectorAll("[data-rst]"), function (b) { b.onclick = function () { clearRev(b.getAttribute("data-rst")); paintCheck(); }; });
         Array.prototype.forEach.call(box.querySelectorAll("[data-rv]"), function (b) {
             b.onclick = function () { var u = b.getAttribute("data-u"), v = b.getAttribute("data-rv"); if (revOf(u) === v) clearRev(u); else setRev(u, v); paintCheck(); };
@@ -1025,8 +1054,10 @@
         if ($("gwRevWa")) $("gwRevWa").onclick = function () { review(null, "wa"); };
         $("gwReChk").onclick = checkPeople;
         if ($("gwDupOut")) $("gwDupOut").onclick = function () {
-            if (!confirm("Aynı cihazdan katılanlar (her cihazdan ilk katılan kalır):\n\n" + dupTxt.join("\n\n") + "\n\n" + extra.length + " hesap çıkarılsın mı?")) return;
-            removeMany(extra.map(function (x) { return x.uid; }));
+            var nm = function (y, cls, tag) { return '<div class="' + cls + '"><span class="gw-tag">' + tag + '</span><b>' + esc(y.name || "Cuber") + '</b><small>' + esc(dtS(y.ts)) + '</small></div>'; };
+            askBox("📱 Aynı cihazdan katılım", '<p class="gw-note">Bu hesaplar aynı cihazdan katılmış. Her cihazdan <b>ilk katılan kalır</b>, diğerleri çekilişten çıkarılır.</p><div class="gw-dups">' +
+                dupG.map(function (a) { return '<div class="gw-dup">' + nm(a[0], "k", "✓ Kalır") + a.slice(1).map(function (y) { return nm(y, "x", "✕ Çıkar"); }).join("") + '</div>'; }).join("") + '</div>',
+                extra.length + " hesabı çıkar", true).then(function (ok) { if (ok) removeMany(extra.map(function (x) { return x.uid; })); });
         };
         Array.prototype.forEach.call(box.querySelectorAll("[data-out]"), function (b) {
             b.onclick = function () {
