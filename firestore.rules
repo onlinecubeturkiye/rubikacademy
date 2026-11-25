@@ -15,11 +15,21 @@ service cloud.firestore {
         && request.auth.token.firebase.sign_in_provider == 'google.com';
     }
 
-    // Çekiliş yöneticisi: site yöneticisi ya da "admin" / "gelistirici" rolü
+    // Profile bağlı tek tek izinler (roles/{uid}.perms listesi): rol değiştirmeden yetki verilir.
+    //  'oda' = ev yarışması odası kurar, 'odaTek' = turu tek başına başlatır, 'cekilis' = çekiliş kurar/yönetir
+    function hasPerm(p) {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/roles/$(request.auth.uid))
+        && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.get('perms', []).hasAny([p])
+        && !(get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['askida', 'silindi']);
+    }
+
+    // Çekiliş yöneticisi: site yöneticisi, "admin" / "gelistirici" rolü ya da 'cekilis' izni
     function gwMgr() {
       return request.auth != null && (isAdmin()
         || (exists(/databases/$(database)/documents/roles/$(request.auth.uid))
-            && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['admin', 'gelistirici']));
+            && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['admin', 'gelistirici'])
+        || hasPerm('cekilis'));
     }
 
     // Askıya alınmış hesap (roles/{uid}.role == 'askida') yazamaz
@@ -127,8 +137,11 @@ service cloud.firestore {
     match /roles/{uid} {
       allow read: if true;
       allow create, update: if isAdmin()
-        && request.resource.data.keys().hasOnly(['role'])
-        && request.resource.data.role in ['uye', 'admin', 'gelistirici', 'tester', 'organizator', 'askida', 'silindi'];
+        && request.resource.data.keys().hasOnly(['role', 'perms'])
+        && request.resource.data.role in ['uye', 'admin', 'gelistirici', 'tester', 'organizator', 'askida', 'silindi']
+        && (!('perms' in request.resource.data) || (request.resource.data.perms is list
+            && request.resource.data.perms.size() <= 10
+            && request.resource.data.perms.toSet().hasOnly(['oda', 'odaTek', 'cekilis'])));
       // Hesabını silen üye kendi rol kaydını da siler (askıya alınmış / silinmişse silemez)
       allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid && !(resource.data.role in ['askida', 'silindi']));
     }
@@ -149,7 +162,8 @@ service cloud.firestore {
       function org() {
         return request.auth != null && (isAdmin()
           || (exists(/databases/$(database)/documents/roles/$(request.auth.uid))
-              && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['organizator', 'gelistirici']));
+              && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['organizator', 'gelistirici'])
+          || hasPerm('oda'));
       }
       function ck() { return ['host', 'hName', 'name', 'cap', 'ev', 'round', 'fin', 'st', 'scr', 'adv', 'R', 'ts', 'mods', 'ban', 'pa', 'ok', 'okBy', 'okTs', 'okNote']; }
       // Onay (double check): ok = 1 onaylandı, -1 reddedildi; yalnız admin yazar. Onay/ret verilmiş odanın sonuçları (R) da yalnız admin'ce değişir.

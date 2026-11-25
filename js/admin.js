@@ -65,6 +65,19 @@
             .then(function (d) { return (d && d.fields && d.fields.role && d.fields.role.stringValue) || "uye"; })
             .catch(function () { return "uye"; });
     }
+    function fetchPerms(uid) {
+        return authed(docsBase() + "/roles/" + uid, { method: "GET" })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) { var f = (d && d.fields && d.fields.perms) || null; return ((f && f.arrayValue && f.arrayValue.values) || []).map(function (v) { return v.stringValue; }).filter(Boolean); })
+            .catch(function () { return []; });
+    }
+    // Rol kaydı yoksa kural "role" alanını da istediği için ikisi birlikte yazılır (rol değişmez)
+    function setPerms(uid, role, perms) {
+        return authed(docsBase() + "/roles/" + uid + "?updateMask.fieldPaths=role&updateMask.fieldPaths=perms", { method: "PATCH", body: JSON.stringify({ fields: {
+            role: { stringValue: role || "uye" },
+            perms: { arrayValue: { values: perms.map(function (p) { return { stringValue: p }; }) } }
+        } }) }).then(function (r) { return r.ok; });
+    }
     function setRole(uid, role) {
         return authed(docsBase() + "/roles/" + uid + "?updateMask.fieldPaths=role", { method: "PATCH", body: JSON.stringify({ fields: { role: { stringValue: role } } }) })
             .then(function (r) { return r.ok; });
@@ -174,6 +187,12 @@
         var opts = ROLES.map(function (r) { return '<option value="' + r[0] + '"' + (r[0] === role ? ' selected' : '') + '>' + r[1] + '</option>'; }).join("");
         return '<h4>Rol</h4><div class="a-ctrl"><select id="roleSel">' + opts + '</select>' +
             '<button class="a-btn main sm" id="roleSave">Kaydet</button><span class="a-msg" id="roleMsg" style="margin:0"></span></div>';
+    }
+    var PERMS = [["oda", "🏠 Ev yarışması odası açabilir"], ["odaTek", "▶️ Odada turu tek başına başlatabilir"], ["cekilis", "🎁 Çekiliş açabilir / yönetebilir"]];
+    function permBox(perms) {
+        return '<h4>İzinler <span class="a-note">(rolden bağımsız, profile bağlı)</span></h4><div class="a-ctrl" style="flex-direction:column;align-items:flex-start;gap:4px">' +
+            PERMS.map(function (p) { return '<label><input type="checkbox" class="permChk" value="' + p[0] + '"' + (perms.indexOf(p[0]) >= 0 ? ' checked' : '') + '> ' + p[1] + '</label>'; }).join("") +
+            '<div><button class="a-btn main sm" id="permSave">İzinleri kaydet</button> <span class="a-msg" id="permMsg" style="margin:0"></span></div></div>';
     }
     function roleName(r) { return r === "admin" ? "Admin" : r === "gelistirici" ? "Geliştirici" : r === "organizator" ? "Organizatör" : (r === "tester" ? "Tester" : (r === "askida" ? "Askıda" : (r === "silindi" ? "Silindi" : "Üye"))); }
     function dangerBox(role) {
@@ -316,9 +335,9 @@
         var sp = document.querySelector(".u-split");
         if (sp) { sp.classList.add("has-detail"); if (matchMedia("(max-width: 720px)").matches) try { sp.scrollIntoView({ block: "start" }); } catch (e) {} }
         detailBox.innerHTML = BACK_BTN + '<div class="u-card open"><p class="a-note">Yükleniyor…</p></div>';
-        Promise.all([fetchMeta(u.uid), listVisits(u.uid, 200), fetchRole(u.uid)]).then(function (res) {
+        Promise.all([fetchMeta(u.uid), listVisits(u.uid, 200), fetchRole(u.uid), fetchPerms(u.uid)]).then(function (res) {
             var role = res[2] || "uye";
-            detailBox.innerHTML = BACK_BTN + '<div class="u-card open">' + roleBox(u.uid, role) + userDetailHtml(u, res[0] || {}, res[1] || []) +
+            detailBox.innerHTML = BACK_BTN + '<div class="u-card open">' + roleBox(u.uid, role) + permBox(res[3] || []) + userDetailHtml(u, res[0] || {}, res[1] || []) +
                 '<details class="sec" id="uEditSec"><summary><b>✏️ Verilerini düzenle</b> <span class="a-note">(antrenör · günlük · bilinen algoritmalar)</span></summary><div class="sec-body"><p class="a-note">Değişiklikler kişinin buluttaki verisine yazılır; cihazları bir sonraki senkronda alır.</p><div id="uEditor"></div></div></details>' +
                 dangerBox(role) + '</div>';
             bindDanger(u, role, pickBtn); bindEditor(u);
@@ -331,6 +350,16 @@
                     if (ok) { msg($id("roleMsg"), "Rol kaydedildi ✓", "ok"); refreshPickBadge(pickBtn, val); }
                     else msg($id("roleMsg"), "Kaydedilemedi (kuralları yayımladın mı?)", "bad");
                 }, function () { save.disabled = false; msg($id("roleMsg"), "Kaydedilemedi.", "bad"); });
+            });
+            var pSave = $id("permSave");
+            if (pSave) pSave.addEventListener("click", function () {
+                var perms = Array.prototype.filter.call(document.querySelectorAll(".permChk"), function (c) { return c.checked; }).map(function (c) { return c.value; });
+                pSave.disabled = true; msg($id("permMsg"), "Kaydediliyor…");
+                // Rolü sunucudaki güncel değerden al: bu ekranda rol değiştirilip kaydedilmediyse eski rol korunur
+                fetchRole(u.uid).then(function (cur) { return setPerms(u.uid, cur, perms); }).then(function (ok) {
+                    pSave.disabled = false;
+                    msg($id("permMsg"), ok ? "İzinler kaydedildi ✓" : "Kaydedilemedi (kuralları yayımladın mı?)", ok ? "ok" : "bad");
+                }, function () { pSave.disabled = false; msg($id("permMsg"), "Kaydedilemedi.", "bad"); });
             });
         }, function () { detailBox.innerHTML = '<div class="u-card open"><p class="a-note">Kullanıcı verisi yüklenemedi.</p></div>'; });
     }
