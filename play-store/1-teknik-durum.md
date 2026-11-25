@@ -12,7 +12,7 @@ Uygulama siteyi (https://rubikacademy.fun) **kendi içindeki WebView'de** açar;
 | Kütüphaneler | AndroidX Core, Firebase Messaging, AndroidX Credentials + Google ID | ✓ |
 | Android Gradle Plugin | 8.10.1, Java 17 | ✓ |
 | compileSdk / targetSdk | 36 / 36 (Google Play şartı: API 36) | ✓ |
-| minSdk | 23 (Android 6.0) | ✓ |
+| minSdk | 24 (Android 7.0; Play otomatik koruma şartı) | ✓ |
 | Mimari | Yerel (native) kod yok → bütün ABI'ler | ✓ |
 | Ekran yönü | Dikey (portrait) | ✓ (bilgi) |
 | İzinler | `INTERNET`, `ACCESS_NETWORK_STATE`, `POST_NOTIFICATIONS`, `CAMERA` (küp tarama), `RECORD_AUDIO` (kablolu timer) — kamera/mikrofon yalnız o özellik açılınca sorulur | ✓ |

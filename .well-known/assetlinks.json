@@ -14,5 +14,17 @@
         "C5:E0:C5:03:A0:C0:35:19:CF:A4:89:78:E3:A8:F0:34:4D:98:91:CA:F8:65:F4:39:B8:3A:E1:09:9A:A2:DB:34"
       ]
     }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.rubikacademy.fun",
+      "sha256_cert_fingerprints": [
+        "D3:D2:19:BC:DA:3E:B5:5B:16:C7:7C:5B:B0:CB:A6:0A:6D:79:44:25:A4:04:78:5B:47:A1:D9:4D:A4:6B:46:68"
+      ]
+    }
   }
 ]

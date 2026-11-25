@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "724519357215",
+    "project_id": "rubikacademydb",
+    "storage_bucket": "rubikacademydb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:724519357215:android:d2a98191b2342c7df1be2a",
+        "android_client_info": {
+          "package_name": "fun.rubikacademy.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "724519357215-dat1hbi7l177i2mtg9d2dkfiuuitt5g1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGH0zGL0_MejGkGxpuHr-MUI-Eyb1fzLU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "724519357215-dat1hbi7l177i2mtg9d2dkfiuuitt5g1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

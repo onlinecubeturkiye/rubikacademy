@@ -22,7 +22,7 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
    Uygulama siteyi kendi WebView'inde açar ve window.RAAppNative verir (android/…/MainActivity.java).
    Yanıtlar window.raAppCb(id, değer) ile gelir; burada Promise'e çevrilir.
    RAApp.info() → { v, push: granted|default|denied|unavailable, google: bool }
-   RAApp.call("requestPush" | "pushToken" | "googleSignIn" | "saveFile" | "share" | "print" | "openExternal" | "setBars", arg)
+   RAApp.call("requestPush" | "pushToken" | "googleSignIn" | "ble" | "saveFile" | "share" | "print" | "openExternal" | "setBars", arg)
 ========================================================= */
 (function () {
     var N = window.RAAppNative; if (!N) return;
@@ -39,6 +39,130 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
         native: true, call: call,
         info: function () { try { return JSON.parse(N.info()) || {}; } catch (e) { return {}; } }
     };
+    // WebView'de Web Bluetooth yok: akıllı küp / akıllı timer için navigator.bluetooth'un kullanılan kısmını yerel köprüyle (Ble.java) taklit et
+    if (N.ble && !navigator.bluetooth) (function () {
+        function fail(n) { try { return new DOMException(n, /Error$/.test(n) ? n : "NetworkError"); } catch (e) { var x = new Error(n); x.name = n; return x; } }
+        function ble(o) { return call("ble", o).then(function (r) { if (!r || r.err) { var e = fail(r ? r.err : "NetworkError"); e.code2 = r && r.err; throw e; } return r; }); }
+        var AL = { battery_service: 0x180f, battery_level: 0x2a19, device_information: 0x180a, generic_access: 0x1800 };
+        function U(u) {
+            if (typeof u === "string" && AL[u] != null) u = AL[u];
+            if (typeof u === "string" && /^[0-9a-f]{4}$/i.test(u)) u = parseInt(u, 16);
+            if (typeof u === "number") return ("00000000" + u.toString(16)).slice(-8) + "-0000-1000-8000-00805f9b34fb";
+            return String(u).toLowerCase();
+        }
+        function dv(b) { var s = atob(b || ""), a = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); return new DataView(a.buffer); }
+        function b64(v) { var a = v instanceof ArrayBuffer ? new Uint8Array(v) : new Uint8Array(v.buffer, v.byteOffset, v.byteLength), s = ""; for (var i = 0; i < a.length; i++) s += String.fromCharCode(a[i]); return btoa(s); }
+        function pick(list, u, many) {
+            var l = u == null ? list : list.filter(function (x) { return x.uuid === U(u); });
+            return l.length ? Promise.resolve(many ? l.slice() : l[0]) : Promise.reject(fail("NotFoundError"));
+        }
+        var devs = {}, advL = [];
+        function fireAdv(d, e) {
+            var ev = new Event("advertisementreceived"), m = new Map();
+            Object.keys(e.mfr || {}).forEach(function (k) { m.set(+k, dv(e.mfr[k])); });
+            ev.device = d; ev.name = e.name; ev.rssi = e.rssi; ev.manufacturerData = m; ev.serviceData = new Map(); ev.uuids = e.uuids || [];
+            d.dispatchEvent(ev);
+        }
+        class Chr extends EventTarget {
+            constructor(s, c) {
+                super(); var p = c.p; this.service = s; this.uuid = c.uuid; this.value = null;
+                this.properties = { broadcast: !!(p & 1), read: !!(p & 2), writeWithoutResponse: !!(p & 4), write: !!(p & 8), notify: !!(p & 16), indicate: !!(p & 32) };
+            }
+            _o(op, x) { return ble(Object.assign({ op: op, id: this.service.device.id, s: this.service.uuid, c: this.uuid }, x)); }
+            readValue() { var c = this; return this._o("read").then(function (v) { return (c.value = dv(v)); }); }
+            writeValueWithResponse(v) { return this._o("write", { v: b64(v) }).then(function () {}); }
+            writeValueWithoutResponse(v) { return this._o("write", { v: b64(v), nr: true }).then(function () {}); }
+            writeValue(v) { return this.properties.write ? this.writeValueWithResponse(v) : this.writeValueWithoutResponse(v); }
+            startNotifications() { var c = this; return this._o("notify", { on: true }).then(function () { return c; }); }
+            stopNotifications() { var c = this; return this._o("notify", { on: false }).then(function () { return c; }); }
+        }
+        class Svc {
+            constructor(d, s) { var sv = this; this.device = d; this.uuid = s.uuid; this.isPrimary = true; this._c = s.c.map(function (c) { var ch = new Chr(sv, c); d._chars[sv.uuid + "|" + ch.uuid] = ch; return ch; }); }
+            getCharacteristic(u) { return pick(this._c, u); }
+            getCharacteristics(u) { return pick(this._c, u, true); }
+        }
+        class Gatt {
+            constructor(d) { this.device = d; this.connected = false; this._s = []; }
+            connect() {
+                var g = this, d = this.device;
+                return ble({ op: "connect", id: d.id }).then(function (l) { d._chars = {}; g._s = l.map(function (s) { return new Svc(d, s); }); g.connected = true; return g; });
+            }
+            disconnect() { if (!this.connected) return; this.connected = false; ble({ op: "disconnect", id: this.device.id }).catch(function () {}); this.device.dispatchEvent(new Event("gattserverdisconnected")); }
+            getPrimaryService(u) { return pick(this._s, u); }
+            getPrimaryServices(u) { return pick(this._s, u, true); }
+        }
+        class Dev extends EventTarget {
+            constructor(id, n) { super(); this.id = id; this.name = n || ""; this._chars = {}; this._watch = false; this.watchingAdvertisements = false; this.gatt = new Gatt(this); }
+            watchAdvertisements(o) {
+                var d = this; d._watch = d.watchingAdvertisements = true;
+                if (o && o.signal) o.signal.addEventListener("abort", function () { d._watch = d.watchingAdvertisements = false; ble({ op: "stopScan" }).catch(function () {}); });
+                return ble({ op: "scan" }).then(function () { if (d._adv) setTimeout(function () { if (d._watch) fireAdv(d, d._adv); }, 0); });
+            }
+            forget() { return Promise.resolve(); }
+        }
+        function dev(id, n) { var d = devs[id] || (devs[id] = new Dev(id, n)); if (n) d.name = n; return d; }
+        window.raBleEv = function (e) {
+            var d;
+            if (e.t === "adv") { d = dev(e.id, e.name); d._adv = e; advL.slice().forEach(function (f) { f(e); }); if (d._watch) fireAdv(d, e); }
+            else if (e.t === "val") { d = devs[e.id]; var c = d && d._chars[e.s + "|" + e.c]; if (c) { c.value = dv(e.v); c.dispatchEvent(new Event("characteristicvaluechanged")); } }
+            else if (e.t === "disc") { d = devs[e.id]; if (d && d.gatt.connected) { d.gatt.connected = false; d.dispatchEvent(new Event("gattserverdisconnected")); } }
+        };
+        function fit(f, e) {
+            var n = e.name || "";
+            if (f.name && n !== f.name) return false;
+            if (f.namePrefix && n.indexOf(f.namePrefix) !== 0) return false;
+            if (f.services && !f.services.every(function (s) { return (e.uuids || []).indexOf(U(s)) >= 0; })) return false;
+            return !!(f.name || f.namePrefix || f.services);
+        }
+        function ok(o, e) {
+            if ((o.exclusionFilters || []).some(function (f) { return fit(f, e); })) return false;
+            return o.acceptAllDevices ? !!e.name : (o.filters || []).some(function (f) { return fit(f, e); });
+        }
+        function requestDevice(o) {
+            o = o || {};
+            return new Promise(function (res, rej) {
+                var box = document.createElement("div"), seen = {};
+                box.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center";
+                box.innerHTML = '<div style="background:#fff;color:#111;width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:18px 16px 24px;font:15px system-ui,sans-serif;max-height:70vh;overflow:auto">' +
+                    '<b style="font-size:17px">Bluetooth cihazı seç</b><p class="raBleM" style="margin:6px 0 10px;color:#666;font-size:13px">Cihazı aç ve telefona yaklaştır. Aranıyor…</p><div class="raBleL"></div>' +
+                    '<button type="button" class="raBleX" style="margin-top:12px;width:100%;padding:12px;border:0;border-radius:12px;background:#eee;color:#111;font:600 15px system-ui,sans-serif">İptal</button></div>';
+                var list = box.querySelector(".raBleL"), msg = box.querySelector(".raBleM");
+                function on(e) {
+                    if (seen[e.id] || !ok(o, e)) return; seen[e.id] = 1;
+                    var b = document.createElement("button"); b.type = "button"; b.textContent = e.name || e.id;
+                    b.style.cssText = "display:block;width:100%;text-align:left;padding:12px;margin:6px 0;border:1px solid #ddd;border-radius:12px;background:#fafafa;color:#111;font:600 15px system-ui,sans-serif";
+                    b.onclick = function () { end(dev(e.id, e.name)); }; list.appendChild(b);
+                }
+                function end(d) {
+                    var i = advL.indexOf(on); if (i >= 0) advL.splice(i, 1);
+                    ble({ op: "stopScan" }).catch(function () {}); box.remove();
+                    if (d) res(d); else rej(fail("NotFoundError"));
+                }
+                box.querySelector(".raBleX").onclick = function () { end(null); };
+                advL.push(on); document.body.appendChild(box);
+                ble({ op: "scan" }).catch(function (er) {
+                    var c = er.code2 || er.name;
+                    msg.textContent = c === "BluetoothOff" ? "Bluetooth kapalı. Açıp tekrar dene." : c === "NotAllowedError" ? "Bluetooth izni verilmedi (Ayarlar → Uygulamalar → Rubik Academy → İzinler)." : "Bluetooth başlatılamadı.";
+                });
+            });
+        }
+        try {
+            Object.defineProperty(navigator, "bluetooth", { configurable: true, value: {
+                getAvailability: function () { return Promise.resolve(true); },
+                getDevices: function () { return Promise.resolve([]); },
+                requestDevice: requestDevice
+            } });
+        } catch (e) {}
+    })();
+    // Uygulamada Google girişi yoksa (google-services.json eksik derleme) Google düğmesini ve "veya" çizgisini gizle
+    try {
+        if (window.RAApp.info().google === false) {
+            document.documentElement.classList.add("ra-nogoogle");
+            var ng = document.createElement("style");
+            ng.textContent = "html.ra-nogoogle .auth-google,html.ra-nogoogle .auth-or,html.ra-nogoogle .acc-google,html.ra-nogoogle .acc-or{display:none!important}";
+            (document.head || document.documentElement).appendChild(ng);
+        }
+    } catch (e) {}
     // Yazdır / PDF: WebView window.print desteklemiyor → Android yazdırma
     window.print = function () { call("print"); };
     // Paylaş: WebView'de navigator.share yok → Android paylaşım menüsü (yalnız metin/bağlantı)
@@ -177,14 +301,12 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
         var hasIcons = window.RAIcons || document.querySelector('script[src*="/js/ra-icons.js"]');
         var me = document.currentScript && document.currentScript.src || "", v = (/[?&]v=([^&]+)/.exec(me) || [])[1] || "";
         if (!hasIcons) { var sc = document.createElement("script"); sc.src = "/js/ra-icons.js" + (v ? "?v=" + v : ""); sc.defer = true; (document.head || document.documentElement).appendChild(sc); }
-        // sponsor banner'ı (içerik admin panelinden)
         // özel paketler (hesaba atanmış tema / algoritma): önbellekteki tema hemen, güncel liste packs.js ile
         var pc = ""; try { pc = localStorage.getItem("ra-pack-css") || ""; } catch (e) {}
         if (pc) { var ps = document.createElement("style"); ps.id = "raPackCss"; ps.textContent = pc; (document.head || document.documentElement).appendChild(ps); }
         try { var sk0 = localStorage.getItem("site-skin") || "", pm = localStorage.getItem("ra-pack-mode"); if (pc && sk0.indexOf("p-") === 0 && pm) document.documentElement.classList.toggle("dark-mode", pm === "dark"); } catch (e) {}
         var pk = document.createElement("script"); pk.src = "/js/packs.js" + (v ? "?v=" + v : ""); pk.defer = true;
         (document.head || document.documentElement).appendChild(pk);
-        // sponsor (Minjuan) reklam alanı kaldırıldı
     } catch (e) {}
 })();
 (function () {

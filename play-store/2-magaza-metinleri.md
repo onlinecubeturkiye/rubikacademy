@@ -10,13 +10,13 @@ Rubik Academy: Küp Öğren
 
 Alternatif (marka riskini azaltmak için): `Küp Akademi: Rubik Küp Öğren` — "Rubik" kelimesi yine geçer; tamamen kaçınmak istersen `Küp Akademi`.
 
-## Kısa açıklama (77/80)
+## Kısa açıklama (72/80)
 
 ```
-Rubik küpü öğren: algoritmalar, antrenör, akıllı küp ve canlı ev yarışmaları.
+Rubik küpü öğren: 1.400+ algoritma, antrenörler ve canlı ev yarışmaları.
 ```
 
-## Uzun açıklama (2347/4000)
+## Uzun açıklama (2182/4000)
 
 ```
 Rubik Academy ile Rubik küpü sıfırdan öğren, algoritmaları ezberle, hızını ölç ve evden canlı yarışmalara katıl. Türkçe, ücretsiz ve küp tutkunları için hazırlandı.
@@ -40,11 +40,9 @@ ANTRENÖRLER
 • Cross, X-Cross ve F2L antrenörleri
 • Look-ahead ve TPS (hız) egzersizleri, metronomla
 
-AKILLI KÜP VE TIMER DESTEĞİ
-• Bluetooth akıllı küplerle çözüm analizi: Cross, F2L, OLL ve PLL sürelerini ayrı ayrı gör
-• Çözüm tekrarı: çözümünü hamle hamle izle
-• Akıllı timer (GAN, QiYi) ve kablolu timer (Stackmat / SpeedStacks) bağlantısı
-• Mıknatıslı küple telefonu zamanlayıcı olarak kullan
+TIMER DESTEĞİ
+• Kablolu timer (Stackmat / SpeedStacks) bağlantısı
+• Bluetooth akıllı küp (GAN vb.) ile çözüm analizi ve akıllı timer: rubikacademy.fun sitesinde, Chrome tarayıcıda
 
 CANLI EV YARIŞMALARI
 • Evden canlı yarış: herkes aynı karıştırmayı çözer, sıralama anında güncellenir
@@ -54,7 +52,6 @@ CANLI EV YARIŞMALARI
 
 HER GÜN YENİ
 • Günün karıştırması: herkesle aynı karıştırmayı çöz, günün sıralamasında yerini al
-• Bildirimlerle yeni yarışmalardan haberin olsun
 
 DAHA FAZLASI
 • Küp çözücü: renkleri gir ya da kamerayla tara, çözümü adım adım izle

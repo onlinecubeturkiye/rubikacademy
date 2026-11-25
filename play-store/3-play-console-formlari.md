@@ -21,8 +21,8 @@ The admin panel is only for the site owner.
 
 ## 2. Ads (Reklamlar)
 
-- Seçim: **"Evet, uygulamamda reklam var"**
-- Neden: Sitede bir küp mağazasının sponsor tanıtımı (banner) gösteriliyor. Reklam ağı / SDK kullanılmıyor, kişisel veri toplanmıyor. Uygulama içinde "Reklam içerir" etiketi görünür.
+- Seçim: **"Hayır, uygulamam reklam içermiyor"**
+- Neden: Sponsor banner'ı 21 Kasım 2026'da kaldırıldı; sitede ve uygulamada reklam ağı / SDK ya da sponsor tanıtımı yok. İleride sponsor tanıtımı eklenirse bu cevap "Evet" yapılmalı.
 
 ## 3. Content rating (İçerik derecelendirmesi — IARC anketi)
 
@@ -41,7 +41,7 @@ The admin panel is only for the site owner.
 ## 4. Target audience and content (Hedef kitle)
 
 - Hedef yaş grupları: **13–15, 16–17, 18 ve üzeri**
-- **13 yaş altını seçme.** Seçersen Aileler politikası devreye girer (Google Analytics, sponsor banner ve sohbet sorun olur).
+- **13 yaş altını seçme.** Seçersen Aileler politikası devreye girer (Google Analytics ve sohbet sorun olur).
 - "Uygulama çocukların ilgisini çekebilir mi?": **Hayır** — dürüst cevap: içerik ve dil gençlere/yetişkinlere yönelik. (Google buna itiraz ederse uygulama içinde yaş kapısı gerekebilir.)
 - Gizlilik politikasında "13 yaş altına yönelik değildir" yazıyor ✓
 
@@ -73,7 +73,7 @@ The admin panel is only for the site owner.
 | Uygulama etkinliği → **Diğer kullanıcı içeriği** | İsteğe bağlı | Uygulama işlevi (bio, algoritma önerileri, puan ve yorumlar, şikayetler, yarışma süreleri) |
 | Uygulama bilgileri ve performans → **Kilitlenme günlükleri** | Zorunlu* | Analiz, Uygulama işlevi (hata kayıtları) |
 | Uygulama bilgileri ve performans → **Diğer uygulama performans verileri / Tanılama** | Zorunlu* | Analiz |
-| Cihaz veya diğer kimlikler → **Cihaz veya diğer kimlikler** | Zorunlu* | Analiz (Google Analytics çerezi, hesapsız cihaz sayacı) |
+| Cihaz veya diğer kimlikler → **Cihaz veya diğer kimlikler** | Zorunlu* | Analiz (Google Analytics çerezi, hesapsız cihaz sayacı), Uygulama işlevi (bildirim jetonu) |
 | Konum → **Yaklaşık konum** | Zorunlu* | Analiz (Google Analytics IP'den ülke/şehir çıkarır) |
 
 \* Google Analytics ve hata kayıtları kullanıcı seçimi olmadan çalıştığı için "zorunlu" işaretle.
