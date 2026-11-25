@@ -924,9 +924,59 @@ document.addEventListener("DOMContentLoaded", function () {
 /* Çevrimdışı kullanım ve "ana ekrana ekle" için service worker */
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
-        navigator.serviceWorker.register("/sw.js").catch(function () {});
+        // sw.js her zaman sunucudan kontrol edilsin (tarayıcı önbelleğindeki eski sw.js'e takılmasın)
+        navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch(function () {});
     });
 }
+
+/* YENİ SÜRÜM KONTROLÜ
+   Uygulama (WebView) ve ana ekrana eklenen site arka planda günlerce açık kalabiliyor; eski sayfa ve
+   önbellekteki dosyalar yüzünden güncelleme ancak "verileri temizle" ile geliyordu. /version.json
+   (sürüm numarası ?v= ile birlikte artırılır) bu sayfanın sürümünden yeniyse: önbellekler silinir,
+   service worker güncellenir ve sayfa yenilenir (kullanıcı sayfayla uğraşıyorsa "Yenile" düğmesi çıkar). */
+(function () {
+    if (!window.fetch) return;
+    var me = document.querySelector('script[src*="/js/common.js"]'), cur = (/[?&]v=(\d+)/.exec((me && me.src) || "") || [])[1];
+    if (!cur) return;
+    var touched = false, shown = false;
+    var mark = function () { touched = true; };
+    window.addEventListener("pointerdown", mark, true); window.addEventListener("keydown", mark, true);
+    function clean() {
+        var jobs = [];
+        try { if (window.caches) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })); } catch (e) {}
+        try { if (navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistration().then(function (r) { return r && r.update(); })); } catch (e) {}
+        return Promise.all(jobs).catch(function () {});
+    }
+    function banner() {
+        if (shown || !document.body) return; shown = true;
+        var el = document.createElement("div"); el.className = "ra-upd ra-noico"; el.setAttribute("role", "status");
+        el.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom));z-index:1200;display:flex;align-items:center;gap:10px;" +
+            "max-width:calc(100% - 24px);padding:8px 8px 8px 14px;border-radius:14px;background:#17171f;color:#fff;font:700 13.5px Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)";
+        el.innerHTML = '<span>Yeni sürüm hazır</span><button type="button" style="border:0;border-radius:10px;padding:8px 12px;background:#3b6cf6;color:#fff;font:800 13px Inter,system-ui,sans-serif;cursor:pointer">Yenile</button>';
+        el.querySelector("button").onclick = function () { location.reload(); };
+        document.body.appendChild(el);
+    }
+    function check(force) {
+        var last = 0; try { last = +(localStorage.getItem("ra-upd-chk") || 0); } catch (e) {}
+        if (!force && Date.now() - last < 5 * 60000) return;
+        try { localStorage.setItem("ra-upd-chk", String(Date.now())); } catch (e) {}
+        fetch("/version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            var v = d && String(d.v || "");
+            if (!/^\d+$/.test(v) || v.length !== cur.length || v <= cur) return;
+            // aynı sürüm için yalnız bir kez otomatik yenile (sunucu önbelleği henüz eskiyse döngüye girmesin)
+            var done = ""; try { done = sessionStorage.getItem("ra-upd-done") || ""; } catch (e) {}
+            clean().then(function () {
+                if (done === v || touched) { banner(); return; }
+                try { sessionStorage.setItem("ra-upd-done", v); } catch (e) {}
+                location.reload();
+            });
+        }).catch(function () {});
+    }
+    // açılışta (kısa gecikmeyle) ve uygulamaya / sekmeye geri dönünce
+    setTimeout(function () { check(true); }, 1500);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") check(false); });
+    window.addEventListener("pageshow", function (e) { if (e.persisted) check(true); });
+})();
 
 /* =========================================================
    2-LOOK <-> TAM OLL/PLL İLERLEME SENKRONU
