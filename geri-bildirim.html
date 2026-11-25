@@ -39,8 +39,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/styles/common.css?v=20270119">
-<script>try{if(window.RAAppNative||/[?&]source=(twa|pwa|app)\b/.test(location.search)||sessionStorage.getItem("ra-app")==="1"||matchMedia("(display-mode: standalone)").matches){var h=document.documentElement;h.classList.add("ra-app");if(window.RAAppNative)h.classList.add("ra-native");document.write('<link rel="stylesheet" href="/styles/app.css?v=20270119">')}}catch(e){}</script>
+<link rel="stylesheet" href="/styles/common.css?v=20270120">
+<script>try{if(window.RAAppNative||/[?&]source=(twa|pwa|app)\b/.test(location.search)||sessionStorage.getItem("ra-app")==="1"||matchMedia("(display-mode: standalone)").matches){var h=document.documentElement;h.classList.add("ra-app");if(window.RAAppNative)h.classList.add("ra-native");document.write('<link rel="stylesheet" href="/styles/app.css?v=20270120">')}}catch(e){}</script>
 <script>try{var d=document.documentElement,k=localStorage.getItem("site-skin");if(localStorage.getItem("theme")!=="light")d.classList.add("dark-mode");if(k&&k!=="standart"){d.setAttribute("data-skin",k);var f={rubik:"Rubik:wght@500;600;700;800;900",neon:"Space+Grotesk:wght@500;600;700",gunbatimi:"Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900"}[k];if(f)document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family='+f+'&display=swap">')}}catch(e){}</script>
 
 <style>
@@ -147,7 +147,7 @@ textarea.fb-in { min-height: 140px; resize: vertical; line-height: 1.55; }
 <section class="fb-card" id="fbCard">
   <form id="fbForm" novalidate>
     <div class="fb-step">
-      <div class="fb-q">Ne hakkında?</div>
+      <div class="fb-q">Ne hakkında? <small>birden fazla seçebilirsin</small></div>
       <div class="fb-kinds" role="group" aria-label="Geri bildirim türü">
         <button type="button" class="fb-kind" data-k="hata" aria-pressed="false"><span>🐞</span>Hata</button>
         <button type="button" class="fb-kind" data-k="oneri" aria-pressed="false"><span>💡</span>Öneri</button>
@@ -171,7 +171,7 @@ textarea.fb-in { min-height: 140px; resize: vertical; line-height: 1.55; }
 
     <div class="fb-step">
       <label class="fb-q" for="fbText">Anlat bakalım</label>
-      <textarea class="fb-in" id="fbText" maxlength="1500" placeholder="Önce yukarıdan bir tür seç…"></textarea>
+      <textarea class="fb-in" id="fbText" maxlength="1500" placeholder="Önce yukarıdan en az bir konu seç…"></textarea>
       <div class="fb-count"><span id="fbCount">0</span> / 1500</div>
     </div>
 
@@ -196,14 +196,14 @@ textarea.fb-in { min-height: 140px; resize: vertical; line-height: 1.55; }
 </footer>
 
 <script>var PAGE_ID = "geri-bildirim";</script>
-<script src="/js/i18n.js?v=20270119"></script>
-<script src="/js/common.js?v=20270119"></script>
-<script src="/js/firebase-config.js?v=20270119"></script>
-<script src="/js/account.js?v=20270119"></script>
+<script src="/js/i18n.js?v=20270120"></script>
+<script src="/js/common.js?v=20270120"></script>
+<script src="/js/firebase-config.js?v=20270120"></script>
+<script src="/js/account.js?v=20270120"></script>
 <script>
 (function () {
     var $ = function (id) { return document.getElementById(id); };
-    var kind = "", mood = 0, WAIT_KEY = "ra-fb-last";
+    var kinds = [], mood = 0, ORDER = ["hata", "oneri", "tasarim", "ovgu", "diger"], WAIT_KEY = "ra-fb-last";
     var PH = {
         hata: "Ne oldu? Hangi sayfadaydın, neye dokundun, ne bekliyordun ve ne oldu? Ne kadar ayrıntı, o kadar hızlı çözüm 🙏",
         oneri: "Hangi özelliği görmek istersin? Sana nasıl yardımcı olurdu?",
@@ -238,13 +238,20 @@ textarea.fb-in { min-height: 140px; resize: vertical; line-height: 1.55; }
     }
     var dev = devInfo(); $("fbDev").textContent = dev + (from ? " · " + from : "");
 
-    function valid() { return kind && $("fbText").value.trim().length >= 5; }
+    function valid() { return kinds.length && $("fbText").value.trim().length >= 5; }
+    function placeholder() {
+        if (!kinds.length) return "Önce yukarıdan en az bir konu seç…";
+        if (kinds.length === 1) return PH[kinds[0]];
+        return "Seçtiğin her konu için birkaç cümle yazabilirsin. Örneğin:\n" + kinds.map(function (k) { return "• " + { hata: "Hata", oneri: "Öneri", tasarim: "Görünüm", ovgu: "Beğendiğim", diger: "Diğer" }[k] + ": …"; }).join("\n");
+    }
     function refresh() { $("fbSend").disabled = !valid(); $("fbCount").textContent = $("fbText").value.length; }
     Array.prototype.forEach.call(document.querySelectorAll(".fb-kind"), function (b) {
         b.onclick = function () {
-            kind = b.getAttribute("data-k");
-            Array.prototype.forEach.call(document.querySelectorAll(".fb-kind"), function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
-            $("fbText").placeholder = PH[kind]; refresh();
+            var k = b.getAttribute("data-k"), on = kinds.indexOf(k) < 0;
+            kinds = kinds.filter(function (x) { return x !== k; }); if (on) kinds.push(k);
+            kinds.sort(function (a, c) { return ORDER.indexOf(a) - ORDER.indexOf(c); });
+            b.setAttribute("aria-pressed", on ? "true" : "false");
+            $("fbText").placeholder = placeholder(); refresh();
             if (!$("fbText").value) $("fbText").focus({ preventScroll: true });
         };
     });
@@ -257,7 +264,7 @@ textarea.fb-in { min-height: 140px; resize: vertical; line-height: 1.55; }
     });
     $("fbText").addEventListener("input", refresh);
     // ?tur=hata gibi bir bağlantıyla gelinirse türü önceden seç
-    try { var t0 = new URLSearchParams(location.search).get("tur"); var b0 = t0 && document.querySelector('.fb-kind[data-k="' + t0 + '"]'); if (b0) b0.onclick(); } catch (e) {}
+    try { (new URLSearchParams(location.search).get("tur") || "").split(",").forEach(function (t0) { var b0 = t0 && document.querySelector('.fb-kind[data-k="' + t0 + '"]'); if (b0) b0.onclick(); }); } catch (e) {}
 
     // Giriş yapmışsa e-postayı doldur
     function fillMail(u) { if (u && u.email && !$("fbMail").value) $("fbMail").value = u.email; }
@@ -279,7 +286,7 @@ textarea.fb-in { min-height: 140px; resize: vertical; line-height: 1.55; }
         var D = "projects/" + cfg.projectId + "/databases/(default)/documents";
         var useDev = $("fbDevOn").checked;
         var app = ""; try { app = window.RAApp && RAApp.native ? String(RAApp.info().v || "") : ""; } catch (x) {}
-        var f = { k: { stringValue: kind }, r: { integerValue: String(mood) }, text: { stringValue: $("fbText").value.trim().slice(0, 1500) },
+        var f = { k: { stringValue: kinds.join(",") }, r: { integerValue: String(mood) }, text: { stringValue: $("fbText").value.trim().slice(0, 1500) },
             mail: { stringValue: mail.slice(0, 120) }, p: { stringValue: from.slice(0, 200) }, dev: { stringValue: useDev ? dev : "" },
             v: { stringValue: app.slice(0, 20) }, u: { stringValue: u } };
         var body = { writes: [{ update: { name: D + "/appfb/" + id, fields: f }, updateTransforms: [{ fieldPath: "ts", setToServerValue: "REQUEST_TIME" }], currentDocument: { exists: false } }] };
@@ -298,8 +305,8 @@ textarea.fb-in { min-height: 140px; resize: vertical; line-height: 1.55; }
         });
     };
     function done() {
-        var msg = { hata: "Hatayı inceleyip en kısa sürede düzelteceğiz.", oneri: "Önerini listemize ekledik.", tasarim: "Görünümle ilgili notunu aldık.", ovgu: "Bu bizi gerçekten çok mutlu etti!", diger: "Mesajını aldık." }[kind] || "Mesajını aldık.";
-        $("fbCard").innerHTML = '<div class="fb-done"><div class="big">' + (kind === "ovgu" ? "💜" : "🧩") + '</div><h2>Teşekkürler!</h2><p>' + msg + ($("fbMail") && $("fbMail").value ? "" : "") + ' Geri bildirimin Rubik Academy\'yi daha iyi yapıyor.</p>' +
+        var msg = kinds.length > 1 ? "Yazdığın her konuya tek tek bakacağız." : ({ hata: "Hatayı inceleyip en kısa sürede düzelteceğiz.", oneri: "Önerini listemize ekledik.", tasarim: "Görünümle ilgili notunu aldık.", ovgu: "Bu bizi gerçekten çok mutlu etti!", diger: "Mesajını aldık." }[kinds[0]] || "Mesajını aldık.");
+        $("fbCard").innerHTML = '<div class="fb-done"><div class="big">' + (kinds.length === 1 && kinds[0] === "ovgu" ? "💜" : "🧩") + '</div><h2>Teşekkürler!</h2><p>' + msg + ($("fbMail") && $("fbMail").value ? "" : "") + ' Geri bildirimin Rubik Academy\'yi daha iyi yapıyor.</p>' +
             '<div class="row"><a class="fb-btn2" href="/">Ana sayfaya dön</a><button type="button" class="fb-btn2" onclick="location.reload()">Bir tane daha yaz</button></div></div>';
         try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (x) {}
     }
