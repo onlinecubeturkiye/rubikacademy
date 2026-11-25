@@ -1,6 +1,6 @@
 // Google Play TABLET (7" + 10") ve KATLANABİLİR ekran görüntülerini üretir.
 // 1) Gerçek sayfaları Playwright ile çeker (açık tema, ?source=app, isMobile + hasTouch) -> ham-buyuk/
-// 2) uret.mjs tarzında kompozisyon yapar -> tablet/ (2560×1440), katlanabilir/ (acik-* 2160×2160, kapali-* 1200×1920)
+// 2) uret.mjs tarzında kompozisyon yapar -> tablet/ (2560×1440), katlanabilir/ (acik-* 2160×2160, acik-43-* 2560×1920, kapali-* 1200×1920)
 // 3) Boyut / kenar kontrolü yazdırır.
 // Önce: python3 play-store/video/sunucu.py 8765   Sonra: node play-store/gorseller/uret-buyuk.mjs [--sadece-kompozisyon]
 // Rekor adları hayali (sahteRekor); giriş bilgisi kullanılmaz; Bluetooth / akıllı küp / Çözüm Analizi / bildirim zili gizlenir.
@@ -48,6 +48,7 @@ const SHOTS = [
 const FORMLAR = {
   tablet: { vw: 1280, vh: 800, dsf: 2, W: 2560, H: 1440, klasor: "tablet", ad: (s) => s.out, sahneler: SHOTS.map((s) => s.id) },
   acik: { vw: 840, vh: 840, dsf: 2, W: 2160, H: 2160, klasor: "katlanabilir", ad: (s) => "acik-" + s.out, sahneler: ["01-ana-sayfa", "02-pll", "03-antrenor", "06-sanal-kup"] },
+  acik43: { vw: 1024, vh: 768, dsf: 2, W: 2560, H: 1920, klasor: "katlanabilir", ad: (s) => "acik-43-" + s.out, sahneler: ["04-rekorlar", "05-yol-haritasi"] },
   kapali: { vw: 400, vh: 640, dsf: 3, W: 1200, H: 1920, klasor: "katlanabilir", ad: (s) => "kapali-" + s.out, sahneler: ["01-ana-sayfa", "04-rekorlar"] },
 };
 
@@ -120,6 +121,13 @@ function html(fad, s, i) {
     .dev{right:110px;top:${(1440 - 1012) / 2}px;width:1584px;height:1012px;border-radius:64px;padding:32px}.scr{border-radius:34px}
     .glow{width:1500px;height:1500px;right:150px;top:-30px}`;
     dots = stickers(i * 17 + 3, 2560, 1440, 22, 50, 140, (x, y) => (x > 860 && y > 150 && y < 1290) || (x > 90 && x < 860 && y > 330 && y < 1100));
+  } else if (fad === "acik43") { // solda başlık, sağda 4:3 açık katlanabilir
+    lay = `.head{left:120px;top:0;bottom:0;width:820px;display:flex;flex-direction:column;justify-content:center}
+    .kick{font-size:30px;padding:14px 28px;margin-bottom:40px;align-self:flex-start}h1{font-size:100px;letter-spacing:-3px}
+    .dev{right:110px;top:${(1920 - 1144) / 2}px;width:1504px;height:1144px;border-radius:64px;padding:32px}.scr{border-radius:36px}
+    .hinge{position:absolute;right:${110 + 751}px;top:${(1920 - 1144) / 2}px;width:2px;height:1144px;background:rgba(0,0,0,.08);z-index:2}
+    .glow{width:1500px;height:1500px;right:110px;top:210px}`;
+    dots = stickers(i * 17 + 9, 2560, 1920, 24, 50, 140, (x, y) => (x > 900 && y > 330 && y < 1580) || (x > 90 && x < 950 && y > 500 && y < 1400));
   } else if (fad === "acik") { // üstte başlık, altta kare açık katlanabilir
     lay = `.head{left:120px;right:120px;top:120px;text-align:center}
     .kick{font-size:34px;padding:16px 32px;margin-bottom:36px}h1{font-size:112px;letter-spacing:-3px}
@@ -137,7 +145,7 @@ function html(fad, s, i) {
   return `<!doctype html><html><head><meta charset="utf-8"><style>${CSS}${ortak}${lay}</style></head><body>
   <div class="bg"></div><div class="dots">${dots}</div><div class="glow"></div>
   <div class="head"><div class="kick">${s.kicker}</div><h1>${s.title}</h1></div>
-  <div class="dev"><div class="scr"><img src="${src}"></div></div>${fad === "acik" ? '<div class="hinge"></div>' : ""}
+  <div class="dev"><div class="scr"><img src="${src}"></div></div>${fad.startsWith("acik") ? '<div class="hinge"></div>' : ""}
   </body></html>`;
 }
 
