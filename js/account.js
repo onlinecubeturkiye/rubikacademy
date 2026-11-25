@@ -102,8 +102,14 @@
         if (window.RAApp && RAApp.native) {
             return RAApp.call("googleSignIn").then(function (r) {
                 if (r && r.token) return m.signInWithCredential(auth, m.GoogleAuthProvider.credential(r.token));
-                var e = new Error((r && r.msg) || "Google girişi yapılamadı");
-                e.code = r && r.err === "cancel" ? "auth/popup-closed-by-user" : r && r.err === "unavailable" ? "auth/operation-not-supported-in-this-environment" : "auth/internal-error";
+                var msg = (r && r.msg) || "";
+                var e = new Error(msg || "Google girişi yapılamadı");
+                // Hesap seçildikten sonra gelen "iptal" çoğu zaman gerçek iptal değildir: uygulamanın imza
+                // parmak izi (SHA-1) Firebase'de kayıtlı değilse Google "[16] Account reauth failed" döner
+                // ve bu iptal gibi görünür. Gerçek iptal değilse kullanıcıya hata göster, sessizce yutma.
+                var realCancel = r && r.err === "cancel" && !/\[\d+\]|reauth|developer|config/i.test(msg);
+                e.code = realCancel ? "auth/popup-closed-by-user" : r && r.err === "unavailable" ? "auth/operation-not-supported-in-this-environment" : "auth/app-google-" + ((r && r.err) || "fail");
+                try { console.warn("Android Google girişi:", r); } catch (x) {}
                 throw e;
             });
         }
@@ -225,6 +231,7 @@
         if (/network-request-failed/.test(c)) return t("e_net");
         if (/popup-blocked/.test(c)) return t("e_popup");
         if (/unauthorized-domain/.test(c)) return t("e_domain");
+        if (/^auth\/app-google-/.test(c)) return t("e_gen") + " (" + c.slice(5) + (err.message ? ": " + err.message : "") + ")";
         return t("e_gen") + (c ? " (" + c + ")" : "");
     }
     function buildModal() {
