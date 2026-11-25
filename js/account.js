@@ -9,10 +9,13 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20270126";
+    var V = "20270129";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
+    // Son oturumun özeti (ad, fotoğraf, yönetici mi): sayfa açılır açılmaz profil düğmesi ve Yönetim sekmesi
+    // bununla çizilir, Firebase oturumu geri yükleyince doğrulanır. Çıkışta silinir.
+    var HINT_KEY = "ra-acc-hint-v1";
 
     /* ---------- metinler ---------- */
     var TXT = {
@@ -78,7 +81,7 @@
     // Giriş sorunu: sebebini ekranda göster (telefonda konsol olmadığı için) ve "Giriş" butonuna dön
     function authErr(msg) {
         try { console.error(msg); } catch (e) {}
-        lsSet(SIGNED_KEY, null); renderNav();
+        lsSet(SIGNED_KEY, null); lsSet(HINT_KEY, null); renderNav();
         // "oturum geri yükleniyor" durumu bitti: üyelere özel sayfalar kilitlensin
         listeners.forEach(function (f) { try { f(null); } catch (e) {} });
         setTimeout(function () { try { showToast("⚠️ " + msg + " Sayfayı yenile ya da tekrar giriş yap."); } catch (e) {} }, 300);
@@ -135,6 +138,7 @@
             m.onAuthStateChanged(auth, function (u) {
                 user = u; authResolved = true;
                 lsSet(SIGNED_KEY, u ? "1" : null);
+                lsSet(HINT_KEY, u ? JSON.stringify({ n: u.displayName || "", p: u.photoURL || "", a: isAdmin() ? 1 : 0 }) : null);
                 // Oturum yok (çıkış yapıldı ya da süresi doldu): cihazda kalan kişisel veriyi sil
                 if (!u && window.raPurgePrivate) raPurgePrivate();
                 renderNav();
@@ -200,13 +204,15 @@
         var restoring = !user && lsGet(SIGNED_KEY) === "1";
         if (user || restoring) {
             var prof = (function () { try { return JSON.parse(lsGet(PROF_KEY)) || {}; } catch (e) { return {}; } })();
-            var nm = (user && (user.displayName || (user.email || "?").split("@")[0])) || prof.name || "·";
+            var hint = (function () { try { return JSON.parse(lsGet(HINT_KEY)) || {}; } catch (e) { return {}; } })();
+            var nm = (user && (user.displayName || (user.email || "?").split("@")[0])) || prof.name || hint.n || "·";
+            var photo = user ? user.photoURL : hint.p;
             navBtn.href = "/icerikler/profil";
             navBtn.title = t("profile") + (user ? " · " + nm : "");
             navBtn.setAttribute("aria-label", t("profile"));
             navBtn.classList.add("in");
-            navBtn.innerHTML = (user && user.photoURL)
-                ? '<img src="' + esc(user.photoURL) + '" alt="" referrerpolicy="no-referrer">'
+            navBtn.innerHTML = photo
+                ? '<img src="' + esc(photo) + '" alt="" referrerpolicy="no-referrer">'
                 : '<span class="acc-ini">' + esc((nm.charAt(0) || "·").toUpperCase()) + '</span>';
             navMenu.innerHTML = accMenuHtml(); bindAccMenu();
         } else {
@@ -680,7 +686,7 @@
     // Onay bekleyen yarışmaların durumunu (herkese açık) oda belgesinden öğren; onaylandıysa admin'in
     // düzelttiği sonuçları al, reddedildi / silindiyse işaretle. 10 dakikada bir, en çok 8 oda.
     function syncCompOk() {
-        if (!user || !every("compok", 10 * 60000)) return Promise.resolve(false);
+        if (!user || !every("compok", 30 * 60000)) return Promise.resolve(false);
         var cs = parse(lsGet("comp-stats-v1")); if (!isObj(cs) || !isObj(cs.r)) return Promise.resolve(false);
         // bekleyenler + adı 3 günden uzun süredir kontrol edilmeyen (admin adını değiştirmiş olabilir) yarışmalar, en yeniler önce
         var codes = {}, last = {}, now = Date.now();
@@ -749,7 +755,8 @@
     function recXc() { var a = parse(lsGet("ra-rec-xc")); return Array.isArray(a) ? a : []; }
     function writeRecords(name, comp) {
         if (!user || !comp) return;
-        // önce yöneticinin ayarlarını (xs, pin, xc) al; değiştiyse istatistikleri onlara göre yeniden hesapla
+        // önce yöneticinin ayarlarını (xs, pin, xc) al (6 saatte bir); değiştiyse istatistikleri onlara göre yeniden hesapla
+        if (!every("recget", 6 * 3600000)) { writeRecordsNow(name, comp); return; }
         api("/records/" + user.uid, { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }).then(function (d) {
             if (!user) return;
             var fl = (d && d.fields) || {}, sv = function (k) { return (fl[k] && fl[k].stringValue) || ""; };
@@ -787,8 +794,11 @@
     function reconcileProfile() {
         var uid = user.uid;
         if (profSync[uid]) return profSync[uid];
+        // oturum başına bir kez okunur (her sayfada değil)
+        try { if (sessionStorage.getItem("ra-prof-rec") === uid) return (profSync[uid] = Promise.resolve(true)); } catch (e) {}
+        var done = function () { try { sessionStorage.setItem("ra-prof-rec", uid); } catch (e) {} return true; };
         return (profSync[uid] = api("/users/" + uid, { method: "GET" }).then(function (r) {
-            if (r.status === 404) return true;            // belge yok: olduğu gibi yaz
+            if (r.status === 404) return done();          // belge yok: olduğu gibi yaz
             if (!r.ok) throw new Error(r.status);         // okunamadı: üzerine yazma
             return r.json().then(function (d) {
                 var f = (d && d.fields) || {}, prof = localProfile(), ch = false;
@@ -796,7 +806,7 @@
                 if (!prof.name && rName) { prof.name = String(rName).slice(0, 24); ch = true; }
                 if (rJoined > 0 && (!prof.joined || rJoined < prof.joined)) { prof.joined = rJoined; ch = true; }
                 if (ch) lsSet(PROF_KEY, JSON.stringify(prof));
-                return true;
+                return done();
             });
         }).catch(function (e) { delete profSync[uid]; throw e; }));
     }
@@ -827,8 +837,12 @@
     }
     function logVisit() {
         if (!user) return;
-        var p = String(location.pathname || "/").slice(0, 120), sk = "ra-visit:" + p;
-        try { if (sessionStorage.getItem(sk)) return; sessionStorage.setItem(sk, "1"); } catch (e) {}
+        // aynı sayfa 6 saatte bir yazılır (her oturumda değil): yazma kotası için
+        var p = String(location.pathname || "/").slice(0, 120), vs = parse(lsGet("ra-visits-v1")), now = Date.now();
+        if (!isObj(vs)) vs = {};
+        if (now - (vs[p] || 0) < 6 * 3600000) return;
+        vs[p] = now; Object.keys(vs).forEach(function (k) { if (now - vs[k] > 6 * 3600000) delete vs[k]; });
+        lsSet("ra-visits-v1", JSON.stringify(vs));
         api("/users/" + user.uid + "/visits", { method: "POST", body: JSON.stringify({ fields: { p: { stringValue: p }, ts: { timestampValue: new Date().toISOString() } } }) }).catch(function () {});
     }
     // İşaretlenen tüm case'ler (bildiklerim/öğreniyorum) — admin paneli için
@@ -856,7 +870,7 @@
         var mask = "?" + ["email", "provider", "name", "theme", "cvd", "skin", "lang", "seen", "dev", "marks"].map(function (k) { return "updateMask.fieldPaths=" + k; }).join("&");
         return api("/users/" + user.uid + "/meta/self" + mask, { method: "PATCH", body: JSON.stringify({ fields: fields }) }).catch(function () {});
     }
-    document.addEventListener("account-synced", function () { if (every("prof", 10 * 60000)) { writeProfile(); writeMeta(); } logVisit(); syncCompOk(); });
+    document.addEventListener("account-synced", function () { if (every("prof", 30 * 60000)) { writeProfile(); writeMeta(); } logVisit(); syncCompOk(); });
 
     /* ---------- sosyal: takip, beğeni, bildirim ---------- */
     function pubUrl(path) { return base() + path + (path.indexOf("?") < 0 ? "?" : "&") + "key=" + encodeURIComponent(cfg.apiKey); }
@@ -1095,7 +1109,7 @@
             .then(function (r) { lsSet("ra-login-ts", String(Date.now())); try { sessionStorage.setItem("ra-sess-logged", "1"); } catch (e) {} return r.ok; });
     }
     function checkLogoutAll() {
-        if (!user || !every("logoutall", 5 * 60000)) return;
+        if (!user || !every("logoutall", 30 * 60000)) return;
         api("/users/" + user.uid + "/sessions/control", { method: "GET" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             var before = d && d.fields && d.fields.before && +d.fields.before.integerValue;
             var mine = +(lsGet("ra-login-ts") || 0);
@@ -1204,7 +1218,7 @@
     function clearAccountLocal() {
         wipeLocal();
         ["ra-profile-v1", "ra-push-saved", "ra-wipe-seen", "ra-login-ts"].forEach(function (k) { lsSet(k, null); });
-        lsSet(META_KEY, null); lsSet(SIGNED_KEY, null);
+        lsSet(META_KEY, null); lsSet(SIGNED_KEY, null); lsSet(HINT_KEY, null);
     }
     function removedByAdmin() {
         clearAccountLocal();
@@ -1224,7 +1238,7 @@
 
     /* ---------- askıya alınmış hesap ---------- */
     function checkSuspended() {
-        if (!user || isAdmin() || !every("susp", 5 * 60000)) return;
+        if (!user || isAdmin() || !every("susp", 30 * 60000)) return;
         window.Account.getRole(user.uid).then(function (r) {
             if (r === "silindi") { removedByAdmin(); return; }
             if (r !== "askida") return;
@@ -1237,7 +1251,7 @@
     function checkMaintenance() {
         if (!enabled) return;
         var cached = null; try { cached = JSON.parse(lsGet("ra-cfg-cache") || "null"); } catch (e) {}
-        var pc = cached && Date.now() - cached.at < 2 * 60000 ? Promise.resolve(cached.c) : getConfig().then(function (c) { lsSet("ra-cfg-cache", JSON.stringify({ at: Date.now(), c: c })); return c; });
+        var pc = cached && Date.now() - cached.at < 10 * 60000 ? Promise.resolve(cached.c) : getConfig().then(function (c) { lsSet("ra-cfg-cache", JSON.stringify({ at: Date.now(), c: c })); return c; });
         pc.then(function (c) {
             var o = document.getElementById("raMaint");
             if (!c.maintenance || isAdmin()) { if (o) o.remove(); return; }
@@ -1266,6 +1280,8 @@
         user: function () { return user; },
         uid: function () { return user ? user.uid : null; },
         isAdmin: isAdmin,
+        // Oturum henüz geri yüklenmediyse son oturumdaki yönetici bilgisi (yalnız arayüz için; yetki sunucuda)
+        adminHint: function () { if (user || authResolved) return isAdmin(); if (lsGet(SIGNED_KEY) !== "1") return false; try { return !!(JSON.parse(lsGet(HINT_KEY)) || {}).a; } catch (e) { return false; } },
         getRole: function (uid) {
             var u = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents/roles/" + encodeURIComponent(uid) + "?key=" + encodeURIComponent(cfg.apiKey);
             return fetch(u).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
@@ -1331,6 +1347,8 @@
         setTimeout(ensurePush, 4000);
         document.addEventListener("account-change", function () { checkMaintenance(); });
     }
+    // Oturumu DOM'un bitmesini beklemeden geri yüklemeye başla (profil/Yönetim daha erken gelsin)
+    try { if (enabled && lsGet(SIGNED_KEY) === "1") loadSDK().catch(function () {}); } catch (e) {}
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
 

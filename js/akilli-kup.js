@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270126";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270129";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -446,7 +446,7 @@
         catch (e) { return "v" + Math.random().toString(36).slice(2, 14); }
     }
     // Canlı izleyici sayısı: herkes 20 sn'de bir comps/{kod}/w/{id} yazar; son 45 sn'de yazanlar sayılır
-    var HB_MS = 20000, FRESH_MS = 45000, hbT = 0;
+    var HB_MS = 30000, FRESH_MS = 70000, hbT = 0;
     // Sayfaya geri dönünce hemen "buradayım" de ve güncelle (arka planda uzun kalan odadan çıkarılır)
     document.addEventListener("visibilitychange", function () { if (comp && document.visibilityState === "visible") { heartbeat(); compPoll(); } });
     // Sayfa/Chrome kapanırken kalp atışı kaydını sil: oda sahibi bunu görünce ~15 sn içinde odadan çıkarır.
