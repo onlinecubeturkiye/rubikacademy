@@ -981,7 +981,8 @@
         var n = { all: rows.length, wait: 0, ok: 0, no: 0, sus: 0, wa: 0, wawait: 0 };
         rows.forEach(function (r) { n[r.v || "wait"]++; if (r.f.some(function (t) { return t[0] !== "new"; })) n.sus++; if (bonusUp(r.x)) { n.wa++; if ([0, 1].some(function (i) { return hasBk(r.x, i) && !revB(r.x.uid, BK[i]); })) n.wawait++; } });
         var groups = {}; l.forEach(function (x) { if (x.d) (groups[x.d] = groups[x.d] || []).push(x); });
-        var extra = []; Object.keys(groups).forEach(function (d) { var a = groups[d].slice().sort(function (p, q) { return (p.ts || 0) - (q.ts || 0); }); extra = extra.concat(a.slice(1)); });
+        var extra = [], dupTxt = []; Object.keys(groups).forEach(function (d) { var a = groups[d].slice().sort(function (p, q) { return (p.ts || 0) - (q.ts || 0); }); extra = extra.concat(a.slice(1));
+            if (a.length > 1) dupTxt.push("• Kalır: " + (a[0].name || "Cuber") + "\n   Çıkar: " + a.slice(1).map(function (y) { return y.name || "Cuber"; }).join(", ")); });
         var list = rows.filter(function (r) { return tab === "all" || (tab === "sus" ? r.f.some(function (t) { return t[0] !== "new"; }) : tab === "wa" ? bonusUp(r.x) > 0 : (r.v || "wait") === tab); })
             // bekleyenler önce; onlar içinde görselini güncelleyen ve en yeni katılan en üstte
             .sort(function (a, b) { return (a.v ? 1 : 0) - (b.v ? 1 : 0) || (changedAfter(b.x.uid) ? 1 : 0) - (changedAfter(a.x.uid) ? 1 : 0) || (b.x.ts || 0) - (a.x.ts || 0); });
@@ -1024,7 +1025,7 @@
         if ($("gwRevWa")) $("gwRevWa").onclick = function () { review(null, "wa"); };
         $("gwReChk").onclick = checkPeople;
         if ($("gwDupOut")) $("gwDupOut").onclick = function () {
-            if (!confirm(extra.length + " hesap çıkarılsın mı? (Her cihazdan ilk katılan kalır)")) return;
+            if (!confirm("Aynı cihazdan katılanlar (her cihazdan ilk katılan kalır):\n\n" + dupTxt.join("\n\n") + "\n\n" + extra.length + " hesap çıkarılsın mı?")) return;
             removeMany(extra.map(function (x) { return x.uid; }));
         };
         Array.prototype.forEach.call(box.querySelectorAll("[data-out]"), function (b) {
