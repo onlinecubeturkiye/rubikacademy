@@ -301,13 +301,24 @@
             }, function (e) { done = false; box.innerHTML = '<p class="a-note">Veriler yüklenemedi (' + esc(e && e.message) + ').</p>'; });
         });
     }
+    var BACK_BTN = '<button type="button" class="a-btn sm u-back" data-uback>← Kullanıcılar</button>';
+    function userBack() {
+        var sp = document.querySelector(".u-split"); if (sp) sp.classList.remove("has-detail");
+        var on = document.querySelector("#uPicker .u-pick.on"); if (on) try { on.scrollIntoView({ block: "center" }); } catch (e) {}
+    }
+    document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest("[data-uback]")) userBack(); });
     function selectUser(u, detailBox, pickBtn, picker) {
+        // Seç modunda satıra dokunmak kişiyi seçer/bırakır
+        if (_selMode && pickBtn) { var ch = pickBtn.parentNode.querySelector(".u-chk"); if (ch) { ch.checked = !ch.checked; ch.dispatchEvent(new Event("change")); } return; }
         Array.prototype.forEach.call(picker.querySelectorAll(".u-pick"), function (b) { b.classList.remove("on"); });
         if (pickBtn) pickBtn.classList.add("on");
-        detailBox.innerHTML = '<div class="u-card open"><p class="a-note">Yükleniyor…</p></div>';
+        // telefonda liste gizlenir, yalnız seçilen kişinin ayrıntısı görünür ("← Kullanıcılar" ile geri dönülür)
+        var sp = document.querySelector(".u-split");
+        if (sp) { sp.classList.add("has-detail"); if (matchMedia("(max-width: 720px)").matches) try { sp.scrollIntoView({ block: "start" }); } catch (e) {} }
+        detailBox.innerHTML = BACK_BTN + '<div class="u-card open"><p class="a-note">Yükleniyor…</p></div>';
         Promise.all([fetchMeta(u.uid), listVisits(u.uid, 200), fetchRole(u.uid)]).then(function (res) {
             var role = res[2] || "uye";
-            detailBox.innerHTML = '<div class="u-card open">' + roleBox(u.uid, role) + userDetailHtml(u, res[0] || {}, res[1] || []) +
+            detailBox.innerHTML = BACK_BTN + '<div class="u-card open">' + roleBox(u.uid, role) + userDetailHtml(u, res[0] || {}, res[1] || []) +
                 '<details class="sec" id="uEditSec"><summary><b>✏️ Verilerini düzenle</b> <span class="a-note">(antrenör · günlük · bilinen algoritmalar)</span></summary><div class="sec-body"><p class="a-note">Değişiklikler kişinin buluttaki verisine yazılır; cihazları bir sonraki senkronda alır.</p><div id="uEditor"></div></div></details>' +
                 dangerBox(role) + '</div>';
             bindDanger(u, role, pickBtn); bindEditor(u);
@@ -343,18 +354,39 @@
         if (f === "a1") return u.seen && now - u.seen < d1;
         if (f === "a7") return u.seen && now - u.seen < 7 * d1;
         if (f === "pasif") return !u.seen || now - u.seen > 30 * d1;
+        if (f === "new") return u.joined && now - u.joined < 7 * d1;
+        if (f === "r:any") return u.role && u.role !== "uye";
+        if (f.indexOf("r:") === 0) return u.role === f.slice(2);
         return true;
+    }
+    // "3 dk", "5 sa", "2 g" — listede kısa son görülme
+    function ago(ms) {
+        if (!ms) return "—";
+        var m = Math.max(0, Math.round((Date.now() - ms) / 60000));
+        if (m < 1) return "şimdi"; if (m < 60) return m + " dk"; var h = Math.round(m / 60); if (h < 24) return h + " sa";
+        var d = Math.round(h / 24); return d < 60 ? d + " g" : Math.round(d / 30) + " ay";
+    }
+    var _selMode = false;
+    function sortUsers(list) {
+        var k = $id("uSort") ? $id("uSort").value : "seen";
+        return list.slice().sort(k === "name" ? function (a, b) { return String(a.name).localeCompare(String(b.name), "tr"); }
+            : function (a, b) { return (b[k] || 0) - (a[k] || 0); });
     }
     function renderPicker() {
         var picker = $id("uPicker"), detailBox = $id("uDetail");
         if (!picker) return;
-        var list = _users.filter(matchesFilter);
+        var list = sortUsers(_users.filter(matchesFilter)), cur = picker.querySelector(".u-pick.on"), curUid = cur && cur.getAttribute("data-uid");
+        picker.classList.toggle("sel-mode", _selMode);
+        if ($id("uShown")) $id("uShown").textContent = list.length === _users.length ? _users.length + " kişi" : list.length + " / " + _users.length + " kişi";
+        if ($id("uAllSel")) $id("uAllSel").hidden = !_selMode || !list.length;
         if (!list.length) { picker.innerHTML = '<p class="a-note" style="padding:8px">Eşleşen kullanıcı yok.</p>'; updateBulkBar(); return; }
+        var now = Date.now();
         picker.innerHTML = list.map(function (u) {
             var badge = (u.role && u.role !== "uye") ? '<span class="role-badge ' + u.role + '">' + roleName(u.role) + '</span>' : '';
-            return '<div class="u-pick-wrap"><input type="checkbox" class="u-chk" data-uid="' + esc(u.uid) + '"' + (_selected[u.uid] ? ' checked' : '') + '>' +
-                '<button type="button" class="u-pick" data-uid="' + esc(u.uid) + '"><span class="u-ava sm">' + avatarMini(u) + '</span>' +
-                '<span class="u-pick-id"><b>' + esc(u.name) + '</b><small>' + esc(dateFmt(u.seen)) + '</small>' + badge + '</span></button></div>';
+            var live = u.seen && now - u.seen < 10 * 60000;
+            return '<div class="u-pick-wrap"><input type="checkbox" class="u-chk" aria-label="Seç: ' + esc(u.name) + '" data-uid="' + esc(u.uid) + '"' + (_selected[u.uid] ? ' checked' : '') + '>' +
+                '<button type="button" class="u-pick' + (u.uid === curUid ? " on" : "") + '" data-uid="' + esc(u.uid) + '"><span class="u-ava sm">' + avatarMini(u) + (live ? '<i class="u-dot" title="Şu an aktif"></i>' : '') + '</span>' +
+                '<span class="u-pick-id"><b>' + esc(u.name) + '</b>' + badge + '</span><small class="u-ago" title="' + esc(dateFmt(u.seen)) + '">' + esc(ago(u.seen)) + '</small></button></div>';
         }).join("");
         Array.prototype.forEach.call(picker.querySelectorAll(".u-pick"), function (btn) {
             btn.addEventListener("click", function () {
@@ -369,6 +401,11 @@
             });
         });
         updateBulkBar();
+    }
+    function setSelMode(on) {
+        _selMode = on; if (!on) _selected = {};
+        var b = $id("uSelMode"); if (b) { b.setAttribute("aria-pressed", on ? "true" : "false"); b.classList.toggle("main", on); b.textContent = on ? "✕ Bitir" : "☑ Seç"; }
+        renderPicker();
     }
     function findUser(uid) { for (var i = 0; i < _users.length; i++) if (_users[i].uid === uid) return _users[i]; return null; }
     function applyUserFilter() { renderPicker(); }
@@ -434,7 +471,8 @@
 
     function renderUsers() {
         var box = $id("aUsersList"); box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
-        _selected = {};
+        _selected = {}; _selMode = false;
+        var smb = $id("uSelMode"); if (smb) { smb.setAttribute("aria-pressed", "false"); smb.classList.remove("main"); smb.textContent = "☑ Seç"; }
         listUsers().then(function (users) {
             _users = users;
             $id("aUsersCount").textContent = users.length + " kullanıcı";
@@ -1672,7 +1710,13 @@
             '<p class="a-note">Bildirime izin verenlere telefon/sistem bildirimi, herkese site içi bildirim olarak düşer. Telefon bildirimi birkaç dakika içinde ulaşır.</p></div></div>' +
             '<div class="box"><h2>📜 Duyuru geçmişi <button class="a-btn sm" id="bcReload" style="float:right">↻</button></h2><div id="aBcList"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>👥 Kullanıcılar <span class="a-sub" id="aUsersCount" style="margin:0"></span></h2>' +
-            '<div class="a-ctrl"><input id="uSearch" placeholder="Ada göre ara…" style="flex:1;min-width:140px"><select id="uFilter"><option value="all">Tümü</option><option value="a1">Son 24 saat aktif</option><option value="a7">Son 7 gün aktif</option><option value="pasif">30 günden eski</option></select><button class="a-btn" id="aUsersLoad">↻ Yenile</button><button class="a-btn" id="uCsv">⬇ CSV</button><button class="a-btn" id="uJson">⬇ JSON</button></div>' +
+            '<div class="u-tools"><input id="uSearch" type="search" placeholder="Ada göre ara…" autocomplete="off">' +
+            '<div class="u-tools-row"><select id="uFilter" aria-label="Süz"><option value="all">Tümü</option><optgroup label="Aktiflik"><option value="a1">Son 24 saat aktif</option><option value="a7">Son 7 gün aktif</option><option value="new">Bu hafta katılan</option><option value="pasif">30 günden eski</option></optgroup><optgroup label="Rol"><option value="r:any">Rolü olanlar</option><option value="r:admin">Admin</option><option value="r:gelistirici">Geliştirici</option><option value="r:tester">Tester</option><option value="r:organizator">Organizatör</option></optgroup></select>' +
+            '<select id="uSort" aria-label="Sırala"><option value="seen">Son giriş</option><option value="joined">Yeni üye</option><option value="name">A–Z</option></select>' +
+            '<button class="a-btn sm" id="uSelMode" type="button" aria-pressed="false" title="Toplu işlem için seç">☑ Seç</button>' +
+            '<button class="a-btn sm" id="aUsersLoad" type="button" title="Yenile" aria-label="Yenile">↻</button>' +
+            '<details class="u-more"><summary class="a-btn sm" title="Dışa aktar" aria-label="Dışa aktar">⬇</summary><div class="u-more-m"><button class="a-btn sm" id="uCsv" type="button">CSV</button><button class="a-btn sm" id="uJson" type="button">JSON</button></div></details></div>' +
+            '<div class="u-meta"><span id="uShown"></span><button type="button" class="u-allsel" id="uAllSel" hidden>Görünenlerin hepsini seç</button></div></div>' +
             '<div class="bulk-bar" id="uBulk" hidden><b id="uSelCount">0</b> seçili · <select id="uBulkRole"><option value="">Rol ata…</option><option value="uye">Üye</option><option value="admin">Admin</option><option value="gelistirici">Geliştirici</option><option value="tester">Tester</option><option value="organizator">Organizatör</option></select> <button class="a-btn sm" id="uBulkRoleGo">Uygula</button> <button class="a-btn sm" id="uBulkNotify">Bildirim gönder</button> · <select id="uBulkPack"><option value="">Paket ata…</option></select> <button class="a-btn sm" id="uBulkPackGo">🎁 Ata</button><span class="a-msg" id="uBulkMsg" style="margin:0"></span></div>' +
             '<div id="aUsersList"></div></div>' +
             '<div class="box"><h2>🚩 Şikayetler <span class="a-sub" id="aRepCount" style="margin:0"></span></h2><p class="a-note">Kullanıcıların uygulama içinden bildirdiği sohbet mesajları ve profiller (Google Play kullanıcı içeriği kuralı). İncele, gerekirse içeriği sil ya da hesabı askıya al, sonra kapat.</p><div class="a-ctrl"><button class="a-btn main" id="aRepLoad">↻ Yükle</button></div><div id="aRepList" class="a-list"></div></div>' +
@@ -1712,6 +1756,9 @@
         $id("aCompClean").addEventListener("click", cleanOldComps);
         $id("uSearch").addEventListener("input", applyUserFilter);
         $id("uFilter").addEventListener("change", applyUserFilter);
+        $id("uSort").addEventListener("change", applyUserFilter);
+        $id("uSelMode").addEventListener("click", function () { setSelMode(!_selMode); });
+        $id("uAllSel").addEventListener("click", function () { _users.filter(matchesFilter).forEach(function (u) { _selected[u.uid] = true; }); renderPicker(); });
         $id("bcReload").addEventListener("click", renderBroadcasts);
         $id("aDevLoad").addEventListener("click", renderDevices);
         $id("aRecLoad").addEventListener("click", renderRecords); $id("aRecBad").addEventListener("change", renderRecords);
