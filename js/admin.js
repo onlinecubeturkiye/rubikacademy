@@ -1162,11 +1162,11 @@
         authed(docsBase() + "/appfb?pageSize=300", { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
             var all = (d.documents || []).map(function (x) { var f = x.fields || {}, o = { id: x.name.split("/").pop() }; Object.keys(f).forEach(function (k) { o[k] = gv(f, k); }); o.when = Date.parse(o.ts || x.createTime) || 0; return o; })
                 .sort(function (a, b) { return b.when - a.when; });
-            var L = flt ? all.filter(function (o) { return o.k === flt; }) : all;
+            var L = flt ? all.filter(function (o) { return String(o.k || "").split(",").indexOf(flt) >= 0; }) : all;
             var rated = all.filter(function (o) { return +o.r > 0; }), avg = rated.length ? (rated.reduce(function (s, o) { return s + +o.r; }, 0) / rated.length).toFixed(1) : "";
             $id("aAfbCount").textContent = all.length ? all.length + " geri bildirim" + (avg ? " · ort. memnuniyet " + avg + "/5" : "") : "";
             box.innerHTML = L.length ? L.map(function (o) {
-                return '<div class="rep-row"><div class="rep-h"><b>' + esc(AFB_K[o.k] || o.k || "?") + '</b>' + (+o.r ? '<span class="cp-chip">' + AFB_M[+o.r] + ' ' + o.r + '/5</span>' : '') + '<span class="a-note">' + esc(dateFmt(o.when)) + '</span></div>' +
+                return '<div class="rep-row"><div class="rep-h"><b>' + esc(String(o.k || "?").split(",").map(function (k) { return AFB_K[k] || k; }).join(" · ")) + '</b>' + (+o.r ? '<span class="cp-chip">' + AFB_M[+o.r] + ' ' + o.r + '/5</span>' : '') + '<span class="a-note">' + esc(dateFmt(o.when)) + '</span></div>' +
                     '<div class="rep-x" style="white-space:pre-wrap">' + esc(o.text || "") + '</div>' +
                     (o.mail ? '<div class="a-note">✉️ <a href="mailto:' + esc(o.mail) + '?subject=' + encodeURIComponent("Rubik Academy geri bildirimin") + '">' + esc(o.mail) + '</a></div>' : '') +
                     (o.dev || o.p ? '<div class="a-note mono small">' + esc([o.dev, o.p].filter(Boolean).join(" · ")) + '</div>' : '') +
