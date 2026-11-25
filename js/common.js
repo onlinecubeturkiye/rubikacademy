@@ -40,6 +40,8 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
         info: function () { try { return JSON.parse(N.info()) || {}; } catch (e) { return {}; } }
     };
     // WebView'de Web Bluetooth yok: akıllı küp / akıllı timer için navigator.bluetooth'un kullanılan kısmını yerel köprüyle (Ble.java) taklit et
+    // Eski uygulama sürümünde Bluetooth köprüsü yok: sayfalar "uygulamayı güncelle" desin
+    if (!N.ble && !navigator.bluetooth) window.RA_BT_UPDATE = true;
     if (N.ble && !navigator.bluetooth) (function () {
         function fail(n) { try { return new DOMException(n, /Error$/.test(n) ? n : "NetworkError"); } catch (e) { var x = new Error(n); x.name = n; return x; } }
         function ble(o) { return call("ble", o).then(function (r) { if (!r || r.err) { var e = fail(r ? r.err : "NetworkError"); e.code2 = r && r.err; throw e; } return r; }); }
@@ -56,7 +58,10 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
             var l = u == null ? list : list.filter(function (x) { return x.uuid === U(u); });
             return l.length ? Promise.resolve(many ? l.slice() : l[0]) : Promise.reject(fail("NotFoundError"));
         }
-        var devs = {}, advL = [];
+        var devs = {}, advL = [], KK = "ra-ble-known";
+        // Bağlanılan cihazlar hatırlanır: getDevices() onları verir, sayfalar tek dokunuşla yeniden bağlanır
+        function known() { try { return JSON.parse(localStorage.getItem(KK)) || {}; } catch (e) { return {}; } }
+        function remember(d) { try { var k = known(); k[d.id] = d.name || ""; localStorage.setItem(KK, JSON.stringify(k)); } catch (e) {} }
         function fireAdv(d, e) {
             var ev = new Event("advertisementreceived"), m = new Map();
             Object.keys(e.mfr || {}).forEach(function (k) { m.set(+k, dv(e.mfr[k])); });
@@ -85,7 +90,7 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
             constructor(d) { this.device = d; this.connected = false; this._s = []; }
             connect() {
                 var g = this, d = this.device;
-                return ble({ op: "connect", id: d.id }).then(function (l) { d._chars = {}; g._s = l.map(function (s) { return new Svc(d, s); }); g.connected = true; return g; });
+                return ble({ op: "connect", id: d.id }).then(function (l) { d._chars = {}; g._s = l.map(function (s) { return new Svc(d, s); }); g.connected = true; remember(d); return g; });
             }
             disconnect() { if (!this.connected) return; this.connected = false; ble({ op: "disconnect", id: this.device.id }).catch(function () {}); this.device.dispatchEvent(new Event("gattserverdisconnected")); }
             getPrimaryService(u) { return pick(this._s, u); }
@@ -98,13 +103,14 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
                 if (o && o.signal) o.signal.addEventListener("abort", function () { d._watch = d.watchingAdvertisements = false; ble({ op: "stopScan" }).catch(function () {}); });
                 return ble({ op: "scan" }).then(function () { if (d._adv) setTimeout(function () { if (d._watch) fireAdv(d, d._adv); }, 0); });
             }
-            forget() { return Promise.resolve(); }
+            forget() { try { var k = known(); delete k[this.id]; localStorage.setItem(KK, JSON.stringify(k)); } catch (e) {} return Promise.resolve(); }
         }
         function dev(id, n) { var d = devs[id] || (devs[id] = new Dev(id, n)); if (n) d.name = n; return d; }
         window.raBleEv = function (e) {
             var d;
             if (e.t === "adv") { d = dev(e.id, e.name); d._adv = e; advL.slice().forEach(function (f) { f(e); }); if (d._watch) fireAdv(d, e); }
             else if (e.t === "val") { d = devs[e.id]; var c = d && d._chars[e.s + "|" + e.c]; if (c) { c.value = dv(e.v); c.dispatchEvent(new Event("characteristicvaluechanged")); } }
+            else if (e.t === "scanfail") { advL.slice().forEach(function (f) { f(e); }); }
             else if (e.t === "disc") { d = devs[e.id]; if (d && d.gatt.connected) { d.gatt.connected = false; d.dispatchEvent(new Event("gattserverdisconnected")); } }
         };
         function fit(f, e) {
@@ -118,38 +124,88 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
             if ((o.exclusionFilters || []).some(function (f) { return fit(f, e); })) return false;
             return o.acceptAllDevices ? !!e.name : (o.filters || []).some(function (f) { return fit(f, e); });
         }
+        var MSG = {
+            BluetoothOff: ["Bluetooth kapalı. Açıp tekrar dene.", "Bluetooth'u aç", "bt"],
+            NotAllowedError: ["Akıllı küpü bulmak için Bluetooth (Yakındaki cihazlar) izni gerekli.", "İzin ver", "retry"],
+            PermDenied: ["Bluetooth izni kapalı. Ayarlar → İzinler → Yakındaki cihazlar'ı aç.", "Ayarları aç", "app"],
+            LocationOff: ["Bu Android sürümünde Bluetooth araması için Konum açık olmalı.", "Konumu aç", "location"],
+            NotSupportedError: ["Bu telefonda Bluetooth LE yok.", "", ""],
+            ScanFailed: ["Arama başlatılamadı. Bluetooth'u kapatıp açmayı dene.", "Tekrar dene", "retry"]
+        };
         function requestDevice(o) {
             o = o || {};
+            var dark = document.documentElement.classList.contains("dark") || document.documentElement.getAttribute("data-theme") === "dark" ||
+                (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.getAttribute("data-theme") !== "light");
+            var C = dark ? { bg: "#1c1c1f", fg: "#f2f2f2", mu: "#a0a0a8", it: "#27272b", bd: "#36363c", ac: "#5b7cff" } : { bg: "#fff", fg: "#111", mu: "#666", it: "#f6f6f8", bd: "#e2e2e6", ac: "#2563eb" };
             return new Promise(function (res, rej) {
-                var box = document.createElement("div"), seen = {};
-                box.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center";
-                box.innerHTML = '<div style="background:#fff;color:#111;width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:18px 16px 24px;font:15px system-ui,sans-serif;max-height:70vh;overflow:auto">' +
-                    '<b style="font-size:17px">Bluetooth cihazı seç</b><p class="raBleM" style="margin:6px 0 10px;color:#666;font-size:13px">Cihazı aç ve telefona yaklaştır. Aranıyor…</p><div class="raBleL"></div>' +
-                    '<button type="button" class="raBleX" style="margin-top:12px;width:100%;padding:12px;border:0;border-radius:12px;background:#eee;color:#111;font:600 15px system-ui,sans-serif">İptal</button></div>';
-                var list = box.querySelector(".raBleL"), msg = box.querySelector(".raBleM");
+                var box = document.createElement("div"), seen = {}, k = known(), t0 = Date.now(), tick;
+                box.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center";
+                box.innerHTML = '<style>@keyframes raBleS{to{transform:rotate(360deg)}}.raBleI{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:13px 12px;margin:6px 0;border:1px solid ' + C.bd + ';border-radius:14px;background:' + C.it + ';color:' + C.fg + ';font:600 15px system-ui,sans-serif}.raBleI small{display:block;font-weight:400;color:' + C.mu + ';font-size:12px}.raBleI i{margin-left:auto;font-style:normal;color:' + C.ac + ';font-size:13px}</style>' +
+                    '<div style="background:' + C.bg + ';color:' + C.fg + ';width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));font:15px system-ui,sans-serif;max-height:75vh;overflow:auto">' +
+                    '<div style="display:flex;align-items:center;gap:10px"><b style="font-size:17px">Bluetooth cihazı seç</b><span class="raBleSp" style="width:16px;height:16px;border:2px solid ' + C.bd + ';border-top-color:' + C.ac + ';border-radius:50%;animation:raBleS .8s linear infinite"></span></div>' +
+                    '<p class="raBleM" style="margin:6px 0 10px;color:' + C.mu + ';font-size:13px">Küpü/timer\'ı uyandır (bir yüzü çevir) ve telefona yaklaştır. Aranıyor…</p>' +
+                    '<button type="button" class="raBleA" style="display:none;width:100%;padding:12px;margin-bottom:6px;border:0;border-radius:12px;background:' + C.ac + ';color:#fff;font:600 15px system-ui,sans-serif"></button>' +
+                    '<div class="raBleL"></div>' +
+                    '<button type="button" class="raBleX" style="margin-top:12px;width:100%;padding:12px;border:0;border-radius:12px;background:' + C.it + ';color:' + C.fg + ';font:600 15px system-ui,sans-serif">İptal</button></div>';
+                var list = box.querySelector(".raBleL"), msg = box.querySelector(".raBleM"), act = box.querySelector(".raBleA"), sp = box.querySelector(".raBleSp");
+                function bars(r) { return r > -60 ? "▂▄▆█" : r > -72 ? "▂▄▆" : r > -85 ? "▂▄" : "▂"; }
                 function on(e) {
-                    if (seen[e.id] || !ok(o, e)) return; seen[e.id] = 1;
-                    var b = document.createElement("button"); b.type = "button"; b.textContent = e.name || e.id;
-                    b.style.cssText = "display:block;width:100%;text-align:left;padding:12px;margin:6px 0;border:1px solid #ddd;border-radius:12px;background:#fafafa;color:#111;font:600 15px system-ui,sans-serif";
-                    b.onclick = function () { end(dev(e.id, e.name)); }; list.appendChild(b);
+                    if (e.t === "scanfail") { problem("ScanFailed"); return; }
+                    if (!ok(o, e)) return;
+                    var b = seen[e.id], add = !b;
+                    if (add) {
+                        b = seen[e.id] = document.createElement("button"); b.type = "button"; b.className = "raBleI";
+                        b.onclick = function () { end(dev(e.id, e.name)); };
+                        msg.textContent = "Bağlanmak için cihaza dokun.";
+                    }
+                    b._r = e.rssi;
+                    b.innerHTML = '<span style="font-size:20px">🧊</span><span>' + String(e.name || e.id).replace(/</g, "&lt;") + '<small>' + (k[e.id] != null ? "Daha önce bağlandı · " : "") + bars(e.rssi) + '</small></span><i>Bağlan →</i>';
+                    // Yeni cihaz gelince güçlü sinyal (yakındaki cihaz) üste; sonra sıra sabit kalır (dokunurken kaymasın)
+                    if (add) Object.keys(seen).map(function (id) { return seen[id]; }).sort(function (a, b) { return b._r - a._r; }).forEach(function (x) { list.appendChild(x); });
+                }
+                function problem(code) {
+                    var m = MSG[code] || ["Bluetooth başlatılamadı.", "Tekrar dene", "retry"];
+                    msg.textContent = m[0]; sp.style.display = "none";
+                    act.style.display = m[1] ? "" : "none"; act.textContent = m[1];
+                    act.onclick = function () {
+                        if (m[2] === "retry") start();
+                        else { ble({ op: "open", what: m[2] }).catch(function () {}); msg.textContent = "Açtıktan sonra buraya dön; arama kendiliğinden başlar."; act.style.display = "none"; waitBack(); }
+                    };
+                }
+                function waitBack() {
+                    function vis() { if (document.visibilityState === "visible") { document.removeEventListener("visibilitychange", vis); setTimeout(start, 400); } }
+                    document.addEventListener("visibilitychange", vis);
+                }
+                function start() {
+                    act.style.display = "none"; sp.style.display = ""; t0 = Date.now();
+                    msg.textContent = "Küpü/timer'ı uyandır (bir yüzü çevir) ve telefona yaklaştır. Aranıyor…";
+                    ble({ op: "scan" }).catch(function (er) {
+                        var c = er.code2 || er.name;
+                        problem(c);
+                        if (c === "BluetoothOff") waitBack();
+                    });
                 }
                 function end(d) {
+                    clearInterval(tick);
                     var i = advL.indexOf(on); if (i >= 0) advL.splice(i, 1);
                     ble({ op: "stopScan" }).catch(function () {}); box.remove();
                     if (d) res(d); else rej(fail("NotFoundError"));
                 }
                 box.querySelector(".raBleX").onclick = function () { end(null); };
+                box.addEventListener("click", function (ev) { if (ev.target === box) end(null); });
+                // 20 sn'de bir şey bulunamazsa ipucu
+                tick = setInterval(function () {
+                    if (!Object.keys(seen).length && sp.style.display !== "none" && Date.now() - t0 > 20000)
+                        msg.textContent = "Henüz cihaz bulunamadı. Küp başka bir telefona/bilgisayara bağlı olmasın; bir yüzünü çevirip bekle.";
+                }, 2000);
                 advL.push(on); document.body.appendChild(box);
-                ble({ op: "scan" }).catch(function (er) {
-                    var c = er.code2 || er.name;
-                    msg.textContent = c === "BluetoothOff" ? "Bluetooth kapalı. Açıp tekrar dene." : c === "NotAllowedError" ? "Bluetooth izni verilmedi (Ayarlar → Uygulamalar → Rubik Academy → İzinler)." : "Bluetooth başlatılamadı.";
-                });
+                start();
             });
         }
         try {
             Object.defineProperty(navigator, "bluetooth", { configurable: true, value: {
                 getAvailability: function () { return Promise.resolve(true); },
-                getDevices: function () { return Promise.resolve([]); },
+                getDevices: function () { var k = known(); return Promise.resolve(Object.keys(k).map(function (id) { return dev(id, k[id]); })); },
                 requestDevice: requestDevice
             } });
         } catch (e) {}
