@@ -1152,6 +1152,29 @@
             Array.prototype.forEach.call(box.querySelectorAll("[data-repok]"), function (b) { b.onclick = function () { b.disabled = true; delDoc("/reports/" + b.getAttribute("data-repok")).then(function (ok) { if (ok) renderReports(); else { b.disabled = false; alert("Kapatılamadı (kuralları yayımladın mı?)"); } }); }; });
         }, function (e) { box.innerHTML = '<p class="a-note">Şikayetler yüklenemedi (' + esc(e && e.message) + ') — güncel Firebase kurallarını yayımladın mı?</p>'; });
     }
+    /* ---------- uygulama geri bildirimleri (appfb/{id}, /geri-bildirim sayfası) ---------- */
+    var AFB_K = { hata: "🐞 Hata", oneri: "💡 Öneri", tasarim: "🎨 Görünüm", ovgu: "💜 Beğendim", diger: "💬 Diğer" };
+    var AFB_M = ["", "😞", "😕", "😐", "🙂", "😍"];
+    function renderAppFb() {
+        var box = $id("aAfbList"); if (!box) return;
+        box.innerHTML = '<p class="a-note">Yükleniyor…</p>';
+        var flt = ($id("aAfbFilter") && $id("aAfbFilter").value) || "";
+        authed(docsBase() + "/appfb?pageSize=300", { method: "GET" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+            var all = (d.documents || []).map(function (x) { var f = x.fields || {}, o = { id: x.name.split("/").pop() }; Object.keys(f).forEach(function (k) { o[k] = gv(f, k); }); o.when = Date.parse(o.ts || x.createTime) || 0; return o; })
+                .sort(function (a, b) { return b.when - a.when; });
+            var L = flt ? all.filter(function (o) { return o.k === flt; }) : all;
+            var rated = all.filter(function (o) { return +o.r > 0; }), avg = rated.length ? (rated.reduce(function (s, o) { return s + +o.r; }, 0) / rated.length).toFixed(1) : "";
+            $id("aAfbCount").textContent = all.length ? all.length + " geri bildirim" + (avg ? " · ort. memnuniyet " + avg + "/5" : "") : "";
+            box.innerHTML = L.length ? L.map(function (o) {
+                return '<div class="rep-row"><div class="rep-h"><b>' + esc(AFB_K[o.k] || o.k || "?") + '</b>' + (+o.r ? '<span class="cp-chip">' + AFB_M[+o.r] + ' ' + o.r + '/5</span>' : '') + '<span class="a-note">' + esc(dateFmt(o.when)) + '</span></div>' +
+                    '<div class="rep-x" style="white-space:pre-wrap">' + esc(o.text || "") + '</div>' +
+                    (o.mail ? '<div class="a-note">✉️ <a href="mailto:' + esc(o.mail) + '?subject=' + encodeURIComponent("Rubik Academy geri bildirimin") + '">' + esc(o.mail) + '</a></div>' : '') +
+                    (o.dev || o.p ? '<div class="a-note mono small">' + esc([o.dev, o.p].filter(Boolean).join(" · ")) + '</div>' : '') +
+                    '<div class="a-ctrl"><button class="a-btn sm" data-afbok="' + esc(o.id) + '">✓ Okundu (sil)</button></div></div>';
+            }).join("") : '<p class="a-note">' + (all.length ? "Bu türde geri bildirim yok." : "Henüz geri bildirim yok.") + '</p>';
+            Array.prototype.forEach.call(box.querySelectorAll("[data-afbok]"), function (b) { b.onclick = function () { b.disabled = true; delDoc("/appfb/" + b.getAttribute("data-afbok")).then(function (ok) { if (ok) renderAppFb(); else { b.disabled = false; alert("Silinemedi (kuralları yayımladın mı?)"); } }); }; });
+        }, function (e) { box.innerHTML = '<p class="a-note">Geri bildirimler yüklenemedi (' + esc(e && e.message) + ') — güncel Firebase kuralları yayında mı?</p>'; });
+    }
     /* ---------- bildirim formu: kime (herkes / aramalı kişi seçimi) ve ne zaman (hazır seçenekler) ---------- */
     function bcFormInit() {
         var sel = $id("bcTarget"), at = $id("bcAt"); if (!sel || bcFormInit.done) return; bcFormInit.done = 1;
@@ -1678,6 +1701,7 @@
             '<div class="bulk-bar" id="uBulk" hidden><b id="uSelCount">0</b> seçili · <select id="uBulkRole"><option value="">Rol ata…</option><option value="uye">Üye</option><option value="admin">Admin</option><option value="gelistirici">Geliştirici</option><option value="tester">Tester</option><option value="organizator">Organizatör</option></select> <button class="a-btn sm" id="uBulkRoleGo">Uygula</button> <button class="a-btn sm" id="uBulkNotify">Bildirim gönder</button> · <select id="uBulkPack"><option value="">Paket ata…</option></select> <button class="a-btn sm" id="uBulkPackGo">🎁 Ata</button><span class="a-msg" id="uBulkMsg" style="margin:0"></span></div>' +
             '<div id="aUsersList"></div></div>' +
             '<div class="box"><h2>🚩 Şikayetler <span class="a-sub" id="aRepCount" style="margin:0"></span></h2><p class="a-note">Kullanıcıların uygulama içinden bildirdiği sohbet mesajları ve profiller (Google Play kullanıcı içeriği kuralı). İncele, gerekirse içeriği sil ya da hesabı askıya al, sonra kapat.</p><div class="a-ctrl"><button class="a-btn main" id="aRepLoad">↻ Yükle</button></div><div id="aRepList" class="a-list"></div></div>' +
+            '<div class="box"><h2>📮 Uygulama geri bildirimleri <span class="a-sub" id="aAfbCount" style="margin:0"></span></h2><p class="a-note">/geri-bildirim sayfasından gelenler (kapalı test kullanıcıları dahil). Okuduğunu sil.</p><div class="a-ctrl"><button class="a-btn main" id="aAfbLoad">↻ Yükle</button><select id="aAfbFilter"><option value="">Tümü</option><option value="hata">🐞 Hata</option><option value="oneri">💡 Öneri</option><option value="tasarim">🎨 Görünüm</option><option value="ovgu">💜 Beğendim</option><option value="diger">💬 Diğer</option></select></div><div id="aAfbList" class="a-list"></div></div>' +
             '<div class="box"><h2>🏅 En aktif kullanıcılar</h2><div id="aActive"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>📈 Site istatistikleri</h2><div id="aSiteStats"><p class="a-note">Yükleniyor…</p></div></div>' +
             '<div class="box"><h2>🗂️ Ayrıntılı istatistik</h2>' +
@@ -1725,6 +1749,7 @@
         bindBulk(); renderBroadcasts(); renderMaintenance(); renderAnon(); renderAd();
         bcFormInit();
         if ($id("aRepLoad")) { $id("aRepLoad").addEventListener("click", renderReports); renderReports(); }
+        if ($id("aAfbLoad")) { $id("aAfbLoad").addEventListener("click", renderAppFb); $id("aAfbFilter").addEventListener("change", renderAppFb); renderAppFb(); }
         if ($id("aPackLoad")) { $id("aPackLoad").addEventListener("click", packsLoad); packsBind(); packsLoad(); }
         // Kullanıcılar listesinde seçilenlere toplu paket atama
         if ($id("uBulkPackGo")) $id("uBulkPackGo").addEventListener("click", function () {

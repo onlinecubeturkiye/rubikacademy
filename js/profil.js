@@ -264,7 +264,7 @@
 
   // Uygulama içi zorunlu bağlantılar (Google Play): ayarlar, gizlilik, koşullar, hesap silme, iletişim
   function linksBox() {
-    var L = [["/ayarlar", "⚙️", "Ayarlar"], ["/gizlilik", "🔒", "Gizlilik politikası"], ["/kosullar", "📄", "Kullanım koşulları"], ["/hesap-silme", "🗑️", "Hesap ve veri silme"], ["mailto:" + SUPPORT_MAIL, "✉️", "İletişim: " + SUPPORT_MAIL]];
+    var L = [["/ayarlar", "⚙️", "Ayarlar"], ["/gizlilik", "🔒", "Gizlilik politikası"], ["/kosullar", "📄", "Kullanım koşulları"], ["/hesap-silme", "🗑️", "Hesap ve veri silme"], ["/geri-bildirim", "📮", "Geri bildirim gönder"],["mailto:" + SUPPORT_MAIL, "✉️", "İletişim: " + SUPPORT_MAIL]];
     return '<div class="box p-links">' + L.map(function (l) { return '<a href="' + l[0] + '"><span>' + l[1] + '</span>' + esc(l[2]) + '<i aria-hidden="true">›</i></a>'; }).join("") + '</div>';
   }
   function renderSignin() {
