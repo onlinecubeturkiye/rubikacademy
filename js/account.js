@@ -1282,6 +1282,16 @@
         isAdmin: isAdmin,
         // Oturum henüz geri yüklenmediyse son oturumdaki yönetici bilgisi (yalnız arayüz için; yetki sunucuda)
         adminHint: function () { if (user || authResolved) return isAdmin(); if (lsGet(SIGNED_KEY) !== "1") return false; try { return !!(JSON.parse(lsGet(HINT_KEY)) || {}).a; } catch (e) { return false; } },
+        // Rol + profile bağlı izinler (perms: 'oda', 'odaTek', 'cekilis'). Askıdaki/silinen hesabın izni yok sayılır.
+        getAccess: function (uid) {
+            var u = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents/roles/" + encodeURIComponent(uid) + "?key=" + encodeURIComponent(cfg.apiKey);
+            function mk(role, perms) { return { role: role, perms: perms, has: function (p) { return perms.indexOf(p) >= 0; } }; }
+            return fetch(u).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+                var f = (d && d.fields) || {}, role = (f.role && f.role.stringValue) || "uye";
+                var perms = ((f.perms && f.perms.arrayValue && f.perms.arrayValue.values) || []).map(function (v) { return v.stringValue; }).filter(Boolean);
+                return mk(role, (role === "askida" || role === "silindi") ? [] : perms);
+            }).catch(function () { return mk("uye", []); });
+        },
         getRole: function (uid) {
             var u = ((cfg.emulator && cfg.emulator.firestore) || "https://firestore.googleapis.com") + "/v1/projects/" + cfg.projectId + "/databases/(default)/documents/roles/" + encodeURIComponent(uid) + "?key=" + encodeURIComponent(cfg.apiKey);
             return fetch(u).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {

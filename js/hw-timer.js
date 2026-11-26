@@ -190,7 +190,7 @@
         });
     }
     function btConnect() {
-        if (!navigator.bluetooth) { emit("status", { kind: "gan", on: false, msg: "Bu tarayıcı Bluetooth desteklemiyor (Android/masaüstü Chrome kullan; iPhone'da Bluefy)." }); return Promise.resolve(false); }
+        if (!navigator.bluetooth) { emit("status", { kind: "gan", on: false, msg: window.RA_BT_UPDATE ? "Uygulaman eski sürüm: Bluetooth için Rubik Academy uygulamasını Play Store'dan güncelle." : "Bu tarayıcı Bluetooth desteklemiyor (Android/masaüstü Chrome kullan; iPhone'da Bluefy)." }); return Promise.resolve(false); }
         var opts = { filters: [{ namePrefix: "GAN" }, { namePrefix: "Gan" }, { namePrefix: "gan" }], optionalServices: [GAN_SVC, "battery_service"] };
         if (!/Bluefy/i.test(navigator.userAgent || "")) opts.filters.push({ services: [GAN_SVC] });
         return navigator.bluetooth.requestDevice(opts).then(btAttach)

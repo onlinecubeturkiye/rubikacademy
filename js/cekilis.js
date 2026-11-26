@@ -1545,7 +1545,7 @@
         var u = me(); S.mgr = false;
         if (!u) { createForm(); return Promise.resolve(); }
         if (Account.isAdmin && Account.isAdmin()) { S.mgr = true; createForm(); if (S.list && !$("gwListWrap").hidden) renderList(); return Promise.resolve(); }
-        return Account.getRole(u.uid).then(function (r) { S.mgr = r === "admin" || r === "gelistirici"; createForm(); if (S.mgr && S.list && !$("gwListWrap").hidden) renderList(); }, function () { createForm(); });
+        return Account.getAccess(u.uid).then(function (a) { S.mgr = a.role === "admin" || a.role === "gelistirici" || a.has("cekilis"); createForm(); if (S.mgr && S.list && !$("gwListWrap").hidden) renderList(); }, function () { createForm(); });
     }
     document.addEventListener("ra-push-change", function () { if (S.g) renderOne(); });
     function start() {

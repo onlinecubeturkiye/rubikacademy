@@ -472,12 +472,12 @@
         devRole = false;
         if (!signedIn()) return;
         if (Account.isAdmin && Account.isAdmin()) { devRole = true; return; }
-        Account.getRole(Account.user().uid).then(function (r) { devRole = r === "gelistirici"; if (comp) renderComp(); }, function () {});
+        Account.getAccess(Account.user().uid).then(function (a) { devRole = a.role === "gelistirici" || a.has("odaTek"); if (comp) renderComp(); }, function () {});
     }
     function isOrgUser() {
         if (!signedIn()) return Promise.resolve(false);
         if (Account.isAdmin && Account.isAdmin()) return Promise.resolve(true);
-        return Account.getRole(Account.user().uid).then(function (r) { return r === "organizator" || r === "gelistirici"; }, function () { return false; });
+        return Account.getAccess(Account.user().uid).then(function (a) { return a.role === "organizator" || a.role === "gelistirici" || a.has("oda"); }, function () { return false; });
     }
     // Oda sahibi (ya da admin): moderatör atar, odayı devreder. Moderatör: turları yönetir, yarışmacı çıkarır.
     function isOwner() { return !!(comp && comp.doc && (comp.doc.host === comp.uid || (Account.isAdmin && Account.isAdmin()))); }
@@ -1829,7 +1829,10 @@
     }
     function init() {
         SOLVED_STR = new Cube().asString();
-        if (!supported()) { $("akNoBt").hidden = false; $("akConnect").disabled = true; }
+        if (!supported()) {
+            $("akNoBt").hidden = false; $("akConnect").disabled = true;
+            if (window.RA_BT_UPDATE) $("akNoBt").textContent = "Uygulaman Bluetooth'u desteklemeyen eski bir sürüm. Akıllı küp için Rubik Academy uygulamasını Play Store'dan güncelle.";
+        }
         $("akConnect").onclick = connect;
         $("akDisc").onclick = disconnect;
         $("akReset").onclick = resetModel;
