@@ -43,7 +43,8 @@
         if (l && l.documents) { l.documents.forEach(function (x) { if (x.name.split("/").pop() === id) Object.assign(x.fields, f); }); cacheSet("list", l); }
         (S.list || []).forEach(function (x) { if (x.id === id) Object.keys(o).forEach(function (k) { x[k] = o[k]; }); });
     }
-    function cacheSet(k, v) { try { localStorage.setItem("ra-gw-c:" + k, JSON.stringify(v)); } catch (e) {} }
+    // büyük veri (ör. base64 görselli liste) cihaz deposunu doldurup diğer kayıtları bozmasın: 150 KB üstü önbelleğe alınmaz
+    function cacheSet(k, v) { try { var j = JSON.stringify(v); if (j && j.length > 150000) { localStorage.removeItem("ra-gw-c:" + k); return; } localStorage.setItem("ra-gw-c:" + k, j); } catch (e) {} }
     function cacheGet(k) { try { return JSON.parse(localStorage.getItem("ra-gw-c:" + k) || "null"); } catch (e) { return null; } }
     function req(path, opts) {
         opts = opts || {};
