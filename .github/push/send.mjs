@@ -28,8 +28,16 @@ const rem = (await remRef.get()).data() || {};
 const seen = new Set(rem.c || []);
 const fresh = (await db.collection("comps").where("st", "==", "lobby").get()).docs
     .filter((d) => !seen.has(d.id) && now - ms(d.get("ts")) < 2 * 3600e3);
+// Çekilişler: yaklaşan (çekiliş zamanı gelmemiş) olanlar — genelde 0-3 belge
+const gwSeen = new Set(rem.g || []);
+const gws = (await db.collection("giveaways").where("drawAt", ">", admin.firestore.Timestamp.fromMillis(now)).get()).docs
+    .filter((d) => !d.get("test"));
+// yeni açılan (son 3 saat): herkese bir kez
+const gwNew = gws.filter((d) => !gwSeen.has("n:" + d.id) && now - ms(d.get("ts")) < 3 * 3600e3 && ms(d.get("closeAt")) > now);
+// çekilişe 15-75 dk kaldı: katılanlara bir kez hatırlatma (saatlik çalışma bu aralığı bir kez yakalar)
+const gwRem = gws.filter((d) => !gwSeen.has("r:" + d.id) && ms(d.get("drawAt")) - now > 15 * 60e3 && ms(d.get("drawAt")) - now <= 75 * 60e3);
 const due = (d) => (ms(d.get("at")) || ms(d.get("ts"))) <= now;
-if (!pendB.some(due) && pendN && !pendN.some(due) && !fresh.length) { console.log("gönderilecek bir şey yok"); process.exit(0); }
+if (!pendB.some(due) && pendN && !pendN.some(due) && !fresh.length && !gwNew.length && !gwRem.length) { console.log("gönderilecek bir şey yok"); process.exit(0); }
 const subs = (await db.collection("pushsubs").get()).docs.map((d) => {
     let sub = null; try { sub = JSON.parse(d.get("sub") || "null"); } catch (e) {}
     return { ref: d.ref, sub, uid: d.get("uid") || "", rem: d.get("rem") || "" };
@@ -116,6 +124,22 @@ for (const d of fresh) {
     await bRef.set({ text, ts: admin.firestore.Timestamp.now(), pushed: true });
     console.log("ev yarışması", d.id, "→", n);
 }
+// 3) Çekiliş: yeni çekiliş duyurusu (herkese) ve çekilişten ~1 saat önce katılanlara hatırlatma
+for (const d of gwNew) {
+    gwSeen.add("n:" + d.id);
+    const t = d.get("title") || "Çekiliş", pr = d.get("prize") || "";
+    const n = await sendTo(subs, { title: "Yeni çekiliş 🎁", body: t + (pr && pr !== t ? ": " + pr : "") + ". Katıl, kazanma şansı yakala!", tag: "g:" + d.id, url: "/icerikler/cekilis?id=" + d.id });
+    console.log("yeni çekiliş", d.id, "→", n);
+}
+for (const d of gwRem) {
+    gwSeen.add("r:" + d.id);
+    const uids = new Set((await d.ref.collection("e").select().get()).docs.map((x) => x.id));
+    const mine = subs.filter((x) => x.uid && uids.has(x.uid));
+    const min = Math.max(5, Math.round((ms(d.get("drawAt")) - now) / 60e3 / 5) * 5);
+    const n = mine.length ? await sendTo(mine, { title: "Çekiliş yaklaşıyor ⏰", body: "“" + (d.get("title") || "Çekiliş") + "” çekilişine yaklaşık " + min + " dakika kaldı. Kazanırsan 2 dakika içinde onaylaman gerekiyor, sayfada ol!", tag: "gr:" + d.id, url: "/icerikler/cekilis?id=" + d.id }) : 0;
+    console.log("çekiliş hatırlatma", d.id, "katılan", uids.size, "→", n);
+}
+rem.g = Array.from(gwSeen).slice(-80);
 rem.c = Array.from(seen).slice(-60);
 await remRef.set(rem);
 console.log("bitti; silinen abonelik:", dead.size);

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="horizontal" android:padding="6dp" android:background="@drawable/widget_bg">
+    <LinearLayout android:id="@+id/w_trainer" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
+        android:orientation="vertical" android:gravity="center">
+        <ImageView android:layout_width="30dp" android:layout_height="30dp" android:src="@drawable/sc_trainer" android:contentDescription="@string/sc_trainer" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/sc_trainer"
+            android:textColor="#17171F" android:textSize="11sp" android:textStyle="bold" android:maxLines="1" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/w_comp" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
+        android:orientation="vertical" android:gravity="center">
+        <ImageView android:layout_width="30dp" android:layout_height="30dp" android:src="@drawable/sc_comp" android:contentDescription="@string/sc_comp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/sc_comp"
+            android:textColor="#17171F" android:textSize="11sp" android:textStyle="bold" android:maxLines="1" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/w_gift" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
+        android:orientation="vertical" android:gravity="center">
+        <ImageView android:layout_width="30dp" android:layout_height="30dp" android:src="@drawable/sc_gift" android:contentDescription="@string/sc_gift" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/sc_gift"
+            android:textColor="#17171F" android:textSize="11sp" android:textStyle="bold" android:maxLines="1" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/w_cube" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
+        android:orientation="vertical" android:gravity="center">
+        <ImageView android:layout_width="30dp" android:layout_height="30dp" android:src="@drawable/sc_cube" android:contentDescription="@string/sc_cube" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/sc_cube"
+            android:textColor="#17171F" android:textSize="11sp" android:textStyle="bold" android:maxLines="1" />
+    </LinearLayout>
+</LinearLayout>

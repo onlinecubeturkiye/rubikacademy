@@ -234,5 +234,34 @@
             }).filter(Boolean).slice(0, n || 6);
         });
     }
-    window.RACompShare = { records: records, comps: comps, liveComps: liveComps, champions: champions, suspect: suspect, image: shareImageR, save: save, downloadCert: downloadCert, text: shareTextR, cert: certImage, certInfo: certInfo, fmt: fmt };
+    // Kişisel rekor kartı (hikâye boyutu 1080x1920): profildeki "Rekorlarımı paylaş"
+    function pbCard(name, pb) {
+        return loadLogo().then(function (logo) {
+            var W = 1080, H = 1920, c = document.createElement("canvas"); c.width = W; c.height = H;
+            var x = c.getContext("2d"), acc = "#6c5ce7";
+            shareBg(x, W, H, acc); shareHead(x, W, logo, "REKORLARIM");
+            x.textAlign = "center"; x.fillStyle = "#eef0f7"; x.font = "900 84px Inter, sans-serif";
+            var nm = String(name || "Cuber"); while (x.measureText(nm).width > W - 160 && nm.length > 3) nm = nm.slice(0, -2);
+            if (nm !== String(name || "Cuber")) nm += "…";
+            x.fillText(nm, W / 2, 330);
+            x.fillStyle = "#a4aabe"; x.font = "700 34px Inter, sans-serif"; x.fillText("Ev yarışması kişisel rekorları", W / 2, 392);
+            var y = 480;
+            [["333", "3x3"], ["222", "2x2"]].forEach(function (e) {
+                var p = pb && pb[e[0]]; if (!p) return;
+                x.fillStyle = "rgba(255,255,255,.06)"; roundRect(x, 80, y, W - 160, 560, 40); x.fill();
+                x.strokeStyle = "rgba(255,255,255,.1)"; x.lineWidth = 2; x.stroke();
+                x.fillStyle = "#c9c3ff"; x.font = "900 56px Inter, sans-serif"; x.fillText(e[1], W / 2, y + 96);
+                [["Tekil", p.s], ["Ao5", p.a5], ["Ao12", p.a12]].forEach(function (r, i) {
+                    var yy = y + 200 + i * 125;
+                    x.textAlign = "left"; x.fillStyle = "#a4aabe"; x.font = "800 40px Inter, sans-serif"; x.fillText(r[0], 150, yy);
+                    x.textAlign = "right"; x.fillStyle = r[1] ? "#ffffff" : "#5b6176"; x.font = "900 64px JetBrains Mono, monospace"; x.fillText(r[1] ? fmt(r[1]) : "-", W - 150, yy + 4);
+                    x.textAlign = "center";
+                });
+                y += 620;
+            });
+            x.fillStyle = "#eef0f7"; x.font = "800 38px Inter, sans-serif"; x.fillText("Sen de yarış: rubikacademy.fun", W / 2, H - 120);
+            return new Promise(function (res) { c.toBlob(res, "image/png"); });
+        });
+    }
+    window.RACompShare = { pbCard: pbCard, records: records, comps: comps, liveComps: liveComps, champions: champions, suspect: suspect, image: shareImageR, save: save, downloadCert: downloadCert, text: shareTextR, cert: certImage, certInfo: certInfo, fmt: fmt };
 })();

@@ -138,7 +138,7 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
                 (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.getAttribute("data-theme") !== "light");
             var C = dark ? { bg: "#1c1c1f", fg: "#f2f2f2", mu: "#a0a0a8", it: "#27272b", bd: "#36363c", ac: "#5b7cff" } : { bg: "#fff", fg: "#111", mu: "#666", it: "#f6f6f8", bd: "#e2e2e6", ac: "#2563eb" };
             return new Promise(function (res, rej) {
-                var box = document.createElement("div"), seen = {}, k = known(), t0 = Date.now(), tick;
+                var box = document.createElement("div"), seen = {}, k = known(), t0 = Date.now(), tick, autoT = 0, done = false;
                 box.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center";
                 box.innerHTML = '<style>@keyframes raBleS{to{transform:rotate(360deg)}}.raBleI{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:13px 12px;margin:6px 0;border:1px solid ' + C.bd + ';border-radius:14px;background:' + C.it + ';color:' + C.fg + ';font:600 15px system-ui,sans-serif}.raBleI small{display:block;font-weight:400;color:' + C.mu + ';font-size:12px}.raBleI i{margin-left:auto;font-style:normal;color:' + C.ac + ';font-size:13px}</style>' +
                     '<div style="background:' + C.bg + ';color:' + C.fg + ';width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));font:15px system-ui,sans-serif;max-height:75vh;overflow:auto">' +
@@ -157,6 +157,11 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
                         b = seen[e.id] = document.createElement("button"); b.type = "button"; b.className = "raBleI";
                         b.onclick = function () { end(dev(e.id, e.name)); };
                         msg.textContent = "Bağlanmak için cihaza dokun.";
+                        // daha önce bağlanılan cihaz görünürse kendiliğinden bağlan (1,2 sn içinde başka seçim yapılmazsa)
+                        if (k[e.id] != null && !autoT) {
+                            msg.textContent = "Son bağlandığın cihaz bulundu, bağlanılıyor… Başka cihaz için ona dokun.";
+                            autoT = setTimeout(function () { end(dev(e.id, e.name)); }, 1200);
+                        }
                     }
                     b._r = e.rssi;
                     b.innerHTML = '<span style="font-size:20px">🧊</span><span>' + String(e.name || e.id).replace(/</g, "&lt;") + '<small>' + (k[e.id] != null ? "Daha önce bağlandı · " : "") + bars(e.rssi) + '</small></span><i>Bağlan →</i>';
@@ -186,7 +191,8 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
                     });
                 }
                 function end(d) {
-                    clearInterval(tick);
+                    if (done) return; done = true;
+                    clearInterval(tick); clearTimeout(autoT);
                     var i = advL.indexOf(on); if (i >= 0) advL.splice(i, 1);
                     ble({ op: "stopScan" }).catch(function () {}); box.remove();
                     if (d) res(d); else rej(fail("NotFoundError"));
