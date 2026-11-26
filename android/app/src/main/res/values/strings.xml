@@ -10,4 +10,10 @@
     <string name="sc_cube">Sanal küp</string>
     <string name="sc_cube_long">Sanal 3D küp</string>
     <string name="widget_desc">Antrenör, yarışma, çekiliş ve sanal küpe tek dokunuşla git</string>
+    <string name="w_gift">Çekiliş geri sayımı</string>
+    <string name="w_gift_desc">En yakın çekiliş ve kalan süre (30 dakikada bir güncellenir)</string>
+    <string name="w_comp">Canlı ev yarışması</string>
+    <string name="w_comp_desc">Açık ev yarışması ve kodu (30 dakikada bir güncellenir)</string>
+    <string name="w_timer">Mini timer</string>
+    <string name="w_timer_desc">Dokun başlat, dokun durdur. Süreler kaydedilmez; istersen JSON olarak paylaş</string>
 </resources>
