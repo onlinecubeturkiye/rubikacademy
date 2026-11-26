@@ -7,7 +7,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -75,6 +77,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle saved) {
         super.onCreate(saved);
+        applyOrientation(getResources().getConfiguration());
         PushService.ensureChannel(this);
 
         root = new FrameLayout(this);
@@ -145,6 +148,28 @@ public class MainActivity extends Activity {
 
         if (saved != null) web.restoreState(saved);
         if (saved == null || web.getUrl() == null) web.loadUrl(startUrl(getIntent()));
+    }
+
+    // Telefon (en kısa kenar < 600dp): dikey. Tablet / açık katlanabilir / Chromebook: kullanıcı nasıl tutarsa.
+    // Katlanabilir telefon açılıp kapanınca yeniden hesaplanır (configChanges sayesinde sayfa yeniden yüklenmez).
+    void applyOrientation(Configuration c) {
+        boolean large = c.smallestScreenWidthDp >= 600;
+        // Çoklu pencere / serbest pencerede yön kilitlenmez (sistem zaten yok sayar, pencere bozulmasın)
+        boolean multi = Build.VERSION.SDK_INT >= 24 && isInMultiWindowMode();
+        int want = large || multi ? ActivityInfo.SCREEN_ORIENTATION_FULL_USER : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+        if (getRequestedOrientation() != want) setRequestedOrientation(want);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration c) {
+        super.onConfigurationChanged(c);
+        applyOrientation(c);
+    }
+
+    @Override
+    public void onMultiWindowModeChanged(boolean on, Configuration c) {
+        super.onMultiWindowModeChanged(on, c);
+        applyOrientation(c);
     }
 
     String startUrl(Intent i) {
