@@ -1120,9 +1120,9 @@
                     // görünür: yalnız ✓ / ✗ ve "⋯"; seyrek işlemler "⋯" ile satırın altında açılır
                     '<div class="gw-pact">' + (x.m ? '' : '<div class="gw-okno"><button type="button" class="gw-qb ok' + (r.v === "ok" ? " on" : "") + '" data-rv="ok" data-u="' + esc(x.uid) + '" title="Onayla" aria-label="Onayla">✓</button><button type="button" class="gw-qb no' + (r.v === "no" ? " on" : "") + '" data-rv="no" data-u="' + esc(x.uid) + '" title="Uygun değil" aria-label="Uygun değil">✗</button></div>') +
                     '<button type="button" class="gw-qb more" data-more title="Diğer işlemler" aria-label="Diğer işlemler" aria-expanded="false">⋯</button></div>' +
-                    '<div class="gw-pmore">' + (isOwner() ? '<button type="button" class="gw-mb' + (x.x2 ? " on" : "") + '" data-x2="' + esc(x.uid) + '">×2 ' + (x.x2 ? "şansı kaldır" : "şans ver") + '</button><button type="button" class="gw-mb' + (x.oc ? " on" : "") + '" data-oc="' + esc(x.uid) + '">⚡ ' + (x.oc ? "Onaysız kazanmayı kaldır" : "Kazanırsa onay beklenmesin") + '</button>' : '') +
-                    (!x.m && any ? '<button type="button" class="gw-mb" data-rst="' + esc(x.uid) + '">↺ Beklemeye geri al</button>' : '') +
-                    '<button type="button" class="gw-mb del" data-out="' + esc(x.uid) + '">🗑 Çekilişten çıkar</button></div></div>';
+                    '<div class="gw-pmore">' + (isOwner() ? '<button type="button" class="gw-mb' + (x.x2 ? " on" : "") + '" data-x2="' + esc(x.uid) + '">×2 ' + (x.x2 ? "şansı kaldır" : "şans ver") + '</button><button type="button" class="gw-mb' + (x.oc ? " on" : "") + '" data-oc="' + esc(x.uid) + '">⚡ ' + (x.oc ? "Onaysızı kaldır" : "Onaysız kazansın") + '</button>' : '') +
+                    (!x.m && any ? '<button type="button" class="gw-mb" data-rst="' + esc(x.uid) + '">↺ Beklemeye al</button>' : '') +
+                    '<button type="button" class="gw-mb del" data-out="' + esc(x.uid) + '">🗑 Çıkar</button></div></div>';
             }).join("") || '<p class="gw-note">' + (n.all ? "Bu bölümde kimse yok." : "Henüz katılımcı yok.") + '</p>') + '</div>';
         Array.prototype.forEach.call(box.querySelectorAll("[data-more]"), function (b) {
             b.onclick = function () {
