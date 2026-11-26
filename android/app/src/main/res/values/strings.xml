@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Rubik Academy</string>
+    <string name="sc_trainer">Antrenör</string>
+    <string name="sc_trainer_long">Algoritma antrenörü</string>
+    <string name="sc_comp">Yarışma</string>
+    <string name="sc_comp_long">Ev yarışması</string>
+    <string name="sc_gift">Çekiliş</string>
+    <string name="sc_gift_long">Çekiliş</string>
+    <string name="sc_cube">Sanal küp</string>
+    <string name="sc_cube_long">Sanal 3D küp</string>
+    <string name="widget_desc">Antrenör, yarışma, çekiliş ve sanal küpe tek dokunuşla git</string>
 </resources>

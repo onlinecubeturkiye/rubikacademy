@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20270136";
+    var V = "20270138";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -72,7 +72,19 @@
     function t(k) { return (TXT[lang()] || TXT.tr)[k] || TXT.tr[k] || k; }
     function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
     function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-    function lsSet(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+    function lsSet(k, v) {
+        try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); }
+        catch (e) {
+            // Depo doluysa (QuotaExceeded) kayıtlar sessizce kayboluyordu (ör. okunan bildirimler her açılışta yeni görünür):
+            // yeniden indirilebilen önbellekleri sil ve bir kez daha dene
+            try {
+                var del = [];
+                for (var i = 0; i < localStorage.length; i++) { var kk = localStorage.key(i); if (kk && /^(ra-gw-c:|ra-cfg-cache$)/.test(kk)) del.push(kk); }
+                del.forEach(function (kk) { localStorage.removeItem(kk); });
+                if (v !== null) localStorage.setItem(k, v);
+            } catch (e2) {}
+        }
+    }
 
     var enabled = !!(cfg.apiKey && cfg.projectId && cfg.authDomain);
 
@@ -974,7 +986,12 @@
     function inboxAdd(notes) {
         var a = inboxGet(), ids = {};
         a.forEach(function (x) { ids[x.id] = 1; });
-        notes.forEach(function (n) { if (!ids[n.id]) a.unshift({ id: n.id, t: String(n.text || "").slice(0, 600), at: Date.now(), u: 1 }); });
+        // Yeni kurulumda / veriler silinince eski duyurular "yeni" diye zili doldurmasın: yalnız son 2 günün
+        // duyuruları okunmamış sayılır, daha eskiler okunmuş olarak listeye girer. Saat, duyurunun kendi saati.
+        var base = +(lsGet("ra-inbox-base") || 0);
+        if (!base) { base = Date.now() - 2 * 86400000; lsSet("ra-inbox-base", String(base)); a.forEach(function (x) { if ((x.at || 0) < base) x.u = 0; }); }
+        notes.slice().reverse().forEach(function (n) { if (!ids[n.id]) a.unshift({ id: n.id, t: String(n.text || "").slice(0, 600), at: n.ts || Date.now(), u: (n.ts || Date.now()) > base ? 1 : 0 }); });
+        a.sort(function (p, q) { return (q.at || 0) - (p.at || 0); });
         lsSet("ra-inbox", JSON.stringify(a.slice(0, 20)));
         bellPaint();
     }

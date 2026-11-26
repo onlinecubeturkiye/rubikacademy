@@ -45,7 +45,17 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="rubikacademy.fun" />
             </intent-filter>
+            <!-- Uygulama simgesine basılı tutunca: Antrenör, Yarışma, Çekiliş, Sanal küp -->
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity>
+
+        <!-- Ana ekran widget'ı (hızlı bağlantılar) -->
+        <receiver android:name=".QuickWidget" android:exported="false" android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_quick" />
+        </receiver>
 
         <!-- Bildirimler (Firebase Cloud Messaging) -->
         <service android:name=".PushService" android:exported="false">

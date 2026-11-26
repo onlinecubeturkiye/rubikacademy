@@ -64,6 +64,7 @@
       var pb = c.pb[e[0]];
       return '<div class="p-pb-row"><b>' + e[1] + '</b><span>Tekil <i dir="ltr">' + fmt(pb.s) + '</i></span><span>Ao5 <i dir="ltr">' + fmt(pb.a5) + '</i></span><span>Ao12 <i dir="ltr">' + fmt(pb.a12) + '</i></span></div>';
     }).join("") + "</div>";
+    if (isMe && evs.length) { window.__raPbShare = { name: myName, pb: c.pb }; html += '<button type="button" class="btn sm" data-pbshare style="margin-top:10px">📤 Rekorlarımı paylaş</button>'; }
     html += '<p class="p-note" style="margin-top:10px"><a href="/icerikler/ev-yarismasi#rekorlar" style="color:var(--ui-accent);font-weight:800">🥇 Rekor tablosu →</a></p>';
     var list = c.list || [], groups = groupComps(list);
     // Sertifikalar: final ilk 3 (yalnız kendi profilinde indirilebilir; başkasının profilinde rozet olarak görünür)
@@ -298,3 +299,12 @@
   }
   if (document.readyState !== "loading") start(); else document.addEventListener("DOMContentLoaded", start);
 })();
+
+// Rekor kartı: hikâye boyutunda görsel (WhatsApp / Instagram); uygulamada Android paylaş menüsü
+document.addEventListener("click", function (e) {
+  var b = e.target.closest && e.target.closest("[data-pbshare]"), d = window.__raPbShare;
+  if (!b || !d || !window.RACompShare || !RACompShare.pbCard) return;
+  b.disabled = true; var t = b.textContent; b.textContent = "Hazırlanıyor…";
+  RACompShare.pbCard(d.name, d.pb).then(function (blob) { return blob && RACompShare.save(blob, "rubikacademy-rekorlarim.png"); })
+    .catch(function () {}).then(function () { b.disabled = false; b.textContent = t; });
+});

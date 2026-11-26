@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uygulama simgesine basılı tutunca çıkan kısayollar; bağlantıyı MainActivity açar -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut android:shortcutId="trainer" android:enabled="true" android:icon="@drawable/sc_trainer" android:shortcutShortLabel="@string/sc_trainer" android:shortcutLongLabel="@string/sc_trainer_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="fun.rubikacademy.app" android:targetClass="fun.rubikacademy.app.MainActivity" android:data="https://rubikacademy.fun/icerikler/algoritmalar/antrenor" />
+    </shortcut>
+    <shortcut android:shortcutId="comp" android:enabled="true" android:icon="@drawable/sc_comp" android:shortcutShortLabel="@string/sc_comp" android:shortcutLongLabel="@string/sc_comp_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="fun.rubikacademy.app" android:targetClass="fun.rubikacademy.app.MainActivity" android:data="https://rubikacademy.fun/icerikler/ev-yarismasi" />
+    </shortcut>
+    <shortcut android:shortcutId="gift" android:enabled="true" android:icon="@drawable/sc_gift" android:shortcutShortLabel="@string/sc_gift" android:shortcutLongLabel="@string/sc_gift_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="fun.rubikacademy.app" android:targetClass="fun.rubikacademy.app.MainActivity" android:data="https://rubikacademy.fun/icerikler/cekilis" />
+    </shortcut>
+    <shortcut android:shortcutId="cube" android:enabled="true" android:icon="@drawable/sc_cube" android:shortcutShortLabel="@string/sc_cube" android:shortcutLongLabel="@string/sc_cube_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="fun.rubikacademy.app" android:targetClass="fun.rubikacademy.app.MainActivity" android:data="https://rubikacademy.fun/icerikler/sanal-kup" />
+    </shortcut>
+</shortcuts>
