@@ -1148,7 +1148,9 @@
         function repaint(uids) {
             // inceleme penceresinde şu an gösterilen kişinin görseli geldiyse pencereyi tazele
             if (S.rvCur && uids.indexOf(S.rvCur) >= 0 && S.rvShow && $("gwRvOk")) S.rvShow();
-            clearTimeout(pfPaintT); pfPaintT = setTimeout(function () { if (S.g && S.g.id === g.id && !($("gwModal") && $("gwModal").classList.contains("open"))) paintCheck(); }, 120);
+            // listeyi baştan çizme (kaydırma en üste atıyordu): yalnız gelen kişilerin küçük görselini yerinde güncelle
+            var box = $("gwChk"); if (!box) return;
+            uids.forEach(function (u) { var b = box.querySelector('[data-proof="' + u + '"]'); if (b) b.innerHTML = thumbHtml(u); });
         }
         function next() {
             if (tok !== pfTok || !chunks.length) { if (tok === pfTok && S.g && S.g.id === g.id) paintCheck(); return Promise.resolve(); }
@@ -1161,6 +1163,10 @@
         }
         // aynı anda 3 grup
         next(); next(); next();
+    }
+    function thumbHtml(uid) {
+        var prs = (((S.chk || {})[uid] || {}).proofs || []).filter(Boolean);
+        return prs.length ? '<img src="' + prs[0] + '" alt="" loading="lazy" decoding="async">' + (prs.length > 1 ? '<i>' + prs.length + '</i>' : '') : proofLoading(uid) ? '<span class="gw-pld" aria-label="Yükleniyor"></span>' : '📷';
     }
     function proofLoading(uid) { var c = (S.chk || {})[uid]; return !!(c && c.pl === 0); }
     function flagsOf(x, all) {
@@ -1187,8 +1193,16 @@
         }
         return f;
     }
+    // Katılımcı arama: listeyi yeniden çizmeden satırları gizler/gösterir
+    function applyFind(box) {
+        var q = String(S.q || "").toLocaleLowerCase("tr").trim(), shown = 0;
+        Array.prototype.forEach.call(box.querySelectorAll(".gw-prow[data-q]"), function (r) { var on = !q || r.getAttribute("data-q").indexOf(q) >= 0; r.hidden = !on; if (on) shown++; });
+        var c = box.querySelector(".gw-findn"); if (c) c.textContent = q ? shown + " sonuç" : "";
+    }
     function paintCheck() {
         var g = S.g, box = $("gwChk"); if (!g || !box) return;
+        // yeniden çizimde kaydırma yeri, arama ve odak korunur
+        var pl0 = box.querySelector(".gw-plist"), st0 = pl0 ? pl0.scrollTop : 0, wy = window.scrollY, fq = document.activeElement && document.activeElement.id === "gwFind";
         var l = S.entries || [], tab = S.tab || "all";
         var nd = notDup(g.id); S.maybe = maybeSame(l).filter(function (a) { return !nd[grpKey(a)]; });
         var rows = l.map(function (x) { return { x: x, f: flagsOf(x, l).filter(function (t) { return t[0] !== "star"; }), s: flagsOf(x, l).filter(function (t) { return t[0] === "star"; }), v: revOf(x.uid) }; });
@@ -1210,13 +1224,14 @@
             '<div class="gw-tabs">' + TABS.map(function (t) { return '<button type="button" data-tab="' + t[0] + '"' + (tab === t[0] ? ' class="on"' : '') + '>' + t[1] + ' <b>' + n[t[0]] + '</b></button>'; }).join("") + '</div>' +
             '<div class="gw-mrow">' + (extra.length || maybeN ? '<button type="button" class="btn sm gw-del" id="gwDupOut">📱 Aynı kişi kontrolü (' + (extra.length + maybeN) + ')</button>' : '') +
             '<button type="button" class="btn sm" id="gwReChk">↻ Yenile</button></div>' +
+            '<div class="gw-find"><input type="search" id="gwFind" placeholder="🔍 Katılımcı ara (ad)…" autocomplete="off" value="' + esc(S.q || "") + '"><span class="gw-findn"></span></div>' +
             '<div class="gw-plist">' + (list.map(function (r) {
                 var x = r.x, prs = (((S.chk || {})[x.uid] || {}).proofs || []).filter(Boolean), vb = revB(x.uid) || revB(x.uid, "b2"), any = r.v || vb, wt = weightOf(x);
                 var stt = r.v === "ok" ? '<b class="ok">✅ Onaylı</b>' : r.v === "no" ? '<b class="no">❌ Uygun değil</b>' : '<b>⏳ Bekliyor</b>';
                 var upd = r.f.some(function (t) { return t[0] === "new"; }), ff = r.f.filter(function (t) { return t[0] !== "new"; });
                 var warn = ff.map(function (t) { return t[1]; }), bad = ff.some(function (t) { return t[0] === "bad"; });
-                return '<div class="gw-prow' + (r.v === "ok" ? " okd" : r.v === "no" ? " nod" : "") + '">' +
-                    '<button type="button" class="gw-pth" data-proof="' + esc(x.uid) + '" title="Görselleri incele">' + (prs.length ? '<img src="' + prs[0] + '" alt="" loading="lazy" decoding="async">' + (prs.length > 1 ? '<i>' + prs.length + '</i>' : '') : proofLoading(x.uid) ? '<span class="gw-pld" aria-label="Yükleniyor"></span>' : '📷') + '</button>' +
+                return '<div class="gw-prow' + (r.v === "ok" ? " okd" : r.v === "no" ? " nod" : "") + '" data-q="' + esc(String(x.name || "").toLocaleLowerCase("tr") + " " + x.uid.toLowerCase()) + '">' +
+                    '<button type="button" class="gw-pth" data-proof="' + esc(x.uid) + '" title="Görselleri incele">' + thumbHtml(x.uid) + '</button>' +
                     '<div class="gw-pn"><div class="gw-pl1"><a' + (isM(x.uid) ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(x.uid) + '" target="_blank" rel="noopener"') + '>' + esc(x.name) + '</a>' + (x.m ? '<i class="gw-star" title="' + (isM(x.uid) ? "Elle eklendi (hesapsız)" : "Elle eklendi") + '">✋</i>' : '') + '</div>' +
                     '<div class="gw-pl2">' + stt + (x.x2 ? '<i class="gw-star" title="Site sahibi verdi">×2</i>' : '') + (x.oc ? '<i class="gw-star" title="Kazanırsa onay beklenmez">⚡</i>' : '') + (bonusUp(x) ? '<i class="gw-star" title="WhatsApp bonusu: ' + bonusUp(x) + ' görsel, ' + bonusCnt(x) + ' onaylı">⭐' + bonusCnt(x) + '/' + bonusUp(x) + '</i>' : '') + (wt > 1 ? '<i class="gw-star" title="Çarkta ' + wt + ' kez">🎡×' + wt + '</i>' : '') + (upd ? '<span class="new">🔄 Görselini güncelledi</span>' : '') + (warn.length ? '<span class="' + (bad ? "bad" : "warn") + '" title="' + esc(warn.join(" · ")) + '">⚠️ ' + esc(warn.join(" · ")) + '</span>' : '') + '</div></div>' +
                     // görünür: yalnız ✓ / ✗ ve "⋯"; seyrek işlemler "⋯" ile satırın altında açılır
@@ -1226,6 +1241,11 @@
                     (!x.m && any ? '<button type="button" class="gw-mb" data-rst="' + esc(x.uid) + '">↺ Beklemeye al</button>' : '') +
                     '<button type="button" class="gw-mb del" data-out="' + esc(x.uid) + '">🗑 Çıkar</button></div></div>';
             }).join("") || '<p class="gw-note">' + (n.all ? "Bu bölümde kimse yok." : "Henüz katılımcı yok.") + '</p>') + '</div>';
+        var pl1 = box.querySelector(".gw-plist"); if (pl1) pl1.scrollTop = st0;
+        if (Math.abs(window.scrollY - wy) > 2) window.scrollTo(0, wy);
+        var fi = $("gwFind");
+        if (fi) { fi.oninput = function () { S.q = fi.value; applyFind(box); if (pl1) pl1.scrollTop = 0; }; if (fq) { fi.focus(); try { fi.setSelectionRange(fi.value.length, fi.value.length); } catch (e) {} } }
+        applyFind(box);
         Array.prototype.forEach.call(box.querySelectorAll("[data-more]"), function (b) {
             b.onclick = function () {
                 var row = b.closest(".gw-prow"), on = !row.classList.contains("more");
