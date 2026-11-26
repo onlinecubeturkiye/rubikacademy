@@ -989,50 +989,62 @@ if ("serviceWorker" in navigator) {
 
 /* YENİ SÜRÜM KONTROLÜ
    Uygulama (WebView) ve ana ekrana eklenen site arka planda günlerce açık kalabiliyor; eski sayfa ve
-   önbellekteki dosyalar yüzünden güncelleme ancak "verileri temizle" ile geliyordu. /version.json
-   (sürüm numarası ?v= ile birlikte artırılır) bu sayfanın sürümünden yeniyse: önbellekler silinir,
-   service worker güncellenir ve sayfa yenilenir (kullanıcı sayfayla uğraşıyorsa "Yenile" düğmesi çıkar). */
+   önbellekteki dosyalar yüzünden güncelleme ancak "verileri temizle" ile geliyordu.
+   /version.json her yayında GitHub Pages tarafından kendiliğinden yazılır (yayınlanan commit kimliği;
+   elle sürüm artırmak gerekmez). Cihaz son gördüğü kimliği saklar; kimlik değişince (yeni PR yayınlandı)
+   bu BİR KEZ işlenir: önbellekler silinir, service worker güncellenir ve uygulamaya / sekmeye geri dönülünce
+   sayfa bir kez yenilenir. Yeni kimlik hemen kaydedildiği için aynı güncelleme bir daha sorulmaz. */
 (function () {
     if (!window.fetch) return;
-    var me = document.querySelector('script[src*="/js/common.js"]'), cur = (/[?&]v=(\d+)/.exec((me && me.src) || "") || [])[1];
-    if (!cur) return;
-    var touched = false, shown = false;
-    var mark = function () { touched = true; };
-    window.addEventListener("pointerdown", mark, true); window.addEventListener("keydown", mark, true);
+    var KEY = "ra-build";
+    function known() { try { return localStorage.getItem(KEY) || ""; } catch (e) { return ""; } }
+    function remember(v) { try { localStorage.setItem(KEY, v); localStorage.removeItem("ra-upd-chk"); } catch (e) {} }
     function clean() {
         var jobs = [];
         try { if (window.caches) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })); } catch (e) {}
         try { if (navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistration().then(function (r) { return r && r.update(); })); } catch (e) {}
         return Promise.all(jobs).catch(function () {});
     }
-    function banner() {
-        if (shown || !document.body) return; shown = true;
-        var el = document.createElement("div"); el.className = "ra-upd ra-noico"; el.setAttribute("role", "status");
-        el.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom));z-index:1200;display:flex;align-items:center;gap:10px;" +
+    // Kullanıcı bir şeyle uğraşıyorsa (yarışma odası, timer, yazı yazıyor) sayfayı yenileme: tek seferlik not göster
+    function busy() {
+        var a = document.activeElement;
+        return !!(document.body && (document.body.classList.contains("c-in-room") || document.body.hasAttribute("data-macro-guard")) ||
+            (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) || document.querySelector(".gw-modal.open, .acc-modal.open"));
+    }
+    function note() {
+        if (!document.body || document.getElementById("raUpd")) return;
+        var el = document.createElement("div"); el.id = "raUpd"; el.className = "ra-upd ra-noico"; el.setAttribute("role", "status");
+        el.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom));z-index:1200;display:flex;align-items:center;gap:8px;" +
             "max-width:calc(100% - 24px);padding:8px 8px 8px 14px;border-radius:14px;background:#17171f;color:#fff;font:700 13.5px Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)";
-        el.innerHTML = '<span>Yeni sürüm hazır</span><button type="button" style="border:0;border-radius:10px;padding:8px 12px;background:#3b6cf6;color:#fff;font:800 13px Inter,system-ui,sans-serif;cursor:pointer">Yenile</button>';
-        el.querySelector("button").onclick = function () { location.reload(); };
+        el.innerHTML = '<span>Yeni sürüm hazır</span><button type="button" data-r style="border:0;border-radius:10px;padding:8px 12px;background:#3b6cf6;color:#fff;font:800 13px Inter,system-ui,sans-serif;cursor:pointer">Yenile</button>' +
+            '<button type="button" data-x aria-label="Kapat" style="border:0;background:none;color:#aaa;font:800 16px Inter,sans-serif;cursor:pointer;padding:4px 6px">✕</button>';
+        el.querySelector("[data-r]").onclick = function () { location.reload(); };
+        el.querySelector("[data-x]").onclick = function () { el.remove(); };
         document.body.appendChild(el);
     }
-    function check(force) {
-        var last = 0; try { last = +(localStorage.getItem("ra-upd-chk") || 0); } catch (e) {}
-        if (!force && Date.now() - last < 5 * 60000) return;
-        try { localStorage.setItem("ra-upd-chk", String(Date.now())); } catch (e) {}
+    var hiddenAt = 0;
+    function check(resumed) {
         fetch("/version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-            var v = d && String(d.v || "");
-            if (!/^\d+$/.test(v) || v.length !== cur.length || v <= cur) return;
-            // aynı sürüm için yalnız bir kez otomatik yenile (sunucu önbelleği henüz eskiyse döngüye girmesin)
-            var done = ""; try { done = sessionStorage.getItem("ra-upd-done") || ""; } catch (e) {}
+            var v = d && d.v != null ? String(d.v).slice(0, 80) : "";
+            if (!v || v.indexOf("{{") >= 0) return;          // yerelde (Jekyll'siz) çalışırken
+            var k = known();
+            if (!k) { remember(v); return; }                  // ilk kez: yalnız kaydet
+            if (v === k) return;                              // güncelleme yok
+            remember(v);                                      // bu güncelleme bir kez işlenir
             clean().then(function () {
-                if (done === v || touched) { banner(); return; }
-                try { sessionStorage.setItem("ra-upd-done", v); } catch (e) {}
-                location.reload();
+                // yeni açılan sayfa zaten sunucudan geldi: yalnız önbellek temizlenir.
+                // uzun süre arka planda kalıp geri dönülen sayfa eski olabilir: bir kez yenilenir
+                if (!resumed) return;
+                if (busy()) note(); else location.reload();
             });
         }).catch(function () {});
     }
-    // açılışta (kısa gecikmeyle) ve uygulamaya / sekmeye geri dönünce
-    setTimeout(function () { check(true); }, 1500);
-    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") check(false); });
+    setTimeout(function () { check(false); }, 1500);
+    document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "hidden") { hiddenAt = Date.now(); return; }
+        // en az 1 dakika arka planda kaldıysa bak (sekme değiştirip dönmelerde her seferinde sorma)
+        if (hiddenAt && Date.now() - hiddenAt > 60000) check(true);
+    });
     window.addEventListener("pageshow", function (e) { if (e.persisted) check(true); });
 })();
 

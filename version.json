@@ -1,1 +1,5 @@
-{"v":"20270133"}
+---
+# Jekyll (GitHub Pages) bu dosyayı her yayında yeniden yazar: v = yayınlanan commit kimliği.
+# Elle değiştirme; js/common.js "YENİ SÜRÜM KONTROLÜ" bunu okur.
+---
+{"v":{{ site.github.build_revision | default: site.time | jsonify }}}
