@@ -274,7 +274,7 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
         "html.ra-app .navbar{min-height:0;padding-bottom:8px;justify-content:center;position:sticky}html.ra-app .nav-logo{gap:10px;margin:0 auto}html.ra-app .nav-logo-mark{width:34px;height:34px}html.ra-app .nav-logo-text{display:inline!important;font-size:19px;font-weight:900;letter-spacing:-.4px}" +
         "html.ra-app .nav-right{position:absolute;right:12px;bottom:8px}" +
         // Uygulama düzeni (telefon): "Geri Dön" düğmesi yerine üst barda geri oku; başlıklar ve boşluklar sıkı
-        "html.ra-app .nav-bar{display:none!important}" +
+        "html.ra-app .nav-bar,html.ra-app .nav-back{display:none!important}" +
         ".ra-back{position:absolute;left:10px;bottom:6px;width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--text,#111);cursor:pointer}" +
         ".ra-back svg{width:24px;height:24px}.ra-back:active{background:color-mix(in srgb,var(--text,#111) 8%,transparent)}" +
         "@media(max-width:899px){" +

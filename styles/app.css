@@ -8,7 +8,7 @@
 
 /* İLK ÇİZİM: <head>'deki kısa betik html.ra-app sınıfını ve bu dosyayı sayfa çizilmeden önce yükler.
    js/common.js sayfa sonunda çalıştığı için, site görünümünün bir an görünmemesi adına temel kurallar burada da var. */
-html.ra-app .nav-links, html.ra-app .nav-bar, html.ra-app #accWrap, html.ra-app footer,
+html.ra-app .nav-links, html.ra-app .nav-bar, html.ra-app .nav-back, html.ra-app #accWrap, html.ra-app footer,
 html.ra-app #btnInstall, html.ra-app .pwa-install, html.ra-app [data-install] { display: none !important; }
 html.ra-app .navbar { min-height: 0; padding-bottom: 8px; justify-content: center; position: sticky; padding-top: max(env(safe-area-inset-top, 0px), 10px); }
 html.ra-native .navbar { padding-top: 10px; }
