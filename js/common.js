@@ -211,7 +211,9 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
     var st = document.createElement("style");
     st.textContent =
         "html.ra-app{-webkit-tap-highlight-color:transparent}" +
-        "html.ra-app-nobar body{overscroll-behavior-y:none}" +
+        // Alt çubuksuz sayfalarda (sanal küp, ZKT timer) aşağı çekip yenileme kapalı. "body{overscroll-behavior-y:none}"
+        // Chrome / uygulama WebView'inde dokunarak kaydırmayı tamamen kilitliyordu → html'de "contain"
+        "html.ra-app-nobar{overscroll-behavior-y:contain}" +
         // uygulama üst barı: logo + ad, ince ve sayfayla aynı zemin (site başlığı gibi durmasın)
         "html.ra-app .navbar{min-height:0;padding-bottom:8px;justify-content:center;position:sticky}html.ra-app .nav-logo{gap:10px;margin:0 auto}html.ra-app .nav-logo-mark{width:34px;height:34px}html.ra-app .nav-logo-text{display:inline!important;font-size:19px;font-weight:900;letter-spacing:-.4px}" +
         "html.ra-app .nav-right{position:absolute;right:12px;bottom:8px}" +

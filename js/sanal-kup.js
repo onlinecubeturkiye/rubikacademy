@@ -7,7 +7,7 @@
    - Son süreler: localStorage "vcube-times-v1"
 ========================================================= */
 (function () {
-    var V = "20270129";
+    var V = "20270130";
     var TIMES_KEY = "vcube-times-v1";
     function $(id) { return document.getElementById(id); }
     function lang() { try { return localStorage.getItem("site-lang") || "tr"; } catch (e) { return "tr"; } }
@@ -104,6 +104,27 @@
         };
         $("vcMsg").hidden = true;
     }
+    // Dokunmatik: küp kütüphanesi küp üstündeki her parmak kaydırmasını engelliyor (kamerayı döndürmek için),
+    // telefonda küp ekranın tamamını kapladığı için sayfa kaydırılamıyordu. Dikey kaydırma artık sayfayı kaydırır;
+    // yatay sürükleme küpü döndürür, dokunma yüzü çevirir.
+    (function () {
+        var st = $("vcStage"), x0 = 0, y0 = 0, mode = "";
+        if (!st) return;
+        st.addEventListener("touchstart", function (e) {
+            if (e.touches.length !== 1) { mode = "multi"; return; }
+            x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; mode = "";
+        }, { capture: true, passive: true });
+        st.addEventListener("touchmove", function (e) {
+            if (mode === "multi" || e.touches.length !== 1) return;
+            if (!mode) {
+                var dx = Math.abs(e.touches[0].clientX - x0), dy = Math.abs(e.touches[0].clientY - y0);
+                if (dx < 6 && dy < 6) return;
+                mode = dy > dx ? "scroll" : "turn";
+            }
+            // kütüphanenin preventDefault'una ulaşmasın: tarayıcı sayfayı kaydırır
+            if (mode === "scroll") e.stopPropagation();
+        }, { capture: true, passive: true });
+    })();
 
     /* ---------- süre ve durum ---------- */
     var mode = "free", t0 = 0, raf = 0, count = 0, scr = "", history = [];
