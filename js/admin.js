@@ -1697,7 +1697,7 @@
             '<h3 class="cp-h3">🏆 Rekor tablosu yönetimi <span class="a-sub" id="aRecCount" style="margin:0"></span></h3>' +
             '<div class="a-ctrl"><button class="a-btn main" id="aRecLoad">↻ Yükle</button><label class="a-note"><input type="checkbox" id="aRecBad" checked> Yalnız şüpheliler</label></div>' +
             '<p class="a-note">Bir süreye dokun → yalnız o süre silinir, kişinin diğer rekorları kalır ve silinen süre geri gelmez. Şüpheli: 3x3 tekil 4 sn, Ao5 5,5 sn, Ao12 6 sn altı; 2x2 tekil 0,6 sn, Ao5 1 sn, Ao12 1,2 sn altı ya da ortalaması tekilinden hızlı olanlar.</p><div id="aRecList" class="a-list"></div>' +
-            '<p class="a-note" style="margin-top:12px">Yarışmalar herkese açık sayfada: <a href="/icerikler/ev-yarismasi" target="_blank" rel="noopener">Ev yarışması</a> · <a href="/icerikler/rekorlar" target="_blank" rel="noopener">Rekor tablosu</a></p></div>' +
+            '<p class="a-note" style="margin-top:12px">Yarışmalar herkese açık sayfada: <a href="/icerikler/ev-yarismasi" target="_blank" rel="noopener">Ev yarışması</a> · <a href="/icerikler/ev-yarismasi#rekorlar" target="_blank" rel="noopener">Rekor tablosu</a></p></div>' +
             '<div class="box"><h2>🔔 Bildirim gönder</h2>' +
             '<div class="bc-form">' +
             '<div class="bc-step"><span class="bc-lbl">1 · Mesaj</span><div class="bc-ta"><textarea id="bcText" maxlength="500" rows="3" placeholder="Ör. Bu akşam 21.00\'de ev yarışması var, kaçırma! 🏠"></textarea><span class="bc-cnt" id="bcCnt">0/500</span></div></div>' +

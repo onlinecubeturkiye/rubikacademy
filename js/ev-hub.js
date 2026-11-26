@@ -65,7 +65,7 @@
         if (mode === "rekor") recs = "";
         el.innerHTML = '<div class="evh ' + mode + '">' + (canClose ? '<button type="button" class="evh-x" aria-label="Kapat (24 saat)" title="24 saat gizle">✕</button>' : '') + '<div class="evh-top"><h2>🏠 Ev Yarışması & Rekorlar<small>' +
             (live.length ? "🔴 Şu an " + live.length + " yarışma canlı" : "Evden canlı küp yarışması: aynı karıştırma, canlı sıralama, final ve sertifika") + '</small></h2>' +
-            '<div class="evh-cta"><a class="evh-btn p" href="/icerikler/ev-yarismasi">' + (live.length ? "▶ Yarışmaya katıl" : "🏠 Yarışmaya katıl") + '</a>' + (mode === "rekor" ? '' : '<a class="evh-btn" href="/icerikler/rekorlar">🥇 Rekor tablosu</a>') + '</div></div>' +
+            '<div class="evh-cta"><a class="evh-btn p" href="/icerikler/ev-yarismasi">' + (live.length ? "▶ Yarışmaya katıl" : "🏠 Yarışmaya katıl") + '</a>' + (mode === "rekor" ? '' : '<a class="evh-btn" href="/icerikler/ev-yarismasi#rekorlar">🥇 Rekor tablosu</a>') + '</div></div>' +
             liveHtml + '<div class="evh-grid">' + recs + champs + '</div></div>';
         var x = el.querySelector(".evh-x");
         if (x) x.onclick = function () {

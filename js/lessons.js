@@ -5,7 +5,7 @@
    (kişisel veri: hesapla senkronlanır, hesapsızken sayfa yenilenince sıfırlanır).
 ========================================================= */
 (function () {
-    var KEY = "lessons-v1", V = "20270131";
+    var KEY = "lessons-v1", V = "20270132";
     var A = "/icerikler/algoritmalar/";
     // demo: { alg, setup: "z2" (sarı üst) | "" (beyaz üst), end: true = case başta görünür, sonda çözülür }
     var COURSE = [
@@ -102,7 +102,7 @@
               learn: ["Ortalama (Ao5) mantığı", "Günlük pratik ve yarışmalar"],
               body: ["Yarışmalarda 5 çözüm yapılır, en iyi ve en kötü atılır, kalan üçün ortalaması (<b>Ao5</b>) alınır.",
                      "Her gün <b>Günün karıştırması</b>nı çöz, ev yarışmalarına katıl, rekorlarını profilinde biriktir."],
-              go: [["🏠 Ev yarışması", "/icerikler/ev-yarismasi"], ["🥇 Rekor tablosu", "/icerikler/rekorlar"]] }
+              go: [["🏠 Ev yarışması", "/icerikler/ev-yarismasi"], ["🥇 Rekor tablosu", "/icerikler/ev-yarismasi#rekorlar"]] }
         ] }
     ];
     var ALL = []; COURSE.forEach(function (c, ci) { c.lessons.forEach(function (l) { l.ci = ci; ALL.push(l); }); });

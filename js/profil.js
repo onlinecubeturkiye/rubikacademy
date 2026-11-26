@@ -64,7 +64,7 @@
       var pb = c.pb[e[0]];
       return '<div class="p-pb-row"><b>' + e[1] + '</b><span>Tekil <i dir="ltr">' + fmt(pb.s) + '</i></span><span>Ao5 <i dir="ltr">' + fmt(pb.a5) + '</i></span><span>Ao12 <i dir="ltr">' + fmt(pb.a12) + '</i></span></div>';
     }).join("") + "</div>";
-    html += '<p class="p-note" style="margin-top:10px"><a href="/icerikler/rekorlar" style="color:var(--ui-accent);font-weight:800">🥇 Rekor tablosu →</a></p>';
+    html += '<p class="p-note" style="margin-top:10px"><a href="/icerikler/ev-yarismasi#rekorlar" style="color:var(--ui-accent);font-weight:800">🥇 Rekor tablosu →</a></p>';
     var list = c.list || [], groups = groupComps(list);
     // Sertifikalar: final ilk 3 (yalnız kendi profilinde indirilebilir; başkasının profilinde rozet olarak görünür)
     var certs = groups.map(function (g) { var f = g.rounds.filter(function (e) { return e.f && !e.pd && e.rk >= 1 && e.rk <= 3; })[0]; return f ? { g: g, e: f } : null; }).filter(Boolean);
