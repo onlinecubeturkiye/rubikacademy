@@ -442,6 +442,107 @@
         var g = {}; xs.forEach(function (x) { if (why[x.uid]) (g[find(x.uid)] = g[find(x.uid)] || []).push(x); });
         return Object.keys(g).map(function (k) { return g[k].sort(function (p, q) { return (p.ts || 0) - (q.ts || 0); }); }).filter(function (a) { return a.length > 1; }).map(function (a) { a.why = why; return a; });
     }
+    // "farklı kişiler" diye işaretlenen gruplar bu cihazda bir daha gösterilmez
+    function grpKey(a) { return a.map(function (y) { return y.uid; }).sort().join(","); }
+    function notDup(gid) { try { return JSON.parse(localStorage.getItem("ra-gw-nd:" + gid) || "{}") || {}; } catch (e) { return {}; } }
+    function setNotDup(gid, k) { var o = notDup(gid); o[k] = 1; try { localStorage.setItem("ra-gw-nd:" + gid, JSON.stringify(o)); } catch (e) {} }
+    // gizli hesap bilgisi (e-posta, giriş türü, cihaz): yalnız site sahibi okuyabilir
+    function provName(p) { return p === "google.com" ? "Google" : p === "password" ? "E-posta/şifre" : p === "apple.com" ? "Apple" : (p || ""); }
+    function loadMeta(uids) {
+        S.meta = S.meta || {};
+        var need = uids.filter(function (u) { return !isM(u) && !S.meta[u]; });
+        if (!need.length || !isOwner()) return Promise.resolve(S.meta);
+        return batchGet(need.map(function (u) { return "/users/" + u + "/meta/self"; })).then(function (d) {
+            need.forEach(function (u) { var x = d["/users/" + u + "/meta/self"]; S.meta[u] = x ? dec(x) : { none: 1 }; });
+            return S.meta;
+        }, function () { return S.meta; });
+    }
+    function metaHtml(uid) {
+        if (isM(uid)) return '<span>✋ Hesapsız (elle eklendi)</span>';
+        if (!isOwner()) return '<span>🔒 E-posta ve cihaz yalnız site sahibine görünür</span>';
+        var m = (S.meta || {})[uid];
+        if (!m) return '<span>⏳ Hesap bilgisi yükleniyor…</span>';
+        if (m.none) return '<span>❓ Hesap bilgisi yok</span>';
+        var o = [];
+        if (m.email) o.push('<span class="gw-dpmail" data-same="m:' + esc(String(m.email).toLowerCase()) + '">✉️ ' + esc(m.email) + '</span>');
+        if (m.provider) o.push('<span>🔑 ' + esc(provName(m.provider)) + '</span>');
+        if (m.dev) o.push('<span data-same="v:' + esc(m.dev) + '">💻 ' + esc(m.dev) + '</span>');
+        return o.join("") || '<span>❓ Hesap bilgisi yok</span>';
+    }
+    // aynı gruptaki kişilerde ortak çıkan değerleri (cihaz, e-posta vb.) turuncu göster
+    function markSame(root) {
+        Array.prototype.forEach.call(root.querySelectorAll(".gw-dup"), function (grp) {
+            var c = {}, els = grp.querySelectorAll("[data-same]");
+            Array.prototype.forEach.call(els, function (e) { var k = e.getAttribute("data-same"); c[k] = (c[k] || 0) + 1; });
+            Array.prototype.forEach.call(els, function (e) { e.classList.toggle("same", c[e.getAttribute("data-same")] > 1); });
+        });
+    }
+    // 📱 Aynı kişi kontrolü: her kişinin bilgileri, onay / ret ve çıkarma seçimi tek pencerede
+    function dupBox(g, dupG, maybe) {
+        var pick = {};
+        var stOf = function (u) { var v = revOf(u); return v === "ok" ? '<span class="gw-dpst ok">✅ Onaylı</span>' : v === "no" ? '<span class="gw-dpst no">❌ Uygun değil</span>' : '<span class="gw-dpst">⏳ Bekliyor</span>'; };
+        var card = function (y, tag, out, why) {
+            var c = (S.chk || {})[y.uid] || {}, u = c.u || {}, st = c.st || {}, it = [];
+            if (out) pick[y.uid] = 1;
+            if (why) it.push('<span class="why">🧩 ' + esc(why) + '</span>');
+            it.push('<span>🕒 Katıldı: ' + esc(dtS(y.ts)) + '</span>');
+            if (u.joined) it.push('<span>🆕 Hesap: ' + esc(dtS(u.joined)) + (y.ts && y.ts >= u.joined ? ' (' + age(y.ts - u.joined) + ' önce)' : '') + '</span>');
+            if (u.seen) it.push('<span>👁 Son görülme: ' + esc(dtS(u.seen)) + '</span>');
+            var act = (+st.solves || 0), kn = (+st.known || 0);
+            if (c.u) it.push('<span>📊 ' + act + ' çözüm · ' + kn + ' algoritma</span>');
+            if (devOf(y)) it.push('<span data-same="d:' + esc(devOf(y)) + '">📱 Cihaz kimliği ' + esc(devOf(y).slice(0, 6)) + '</span>');
+            if (fpOf(y)) it.push('<span data-same="f:' + esc(fpOf(y)) + '">🧬 Cihaz özeti ' + esc(fpOf(y)) + '</span>');
+            return '<div class="gw-dp' + (out ? ' x' : '') + '" data-dp="' + esc(y.uid) + '">' +
+                '<div class="gw-dph"><span class="gw-tag ' + (out ? 'out' : 'keep') + '">' + tag + '</span><a' + (isM(y.uid) ? '' : ' href="/icerikler/profil?u=' + encodeURIComponent(y.uid) + '" target="_blank" rel="noopener"') + '>' + esc(y.name || "Cuber") + '</a></div>' +
+                '<div class="gw-dpi">' + it.join("") + '<span class="gw-dpm" data-mt="' + esc(y.uid) + '">' + metaHtml(y.uid) + '</span></div>' +
+                '<div class="gw-dpa">' + (y.m ? stOf(y.uid) : '<div class="gw-dprv"><button type="button" class="ok' + (revOf(y.uid) === "ok" ? " on" : "") + '" data-dv="ok" data-u="' + esc(y.uid) + '">✓ Onayla</button><button type="button" class="no' + (revOf(y.uid) === "no" ? " on" : "") + '" data-dv="no" data-u="' + esc(y.uid) + '">✗ Uygun değil</button></div>') +
+                '<label class="gw-dpo"><input type="checkbox" data-mb="' + esc(y.uid) + '"' + (out ? ' checked' : '') + '> Çıkar</label></div></div>';
+        };
+        var all = [];
+        dupG.forEach(function (a) { all = all.concat(a); }); maybe.forEach(function (a) { all = all.concat(a); });
+        var okTxt = function () { var n = Object.keys(pick).length; return n ? "🗑 " + n + " hesabı çıkar" : "Çıkarılacak hesap seçilmedi"; };
+        var p = askBox("📱 Aynı kişi kontrolü",
+            '<p class="gw-note">Her kişinin bilgilerine bak; uygunsa <b>✓ Onayla</b>, aynı kişiyse <b>Çıkar</b>\'ı işaretle. Gruptaki kişilerde <span class="gw-samek">ortak çıkan</span> bilgiler turuncu görünür.</p>' +
+            (dupG.length ? '<div class="gw-dups"><h5>📱 Kesin: aynı cihazdan katılmış</h5><p class="gw-note" style="margin:0">Her cihazdan ilk katılan kalır, diğerleri çıkarılmak üzere işaretli. İstersen değiştir.</p>' +
+                dupG.map(function (a) { return '<div class="gw-dup">' + card(a[0], "✓ İlk katılan", false) + a.slice(1).map(function (y) { return card(y, "✕ Aynı cihaz", true); }).join("") + '</div>'; }).join("") + '</div>' : '') +
+            (maybe.length ? '<div class="gw-dups"><h5>🧩 Kontrol et (kesin değil)</h5><p class="gw-note" style="margin:0">Farklı tarayıcıdan, uygulamadan ya da verileri silip yeniden katılmış olabilir.</p>' +
+                maybe.map(function (a, i) { return '<div class="gw-dup maybe" data-grp="' + i + '">' + card(a[0], "İlk katılan", false, a.why[a[0].uid]) + a.slice(1).map(function (y) { return card(y, "Sonra katılan", false, a.why[y.uid]); }).join("") +
+                    '<button type="button" class="btn sm gw-ndb" data-nd="' + i + '">👥 Farklı kişiler, hepsini onayla</button></div>'; }).join("") + '</div>' : ''),
+            okTxt(), true);
+        var m = $("gwModal"), okB = $("gwAskOk"); if (!m || !okB) return;
+        m.querySelector(".gw-mbox").classList.add("gw-dupbox");
+        if ($("gwAskNo")) $("gwAskNo").textContent = "Kapat";
+        var sync = function () { okB.textContent = okTxt(); okB.disabled = !Object.keys(pick).length; };
+        var paintRv = function (u) { Array.prototype.forEach.call(m.querySelectorAll('[data-dv][data-u="' + u + '"]'), function (b) { b.classList.toggle("on", revOf(u) === b.getAttribute("data-dv")); }); };
+        sync(); markSame(m);
+        Array.prototype.forEach.call(m.querySelectorAll("[data-mb]"), function (cb) {
+            cb.onchange = function () { var u = cb.getAttribute("data-mb"); if (cb.checked) pick[u] = 1; else delete pick[u]; var c = cb.closest(".gw-dp"); if (c) c.classList.toggle("x", cb.checked); sync(); };
+        });
+        Array.prototype.forEach.call(m.querySelectorAll("[data-dv]"), function (b) {
+            b.onclick = function () {
+                var u = b.getAttribute("data-u"), v = b.getAttribute("data-dv");
+                if (revOf(u) === v) clearRev(u); else setRev(u, v);
+                // onaylanan kişi çıkarılmaz
+                if (v === "ok" && revOf(u) === "ok") { var cb = m.querySelector('[data-mb="' + u + '"]'); if (cb && cb.checked) { cb.checked = false; cb.onchange(); } }
+                paintRv(u); paintCheck();
+            };
+        });
+        Array.prototype.forEach.call(m.querySelectorAll("[data-nd]"), function (b) {
+            b.onclick = function () {
+                var a = maybe[+b.getAttribute("data-nd")]; if (!a) return;
+                a.forEach(function (y) { var cb = m.querySelector('[data-mb="' + y.uid + '"]'); if (cb && cb.checked) { cb.checked = false; cb.onchange(); } if (!y.m && revOf(y.uid) !== "ok") setRev(y.uid, "ok"); paintRv(y.uid); });
+                setNotDup(g.id, grpKey(a));
+                var grp = b.closest(".gw-dup"); if (grp) { grp.classList.add("done"); b.disabled = true; b.textContent = "✓ Farklı kişiler olarak işaretlendi"; }
+                paintCheck();
+            };
+        });
+        loadMeta(all.map(function (y) { return y.uid; })).then(function () {
+            if (!m.classList.contains("open")) return;
+            Array.prototype.forEach.call(m.querySelectorAll("[data-mt]"), function (e) { e.innerHTML = metaHtml(e.getAttribute("data-mt")); });
+            markSame(m);
+        });
+        p.then(function (ok) { var u = Object.keys(pick); if (ok && u.length) removeMany(u); });
+    }
     function remember(g) { try { var j = JSON.parse(localStorage.getItem("ra-gw-joined") || "{}") || {}; j[g.id] = g.drawAt; localStorage.setItem("ra-gw-joined", JSON.stringify(j)); } catch (e) {} }
     function localJoined(id) { try { return !!(JSON.parse(localStorage.getItem("ra-gw-joined") || "{}") || {})[id]; } catch (e) { return false; } }
     function forget(g) { try { var j = JSON.parse(localStorage.getItem("ra-gw-joined") || "{}") || {}; delete j[g.id]; localStorage.setItem("ra-gw-joined", JSON.stringify(j)); } catch (e) {} }
@@ -1088,7 +1189,7 @@
     function paintCheck() {
         var g = S.g, box = $("gwChk"); if (!g || !box) return;
         var l = S.entries || [], tab = S.tab || "all";
-        S.maybe = maybeSame(l);
+        var nd = notDup(g.id); S.maybe = maybeSame(l).filter(function (a) { return !nd[grpKey(a)]; });
         var rows = l.map(function (x) { return { x: x, f: flagsOf(x, l).filter(function (t) { return t[0] !== "star"; }), s: flagsOf(x, l).filter(function (t) { return t[0] === "star"; }), v: revOf(x.uid) }; });
         var n = { all: rows.length, wait: 0, ok: 0, no: 0, sus: 0, wa: 0, wawait: 0 };
         rows.forEach(function (r) { n[r.v || "wait"]++; if (r.f.some(function (t) { return t[0] !== "new"; })) n.sus++; if (bonusUp(r.x)) { n.wa++; if ([0, 1].some(function (i) { return hasBk(r.x, i) && !revB(r.x.uid, BK[i]); })) n.wawait++; } });
@@ -1154,23 +1255,7 @@
         if ($("gwRev")) $("gwRev").onclick = function () { review(null, "yt"); };
         if ($("gwRevWa")) $("gwRevWa").onclick = function () { review(null, "wa"); };
         $("gwReChk").onclick = function () { this.disabled = true; this.textContent = "Yenileniyor…"; checkPeople(true); };
-        if ($("gwDupOut")) $("gwDupOut").onclick = function () {
-            var nm = function (y, cls, tag) { return '<div class="' + cls + '"><span class="gw-tag">' + tag + '</span><b>' + esc(y.name || "Cuber") + '</b><small>' + esc(dtS(y.ts)) + '</small></div>'; };
-            var pick = {};
-            var chk = function (y, why) { return '<div class="x maybe"><label class="chk"><input type="checkbox" data-mb="' + esc(y.uid) + '"><span style="flex:1;min-width:0"><b style="display:block">' + esc(y.name || "Cuber") + '</b><span class="why">' + esc(why || "") + '</span></span><small>' + esc(dtS(y.ts)) + '</small></label></div>'; };
-            var okTxt = function () { var n = extra.length + Object.keys(pick).length; return n ? n + " hesabı çıkar" : "Çıkarılacak hesap yok"; };
-            var p = askBox("📱 Aynı kişi kontrolü",
-                (dupG.length ? '<p class="gw-note"><b>Kesin:</b> bu hesaplar aynı cihazdan katılmış. Her cihazdan <b>ilk katılan kalır</b>, diğerleri çıkarılır.</p><div class="gw-dups">' +
-                    dupG.map(function (a) { return '<div class="gw-dup">' + nm(a[0], "k", "✓ Kalır") + a.slice(1).map(function (y) { return nm(y, "x", "✕ Çıkar"); }).join("") + '</div>'; }).join("") + '</div>' : '') +
-                (maybe.length ? '<div class="gw-dups"><h5>🧩 Kontrol et (kesin değil)</h5><p class="gw-note" style="margin:0">Farklı tarayıcıdan, uygulamadan ya da verileri silip yeniden katılmış olabilir. Aynı kişiyse çıkarılacakları işaretle.</p>' +
-                    maybe.map(function (a) { return '<div class="gw-dup maybe">' + nm(a[0], "k", "İlk katılan") + a.slice(1).map(function (y) { return chk(y, a.why[y.uid]); }).join("") + '</div>'; }).join("") + '</div>' : ''),
-                okTxt(), true);
-            var okB = $("gwAskOk"); okB.disabled = !extra.length;
-            Array.prototype.forEach.call(document.querySelectorAll("[data-mb]"), function (cb) {
-                cb.onchange = function () { var u = cb.getAttribute("data-mb"); if (cb.checked) pick[u] = 1; else delete pick[u]; okB.textContent = okTxt(); okB.disabled = !(extra.length + Object.keys(pick).length); };
-            });
-            p.then(function (ok) { if (ok) removeMany(extra.map(function (x) { return x.uid; }).concat(Object.keys(pick))); });
-        };
+        if ($("gwDupOut")) $("gwDupOut").onclick = function () { dupBox(g, dupG, maybe); };
         Array.prototype.forEach.call(box.querySelectorAll("[data-out]"), function (b) {
             b.onclick = function () {
                 var uid = b.getAttribute("data-out"), x = l.filter(function (y) { return y.uid === uid; })[0];
