@@ -258,7 +258,7 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
     // sayfanın <head>'i app.css'i erken yüklediyse (ilk açılışta site görünümü yanıp sönmesin) tekrar ekleme
     if (!document.querySelector('link[href^="/styles/app.css"]')) { var ln = document.createElement("link"); ln.rel = "stylesheet"; ln.href = "/styles/app.css"; (document.head || d).appendChild(ln); }
     var path = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
-    var noBar = /\/(zkttimer|sanal-kup|giris)$|\/algoritmalar\/yazdir|\/kup-arena\//.test(path);
+    var noBar = /\/(sanal-kup|giris)$|\/algoritmalar\/yazdir|\/kup-arena\//.test(path);
     if (noBar) d.classList.add("ra-app-nobar");
     // Android uygulaması (RAAppNative) sistem çubuklarının boşluğunu zaten kendisi bırakıyor (MainActivity);
     // WebView env(safe-area-inset-*) değerini yine de verdiği için boşluk iki kat oluyordu → uygulamada 0
@@ -314,7 +314,7 @@ try { if (!localStorage.getItem("ra-zkt1")) { localStorage.setItem("ra-zkt1", "1
     var ic = function (p) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; };
     var TABS = [
         ["/", "Ana Sayfa", ic('<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>'), /^\/$/],
-        ["/icerikler", "İçerikler", ic('<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>'), /^\/icerikler$|^\/icerikler\/(algoritmalar(?!\/antrenor)|videolar|kup-rehberi|cozucu|akilli-kup|yol-haritasi|dersler|keyhole|sss|cekilis)/],
+        ["/icerikler", "İçerikler", ic('<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>'), /^\/icerikler$|^\/icerikler\/(algoritmalar(?!\/antrenor)|videolar|kup-rehberi|cozucu|akilli-kup|yol-haritasi|dersler|keyhole|sss|cekilis|zkttimer)/],
         ["/icerikler/algoritmalar/antrenor", "Antrenör", ic('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>'), /antrenor/],
         ["/icerikler/ev-yarismasi", "Yarışma", ic('<path d="M8 4h8v4.5a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a2.5 2.5 0 0 0 3 4M16 5.5h3a2.5 2.5 0 0 1-3 4"/><path d="M12 12.5V16M8.5 20h7M10 16h4v4h-4z"/>'), /ev-yarismasi|rekorlar/],
         ["/icerikler/profil", "Profil", ic('<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>'), /profil|ayarlar/]
