@@ -858,7 +858,7 @@ var SITE_I18N = {
 
         zkttimer: {
             tr: {
-                navBack: "← Ana Sayfa",
+                back_btn: "← Geri Dön",
                 badge: "Yeni · ZKT Timer",
                 heroP: "Türkiye'nin en kapsamlı küp zamanlayıcısı. Sürelerini kaydet, istatistiklerini takip et ve arkadaşlarınla online küp çöz — web, Android ve iOS'ta senin cebinde.",
                 linkSiteSmall: "Tarayıcıda Aç",
@@ -878,7 +878,7 @@ var SITE_I18N = {
                 feature3P: "Online odalar oluştur, arkadaşlarını davet et ve gerçek zamanlı olarak küp çöz."
             },
             en: {
-                navBack: "← Home",
+                back_btn: "← Go Back",
                 badge: "New · ZKT Timer",
                 heroP: "Turkey's most comprehensive cube timer. Log your times, track your stats, and solve cubes online with your friends — with you on web, Android and iOS.",
                 linkSiteSmall: "Open in Browser",
@@ -898,7 +898,7 @@ var SITE_I18N = {
                 feature3P: "Create online rooms, invite your friends, and solve cubes together in real time."
             },
             fr: {
-                navBack: "← Accueil",
+                back_btn: "← Retour",
                 badge: "Nouveau · ZKT Timer",
                 heroP: "Le chronomètre de cube le plus complet de Turquie. Enregistre tes temps, suis tes statistiques et résous des cubes en ligne avec tes amis — sur le web, Android et iOS, directement dans ta poche.",
                 linkSiteSmall: "Ouvrir dans le navigateur",
@@ -918,7 +918,7 @@ var SITE_I18N = {
                 feature3P: "Crée des salles en ligne, invite tes amis et résolvez des cubes ensemble en temps réel."
             },
             ru: {
-                navBack: "← Главная",
+                back_btn: "← Назад",
                 badge: "Новое · ZKT Timer",
                 heroP: "Самый полнофункциональный таймер для кубика в Турции. Сохраняй время, отслеживай статистику и собирай кубик онлайн с друзьями — на сайте, Android и iOS.",
                 linkSiteSmall: "Открыть в браузере",
@@ -938,7 +938,7 @@ var SITE_I18N = {
                 feature3P: "Создавай онлайн-комнаты, приглашай друзей и собирай кубик в реальном времени вместе."
             },
             de: {
-                navBack: "← Startseite",
+                back_btn: "← Zurück",
                 badge: "Neu · ZKT Timer",
                 heroP: "Der umfangreichste Würfel-Timer der Türkei. Speichere deine Zeiten, verfolge deine Statistiken und löse Würfel online mit deinen Freunden — im Web, auf Android und iOS.",
                 linkSiteSmall: "Im Browser öffnen",
@@ -958,7 +958,7 @@ var SITE_I18N = {
                 feature3P: "Erstelle Online-Räume, lade deine Freunde ein und löst Würfel in Echtzeit gemeinsam."
             },
             ar: {
-                navBack: "الرئيسية ←",
+                back_btn: "→ رجوع",
                 badge: "جديد · ZKT Timer",
                 heroP: "أشمل ساعة توقيت لمكعب روبيك في تركيا. سجّل أوقاتك، تابع إحصائياتك، وحلّ المكعب أونلاين مع أصدقائك — على الموقع وأندرويد و iOS.",
                 linkSiteSmall: "افتح في المتصفح",
