@@ -56,6 +56,29 @@
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity>
 
+        <receiver android:name=".GiveawayWidget" android:exported="false" android:label="@string/w_gift">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_giveaway_info" />
+        </receiver>
+        <receiver android:name=".CompWidget" android:exported="false" android:label="@string/w_comp">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_comp_info" />
+        </receiver>
+        <receiver android:name=".TimerWidget" android:exported="false" android:label="@string/w_timer">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="fun.rubikacademy.app.TIMER_TOGGLE" />
+                <action android:name="fun.rubikacademy.app.TIMER_RESET" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_timer_info" />
+        </receiver>
+        <!-- Timer widget'ındaki süreleri JSON olarak paylaşır (görünmez) -->
+        <activity android:name=".TimerExportActivity" android:exported="false" android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <!-- Ana ekran widget'ı (hızlı bağlantılar) -->
         <receiver android:name=".QuickWidget" android:exported="false" android:label="@string/app_name">
             <intent-filter>
