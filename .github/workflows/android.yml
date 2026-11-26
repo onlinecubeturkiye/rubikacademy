@@ -1,5 +1,8 @@
-# Android uygulaması (TWA) derlemesi: imzasız APK + AAB üretir ve "android-build" dalına koyar.
-# İmzalama, depo herkese açık olduğu için anahtar burada tutulmadan ayrıca yapılır.
+# Android uygulaması derlemesi: APK + AAB üretir ve "android-build" dalına koyar.
+# İmza: yükleme anahtarı depoda DEĞİL, GitHub "Actions secrets" içinde durur (depo herkese açık olsa da gizli kalır):
+#   RA_UPLOAD_KEYSTORE_B64 (keystore dosyasının base64'ü), RA_UPLOAD_STORE_PASS, RA_UPLOAD_KEY_ALIAS, RA_UPLOAD_KEY_PASS
+# Bunlar tanımlıysa Play'e doğrudan yüklenebilecek imzalı dosyalar da üretilir (rubikacademy-signed.aab / .apk);
+# tanımlı değilse eskisi gibi yalnız imzasız dosyalar çıkar.
 name: Android derlemesi
 on:
   workflow_dispatch:
@@ -39,6 +42,24 @@ jobs:
           "$BT/zipalign" -f -p 4 android/app/build/outputs/apk/release/app-release-unsigned.apk out/rubikacademy-unsigned.apk
           cp android/app/build/outputs/bundle/release/app-release.aab out/rubikacademy-unsigned.aab
           cp "$BT/lib/apksigner.jar" out/apksigner.jar
+          ls -la out
+      - name: İmzala (yükleme anahtarı tanımlıysa)
+        env:
+          KS_B64: ${{ secrets.RA_UPLOAD_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.RA_UPLOAD_STORE_PASS }}
+          KEY_ALIAS: ${{ secrets.RA_UPLOAD_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.RA_UPLOAD_KEY_PASS }}
+        run: |
+          if [ -z "$KS_B64" ] || [ -z "$KS_PASS" ] || [ -z "$KEY_ALIAS" ]; then echo "Yükleme anahtarı tanımlı değil: yalnız imzasız dosyalar."; exit 0; fi
+          BT="$ANDROID_HOME/build-tools/36.0.0"
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          export KP="${KEY_PASS:-$KS_PASS}"
+          cp out/rubikacademy-unsigned.aab out/rubikacademy-signed.aab
+          jarsigner -sigalg SHA256withRSA -digestalg SHA-256 -keystore "$RUNNER_TEMP/upload.jks" -storepass "$KS_PASS" -keypass "$KP" out/rubikacademy-signed.aab "$KEY_ALIAS"
+          "$BT/apksigner" sign --ks "$RUNNER_TEMP/upload.jks" --ks-pass env:KS_PASS --ks-key-alias "$KEY_ALIAS" --key-pass env:KP --out out/rubikacademy-signed.apk out/rubikacademy-unsigned.apk
+          rm -f "$RUNNER_TEMP/upload.jks"
+          jarsigner -verify out/rubikacademy-signed.aab | tail -1
+          "$BT/apksigner" verify out/rubikacademy-signed.apk && echo "İmzalı dosyalar hazır."
           ls -la out
       - name: android-build dalına koy
         run: |
