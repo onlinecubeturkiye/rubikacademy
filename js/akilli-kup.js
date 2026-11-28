@@ -8,7 +8,7 @@
 ========================================================= */
 (function () {
     var DNF = 99999999;
-    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270139";
+    var LIB_URL = "/js/vendor/smartcube-bluetooth.min.js?v=20270140";
     var MAC_KEY = "trainer-bt-mac-v1", HIST_KEY = "smart-solves-v1";
     var FACES = "URFDLB";
     function $(id) { return document.getElementById(id); }
@@ -382,6 +382,12 @@
         if (a.some(function (x) { return x >= DNF; })) return DNF;
         return a.reduce(function (x, y) { return x + y; }, 0) / a.length;
     }
+    // Ao12 finalinde art arda her 5 çözümün Ao5'i: en iyisi (DNF'li pencereler sayılmaz)
+    function bestAo5(t) {
+        var best = null;
+        for (var i = 0; i + 5 <= t.length; i++) { var a = avgOf(t.slice(i, i + 5), 5); if (a != null && a < DNF && (best == null || a < best)) best = a; }
+        return best;
+    }
     function clip(s, n) { s = String(s || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
     function roundRect(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
     function closeFinal() { $("akFinal").classList.remove("show"); }
@@ -538,7 +544,13 @@
             compDone(DNF); cMsg("");
             return;
         }
-        if (isHost() && waited > SLOT_MS + 6000 && !comp.dnfBusy) {
+        if (isHost() && waited > SLOT_MS + 6000) dnfLate();
+    }
+    // Bu çözümü henüz girmemiş yarışmacılara DNF yaz (süre dolunca kendiliğinden; organizatör "Atla" ile hemen)
+    function dnfLate() {
+        if (!comp || !comp.doc || comp.doc.st !== "run" || comp.dnfBusy) return;
+        var k = syncInfo().min; if (k >= NS()) return;
+        {
             var late = comp.players.filter(function (p) { return p.uid !== comp.uid && eligible(p.uid) && timesOf(p).length === k; });
             if (!late.length) return;
             comp.dnfBusy = true;
@@ -554,6 +566,11 @@
                 });
             })).then(function () { comp && (comp.dnfBusy = false); compPoll(); }, function () { comp && (comp.dnfBusy = false); });
         }
+    }
+    function lateList() {
+        if (!comp || !comp.doc || comp.doc.st !== "run") return [];
+        var si = syncInfo(), k = si.min; if (k >= NS() || !si.counts.some(function (c) { return c > k; })) return [];
+        return comp.players.filter(function (p) { return eligible(p.uid) && (p.uid === comp.uid && !comp.watch ? myTimes().length : timesOf(p).length) === k && p.uid !== comp.uid; });
     }
     function scrList() { return String((comp && comp.doc && comp.doc.scr) || "").split("|").filter(Boolean); }
     // Turdaki çözüm sayısı = karıştırma sayısı: normal turlar 5 (Ao5), istenirse final 12 (Ao12)
@@ -1346,6 +1363,7 @@
             var k = comp.code + ":" + r.n, old = st.r[k] || {};
             st.r[k] = { nm: String(d.name || "").slice(0, 40), ev: d.ev === "222" ? "222" : "333", n: rS(r), s: ok.length ? Math.min.apply(null, ok) : null, a: row.a != null && row.a < DNF ? Math.round(row.a) : null, rk: i + 1, p: r.rows.length, f: r.f ? 1 : 0, t: (row.t || []).slice(0, 12).map(function (x) { return x >= DNF ? -1 : Math.round(x); }), ts: old.ts || Date.now() };
             // onay (double check): admin onaylayana kadar rekorlara / profile işlenmez
+            if (rS(r) === 12) { var b5 = bestAo5(row.t || []); if (b5 != null) st.r[k].b5 = Math.round(b5); }
             var okv = d.ok === 1 ? 1 : d.ok === -1 ? -1 : old.ok; if (okv != null) st.r[k].ok = okv;
             if (!st.rooms[comp.code]) st.rooms[comp.code] = st.r[k].ts;
         });
@@ -1565,7 +1583,15 @@
         var left = slotLeft();
         if (left == null && d.st === "run" && player && si.min < NS() && n <= si.min && comp.editIdx == null) h += '<div class="c-cd">⏱ İlk süre girilince 1:30 geri sayım başlar</div>';
         if (left != null && d.st === "run" && player) { var sec = Math.max(0, Math.ceil(left / 1000)); h += '<div class="c-cd' + (sec <= 20 ? " warn" : "") + '">⏱ ' + Math.floor(sec / 60) + ':' + ("0" + sec % 60).slice(-2) + (sec ? ' · süre girmezsen <b>DNF</b>' : ' · süre doldu, DNF yazılıyor') + '</div>'; }
+        // Organizatör: bu çözümü girmeyenleri beklemeden geç (onlara DNF yazılır)
+        var lt = isHost() ? lateList() : [];
+        if (lt.length) h += '<button type="button" class="btn sm c-skip" id="cSkip" title="' + esc(lt.map(function (p) { return p.name; }).join(", ")) + '">⏭ Bekleyenleri atla (' + lt.length + ' kişi DNF)</button>';
         box.innerHTML = h;
+        if ($("cSkip")) $("cSkip").onclick = function () {
+            var l = lateList(); if (!l.length) return;
+            if (!confirm(l.map(function (p) { return p.name; }).join(", ") + " bu çözümü girmedi. Atlansın mı? Onlara bu çözüm için DNF yazılır.")) return;
+            this.disabled = true; dnfLate();
+        };
         if ($("cGoNow")) $("cGoNow").onclick = function () { this.disabled = true; checkPrep(true); };
         var c = $("cEditCancel"); if (c) c.onclick = function () { comp.editIdx = null; renderComp(); };
         // üst: büyük karıştırma + görsel
@@ -1616,6 +1642,9 @@
         var tHtml = rows.length ? '<table class="c-grid-t"><thead><tr><th class="c-rl">#</th>' + headCells + '</tr></thead><tbody>' +
             line("SIRA", "c-rank", function (r) { return r.a == null ? "-" : (rows.indexOf(r) + 1) + "."; }) +
             line("AO" + NS(), "c-avg", function (r) { return '<b class="' + (bestAo != null && r.a === bestAo ? "best" : "") + '">' + (r.a == null ? "-" : fmt(r.a)) + "</b>"; }) +
+            // Ao12 finalinde: son 5 çözümün Ao5'i ve şimdiye kadarki en iyi Ao5 (en iyisi Ao5 rekoru olarak sayılır)
+            (NS() === 12 ? line("SON AO5", "c-avg5", function (r) { var t = r.t.filter(function (x) { return x != null; }), a = t.length >= 5 ? avgOf(t.slice(-5), 5) : null; return a == null ? "-" : fmt(a); }) +
+                line("EN İYİ AO5", "c-avg5", function (r) { var b = bestAo5(r.t.filter(function (x) { return x != null; })); return b == null ? "-" : "<b>" + fmt(b) + "</b>"; }) : "") +
             slotsArr().filter(function (i) { return i <= cur || rows.some(function (r) { return r.t[i] != null; }); }).map(function (i) {
                 return line(String(i + 1), i === cur ? "cur" : "", function (r) {
                     var x = r.t[i]; if (x == null) return i === cur ? '<span class="c-wait">…</span>' : "-";

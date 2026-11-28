@@ -1412,6 +1412,46 @@
         var a = []; Array.prototype.forEach.call(document.querySelectorAll("." + px + "Ask"), function (c) { if (c.checked) a.push(c.value); });
         return { ask: a.join(","), askQ: $(px + "AskQ").value.trim().slice(0, 80) };
     }
+    // Görseli dosyadan seç: telefonda küçültülüp sıkıştırılır (en çok 800 px, webp/jpeg) ve çekiliş belgesine gömülür
+    function compressImg(file) {
+        return new Promise(function (res, rej) {
+            if (!file || !/^image\//.test(file.type)) return rej(new Error("Görsel dosyası seç."));
+            var u = URL.createObjectURL(file), im = new Image();
+            im.onload = function () {
+                URL.revokeObjectURL(u);
+                var tries = [[800, .82], [640, .75], [480, .7]], out = "";
+                for (var i = 0; i < tries.length; i++) {
+                    var k = Math.min(1, tries[i][0] / Math.max(im.width, im.height)), c = document.createElement("canvas");
+                    c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+                    c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+                    out = c.toDataURL("image/webp", tries[i][1]); if (out.indexOf("data:image/webp") !== 0) out = c.toDataURL("image/jpeg", tries[i][1]);
+                    if (out.length <= 160000) break;
+                }
+                out.length <= 160000 ? res(out) : rej(new Error("Görsel çok büyük, daha küçük bir görsel seç."));
+            };
+            im.onerror = function () { URL.revokeObjectURL(u); rej(new Error("Görsel açılamadı.")); };
+            im.src = u;
+        });
+    }
+    // Görsel alanı: internetten bağlantı ya da dosyadan seç (önizlemeli)
+    function imgFieldHtml(pre, cur) {
+        var link = cur && /^https:\/\//.test(cur) ? cur : "";
+        return '<div class="gw-f"><span>Kendi görselin (isteğe bağlı, hazır görselin yerine)</span><div class="gw-imgf">' +
+            '<input id="' + pre + 'Img" maxlength="500" value="' + esc(link) + '" placeholder="İnternetten: https://…jpg">' +
+            '<label class="btn sm">📁 Dosyadan seç<input type="file" id="' + pre + 'File" accept="image/*" hidden></label></div>' +
+            '<div class="gw-imgp" id="' + pre + 'Prev">' + (cur && !/^\/img\/cekilis\//.test(cur) ? '<img src="' + esc(cur) + '" alt=""><button type="button" class="gw-imgx" id="' + pre + 'ImgX" aria-label="Görseli kaldır">✕</button>' : '') + '</div></div>';
+    }
+    function imgFieldBind(pre, st) {
+        var prev = $(pre + "Prev"), show = function (src) { prev.innerHTML = src ? '<img src="' + esc(src) + '" alt=""><button type="button" class="gw-imgx" id="' + pre + 'ImgX" aria-label="Görseli kaldır">✕</button>' : ''; var x = $(pre + "ImgX"); if (x) x.onclick = function () { st.file = ""; st.cleared = true; $(pre + "Img").value = ""; show(""); }; };
+        var x0 = $(pre + "ImgX"); if (x0) x0.onclick = function () { st.file = ""; st.cleared = true; $(pre + "Img").value = ""; show(""); };
+        $(pre + "File").onchange = function () {
+            var f = this.files && this.files[0]; if (!f) return;
+            compressImg(f).then(function (d) { st.file = d; st.cleared = false; $(pre + "Img").value = ""; show(d); }, function (e) { alert(e.message); });
+        };
+        $(pre + "Img").oninput = function () { var v = this.value.trim(); if (/^https:\/\/.+/.test(v)) { st.file = ""; st.cleared = false; show(v); } };
+    }
+    // Düzenleyen: profil bağlantısı (…/profil?u=KİMLİK) ya da kimlik
+    function hostOf(v) { v = String(v || "").trim(); var m = /[?&]u=([A-Za-z0-9]{20,40})/.exec(v); if (m) return m[1]; return /^[A-Za-z0-9]{20,40}$/.test(v) ? v : null; }
     function editGw() {
         var g = S.g; if (!g || !S.mgr) return;
         var owner = !!(window.Account && Account.isAdmin && Account.isAdmin()), p = phase(g), canDate = p === "open" || p === "closed", m0 = modeOf(g), ch = chans(g);
@@ -1421,7 +1461,9 @@
             '<label class="gw-f"><span>Ödül *</span><input id="gePrize" maxlength="120" required value="' + esc(g.prize || "") + '"></label>' +
             (owner ? '<label class="gw-f"><span>Açıklama</span><textarea id="geDesc" maxlength="1500" rows="3">' + esc(g.desc || "") + '</textarea></label>' : '') +
             '<div class="gw-f"><span>Görsel</span><div class="gw-presets" id="gePre">' + PRESETS.map(function (x) { return '<button type="button" data-p="' + x[0] + '"' + (imgOf(g) === "/img/cekilis/" + x[0] + ".svg" ? ' class="on"' : '') + '><img src="/img/cekilis/' + x[0] + '.svg" alt="" loading="lazy"><span>' + esc(x[1]) + '</span></button>'; }).join("") + '</div></div>' +
-            (owner ? '<label class="gw-f"><span>Kendi görsel bağlantın (isteğe bağlı)</span><input id="geImg" maxlength="500" value="' + esc(/^\/img\/cekilis\//.test(imgOf(g)) ? "" : imgOf(g)) + '" placeholder="https://…jpg"></label>' : '') +
+            imgFieldHtml("ge", imgOf(g)) +
+            '<div class="gw-row2"><label class="gw-f"><span>Düzenleyen adı</span><input id="geHName" maxlength="40" value="' + esc(g.hName || "") + '" placeholder="Rubik Academy"></label>' +
+            '<label class="gw-f"><span>Düzenleyen profili (bağlantı ya da kimlik)</span><input id="geHost" maxlength="200" value="' + esc(g.host ? location.origin + "/icerikler/profil?u=" + g.host : "") + '" placeholder="https://rubikacademy.fun/icerikler/profil?u=…"></label></div>' +
             '<div class="gw-f"><span>Çekiliş türü</span><div class="gw-seg" id="geMode">' + ["cark", "mini", "rastgele"].map(function (k) { return '<button type="button" data-m="' + k + '"' + (k === m0 ? ' class="on"' : '') + '>' + MODE_LBL[k] + '</button>'; }).join("") + '</div></div>' +
             '<label class="gw-f"><span>Çekiliş tarihi ve saati *' + (canDate ? '' : ' (çekiliş yapıldı, değiştirilemez)') + '</span><input id="geAt" type="datetime-local" value="' + loc(g.drawAt) + '"' + (canDate ? '' : ' disabled') + '></label>' +
             '<div class="gw-f"><span>Katılma şartları</span><div class="gw-reqbox">' + [0, 1].map(function (i) { var c = ch[i] || { name: YT_DEF[i][0], url: YT_DEF[i][1] }; return '<div class="gw-ych"><label class="gw-chkf"><input type="checkbox" class="geYt"' + (ch[i] ? ' checked' : '') + '> YouTube aboneliği</label><div class="gw-row"><input class="geYtName" maxlength="40" value="' + esc(c.name) + '" aria-label="Kanal adı"><input class="geYtUrl" maxlength="120" value="' + esc(c.url) + '" aria-label="Kanal bağlantısı"></div></div>'; }).join("") +
@@ -1432,14 +1474,18 @@
         $("gePre").onclick = function (e) { var b = e.target.closest("button"); if (!b) return; pick = b.getAttribute("data-p"); Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle("on", x === b); }); };
         $("geMode").onclick = function (e) { var b = e.target.closest("button"); if (!b) return; mode = b.getAttribute("data-m"); Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle("on", x === b); }); };
         $("geX").onclick = closeModal; askFormBind("ge");
+        var gim = { file: "", cleared: false }; imgFieldBind("ge", gim);
         $("geForm").onsubmit = function (e) {
             e.preventDefault();
             var o = { title: $("geTitle").value.trim(), prize: $("gePrize").value.trim(), mode: mode };
             if (!o.title) { $("geMsg").textContent = "Başlık boş olamaz."; return; }
             if ($("geDesc")) o.desc = $("geDesc").value.trim();
-            var own = $("geImg") ? $("geImg").value.trim() : "";
+            var own = $("geImg").value.trim();
             if (own && !/^https:\/\//.test(own)) { $("geMsg").textContent = "Görsel bağlantısı https:// ile başlamalı."; return; }
-            if (own) o.img = own; else if (pick) o.img = "/img/cekilis/" + pick + ".svg"; else if ($("geImg") && !own && !/^\/img\/cekilis\//.test(imgOf(g))) o.img = "/img/cekilis/kup.svg";
+            if (gim.file) o.img = gim.file; else if (own) o.img = own; else if (pick) o.img = "/img/cekilis/" + pick + ".svg"; else if (gim.cleared || !/^\/img\/cekilis\//.test(imgOf(g)) && !/^data:/.test(imgOf(g))) o.img = "/img/cekilis/kup.svg";
+            var hn = $("geHName").value.trim(), hv = $("geHost").value.trim();
+            if (hn) o.hName = hn.slice(0, 40);
+            if (hv) { var hu = hostOf(hv); if (!hu) { $("geMsg").textContent = "Düzenleyen profili için profil bağlantısını ya da kimliği yapıştır."; return; } if (hu !== g.host) o.host = hu; }
             var ycs = [], bad = "";
             Array.prototype.forEach.call(document.querySelectorAll("#geForm .gw-ych:not(.gw-wab)"), function (row) {
                 if (!row.querySelector(".geYt").checked) return;
@@ -1480,7 +1526,7 @@
             '<label class="gw-f"><span>Ödül *</span><input id="gnPrize" maxlength="120" required placeholder="3x3 manyetik speed küp"></label></div>' +
             // açıklama ve kendi görsel bağlantısı yalnız site sahibinin hesabında görünür
             (owner ? '<label class="gw-f"><span>Açıklama</span><textarea id="gnDesc" maxlength="1500" rows="3" placeholder="Şartlar, sponsor, notlar…"></textarea></label>' +
-            '<label class="gw-f"><span>Kendi görsel bağlantın (isteğe bağlı, hazır görselin yerine)</span><input id="gnImg" maxlength="500" placeholder="https://…jpg"></label>' : '') +
+            '' : '') + imgFieldHtml("gn", "") +
             '<label class="gw-f"><span>Çekiliş tarihi ve saati *</span><input id="gnAt" type="datetime-local" required></label>' +
             '<div class="gw-f"><span>Katılma şartları</span><div class="gw-reqbox"><p class="gw-note" style="margin:0 0 8px">Her çekilişte: hesap açık ve bildirimler açık olmalı.</p>' +
             YT_DEF.map(function (c, i) { return '<div class="gw-ych"><label class="gw-chkf"><input type="checkbox" class="gnYt" data-i="' + i + '" checked> YouTube aboneliği: <b>' + esc(c[0]) + '</b></label>' +
@@ -1498,6 +1544,7 @@
             $("gnTitle").placeholder = (mode === "mini" ? "Mini " + p[2].charAt(0).toLocaleLowerCase("tr") + p[2].slice(1) : p[2]); $("gnPrize").placeholder = p[3];
         }
         $("gnMode").onclick = function (e) { var b = e.target.closest("button"); if (!b) return; mode = b.getAttribute("data-m"); Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle("on", x === b); }); info(); suggest(); };
+        var nim = { file: "", cleared: false }; imgFieldBind("gn", nim);
         $("gnPre").onclick = function (e) { var b = e.target.closest("button"); if (!b) return; pick = b.getAttribute("data-p"); Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle("on", x === b); }); suggest(); };
         $("gnTest").onchange = function () {
             info();
@@ -1530,6 +1577,8 @@
             patch("/giveaways/" + id, o, "&currentDocument.exists=false").then(function (r) {
                 b.disabled = false;
                 if (!r.ok) { $("gnMsg").textContent = "Oluşturulamadı (" + r.status + ")."; return; }
+                // dosyadan seçilen görsel: oluşturma kuralı yalnız kısa bağlantıya izin verdiği için hemen ardından eklenir
+                if (nim.file) return patch("/giveaways/" + id, { img: nim.file }).then(function () { openOne(id); }, function () { openOne(id); });
                 openOne(id);
             }, function () { b.disabled = false; $("gnMsg").textContent = "Bağlantı hatası."; });
         };

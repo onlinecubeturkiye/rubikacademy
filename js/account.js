@@ -9,7 +9,7 @@
    Site girişsiz de eskisi gibi çalışır; veriler o cihazda kalır.
 ========================================================= */
 (function () {
-    var V = "20270139";
+    var V = "20270140";
     var cfg = window.RA_FIREBASE || {};
     var SIGNED_KEY = "ra-auth-v1";      // bu cihazda giriş yapılmış mı (SDK'yı erken yüklemek için)
     var META_KEY = "ra-sync-meta-v1";   // { uid, h: {anahtar: özet}, t: {anahtar: zaman} }
@@ -658,6 +658,11 @@
                 if (typeof e.s === "number" && !recX("s" + e.ev, e.s) && (!pb.s || e.s < pb.s)) pb.s = e.s;
                 var ak = e.n === 12 ? "a12" : "a5";
                 if (typeof e.a === "number" && !recX(ak + "_" + e.ev, e.a) && (!pb[ak] || e.a < pb[ak])) pb[ak] = e.a;
+                // Ao12 finali: art arda 5 çözümün en iyi Ao5'i Ao5 rekoruna da sayılır (yönetici düzeltmesi varsa süre listesinden yeniden hesaplanır)
+                if (e.n === 12) {
+                    var b5 = Array.isArray(e.t) && e.t.length >= 5 ? bestAo5Of(e.t) : (typeof e.b5 === "number" ? e.b5 : null);
+                    if (typeof b5 === "number" && !recX("a5_" + e.ev, b5) && (!pb.a5 || b5 < pb.a5)) pb.a5 = b5;
+                }
             }
             // yöneticinin sabitlediği rekorlar (records/{uid}.pin): 0 = rekor yok, sayı = o değer
             var pins = recPins();
@@ -680,6 +685,16 @@
         var out = { known: known, learning: learning, sets: sets, solves: solves, best: best, daily: dcount, dlist: dlist.slice(0, 20), comp: comp, cnt: cnt };
         if (cl.length) out.cubes = cl;
         return out;
+    }
+    // Ao12 süre listesinden (DNF = -1) art arda 5 çözümün en iyi Ao5'i (WCA: en iyi ve en kötü atılır)
+    function bestAo5Of(t) {
+        var best = null;
+        for (var i = 0; i + 5 <= t.length; i++) {
+            var w = t.slice(i, i + 5).map(function (x) { return x < 0 || x == null ? Infinity : x; }).sort(function (a, b) { return a - b; }).slice(1, 4);
+            if (w.some(function (x) { return x === Infinity; })) continue;
+            var a = Math.round((w[0] + w[1] + w[2]) / 3); if (best == null || a < best) best = a;
+        }
+        return best;
     }
     // Profil istatistiği en fazla 8000 karakter (kural sınırı). Kesip JSON'u bozmak yerine küçült:
     // önce eski yarışma turlarının süreleri, sonra eski turlar, sonra günlük listesi atılır
