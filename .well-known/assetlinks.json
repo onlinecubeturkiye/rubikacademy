@@ -17,13 +17,17 @@
   },
   {
     "relation": [
-      "delegate_permission/common.handle_all_urls"
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
     ],
     "target": {
       "namespace": "android_app",
       "package_name": "app.rubikacademy.fun",
       "sha256_cert_fingerprints": [
-        "D3:D2:19:BC:DA:3E:B5:5B:16:C7:7C:5B:B0:CB:A6:0A:6D:79:44:25:A4:04:78:5B:47:A1:D9:4D:A4:6B:46:68"
+        "D3:D2:19:BC:DA:3E:B5:5B:16:C7:7C:5B:B0:CB:A6:0A:6D:79:44:25:A4:04:78:5B:47:A1:D9:4D:A4:6B:46:68",
+        "0C:C0:6F:22:B0:9D:77:2C:67:97:07:94:DB:5F:8A:CA:81:D1:A5:15:DE:CF:F4:E9:17:05:A2:4B:DA:87:C7:5D",
+        "BF:32:81:71:D7:3D:4D:23:69:4F:81:2E:5A:96:58:CC:C1:46:AF:79:67:F1:65:70:BB:EC:84:6B:C8:6B:56:8F",
+        "03:C7:94:70:7D:9B:4C:12:BF:A6:E7:61:33:48:08:61:37:B3:06:A6:37:36:96:33:88:14:68:5B:57:3D:CD:66"
       ]
     }
   }
